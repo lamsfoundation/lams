@@ -8,7 +8,7 @@
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/spreadsheetcommon.js'/>"></script>
+<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/spreadsheetcommon.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>

@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- Advance Tab Content -->
 	
@@ -7,10 +6,10 @@
 	
 	<div class="radio">
 		<label for="learnerNotAllowedToSave">
-		<input type="radio" name="spreadsheet.learnerAllowedToSave" value="${false}" styleId="learnerNotAllowedToSave"
-			<c:if test="${not formBean.spreadsheet.learnerAllowedToSave}">checked="checked"</c:if> 
-			onclick="document.spreadsheetForm.isMarkingEnabled.disabled = true;
-					 document.spreadsheetForm.isMarkingEnabled.checked = false;"
+		<input type="radio" name="spreadsheet.learnerAllowedToSave" value="${false}" id="learnerNotAllowedToSave"
+			<c:if test="${not spreadsheetForm.spreadsheet.learnerAllowedToSave}">checked="checked"</c:if> 
+			onclick="document.forms.spreadsheetForm.isMarkingEnabled.disabled = true;
+					 document.forms.spreadsheetForm.isMarkingEnabled.checked = false;"
 		/>
 			<fmt:message key="label.authoring.advanced.play.only" />
 		</label>
@@ -18,9 +17,9 @@
 	
 	<div class="radio">
 		<label for="learnerAllowedToSave">
-		<input type="radio" name="spreadsheet.learnerAllowedToSave" value="${true}" styleId="learnerAllowedToSave"
-			<c:if test="${formBean.spreadsheet.learnerAllowedToSave}">checked="checked"</c:if> 
-			onclick="document.spreadsheetForm.isMarkingEnabled.disabled = false;"
+		<input type="radio" name="spreadsheet.learnerAllowedToSave" value="${true}" id="learnerAllowedToSave"
+			<c:if test="${spreadsheetForm.spreadsheet.learnerAllowedToSave}">checked="checked"</c:if> 
+			onclick="document.forms.spreadsheetForm.isMarkingEnabled.disabled = false;"
 		/>
 			<fmt:message key="label.authoring.advanced.learners.are.allowed.to.save" />
 		</label>
@@ -28,9 +27,8 @@
 	
 	<div class="checkbox loffset10">
 		<label for="isMarkingEnabled">
-		<html:checkbox property="spreadsheet.markingEnabled" styleId="isMarkingEnabled"
-			disabled="${not formBean.spreadsheet.learnerAllowedToSave}" >
-		</html:checkbox>
+		<form:checkbox path="spreadsheet.markingEnabled" id="isMarkingEnabled"
+			disabled="${not spreadsheetForm.spreadsheet.learnerAllowedToSave}" />
 		<fmt:message key="label.authoring.advanced.enable.spreadsheet.marking" />
 		</label>
 	</div>
@@ -40,17 +38,17 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 
 	<div class="checkbox">
-		<label for="lockWhenFinished"><html:checkbox property="spreadsheet.lockWhenFinished" styleId="lockWhenFinished" />
+		<label for="lockWhenFinished"><form:checkbox path="spreadsheet.lockWhenFinished" id="lockWhenFinished" />
 		<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
 	</div>
 
 	<div class="checkbox">
-		<label for="reflectOn"><html:checkbox property="spreadsheet.reflectOnActivity" styleId="reflectOn"/>
+		<label for="reflectOn"><form:checkbox path="spreadsheet.reflectOnActivity" id="reflectOn"/>
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" /></label>
 		</div>
 		<div class="form-group">
-		<html:textarea property="spreadsheet.reflectInstructions" styleId="reflectInstructions"  styleClass="form-control" rows="3"
-			onkeyup="javascript:turnOnReflect()"/>
+		<textarea name="spreadsheet.reflectInstructions" id="reflectInstructions"  class="form-control" rows="3"
+			onkeyup="javascript:turnOnReflect()">${spreadsheetForm.spreadsheet.reflectInstructions}</textarea>
 	</div>
 
 </lams:SimplePanel>

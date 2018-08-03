@@ -21,23 +21,19 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.mindmap.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
  */
-public class AuthoringForm extends ActionForm {
+public class AuthoringForm {
 
     private static final long serialVersionUID = 3950453134542135495L;
 
@@ -54,12 +50,12 @@ public class AuthoringForm extends ActionForm {
     private boolean reflectOnActivity;
     private String reflectInstructions;
 
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
+    public MultiValueMap<String, String> validate(MessageService messageService, HttpServletRequest arg1) {
 
-	return ac;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap.add("GLOBAL", messageService.getMessage("this is an error"));
+
+	return errorMap;
     }
 
     public String getSessionMapID() {

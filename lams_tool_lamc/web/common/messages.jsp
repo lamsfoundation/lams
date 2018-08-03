@@ -10,13 +10,3 @@
             </lams:Alert>
         </c:if>
         
-<%-- Success Messages --%>
-<logic:messagesPresent message="true">
-    <div class="message" id="successMessages">
-       	<lams:Alert id="errorMessages" type="info" close="false">
-	        <html:messages id="message" message="true">
-            	<c:out value="${message}" escapeXml="false"/><br/>
-    	    </html:messages>
-	    </lams:Alert>
-    </div>
-</logic:messagesPresent>

@@ -1,11 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="dto" value="${mindmapDTO}" />
 
-<!--<c:if test="${dto.contentInUse}">
+<c:if test="${dto.contentInUse}">
 	<lams:Alert type="warn" id="alertContentEdit" close="false">
 		<fmt:message key="message.alertContentEdit" />
 	</lams:Alert>
-</c:if>-->
+</c:if>
 
 <table class="table table-condensed">
 	<tbody>
@@ -29,16 +29,16 @@
 </table>
 
 <p class="align-right">
-	<c:url value="/authoring.do" var="authoringUrl">
+	<c:url value="/authoring/authoring.do" var="authoringUrl">
 		<c:param name="toolContentID" value="${dto.toolContentId}" />
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 	</c:url>
 	
 	<c:if test="${dto.contentInUse == false}">
-		<html:link href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+		<a href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 			<fmt:message key="button.editActivity" />
-		</html:link>
+		</a>
 	</c:if>
 </p>
 

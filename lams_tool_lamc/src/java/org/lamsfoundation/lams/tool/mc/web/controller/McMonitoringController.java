@@ -41,8 +41,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
@@ -347,8 +345,7 @@ public class McMonitoringController {
      */
     @RequestMapping(path = "/setActivityEvaluation", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public String setActivityEvaluation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String setActivityEvaluation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String activityEvaluation = WebUtil.readStrParam(request, McAppConstants.ATTR_ACTIVITY_EVALUATION);

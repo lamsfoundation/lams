@@ -138,6 +138,8 @@ public class McController {
 	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
 	return "authoring/AuthoringTabsHolder";
+	
+	
     }
 
     /**
@@ -598,7 +600,6 @@ public class McController {
      * Prepares MC questions for QTI packing
      */
     @RequestMapping("/exportQTI")
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public String exportQTI(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapId = request.getParameter(McAppConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()

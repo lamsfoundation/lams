@@ -21,18 +21,14 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.mindmap.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  * @author Anthony Sukkar
  *
  *
  */
-public class LearningForm extends ActionForm {
+public class LearningForm {
 
     private static final long serialVersionUID = -4728946254882237144L;
 

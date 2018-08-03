@@ -16,7 +16,7 @@
 	</tr>
 </table>
 
-<c:url  var="authoringUrl" value="/authoringStarter.do">
+<c:url  var="authoringUrl" value="/authoring/authoring.do">
 	<c:param name="toolContentID" value="${mcGeneralMonitoringDTO.toolContentID}" />
 	<c:param name="contentFolderID" value="${contentFolderID}" />
 	<c:param name="mode" value="teacher" />

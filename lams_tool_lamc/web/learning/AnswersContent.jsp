@@ -52,22 +52,22 @@
 
         function submitNextQuestionSelected() {
           if (verifyAllQuestionsAnswered()) {
-            ++document.McLearningForm.questionIndex.value;
-            document.McLearningForm.nextQuestionSelected.value = 1;
+            ++document.forms.McLearningForm.questionIndex.value;
+            document.forms.McLearningForm.nextQuestionSelected.value = 1;
             disableContinueButton();
-            document.McLearningForm.submit();
+            document.forms.McLearningForm.submit();
           }
         }
 
         function submitAllAnswers() {
-          document.McLearningForm.continueOptionsCombined.value = 1;			
+          document.forms.McLearningForm.continueOptionsCombined.value = 1;			
           doSubmit();
         }
 
         function doSubmit() {
           if (verifyAllQuestionsAnswered()) {
             disableContinueButton();
-            document.McLearningForm.submit();
+            document.forms.McLearningForm.submit();
           }
         }
 

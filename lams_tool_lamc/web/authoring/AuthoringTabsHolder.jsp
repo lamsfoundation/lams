@@ -28,8 +28,8 @@
 
 		
 		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
-			document.McAuthoringForm.questionIndex.value=questionIndexValue; 
-			document.McAuthoringForm.dispatch.value=actionMethod;
+			document.forms.McAuthoringForm.questionIndex.value=questionIndexValue; 
+			document.forms.McAuthoringForm.dispatch.value=actionMethod;
 			
 			$('#authoringForm').ajaxSubmit({ 
 				data: { 
@@ -38,7 +38,7 @@
 				target:  $('#resourceListArea'),
 	    		iframe: true,
 	    		success:    function() { 
-	    			document.McAuthoringForm.dispatch.value="submitAllContent";
+	    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
 	    			refreshThickbox();
 	    	    }
 		    });
@@ -69,8 +69,8 @@
         } 
         
         function doSubmit(method) {
-        	document.McAuthoringForm.dispatch.value=method;
-        	document.McAuthoringForm.submit();
+        	document.forms.McAuthoringForm.dispatch.value=method;
+        	document.forms.McAuthoringForm.submit();
         }
 	</script>
 </lams:head>

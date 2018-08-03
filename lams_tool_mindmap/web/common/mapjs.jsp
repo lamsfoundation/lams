@@ -33,8 +33,8 @@
 		mindMupContent = content;
 		$.ajax({ 
 	        method: "POST", 
-	        url: "${url=='author'?'authoring.do':'learning.do'}", 
-	        data: { dispatch: "setMindmapContentJSON", mindmapId: "${mindmapId}", userId: "${userId}", 
+	        url: "${url=='author'? 'setMindmapContentJSON.do':'../learning/setMindmapContentJSON.do'}",
+	        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
 				sessionId: "${sessionId}", mode: "${mode}" } , 
 	        dataType: "json", 
 	        success: function (response) {
@@ -160,8 +160,8 @@
 	
 			$.ajax({ 
 		        method: "POST", 
-		        url: "learning.do", 
-		        data: { dispatch: "notifyServerActionJSON", mindmapId: "${mindmapId}", userId: "${userId}", 
+		        url: "notifyServerActionJSON.do", 
+		        data: { mindmapId: "${mindmapId}", userId: "${userId}", 
 					sessionId: "${sessionId}", lastActionId: lastActionId, actionJSON:  JSON.stringify(updateRequest) } , 
 		        dataType: "json", 
 		        success: function (response) {
@@ -370,9 +370,8 @@
 				disableButtons();
 		 		$.ajax({ 
 			        method: "POST", 
-			        url: "learning.do", 
+			        url: "saveLastMindmapChanges.do", 
 			        data: { 
-			        		dispatch: "saveLastMindmapChanges", 
 			        		mindmapId: "${mindmapId}", 
 			        		userId: "${userId}", 
 			        		toolSessionID: "${sessionId}",

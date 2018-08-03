@@ -4,13 +4,13 @@
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 	<body class="stripes">
-		<html:form action="/authoring/init.do?mode=${mode}" method="post" styleId="startForm">
-			<html:hidden property="spreadsheet.contentId"/>
-			<html:hidden property="sessionMapID" styleId="ssss"/>
-		</html:form>
+		<form:form action="init.do?mode=${mode}" method="post" modelAttribute="spreadsheetForm" id="spreadsheetForm">
+			<form:hidden path="spreadsheet.contentId"/>
+			<form:hidden path="sessionMapID" id="ssss"/>
+		</form:form>
 		
 		<script type="text/javascript">
-			document.getElementById("startForm").submit();
+			document.getElementById("spreadsheetForm").submit();
 		</script>
 	<body class="stripes">
 </html>

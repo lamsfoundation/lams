@@ -50,10 +50,10 @@
 								</c:choose>
 								<c:if test="${user.userModifiedSpreadsheet != null}">
 									<c:set var="editUrl"><c:url value="/monitoring/editMark.do"/>?userUid=${user.uid}&toolContentID=${sessionMap.toolContentID}&sessionMapID=${sessionMapID}</c:set>
-									<html:link href="javascript:launchPopup('${editUrl}');" 
-										property="submit" styleClass="btn btn-default btn-sm loffset5">
+									<a href="javascript:launchPopup('${editUrl}');" 
+										name="submit" class="btn btn-default btn-sm loffset5">
 										<fmt:message key="label.monitoring.vieawallmarks.update.marks" />
-									</html:link>
+									</a>
 								</c:if>
 							</div>
 						</div>
@@ -78,9 +78,9 @@
 				</div>
 				</div>
 				
-				<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-default">
+				<a href="javascript:window.close();" name="submit" class="btn btn-default">
 						<fmt:message key="button.close" />
-				</html:link>
+				</a>
 
 		<div id="footer"></div>
 

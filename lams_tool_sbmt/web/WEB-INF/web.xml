@@ -79,28 +79,6 @@
 	</listener>
 
 	<servlet>
-		<servlet-name>action</servlet-name>
-		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-		<init-param>
-			<param-name>config</param-name>
-			<param-value>/WEB-INF/struts-config.xml</param-value>
-		</init-param>
-		<init-param>
-			<param-name>debug</param-name>
-			<param-value>999</param-value>
-		</init-param>
-		<init-param>
-			<param-name>detail</param-name>
-			<param-value>2</param-value>
-		</init-param>
-		<init-param>
-			<param-name>validate</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-
-	<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
 		<init-param>

@@ -84,7 +84,7 @@ public class RootJSON extends ObjectNode {
      */
     public static NodeModel toNodeModel(String jsonContent) throws JsonProcessingException, IOException {
 	ObjectNode rootModel = JsonUtil.readObject(jsonContent);
-	if (!MAPJS_JSON_ROOT_ID_VALUE.equals(rootModel.get(IdeaJSON.MAPJS_JSON_ID_KEY))) {
+	if (!MAPJS_JSON_ROOT_ID_VALUE.equals(JsonUtil.optString(rootModel, IdeaJSON.MAPJS_JSON_ID_KEY))) {
 	    throw new IOException("Root idea missing. Unable to parse mindmap. " + jsonContent);
 	}
 
