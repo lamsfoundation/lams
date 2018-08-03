@@ -44,7 +44,7 @@
 				</lams:Alert>
 			</c:when>
 			<c:otherwise>
-			    <form:hidden path="code" id="spreadsheet-code" value="${markForm.code}"/>	
+			    <input type="hidden" name="spreadsheetCode" id="spreadsheet-code" value="<c:out value='${markForm.code}' />" />	
 				<iframe
 					id="externalSpreadsheet" name="externalSpreadsheet" src="${spreadsheetURL}"
 					style="width:99%" frameborder="no" height="385px"
