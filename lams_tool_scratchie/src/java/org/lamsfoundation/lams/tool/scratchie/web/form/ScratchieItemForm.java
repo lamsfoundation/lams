@@ -38,7 +38,6 @@ public class ScratchieItemForm {
     private String itemIndex;
     private String sessionMapID;
     private String contentFolderID;
-    private List<ScratchieAnswer> answerList;
 
     // tool access mode;
     private String mode;
@@ -92,14 +91,6 @@ public class ScratchieItemForm {
 
     public void setDescription(String description) {
 	this.description = description;
-    }
-
-    public List<ScratchieAnswer> getAnswerList() {
-        return answerList;
-    }
-
-    public void setAnswerList(List<ScratchieAnswer> answerList) {
-        this.answerList = answerList;
     }
 
     

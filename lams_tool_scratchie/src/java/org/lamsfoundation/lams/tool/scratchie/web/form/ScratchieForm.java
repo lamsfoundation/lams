@@ -41,15 +41,6 @@ public class ScratchieForm {
 
     private String sessionMapID;
     private String contentFolderID;
-    private SortedSet<ScratchieItem> itemList;
-
-    public SortedSet<ScratchieItem> getItemList() {
-        return itemList;
-    }
-
-    public void setItemList(SortedSet<ScratchieItem> itemList) {
-        this.itemList = itemList;
-    }
 
     //tool access mode;
     private String mode;

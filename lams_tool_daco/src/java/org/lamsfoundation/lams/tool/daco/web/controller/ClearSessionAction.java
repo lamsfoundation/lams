@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.daco.web.action;
+package org.lamsfoundation.lams.tool.daco.web.controller;
 
 import javax.servlet.http.HttpSession;
 

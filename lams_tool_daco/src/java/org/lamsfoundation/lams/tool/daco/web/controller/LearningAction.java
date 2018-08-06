@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.daco.web.action;
+package org.lamsfoundation.lams.tool.daco.web.controller;
 
 import java.io.IOException;
 import java.text.ParseException;

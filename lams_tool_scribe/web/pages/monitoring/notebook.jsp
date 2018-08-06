@@ -18,7 +18,8 @@
 		<lams:headItems />
 	</lams:head>
 	<body class="stripes">
-		<lams:Page title='<fmt:message key="pageTitle.monitoring.notebook"/>' type="monitor">
+	<c:set var="title"><fmt:message key="pageTitle.monitoring.notebook" /></c:set>
+		<lams:Page title="${title}" type="monitor">
 			<h4>
 				<c:out value="${scribeUserDTO.firstName} ${scribeUserDTO.lastName}" escapeXml="true"/>
 			</h4>
