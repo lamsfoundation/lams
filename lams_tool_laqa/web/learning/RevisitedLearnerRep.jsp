@@ -465,7 +465,7 @@
 			</div>
 		</c:if>
 
-		<form:form action="learning.do" modelAttribute="qaLearningForm" method="POST" target="_self">
+		<form:form action="/lams/tool/laqa11/learning/learning.do" modelAttribute="qaLearningForm" method="POST" target="_self">
 			<form:hidden path="toolSessionID" id="toolSessionID" />
 			<form:hidden path="userID" id="userID" />
 			<form:hidden path="httpSessionID" />

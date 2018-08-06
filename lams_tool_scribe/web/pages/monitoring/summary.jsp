@@ -17,7 +17,7 @@
 	});
 </script>
 
-<form:form action="monitoring.do" modelAttribute="monitoringForm">
+<form:form action="/lams/tool/lascrb11/monitoring.do" modelAttribute="monitoringForm">
 	<form:hidden path="toolContentID" value="${dto.toolContentID}" />
 	<form:hidden path="contentFolderID" />
 	<p>
@@ -64,7 +64,7 @@
 	<div class="loffset5">
 		<c:choose>
 			<c:when test="${not empty session.userDTOs and (not dto.autoSelectScribe or session.appointedScribe != null)}">
-				<form:form action="monitoring/appointScribe.do" modelAttribute="monitoringForm">
+				<form:form action="/lams/tool/lascrb11/monitoring/appointScribe.do" modelAttribute="monitoringForm">
 		
 					<form:hidden path="toolSessionID" value="${session.sessionID}" />
 					<form:hidden path="contentFolderID" />
@@ -160,8 +160,9 @@
 					<c:if test="${dto.reflectOnActivity}">
 						<td style="text-align: right">
 							<c:if test="${user.finishedReflection}">
-								<c:url value="monitoring/openNotebook.do?uid='${user.uid}'"/>
-
+								<c:url value="monitoring/openNotebook.do" var="openNotebook">
+									<c:param name="uid" value="${user.uid}" />
+								</c:url>
 								<a href="javascript:launchPopup('${openNotebook}','<fmt:message key="heading.reflection" />');" class="btn btn-default btn-sm" >
 									<fmt:message key="link.view" />
 								</a>

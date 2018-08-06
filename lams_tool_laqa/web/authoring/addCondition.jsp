@@ -12,7 +12,7 @@
 	 <form:form modelAttribute="QaConditionForm">
 	 </form:form>
 		<!-- Basic Info Form-->
-		<form:form action="../authoringConditions/saveOrUpdateCondition.do" method="post" modelAttribute="QaConditionForm" id="QaConditionForm" >
+		<form:form action="/lams/tool/laqa11/authoringConditions/saveOrUpdateCondition.do" method="post" modelAttribute="QaConditionForm" id="QaConditionForm" >
 			<%@ include file="/common/messages.jsp"%>
 			<form:hidden path="orderId" />
 			

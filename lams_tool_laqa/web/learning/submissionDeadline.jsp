@@ -32,7 +32,7 @@
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-		<form:form action="learning.do" method="POST" modelAttribute="qaLearningForm" id="qaLearningForm">
+		<form:form action="/lams/tool/laqa11/learning/learning.do" method="POST" modelAttribute="qaLearningForm" id="qaLearningForm">
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="userID" />
 			<form:hidden path="httpSessionID" />

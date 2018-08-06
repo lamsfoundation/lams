@@ -42,7 +42,7 @@
 			
 	<form:form action="authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data" >
 		<form:hidden path="scratchie.contentId" />
-		<form:hidden path="mode" value="${mode}"/>
+		<form:hidden path="mode"/>
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
 		<form:hidden path="currentTab" id="currentTab" />
