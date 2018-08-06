@@ -23,8 +23,11 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
+import java.util.SortedSet;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 
 /**
  * Scratchie Form.
@@ -38,7 +41,19 @@ public class ScratchieForm {
 
     private String sessionMapID;
     private String contentFolderID;
+    private SortedSet<ScratchieItem> itemList;
 
+    public SortedSet<ScratchieItem> getItemList() {
+        return itemList;
+    }
+
+    public void setItemList(SortedSet<ScratchieItem> itemList) {
+        this.itemList = itemList;
+    }
+
+    //tool access mode;
+    private String mode;
+    
     // Forum fields
     private int currentTab;
 
@@ -85,5 +100,15 @@ public class ScratchieForm {
     public Scratchie getScratchie() {
 	return scratchie;
     }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+    
+    
 
 }

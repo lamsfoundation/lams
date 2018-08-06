@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="confidenceLevelsActivities" value="${sessionMap.confidenceLevelsActivities}" />
 
@@ -9,7 +8,7 @@
 		$("#display-confidence-levels-activities").click(function() {
 			$("#confidence-levels-activity").prop("disabled", !$(this).is(':checked'));
 		});
-		<c:if test="${formBean.scratchie.confidenceLevelsActivityUiid == null}">$("#confidence-levels-activity").prop('disabled','disabled'); </c:if>
+		<c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid == null}">$("#confidence-levels-activity").prop('disabled','disabled'); </c:if>
 		
 		
 		$("#overwrite-preset-marks").click(function() {
@@ -47,7 +46,7 @@
 	
 	<div class="checkbox">
 		<label for="show-scratchies-in-results">
-			<form:checkbox property="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
+			<form:checkbox path="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
 			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
 		</label>
 	</div>
@@ -81,7 +80,7 @@
 			<c:otherwise>
 				<label for="display-confidence-levels-activities">
 					<input type="checkbox" id="display-confidence-levels-activities"
-							<c:if test="${formBean.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
+							<c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid != null}">checked="true"</c:if>
 					/>
 				
 					<fmt:message key="label.show.confidence.level" />&nbsp;
@@ -159,6 +158,6 @@
 		}
 	});
 	
-	<c:if test="${formBean.scratchie.burningQuestionsEnabled}">$("#shuffle-items").prop("disabled", true);</c:if>
+	<c:if test="${authoringForm.scratchie.burningQuestionsEnabled}">$("#shuffle-items").prop("disabled", true);</c:if>
 	
 </script>

@@ -22,6 +22,10 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+
 /**
  *
  * Scratchie Item Form.
@@ -34,6 +38,7 @@ public class ScratchieItemForm {
     private String itemIndex;
     private String sessionMapID;
     private String contentFolderID;
+    private List<ScratchieAnswer> answerList;
 
     // tool access mode;
     private String mode;
@@ -89,4 +94,13 @@ public class ScratchieItemForm {
 	this.description = description;
     }
 
+    public List<ScratchieAnswer> getAnswerList() {
+        return answerList;
+    }
+
+    public void setAnswerList(List<ScratchieAnswer> answerList) {
+        this.answerList = answerList;
+    }
+
+    
 }

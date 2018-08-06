@@ -40,7 +40,7 @@
 </lams:head>
 <body class="stripes" onLoad="init()">
 			
-	<form:form action="authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data" >
+	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data" >
 		<form:hidden path="scratchie.contentId" />
 		<form:hidden path="mode"/>
 		<form:hidden path="sessionMapID" />
@@ -78,8 +78,8 @@
 					accessMode="author"
 				--%>
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ScratchieConstants.TOOL_SIGNATURE%>" 
-					toolContentID="${formBean.scratchie.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-					customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}" />
+					toolContentID="${authoringForm.scratchie.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+					customiseSessionID="${authoringForm.sessionMapID}" contentFolderID="${authoringForm.contentFolderID}" />
 			</lams:TabBodyArea>
 
 			<div id="footer"></div>

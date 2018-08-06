@@ -45,7 +45,7 @@
 </lams:head>
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
-	<form:form enctype="multipart/form-data" modelAttribute="pedagogicalPlannerForm" action="authoring/saveOrUpdatePedagogicalPlannerForm.do" id="pedagogicalPlannerForm" method="post">
+	<form:form enctype="multipart/form-data" modelAttribute="pedagogicalPlannerForm" action="/lams/tool/lascrt11/authoring/saveOrUpdatePedagogicalPlannerForm.do" id="pedagogicalPlannerForm" method="post">
 		<form:hidden path="toolContentID" id="toolContentID" />
 		<form:hidden path="valid" id="valid" />
 		<form:hidden path="callID" id="callID" />
@@ -53,8 +53,8 @@
 		
 		<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.instructions"/></h4>
 		<lams:CKEditor id="instructions"
-			value="${formBean.instructions}"
-			contentFolderID="${formBean.contentFolderID}"
+			value="${pedagogicalPlannerForm.instructions}"
+			contentFolderID="${pedagogicalPlannerForm.contentFolderID}"
                toolbarSet="CustomPedplanner" height="150px"
                width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>

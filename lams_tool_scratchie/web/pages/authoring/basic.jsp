@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:if test="${itemList == null}">
 	<c:set var="itemList" value="${sessionMap.itemList}"/>
@@ -98,11 +97,11 @@
 </div>
 <div class="form-group">
     <label for="scratchie.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
-    <lams:CKEditor id="scratchie.instructions" value="${formBean.scratchie.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+    <lams:CKEditor id="scratchie.instructions" value="${authoringForm.scratchie.instructions}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
 </div>
 
 <%-- <div id="resourceListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
  	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
  --%>

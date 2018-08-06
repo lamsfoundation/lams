@@ -191,6 +191,7 @@ public class AuthoringController {
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	itemList.clear();
 	itemList.addAll(items);
+	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
 
 	// If there is no order id, set it up
 	int i = 1;

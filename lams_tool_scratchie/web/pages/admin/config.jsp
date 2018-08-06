@@ -23,7 +23,7 @@
 				</lams:Alert>
 			</c:if>
 			
-			<form:form action="admin/saveContent.do" modelAttribute="scratchieAdminForm" id="scratchieAdminForm" method="post" enctype="multipart/form-data">
+			<form:form action="/lams/tool/lascrt11/admin/saveContent.do" modelAttribute="scratchieAdminForm" id="scratchieAdminForm" method="post" enctype="multipart/form-data">
 				<div class="checkbox">
 					<label for="enabledExtraPointOption">
 					<form:checkbox path="enabledExtraPointOption"/>

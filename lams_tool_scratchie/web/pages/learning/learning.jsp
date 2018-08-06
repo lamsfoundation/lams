@@ -222,7 +222,7 @@
 				document.getElementById("finishButton").disabled = true;
 
 		        	var myForm = $('#burning-questions');
-		        	myForm.attr("action", '<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>&date=' + new Date().getTime());
+		        	myForm.attr("action", '<c:url value="/learning.do?sessionMapID=${sessionMapID}"/>&date=' + new Date().getTime());
 		        	myForm.submit();
 			}
 			

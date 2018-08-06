@@ -75,11 +75,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -569,7 +571,8 @@ public class QaLearningController implements QaAppConstants {
 	return forwardName;
     }
 
-    @RequestMapping("/checkLeaderProgress")
+    @RequestMapping(value="/checkLeaderProgress", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
     public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -581,9 +584,7 @@ public class QaLearningController implements QaAppConstants {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	return ObjectNode.toString();
     }
 
     /**
@@ -598,14 +599,14 @@ public class QaLearningController implements QaAppConstants {
      * @throws ServletException
      */
     @RequestMapping("/autoSaveAnswers")
-    public String autoSaveAnswers(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
+    @ResponseBody
+    public void autoSaveAnswers(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
 	    HttpServletRequest request) throws IOException, ServletException {
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (qaQueUsr.isResponseFinalized()) {
-	    return null;
 	}
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
@@ -632,7 +633,6 @@ public class QaLearningController implements QaAppConstants {
 		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(currentQuestionIndex), true);
 	    }
 	}
-	return null;
     }
 
     /**

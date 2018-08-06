@@ -22,7 +22,7 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<form:form action="learning/submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
+	<form:form action="/lams/tool/lascrt11/learning/submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
 		<form:hidden path="userID" />
 		<form:hidden path="sessionMapID" />
 

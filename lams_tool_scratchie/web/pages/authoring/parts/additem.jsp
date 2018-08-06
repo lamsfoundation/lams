@@ -220,7 +220,7 @@
 	
 			<%@ include file="/common/messages.jsp"%>
 			
-			<form:form action="authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
+			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="answerList" id="answerList" />
 				<form:hidden path="itemIndex" />
@@ -233,7 +233,7 @@
 
 				<div class="form-group">
 					<label for="description"><fmt:message key="label.authoring.basic.question.text" /></label>
-					<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+					<lams:CKEditor id="description" value="${authoringForm.description}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
 				</div>
 
 				<label for="hasAnswerFilled" class="error" style="display: none;"></label>
