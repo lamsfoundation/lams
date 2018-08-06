@@ -94,7 +94,7 @@
 <!-- Basic Tab Content -->
 <div class="form-group">
     <label for="scratchie.title"><fmt:message key="label.authoring.basic.title"/></label>
-    <html:text property="scratchie.title" styleClass="form-control"></html:text>
+    <form:input path="scratchie.title" cssClass="form-control"/>
 </div>
 <div class="form-group">
     <label for="scratchie.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>

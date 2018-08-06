@@ -198,7 +198,7 @@
 			<hr>
 		
 		
-			<form:form action="learning/forceCompleteActivity.do" modelAttribute="learningForm" onsubmit="return confirmForceComplete();">
+			<form:form action="forceCompleteActivity.do" modelAttribute="learningForm" onsubmit="return confirmForceComplete();">
 				<form:hidden path="scribeUserUID" value="${scribeUserDTO.uid}" />
 				<form:hidden path="mode" />
 		

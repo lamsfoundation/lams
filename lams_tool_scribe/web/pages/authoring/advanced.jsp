@@ -8,13 +8,13 @@
 	
 	<div class="radio">
 		<label for="autoSelectScribe1">
-			<form:radiobutton path="autoSelectScribe" checked="checked" id="autoSelectScribe1"/>
+			<form:radiobutton path="autoSelectScribe" checked="checked" value="true" id="autoSelectScribe1"/>
 			<fmt:message key="advanced.firstLearner" />
 		</label>
 	</div>
 	<div class="radio">
 		<label for="autoSelectScribe2">
-			<form:radiobutton path="autoSelectScribe" id="autoSelectScribe2"/>
+			<form:radiobutton path="autoSelectScribe" value="false" id="autoSelectScribe2"/>
 			<fmt:message key="advanced.selectInMonitor" />
 		</label>
 	</div>

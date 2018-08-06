@@ -22,9 +22,9 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<html:form action="learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="learning/submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
@@ -34,18 +34,18 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</div>
 
-			<html:textarea rows="8" property="entryText" styleId="focused" styleClass="form-control" />
+			<form:textarea rows="8" path="entryText" id="focused" cssClass="form-control" />
 
 			<div class="voffset10 pull-right">
-				<html:button property="finishButton" styleId="finishButton" onclick="submitForm()"
-					styleClass="btn btn-sm btn-default">
+				<button name="finishButton" id="finishButton" onclick="submitForm()"
+					class="btn btn-sm btn-default">
 					<fmt:message key="label.submit" />
-				</html:button>
+				</buttun>
 			</div>
 
 			<div id="footer"></div>
 		</lams:Page>
-	</html:form>
+	</form:form>
 	<script type="text/javascript">
 		window.onload = function() {
 			document.getElementById("focused").focus();

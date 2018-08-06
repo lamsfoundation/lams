@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.scribe.web.forms;
 
-import org.apache.struts.upload.FormFile;
-
 /**
  *
  */
@@ -50,9 +48,9 @@ public class AuthoringForm {
 
     boolean showAggregatedReports;
 
-    FormFile onlineFile;
+    String onlineFile;
 
-    FormFile offlineFile;
+    String offlineFile;
 
     String currentTab;
 
@@ -99,11 +97,11 @@ public class AuthoringForm {
 	this.instructions = instructions;
     }
 
-    public FormFile getOfflineFile() {
+    public String getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(FormFile offlineFile) {
+    public void setOfflineFile(String offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
@@ -115,11 +113,11 @@ public class AuthoringForm {
 	this.offlineInstruction = offlineInstruction;
     }
 
-    public FormFile getOnlineFile() {
+    public String getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
+    public void setOnlineFile(String onlineFile) {
 	this.onlineFile = onlineFile;
     }
 

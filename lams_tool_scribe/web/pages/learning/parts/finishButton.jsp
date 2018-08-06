@@ -14,7 +14,7 @@
 </script>
 
 <div class="voffset10">
-	<form:form action="${!scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity ? 'learning/openNotebook.do' : learning/finishActivity.do'}" modelAttribute="learningForm" method="post" onsubmit="disableFinishButton()" id="learningForm">
+	<form:form action="${(scribeUserDTO.finishedActivity == 'false' and scribeDTO.reflectOnActivity == 'true') ? '/lams/tool/lascrb11/learning/openNotebook.do' : '/lams/tool/lascrb11/learning/finishActivity.do'}" modelAttribute="learningForm" method="post" onsubmit="disableFinishButton()" id="learningForm">
 		<form:hidden path="scribeUserUID" value="${scribeUserDTO.uid}" />
 		<c:choose>
 			<c:when

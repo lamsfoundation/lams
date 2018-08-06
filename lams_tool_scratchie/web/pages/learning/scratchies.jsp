@@ -12,21 +12,21 @@
 				<td style="width: 40px;">
 					<c:choose>
 						<c:when test="${answer.scratched && answer.correct}">
-							<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image"
+							<img src="<lams:WebAppURL/> includes/images/scratchie-correct.png" class="scartchie-image"
 								 id="image-${item.uid}-${answer.uid}">
 						</c:when>
 						<c:when test="${answer.scratched && !answer.correct}">
-							<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" class="scartchie-image"
+							<img src="<lams:WebAppURL/> includes/images/scratchie-wrong.png" class="scartchie-image"
 								 id="image-${item.uid}-${answer.uid}">
 						</c:when>
 						<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher') || showResults}">
-							<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image"
+							<img src="<lams:WebAppURL/> includes/images/answer-${status.index + 1}.png" class="scartchie-image"
 								 id="image-${item.uid}-${answer.uid}">
 						</c:when>
 						<c:otherwise>
 							<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;"
 								id="imageLink-${item.uid}-${answer.uid}"> <img
-								src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image"
+								src="<lams:WebAppURL/> includes/images/answer-${status.index + 1}.png" class="scartchie-image"
 								id="image-${item.uid}-${answer.uid}" />
 							</a>
 						</c:otherwise>

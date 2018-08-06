@@ -121,17 +121,17 @@
 		<c:choose>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
-					styleClass="btn btn-default">
+				<button nae="finishButton" id="finishButton" onclick="return finish(false);"
+					class="btn btn-default">
 					<fmt:message key="label.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
 				<input type="hidden" name="method" id="method" value="showResults">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
-					styleClass="btn btn-default">
+				<button name="finishButton" id="finishButton" onclick="return finish(false);"
+					class="btn btn-default">
 					<fmt:message key="label.submit" />
-				</html:button>
+				</button>
 			</c:otherwise>
 		</c:choose>
 	</div>

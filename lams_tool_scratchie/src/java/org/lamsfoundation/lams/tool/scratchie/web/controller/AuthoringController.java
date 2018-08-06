@@ -213,7 +213,7 @@ public class AuthoringController {
     /**
      * Display same entire authoring page content from HttpSession variable.
      */
-    @RequestMapping("/initPage")
+    @RequestMapping("/init")
     private String initPage(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);

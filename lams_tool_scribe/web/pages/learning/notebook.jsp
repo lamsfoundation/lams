@@ -36,7 +36,7 @@
 		
 		<lams:Page type="learner" title="${scribeDTO.title}">
 		
-			<form:form action="learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" styleId="learningForm">
+			<form:form action="submitReflection.do"  modelAttribute="learningForm" method="post" onsubmit="disableFinishButton();" id="learningForm">
 				<form:hidden path="scribeUserUID" />
 		
 				<div class="panel">

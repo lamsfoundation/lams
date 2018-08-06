@@ -4,10 +4,10 @@
 <html>
 	<body class="stripes">
 	
-		<html:form action="/authoring/init.do?mode=${mode}" method="post" styleId="startForm">
-			<html:hidden property="scratchie.contentId"/>
-			<html:hidden property="sessionMapID"/>
-		</html:form>
+		<form:form action="init.do?mode=${mode}" method="post" modelAttribute="authoringForm" id="startForm">
+			<form:hidden path="scratchie.contentId"/>
+			<form:hidden path="sessionMapID"/>
+		</form:form>
 		
 		<script type="text/javascript">
 			document.getElementById("startForm").submit();
