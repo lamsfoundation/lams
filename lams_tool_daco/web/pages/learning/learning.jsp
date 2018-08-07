@@ -56,7 +56,7 @@
 		var LABEL_NOT_ALLOWED_FORMAT = '<c:out value="${LABEL_NOT_ALLOWED_FORMAT_VAR}" />';	
 
     </script>
-    <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
+    <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoLearning.js"></script>
 </lams:head>
 
 
@@ -97,9 +97,9 @@
 <c:if test="${mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
-				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="btn btn-default btn-disable-on-submit voffset5 pull-right">
+				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default btn-disable-on-submit voffset5 pull-right">
 					<fmt:message key="label.learning.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
 				<button type="submit" property="FinishButton" id="finishButton" onclick="javascript:finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">

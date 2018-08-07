@@ -22,7 +22,7 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
-	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/> /includes/css/scratchie-learning.css" />
+	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 	<style type="text/css">
 		.burning-question-container {
 			padding: 0 15px;
@@ -195,7 +195,7 @@
 					
 					//ajax form submit
 					$('#burning-questions').ajaxSubmit({
-						url: "<c:url value='/learning/autosaveBurningQuestions.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
+						url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 		                success: function() {
 			                	$.jGrowl(
 			                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.burning.questions.autosaved" />",

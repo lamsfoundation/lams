@@ -27,10 +27,10 @@
 
 <!-- Add question form-->
 <%@ include file="/common/messages.jsp"%>
-<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
-	<html:hidden property="sessionMapID" />
+<form:form action="authoring/saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
+	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="2" />
-	<html:hidden property="questionIndex" />
+	<form:hidden path="questionIndex" />
 	
 	<p><fmt:message key="label.authoring.basic.textarea.help" /></p>
 	
@@ -42,18 +42,18 @@
  		<div class="form-group form-inline">
 			<div class="checkbox">
 			    <label>
-		 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+		 	      <form:checkbox path="questionRequired" id="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
 			    </label>
 	  	</div>
 		</div>
  		<div class="form-group form-inline">
     	<label for="max"><fmt:message key="label.authoring.basic.max.word" />:</label>
-	 		<html:text styleId="max" property="max" size="10"  styleClass="form-control"/>
+	 		<form:input id="max" path="max" size="10"  cssClass="form-control"/>
 		</div>	  	
  </div>
  	<!--  end options -->
   	
-</html:form>
+</form:form>
 
 <c:set var="addButtonMessageKey" value="label.authoring.basic.textarea.add" />
 <%@ include file="buttons.jsp"%>

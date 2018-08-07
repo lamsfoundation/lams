@@ -29,9 +29,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -41,7 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Marcin Cieslak
  */
-public class RecordForm{
+public class RecordForm {
 
     private static Logger logger = Logger.getLogger(RecordForm.class.getName());
     private String sessionMapID;
@@ -52,7 +49,7 @@ public class RecordForm{
 
     public void setAnswer(int number, String answer) {
 	if (this.answer == null) {
-	    this.answer = new ArrayList<String>();
+	    this.answer = new ArrayList<>();
 	}
 	while (number >= this.answer.size()) {
 	    this.answer.add(null);
@@ -70,7 +67,7 @@ public class RecordForm{
     public void setFile(int number, MultipartFile file) {
 	if (file.getSize() > 0) {
 	    if (this.file == null) {
-		this.file = new ArrayList<MultipartFile>();
+		this.file = new ArrayList<>();
 	    }
 	    while (number >= this.file.size()) {
 		this.file.add(null);
@@ -86,7 +83,6 @@ public class RecordForm{
 	return file.get(number);
     }
 
-    
     public void reset(HttpServletRequest request) {
 	answer = null;
 	file = null;

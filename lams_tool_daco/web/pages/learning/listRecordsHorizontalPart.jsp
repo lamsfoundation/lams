@@ -24,13 +24,13 @@
 			height: 100%;
 		}
 	</style>
-	<link href="<html:rewrite page='/includes/css/daco.css'/>" rel="stylesheet" type="text/css">
+	<link href="<lams:WebAppURL/>includes/css/daco.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript">
-		var editRecordUrl = "<html:rewrite page='/learning/editRecord.do' />";
-		var removeRecordUrl = "<html:rewrite page='/learning/removeRecord.do' />";
+		var editRecordUrl = "<lams:WebAppURL/>earning/editRecord.do";
+		var removeRecordUrl = "<lams:WebAppURL/>learning/removeRecord.do";
 		var recordListLength = "${fn:length(recordList)}";
 	</script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/dacoLearning.js"></script>
 </lams:head>
 <body class="tabpart">
 	

@@ -8,7 +8,7 @@
 
  		<div class="checkbox">
 		    <label>
-	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+	 	      <form:checkbox path="questionRequired" id="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
 		    </label>
 	  	</div>
 	</div>

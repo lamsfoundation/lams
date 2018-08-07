@@ -48,7 +48,6 @@
 			    		var rows = [],
 			            json = {};
 			    		
-			    		debugger;
 			    		
 						for (i = 0; i < data.rows.length; i++){
 							var userData = data.rows[i];

@@ -37,7 +37,6 @@
 	});
 
 	function leaderSelection() {
-		debugger;
 		$.ajax({
 	    	async: false,
 	        url: '<c:url value="/learning/becomeLeader.do?toolSessionID=${toolSessionID}"/>',

@@ -27,10 +27,10 @@
 
 <!-- Add question form-->
 <%@ include file="/common/messages.jsp"%>
-<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
-	<html:hidden property="sessionMapID" />
+<form:form action="authoring/saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
+	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="4" />
-	<html:hidden property="questionIndex" />
+	<form:hidden path="questionIndex" />
 
 	<%@ include file="description.jsp"%>
 
@@ -39,13 +39,13 @@
 	<div id="additionalOptionsArea" style="display: none;" class="panel-body">
 		<div class="checkbox">
 		    <label>
-	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+	 	      <form:checkbox path="questionRequired" id="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
 		    </label>
 	  	</div>
 	</div>
  	<!--  end options -->
 	
-</html:form>
+</form:form>
 
 <c:set var="addButtonMessageKey" value="label.authoring.basic.date.add" />
 <%@ include file="buttons.jsp"%>

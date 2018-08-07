@@ -74,6 +74,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -603,7 +604,8 @@ public class LearningController {
      * Autosaves burning questions. Only leaders can perform it.
      */
     @RequestMapping("/autosaveBurningQuestions")
-    private String autosaveBurningQuestions(HttpServletRequest request) throws ScratchieApplicationException {
+    @ResponseBody
+    private void autosaveBurningQuestions(HttpServletRequest request) throws ScratchieApplicationException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -613,12 +615,9 @@ public class LearningController {
 	ScratchieUser leader = getCurrentUser(sessionId);
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(sessionId);
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return null;
 	}
 
 	saveBurningQuestions(request);
-
-	return null;
     }
 
     /**

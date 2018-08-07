@@ -4,13 +4,13 @@
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 <body class="stripes">
-<html:form action="/authoring/init.do?mode=${mode}" method="post" styleId="startForm">
-	<html:hidden property="daco.contentId"/>
-	<html:hidden property="sessionMapID"/>
-</html:form>
+<form:form action="init.do?mode=${mode}" modelAttribute="authoringForm" method="post" id="authoringForm">
+	<form:hidden path="daco.contentId"/>
+	<form:hidden path="sessionMapID"/>
+</form:form>
 
 <script type="text/javascript">
-document.getElementById("startForm").submit();
+document.getElementById("authoringForm").submit();
 </script>
 <body class="stripes">
 </html>

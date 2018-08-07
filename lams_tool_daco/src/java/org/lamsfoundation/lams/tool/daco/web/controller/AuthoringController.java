@@ -354,7 +354,7 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping("/init")
-    protected String initPage(@ModelAttribute("dacoForm") DacoForm dacoForm, HttpServletRequest request)
+    protected String initPage(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -362,13 +362,13 @@ public class AuthoringController {
 	DacoForm existForm = (DacoForm) sessionMap.get(DacoConstants.ATTR_DACO_FORM);
 
 	try {
-	    PropertyUtils.copyProperties(dacoForm, existForm);
+	    PropertyUtils.copyProperties(authoringForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	authoringForm.setMode(mode.toString());
 
 	return "pages/authoring/authoring";
     }
@@ -605,15 +605,15 @@ public class AuthoringController {
      *
      */
     @RequestMapping("/start")
-    protected String start(@ModelAttribute("dacoForm") DacoForm dacoForm, HttpServletRequest request)
+    protected String start(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	return starting(dacoForm, request);
+	return starting(authoringForm, request);
     }
 
     @RequestMapping("/definelater")
-    protected String defineLater(@ModelAttribute("dacoForm") DacoForm dacoForm, HttpServletRequest request)
+    protected String defineLater(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	// update define later flag to true
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -626,10 +626,10 @@ public class AuthoringController {
 	dacoService.auditLogStartEditingActivityInMonitor(contentId);
 
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	return starting(dacoForm, request);
+	return starting(authoringForm, request);
     }
 
-    protected String starting(@ModelAttribute("dacoForm") DacoForm dacoForm, HttpServletRequest request)
+    protected String starting(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 
 	// save toolContentID into HTTPSession
@@ -643,11 +643,11 @@ public class AuthoringController {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	dacoForm.setSessionMapID(sessionMap.getSessionID());
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	dacoForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
 	try {
@@ -666,7 +666,7 @@ public class AuthoringController {
 		questions = new ArrayList<>(daco.getDacoQuestions());
 	    }
 
-	    dacoForm.setDaco(daco);
+	    authoringForm.setDaco(daco);
 	} catch (Exception e) {
 	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
@@ -697,7 +697,7 @@ public class AuthoringController {
 	dacoQuestionList.clear();
 	dacoQuestionList.addAll(questions);
 
-	sessionMap.put(DacoConstants.ATTR_DACO_FORM, dacoForm);
+	sessionMap.put(DacoConstants.ATTR_DACO_FORM, authoringForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 
@@ -715,26 +715,26 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping("/update")
-    protected String updateContent(@ModelAttribute("dacoForm") DacoForm dacoForm, HttpServletRequest request)
+    protected String updateContent(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(dacoForm.getSessionMapID());
+		.getAttribute(authoringForm.getSessionMapID());
 
 	ToolAccessMode toolAccessMode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, toolAccessMode.toString());
 
-	MultiValueMap<String, String> errorMap = validateDacoForm(dacoForm, request);
+	MultiValueMap<String, String> errorMap = validateDacoForm(authoringForm, request);
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    return "pages/authoring/authoring";
 	}
 
-	Daco daco = dacoForm.getDaco();
+	Daco daco = authoringForm.getDaco();
 
 	// **********************************Get Daco PO*********************
-	Daco dacoPO = dacoService.getDacoByContentId(dacoForm.getDaco().getContentId());
+	Daco dacoPO = dacoService.getDacoByContentId(authoringForm.getDaco().getContentId());
 	if (dacoPO == null) {
 	    // new Daco, create it.
 	    dacoPO = daco;
@@ -762,7 +762,7 @@ public class AuthoringController {
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	DacoUser dacoUser = dacoService.getUserByUserIdAndContentId(new Long(user.getUserID().intValue()),
-		dacoForm.getDaco().getContentId());
+		authoringForm.getDaco().getContentId());
 	if (dacoUser == null) {
 	    dacoUser = new DacoUser(user, dacoPO);
 	}
@@ -795,17 +795,17 @@ public class AuthoringController {
 		dacoService.deleteDacoQuestion(question.getUid());
 	    }
 	}
-	dacoForm.setDaco(dacoPO);
+	authoringForm.setDaco(dacoPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	return "pages/authoring/authoring";
     }
 
-    protected MultiValueMap<String, String> validateDacoForm(DacoForm dacoForm, HttpServletRequest request) {
+    protected MultiValueMap<String, String> validateDacoForm(DacoForm authoringForm, HttpServletRequest request) {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	Short min = dacoForm.getDaco().getMinRecords();
-	Short max = dacoForm.getDaco().getMaxRecords();
+	Short min = authoringForm.getDaco().getMinRecords();
+	Short max = authoringForm.getDaco().getMaxRecords();
 	if (min != null && max != null && min > 0 && max > 0 && min > max) {
 	    errorMap.add("GLOBAL", messageService.getMessage(DacoConstants.ERROR_MSG_RECORDLIMIT_MIN_TOOHIGH_MAX));
 	}
