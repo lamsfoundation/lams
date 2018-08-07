@@ -77,15 +77,14 @@ public class MessageForm {
      */
     public MultiValueMap<String, String> validate(HttpServletRequest request) {
 
-	Forum forum = null;
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
 	    if (StringUtils.isBlank(message.getSubject())) {
-		errorMap.add("message.subject" + forum.getUid(), messageService.getMessage("error.subject.required"));
+		errorMap.add("message.subject", messageService.getMessage("error.subject.required"));
 	    }
 	    boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	    if (!isTestHarness && StringUtils.isBlank(message.getBody())) {
-		errorMap.add("message.body" + forum.getUid(), messageService.getMessage("error.body.required"));
+		errorMap.add("message.body", messageService.getMessage("error.body.required"));
 	    }
 
 	    // validate item size
@@ -93,7 +92,7 @@ public class MessageForm {
 	    if (request.getRequestURI().indexOf("/learning/") != -1) {
 		if ((this.getAttachmentFile() != null)
 			&& FileUtil.isExecutableFile(this.getAttachmentFile().getOriginalFilename())) {
-		    errorMap.add("message.attachment" + forum.getUid(), messageService.getMessage("error.attachment.executable"));
+		    errorMap.add("message.attachment", messageService.getMessage("error.attachment.executable"));
 		}
 		largeFile = false;
 	    }

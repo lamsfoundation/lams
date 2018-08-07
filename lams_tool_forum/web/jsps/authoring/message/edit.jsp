@@ -15,7 +15,7 @@
 	
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
-		<form:form action="updateTopic.do" focus="message.subject" enctype="multipart/form-data" id="messageForm" modelAttribute="messageForm" onsubmit="return validate();">
+		<form:form action="updateTopic.do" focus="message.subject" enctype="multipart/form-data" id="topicFormId" modelAttribute="topicFormId" onsubmit="return validate();">
 			
 			<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
 			<form:hidden path="sessionMapID" />
@@ -24,20 +24,20 @@
 			<div class="form-group">
 		    <label for="message.subject"><fmt:message key="message.label.subject" /> *</label>
 			<form:input type="text" size="30" tabindex="1" path="message.subject" value="${message.subject}" maxlength="60" cssClass="form-control"/>
-		    <c:set var="message.subject" value="errorMap${forum.uid}" />
+		    <form:errors path="message.subject" />
 			</div>
 			
 			<div class="form-group">
 		    <label for="forum.instructions"><fmt:message key="message.label.body" /> *</label>
 			<c:set var="body" value=""/>
-			<c:if test="${not empty messageForm.message}">
-				<c:set var="body" value="${messageForm.message.body}"/>
+			<c:if test="${not empty topicFormId.message}">
+				<c:set var="body" value="${topicFormId.message.body}"/>
 			</c:if>
 			<lams:CKEditor id="message.body" value="${body}" contentFolderID="${sessionMap.contentFolderID}" />
-			<c:set var="message.body" value="errorMap${forum.uid}" />
+			<form:errors path="message.body" />
 			</div>
 
-			<c:set var="itemAttachment" value="${messageForm}" />
+			<c:set var="itemAttachment" value="${topicFormId}" />
 			<div class="form-group">
 				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
 				<div id="itemAttachmentArea" class="small-space-bottom">

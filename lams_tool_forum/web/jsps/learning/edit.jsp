@@ -116,10 +116,10 @@
 		</script>
 		
 		<form:form action="updateTopicInline.do"
-				focus="message.subject" enctype="multipart/form-data" id="messageForm" modelAttribute="messageForm">
+				focus="message.subject" enctype="multipart/form-data" id="editForm" modelAttribute="editForm">
 				
 			<form:hidden path="sessionMapID"/>	
-			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
+			<c:set var="sessionMapID" value="${editForm.sessionMapID}"/>
 			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		
 			<div class="container-fluid">

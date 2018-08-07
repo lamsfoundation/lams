@@ -820,7 +820,7 @@ public class LearningController {
      * Display a editable form for a special topic in order to update it.
      */
     @RequestMapping("/editTopic")
-    public String editTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+    public String editTopic(@ModelAttribute("editForm") MessageForm editForm, HttpServletRequest request)
 	    throws PersistenceException {
 	Long topicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
@@ -828,12 +828,12 @@ public class LearningController {
 
 	// echo current topic content to web page
 	if (topic != null) {
-	    messageForm.setMessage(topic.getMessage());
+	    editForm.setMessage(topic.getMessage());
 	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
 	}
 
 	// cache this topicID, using in Update topic
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap sessionMap = getSessionMap(request, editForm);
 	sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed

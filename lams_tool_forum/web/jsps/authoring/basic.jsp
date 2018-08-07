@@ -131,13 +131,13 @@
 		}
 
 		showBusy("itemAttachmentArea");
-		var formData = new FormData(document.getElementById("messageForm"));
+		var formData = new FormData(document.getElementById("topicFormId"));
 	    $.ajax({ // create an AJAX call...
 			data: formData, 
 	        processData: false, // tell jQuery not to process the data
 	        contentType: false, // tell jQuery not to set contentType
-           	type: $("#messageForm").attr('method'),
-			url: $("#messageForm").attr('action'),
+           	type: $("#topicFormId").attr('method'),
+			url: $("#topicFormId").attr('action'),
 			success: function(data) {
                	$('#messageArea').html(data);
 	       		hideBusy("itemAttachmentArea");

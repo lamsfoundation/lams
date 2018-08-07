@@ -441,9 +441,9 @@ public class AuthoringController {
      * author posted before.
      */
     @RequestMapping("/newTopic")
-    public String newTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
+    public String newTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	messageForm.setSessionMapID(sessionMapID);
+	topicFormId.setSessionMapID(sessionMapID);
 
 	return "jsps/authoring/message/create";
     }
@@ -452,12 +452,12 @@ public class AuthoringController {
      * Create a topic in memory. This topic will be saved when user save entire authoring page.
      */
     @RequestMapping("/createTopic")
-    public String createTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+    public String createTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request)
 	    throws IOException, ServletException, PersistenceException {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(messageForm.getSessionMapID());
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+		.getAttribute(topicFormId.getSessionMapID());
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, topicFormId.getSessionMapID());
 
 	SortedSet topics = getTopics(sessionMap);
 	// get login user (author)
@@ -466,7 +466,7 @@ public class AuthoringController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	// get message info from web page
-	Message message = messageForm.getMessage();
+	Message message = topicFormId.getMessage();
 	// init some basic variables for first time create
 	message.setIsAuthored(true);
 	message.setCreated(new Date());
@@ -494,10 +494,10 @@ public class AuthoringController {
 
 	// set attachment of this topic
 	Set attSet = null;
-	if (messageForm.getAttachmentFile() != null
-		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
+	if (topicFormId.getAttachmentFile() != null
+		&& !StringUtils.isEmpty(topicFormId.getAttachmentFile().getOriginalFilename())) {
 	    forumService = getForumManager();
-	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
+	    Attachment att = forumService.uploadAttachment(topicFormId.getAttachmentFile());
 	    // only allow one attachment, so replace whatever
 	    attSet = new HashSet();
 	    attSet.add(att);
@@ -568,7 +568,7 @@ public class AuthoringController {
      * ready for user update this topic.
      */
     @RequestMapping("/editTopic")
-    public String editTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+    public String editTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request)
 	    throws PersistenceException {
 
 	// get SessionMAP
@@ -576,7 +576,7 @@ public class AuthoringController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 
-	messageForm.setSessionMapID(sessionMapID);
+	topicFormId.setSessionMapID(sessionMapID);
 
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
@@ -586,7 +586,7 @@ public class AuthoringController {
 	    MessageDTO topic = rList.get(topicIdx);
 	    if (topic != null) {
 		// update message to HTML Form to echo back to web page: for subject, body display
-		messageForm.setMessage(topic.getMessage());
+		topicFormId.setMessage(topic.getMessage());
 	    }
 	    // echo back to web page: for attachment display
 	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
@@ -601,19 +601,19 @@ public class AuthoringController {
      * whole authoring page.
      */
     @RequestMapping("/updateTopic")
-    public String updateTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+    public String updateTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request)
 	    throws PersistenceException {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(messageForm.getSessionMapID());
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+		.getAttribute(topicFormId.getSessionMapID());
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, topicFormId.getSessionMapID());
 
 	// get param from HttpServletRequest
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
 
 	if (topicIdx != -1) {
-	    Message message = messageForm.getMessage();
+	    Message message = topicFormId.getMessage();
 
 	    Set topics = getTopics(sessionMap);
 	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
@@ -626,16 +626,16 @@ public class AuthoringController {
 	    newMsg.getMessage().setBody(message.getBody());
 	    newMsg.getMessage().setUpdated(new Date());
 	    // update attachment
-	    if (messageForm.getAttachmentFile() != null
-		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
+	    if (topicFormId.getAttachmentFile() != null
+		    && !StringUtils.isEmpty(topicFormId.getAttachmentFile().getOriginalFilename())) {
 		forumService = getForumManager();
-		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
+		Attachment att = forumService.uploadAttachment(topicFormId.getAttachmentFile());
 		// only allow one attachment, so replace whatever
 		Set attSet = new HashSet();
 		attSet.add(att);
 		newMsg.setHasAttachment(true);
 		newMsg.getMessage().setAttachments(attSet);
-	    } else if (!messageForm.isHasAttachment()) {
+	    } else if (!topicFormId.isHasAttachment()) {
 		Set att = newMsg.getMessage().getAttachments();
 		if (att != null && att.size() > 0) {
 		    List delTopicAtt = getTopicDeletedAttachmentList(sessionMap);

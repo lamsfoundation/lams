@@ -12,7 +12,7 @@
 		
 		<c:otherwise>
 			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
-			<textarea rows="10" class="form-control" tabindex="2" name="message.body">${message.body}</textarea> 
+			<textarea rows="10" class="form-control" tabindex="2" name="message.body" id="messageBody">${message.body}</textarea> 
 		</c:otherwise>
 	</c:choose>
  
@@ -40,7 +40,7 @@
 			var counter = function(evt) {
 				
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea[id="message.body__lamstextarea"]').val();
+						: $('textarea#messageBody').val();
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
 				//limit is not exceeded
@@ -74,8 +74,7 @@
 					this.value = this.value.substring(0, limit);
 					//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
 					//manually handle onchange event. It is a kind of crack coding!
-					filterData(document.getElementById('message.body__lamstextarea'),
-							document.getElementById('message.body__lamshidden'));
+					filterData(document.getElementById('messageBody'));
 						
 				}
 			};
@@ -93,7 +92,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				$('textarea#messageBody').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
@@ -135,7 +134,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				$('textarea#messageBody').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
@@ -168,5 +167,4 @@
 	</div> <!-- end row -->
 	</c:if>
 	
-	<c:set var="message.body" value="errorMap${forum.uid}" />
-
+	<form:errors path="message.body" />

@@ -7,7 +7,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <input type="hidden" name="hasAttachment" value="${itemAttachment.hasAttachment}" />
 <c:choose>
-	<c:when test="${messageForm.hasAttachment}">
+	<c:when test="${itemAttachment.hasAttachment}">
 		<ul>
 			<li>
 				<c:forEach var="file" items="${topic.message.attachments}">
