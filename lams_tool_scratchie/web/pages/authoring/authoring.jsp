@@ -45,7 +45,7 @@
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
 		<form:hidden path="currentTab" id="currentTab" />
-		<form:hidden path="itemList" id="itemList" />
+		<input type="hidden" name="itemList" id="itemList" />
 	
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>

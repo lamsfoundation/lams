@@ -232,7 +232,7 @@ public class LearningController {
 	    // show results page
 	} else if (isShowResults) {
 
-	    String redirectURL = "redirect:learning/showResults.do";
+	    String redirectURL = "redirect:showResults.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ScratchieConstants.ATTR_SESSION_MAP_ID,
 		    sessionMap.getSessionID());
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
@@ -726,7 +726,7 @@ public class LearningController {
 	}
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
 
-	String redirectURL = "redirect:/learning/showResults.do";
+	String redirectURL = "redirect:showResults.do";
 	redirectURL = WebUtil.appendParameterToURL(redirectURL, ScratchieConstants.ATTR_SESSION_MAP_ID,
 		sessionMap.getSessionID());
 	return redirectURL;

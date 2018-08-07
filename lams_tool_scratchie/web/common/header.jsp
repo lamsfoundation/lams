@@ -5,7 +5,7 @@
 
 <!-- ********************  CSS ********************** -->
 <lams:css />
-<link href="<html:rewrite page='/includes/css/scratchie.css'/>" rel="stylesheet" type="text/css">
+<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

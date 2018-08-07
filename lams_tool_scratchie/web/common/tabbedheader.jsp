@@ -4,7 +4,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
 	<!-- ********************  CSS ********************** -->
-<link href="<html:rewrite page='/includes/css/scratchie.css'/>" rel="stylesheet" type="text/css">
+<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
 <lams:css/>
 
 	<!-- ********************  javascript ********************** -->

@@ -111,7 +111,7 @@
 //		populateQuestionToForm(questionIndex, question, questionForm, request);
 //	    }
 //	}
-//	return findForward(question == null ? -1 : question.getType(), mapping);
+//	return findForward(question == null ? -1 : question.getType();
 //    }
 //
 //    /**
@@ -198,7 +198,7 @@
 //     * @param mapping
 //     * @return
 //     */
-//    protected ActionForward findForward(short type, ActionMapping mapping) {
+//    protected String findForward(short type) {
 //	ActionForward forward;
 //	switch (type) {
 //	    case DacoConstants.QUESTION_TYPE_TEXTFIELD:

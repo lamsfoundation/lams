@@ -32,7 +32,6 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>
@@ -123,11 +122,11 @@
     }  				
 </script>	
 <div id="saveCancelButtons" >
-		<html:link href="javascript:doSubmit_Form_Only();" styleId="saveButton" property="submit" styleClass="btn btn-primary pull-right">
+		<a href="javascript:doSubmit_Form_Only();" id="saveButton" name="submit" class="btn btn-primary pull-right">
 			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
-		</html:link>
-		<html:link href="javascript:;" property="cancel" styleId="cancelButton" onclick="javascript:doCancel()" styleClass="btn btn-default roffset5 pull-right">
+		</a>
+		<a href="javascript:;" nname="cancel" id="cancelButton" onclick="javascript:doCancel()" class="btn btn-default roffset5 pull-right">
 			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
-		</html:link>
+		</a>
 </div>
 <!-- end tab content -->

@@ -222,7 +222,7 @@
 			
 			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
 				<form:hidden path="sessionMapID" />
-				<form:hidden path="answerList" id="answerList" />
+				<input type="hidden" name="answerList" id="answerList" />
 				<form:hidden path="itemIndex" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 	

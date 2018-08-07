@@ -41,8 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
@@ -192,8 +190,8 @@ public class TblMonitorController {
      */
     @RequestMapping(value = "/isBurningQuestionsEnabled", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public String isBurningQuestionsEnabled(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    public String isBurningQuestionsEnabled(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);

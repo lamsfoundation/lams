@@ -69,11 +69,11 @@
 	    			// show static image after animation
 	    			setTimeout(
 	    	    			function(){
-	    					image.attr("src", "<lams:WebAppURL/> includes/images/scratchie-" + imageSuffix + ".png");
+	    					image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
 	    				}, 
 	    				1300
 	    			);
-	    		}).attr("src", "<lams:WebAppURL/> includes/images/scratchie-" + imageSuffix + "-animation.gif");
+	    		}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
 		}
 
 		function scratchItem(itemUid, answerUid){
@@ -222,7 +222,7 @@
 				document.getElementById("finishButton").disabled = true;
 
 		        	var myForm = $('#burning-questions');
-		        	myForm.attr("action", '<c:url value="/learning.do?sessionMapID=${sessionMapID}"/>&date=' + new Date().getTime());
+		        	myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
 		        	myForm.submit();
 			}
 			
