@@ -136,7 +136,7 @@
 <script type="text/javascript">
 	//automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOn");
+	var rao = document.getElementById("reflect-on");
 	function turnOnRefect(){
 		if(isEmpty(ra.value)){
 		//turn off	

@@ -36,7 +36,6 @@ public class LearningForm {
 
     private static final long serialVersionUID = -4728946254882237144L;
 
-    private String dispatch;
     private Long scribeUserUID;
     private Long toolSessionID;
     private String mode;
@@ -58,14 +57,6 @@ public class LearningForm {
 
     public void setScribeUserUID(Long scribeUserUID) {
 	this.scribeUserUID = scribeUserUID;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

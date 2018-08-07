@@ -138,12 +138,12 @@
 				
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
-					window.location.href = LEARNING_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
+					window.location.href = LEARNING_URL + 'learner/restartLesson.do?lessonID=' + lessonId;
 				}
 			}
 
 			function viewNotebookEntries(){
-				openPopUp(LEARNING_URL + "notebook.do?method=viewAll&lessonID=" + lessonId,
+				openPopUp(LEARNING_URL + "notebook/viewAll.do?lessonID=" + lessonId,
 						"Notebook",
 						648,1152,
 						"no");
@@ -245,9 +245,8 @@
 
 				if ( lessonId != "" || toolSessionId != "" ) {
 					$.ajax({
-						url : LEARNING_URL + 'learner.do',
+						url : LEARNING_URL + 'learner/getLessonDetails.do',
 						data : {
-							'method'   : 'getLessonDetails',
 							'lessonID' : lessonId,
 							'toolSessionID' : toolSessionId,
 						},

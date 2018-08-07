@@ -30,20 +30,11 @@ public class MonitoringForm {
 
     private static final long serialVersionUID = 9096908688391850595L;
 
-    String dispatch;
     Long toolSessionID;
     Long toolContentID;
     String contentFolderID;
     Long appointedScribeUID;
     Long currentTab;
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
-    }
 
     public Long getToolSessionID() {
 	return toolSessionID;

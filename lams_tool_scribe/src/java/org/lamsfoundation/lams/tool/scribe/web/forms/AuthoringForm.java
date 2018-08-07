@@ -54,8 +54,6 @@ public class AuthoringForm {
 
     String currentTab;
 
-    String dispatch;
-
     String sessionMapID;
 
     Long deleteFileUuid;
@@ -79,14 +77,6 @@ public class AuthoringForm {
 
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public String getInstructions() {
