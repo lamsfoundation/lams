@@ -5,14 +5,14 @@
 
 	<c:choose>
 		<c:when test="${sessionMap.allowRichEditor}">
-			<lams:CKEditor id="message.body" value="${messageForm.message.body}" 
+			<lams:CKEditor id="message.body" value="${message.body}" 
 					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 			</lams:CKEditor>
 		</c:when>
 		
 		<c:otherwise>
 			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
-			<textarea rows="10" class="form-control" tabindex="2" name="message.body"/> 
+			<textarea rows="10" class="form-control" tabindex="2" name="message.body">${message.body}</textarea> 
 		</c:otherwise>
 	</c:choose>
  
@@ -20,6 +20,7 @@
 	<div class="row voffset10">
 
 	<div class="col-xs-12 col-sm-6">
+	
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 	<c:if test="${sessionMap.maxCharacters > 0}">
 

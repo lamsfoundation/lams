@@ -463,6 +463,49 @@ public class LearningController {
 	return "jsps/learning/viewtopic";
     }
 
+    @RequestMapping("/viewTopicNext")
+    public String viewTopicNext(HttpServletRequest request) {
+
+	forumService = getForumManager();
+
+	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
+
+	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+
+	// get forum user and forum
+	// if coming from topic list, the toolSessionId is in the SessionMap.
+	// if coming from the monitoring statistics window, it is passed in as a parameter.
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+	if (toolSessionId != null) {
+	    sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	    String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE, true);
+	    if (mode != null) {
+		sessionMap.put(AttributeNames.PARAM_MODE, mode);
+	    }
+	} else {
+	    toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	}
+	ForumUser forumUser = getCurrentUser(request, toolSessionId);
+	Forum forum = forumUser.getSession().getForum();
+
+	Long lastMsgSeqId = WebUtil.readLongParam(request, ForumConstants.PAGE_LAST_ID, true);
+	Long pageSize = WebUtil.readLongParam(request, ForumConstants.PAGE_SIZE, true);
+
+	setupViewTopicPagedDTOList(request, rootTopicId, sessionMapID, forumUser, forum, lastMsgSeqId, pageSize);
+
+	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
+	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
+	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
+	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
+	// as it has a link from the view topic screen back to View Forum screen.
+	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
+	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
+
+	return "jsps/learning/message/topicviewwrapper";
+    }
+
     private void setupViewTopicPagedDTOList(HttpServletRequest request, Long rootTopicId, String sessionMapID,
 	    ForumUser forumUser, Forum forum, Long lastMsgSeqId, Long pageSize) {
 	// get root topic list

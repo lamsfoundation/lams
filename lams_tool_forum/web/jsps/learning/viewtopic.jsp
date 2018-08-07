@@ -50,10 +50,12 @@
 			function setupJRatingSetPath() {
 				setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 			}
-			
+			<c:set var="refresh">
+			<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=${reqIDVar.getTime()};
+		</c:set>
 			function refreshTopic(){
 				var reqIDVar = new Date();
-				location.href= "<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid="+reqIDVar.getTime();;
+				location.href= '${refresh}';
 			}
 		</script>
 

@@ -24,7 +24,7 @@
 			
 			<div class="form-group">
 			    <label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /> *</label>
-			    <input type="text" tabindex="1" path="displayName" size="51" class="form-control"/>
+			    <input type="text" tabindex="1" name="displayName" value="${forumConditionForm.displayName}" size="51" class="form-control"/>
 			</div>
 
 			<%-- Text search form fields are being included --%>
@@ -34,8 +34,8 @@
 			<c:forEach var="itemE" items="${forumConditionForm.possibleItems}">
 		    	<div class="checkbox">
 		    	<label>
-		    	<form:checkbox path="selectedItems" value="${itemE.key}"/>
-		    		<c:out value="${itemE.value}" />
+		    	<form:checkbox path="selectedItems" value="${itemE.value}"/>
+		    		<c:out value="${itemE.key}" />
 		    	</label>
 				</div>
 		    	</c:forEach>

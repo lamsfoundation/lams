@@ -95,7 +95,7 @@
 			        			if ( ! threadDiv) {
 			        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
 		        				} else {
-			        				var loadString = "<lams:WebAppURL />learning/viewTopicThread.do?topicID="" + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
+			        				var loadString = "<lams:WebAppURL />learning/viewTopicThread.do?topicID=" + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
 			        				$.ajaxSetup({ cache: true });
 									$(threadDiv).load(loadString, function() {
 										setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");

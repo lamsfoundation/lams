@@ -56,7 +56,7 @@
 			<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}
 		</c:set>
 		<c:set var="refresh">
-			<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}"
+			<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}
 		</c:set>
 		
 		<script type="text/javascript">

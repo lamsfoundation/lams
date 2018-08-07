@@ -53,13 +53,13 @@
 				document.getElementById("finishButton").disabled = true;
 			}
 			function submitForm(methodName){
-		        	var f = document.getElementById('messageForm');
+		        	var f = document.getElementById('reflectionForm');
 			        f.submit();
 		        }
 		</script>
 		
 		<form:form action="submitReflection.do" method="post"
-			onsubmit="disableFinishButton();" modelAttribute="messageForm" id="messageForm">
+			onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
 			<form:hidden path="userID" />
 			<form:hidden path="sessionMapID" />
 		
@@ -71,7 +71,7 @@
 					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 				</p>
 		
-				<textarea id="focused" rows="5" name="entryText" class="form-control"></textarea>
+				<textarea id="focused" rows="5" name="entryText" class="form-control">${reflectionForm.entryText}</textarea>
 		
 				<div class="space-bottom-top align-right">
 					<a  href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
