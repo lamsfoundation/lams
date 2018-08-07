@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
 import java.util.ArrayList;
@@ -29,24 +28,31 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
  */
-public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
+    
+    @Autowired
+    @Qualifier("forumMessageService")
+    private MessageService messageService;
+    
     private List<String> topic;
     private String contentFolderID;
     private String instructions;
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate() {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (topic != null && !topic.isEmpty()) {
@@ -58,14 +64,13 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("error.must.have.topic");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.must.have.topic"));
 	    valid = false;
 	    topic = null;
 	}
 
 	setValid(valid);
-	return errors;
+	return errorMap;
     }
 
     public void fillForm(Forum forum) {
@@ -73,8 +78,8 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
 	    setToolContentID(forum.getContentId());
 	    setInstructions(forum.getInstructions());
 
-	    topic = new ArrayList<String>();
-	    Set<Message> messages = new TreeSet<Message>(new MessageComparator());
+	    topic = new ArrayList<>();
+	    Set<Message> messages = new TreeSet<>(new MessageComparator());
 	    messages.addAll(forum.getMessages());
 	    if (messages != null) {
 		int topicIndex = 0;
@@ -89,7 +94,7 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
 
     public void setTopic(int number, String Topics) {
 	if (topic == null) {
-	    topic = new ArrayList<String>();
+	    topic = new ArrayList<>();
 	}
 	while (number >= topic.size()) {
 	    topic.add(null);

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.forum.web.actions;
+package org.lamsfoundation.lams.tool.forum.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -38,12 +38,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -73,10 +67,20 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -86,91 +90,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * User: conradb Date: 24/06/2005 Time: 10:54:09
  */
-public class LearningAction extends Action {
-    private static Logger log = Logger.getLogger(LearningAction.class);
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
+
+    private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
+    @Autowired
+    @Qualifier("forumService")
     private IForumService forumService;
 
-    @Override
-    public final ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	String param = mapping.getParameter();
-	// --------------Forum Level ------------------
-	if (param.equals("viewForum")) {
-	    return viewForum(mapping, form, request, response);
-	}
-	if (param.equals("finish")) {
-	    return finish(mapping, form, request, response);
-	}
+    @Autowired
+    @Qualifier("forumMessageService")
+    private MessageService messageService;
 
-	// --------------Topic Level ------------------
-	if (param.equals("viewTopic") || param.equals("viewTopicNext")) {
-	    return viewTopic(mapping, form, request, response);
-	}
-	if (param.equals("viewTopicThread")) {
-	    return viewTopicThread(mapping, form, request, response);
-	}
-	if (param.equals("viewMessage")) {
-	    return viewMessage(mapping, form, request, response);
-	}
-	if (param.equals("newTopic")) {
-	    return newTopic(mapping, form, request, response);
-	}
-	if (param.equals("createTopic")) {
-	    return createTopic(mapping, form, request, response);
-	}
-	if (param.equals("newReplyTopic")) {
-	    return newReplyTopic(mapping, form, request, response);
-	}
-	if (param.equals("replyTopic")) {
-	    return replyTopic(mapping, form, request, response);
-	}
-	if (param.equals("replyTopicInline")) {
-	    return replyTopicInline(mapping, form, request, response);
-	}
-	if (param.equals("editTopic")) {
-	    return editTopic(mapping, form, request, response);
-	}
-	if (param.equals("updateTopic")) {
-	    return updateTopic(mapping, form, request, response);
-	}
-	if (param.equals("updateTopicInline")) {
-	    return updateTopicInline(mapping, form, request, response);
-	}
-	if (param.equals("deleteAttachment")) {
-	    return deleteAttachment(mapping, form, request, response);
-	}
-	if (param.equals("updateMessageHideFlag")) {
-	    return updateMessageHideFlag(mapping, form, request, response);
-	}
-	if (param.equals("rateMessage")) {
-	    return rateMessage(mapping, form, request, response);
-	}
-
-	// ================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward("error");
-    }
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     // ==========================================================================================
     // Forum level methods
     // ==========================================================================================
     /**
      * Display root topics of a forum. This page will be the initial page of Learner page.
-     *
-     * @throws Exception
-     *
      */
-    private ActionForward viewForum(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/viewForum")
+    public String viewForum(HttpServletRequest request) throws Exception {
 
 	// initial Session Map
 	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
@@ -188,7 +134,8 @@ public class LearningAction extends Action {
 	// set the mode into http session
 	ToolAccessMode mode = null;
 	try {
-	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, LearningAction.MODE_OPTIONAL);
+	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
+		    LearningController.MODE_OPTIONAL);
 	} catch (Exception exp) {
 	}
 	if (mode == null) {
@@ -204,7 +151,7 @@ public class LearningAction extends Action {
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 
 	if (session == null || session.getForum() == null) {
-	    LearningAction.log.error("Failed on getting session by given sessionID:" + sessionId);
+	    LearningController.log.error("Failed on getting session by given sessionID:" + sessionId);
 	    throw new Exception("Failed on getting session by given sessionID:" + sessionId);
 	}
 
@@ -258,7 +205,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_REPLY, forum.getMaximumReply());
 
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, getServlet().getServletContext());
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(forumUser.getUid(), forum.getUid());
@@ -292,7 +239,7 @@ public class LearningAction extends Action {
 
 	// add define later support
 	if (forum.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "jsps/learning/definelater";
 	}
 
 	// set contentInUse flag to true!
@@ -343,24 +290,20 @@ public class LearningAction extends Action {
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "jsps/learning/submissionDeadline";
 	    }
 	}
 
-	return mapping.findForward("success");
+	return "jsps/learning/viewforum";
     }
 
     /**
      * Learner click "finish" button in forum page, this method will turn on session status flag for this learner.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/finish")
+    public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
+
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
@@ -371,7 +314,7 @@ public class LearningAction extends Action {
 
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
 	    if (!validateBeforeFinish(request, sessionMapID)) {
-		return mapping.getInputForward();
+		return "jsps/learning/viewforum";
 	    }
 
 	    String nextActivityUrl;
@@ -384,7 +327,7 @@ public class LearningAction extends Action {
 		// finish current session for user
 		forumService.finishUserSession(getCurrentUser(request, sessionId));
 		ToolSessionManager sessionMgrService = ForumServiceProxy
-			.getToolSessionManager(getServlet().getServletContext());
+			.getToolSessionManager(applicationContext.getServletContext());
 		nextActivityUrl = sessionMgrService.leaveToolSession(sessionId, userID);
 		response.sendRedirect(nextActivityUrl);
 	    } catch (DataMissingException e) {
@@ -401,22 +344,17 @@ public class LearningAction extends Action {
 	List rootTopics = forumService.getRootTopics(sessionId);
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 
-	return mapping.getInputForward();
+	return "jsps/learning/viewforum";
     }
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
+
+	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -429,41 +367,35 @@ public class LearningAction extends Action {
 	if (entry == null) {
 	    // create new entry
 	    forumService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ForumConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+		    ForumConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(reflectionForm.getEntryText());
 	    entry.setLastModified(new Date());
 	    forumService.updateEntry(entry);
 	}
 
-	return finish(mapping, form, request, response);
+	return finish(reflectionForm, request, response);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return mapping.getInputForward();
+	    return "jsps/learning/viewforum";
 	}
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
+	reflectionForm.setUserID(user.getUserID());
+	reflectionForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
 	IForumService submitFilesService = getForumManager();
@@ -474,10 +406,10 @@ public class LearningAction extends Action {
 		ForumConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
+	    reflectionForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward("success");
+	return "jsps/learning/notebook";
     }
 
     // ==========================================================================================
@@ -487,15 +419,9 @@ public class LearningAction extends Action {
     /**
      * Display the messages for a particular topic. The Topic will arranged by Tree structure and loaded thread by
      * thread (with paging).
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewTopic")
+    public String viewTopic(HttpServletRequest request) {
 
 	forumService = getForumManager();
 
@@ -534,7 +460,7 @@ public class LearningAction extends Action {
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
-	return mapping.findForward("success");
+	return "jsps/learning/viewtopic";
     }
 
     private void setupViewTopicPagedDTOList(HttpServletRequest request, Long rootTopicId, String sessionMapID,
@@ -561,15 +487,9 @@ public class LearningAction extends Action {
     /**
      * Display the messages for a particular thread in a particular topic. Returns all messages for this thread - does
      * not need paging.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward viewTopicThread(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewTopicThread")
+    public String viewTopicThread(HttpServletRequest request) {
 
 	forumService = getForumManager();
 
@@ -603,20 +523,14 @@ public class LearningAction extends Action {
 	// transfer SessionMapID as well
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return mapping.findForward("success");
+	return "jsps/learning/message/topicviewwrapper";
     }
 
     /**
      * Display a single message.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward viewMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewMessage")
+    public String viewMessage(HttpServletRequest request) {
 
 	forumService = getForumManager();
 
@@ -649,42 +563,27 @@ public class LearningAction extends Action {
 	// transfer SessionMapID as well
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return mapping.findForward("success");
+	return "jsps/learning/message/msgviewwrapper";
     }
 
     /**
      * Display empty page for a new topic in forum
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newTopic")
+    public String newTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
 	// transfer SessionMapID as well
-	((MessageForm) form).setSessionMapID(WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
+	messageForm.setSessionMapID(WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
 
-	return mapping.findForward("success");
+	return "jsps/learning/create";
     }
 
     /**
      * Create a new root topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws PersistenceException
      */
-    public ActionForward createTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, PersistenceException {
+    @RequestMapping("/createTopic")
+    public String createTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+	    throws IOException, ServletException, PersistenceException {
 
-	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -727,24 +626,18 @@ public class LearningAction extends Action {
 	// notify learners and teachers
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
 
-	return mapping.findForward("success");
+	return "jsps/learning/viewforum";
     }
 
     /**
      * Display replay topic page. Message form subject will include parent topics same subject.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newReplyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	MessageForm msgForm = (MessageForm) form;
+    @RequestMapping("/newReplyTopic")
+    public String newReplyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
+
 	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = getSessionMap(request, msgForm);
-	msgForm.setSessionMapID(sessionMapID);
+	SessionMap sessionMap = getSessionMap(request, messageForm);
+	messageForm.setSessionMapID(sessionMapID);
 
 	Long parentId = WebUtil.readLongParam(request, ForumConstants.ATTR_PARENT_TOPIC_ID);
 	sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
@@ -760,9 +653,9 @@ public class LearningAction extends Action {
 
 	    // echo back current topic subject to web page
 	    if (reTitle != null && !reTitle.trim().startsWith("Re:")) {
-		msgForm.getMessage().setSubject("Re:" + reTitle);
+		messageForm.getMessage().setSubject("Re:" + reTitle);
 	    } else {
-		msgForm.getMessage().setSubject(reTitle);
+		messageForm.getMessage().setSubject(reTitle);
 	    }
 	}
 
@@ -774,16 +667,16 @@ public class LearningAction extends Action {
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
-	return mapping.findForward("success");
+	return "jsps/learning/reply";
     }
 
     /**
      * Create a replayed topic for a parent topic.
      */
-    private ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/replyTopic")
+    public String replyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException {
 
-	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -821,16 +714,17 @@ public class LearningAction extends Action {
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
 	sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
-	return mapping.findForward("success");
+	return "jsps/learning/viewtopic";
     }
 
     /**
      * Create a replayed topic for a parent topic.
      */
-    private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping(path = "/replyTopicInline", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String replyTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException, IOException {
 
-	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -871,9 +765,8 @@ public class LearningAction extends Action {
 	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 	ObjectNode.put(ForumConstants.ATTR_PARENT_TOPIC_ID, newMessageSeq.getMessage().getParent().getUid());
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+
+	return ObjectNode.toString();
     }
 
     private void setMonitorMode(SessionMap<String, Object> sessionMap, Message message) {
@@ -882,29 +775,22 @@ public class LearningAction extends Action {
 
     /**
      * Display a editable form for a special topic in order to update it.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
      */
-    public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException {
+    @RequestMapping("/editTopic")
+    public String editTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+	    throws PersistenceException {
 	Long topicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
 	MessageDTO topic = getTopic(topicId);
 
 	// echo current topic content to web page
-	MessageForm msgForm = (MessageForm) form;
 	if (topic != null) {
-	    msgForm.setMessage(topic.getMessage());
+	    messageForm.setMessage(topic.getMessage());
 	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
 	}
 
 	// cache this topicID, using in Update topic
-	SessionMap sessionMap = getSessionMap(request, msgForm);
+	SessionMap sessionMap = getSessionMap(request, messageForm);
 	sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
@@ -915,21 +801,15 @@ public class LearningAction extends Action {
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
-	return mapping.findForward("success");
+	return "jsps/learning/edit";
     }
 
     /**
      * Delete attachment from topic. This method only reset attachment information in memory. The finally update will
      * happen in <code>updateTopic</code> method. So topic can keep this attachment if user choose "Cancel" edit topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/deleteAttachment")
+    public String deleteAttachment(HttpServletRequest request) {
 	// only reset not attachment flag.
 	MessageDTO dto = new MessageDTO();
 	dto.setHasAttachment(false);
@@ -938,25 +818,18 @@ public class LearningAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
 	request.setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD, sessionMap.get(ForumConstants.ATTR_ALLOW_UPLOAD));
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-	return mapping.findForward("success");
+	return "jsps/learning/message/msgattachment";
     }
 
     /**
      * Update a topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
      */
-    public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException {
+    @RequestMapping("/updateTopic")
+    public String updateTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+	    throws PersistenceException {
 
 	forumService = getForumManager();
 
-	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
@@ -969,7 +842,7 @@ public class LearningAction extends Action {
 	Forum forum = forumUser.getSession().getForum();
 	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
 
-	return mapping.findForward("success");
+	return "jsps/learning/viewtopic";
     }
 
     private void doUpdateTopic(HttpServletRequest request, MessageForm messageForm, SessionMap sessionMap, Long topicId,
@@ -1011,22 +884,14 @@ public class LearningAction extends Action {
 
     /**
      * Update a topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
-     * @throws JSONException
-     * @throws IOException
      */
-    public ActionForward updateTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping(path = "/updateTopicInline", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String updateTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws PersistenceException, IOException {
 
 	forumService = getForumManager();
 
-	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
@@ -1038,22 +903,15 @@ public class LearningAction extends Action {
 	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 	Long rootTopicId = forumService.getRootTopicId(topicId);
 	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+
+	return ObjectNode.toString();
     }
 
     /**
      * Sets the visibility of a message by updating the hide flag for a message
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward updateMessageHideFlag(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/updateMessageHideFlag")
+    public String updateMessageHideFlag(HttpServletRequest request) {
 
 	Long msgId = new Long(WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID));
 	Boolean hideFlag = new Boolean(WebUtil.readBooleanParam(request, "hideFlag"));
@@ -1086,20 +944,15 @@ public class LearningAction extends Action {
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,
 		WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
 
-	return mapping.findForward("success");
+	return "jsps/learning/viewtopic";
     }
 
     /**
      * Rates postings submitted by other learners.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward rateMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping(path = "/rateMessage", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String rateMessage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	forumService = getForumManager();
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
@@ -1133,9 +986,8 @@ public class LearningAction extends Action {
 	ObjectNode.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
 	ObjectNode.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
 	ObjectNode.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+
+	return ObjectNode.toString();
     }
 
     // ==========================================================================================
@@ -1162,15 +1014,14 @@ public class LearningAction extends Action {
 		int numOfPostsInTopic = forumService.getNumOfPostsByTopic(userID, topicId);
 		if (numOfPostsInTopic < forum.getMinimumReply()) {
 		    // create error
-		    ActionMessages errors = new ActionMessages();
-		    errors.add(ActionMessages.GLOBAL_MESSAGE,
-			    new ActionMessage("error.less.mini.post", forum.getMinimumReply()));
-		    saveErrors(request, errors);
+		    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+		    errorMap.add("GLOBAL",
+			    messageService.getMessage("error.less.mini.post", String.valueOf(forum.getMinimumReply())));
+		    request.setAttribute("errorMap", errorMap);
 
 		    // get all root topic to display on init page
 		    List rootTopics = forumService.getRootTopics(sessionId);
 		    request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
-		    request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		    return false;
 		}
 
@@ -1182,8 +1033,6 @@ public class LearningAction extends Action {
     /**
      * This method will set flag in message DTO:
      * <li>If this topic is created by current login user, then set Author mark true.</li>
-     *
-     * @param msgDtoList
      */
     private void updateMesssageFlag(List msgDtoList) {
 	// set current user to web page, so that can display "edit" button
@@ -1205,10 +1054,6 @@ public class LearningAction extends Action {
 	}
     }
 
-    /**
-     * @param topicId
-     * @return
-     */
     private MessageDTO getTopic(Long topicId) {
 	// get Topic content according to TopicID
 	forumService = getForumManager();
@@ -1219,10 +1064,6 @@ public class LearningAction extends Action {
     /**
      * Get login user information from system level session. Check it whether it exists in database or not, and save it
      * if it does not exists. Return an instance of PO of ForumUser.
-     *
-     * @param request
-     * @param sessionId
-     * @return Current user instance
      */
     private ForumUser getCurrentUser(HttpServletRequest request, Long sessionId) {
 	// get login user (author)
@@ -1241,25 +1082,19 @@ public class LearningAction extends Action {
 
     /**
      * Get Forum Service.
-     *
-     * @return
      */
     private IForumService getForumManager() {
 	if (forumService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
 	}
 	return forumService;
     }
 
-    /**
-     * @param messageForm
-     * @param message
-     */
     private void setAttachment(MessageForm messageForm, Message message) {
 	if (messageForm.getAttachmentFile() != null
-		&& !StringUtils.isBlank(messageForm.getAttachmentFile().getFileName())) {
+		&& !StringUtils.isBlank(messageForm.getAttachmentFile().getOriginalFilename())) {
 	    forumService = getForumManager();
 	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 	    Set attSet = message.getAttachments();

@@ -41,9 +41,8 @@
 					<c:forEach items="${topicList}" var="topic">
 						<tr>
 							<td><c:set var="viewtopic">
-									<html:rewrite
-										page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}" />
-								</c:set> <html:link href="${viewtopic}" styleId="topicTitle">
+									<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}
+								</c:set> <a href="${viewtopic}" id="topicTitle">
 									<c:choose>
 										<c:when test="${topic.newPostingsNum > 0}">
 											<b><c:out value="${topic.message.subject}" /></b>
@@ -52,7 +51,7 @@
 											<c:out value="${topic.message.subject}" />
 										</c:otherwise>
 									</c:choose>
-								</html:link> <c:if test="${topic.hasAttachment}">
+								</a> <c:if test="${topic.hasAttachment}">
 									<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 								</c:if></td>
 							<td><%-- Author Name --%>

@@ -21,14 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 
 /**
@@ -40,7 +37,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Forum;
  * Date: 10/06/2005
  * Time: 15:44:36
  */
-public class ForumForm extends ActionForm {
+public class ForumForm {
     private static final long serialVersionUID = -6054354910960460120L;
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
@@ -65,7 +62,7 @@ public class ForumForm extends ActionForm {
 
     /**
      * Initialize this form by given <code>Forum</code> instance.
-     * 
+     *
      * @param forum
      */
     public void setForum(Forum forum) {
@@ -79,8 +76,7 @@ public class ForumForm extends ActionForm {
 
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset(HttpServletRequest request) {
 	forum.setAllowEdit(false);
 	forum.setAllowAnonym(false);
 	forum.setAllowRichEditor(false);

@@ -5,14 +5,14 @@
 
 	<c:choose>
 		<c:when test="${sessionMap.allowRichEditor}">
-			<lams:CKEditor id="message.body" value="${formBean.message.body}" 
+			<lams:CKEditor id="message.body" value="${messageForm.message.body}" 
 					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 			</lams:CKEditor>
 		</c:when>
 		
 		<c:otherwise>
 			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
-			<lams:STRUTS-textarea rows="10" styleClass="form-control" tabindex="2" property="message.body"/> 
+			<textarea rows="10" class="form-control" tabindex="2" name="message.body"/> 
 		</c:otherwise>
 	</c:choose>
  
@@ -147,8 +147,8 @@
 	<div class="col-xs-12 col-sm-6 text-right ">
 	<c:if test="${sessionMap.allowAnonym}">
 		<div class="checkbox form-control-inline">
-		<label for="isAnonymous"><html:checkbox
-				property="message.isAnonymous" styleId="isAnonymous" /> <fmt:message
+		<label for="isAnonymous"><form:checkbox
+				path="message.isAnonymous" id="isAnonymous" /> <fmt:message
 				key="label.post.anonomously" /></label>
 		</div>&nbsp;<a tabindex="0" role="button" data-toggle="popover"><i class="fa fa-info-circle"></i></a>
 	
@@ -167,5 +167,5 @@
 	</div> <!-- end row -->
 	</c:if>
 	
-	<html:errors property="message.body" />
+	<c:set var="message.body" value="errorMap${forum.uid}" />
 

@@ -4,8 +4,6 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
 <!--  Basic Tab Content -->
 
 <script type="text/javascript">
@@ -150,24 +148,24 @@
 
 <div class="form-group">
     <label for="forum.title"><fmt:message key="label.authoring.basic.title"/></label>
-    <html:text property="forum.title" styleClass="form-control"></html:text>
+    <input type="text" name="forum.title" value="${forumForm.forum.title}" class="form-control"/>
 </div>
 <div class="form-group">
     <label for="forum.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
-    <lams:CKEditor id="forum.instructions" value="${formBean.forum.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+    <lams:CKEditor id="forum.instructions" value="${forumForm.forum.instructions}" contentFolderID="${forumForm.contentFolderID}"></lams:CKEditor>
 </div>
 
 <!-- Topics List Row -->
 <div id="messageListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${forumForm.sessionMapID}" />
 	<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
 </div>
 
 <lams:WaitingSpinner id="messageListArea_Busy"/>
 
 <div class="form-inline">
-	<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 
-			class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.create.new.topic" /> 
+	<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newTopic.do?sessionMapID=${forumForm.sessionMapID}');" id="addTopic" class="btn btn-default btn-sm">
+    <i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.create.new.topic" /> 
 	</a>
 </div>
 

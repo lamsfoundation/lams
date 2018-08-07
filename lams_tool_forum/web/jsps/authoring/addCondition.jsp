@@ -19,31 +19,28 @@
 	
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="forumConditionForm" focus="displayName" >
-			<html:hidden property="orderId" />
+		<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="forumConditionForm" id="forumConditionForm" focus="displayName" >
+			<form:hidden path="orderId" />
 			
 			<div class="form-group">
 			    <label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /> *</label>
-			    <html:text tabindex="1" property="displayName" size="51" styleClass="form-control"/>
+			    <input type="text" tabindex="1" path="displayName" size="51" class="form-control"/>
 			</div>
 
 			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
+			<lams:TextSearch sessionMapID="${sessionMapID}"  />
 						
 			<h4><fmt:message key="textsearch.topics" /></h4>
-			<div class="checkbox">
-			<logic:iterate name="forumConditionForm" id="itemE" property="possibleItems">
-				<div class="checkbox">
-				<label>
-			  	<html:multibox property="selectedItems" >
-			    	<bean:write name="itemE" property="value" />
-			  	</html:multibox>
-			    <bean:write name="itemE" property="label"/>
-			    </label>
-			    </div>
-			</logic:iterate>
+			<c:forEach var="itemE" items="${forumConditionForm.possibleItems}">
+		    	<div class="checkbox">
+		    	<label>
+		    	<form:checkbox path="selectedItems" value="${itemE.key}"/>
+		    		<c:out value="${itemE.value}" />
+		    	</label>
+				</div>
+		    	</c:forEach>
 			
-		</html:form>
+		</form:form>
 
 		<div class="voffset5 pull-right">
 		    <a href="#" onclick="hideConditionMessage();" class="btn btn-default btn-xs"><fmt:message key="button.cancel" /> </a>

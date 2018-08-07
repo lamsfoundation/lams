@@ -20,48 +20,32 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.forum.web.actions;
+package org.lamsfoundation.lams.tool.forum.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumConfigItem;
-import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.web.forms.AdminForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Marcin Cieslak
  */
-public class AdminAction extends Action {
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+
+    @Autowired
+    @Qualifier("forumService")
     private IForumService forumService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("saveContent")) {
-	    return saveContent(mapping, form, request, response);
-	}
-
-	return start(mapping, form, request, response);
-    }
-
-    public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	if (forumService == null) {
-	    forumService = ForumServiceProxy.getForumService(this.getServlet().getServletContext());
-	}
-
-	AdminForm adminForm = (AdminForm) form;
+    @RequestMapping("/start")
+    public String start(@ModelAttribute AdminForm adminForm, HttpServletRequest request) {
 
 	ForumConfigItem keepLearnerContent = forumService.getConfigItem(ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
 	if (keepLearnerContent != null) {
@@ -69,22 +53,17 @@ public class AdminAction extends Action {
 	}
 
 	request.setAttribute("error", false);
-	return mapping.findForward("config");
+	return "jsps/admin/config";
     }
 
-    public ActionForward saveContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	AdminForm adminForm = (AdminForm) form;
-
-	if (forumService == null) {
-	    forumService = ForumServiceProxy.getForumService(this.getServlet().getServletContext());
-	}
+    @RequestMapping("/saveContent")
+    public String saveContent(@ModelAttribute AdminForm adminForm, HttpServletRequest request) {
 
 	ForumConfigItem keepLearnerContent = forumService.getConfigItem(ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
 	keepLearnerContent.setConfigValue(String.valueOf(adminForm.getKeepLearnerContent()));
 	forumService.saveForumConfigItem(keepLearnerContent);
 
 	request.setAttribute("savedSuccess", true);
-	return mapping.findForward("config");
+	return "jsps/admin/configE";
     }
 }

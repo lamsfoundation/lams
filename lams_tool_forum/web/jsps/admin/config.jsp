@@ -11,7 +11,7 @@
 	<body class="stripes">
 
 		<c:set var="title"><fmt:message key="admin.page.title" /></c:set>
-		<lams:Page type="admin" title="${title}">
+		<lams:Page type="admin" title="${title}" formID="adminForm">
 			
 			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 			
@@ -23,14 +23,14 @@
 				</lams:Alert>
 			</c:if>
 			
-			<html:form action="/admin/saveContent" styleId="adminForm" method="post" enctype="multipart/form-data">
+			<form:form action="saveContent.do" id="adminForm" modelAttribute="adminForm" method="post" enctype="multipart/form-data">
 				<div class="checkbox">
 					<label for="keepLearnerContent">
-					<html:checkbox property="keepLearnerContent"/>
+					<form:checkbox path="keepLearnerContent"/>
 					<fmt:message key="admin.keep.learner.content" /></label>
 				</div>
-				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></html:submit>
-			</html:form>
+				<input type="submit" class="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></input>
+			</form:form>
 			
 		<div id="footer"></div>
 		</lams:Page>

@@ -20,30 +20,21 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.forum.web.actions;
+package org.lamsfoundation.lams.tool.forum.web.controller;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
@@ -53,148 +44,112 @@ import org.lamsfoundation.lams.tool.forum.util.ConditionTopicComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumConditionForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Auxiliary action in author mode. It contains operations with ForumCondition. The rest of operations are located in
  * <code>AuthoringAction</code> action.
  *
  * @author Marcin Cieslak
- * @see org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction
+ * @see org.lamsfoundation.lams.tool.forum.web.controller.AuthoringAction
  */
-public class AuthoringConditionAction extends Action {
+@Controller
+@RequestMapping("/authoringCondition")
+public class AuthoringConditionController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("forumService")
+    private IForumService forumService;
 
-	String param = mapping.getParameter();
-
-	if (param.equals("newConditionInit")) {
-	    return newConditionInit(mapping, form, request, response);
-	}
-	if (param.equals("editCondition")) {
-	    return editCondition(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateCondition")) {
-	    return saveOrUpdateCondition(mapping, form, request, response);
-	}
-	if (param.equals("removeCondition")) {
-	    return removeCondition(mapping, form, request, response);
-	}
-	if (param.equals("upCondition")) {
-	    return upCondition(mapping, form, request, response);
-	}
-	if (param.equals("downCondition")) {
-	    return downCondition(mapping, form, request, response);
-	}
-	return null;
-    }
+    @Autowired
+    @Qualifier("forumMessageService")
+    private MessageService messageService;
 
     /**
      * Display empty page for a new condition.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newConditionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/newConditionInit")
+    public String newConditionInit(@ModelAttribute ForumConditionForm forumConditionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	populateFormWithPossibleItems(form, request);
-	((ForumConditionForm) form).setOrderId(-1);
-	return mapping.findForward("addcondition");
+	populateFormWithPossibleItems(forumConditionForm, request);
+	forumConditionForm.setOrderId(-1);
+	return "jsps/authoring/addCondition";
     }
 
     /**
      * Display edit page for an existing condition.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward editCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editCondition")
+    public String editCondition(@ModelAttribute ForumConditionForm forumConditionForm, HttpServletRequest request) {
 
-	ForumConditionForm ForumConditionForm = (ForumConditionForm) form;
-	String sessionMapID = ForumConditionForm.getSessionMapID();
+	String sessionMapID = forumConditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(ForumConstants.PARAM_ORDER_ID), -1);
 	ForumCondition condition = null;
 	if (orderId != -1) {
 	    SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
-	    List<ForumCondition> conditionList = new ArrayList<ForumCondition>(conditionSet);
+	    List<ForumCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
-		populateConditionToForm(orderId, condition, ForumConditionForm, request);
+		populateConditionToForm(orderId, condition, forumConditionForm, request);
 	    }
 	}
 
-	populateFormWithPossibleItems(form, request);
-	return condition == null ? null : mapping.findForward("addcondition");
+	populateFormWithPossibleItems(forumConditionForm, request);
+	return condition == null ? null : "jsps/authoring/addCondition";
     }
 
     /**
      * This method will get necessary information from condition form and save or update into <code>HttpSession</code>
      * condition list. Notice, this save is not persist them into database, just save <code>HttpSession</code>
      * temporarily. Only they will be persist when the entire authoring page is being persisted.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-    private ActionForward saveOrUpdateCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/saveOrUpdateCondition")
+    public String saveOrUpdateCondition(@ModelAttribute ForumConditionForm forumConditionForm,
+	    HttpServletRequest request) {
 
-	ForumConditionForm conditionForm = (ForumConditionForm) form;
-	ActionErrors errors = validateForumCondition(conditionForm, request);
+	MultiValueMap<String, String> errorMap = validateForumCondition(forumConditionForm, request);
 
-	if (!errors.isEmpty()) {
-	    populateFormWithPossibleItems(form, request);
-	    this.addErrors(request, errors);
-	    return mapping.findForward("addcondition");
+	if (!errorMap.isEmpty()) {
+	    populateFormWithPossibleItems(forumConditionForm, request);
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/authoring/addCondition";
 	}
 
 	try {
-	    extractFormToForumCondition(request, conditionForm);
+	    extractFormToForumCondition(request, forumConditionForm);
 	} catch (Exception e) {
 
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition", e.getMessage()));
-	    if (!errors.isEmpty()) {
-		populateFormWithPossibleItems(form, request);
-		this.addErrors(request, errors);
-		return mapping.findForward("addcondition");
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition"));
+	    if (!errorMap.isEmpty()) {
+		populateFormWithPossibleItems(forumConditionForm, request);
+		request.setAttribute("errorMap", errorMap);
+		return "jsps/authoring/addCondition";
 	    }
 	}
 
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, conditionForm.getSessionMapID());
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, forumConditionForm.getSessionMapID());
 
-	return mapping.findForward(ForumConstants.SUCCESS);
+	return "jsps/authoring/conditionList";
     }
 
     /**
      * Remove condition from HttpSession list and update page display. As authoring rule, all persist only happen when
      * user submit whole page. So this remove is just impact HttpSession values.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward removeCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeCondition")
+    public String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
@@ -203,7 +158,7 @@ public class AuthoringConditionAction extends Action {
 	int orderId = NumberUtils.stringToInt(request.getParameter(ForumConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
-	    List<ForumCondition> conditionList = new ArrayList<ForumCondition>(conditionSet);
+	    List<ForumCondition> conditionList = new ArrayList<>(conditionSet);
 	    ForumCondition condition = conditionList.remove(orderId);
 
 	    for (ForumCondition otherCondition : conditionSet) {
@@ -219,38 +174,26 @@ public class AuthoringConditionAction extends Action {
 	}
 
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ForumConstants.SUCCESS);
+	return "jsps/authoring/conditionList";
     }
 
     /**
      * Move up current item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward upCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upCondition")
+    public String upCondition(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
      * Move down current item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward downCondition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downCondition")
+    public String downCondition(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -258,7 +201,7 @@ public class AuthoringConditionAction extends Action {
 	int orderId = NumberUtils.stringToInt(request.getParameter(ForumConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
 	    SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
-	    List<ForumCondition> conditionList = new ArrayList<ForumCondition>(conditionSet);
+	    List<ForumCondition> conditionList = new ArrayList<>(conditionSet);
 	    // get current and the target item, and switch their sequnece
 	    ForumCondition condition = conditionList.get(orderId);
 	    ForumCondition repCondition;
@@ -277,31 +220,20 @@ public class AuthoringConditionAction extends Action {
 	}
 
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(ForumConstants.SUCCESS);
+	return "jsps/authoring/conditionList";
     }
 
     // *************************************************************************************
     // Private methods for internal needs
     // *************************************************************************************
-    /**
-     * Return ForumService bean.
-     */
-    private IForumService getForumService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
-    }
 
     /**
      * List containing Forum conditions.
-     *
-     * @param request
-     * @return
      */
     private SortedSet<ForumCondition> getForumConditionSet(SessionMap sessionMap) {
 	SortedSet<ForumCondition> list = (SortedSet<ForumCondition>) sessionMap.get(ForumConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
+	    list = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(ForumConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;
@@ -310,7 +242,7 @@ public class AuthoringConditionAction extends Action {
     private SortedSet<MessageDTO> getMessageDTOList(SessionMap sessionMap) {
 	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
 	if (topics == null) {
-	    topics = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	    topics = new TreeSet<>(new MessageDtoComparator());
 	    sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 	}
 	return topics;
@@ -318,9 +250,6 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Get the deleted condition list, which could be persisted or non-persisted items.
-     *
-     * @param request
-     * @return
      */
     private List getDeletedForumConditionList(SessionMap sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.ATTR_DELETED_CONDITION_LIST);
@@ -328,10 +257,6 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
      */
     private List getListFromSession(SessionMap sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
@@ -344,11 +269,6 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * This method will populate condition information to its form for edit use.
-     *
-     * @param orderId
-     * @param condition
-     * @param form
-     * @param request
      */
     private void populateConditionToForm(int orderId, ForumCondition condition, ForumConditionForm form,
 	    HttpServletRequest request) {
@@ -360,14 +280,9 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * This method will populate questions to choose to the form for edit use.
-     *
-     * @param sequenceId
-     * @param condition
-     * @param form
-     * @param request
      */
-    private void populateFormWithPossibleItems(ActionForm form, HttpServletRequest request) {
-	ForumConditionForm conditionForm = (ForumConditionForm) form;
+    private void populateFormWithPossibleItems(ForumConditionForm conditionForm, HttpServletRequest request) {
+
 	// get back sessionMAP
 	String sessionMapID = conditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -376,21 +291,17 @@ public class AuthoringConditionAction extends Action {
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
 
-	List<LabelValueBean> lvBeans = new LinkedList<LabelValueBean>();
+	Map<String, String> possibleItems = new HashMap<>(messageDTOs.size());
 
 	for (MessageDTO messageDTO : messageDTOs) {
 	    Message topic = messageDTO.getMessage();
-	    lvBeans.add(new LabelValueBean(topic.getSubject(), new Long(topic.getCreated().getTime()).toString()));
+	    possibleItems.put(topic.getSubject(), new Long(topic.getCreated().getTime()).toString());
 	}
-	conditionForm.setPossibleItems(lvBeans.toArray(new LabelValueBean[] {}));
+	conditionForm.setPossibleItems(possibleItems);
     }
 
     /**
      * Extract form content to ForumCondition.
-     *
-     * @param request
-     * @param form
-     * @throws Exception
      */
     private void extractFormToForumCondition(HttpServletRequest request, ForumConditionForm form) throws Exception {
 
@@ -401,7 +312,7 @@ public class AuthoringConditionAction extends Action {
 	ForumCondition condition = null;
 
 	if (orderId == -1) { // add
-	    String properConditionName = getForumService().createTextSearchConditionName(conditionSet);
+	    String properConditionName = forumService.createTextSearchConditionName(conditionSet);
 	    condition = form.extractCondition();
 	    condition.setName(properConditionName);
 	    int maxOrderId = 1;
@@ -412,13 +323,13 @@ public class AuthoringConditionAction extends Action {
 	    condition.setOrderId(maxOrderId);
 	    conditionSet.add(condition);
 	} else { // edit
-	    List<ForumCondition> conditionList = new ArrayList<ForumCondition>(conditionSet);
+	    List<ForumCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId - 1);
 	    form.extractCondition(condition);
 	}
 
 	Long[] selectedItems = form.getSelectedItems();
-	Set<Message> conditionTopics = new TreeSet<Message>(new ConditionTopicComparator());
+	Set<Message> conditionTopics = new TreeSet<>(new ConditionTopicComparator());
 	Set<MessageDTO> messageDTOs = getMessageDTOList(sessionMap);
 
 	for (Long selectedItem : selectedItems) {
@@ -434,17 +345,16 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Validate ForumCondition
-     *
-     * @param conditionForm
-     * @return
      */
-    private ActionErrors validateForumCondition(ForumConditionForm conditionForm, HttpServletRequest request) {
-	ActionErrors errors = new ActionErrors();
+    private MultiValueMap<String, String> validateForumCondition(ForumConditionForm conditionForm,
+	    HttpServletRequest request) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	String formConditionName = conditionForm.getDisplayName();
 	if (StringUtils.isBlank(formConditionName)) {
 
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.name.blank"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.name.blank"));
 	} else {
 
 	    Integer formConditionOrderId = conditionForm.getOrderId();
@@ -456,7 +366,7 @@ public class AuthoringConditionAction extends Action {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {
 
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.duplicated.name"));
+		    errorMap.add("GLOBAL", messageService.getMessage("error.condition.duplicated.name"));
 		    break;
 		}
 	    }
@@ -465,13 +375,10 @@ public class AuthoringConditionAction extends Action {
 	// should be selected at least one question
 	Long[] selectedItems = conditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.no.questions.selected"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.condition.no.questions.selected"));
 	}
 
-	return errors;
+	return errorMap;
     }
 
-    private ActionMessages validate(ForumConditionForm form, ActionMapping mapping, HttpServletRequest request) {
-	return new ActionMessages();
-    }
 }

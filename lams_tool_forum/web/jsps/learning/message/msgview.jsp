@@ -111,7 +111,7 @@
 				<c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 					<c:forEach var="file" items="${msgDto.message.attachments}">
 						<c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
+							<lams:WebAppURL />download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true
 						</c:set>
 						<a href="<c:out value='${downloadURL}' escapeXml='false'/>"><c:out value="${file.fileName}" /> </a>
 					</c:forEach>
@@ -148,12 +148,11 @@
 			<!--  Hide/Unhide Button -->
 			<c:if test='${sessionMap.mode == "teacher"}'>
 				<c:set var="updateMark">
-					<html:rewrite
-						page="/monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum&hideReflection=${sessionMap.hideReflection}" />
+					<lams:WebAppURL />monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum&hideReflection=${sessionMap.hideReflection}
 				</c:set>
-				<html:link href="${updateMark}" styleClass="comment">
+				<a href="${updateMark}" class="comment">
 					<fmt:message key="lable.topic.title.mark" />
-				</html:link>
+				</a>
 				&middot;
 							
 				<!--  call the hide action -->
@@ -161,22 +160,20 @@
 					<c:when test="${hidden}">
 						<!--  display a show link  -->
 						<c:set var="hidetopic">
-							<html:rewrite
-								page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=false" />
+							<lams:WebAppURL />learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=false
 						</c:set>
-						<html:link href="${hidetopic}" styleClass="comment">
+						<a href="${hidetopic}" class="comment">
 							<fmt:message key="label.show" />
-						</html:link>
+						</a>
 					</c:when>
 					<c:otherwise>
 						<!--  display a hide link -->
 						<c:set var="hidetopic">
-							<html:rewrite
-								page="/learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=true" />
+							<lams:WebAppURL />learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=true
 						</c:set>
-						<html:link href="${hidetopic}" styleClass="comment">
+						<a href="${hidetopic}" class="comment">
 							<fmt:message key="label.hide" />
-						</html:link>
+						</a>
 					</c:otherwise>
 				</c:choose>
 				&middot;
@@ -185,8 +182,7 @@
 			<!--  Reply Button -->
 			<c:if test="${(not sessionMap.finishedLock) && (not noMorePosts)}">
 				<c:set var="replytopic">
-					<html:rewrite
-						page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
+					<lams:WebAppURL />learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
 				</c:set>
 				<a href="#${msgDto.message.uid}" onClick="javascript:createReply(${msgDto.message.uid},'${replytopic}',${msgLevel})"
 					class="comment"><fmt:message key="label.reply" /></a>
@@ -198,8 +194,7 @@
 				<c:if
 					test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
 					<c:set var="edittopic">
-						<html:rewrite
-							page="/learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
+						<lams:WebAppURL />learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}
 					</c:set>
 					<a href="#${msgDto.message.uid}" onClick="javascript:createEdit(${msgDto.message.uid},'${edittopic}',${msgLevel})"
 						class="comment"><fmt:message key="label.edit" /></a>

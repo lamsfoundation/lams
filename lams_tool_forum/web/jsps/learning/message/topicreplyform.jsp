@@ -2,9 +2,9 @@
 
 <div class="form-group">
 	<label><fmt:message key="message.label.subject" />&nbsp;</label>&nbsp;
-	<html:text styleClass="form-control" tabindex="1" property="message.subject" maxlength="60" />
+	<input type="text" class="form-control" tabindex="1" name="message.subject" value="${message.subject}" maxlength="60" />
 	&nbsp;
-	<html:errors property="message.subject" />
+	<c:set var="message.subject" value="errorMap${forum.uid}" />
 </div>
 <div class="form-group">
 	<label><fmt:message key="message.label.body" /> *</label><BR />
@@ -14,18 +14,16 @@
 
 	<div class="form-group">
  		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
- 		<html:errors property="message.attachment" />
+ 		<c:set var="message.attachment" value="errorMap${forum.uid}" />
 	</div>
 	
 	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 </c:if>
 
 <div class="btn-group-xs voffset5 pull-right">
-	<html:button property="goback" styleId="cancelButton" onclick="javascript:cancelReply();"
-		styleClass="btn btn-default roffset5">
+	<button name="goback" id="cancelButton" onclick="javascript:cancelReply();"
+		class="btn btn-default roffset5">
 		<fmt:message key="button.cancel" />
-	</html:button>
-	<html:submit styleClass="btn btn-default" styleId="submitButton">
-		<fmt:message key="button.submit" />
-	</html:submit>
+	</button>
+	<input type="submit" class="btn btn-default" id="submitButton" value="<fmt:message key="button.submit" />"/>
 </div>

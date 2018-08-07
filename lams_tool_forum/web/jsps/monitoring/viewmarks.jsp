@@ -46,11 +46,12 @@
 
 	<div class="panel-body ${bgClass}" >
 
-	<div class="pull-right"><html:form action="/monitoring/editMark" method="post">
-			<html:hidden property="sessionMapID" value="${sessionMapID}"/>
-			<html:hidden property="topicID" value="${topic.message.uid}"/>
+	<div class="pull-right">
+			<form:form action="editMark.do" id="markForm" modelAttribute="markForm" method="post">
+			<form:hidden path="sessionMapID" value="${sessionMapID}"/>
+			<form:hidden path="topicID" value="${topic.message.uid}"/>
 			<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="btn btn-default btn-sm" />
-			</html:form>
+			</form:form>
 	</div>
 
 		<div class="row">
@@ -91,7 +92,7 @@
 
 	<c:forEach var="file" items="${topic.message.attachments}">
 		<c:set var="downloadURL">
-			<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
+			<lams:WebAppURL />download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true
 		</c:set>
 		<a href="<c:out value='${downloadURL}' escapeXml='false'/>"><i class="fa fa-paperclip" title="<fmt:message key='message.label.attachment'/>"></i></a>
 	</c:forEach>

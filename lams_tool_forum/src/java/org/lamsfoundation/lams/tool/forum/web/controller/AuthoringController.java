@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.forum.web.actions;
+package org.lamsfoundation.lams.tool.forum.web.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -39,19 +39,13 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.authoring.web.AuthoringAction;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -65,97 +59,45 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
-import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
     private static Logger log = Logger.getLogger(AuthoringAction.class);
+
+    @Autowired
+    @Qualifier("forumService")
     private IForumService forumService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, PersistenceException,
-	    IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    @Autowired
+    @Qualifier("forumMessageService")
+    private MessageService messageService;
 
-	String param = mapping.getParameter();
-	// -----------------------Forum Author function ---------------------------
-	if (param.equals("initPage")) {
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR);
-	    return initPage(mapping, form, request, response);
-	}
-
-	// ***************** Monitoring define later screen ********************
-	if (param.equals("defineLater")) {
-	    // update define later flag to true
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
-	    forumService = getForumManager();
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    Forum forum = forumService.getForumByContentId(contentId);
-
-	    if (!forum.isContentInUse()) {
-		forum.setDefineLater(true);
-		forumService.updateForum(forum);
-
-		// audit log the teacher has started editing activity in monitor
-		forumService.auditLogStartEditingActivityInMonitor(contentId);
-	    }
-
-	    return initPage(mapping, form, request, response);
-	}
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-	// -----------------------Topic function ---------------------------
-	if (param.equals("newTopic")) {
-	    return newTopic(mapping, form, request, response);
-	}
-	if (param.equals("createTopic")) {
-	    return createTopic(mapping, form, request, response);
-	}
-	if (param.equals("editTopic")) {
-	    return editTopic(mapping, form, request, response);
-	}
-	if (param.equals("updateTopic")) {
-	    return updateTopic(mapping, form, request, response);
-	}
-	if (param.equals("deleteTopic")) {
-	    return deleteTopic(mapping, form, request, response);
-	}
-	if (param.equals("deleteAttachment")) {
-	    return deleteAttachment(mapping, form, request, response);
-	}
-	if (param.equals("upTopic")) {
-	    return upTopic(mapping, form, request, response);
-	}
-	if (param.equals("downTopic")) {
-	    return downTopic(mapping, form, request, response);
-	}
-	if (param.equals("initPedagogicalPlannerForm")) {
-	    return initPedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
-	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("createPedagogicalPlannerTopic")) {
-	    return createPedagogicalPlannerTopic(mapping, form, request, response);
-	}
-
-	return mapping.findForward("error");
-    }
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     // ******************************************************************************************************************
     // Forum Author functions
@@ -164,20 +106,15 @@ public class AuthoringAction extends Action {
     /**
      * This page will display initial submit tool content. Or just a blank page if the toolContentID does not exist
      * before.
-     *
-     * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
-     *      org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
      */
-    protected ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/authoring")
+    public String initPage(@ModelAttribute ForumForm forumForm, HttpServletRequest request) {
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	ForumForm forumForm = (ForumForm) form;
 	forumForm.setSessionMapID(sessionMap.getSessionID());
 	forumForm.setContentFolderID(contentFolderID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
@@ -193,7 +130,7 @@ public class AuthoringAction extends Action {
 	    if (forum == null) {
 		forum = forumService.getDefaultContent(contentId);
 		if (forum.getMessages() != null) {
-		    List<Message> list = new ArrayList<Message>();
+		    List<Message> list = new ArrayList<>();
 		    // sorted by create date
 		    Iterator iter = forum.getMessages().iterator();
 		    while (iter.hasNext()) {
@@ -236,17 +173,16 @@ public class AuthoringAction extends Action {
 
 	    sessionMap.put(ForumConstants.AUTHORING_FORUM, forum);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
-	    return mapping.findForward("error");
+	    AuthoringController.log.error(e);
+	    return "error";
 	}
 
-	// set back STRUTS component value
 	// init it to avoid null exception in following handling
 	if (topics == null) {
-	    topics = new ArrayList<MessageDTO>();
+	    topics = new ArrayList<>();
 	}
 
-	Set topicSet = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	Set topicSet = new TreeSet<>(new MessageDtoComparator());
 	topicSet.addAll(topics);
 	sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topicSet);
 
@@ -254,11 +190,111 @@ public class AuthoringAction extends Action {
 	SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
 	conditionSet.clear();
 	conditionSet.addAll(forum.getConditions());
-	
+
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward("success");
+	return "jsps/authoring/authoring";
+    }
+
+    @RequestMapping("/defineLater")
+    public String defineLater(@ModelAttribute ForumForm forumForm, HttpServletRequest request) {
+
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Forum forum = forumService.getForumByContentId(contentId);
+
+	if (!forum.isContentInUse()) {
+	    forum.setDefineLater(true);
+	    forumService.updateForum(forum);
+
+	    // audit log the teacher has started editing activity in monitor
+	    forumService.auditLogStartEditingActivityInMonitor(contentId);
+	}
+
+	// initial Session Map
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	forumForm.setSessionMapID(sessionMap.getSessionID());
+	forumForm.setContentFolderID(contentFolderID);
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+
+	// get back the topic list and display them on page
+	forumService = getForumManager();
+
+	List<MessageDTO> topics = null;
+	try {
+	    forum = forumService.getForumByContentId(contentId);
+	    // if forum does not exist, try to use default content instead.
+	    if (forum == null) {
+		forum = forumService.getDefaultContent(contentId);
+		if (forum.getMessages() != null) {
+		    List<Message> list = new ArrayList<>();
+		    // sorted by create date
+		    Iterator iter = forum.getMessages().iterator();
+		    while (iter.hasNext()) {
+			Message topic = (Message) iter.next();
+			// contentFolderID != -1 means it is sysadmin: LDEV-906
+			if (topic.getCreatedBy() == null && !StringUtils.equals(contentFolderID, "-1")) {
+			    // get login user (author)
+			    HttpSession ss = SessionManager.getSession();
+			    // get back login user DTO
+			    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			    ForumUser fuser = new ForumUser(user, null);
+			    topic.setCreatedBy(fuser);
+			}
+			list.add(topic);
+		    }
+		    topics = MessageDTO.getMessageDTO(list);
+		} else {
+		    topics = null;
+		}
+	    } else {
+		topics = forumService.getAuthoredTopics(forum.getUid());
+		// failure tolerance: if current contentID is defaultID, the createBy will be null.
+		// contentFolderID != -1 means it is sysadmin: LDEV-906
+		if (!StringUtils.equals(contentFolderID, "-1")) {
+		    for (MessageDTO messageDTO : topics) {
+			if (StringUtils.isBlank(messageDTO.getAuthor())) {
+			    // get login user (author)
+			    HttpSession ss = SessionManager.getSession();
+			    // get back login user DTO
+			    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			    ForumUser fuser = new ForumUser(user, null);
+			    messageDTO.setAuthor(fuser.getFirstName() + " " + fuser.getLastName());
+			}
+		    }
+		}
+	    }
+
+	    // tear down PO to normal object using clone() method
+	    forumForm.setForum((Forum) forum.clone());
+
+	    sessionMap.put(ForumConstants.AUTHORING_FORUM, forum);
+	} catch (Exception e) {
+	    AuthoringController.log.error(e);
+	    return "error";
+	}
+
+	// init it to avoid null exception in following handling
+	if (topics == null) {
+	    topics = new ArrayList<>();
+	}
+
+	Set topicSet = new TreeSet<>(new MessageDtoComparator());
+	topicSet.addAll(topics);
+	sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topicSet);
+
+	// init condition set
+	SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
+	conditionSet.clear();
+	conditionSet.addAll(forum.getConditions());
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+
+	return "jsps/authoring/authoring";
     }
 
     /**
@@ -270,30 +306,21 @@ public class AuthoringAction extends Action {
      * <li>Topics' attachment file</li>
      * <li>Author user information</li>
      * </ol>
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @RequestMapping("/update")
+    public String updateContent(@ModelAttribute ForumForm forumForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	
-	ForumForm forumForm = (ForumForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(forumForm.getSessionMapID());
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(forumForm.getSessionMapID());
 	// validation
-	ActionMessages errors = validate(forumForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    return mapping.findForward("success");
+	MultiValueMap<String, String> errorMap = validate(forumForm, request);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/authoring/authoring";
 	}
 
 	Forum forum = forumForm.getForum();
@@ -323,7 +350,7 @@ public class AuthoringAction extends Action {
 	    // new Forum, create it.
 	    forumPO = forum;
 	    forumPO.setContentId(forumForm.getToolContentID());
-	    
+
 	} else {
 	    Long uid = forumPO.getUid();
 	    PropertyUtils.copyProperties(forumPO, forum);
@@ -403,7 +430,7 @@ public class AuthoringAction extends Action {
 	forum = forumService.updateForum(forum);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward("success");
+	return "jsps/authoring/authoring";
     }
 
     // ******************************************************************************************************************
@@ -412,37 +439,24 @@ public class AuthoringAction extends Action {
     /**
      * Display emtpy topic page for user input topic information. This page will contain all topics list which this
      * author posted before.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newTopic")
+    public String newTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	((MessageForm) form).setSessionMapID(sessionMapID);
+	messageForm.setSessionMapID(sessionMapID);
 
-	return mapping.findForward("success");
+	return "jsps/authoring/message/create";
     }
 
     /**
      * Create a topic in memory. This topic will be saved when user save entire authoring page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws PersistenceException
      */
-    public ActionForward createTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, PersistenceException {
-	MessageForm messageForm = (MessageForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(messageForm.getSessionMapID());
+    @RequestMapping("/createTopic")
+    public String createTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+	    throws IOException, ServletException, PersistenceException {
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(messageForm.getSessionMapID());
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	SortedSet topics = getTopics(sessionMap);
@@ -481,7 +495,7 @@ public class AuthoringAction extends Action {
 	// set attachment of this topic
 	Set attSet = null;
 	if (messageForm.getAttachmentFile() != null
-		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())) {
+		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
 	    forumService = getForumManager();
 	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 	    // only allow one attachment, so replace whatever
@@ -506,25 +520,20 @@ public class AuthoringAction extends Action {
 
 	topics.add(MessageDTO.getMessageDTO(message));
 
-	return mapping.findForward("success");
+	return "jsps/authoring/message/topiclist";
     }
 
     /**
      * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring
      * page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
      */
-    public ActionForward deleteTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException {
+    @RequestMapping("/deleteTopic")
+    public String deleteTopic(HttpServletRequest request) throws PersistenceException {
+
 	// get SessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
@@ -551,29 +560,23 @@ public class AuthoringAction extends Action {
 	    }
 	}
 
-	return mapping.findForward("success");
+	return "jsps/authoring/message/topiclist";
     }
 
     /**
      * Display a HTML FORM which contains subject, body and attachment information from a special topic. This page is
      * ready for user update this topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
      */
-    public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException {
+    @RequestMapping("/editTopic")
+    public String editTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+	    throws PersistenceException {
 
 	// get SessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
-	MessageForm msgForm = (MessageForm) form;
-	msgForm.setSessionMapID(sessionMapID);
+	messageForm.setSessionMapID(sessionMapID);
 
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
@@ -583,31 +586,26 @@ public class AuthoringAction extends Action {
 	    MessageDTO topic = rList.get(topicIdx);
 	    if (topic != null) {
 		// update message to HTML Form to echo back to web page: for subject, body display
-		msgForm.setMessage(topic.getMessage());
+		messageForm.setMessage(topic.getMessage());
 	    }
 	    // echo back to web page: for attachment display
 	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
 	}
 
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX, topicIndex);
-	return mapping.findForward("success");
+	return "jsps/authoring/message/edit";
     }
 
     /**
      * Submit user updated inforamion in a topic to memory. This update will be submit to database only when user save
      * whole authoring page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
      */
-    public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException {
-	MessageForm messageForm = (MessageForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(messageForm.getSessionMapID());
+    @RequestMapping("/updateTopic")
+    public String updateTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
+	    throws PersistenceException {
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(messageForm.getSessionMapID());
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	// get param from HttpServletRequest
@@ -629,7 +627,7 @@ public class AuthoringAction extends Action {
 	    newMsg.getMessage().setUpdated(new Date());
 	    // update attachment
 	    if (messageForm.getAttachmentFile() != null
-		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())) {
+		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
 		forumService = getForumManager();
 		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 		// only allow one attachment, so replace whatever
@@ -649,56 +647,39 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX, topicIndex);
-	return mapping.findForward("success");
+	return "jsps/authoring/message/topiclist";
     }
 
     /**
      * Remove message attachment.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/deleteAttachment")
+    public String deleteAttachment(HttpServletRequest request) {
 	request.setAttribute("itemAttachment", null);
-	return mapping.findForward("success");
+	return "jsps/authoring/parts/msgattachment";
     }
 
     /**
      * Move up current topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward upTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchTopic(mapping, request, true);
+    @RequestMapping("/upTopic")
+    public String upTopic(HttpServletRequest request) {
+	return switchTopic(request, true);
     }
 
     /**
      * Move down current topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward downTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchTopic(mapping, request, false);
+    @RequestMapping("/downTopic")
+    public String downTopic(HttpServletRequest request) {
+	return switchTopic(request, false);
     }
 
-    private ActionForward switchTopic(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchTopic(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX), -1);
 	if (itemIdx != -1) {
@@ -724,56 +705,41 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward("success");
+	return "jsps/authoring/message/topiclist";
     }
 
     // ******************************************************************************************************************
     // Private method for internal functions
     // ******************************************************************************************************************
+
     private IForumService getForumManager() {
 	if (forumService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
 	}
 	return forumService;
     }
 
-    /**
-     * @param request
-     * @return
-     */
     private SortedSet<MessageDTO> getTopics(SessionMap<String, Object> sessionMap) {
 	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
 	if (topics == null) {
-	    topics = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	    topics = new TreeSet<>(new MessageDtoComparator());
 	    sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 	}
 	return topics;
     }
 
-    /**
-     * @param request
-     * @return
-     */
     private List getTopicDeletedAttachmentList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.DELETED_ATTACHMENT_LIST);
     }
 
-    /**
-     * @param request
-     * @return
-     */
     private List getDeletedTopicList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.DELETED_AUTHORING_TOPICS_LIST);
     }
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
      */
     private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
@@ -788,12 +754,12 @@ public class AuthoringAction extends Action {
      * Forum validation method from STRUCT interface.
      *
      */
-    public ActionMessages validate(ForumForm form, ActionMapping mapping,
-	    javax.servlet.http.HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate(ForumForm form, HttpServletRequest request) {
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(form.getSessionMapID());
-	ActionMessage ae;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(form.getSessionMapID());
 	try {
 	    String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 	    // if (StringUtils.isBlank(form.getForum().getTitle())) {
@@ -810,54 +776,50 @@ public class AuthoringAction extends Action {
 		    allowNewTopic = forumPO.isAllowNewTopic();
 		} else {
 		    // failure tolerance
-		    AuthoringAction.log.error("ERROR: Can not found Forum by toolContentID:" + form.getToolContentID());
+		    AuthoringController.log
+			    .error("ERROR: Can not found Forum by toolContentID:" + form.getToolContentID());
 		    allowNewTopic = true;
 		}
 	    }
 	    if (!allowNewTopic) {
 		Set topics = getTopics(sessionMap);
 		if (topics.size() == 0) {
-		    ActionMessage error = new ActionMessage("error.must.have.topic");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		    errorMap.add("GLOBAL", messageService.getMessage("error.must.have.topic"));
 		}
 	    }
 	    // define it later mode(TEACHER) skip below validation.
 	    if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-		return errors;
+		return errorMap;
 	    }
 	    if (!form.getForum().isAllowRichEditor() && form.getForum().isLimitedMaxCharacters()) {
 		if (form.getForum().getMaxCharacters() <= 0) {
-		    ActionMessage error = new ActionMessage("error.limit.char.less.zero");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		    errorMap.add("GLOBAL", messageService.getMessage("error.limit.char.less.zero"));
 		}
 	    }
 	    if (!form.getForum().isAllowRichEditor()) {
 		if (form.getForum().getMaxCharacters() != 0
 			&& form.getForum().getMaxCharacters() < form.getForum().getMinCharacters()) {
-		    ActionMessage error = new ActionMessage("error.min.post.char.less");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		    errorMap.add("GLOBAL", messageService.getMessage("error.min.post.char.less"));
 		}
 	    }
 	    if (form.getForum().isAllowRateMessages()) {
 		if (form.getForum().getMaximumRate() != 0
 			&& form.getForum().getMaximumRate() < form.getForum().getMinimumRate()) {
-		    ActionMessage error = new ActionMessage("error.min.rate.less.max");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		    errorMap.add("GLOBAL", messageService.getMessage("error.min.rate.less.max"));
 		}
 	    }
 
 	    if (!form.getForum().isAllowNewTopic()) {
 		if (form.getForum().getMaximumReply() != 0
 			&& form.getForum().getMaximumReply() < form.getForum().getMinimumReply()) {
-		    ActionMessage error = new ActionMessage("error.min.less.max");
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		    errorMap.add("GLOBAL", messageService.getMessage("error.min.less.max"));
 		}
 	    }
 
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e.toString());
+	    AuthoringController.log.error(e.toString());
 	}
-	return errors;
+	return errorMap;
     }
 
     private float convertToMeg(int numBytes) {
@@ -866,14 +828,11 @@ public class AuthoringAction extends Action {
 
     /**
      * List containing Forum conditions.
-     *
-     * @param request
-     * @return
      */
     private SortedSet<ForumCondition> getForumConditionSet(SessionMap<String, Object> sessionMap) {
 	SortedSet<ForumCondition> list = (SortedSet<ForumCondition>) sessionMap.get(ForumConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
+	    list = new TreeSet<>(new TextSearchConditionComparator());
 	    sessionMap.put(ForumConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;
@@ -881,31 +840,30 @@ public class AuthoringAction extends Action {
 
     /**
      * Get the deleted condition list, which could be persisted or non-persisted items.
-     *
-     * @param request
-     * @return
      */
     private List getDeletedForumConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.ATTR_DELETED_CONDITION_LIST);
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(@ModelAttribute ForumPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) {
+
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Forum forum = getForumManager().getForumByContentId(toolContentID);
 	plannerForm.fillForm(forum);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward("success");
+	return "jsps/authoring/pedagogicalPlannerForm";
 
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute ForumPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) throws IOException {
+
+	MultiValueMap<String, String> errorMap = plannerForm.validate();
+	if (errorMap.isEmpty()) {
 	    Forum forum = getForumManager().getForumByContentId(plannerForm.getToolContentID());
 	    forum.setInstructions(plannerForm.getInstructions());
 
@@ -915,8 +873,8 @@ public class AuthoringAction extends Action {
 	    String topic = null;
 	    String subject = null;
 	    Message message = null;
-	    List<Message> newTopics = new LinkedList<Message>();
-	    Set<Message> forumTopics = new TreeSet<Message>(new MessageComparator());
+	    List<Message> newTopics = new LinkedList<>();
+	    Set<Message> forumTopics = new TreeSet<>(new MessageComparator());
 	    for (Message existingMessage : forum.getMessages()) {
 		if (existingMessage.getIsAuthored() && existingMessage.getToolSession() == null) {
 		    forumTopics.add(existingMessage);
@@ -986,16 +944,15 @@ public class AuthoringAction extends Action {
 	    forum.getMessages().addAll(newTopics);
 	    getForumManager().updateForum(forum);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
 	}
-	return mapping.findForward("success");
+	return "jsps/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerTopic(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException, PersistenceException {
-	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
+    @RequestMapping("/createPedagogicalPlannerTopic")
+    public String createPedagogicalPlannerTopic(@ModelAttribute ForumPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request) throws IOException, ServletException, PersistenceException {
 	plannerForm.setTopic(plannerForm.getTopicCount().intValue(), "");
-	return mapping.findForward("success");
+	return "jsps/authoring/pedagogicalPlannerForm";
     }
 }

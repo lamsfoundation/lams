@@ -1,15 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 
-<html:form action="/monitoring/updateMark" method="post">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+<form:form action="updateMark.do" id="markForm" modelAttribute="markForm" method="post">
+
+	<c:set var="sessionMap" value="${sessionScope[markForm.sessionMapID]}" />
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
     <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
     <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	<html:hidden property="sessionMapID"/>
-	<html:hidden property="topicID"/>
-	<html:hidden property="hideReflection" value="${sessionMap.hideReflection}"/>
+	<form:hidden path="sessionMapID"/>
+	<form:hidden path="topicID"/>
+	<form:hidden path="hideReflection" value="${sessionMap.hideReflection}"/>
 
 	<p>
 		<fmt:message key="message.assign.mark" />&nbsp;
@@ -20,11 +20,11 @@
 	
 	<p>
 		<c:set var="viewtopic">
-		    <html:rewrite page="/learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${formBean.sessionMapID}&hideReflection=${sessionMap.hideReflection}" />
+		    <lams:WebAppURL />learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${formBean.sessionMapID}&hideReflection=${sessionMap.hideReflection}
 		</c:set>
-		<html:link href="javascript:launchPopup('${viewtopic}','viewtopic')">
+		<a href="javascript:launchPopup('${viewtopic}','viewtopic')">
 			<c:out value="${topic.message.subject}" />
-		</html:link>
+		</a>
 		<c:if test="${topic.hasAttachment}">
 			<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 		</c:if>
@@ -34,12 +34,11 @@
 
 	<div class="form-group">
 		<label for="mark"><fmt:message key="lable.topic.title.mark" />*</label>
-		<html:text property="mark" styleClass="form-control form-control-inline"/>
+		<input type="text" name="mark" value="${markForm.mark}" class="form-control form-control-inline"/>
 	</div>
 	<div class="form-group">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />		
 		<label for="comment"><fmt:message key="lable.topic.title.comment" /></label>
-		<lams:CKEditor id="comment"	value="${formBean.comment}" toolbarSet="DefaultMonitor">
+		<lams:CKEditor id="comment"	value="${markForm.comment}" toolbarSet="DefaultMonitor">
 		</lams:CKEditor>
 	</div>
 
@@ -49,13 +48,13 @@
 					
 		<c:if test="${sessionMap.updateMode == 'listMarks'}">
 			<c:set var="cancelUrl">
-				<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${formBean.sessionMapID}&userUid=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
+				<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${markForm.sessionMapID}&userUid=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
 			</c:set>
 		</c:if>
 					
 		<c:if test="${sessionMap.updateMode == 'viewForum'}">
 			<c:set var="cancelUrl">
-					<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
+					<c:url value="/learning/viewTopic.do"/>?sessionMapID=${markForm.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
 			</c:set>
 		</c:if>
 	
@@ -68,4 +67,4 @@
 	});
 </script>
 
-</html:form>
+</form:form>

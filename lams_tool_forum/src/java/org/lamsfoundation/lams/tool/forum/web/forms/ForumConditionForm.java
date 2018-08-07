@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import org.apache.struts.util.LabelValueBean;
+import java.util.Map;
+
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Forum needs.
@@ -35,11 +35,11 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
  * @author Marcin Cieslak
  *
  */
-public class ForumConditionForm extends TextSearchActionForm {
+public class ForumConditionForm extends TextSearchForm {
     /**
      * Names of the topics that could be selected by a user.
      */
-    private LabelValueBean[] possibleItems;
+    private Map<String, String> possibleItems;
     /**
      * Dates of creation of topics that were selected by a user.
      */
@@ -71,11 +71,11 @@ public class ForumConditionForm extends TextSearchActionForm {
 	setSelectedItems(selectedItems);
     }
 
-    public LabelValueBean[] getPossibleItems() {
+    public Map<String, String> getPossibleItems() {
 	return possibleItems;
     }
 
-    public void setPossibleItems(LabelValueBean[] possibleItems) {
+    public void setPossibleItems(Map<String, String> possibleItems) {
 	this.possibleItems = possibleItems;
     }
 

@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<html:errors />  
 
 <table cellpadding="0">
 	<!-- Title Row -->
@@ -25,9 +24,9 @@
 
 	<tr>
 		<td colspan="2">
-			<html:link forward="forwardToAuthorPage" styleClass="button">
+			<a forward="forwardToAuthorPage" class="button">
 				<fmt:message key="label.monitoring.edit.activity.edit" />
-			</html:link>
+			</a>
 		</td>
 	</tr>
 </table>

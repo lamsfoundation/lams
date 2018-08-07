@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.forum.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -41,6 +40,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * User: conradb Date: 8/06/2005 Time: 14:49:59
@@ -168,7 +168,7 @@ public interface IForumService {
      * @return Attachment A new instance of attachment has uploaded file VersionID and UUID information.
      * @throws PersistenceException
      */
-    Attachment uploadAttachment(FormFile file) throws PersistenceException;
+    Attachment uploadAttachment(MultipartFile file) throws PersistenceException;
 
     // ************************************************************************************
     // *********************Get topic methods **********************
