@@ -6,55 +6,51 @@
 
 	<div class="checkbox">
 		<label for="allowLearnerCreatePages"> 
-		<html:checkbox	property="allowLearnerCreatePages" value="1" styleId="allowLearnerCreatePages"></html:checkbox> 
+		<form:checkbox	path="allowLearnerCreatePages" value="1" id="allowLearnerCreatePages"/>
 		<fmt:message key="advanced.allowLearnerCreatePages" /></label>
 	</div>
 	
 	<div class="checkbox">
 		<label	for="allowLearnerInsertLinks">
-		<html:checkbox property="allowLearnerInsertLinks" value="1" styleId="allowLearnerInsertLinks"></html:checkbox>  
+		<form:checkbox path="allowLearnerInsertLinks" value="1" id="allowLearnerInsertLinks"/>
 		<fmt:message key="advanced.allowLearnerInsertLinks" /></label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="allowLearnerAttachImages"> 
-		<html:checkbox	property="allowLearnerAttachImages" value="1" styleId="allowLearnerAttachImages"></html:checkbox> 
+		<form:checkbox	path="allowLearnerAttachImages" value="1" id="allowLearnerAttachImages"/>
 		<fmt:message key="advanced.allowLearnerAttachImages" /> </label>
 	</div>
 		
 	<div><fmt:message key="advanced.editingLimits.prompt" /></div>
 	
-	<div><fmt:message key="advanced.editingLimits.minimum" />&nbsp;<html:select
-		property="minimumEdits" styleId="minimumEdits" styleClass="form-control form-control-inline input-sm" onchange="validateEditCount(true);">
-		<html:option value="0">
-			<fmt:message key="advanced.editingLimits.nominimum" />
-		</html:option>
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="10">10</html:option>
-	</html:select>&nbsp;<fmt:message key="advanced.editingLimits.maximum" />&nbsp;<html:select
-		property="maximumEdits" styleId="maximumEdits" styleClass="form-control form-control-inline input-sm" onchange="validateEditCount(true);">
-		<html:option value="0">
-			<fmt:message key="advanced.editingLimits.nomaximum" />
-		</html:option>
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="10">10</html:option>
-	</html:select></div>
+	<div><fmt:message key="advanced.editingLimits.minimum" />&nbsp;
+	<form:select path="minimumEdits" id="minimumEdits" cssClass="form-control form-control-inline input-sm" multiple="multiple" onchange="validateEditCount(true);">
+		<form:option value="0"> <fmt:message key="advanced.editingLimits.nominimum" /> </html:option>
+		<form:option value="1" label="1"/>
+		<form:option value="2" label="2"/>
+		<form:option value="3" label="3"/>
+		<form:option value="4" label="4"/>
+		<form:option value="5" label="5"/>
+		<form:option value="6" label="6"/>
+		<form:option value="7" label="7"/>
+		<form:option value="8" label="8"/>
+		<form:option value="9" label="9"/>
+		<form:option value="10" label="10"/>
+	</form:select>&nbsp;<fmt:message key="advanced.editingLimits.maximum" />&nbsp;
+	<form:select path="maximumEdits" id="maximumEdits" cssClass="form-control form-control-inline input-sm" multiple="multiple" onchange="validateEditCount(true);">
+		<form:option value="0"> <fmt:message key="advanced.editingLimits.nomaximum" /> </html:option>
+		<form:option value="1" label="1"/>
+		<form:option value="2" label="2"/>
+		<form:option value="3" label="3"/>
+		<form:option value="4" label="4"/>
+		<form:option value="5" label="5"/>
+		<form:option value="6" label="6"/>
+		<form:option value="7" label="7"/>
+		<form:option value="8" label="8"/>
+		<form:option value="9" label="9"/>
+		<form:option value="10" label="10"/>
+	</form:select></div>
 
 </lams:SimplePanel>
 
@@ -62,7 +58,7 @@
 
 	<div class="checkbox">
 		<label	for="notifyUpdates">
-		<html:checkbox property="notifyUpdates" value="1" styleId="notifyUpdates"></html:checkbox>
+		<form:checkbox path="notifyUpdates" value="1" id="notifyUpdates"/>
 		<fmt:message key="advanced.notifyChange" /> </label>
 	</div>
 	
@@ -72,18 +68,18 @@
 
 	<div class="checkbox">
 		<label for="lockOnFinished">
-		<html:checkbox property="lockOnFinished" value="1" styleId="lockOnFinished"></html:checkbox>
+		<form:checkbox path="lockOnFinished" value="1" id="lockOnFinished"/>
 		<fmt:message key="advanced.lockOnFinished" /></label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="reflectOnActivity">
-		<html:checkbox property="reflectOnActivity" value="1"
-		styleId="reflectOnActivity"></html:checkbox>
+		<form:checkbox path="reflectOnActivity" value="1"
+		id="reflectOnActivity"/>
 		<fmt:message key="advanced.reflectOnActivity" /> </label>
 	</div>
 	<div class="form-group">
-		<html:textarea property="reflectInstructions" rows="3" styleClass="form-control" styleId="reflectInstructions" />
+		<textarea name="reflectInstructions" rows="3" class="form-control" id="reflectInstructions" >${authoringForm.reflectInstructions}</textarea>
 	</div>
 	
 </lams:SimplePanel>	

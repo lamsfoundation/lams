@@ -2,8 +2,6 @@
 
 <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
 <!-- ========== Basic Tab ========== -->
 
 <div id="wikimenu" class="panel panel-default">

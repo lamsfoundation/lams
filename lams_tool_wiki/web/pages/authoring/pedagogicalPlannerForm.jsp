@@ -32,22 +32,21 @@
 		</p>
 	</logic:messagesPresent>	
 	
-	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
+	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="plannerForm" id="plannerForm" method="post">
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" id="valid" />
+		<form:hidden path="callID" id="callID" />
+		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />
 		<h4 class="space-left"><fmt:message key="label.authoring.basic.title" /></h4>
-		<html:text property="title" size="80" styleClass="item" />
+		<input type="text" name="title" size="80" class="item" />
 		<h4 class="space-left"><fmt:message key="label.wiki.body" /></h4>
 		
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<lams:CKEditor id="wikiBody"
-			value="${formBean.wikiBody}"
-			contentFolderID="${formBean.contentFolderID}"
+			value="${plannerForm.wikiBody}"
+			contentFolderID="${plannerForm.contentFolderID}"
 			toolbarSet="CustomPedplanner" height="150px"
 			width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
-	</html:form>
+	</form:form>
 </body>
 </lams:html>
