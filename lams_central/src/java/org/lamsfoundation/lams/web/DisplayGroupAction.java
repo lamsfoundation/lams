@@ -216,8 +216,9 @@ public class DisplayGroupAction extends Action {
 	}
 
 	if (roles.contains(Role.ROLE_AUTHOR) && orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-	    moreLinks.add(new IndexLinkBean("index.outcomes.manage", "javascript:showOutcomesDialog()",
-			"fa fa-fw fa-check-circle-o", "index.outcomes.manage.tooltip"));
+	    moreLinks.add(
+		    new IndexLinkBean("index.outcome.manage", "javascript:showOutcomeDialog(" + organisationId + ")",
+			    "fa fa-fw fa-check-circle-o", "index.outcome.manage.tooltip"));
 	}
 
 	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()

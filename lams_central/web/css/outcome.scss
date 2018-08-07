@@ -1,0 +1,32 @@
+@import "_lams_variables.scss";
+	
+div#titleDiv {
+	font-size: small;
+	font-weight: bold;
+	padding: 5px 0;
+	text-align: center;
+	border-bottom: $border-thin-dotted;
+}
+
+.manageOutcomeButton {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+#addOutcomeButton {
+	float: right;
+	margin: 20px 10px 10px 0;
+}
+
+.outcomeContainer {
+	font-size: 1.3em;
+}
+
+.outcomeContainer .row {
+	padding-top: 10px;
+}
+
+.outcomeContainer .row:first-child {
+	border-bottom: $border-thin-solid;
+}

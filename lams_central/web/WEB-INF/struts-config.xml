@@ -34,14 +34,18 @@
       type="org.lamsfoundation.lams.monitoring.web.FileUploadForm"
     />
    <form-bean
-  name="PedagogicalPlannerGroupingForm"
-  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
-/>
-<form-bean
-  name="PedagogicalPlannerSequenceNodeForm"
-  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
-/>
-
+  	  name="PedagogicalPlannerGroupingForm"
+  	  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
+	/>
+	<form-bean
+	  name="PedagogicalPlannerSequenceNodeForm"
+	  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
+	/>
+    <form-bean
+      name="outcomeForm"
+      type="org.lamsfoundation.lams.web.outcome.OutcomeForm"
+    />
+    
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="userId" type="java.lang.Integer" />
 	<form-property name="login" type="java.lang.String" />
@@ -866,7 +870,18 @@
     >
 		<!--  text response on success -->
     </action>
-
+    
+    <action
+      path="/outcome"
+      type="org.lamsfoundation.lams.web.outcome.OutcomeAction"
+      name="outcomeForm"
+      parameter="method"
+      validate="false"
+      scope="request"
+    >
+    <forward name="outcomeManage" path="/outcome/outcomeManage.jsp" />
+    <forward name="outcomeEdit"   path="/outcome/outcomeEdit.jsp" />
+    </action>
 
 
   </action-mappings>
