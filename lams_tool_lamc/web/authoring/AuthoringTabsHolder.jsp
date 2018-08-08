@@ -20,25 +20,24 @@
 			});		
 		});
 
-		function submitMethod(methodName) {
-			var f = document.getElementById('mcAuthoringForm');
-			f.action = methodName + ".do";
-			f.submit();
+		function submitMethod(actionMethod) {
+			document.forms.McAuthoringForm.action=actionMethod+".do"; 
+			document.forms.McAuthoringForm.submit();
 		}
 
 		
 		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
 			document.forms.McAuthoringForm.questionIndex.value=questionIndexValue; 
-			document.forms.McAuthoringForm.dispatch.value=actionMethod;
+			document.forms.McAuthoringForm.action=actionMethod+".do";
 			
-			$('#authoringForm').ajaxSubmit({ 
+			$('#mcAuthoringForm').ajaxSubmit({ 
 				data: { 
 					sessionMapId: '${sessionMapId}'
 				},
 				target:  $('#resourceListArea'),
 	    		iframe: true,
 	    		success:    function() { 
-	    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
+	    			document.forms.McAuthoringForm.action="submitAllContent.do";
 	    			refreshThickbox();
 	    	    }
 		    });
@@ -69,10 +68,11 @@
         } 
         
         function doSubmit(method) {
-        	document.forms.McAuthoringForm.dispatch.value=method;
+        	document.forms.McAuthoringForm.action=method+".do";
         	document.forms.McAuthoringForm.submit();
         }
 	</script>
+	
 </lams:head>
 <body onLoad="init();" class="stripes">
 

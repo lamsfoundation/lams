@@ -4,16 +4,16 @@
 <script type="text/javascript">
 	function removeQuestion(questionIndex) {
 		document.forms.McAuthoringForm.questionIndex.value=questionIndex;
-		document.forms.McAuthoringForm.dispatch.value='removeQuestion'; 
+		document.forms.McAuthoringForm.action='removeQuestion.do'; 
 		
-		$('#authoringForm').ajaxSubmit({ 
+		$('#mcAuthoringForm').ajaxSubmit({ 
     		target:  $('#resourceListArea'),
     		data: { 
 				sessionMapId: '${sessionMapId}'
 			},
     		iframe: true,
     		success:    function() { 
-    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
+    			document.forms.McAuthoringForm.action="submitAllContent.do";
     			refreshThickbox();
     	    }
 	    });
@@ -35,7 +35,7 @@
     		target:  $('#resourceListArea'),
     		iframe: true,
     		success:    function() { 
-    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
+    			document.forms.McAuthoringForm.action="submitAllContent.do";
     			refreshThickbox();
     	    	form.remove();
     	    }
