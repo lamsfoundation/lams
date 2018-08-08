@@ -32,7 +32,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
@@ -41,6 +46,10 @@ public class AuthoringForm extends WikiPageForm {
 
     private static final long serialVersionUID = 353256767734345767L;
 
+    @Autowired
+    @Qualifier("wikiMessageService")
+    private MessageService messageService;
+    
     // Properties
 
     String offlineInstruction;
@@ -85,12 +94,12 @@ public class AuthoringForm extends WikiPageForm {
 
     SessionMap sessionMap;
 
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
+    public MultiValueMap<String, String> validate(HttpServletRequest arg1) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	return ac;
+	errorMap.add("GLOBAL", messageService.getMessage("this is an error"));
+
+	return errorMap;
     }
 
     public String getSessionMapID() {
