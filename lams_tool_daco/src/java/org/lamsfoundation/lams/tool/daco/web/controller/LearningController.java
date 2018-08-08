@@ -553,7 +553,7 @@ public class LearningController {
 	    dacoService.updateEntry(entry);
 	}
 
-	return "pages/learning/finish";
+	return finish(request);
     }
 
     // *************************************************************************************

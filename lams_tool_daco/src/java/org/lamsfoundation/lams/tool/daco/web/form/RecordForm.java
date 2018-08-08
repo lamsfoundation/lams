@@ -108,4 +108,11 @@ public class RecordForm {
     public int getFileCount() {
 	return file.size();
     }
+    public List<String> getAnswer() {
+	return answer;
+    }
+
+    public void setAnswer(List<String> answer) {
+	this.answer = answer;
+    }
 }

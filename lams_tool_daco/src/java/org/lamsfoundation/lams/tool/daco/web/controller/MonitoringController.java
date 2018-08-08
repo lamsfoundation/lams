@@ -40,8 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
@@ -467,7 +465,8 @@ public class MonitoringController {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected ActionForward getQuestionSummaries(ActionMapping mapping, HttpServletRequest request) {
+    @RequestMapping("/getQuestionSummaries")
+    protected String getQuestionSummaries(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
@@ -493,7 +492,7 @@ public class MonitoringController {
 	}
 
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(DacoConstants.SUCCESS);
+	return "pages/monitoring/questionSummaries";
     }
 
     /**
