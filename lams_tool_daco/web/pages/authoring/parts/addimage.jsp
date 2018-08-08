@@ -27,7 +27,7 @@
 
 <!-- Add question form-->
 <%@ include file="/common/messages.jsp"%>
-<form:form action="authoring/saveOrUpdateQuestiondo" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
+<form:form action="saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
 	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="6" />
 	<form:hidden path="questionIndex" />

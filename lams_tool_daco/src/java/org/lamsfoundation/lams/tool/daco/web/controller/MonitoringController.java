@@ -519,7 +519,7 @@ public class MonitoringController {
 
 	request.setAttribute(DacoConstants.ATTR_SESSION_SUMMARIES, sessList);
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "statistic";
+	return "pages/monitoring/statistics";
     }
 
 }

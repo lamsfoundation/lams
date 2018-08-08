@@ -44,7 +44,7 @@
 	
 	
 	function editQuestion(questionIndex,sessionMapID){
-		var url = "<c:url value="/authoring/editQuestion.do?questionIndex="/>" + questionIndex +"&reqID="+(new Date()).getTime()+"&sessionMapID="+sessionMapID;
+		var url = '<c:url value="/authoring/editQuestion.do?questionIndex="/>' + questionIndex +"&reqID="+(new Date()).getTime()+"&sessionMapID="+sessionMapID;
 		showQuestionInputArea(url);
 	}
 	
