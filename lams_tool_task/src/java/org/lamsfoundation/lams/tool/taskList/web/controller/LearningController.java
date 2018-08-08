@@ -379,7 +379,7 @@ public class LearningController implements TaskListConstants {
 	}
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "/pages/learning/learning";
+	    return "pages/learning/learning";
 	}
 
 	// get sessionId from HttpServletRequest
