@@ -23,7 +23,7 @@
 
 	<lams:Page type="learner" title="${daco.title}">
 
-	<form:form action="learning/submitReflection.do" modelAttribute="messageForm" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;" id="messageForm">
+	<form:form action="submitReflection.do" modelAttribute="messageForm" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;" id="messageForm">
 		<form:hidden path="userId" />
 		<form:hidden path="sessionId" />
 		<form:hidden path="sessionMapID" />

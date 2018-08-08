@@ -2,7 +2,7 @@
 		
 
 <%@ include file="/common/taglibs.jsp"%>
-<%@page import="org.lamsfoundation.lams.tool.daco.DacoConstants;"%>
+<%@page import="org.lamsfoundation.lams.tool.daco.DacoConstants"%>
 
 <lams:html>
 <lams:head>

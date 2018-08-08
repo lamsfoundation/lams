@@ -69,7 +69,7 @@
 	</div>
 
 	<!-- Form to add/edit a record -->
-	<form:form action="learning/saveOrUpdateRecord.do" modelAttribute="recordForm" method="post" id="recordForm" enctype="multipart/form-data">
+	<form:form action="saveOrUpdateRecord.do" modelAttribute="recordForm" method="post" id="recordForm" enctype="multipart/form-data" >
 	
 	<c:set var="fileNumber" value="0" />
 	<c:set var="answerIndex" value="0" />
@@ -182,7 +182,7 @@
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							<%-- It displays for example A) instead of 1) --%>
 							${fn:substring(ordinal,status.index,status.index+1)}) 
-							<form:radiobutton path="answer[${answerIndex}]" value="${status.index+1}"><label>&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></label></form:radiobutton><br />
+							<form:radiobutton path="answer[${answerIndex}]" value="${status.index+1}" /><label>&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></label><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>

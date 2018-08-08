@@ -125,7 +125,7 @@ public class LearningController {
      *
      */
     @RequestMapping("/start")
-    protected String start(HttpServletRequest request) {
+    protected String start(@ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 
 	// initial Session Map
 	SessionMap sessionMap = new SessionMap();
@@ -629,7 +629,7 @@ public class LearningController {
 	return dacoUser;
     }
 
-    protected MultiValueMap<String, String> validateRecordForm(Daco daco, RecordForm recordForm,
+    protected MultiValueMap<String, String> validateRecordForm(Daco daco, @ModelAttribute RecordForm recordForm,
 	    Set<DacoQuestion> questionList, int recordCount) {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	Short maxRecords = daco.getMaxRecords();
