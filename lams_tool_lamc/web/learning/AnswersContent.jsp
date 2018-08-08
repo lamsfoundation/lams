@@ -3,6 +3,7 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" scope="request" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request" />
+<c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="mode" value="${sessionMap.mode}" scope="request" />
 <c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request" />
 <c:set var="isPrefixAnswersWithLetters" value="${sessionMap.content.prefixAnswersWithLetters}" scope="request" />

@@ -115,10 +115,6 @@ public class McLearningController {
 
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	
-	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	mcLearningForm.setToolContentID(toolContentId);
-
-	LearningUtil.saveFormRequestData(request, mcLearningForm);
 	/*
 	 * by now, we made sure that the passed tool session id exists in the db as a new record Make sure we can
 	 * retrieve it and the relavent content
@@ -140,6 +136,8 @@ public class McLearningController {
 	}
 
 	String mode = request.getParameter(McAppConstants.MODE);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	
 	McQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    // monitoring mode - user is specified in URL
@@ -259,7 +257,7 @@ public class McLearningController {
      * ActionForward endLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
      * response)
      */
-    @ModelAttribute("/endLearning")
+    @RequestMapping("/endLearning")
     public String endLearning(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -783,12 +781,17 @@ public class McLearningController {
     }
 
     private McQueUsr getCurrentUser(String toolSessionId) {
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionId));
 
 	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());
+
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionId));
+	McQueUsr qaUser = mcService.getMcUserBySession(userId, mcSession.getUid());
+	if (qaUser == null) {
+	    qaUser = mcService.createMcUser(new Long(toolSessionId));
+	}
 
 	return mcService.getMcUserBySession(userId, mcSession.getUid());
     }
