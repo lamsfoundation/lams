@@ -86,12 +86,10 @@
 			</div>
 		</div>
 	</c:forEach>
+	<div id="addOutcomeButton" class="btn btn-primary" onClick="javascript:openEditOutcomeDialog()">
+		<i class="fa fa-plus"></i>
+		<span><fmt:message key='outcome.manage.add' /></span>
+	</div>
 </div>
-
-<div id="addOutcomeButton" class="btn btn-primary" onClick="javascript:openEditOutcomeDialog()">
-	<i class="fa fa-plus"></i>
-	<span><fmt:message key='outcome.manage.add' /></span>
-</div>
-
 </body>
 </lams:html>

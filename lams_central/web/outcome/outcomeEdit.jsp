@@ -21,8 +21,13 @@
 	<script type="text/javascript">
 		<c:if test="${saved}">
 			var outcomesFrame = $('#dialogOutcome iframe', window.parent.document);
-			outcomesFrame.attr('src', outcomesFrame.attr('src'));
-	       	window.parent.closeDialog('dialogOutcomeEdit');
+			if (outcomesFrame.length == 0) {
+				window.parent.document.location.href = 
+					'<lams:LAMSURL/>outcome.do?method=outcomeManage${empty param.organisationID ? "" : "&organisationID=param.organisationID"}';
+			} else {
+				outcomesFrame.attr('src', outcomesFrame.attr('src'));
+	       		window.parent.closeDialog('dialogOutcomeEdit');
+			}
 		</c:if>
 		
 		var organisationId = '${param.organisationID}',
@@ -117,13 +122,12 @@
 				</div>
 			</div>
 		</div>
+		<c:if test="${not formDisabled}">
+			<button id="addOutcomeButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
+				<fmt:message key="outcome.manage.add.save" />
+			</button>
+		</c:if>
 	</div>
-	
-	<c:if test="${not formDisabled}">
-		<button id="addOutcomeButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
-			<fmt:message key="outcome.manage.add.save" />
-		</button>
-	</c:if>
 </html:form>
 </body>
 </lams:html>

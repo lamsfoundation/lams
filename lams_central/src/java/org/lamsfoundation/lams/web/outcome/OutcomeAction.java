@@ -110,18 +110,12 @@ public class OutcomeAction extends DispatchAction {
 	    }
 	}
 
-	if (organisationId == null) {
-	    if (!getSecurityService().isSysadmin(userId, "add/edit global outcome", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
-	    }
-	} else {
-	    if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		    "add/edit course outcome", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
+	if (organisationId != null && !getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.AUTHOR }, "add/edit course outcome", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
+	    return null;
 	}
+
 	OutcomeForm outcomeForm = (OutcomeForm) form;
 	outcomeForm.setOrganisationId(organisationId);
 	outcomeForm.setContentFolderId(getOutcomeService().getContentFolderId(organisationId));
@@ -216,7 +210,8 @@ public class OutcomeAction extends DispatchAction {
 	if (outcome == null) {
 	    throw new IllegalArgumentException("Can not find an outcome with ID " + outcomeId);
 	}
-	Integer organisationId = outcome.getOrganisation().getOrganisationId();
+	Integer organisationId = outcome.getOrganisation() == null ? null
+		: outcome.getOrganisation().getOrganisationId();
 	Integer userId = getUserDTO().getUserID();
 
 	if (organisationId == null) {
