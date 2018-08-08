@@ -144,7 +144,7 @@
 		<!-- End announcements and advanced settings -->
 
 		<div class="form-group">
-			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="learner.do" enctype="multipart/form-data"
+			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="viewAnswers.do" enctype="multipart/form-data"
 				method="POST" target="_self">
 				<form:hidden path="toolContentID" />
 				<form:hidden path="toolSessionID" id="tool-session-id" />

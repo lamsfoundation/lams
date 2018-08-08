@@ -111,13 +111,18 @@ public class McLearningController {
 	mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
+	mcLearningForm.setToolSessionID(toolSessionID);
 
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
+	
+	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
+	mcLearningForm.setToolContentID(toolContentId);
+
+	LearningUtil.saveFormRequestData(request, mcLearningForm);
 	/*
 	 * by now, we made sure that the passed tool session id exists in the db as a new record Make sure we can
 	 * retrieve it and the relavent content
 	 */
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	if (mcSession == null) {
 	    return "error";
 	}
