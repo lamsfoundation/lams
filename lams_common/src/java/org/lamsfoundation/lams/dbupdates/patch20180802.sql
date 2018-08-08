@@ -11,9 +11,13 @@ CREATE TABLE lams_outcome_scale (
 	name VARCHAR(255),
 	code VARCHAR(50),
 	description TEXT,
+	content_folder_id CHAR(36),
 	create_by BIGINT,
 	create_date_time DATETIME NOT NULL,
 	PRIMARY KEY (scale_id),
+	INDEX (name),
+	INDEX (code),
+	UNIQUE INDEX (code, organisation_id),
 	CONSTRAINT FK_lams_outcome_scale_1 FOREIGN KEY (organisation_id) REFERENCES lams_organisation (organisation_id) ON DELETE CASCADE ON UPDATE CASCADE
 	);
 	
@@ -33,9 +37,13 @@ CREATE TABLE lams_outcome (
 	name VARCHAR(255),
 	code VARCHAR(50),
 	description TEXT,
+	content_folder_id CHAR(36),
 	create_by BIGINT,
 	create_date_time DATETIME NOT NULL,
 	PRIMARY KEY (outcome_id),
+	INDEX (name),
+	INDEX (code),
+	UNIQUE INDEX (code, organisation_id),
 	CONSTRAINT FK_lams_outcome_1 FOREIGN KEY (organisation_id) REFERENCES lams_organisation (organisation_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	-- Do not remove outcomes when a scale gets removed. Programmer needs to do it manually to make sure it is the right step.
 	CONSTRAINT FK_lams_outcome_2 FOREIGN KEY (scale_id) REFERENCES lams_outcome_scale (scale_id) ON UPDATE CASCADE

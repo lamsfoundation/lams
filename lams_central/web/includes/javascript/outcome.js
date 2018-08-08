@@ -15,9 +15,8 @@ function openEditOutcomeDialog(outcomeId) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcome.do?method=outcomeEdit&organisationID='
-						+ organisationId 
-						+ (outcomeId ? "&outcomeId=" + outcomeId : ""));
+						+ 'outcome.do?method=outcomeEdit&'
+						+ (outcomeId ? "outcomeId=" + outcomeId : "organisationID=" + organisationId));
 		}
 	});
 }

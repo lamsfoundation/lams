@@ -13,6 +13,7 @@ public class OutcomeScale {
     private String name;
     private String code;
     private String description;
+    private String contentFolderId;
     private User createBy;
     private Date createDateTime;
 
@@ -80,5 +81,13 @@ public class OutcomeScale {
 
     public void setItems(Set<OutcomeScaleItem> items) {
 	this.items = items;
+    }
+
+    public String getContentFolderId() {
+        return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+        this.contentFolderId = contentFolderId;
     }
 }

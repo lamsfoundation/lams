@@ -49,6 +49,7 @@
 	<input type="hidden" name="method" value="outcomeSave" />
 	<html:hidden property="outcomeId" />
 	<html:hidden property="organisationId" />
+	<html:hidden property="contentFolderId" />
 	
 	<div class="container">
 		<div class="row vertical-center-row">
@@ -108,7 +109,7 @@
 									<c:out value="${formBean.description}" />
 								</c:when>
 								<c:otherwise>
-									 <lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${contentFolderID}"></lams:CKEditor>
+									 <lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${formBean.contentFolderId}"></lams:CKEditor>
 								</c:otherwise>
 							</c:choose>
 						</div>

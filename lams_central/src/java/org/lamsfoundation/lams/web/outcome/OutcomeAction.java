@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -64,8 +65,8 @@ public class OutcomeAction extends DispatchAction {
     private static ILessonService lessonService;
     private static ISecurityService securityService;
     private static IIntegrationService integrationService;
+    private static IOutcomeService outcomeService;
 
-    @SuppressWarnings("unchecked")
     public ActionForward outcomeManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -85,7 +86,7 @@ public class OutcomeAction extends DispatchAction {
 		return null;
 	    }
 	}
-	List<Outcome> outcomes = getUserManagementService().findAll(Outcome.class);
+	List<Outcome> outcomes = getOutcomeService().getOutcomesForManagement(organisationId);
 	request.setAttribute("outcomes", outcomes);
 
 	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
@@ -99,15 +100,14 @@ public class OutcomeAction extends DispatchAction {
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
 	Outcome outcome = null;
 	Integer organisationId = null;
-	if (outcomeId != null) {
+	if (outcomeId == null) {
+	    organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	} else {
 	    outcome = (Outcome) getUserManagementService().findById(Outcome.class, outcomeId);
-	    if (outcome != null && outcome.getOrganisation() != null) {
+	    if (outcome.getOrganisation() != null) {
 		// get organisation ID from the outcome - the safest way
 		organisationId = outcome.getOrganisation().getOrganisationId();
 	    }
-	}
-	if (organisationId == null) {
-	    organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	}
 
 	if (organisationId == null) {
@@ -123,11 +123,10 @@ public class OutcomeAction extends DispatchAction {
 	    }
 	}
 	OutcomeForm outcomeForm = (OutcomeForm) form;
-	outcomeForm.setOrganisationId(outcome == null ? organisationId
-		: (outcome.getOrganisation() == null ? null : outcome.getOrganisation().getOrganisationId()));
+	outcomeForm.setOrganisationId(organisationId);
+	outcomeForm.setContentFolderId(getOutcomeService().getContentFolderId(organisationId));
 	if (outcome != null) {
 	    outcomeForm.setOutcomeId(outcome.getOutcomeId());
-
 	    outcomeForm.setName(outcome.getName());
 	    outcomeForm.setCode(outcome.getCode());
 	    outcomeForm.setDescription(outcome.getDescription());
@@ -146,18 +145,17 @@ public class OutcomeAction extends DispatchAction {
 	    HttpServletResponse response) throws Exception {
 	OutcomeForm outcomeForm = (OutcomeForm) form;
 	Integer userId = getUserDTO().getUserID();
-	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
+	Long outcomeId = outcomeForm.getOutcomeId();
 	Outcome outcome = null;
 	Integer organisationId = null;
-	if (outcomeId != null) {
+	if (outcomeId == null) {
+	    organisationId = outcomeForm.getOrganisationId();
+	} else {
 	    outcome = (Outcome) getUserManagementService().findById(Outcome.class, outcomeId);
-	    if (outcome != null) {
+	    if (outcome.getOrganisation() != null) {
 		// get organisation ID from the outcome - the safest way
 		organisationId = outcome.getOrganisation().getOrganisationId();
 	    }
-	}
-	if (organisationId == null) {
-	    organisationId = outcomeForm.getOrganisationId();
 	}
 
 	if (organisationId == null) {
@@ -191,7 +189,7 @@ public class OutcomeAction extends DispatchAction {
 		outcome.setName(outcomeForm.getName());
 		outcome.setCode(outcomeForm.getCode());
 		outcome.setDescription(outcomeForm.getDescription());
-		outcomeForm.setOrganisationId(organisationId);
+		outcome.setContentFolderId(outcomeForm.getContentFolderId());
 		if (outcomeForm.getScaleId() != null) {
 		    OutcomeScale scale = (OutcomeScale) getUserManagementService().findById(OutcomeScale.class,
 			    outcomeForm.getScaleId());
@@ -290,6 +288,15 @@ public class OutcomeAction extends DispatchAction {
 	    OutcomeAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return OutcomeAction.securityService;
+    }
+
+    private IOutcomeService getOutcomeService() {
+	if (OutcomeAction.outcomeService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    OutcomeAction.outcomeService = (IOutcomeService) ctx.getBean("outcomeService");
+	}
+	return OutcomeAction.outcomeService;
     }
 
     private IIntegrationService getIntegrationService() {

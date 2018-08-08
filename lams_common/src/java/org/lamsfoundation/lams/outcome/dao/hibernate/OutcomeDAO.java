@@ -22,10 +22,39 @@
 
 package org.lamsfoundation.lams.outcome.dao.hibernate;
 
+import java.util.List;
+
+import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
+
+    private static final String FIND_CONTENT_FOLDER_ID_BY_ORGANISATION = "SELECT * FROM (SELECT content_folder_id FROM lams_outcome WHERE organisation_id ? "
+	    + "UNION SELECT content_folder_id FROM lams_outcome_scale WHERE organisation_id ?) AS a WHERE content_folder_id IS NOT NULL LIMIT 1";
+
+    private static final String FIND_OUTCOMES_SORTED_BY_NAME = "FROM Outcome o WHERE o.organisation IS NULL ? ORDER BY o.name, o.code";
+
+    /**
+     * Finds an existing content folder ID for the given organisation outcomes or scales, or for global ones
+     */
+    public String getContentFolderID(Integer organisationId) {
+	String queryString = FIND_CONTENT_FOLDER_ID_BY_ORGANISATION.replaceAll("\\?",
+		organisationId == null ? "IS NULL" : "=" + organisationId);
+	Query query = getSession().createSQLQuery(queryString);
+	return (String) query.uniqueResult();
+    }
+
+    /**
+     * Finds all global outcomes and ones for the given organisation
+     */
+    @SuppressWarnings("unchecked")
+    public List<Outcome> getOutcomesSortedByName(Integer organisationId) {
+	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replaceAll("\\?",
+		organisationId == null ? "" : "OR o.organisation.organisationId = " + organisationId);
+	return find(queryString);
+    }
 }

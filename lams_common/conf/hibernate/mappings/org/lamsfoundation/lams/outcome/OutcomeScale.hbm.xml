@@ -17,8 +17,8 @@
 		<property name="code" type="java.lang.String" column="code"
 			length="50">
 		</property>
-		<property name="description" type="java.lang.String" column="description"
-			length="65535">
+		<property name="contentFolderId" type="java.lang.String" column="content_folder_id"
+			length="36">
 		</property>
 		<property name="createDateTime" type="java.sql.Timestamp"
 			column="create_date_time" not-null="true" length="19">

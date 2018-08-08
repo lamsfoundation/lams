@@ -12,6 +12,7 @@ public class Outcome {
     private String name;
     private String code;
     private String description;
+    private String contentFolderId;
     private User createBy;
     private Date createDateTime;
 
@@ -77,5 +78,13 @@ public class Outcome {
 
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
+    }
+
+    public String getContentFolderId() {
+        return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+        this.contentFolderId = contentFolderId;
     }
 }

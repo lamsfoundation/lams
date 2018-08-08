@@ -33,13 +33,14 @@ public class OutcomeForm extends ActionForm {
     private String name;
     private String code;
     private String description;
+    private String contentFolderId;
 
     public Long getOutcomeId() {
 	return outcomeId;
     }
 
     public void setOutcomeId(Long outcomeId) {
-	this.outcomeId = outcomeId;
+	this.outcomeId = outcomeId != null && outcomeId < 1 ? null : outcomeId;
     }
 
     public Integer getOrganisationId() {
@@ -47,7 +48,7 @@ public class OutcomeForm extends ActionForm {
     }
 
     public void setOrganisationId(Integer organisationId) {
-	this.organisationId = organisationId;
+	this.organisationId = organisationId != null && organisationId < 1 ? null : organisationId;
     }
 
     public Long getScaleId() {
@@ -80,5 +81,13 @@ public class OutcomeForm extends ActionForm {
 
     public void setDescription(String description) {
 	this.description = description;
+    }
+
+    public String getContentFolderId() {
+	return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+	this.contentFolderId = contentFolderId;
     }
 }
