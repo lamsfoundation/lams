@@ -58,7 +58,6 @@
 			});
 		
 			$('#replyForm').submit(function() { // catch the form's submit event
-		
 				disableSubmitButton();
 				if ( validateForm() ) {
 		

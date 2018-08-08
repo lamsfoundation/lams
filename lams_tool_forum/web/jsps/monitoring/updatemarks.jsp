@@ -20,7 +20,7 @@
 		    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 			<form:hidden path="sessionMapID"/>
 			<form:hidden path="topicID"/>
-			<inpu type="hidden" name="hideReflection" value="${sessionMap.hideReflection}"/>
+			<input type="hidden" name="hideReflection" value="${sessionMap.hideReflection}"/>
 		
 			<p>
 				<fmt:message key="message.assign.mark" />&nbsp;
