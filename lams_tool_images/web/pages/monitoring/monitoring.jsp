@@ -115,7 +115,6 @@
 				});
 				
 				$(".toggle-image-visibility").click(function() {
-					debugger;
 					var imageToggleLink = $(this);
 					var imageUid = $(this).data("image-uid");
 					
