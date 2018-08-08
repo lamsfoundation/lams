@@ -14,7 +14,7 @@
 
 	<div class="form-group">
  		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
- 		<form:errors path="message.attachment" />
+ 		<form:errors path="message.attachments" />
 	</div>
 	
 	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>

@@ -15,7 +15,7 @@
 	<div class="form-group">
 		<label><fmt:message key="message.label.attachment" /></label><BR/>
 		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
-		<form:errors path="message.attachment" />
+		<form:errors path="message.attachments" />
 	</div>
 </c:if>
 

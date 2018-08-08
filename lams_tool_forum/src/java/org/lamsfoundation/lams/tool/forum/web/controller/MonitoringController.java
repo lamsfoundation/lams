@@ -567,7 +567,7 @@ public class MonitoringController {
      * View a special user's mark
      */
     @RequestMapping("/viewUserMark")
-    public String viewUserMark(HttpServletRequest request) {
+    public String viewUserMark(@ModelAttribute MarkForm markForm, HttpServletRequest request) {
 	Long userUid = new Long(WebUtil.readLongParam(request, ForumConstants.USER_UID));
 	Long sessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 

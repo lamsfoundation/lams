@@ -89,7 +89,7 @@ public class MessageForm {
 	    if (request.getRequestURI().indexOf("/learning/") != -1) {
 		if ((this.getAttachmentFile() != null)
 			&& FileUtil.isExecutableFile(this.getAttachmentFile().getOriginalFilename())) {
-		    errors.reject("message.attachment", messageService.getMessage("error.attachment.executable"));
+		    errors.reject("message.attachments", messageService.getMessage("error.attachment.executable"));
 		}
 		largeFile = false;
 	    }

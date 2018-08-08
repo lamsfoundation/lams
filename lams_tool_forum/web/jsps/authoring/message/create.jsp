@@ -42,7 +42,7 @@
 			<div class="form-group">
 				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
 				<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="3" />
-				<form:errors path="message.attachment" />
+				<form:errors path="message.attachments" />
 				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 			</div>
 
