@@ -3,7 +3,7 @@
 <div class="form-group">
     <label><fmt:message key="message.label.subject" />&nbsp;</label>
 	<input type="text" size="50" tabindex="1" value="${message.subject}" name="message.subject" maxlength="60"/> &nbsp;
-	<c:set var="message.subject" value="errorMap${forum.uid}" />
+	<form:errors path="message.subject" />
 </div>
 
 <div class="form-group">
@@ -15,7 +15,7 @@
 	<div class="form-group">
 		<label><fmt:message key="message.label.attachment" /></label><BR/>
 		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
-		<c:set var="message.attachment" value="errorMap${forum.uid}" />
+		<form:errors path="message.attachment" />
 	</div>
 </c:if>
 

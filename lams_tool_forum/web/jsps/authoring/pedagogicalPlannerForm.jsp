@@ -37,7 +37,7 @@
   	<script type="text/javascript">
   		function createTopic(){
   			prepareFormData();
-  			$('#pedagogicalPlannerForm').ajaxSubmit({
+  			$('#plannerForm').ajaxSubmit({
   				url: "<c:url value='/authoring/createPedagogicalPlannerTopic.do' />",
   				success: function(responseText){
  	  				var bodyTag = '<body';

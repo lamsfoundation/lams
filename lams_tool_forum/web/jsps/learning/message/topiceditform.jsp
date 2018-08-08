@@ -3,7 +3,7 @@
 <div class="form-group">
     <label><fmt:message key="message.label.subject" />&nbsp;</label>
     <input type="text" size="50" tabindex="1" value="${message.subject}" name="message.subject" maxlength="60"/> &nbsp;
-	<c:set var="message.subject" value="errorMap${forum.uid}" />
+	<form:errors path="message.subject" />
 </div>
 
 <div class="form-group">

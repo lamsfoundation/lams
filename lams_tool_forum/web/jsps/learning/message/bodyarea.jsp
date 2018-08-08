@@ -113,7 +113,7 @@
 			//character count fuction
 			var counter = function() {
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea[id="message.body__lamstextarea"]').val();
+						: $('textarea#messageBody').val();
 			    
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				

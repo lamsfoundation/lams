@@ -676,11 +676,11 @@ public class LearningController {
      * Display replay topic page. Message form subject will include parent topics same subject.
      */
     @RequestMapping("/newReplyTopic")
-    public String newReplyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
+    public String newReplyTopic(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request) {
 
 	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = getSessionMap(request, messageForm);
-	messageForm.setSessionMapID(sessionMapID);
+	SessionMap sessionMap = getSessionMap(request, replyForm);
+	replyForm.setSessionMapID(sessionMapID);
 
 	Long parentId = WebUtil.readLongParam(request, ForumConstants.ATTR_PARENT_TOPIC_ID);
 	sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
@@ -696,9 +696,9 @@ public class LearningController {
 
 	    // echo back current topic subject to web page
 	    if (reTitle != null && !reTitle.trim().startsWith("Re:")) {
-		messageForm.getMessage().setSubject("Re:" + reTitle);
+		replyForm.getMessage().setSubject("Re:" + reTitle);
 	    } else {
-		messageForm.getMessage().setSubject(reTitle);
+		replyForm.getMessage().setSubject(reTitle);
 	    }
 	}
 
@@ -717,14 +717,14 @@ public class LearningController {
      * Create a replayed topic for a parent topic.
      */
     @RequestMapping("/replyTopic")
-    public String replyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
+    public String replyTopic(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException {
 
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap sessionMap = getSessionMap(request, replyForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	Message message = messageForm.getMessage();
+	Message message = replyForm.getMessage();
 	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	if (isTestHarness) {
 	    message.setBody(request.getParameter("message.body__textarea"));
@@ -736,7 +736,7 @@ public class LearningController {
 	ForumUser forumUser = getCurrentUser(request, sessionId);
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
-	setAttachment(messageForm, message);
+	setAttachment(replyForm, message);
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
@@ -751,7 +751,7 @@ public class LearningController {
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 	Forum forum = session.getForum();
 
-	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
+	setupViewTopicPagedDTOList(request, rootTopicId, replyForm.getSessionMapID(), forumUser, forum, null, null);
 
 	// notify learners and teachers
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
@@ -765,14 +765,14 @@ public class LearningController {
      */
     @RequestMapping(path = "/replyTopicInline", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public String replyTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
+    public String replyTopicInline(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException, IOException {
 
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap sessionMap = getSessionMap(request, replyForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	Message message = messageForm.getMessage();
+	Message message = replyForm.getMessage();
 	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	if (isTestHarness) {
 	    message.setBody(request.getParameter("message.body__textarea"));
@@ -784,7 +784,7 @@ public class LearningController {
 	ForumUser forumUser = getCurrentUser(request, sessionId);
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
-	setAttachment(messageForm, message);
+	setAttachment(replyForm, message);
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
@@ -805,7 +805,7 @@ public class LearningController {
 	ObjectNode.put(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 	ObjectNode.put(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 	ObjectNode.put(ForumConstants.ATTR_THREAD_ID, newMessageSeq.getThreadMessage().getUid());
-	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, replyForm.getSessionMapID());
 	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 	ObjectNode.put(ForumConstants.ATTR_PARENT_TOPIC_ID, newMessageSeq.getMessage().getParent().getUid());
 

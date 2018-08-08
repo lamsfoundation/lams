@@ -19,7 +19,7 @@
 			
 			<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
 			<form:hidden path="sessionMapID" />
-			<c:set var="sessionMap" value="${sessionScope[messageForm.sessionMapID]}" />
+			<c:set var="sessionMap" value="${sessionScope[forumForm.sessionMapID]}" />
 
 			<div class="form-group">
 		    <label for="message.subject"><fmt:message key="message.label.subject" /> *</label>

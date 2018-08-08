@@ -135,7 +135,7 @@
 		</script>
 		
 		<form:form action="replyTopicInline.do"
-				focus="message.body__lamstextarea" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
+				focus="textarea#messageBody" enctype="multipart/form-data" modelAttribute="replyForm" id="replyForm" >
 				
 			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
 			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>

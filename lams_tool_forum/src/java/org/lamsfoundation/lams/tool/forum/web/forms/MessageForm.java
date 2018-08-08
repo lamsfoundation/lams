@@ -28,15 +28,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -75,16 +73,15 @@ public class MessageForm {
      * MessageForm validation method from STRUCT interface.
      *
      */
-    public MultiValueMap<String, String> validate(HttpServletRequest request) {
+    public Errors validate(HttpServletRequest request, Errors errors) {
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
 	    if (StringUtils.isBlank(message.getSubject())) {
-		errorMap.add("message.subject", messageService.getMessage("error.subject.required"));
+		errors.reject("message.subject", messageService.getMessage("error.subject.required"));
 	    }
 	    boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	    if (!isTestHarness && StringUtils.isBlank(message.getBody())) {
-		errorMap.add("message.body", messageService.getMessage("error.body.required"));
+		errors.reject("message.body", messageService.getMessage("error.body.required"));
 	    }
 
 	    // validate item size
@@ -92,7 +89,7 @@ public class MessageForm {
 	    if (request.getRequestURI().indexOf("/learning/") != -1) {
 		if ((this.getAttachmentFile() != null)
 			&& FileUtil.isExecutableFile(this.getAttachmentFile().getOriginalFilename())) {
-		    errorMap.add("message.attachment", messageService.getMessage("error.attachment.executable"));
+		    errors.reject("message.attachment", messageService.getMessage("error.attachment.executable"));
 		}
 		largeFile = false;
 	    }
@@ -102,7 +99,7 @@ public class MessageForm {
 	} catch (Exception e) {
 	    MessageForm.logger.error("", e);
 	}
-	return errorMap;
+	return errors;
     }
 
     // -------------------------get/set methods----------------

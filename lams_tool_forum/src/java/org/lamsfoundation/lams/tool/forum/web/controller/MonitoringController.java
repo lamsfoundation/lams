@@ -696,7 +696,7 @@ public class MonitoringController {
 		 // display root topic rather than leaf one
 	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
 
-	    String redirect = "redirect:/viewTopic.do";
+	    String redirect = "redirect:/monitoring/viewTopic.do";
 	    redirect = WebUtil.appendParameterToURL(redirect, ForumConstants.ATTR_SESSION_MAP_ID,
 		    markForm.getSessionMapID());
 	    redirect = WebUtil.appendParameterToURL(redirect, ForumConstants.ATTR_USER, user.toString());

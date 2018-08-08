@@ -63,7 +63,7 @@
 			<form:hidden path="userID" />
 			<form:hidden path="sessionMapID" />
 		
-			<lams:Page type="learner" title="${sessionMap.title}" formID="messageForm">
+			<lams:Page type="learner" title="${sessionMap.title}" formID="reflectionForm">
 		
 				<%@ include file="/common/messages.jsp"%>
 		
