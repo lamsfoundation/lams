@@ -559,6 +559,7 @@ public class AuthoringController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	startForm.setMode(mode.toString());
 	request.setAttribute("authoringForm", startForm);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return "pages/authoring/authoring";
     }

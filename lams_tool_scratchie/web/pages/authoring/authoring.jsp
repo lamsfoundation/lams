@@ -44,6 +44,7 @@
 		<form:hidden path="scratchie.contentId" />
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
+		<form:hidden property="mode" value="${mode}"/>
 		<form:hidden path="currentTab" id="currentTab" />
 		<input type="hidden" name="itemList" id="itemList" />
 	

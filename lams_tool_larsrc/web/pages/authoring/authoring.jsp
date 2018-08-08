@@ -70,6 +70,7 @@
 		<form:hidden path="resource.contentId" />
 		<form:hidden path="mode" />
 		<form:hidden path="sessionMapID" />
+		<form:hidden property="mode" value="${mode}"/>
 		<form:hidden path="contentFolderID" />
 		<form:hidden path="currentTab" styleId="currentTab" />
 	

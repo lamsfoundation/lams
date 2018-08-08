@@ -45,6 +45,7 @@
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="currentTab" id="currentTab" />
+			<form:hidden path="mode" value="${mode}"/>
 	
 	 		<lams:TabBodys>
 				<!-- tab content 1 (Basic) -->
