@@ -29,9 +29,6 @@ public interface McAppConstants {
 
     public static final String TOOL_SIGNATURE = "lamc11";
 
-    /*
-     * Struts level constants
-     */
     public static final String LOAD_AUTHORING = "authoringTabsHolder";
     public static final String LEARNING_STARTER = "learningStarter";
     public static final String LOAD_LEARNER = "loadLearner";
