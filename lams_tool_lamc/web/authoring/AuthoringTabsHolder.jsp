@@ -21,14 +21,14 @@
 		});
 
 		function submitMethod(actionMethod) {
-			document.forms.McAuthoringForm.action=actionMethod+".do"; 
-			document.forms.McAuthoringForm.submit();
+			document.forms.mcAuthoringForm.action=actionMethod+".do"; 
+			document.forms.mcAuthoringForm.submit();
 		}
 
 		
 		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
-			document.forms.McAuthoringForm.questionIndex.value=questionIndexValue; 
-			document.forms.McAuthoringForm.action=actionMethod+".do";
+			document.forms.mcAuthoringForm.questionIndex.value=questionIndexValue; 
+			document.forms.mcAuthoringForm.action=actionMethod+".do";
 			
 			$('#mcAuthoringForm').ajaxSubmit({ 
 				data: { 
@@ -37,7 +37,7 @@
 				target:  $('#resourceListArea'),
 	    		iframe: true,
 	    		success:    function() { 
-	    			document.forms.McAuthoringForm.action="submitAllContent.do";
+	    			document.forms.mcAuthoringForm.action="submitAllContent.do";
 	    			refreshThickbox();
 	    	    }
 		    });
@@ -68,8 +68,8 @@
         } 
         
         function doSubmit(method) {
-        	document.forms.McAuthoringForm.action=method+".do";
-        	document.forms.McAuthoringForm.submit();
+        	document.forms.mcAuthoringForm.action=method+".do";
+        	document.forms.mcAuthoringForm.submit();
         }
 	</script>
 	

@@ -54,13 +54,13 @@
 			}
 				
 			function submitModifyCandidate(candidateIndexValue, actionMethod) {
-				document.forms.McAuthoringForm.candidateIndex.value=candidateIndexValue;
-				submitForm(actionMethod);
+				document.forms.mcAuthoringForm.candidateIndex.value=candidateIndexValue;
+				submitMethod(actionMethod);
 			}
 
 			function removeCandidate(candidateIndexValue) {
 				if (validateMinumumCandidateCount()) {
-					document.forms.McAuthoringForm.candidateIndex.value=candidateIndexValue;
+					document.forms.mcAuthoringForm.candidateIndex.value=candidateIndexValue;
 					submitMethod("removeCandidate");
 				}
 			}
@@ -75,7 +75,7 @@
 				}
 				
 				var singleCorrectEntry = 0;
-				var radioCorrect=document.forms.McAuthoringForm.correct;
+				var radioCorrect=document.forms.mcAuthoringForm.correct;
 				if ((radioCorrect == 'null') || (radioCorrect == 'undefined')) {
 					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
 					alert(msg);
@@ -124,7 +124,7 @@
 			}
 
 			function validateMinumumCandidateCount() {
-				var radioCorrect=document.forms.McAuthoringForm.correct;
+				var radioCorrect=document.forms.mcAuthoringForm.correct;
 				if ((radioCorrect == 'undefined') || (radioCorrect == null)) {
 					var msg = "<fmt:message key="candidates.unremovable.groupSize"/>";
 					alert(msg);
@@ -164,7 +164,7 @@
 			</div>
 			
 			<div class="form-group">
-				<button name="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" class="btn btn-default btn-sm">
+				<button name="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" type="button" class="btn btn-default btn-sm">
 					<fmt:message key="label.add.candidates" />
 				</button>
 			</div>

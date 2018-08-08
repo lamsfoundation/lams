@@ -16,7 +16,7 @@
 		}
 
 		function submitForm(methodName) {
-			var f = document.getElementById('messageForm');
+			var f = document.getElementById('mcLearningForm');
 			f.submit();
 		}
 	</script>
@@ -28,10 +28,10 @@
 		<fmt:message key="activity.title" />
 	</c:set>
 
-	<lams:Page type="learner" title="${title}">
+	<lams:Page type="learner" title="${title}" formID="mcLearningForm">
 
 		<form:form action="learner.do" method="POST" onsubmit="disableFinishButton();"
-			modelAttribute="mcLearningForm" id="messageForm">
+			modelAttribute="mcLearningForm" id="mcLearningForm">
 			<form:hidden path="toolContentID" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="httpSessionID" />

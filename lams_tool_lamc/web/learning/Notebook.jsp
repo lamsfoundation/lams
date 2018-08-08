@@ -16,12 +16,11 @@
 		</div>
 
 		<div class="form-group">
-			<form:form action="submitReflection.do" modelAttribute="mcLearningForm" id="reflectionForm" method="POST">
+			<form:form action="submitReflection.do" modelAttribute="mcLearningForm" id="mcLearningForm" method="POST">
 				<form:hidden path="toolContentID" />
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="httpSessionID" />
 				<form:hidden path="userID" />
-				<form:hidden path="submitReflection" />
 				<textarea rows="4" name="entryText" class="form-control" id="focusedInput">
 					<c:if test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
 						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
@@ -30,7 +29,7 @@
 
 
 				<a href="#" name="submitReflection" class="btn btn-primary pull-right voffset10 na"
-					onclick="javascript:document.McLearningForm.submit();return false">
+					onclick="javascript:document.mcLearningForm.submit();return false">
 					<fmt:message key="button.endLearning" />
 				</a>
 

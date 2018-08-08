@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -118,7 +119,7 @@ public class McLearningController {
 	 */
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	if (mcSession == null) {
-	    return "McErrorBox";
+	    return "error";
 	}
 
 	/*
@@ -130,7 +131,7 @@ public class McLearningController {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("error.content.doesNotExist"));
 	    request.setAttribute("errorMap", errorMap);
-	    return "McErrorBox";
+	    return "error";
 	}
 
 	String mode = request.getParameter(McAppConstants.MODE);
@@ -248,57 +249,7 @@ public class McLearningController {
 	return "learning/AnswersContent";
     }
 
-    /**
-     * main content/question content management and workflow logic
-     *
-     * if the passed toolContentId exists in the db, we need to get the relevant data into the Map if not, create the
-     * default Map
-     */
-    public String unspecified(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
-	LearningUtil.saveFormRequestData(request, mcLearningForm);
-	return null;
-    }
-
-    /**
-     * responds to learner activity in learner mode.
-     */
-    @RequestMapping("/displayMc")
-    public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	mcLearningForm.setToolSessionID(toolSessionID);
-
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
-
-	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	mcLearningForm.setToolContentID(toolContentId);
-
-	LearningUtil.saveFormRequestData(request, mcLearningForm);
-
-	if (mcLearningForm.getNextQuestionSelected() != null && !mcLearningForm.getNextQuestionSelected().equals("")) {
-	    mcLearningForm.resetParameters();
-	    return getNextOptions(mcLearningForm, request);
-	}
-	if (mcLearningForm.getContinueOptionsCombined() != null) {
-	    return continueOptionsCombined(mcLearningForm, request);
-	} else if (mcLearningForm.getNextOptions() != null) {
-	    return getNextOptions(mcLearningForm, request);
-	} else if (mcLearningForm.getRedoQuestions() != null) {
-	    return redoQuestions(mcLearningForm, request);
-	} else if (mcLearningForm.getViewAnswers() != null) {
-	    return viewAnswers(mcLearningForm, request);
-	} else if (mcLearningForm.getSubmitReflection() != null) {
-	    return submitReflection(mcLearningForm, request, response);
-	} else if (mcLearningForm.getForwardtoReflection() != null) {
-	    return forwardtoReflection(mcLearningForm, request);
-	} else if (mcLearningForm.getLearnerFinished() != null) {
-	    return endLearning(mcLearningForm, request, response);
-	}
-
-	return "learning/AnswersContent";
-    }
-
+   
     /**
      * ActionForward endLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
      * response)
@@ -689,7 +640,7 @@ public class McLearningController {
     /**
      * checks Leader Progress
      */
-    @RequestMapping("/checkLeaderProgress")
+    @RequestMapping(path = "/checkLeaderProgress", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -702,9 +653,7 @@ public class McLearningController {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	return ObjectNode.toString();
     }
 
     @RequestMapping("/submitReflection")
