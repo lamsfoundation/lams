@@ -4,8 +4,8 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,26 +20,22 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
+/* $Id: MonitoringAction.java,v 1.16 2016/12/07 13:47:24 marcin Exp $ */
 
-/* $Id$ */
-package org.eucm.lams.tool.eadventure.web.action;
+package org.lamsfoundation.lams.tool.dimdim.web.controller;
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.RedirectingActionForward;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class MonitoringAction extends Action {
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	return new RedirectingActionForward("/index.html");
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
+    @RequestMapping("")
+    public String execute() throws IOException, ServletException {
+	return "index";
     }
 }

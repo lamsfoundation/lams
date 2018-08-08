@@ -21,21 +21,16 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.eucm.lams.tool.eadventure.web.action;
+package org.eucm.lams.tool.eadventure.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.RedirectingActionForward;
-
-public class AuthoringAction extends Action {
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	return new RedirectingActionForward("/index.html");
+@Controller
+@RequestMapping("authoring")
+public class AuthoringConroller {
+    @RequestMapping("/start")
+    public String execute() throws Exception {
+	return "index";
     }
 }
