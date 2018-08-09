@@ -67,7 +67,7 @@ public class LocaleFilter extends OncePerRequestFilter {
 	String direction = null;
 	TimeZone tz = null;
 
-	// get locale from user settings
+	// 1. get locale from user settings
 	HttpSession session = SessionManager.getSession();
 	if (session != null) {
 	    UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
@@ -83,13 +83,14 @@ public class LocaleFilter extends OncePerRequestFilter {
 		}
 	    }
 	}
-
-	// get default locale from configuration
+	// 2. get default locale from client's browser.
+	// 3. get server's default locale
+	// 4. fall back to "en_AU" 
 	if (preferredLocale == null) {
-	    String defaults[] = LanguageUtil.getDefaultLangCountry();
-	    preferredLocale = new Locale(defaults[0] == null ? "" : defaults[0],
-		    defaults[1] == null ? "" : defaults[1]);
+	    Locale browserLocale = request.getLocale();
+	    preferredLocale = LanguageUtil.getSupportedLocaleByNameOrLanguageCode(browserLocale);
 	}
+	
 	if (direction == null) {
 	    direction = LanguageUtil.getDefaultDirection();
 	}

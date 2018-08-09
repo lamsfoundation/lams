@@ -23,12 +23,14 @@
 
 package org.lamsfoundation.lams.util;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -170,7 +172,16 @@ public class LanguageUtil {
 	}
 	return LanguageUtil.getDefaultLocale();
     }
-
+    
+    /**
+     * Wrapper method for getSupportedLocaleByNameOrLanguageCode(String input).
+     */
+    public static Locale getSupportedLocaleByNameOrLanguageCode(Locale locale) {
+	String localeId = MessageFormat.format("{0}_{1}", locale.getLanguage(), locale.getCountry());
+	SupportedLocale supportedLocale = LanguageUtil.getSupportedLocaleByNameOrLanguageCode(localeId);
+	return new Locale(supportedLocale.getLanguageIsoCode(), supportedLocale.getCountryIsoCode());
+    }
+	
     /**
      * Searches for a supported locale based on the provided input, first assuming it has "xx_XX" format, then that the
      * first two letters is a language ISO code. Otherwise returns server default locale.
