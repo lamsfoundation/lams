@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.dokumaran.web.action;
+package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,17 +29,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -60,8 +55,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -69,39 +68,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Steve.Ni
  */
-public class LearningAction extends Action {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    private static IDokumaranService dokumaranService;
+    @Autowired
+    @Qualifier("dokumaranService")
+    private IDokumaranService dokumaranService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, DokumaranConfigurationException,
-	    URISyntaxException, DokumaranApplicationException {
-
-	String param = mapping.getParameter();
-	// -----------------------Dokumaran Learner function ---------------------------
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("checkLeaderProgress")) {
-	    return checkLeaderProgress(mapping, form, request, response);
-	}
-	if (param.equals("finish")) {
-	    return finish(mapping, form, request, response);
-	}
-
-	// ================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(DokumaranConstants.ERROR);
-    }
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Read dokumaran data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -113,8 +91,8 @@ public class LearningAction extends Action {
      * @throws URISyntaxException
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @RequestMapping("/start")
+    private String start(HttpServletRequest request, HttpServletResponse response)
 	    throws DokumaranConfigurationException, DokumaranApplicationException, URISyntaxException {
 
 	// initial Session Map
@@ -124,10 +102,9 @@ public class LearningAction extends Action {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	Long toolSessionId = new Long(request.getParameter(DokumaranConstants.PARAM_TOOL_SESSION_ID));
-	IDokumaranService service = getDokumaranService();
-	Dokumaran dokumaran = service.getDokumaranBySessionId(toolSessionId);
+	Dokumaran dokumaran = dokumaranService.getDokumaranBySessionId(toolSessionId);
 	request.setAttribute(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
-	DokumaranSession session = service.getDokumaranSessionBySessionId(toolSessionId);
+	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 
 	// get back the dokumaran and item list and display them on page
 	DokumaranUser user = null;
@@ -135,30 +112,29 @@ public class LearningAction extends Action {
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // dokumaranUser may be null if the user was force completed.
-	    user = getSpecifiedUser(service, toolSessionId,
-		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+	    user = getSpecifiedUser(dokumaranService, toolSessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    // get back login user DTO
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    user = service.getUserByIDAndSession(new Long(userDto.getUserID().intValue()), toolSessionId);
+	    user = dokumaranService.getUserByIDAndSession(new Long(userDto.getUserID().intValue()), toolSessionId);
 	    if (user == null) {
 		user = new DokumaranUser(userDto, session);
-		service.saveUser(user);
+		dokumaranService.saveUser(user);
 		isFirstTimeAccess = true;
 	    }
 	}
 
 	// support for leader select feature
 	List<DokumaranUser> leaders = dokumaran.isUseSelectLeaderToolOuput()
-		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(),
+		? dokumaranService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(),
 			isFirstTimeAccess)
 		: new ArrayList<>();
 	// forwards to the leaderSelection page
 	if (dokumaran.isUseSelectLeaderToolOuput() && leaders.isEmpty() && !mode.isTeacher()) {
 
 	    // get group users and store it to request as DTO objects
-	    List<DokumaranUser> groupUsers = service.getUsersBySession(toolSessionId);
+	    List<DokumaranUser> groupUsers = dokumaranService.getUsersBySession(toolSessionId);
 	    List<User> groupUserDtos = new ArrayList<>();
 	    for (DokumaranUser groupUser : groupUsers) {
 		User groupUserDto = new User();
@@ -168,14 +144,14 @@ public class LearningAction extends Action {
 	    }
 	    request.setAttribute(DokumaranConstants.ATTR_GROUP_USERS, groupUserDtos);
 	    request.setAttribute(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
-	    return mapping.findForward("waitforleader");
+	    return "pages/learning/waitforleader";
 	}
 	//time limit is set but hasn't yet launched by a teacher - show waitForTimeLimitLaunch page
 	if (dokumaran.getTimeLimit() > 0 && dokumaran.getTimeLimitLaunchedDate() == null) {
-	    return mapping.findForward("waitForTimeLimitLaunch");
+	    return "pages/learning/waitForTimeLimitLaunch";
 	}
 
-	boolean isUserLeader = (user != null) && service.isUserLeader(leaders, user.getUserId());
+	boolean isUserLeader = (user != null) && dokumaranService.isUserLeader(leaders, user.getUserId());
 
 	// check whether finish lock is on/off
 	boolean finishedLock = dokumaran.getLockWhenFinished() && (user != null) && user.isSessionFinished();
@@ -190,14 +166,14 @@ public class LearningAction extends Action {
 	sessionMap.put(DokumaranConstants.ATTR_USER_FINISHED, (user != null) && user.isSessionFinished());
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED,
-		service.isLeaderResponseFinalized(leaders));
+		dokumaranService.isLeaderResponseFinalized(leaders));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// reflection information
 	String entryText = new String();
 	if (user != null) {
-	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	    NotebookEntry notebookEntry = dokumaranService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    DokumaranConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 	    if (notebookEntry != null) {
 		entryText = notebookEntry.getEntry();
@@ -209,16 +185,16 @@ public class LearningAction extends Action {
 
 	// add define later support
 	if (dokumaran.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/definelater";
 	}
 
 	// set contentInUse flag to true!
 	dokumaran.setContentInUse(true);
 	dokumaran.setDefineLater(false);
-	service.saveOrUpdateDokumaran(dokumaran);
+	dokumaranService.saveOrUpdateDokumaran(dokumaran);
 
-	ActivityPositionDTO activityPosition = LearningWebUtil
-		.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet().getServletContext());
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
+		toolSessionId, request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
@@ -229,17 +205,17 @@ public class LearningAction extends Action {
 	DokumaranConfigItem apiKeyConfig = dokumaranService.getConfigItem(DokumaranConfigItem.KEY_API_KEY);
 	if (apiKeyConfig == null || apiKeyConfig.getConfigValue() == null || etherpadServerUrlConfig == null
 		|| etherpadServerUrlConfig.getConfigValue() == null) {
-	    return mapping.findForward("notconfigured");
+	    return "pages/learning/notconfigured";
 	}
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 
 	//time limit
 	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && dokumaran.getTimeLimit() != 0;
-	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(dokumaran) : 0;
+	long secondsLeft = isTimeLimitEnabled ? dokumaranService.getSecondsLeft(dokumaran) : 0;
 	request.setAttribute(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
-	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(dokumaran);
+	boolean isTimeLimitExceeded = dokumaranService.checkTimeLimitExceeded(dokumaran);
 
 	String padId = session.getPadId();
 	//in case of non-leader or finished lock or isTimeLimitExceeded - show Etherpad in readonly mode
@@ -247,36 +223,35 @@ public class LearningAction extends Action {
 	    padId = session.getEtherpadReadOnlyId();
 	    //in case Etherpad didn't have enough time to initialize - show notconfigured.jsp
 	    if (padId == null) {
-		return mapping.findForward("notconfigured");
+		return "pages/learning/notconfigured";
 	    }
 	}
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);
 
 	//add new sessionID cookie in order to access pad
 	if (user != null) {
-	    Cookie etherpadSessionCookie = service.createEtherpadCookieForLearner(user, session);
+	    Cookie etherpadSessionCookie = dokumaranService.createEtherpadCookieForLearner(user, session);
 	    response.addCookie(etherpadSessionCookie);
 	}
 
-	return mapping.findForward(DokumaranConstants.SUCCESS);
+	return "pages/learning/learning";
     }
 
     /**
      * Checks Leader Progress
      */
-    private ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/checkLeaderProgress")
+    private String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	IDokumaranService service = getDokumaranService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	boolean isLeaderResponseFinalized = service.isLeaderResponseFinalized(toolSessionId);
+	boolean isLeaderResponseFinalized = dokumaranService.isLeaderResponseFinalized(toolSessionId);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(responseJSON);
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -288,8 +263,8 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finish")
+    private String finish(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DokumaranConstants.ATTR_SESSION_MAP_ID);
@@ -300,7 +275,6 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	IDokumaranService service = getDokumaranService();
 	// get sessionId from HttpServletRequest
 	String nextActivityUrl = null;
 	try {
@@ -308,13 +282,13 @@ public class LearningAction extends Action {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
+	    nextActivityUrl = dokumaranService.finishToolSession(sessionId, userID);
 	    request.setAttribute(DokumaranConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (DokumaranApplicationException e) {
-	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
+	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(DokumaranConstants.SUCCESS);
+	return "pages/learning/finish";
     }
 
     /**
@@ -326,31 +300,30 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newReflection")
+    private String newReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, DokumaranConstants.ATTR_SESSION_MAP_ID);
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
+	reflectionForm.setUserID(user.getUserID());
+	reflectionForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	IDokumaranService submitFilesService = getDokumaranService();
 
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = dokumaranService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		DokumaranConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
+	    reflectionForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(DokumaranConstants.SUCCESS);
+	return "pages/learning/notebook";
     }
 
     /**
@@ -362,53 +335,42 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
+    @RequestMapping("/submitReflection")
+    private String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request) {
+	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, DokumaranConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	IDokumaranService service = getDokumaranService();
-
 	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = dokumaranService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		DokumaranConstants.TOOL_SIGNATURE, userId);
 
 	if (entry == null) {
 	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    DokumaranConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+	    dokumaranService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    DokumaranConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(reflectionForm.getEntryText());
 	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
+	    dokumaranService.updateEntry(entry);
 	}
 
-	return finish(mapping, form, request, response);
+	return finish(reflectionForm, request);
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
 
-    private IDokumaranService getDokumaranService() {
-	if (LearningAction.dokumaranService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LearningAction.dokumaranService = (IDokumaranService) wac.getBean(DokumaranConstants.RESOURCE_SERVICE);
-	}
-	return LearningAction.dokumaranService;
-    }
-
     private DokumaranUser getSpecifiedUser(IDokumaranService service, Long sessionId, Integer userId) {
 	DokumaranUser dokumaranUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (dokumaranUser == null) {
-	    LearningAction.log.error(
+	    LearningController.log.error(
 		    "Unable to find specified user for dokumaran activity. Screens are likely to fail. SessionId="
 			    + sessionId + " UserId=" + userId);
 	}

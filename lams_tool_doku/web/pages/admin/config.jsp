@@ -27,29 +27,27 @@
 				</lams:Alert>
 			</c:if>
 			
-			<html:form action="/ladoku11admin" styleId="ladoku11adminForm" method="post" enctype="multipart/form-data">
-				
-				<html:hidden property="dispatch" value="saveContent" />
+			<form:form action="saveContent.do" modelAttribute="ladoku11adminForm" id="ladoku11adminForm" method="post" enctype="multipart/form-data">
 				
 				<div class="form-group voffset5">
 					<label for="etherpadUrl">
 						<fmt:message key="admin.etherpad.url" />
 					</label>
-					<html:text property="etherpadUrl" size="50" maxlength="255" styleClass="form-control form-control-inline"/>
+					<form:input path="etherpadUrl" size="50" maxlength="255" cssClass="form-control form-control-inline"/>
 				</div>
 				
 				<div class="form-group voffset5">
 					<label for="apiKey">
 						<fmt:message key="admin.apiKey" />
 					</label>
-					<html:text property="apiKey" size="50" maxlength="255" styleClass="form-control form-control-inline"/>
+					<form:input path="apiKey" size="50" maxlength="255" cssClass="form-control form-control-inline"/>
 				</div>
 			
-				<html:submit styleClass="btn btn-primary pull-right">
+				<button class="btn btn-primary pull-right">
 					<fmt:message key="label.save"/>
-				</html:submit>
+				</button>
 			
-			</html:form>
+			</form:form>
 			
 			<div id="footer">
 			</div>

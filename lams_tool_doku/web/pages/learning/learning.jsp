@@ -38,7 +38,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/etherpad.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -243,9 +243,9 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5">
+						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-default voffset5">
 						<fmt:message key="label.edit" />
-						</html:button>
+						</button>
 					</c:if>
 				</div>
 			</div>
@@ -256,14 +256,14 @@
 			<div>
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" styleId="finish-button"
-								onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">
+						<button name="FinishButton" id="finish-button"
+								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finish-button"
-								onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
+						<a href="#nogo" name="FinishButton" id="finish-button"
+								onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
@@ -274,7 +274,7 @@
 				 					</c:otherwise>
 				 				</c:choose>
 							</span>
-						</html:link>
+						</a>
 					</c:otherwise>
 				</c:choose>
 			</div>

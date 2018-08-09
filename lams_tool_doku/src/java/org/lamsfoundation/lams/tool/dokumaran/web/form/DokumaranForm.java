@@ -48,6 +48,8 @@ public class DokumaranForm extends ActionForm {
     private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
+    
+    private String mode;
 
     private Dokumaran dokumaran;
 
@@ -65,9 +67,8 @@ public class DokumaranForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
+    
+    public void reset(HttpServletRequest request, String param) {
 	// if it is start page, all data read out from database or current session
 	// so need not reset checkbox to refresh value!
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
@@ -124,6 +125,14 @@ public class DokumaranForm extends ActionForm {
 
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
 }

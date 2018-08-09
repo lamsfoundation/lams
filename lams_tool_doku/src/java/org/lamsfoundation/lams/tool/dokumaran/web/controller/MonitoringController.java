@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.dokumaran.web.action;
+package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -58,33 +58,26 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController{
+    
+    public static Logger log = Logger.getLogger(MonitoringController.class);
+    
+    @Autowired
+    @Qualifier("dokumaranService")
+    private IDokumaranService dokumaranService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, DokumaranConfigurationException, URISyntaxException {
-	String param = mapping.getParameter();
 
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
-
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	} else if (param.equals("fixFaultySession")) {
-	    return fixFaultySession(mapping, form, request, response);
-	} else if (param.equals("launchTimeLimit")) {
-	    return launchTimeLimit(mapping, form, request, response);
-	} else if (param.equals("addOneMinute")) {
-	    return addOneMinute(mapping, form, request, response);
-	}
-
-	return mapping.findForward(DokumaranConstants.ERROR);
-    }
-
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/summary")
+    private String summary(HttpServletRequest request,
 	    HttpServletResponse response) throws DokumaranConfigurationException, URISyntaxException {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -95,24 +88,23 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	IDokumaranService service = getDokumaranService();
-	List<SessionDTO> groupList = service.getSummary(contentId);
+	List<SessionDTO> groupList = dokumaranService.getSummary(contentId);
 	boolean hasFaultySession = false;
 	for (SessionDTO group : groupList) {
 	    hasFaultySession |= group.isSessionFaulty();
 	}
 
-	Dokumaran dokumaran = service.getDokumaranByContentId(contentId);
+	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(contentId);
 
 	// Create reflectList if reflection is enabled.
 	if (dokumaran.isReflectOnActivity()) {
-	    List<ReflectDTO> relectList = service.getReflectList(contentId);
+	    List<ReflectDTO> relectList = dokumaranService.getReflectList(contentId);
 	    sessionMap.put(DokumaranConstants.ATTR_REFLECT_LIST, relectList);
 	}
 	
 	//time limit
 	boolean isTimeLimitEnabled = dokumaran.getTimeLimit() != 0;
-	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(dokumaran) : 0;
+	long secondsLeft = isTimeLimitEnabled ? dokumaranService.getSecondsLeft(dokumaran) : 0;
 	sessionMap.put(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
 	// cache into sessionMap
@@ -121,12 +113,12 @@ public class MonitoringAction extends Action {
 	sessionMap.put(DokumaranConstants.PAGE_EDITABLE, dokumaran.isContentInUse());
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, contentId);
-	sessionMap.put(DokumaranConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
+	sessionMap.put(DokumaranConstants.ATTR_IS_GROUPED_ACTIVITY, dokumaranService.isGroupedActivity(contentId));
 	
 	// get the API key from the config table and add it to the session
-	DokumaranConfigItem etherpadServerUrlConfig = service.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
+	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
 	if (etherpadServerUrlConfig == null || etherpadServerUrlConfig.getConfigValue() == null) {
-	    return mapping.findForward("notconfigured");
+	    return "pages/learning/notconfigured";
 	}
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
@@ -138,22 +130,22 @@ public class MonitoringAction extends Action {
 	//no need to store cookie if there are no sessions created yet
 	if (!groupList.isEmpty()) {
 	    // add new sessionID cookie in order to access pad
-	    Cookie etherpadSessionCookie = service.createEtherpadCookieForMonitor(user, contentId);
+	    Cookie etherpadSessionCookie = dokumaranService.createEtherpadCookieForMonitor(user, contentId);
 	    response.addCookie(etherpadSessionCookie);
 	}
 	
-	return mapping.findForward(DokumaranConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
     
-    private ActionForward fixFaultySession(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/fixFaultySession")
+    private void fixFaultySession(HttpServletRequest request,
 	    HttpServletResponse response) throws DokumaranConfigurationException, ServletException, IOException {
-	IDokumaranService service = getDokumaranService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	DokumaranSession session = service.getDokumaranSessionBySessionId(toolSessionId);
+	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 	
 	try {
 	    log.debug("Fixing faulty session (sessionId=" + toolSessionId + ").");
-	    service.createPad(session.getDokumaran(), session);
+	    dokumaranService.createPad(session.getDokumaran(), session);
 
 	} catch (Exception e) {
 	    // printing out error cause
@@ -164,10 +156,8 @@ public class MonitoringAction extends Action {
 	    out.flush();
 	    out.close();
 	    log.error("Failed! " + e.getMessage());
-	    return null;
 	}
 	
-	return null;
     }
     
     /**
@@ -175,14 +165,11 @@ public class MonitoringAction extends Action {
      * @throws IOException 
      * @throws JSONException 
      */
-    private ActionForward launchTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IDokumaranService service = getDokumaranService();
+    @RequestMapping("/launchTimeLimit")
+    private void launchTimeLimit(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 	
-	service.launchTimeLimit(toolContentId);
-
-	return null;
+	dokumaranService.launchTimeLimit(toolContentId);
     }
     
     /**
@@ -190,23 +177,12 @@ public class MonitoringAction extends Action {
      * @throws IOException 
      * @throws JSONException 
      */
-    private ActionForward addOneMinute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IDokumaranService service = getDokumaranService();
+    @RequestMapping("/addOneMinute")
+    private void addOneMinute(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 	
-	service.addOneMinute(toolContentId);
+	dokumaranService.addOneMinute(toolContentId);
 
-	return null;
     }
 
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    
-    private IDokumaranService getDokumaranService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IDokumaranService) wac.getBean(DokumaranConstants.RESOURCE_SERVICE);
-    }
 }

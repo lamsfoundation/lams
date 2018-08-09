@@ -21,23 +21,17 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.dokumaran.web.action;
+package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
@@ -50,51 +44,24 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Steve.Ni
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	// -----------------------Dokumaran Author function---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    IDokumaranService service = getDokumaranService();
-	    Dokumaran dokumaran = service.getDokumaranByContentId(contentId);
-
-	    dokumaran.setDefineLater(true);
-	    service.saveOrUpdateDokumaran(dokumaran);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-
-	return mapping.findForward(DokumaranConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("dokumaranService")
+    private IDokumaranService dokumaranService;
 
     /**
      * Read dokumaran data from database and put them into HttpSession. It will
@@ -106,44 +73,66 @@ public class AuthoringAction extends Action {
      * @throws ServletException
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/start")
+    private String start(@ModelAttribute("authoringForm") DokumaranForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return starting(authoringForm, request);
+    }
+
+    @RequestMapping("/definelater")
+    private String definelater(@ModelAttribute("authoringForm") DokumaranForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(contentId);
+
+	dokumaran.setDefineLater(true);
+	dokumaranService.saveOrUpdateDokumaran(dokumaran);
+
+	//audit log the teacher has started editing activity in monitor
+	dokumaranService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return starting(authoringForm, request);
+    }
+
+    private String starting(@ModelAttribute("authoringForm") DokumaranForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, DokumaranConstants.PARAM_TOOL_CONTENT_ID));
 
 	// get back the dokumaran and item list and display them on page
-	IDokumaranService service = getDokumaranService();
 
 	Dokumaran dokumaran = null;
-	DokumaranForm dokumaranForm = (DokumaranForm) form;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	dokumaranForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	dokumaranForm.setSessionMapID(sessionMap.getSessionID());
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
-	    dokumaran = service.getDokumaranByContentId(contentId);
+	    dokumaran = dokumaranService.getDokumaranByContentId(contentId);
 	    // if dokumaran does not exist, try to use default content instead.
 	    if (dokumaran == null) {
-		dokumaran = service.getDefaultContent(contentId);
+		dokumaran = dokumaranService.getDefaultContent(contentId);
 	    }
 
-	    dokumaranForm.setDokumaran(dokumaran);
+	    authoringForm.setDokumaran(dokumaran);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
-	sessionMap.put(DokumaranConstants.ATTR_RESOURCE_FORM, dokumaranForm);
+	sessionMap.put(DokumaranConstants.ATTR_RESOURCE_FORM, authoringForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(DokumaranConstants.SUCCESS);
+	return "pages/authoring/start";
     }
 
     /**
@@ -156,23 +145,26 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+
+    @RequestMapping("/init")
+    private String initPage(@ModelAttribute("authoringForm") DokumaranForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, DokumaranConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	DokumaranForm existForm = (DokumaranForm) sessionMap.get(DokumaranConstants.ATTR_RESOURCE_FORM);
 
-	DokumaranForm dokumaranForm = (DokumaranForm) form;
 	try {
-	    PropertyUtils.copyProperties(dokumaranForm, existForm);
+	    PropertyUtils.copyProperties(authoringForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	
-	return mapping.findForward(DokumaranConstants.SUCCESS);
+	authoringForm.setMode(mode.toString());
+
+	return "pages/authoring/authoring";
     }
 
     /**
@@ -186,24 +178,25 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	DokumaranForm dokumaranForm = (DokumaranForm) form;
+
+    @RequestMapping("/update")
+    private String updateContent(@ModelAttribute("authoringForm") DokumaranForm authoringForm,
+	    HttpServletRequest request) throws Exception {
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(dokumaranForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(authoringForm.getSessionMapID());
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	Dokumaran dokumaran = dokumaranForm.getDokumaran();
-	IDokumaranService service = getDokumaranService();
+	Dokumaran dokumaran = authoringForm.getDokumaran();
 
 	// **********************************Get Dokumaran PO*********************
-	Dokumaran dokumaranPO = service.getDokumaranByContentId(dokumaran.getContentId());
+	Dokumaran dokumaranPO = dokumaranService.getDokumaranByContentId(dokumaran.getContentId());
 	if (dokumaranPO == null) {
 	    // new Dokumaran, create it
 	    dokumaranPO = dokumaran;
 	    dokumaranPO.setCreated(new Timestamp(new Date().getTime()));
 	    dokumaranPO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = dokumaranPO.getUid();
 	    PropertyUtils.copyProperties(dokumaranPO, dokumaran);
@@ -212,7 +205,7 @@ public class AuthoringAction extends Action {
 	    // Below we remove reference to one of Assessment objects,
 	    // so maybe there will be just one object in session when save is done
 	    // If this fails, we may have to evict the object from session using DAO
-	    dokumaranForm.setDokumaran(null);
+	    authoringForm.setDokumaran(null);
 	    dokumaran = null;
 	    // get back UID
 	    dokumaranPO.setUid(uid);
@@ -229,7 +222,7 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	DokumaranUser dokumaranUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+	DokumaranUser dokumaranUser = dokumaranService.getUserByIDAndContent(new Long(user.getUserID().intValue()),
 		dokumaranPO.getContentId());
 	if (dokumaranUser == null) {
 	    dokumaranUser = new DokumaranUser(user, dokumaranPO);
@@ -238,26 +231,14 @@ public class AuthoringAction extends Action {
 	dokumaranPO.setCreatedBy(dokumaranUser);
 
 	// ***************************** finally persist dokumaranPO again
-	service.saveOrUpdateDokumaran(dokumaranPO);
+	dokumaranService.saveOrUpdateDokumaran(dokumaranPO);
 
-	dokumaranForm.setDokumaran(dokumaranPO);
+	authoringForm.setDokumaran(dokumaranPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	
-	return mapping.findForward(DokumaranConstants.SUCCESS);
-    }
 
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    /**
-     * Return DokumaranService bean.
-     */
-    private IDokumaranService getDokumaranService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IDokumaranService) wac.getBean(DokumaranConstants.RESOURCE_SERVICE);
+	return "pages/authoring/authoring";
     }
 
 }
