@@ -668,7 +668,7 @@ public class LearningController {
 
 	// notify learners and teachers
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
-
+	request.setAttribute("formBean", messageForm);
 	return "jsps/learning/viewforum";
     }
 
@@ -676,11 +676,11 @@ public class LearningController {
      * Display replay topic page. Message form subject will include parent topics same subject.
      */
     @RequestMapping("/newReplyTopic")
-    public String newReplyTopic(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request) {
+    public String newReplyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
 
 	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = getSessionMap(request, replyForm);
-	replyForm.setSessionMapID(sessionMapID);
+	SessionMap sessionMap = getSessionMap(request, messageForm);
+	messageForm.setSessionMapID(sessionMapID);
 
 	Long parentId = WebUtil.readLongParam(request, ForumConstants.ATTR_PARENT_TOPIC_ID);
 	sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
@@ -696,9 +696,9 @@ public class LearningController {
 
 	    // echo back current topic subject to web page
 	    if (reTitle != null && !reTitle.trim().startsWith("Re:")) {
-		replyForm.getMessage().setSubject("Re:" + reTitle);
+		messageForm.getMessage().setSubject("Re:" + reTitle);
 	    } else {
-		replyForm.getMessage().setSubject(reTitle);
+		messageForm.getMessage().setSubject(reTitle);
 	    }
 	}
 
@@ -709,7 +709,6 @@ public class LearningController {
 	// as it has a link from the view topic screen back to View Forum screen.
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
 	return "jsps/learning/reply";
     }
 
@@ -717,14 +716,14 @@ public class LearningController {
      * Create a replayed topic for a parent topic.
      */
     @RequestMapping("/replyTopic")
-    public String replyTopic(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request,
+    public String replyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException {
 
-	SessionMap sessionMap = getSessionMap(request, replyForm);
+	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	Message message = replyForm.getMessage();
+	Message message = messageForm.getMessage();
 	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	if (isTestHarness) {
 	    message.setBody(request.getParameter("message.body__textarea"));
@@ -736,7 +735,7 @@ public class LearningController {
 	ForumUser forumUser = getCurrentUser(request, sessionId);
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
-	setAttachment(replyForm, message);
+	setAttachment(messageForm, message);
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
@@ -751,7 +750,7 @@ public class LearningController {
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 	Forum forum = session.getForum();
 
-	setupViewTopicPagedDTOList(request, rootTopicId, replyForm.getSessionMapID(), forumUser, forum, null, null);
+	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
 
 	// notify learners and teachers
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
@@ -765,14 +764,14 @@ public class LearningController {
      */
     @RequestMapping("/replyTopicInline")
     @ResponseBody
-    public String replyTopicInline(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request,
+    public String replyTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException, IOException {
 
-	SessionMap sessionMap = getSessionMap(request, replyForm);
+	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	Message message = replyForm.getMessage();
+	Message message = messageForm.getMessage();
 	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	if (isTestHarness) {
 	    message.setBody(request.getParameter("message.body__textarea"));
@@ -784,7 +783,7 @@ public class LearningController {
 	ForumUser forumUser = getCurrentUser(request, sessionId);
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
-	setAttachment(replyForm, message);
+	setAttachment(messageForm, message);
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
@@ -805,7 +804,7 @@ public class LearningController {
 	ObjectNode.put(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 	ObjectNode.put(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 	ObjectNode.put(ForumConstants.ATTR_THREAD_ID, newMessageSeq.getThreadMessage().getUid());
-	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, replyForm.getSessionMapID());
+	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 	ObjectNode.put(ForumConstants.ATTR_PARENT_TOPIC_ID, newMessageSeq.getMessage().getParent().getUid());
 
@@ -821,7 +820,7 @@ public class LearningController {
      * Display a editable form for a special topic in order to update it.
      */
     @RequestMapping("/editTopic")
-    public String editTopic(@ModelAttribute("editForm") MessageForm editForm, HttpServletRequest request)
+    public String editTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
 	    throws PersistenceException {
 	Long topicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
@@ -829,12 +828,12 @@ public class LearningController {
 
 	// echo current topic content to web page
 	if (topic != null) {
-	    editForm.setMessage(topic.getMessage());
+	    messageForm.setMessage(topic.getMessage());
 	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
 	}
 
 	// cache this topicID, using in Update topic
-	SessionMap sessionMap = getSessionMap(request, editForm);
+	SessionMap sessionMap = getSessionMap(request, messageForm);
 	sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
@@ -844,7 +843,6 @@ public class LearningController {
 	// as it has a link from the view topic screen back to View Forum screen.
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
 	return "jsps/learning/edit";
     }
 
@@ -885,7 +883,6 @@ public class LearningController {
 	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 	Forum forum = forumUser.getSession().getForum();
 	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
-
 	return "jsps/learning/viewtopic";
     }
 

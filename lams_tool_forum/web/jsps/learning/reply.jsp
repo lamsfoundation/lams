@@ -50,14 +50,14 @@
 		<script type="text/javascript">
 			// The treetable code uses the clicks to expand and collapse the replies but then 
 			// the buttons will not work. So stop the event propogating up the event chain. 
-			$("#replyForm").click(function (e) {
+			$("#messageForm").click(function (e) {
 				e.stopPropagation();
 			});
-			$("#replyForm").keydown(function (e) {
+			$("#messageForm").keydown(function (e) {
 		    	e.stopPropagation();
 			});
 		
-			$('#replyForm').submit(function() { // catch the form's submit event
+			$('#messageForm').submit(function() { // catch the form's submit event
 				disableSubmitButton();
 				if ( validateForm() ) {
 		
@@ -134,7 +134,7 @@
 		</script>
 		
 		<form:form action="replyTopicInline.do"
-				focus="textarea#messageBody" enctype="multipart/form-data" modelAttribute="replyForm" id="replyForm" >
+				focus="textarea#messageBody" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
 				
 			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
 			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>

@@ -5,14 +5,14 @@
 
 	<c:choose>
 		<c:when test="${sessionMap.allowRichEditor}">
-			<lams:CKEditor id="message.body" value="${message.body}" 
+			<lams:CKEditor id="message.body" value="${messageForm.message.body}" 
 					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 			</lams:CKEditor>
 		</c:when>
 		
 		<c:otherwise>
 			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
-			<textarea rows="10" class="form-control" tabindex="2" name="message.body" id="messageBody">${message.body}</textarea> 
+			<textarea rows="10" class="form-control" tabindex="2" name="message.body" id="messageBody">${messageForm.message.body}</textarea> 
 		</c:otherwise>
 	</c:choose>
  
