@@ -2,7 +2,7 @@
 
 <div class="form-group">
     <label><fmt:message key="message.label.subject" />&nbsp;</label>
-    <input type="text" size="50" tabindex="1" value="${message.subject}" name="message.subject" maxlength="60"/> &nbsp;
+    <form:input size="50" tabindex="1" value="${message.subject}" path="message.subject" maxlength="60"/> &nbsp;
 	<form:errors path="message.subject" />
 </div>
 

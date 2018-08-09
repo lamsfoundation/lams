@@ -763,7 +763,7 @@ public class LearningController {
     /**
      * Create a replayed topic for a parent topic.
      */
-    @RequestMapping(path = "/replyTopicInline", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/replyTopicInline")
     @ResponseBody
     public String replyTopicInline(@ModelAttribute("replyForm") MessageForm replyForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException, IOException {
@@ -809,6 +809,7 @@ public class LearningController {
 	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 	ObjectNode.put(ForumConstants.ATTR_PARENT_TOPIC_ID, newMessageSeq.getMessage().getParent().getUid());
 
+	response.setContentType("application/json;charset=UTF-8");
 	return ObjectNode.toString();
     }
 
@@ -928,7 +929,7 @@ public class LearningController {
     /**
      * Update a topic.
      */
-    @RequestMapping(path = "/updateTopicInline", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/updateTopicInline")
     @ResponseBody
     public String updateTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws PersistenceException, IOException {
@@ -947,6 +948,7 @@ public class LearningController {
 	Long rootTopicId = forumService.getRootTopicId(topicId);
 	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
+	response.setContentType("application/json;charset=UTF-8");
 	return ObjectNode.toString();
     }
 
@@ -993,7 +995,7 @@ public class LearningController {
     /**
      * Rates postings submitted by other learners.
      */
-    @RequestMapping(path = "/rateMessage", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/rateMessage")
     @ResponseBody
     public String rateMessage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -1030,6 +1032,7 @@ public class LearningController {
 	ObjectNode.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
 	ObjectNode.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 
+	response.setContentType("application/json;charset=UTF-8");
 	return ObjectNode.toString();
     }
 

@@ -31,7 +31,7 @@
 			
 			<p>
 				<c:set var="viewtopic">
-				    <lams:WebAppURL />learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${formBean.sessionMapID}&hideReflection=${sessionMap.hideReflection}
+				    <lams:WebAppURL />learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${markForm.sessionMapID}&hideReflection=${sessionMap.hideReflection}
 				</c:set>
 				<a href="javascript:launchPopup('${viewtopic}','viewtopic')">
 					<c:out value="${topic.message.subject}" />
@@ -40,7 +40,6 @@
 					<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 				</c:if>
 			</p>
-			
 			<%@ include file="/common/messages.jsp"%>
 		
 			<div class="form-group">

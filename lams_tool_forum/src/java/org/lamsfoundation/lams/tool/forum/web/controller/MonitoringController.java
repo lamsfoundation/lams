@@ -78,6 +78,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -184,9 +185,10 @@ public class MonitoringController {
     /**
      * Refreshes user list.
      */
-    @RequestMapping(path = "/getUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getUsers")
     @ResponseBody
-    public String getUsers(HttpServletRequest request) throws IOException, ServletException {
+    public String getUsers(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -300,7 +302,7 @@ public class MonitoringController {
 	    rows.add(responseRow);
 	}
 	responcedata.set("rows", rows);
-
+	response.setContentType("application/json;charset=UTF-8");
 	return responcedata.toString();
     }
 
@@ -532,7 +534,7 @@ public class MonitoringController {
 	Message topic = forumService.getMessage(msgUid);
 
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC, MessageDTO.getMessageDTO(topic));
-	return "jsps/monitoring/message/viewtopic";
+	return "jsps/learning/viewtopic";
     }
 
     @RequestMapping("/releaseMark")
@@ -646,12 +648,12 @@ public class MonitoringController {
 	Float mark = null;
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (StringUtils.isBlank(markStr)) {
-	    errorMap.add("report.mark", messageService.getMessage("error.valueReqd"));
+	    errorMap.add("GLOBAL", messageService.getMessage("error.valueReqd"));
 	} else {
 	    try {
 		mark = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
 	    } catch (Exception e) {
-		errorMap.add("report.mark", messageService.getMessage("error.mark.invalid.number"));
+		errorMap.add("GLOBAL", messageService.getMessage("error.mark.invalid.number"));
 	    }
 	}
 
@@ -664,7 +666,7 @@ public class MonitoringController {
 	    // each back to web page
 	    request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
 	    request.setAttribute("errorMap", errorMap);
-	    return "jsps/monitoring/monitoring";
+	    return "jsps/monitoring/updatemarks";
 	}
 
 	// update message report
@@ -696,7 +698,7 @@ public class MonitoringController {
 		 // display root topic rather than leaf one
 	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
 
-	    String redirect = "redirect:/monitoring/viewTopic.do";
+	    String redirect = "redirect:/learning/viewTopic.do";
 	    redirect = WebUtil.appendParameterToURL(redirect, ForumConstants.ATTR_SESSION_MAP_ID,
 		    markForm.getSessionMapID());
 	    redirect = WebUtil.appendParameterToURL(redirect, ForumConstants.ATTR_USER, user.toString());
@@ -709,7 +711,7 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request) throws IOException {
 

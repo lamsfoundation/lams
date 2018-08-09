@@ -40,7 +40,7 @@
 	<table class="table table-condensed table-no-border">
 		<tr>
 			<td class="field-name" width="30%">
-				<fmt:message key="label.monitoring.statistic.total.message" />
+				<fmt:message key="lable.monitoring.statistic.total.message" />
 			</td>
 			<td>
 				<c:out value="${sessionTotalMessage}" />
