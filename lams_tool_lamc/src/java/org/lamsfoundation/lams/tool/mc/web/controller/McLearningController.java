@@ -65,7 +65,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -114,7 +113,7 @@ public class McLearningController {
 	mcLearningForm.setToolSessionID(toolSessionID);
 
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
-	
+
 	/*
 	 * by now, we made sure that the passed tool session id exists in the db as a new record Make sure we can
 	 * retrieve it and the relavent content
@@ -137,7 +136,7 @@ public class McLearningController {
 
 	String mode = request.getParameter(McAppConstants.MODE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	
+
 	McQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    // monitoring mode - user is specified in URL
@@ -252,7 +251,6 @@ public class McLearningController {
 	return "learning/AnswersContent";
     }
 
-   
     /**
      * ActionForward endLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
      * response)
@@ -643,7 +641,7 @@ public class McLearningController {
     /**
      * checks Leader Progress
      */
-    @RequestMapping(path = "/checkLeaderProgress", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/checkLeaderProgress")
     @ResponseBody
     public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -656,6 +654,7 @@ public class McLearningController {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	response.setContentType("application/json;charset=UTF-8");
 	return ObjectNode.toString();
     }
 

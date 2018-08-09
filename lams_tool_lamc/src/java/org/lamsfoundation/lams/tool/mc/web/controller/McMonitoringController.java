@@ -316,7 +316,7 @@ public class McMonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request) {
 
@@ -343,7 +343,7 @@ public class McMonitoringController {
     /**
      * Set tool's activityEvaluation
      */
-    @RequestMapping(path = "/setActivityEvaluation", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/setActivityEvaluation")
     @ResponseBody
     public String setActivityEvaluation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -353,6 +353,7 @@ public class McMonitoringController {
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("success", "true");
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 
@@ -396,9 +397,9 @@ public class McMonitoringController {
     /**
      * Return paged users for jqGrid.
      */
-    @RequestMapping(path = "/getPagedUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getPagedUsers")
     @ResponseBody
-    public String getPagedUsers(HttpServletRequest request) {
+    public String getPagedUsers(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession session = mcService.getMcSessionById(sessionId);
@@ -472,7 +473,7 @@ public class McMonitoringController {
 	responseJSON.put("page", page);
 	responseJSON.put("records", countVisitLogs);
 	responseJSON.set("rows", rows);
-
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 
@@ -493,9 +494,9 @@ public class McMonitoringController {
     /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
-    @RequestMapping(path = "/getMarkChartData", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getMarkChartData")
     @ResponseBody
-    public String getMarkChartData(HttpServletRequest request) throws IOException {
+    public String getMarkChartData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(contentID);
@@ -516,7 +517,7 @@ public class McMonitoringController {
 	} else {
 	    responseJSON.set("data", JsonUtil.readArray(new Float[0]));
 	}
-
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
 
     }
