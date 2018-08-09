@@ -24,7 +24,7 @@
 	};
         
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc',
+    	window.open('<lams:LAMSURL />questions/questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=240,scrollbars=yes');
     }
 	
@@ -45,7 +45,7 @@
     function exportQTI() {
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("title")[0].value);
-    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}" />'
+    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}'
     			+ '&title=' + title;
     }
 </script>

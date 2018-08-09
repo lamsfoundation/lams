@@ -295,12 +295,12 @@
 
 		<!--  now really start the form -->
 		<div class="form-group">
-				<form:hidden property="toolContentID" />
-				<form:hidden property="toolSessionID" />
-				<form:hidden property="httpSessionID" />
-				<form:hidden property="userID" />
-				<form:hidden property="userOverPassMark" />
-				<form:hidden property="passMarkApplicable" />
+				<form:hidden path="toolContentID" />
+				<form:hidden path="toolSessionID" />
+				<form:hidden path="httpSessionID" />
+				<form:hidden path="userID" />
+				<form:hidden path="userOverPassMark" />
+				<form:hidden path="passMarkApplicable" />
 
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
 					<input type="submit" name="redoQuestions" class="btn btn-primary pull-left">
@@ -312,7 +312,7 @@
 						|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
 					<div class="voffset5">
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-							<form:hidden property="learnerFinished" value="Finished" />
+							<form:hidden path="learnerFinished" value="Finished" />
 
 							<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton"
 									onclick="submitForm('finish'); return false;">
@@ -328,9 +328,7 @@
 						</c:if>
 
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<input type="submit" name="forwardtoReflection" class="btn btn-primary pull-right">
-								<fmt:message key="label.continue" />
-							</input>
+							<input type="submit" name="forwardtoReflection" class="btn btn-primary pull-right" value="<fmt:message key="label.continue" />"/>
 						</c:if>
 					</div>
 				</c:if>

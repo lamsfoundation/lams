@@ -108,7 +108,7 @@
 		<input type="hidden" id="questionCount" value="${plannerForm.questionCount}" />
 		
 		<table id="questionTable" cellpadding="0" cellspacing="0">
-			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">
+			<c:forEach var="questionIndex"  begin="1" end="${plannerForm.questionCount}">
 				<tr>
 					<td class="FCKcell">
 						<lams:CKEditor id="question[${questionIndex-1}]"

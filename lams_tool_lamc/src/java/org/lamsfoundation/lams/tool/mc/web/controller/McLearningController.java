@@ -96,7 +96,7 @@ public class McLearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/learner")
+    @RequestMapping("/learning")
     public String execute(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
 
 	mcLearningForm.setMcService(mcService);
@@ -278,13 +278,13 @@ public class McLearningController {
 	    nextUrl = mcService.leaveToolSession(new Long(toolSessionID), userDto.getUserID().longValue());
 	} catch (DataMissingException e) {
 	    McLearningController.logger.error("failure getting nextUrl: " + e);
-	    return "learningIndex";
+	    return "learning/AnswersContent";
 	} catch (ToolException e) {
 	    McLearningController.logger.error("failure getting nextUrl: " + e);
-	    return "learningIndex";
+	    return "learning/AnswersContent";
 	} catch (Exception e) {
 	    McLearningController.logger.error("unknown exception getting nextUrl: " + e);
-	    return "learningIndex";
+	    return "learning/AnswersContent";
 	}
 
 	response.sendRedirect(nextUrl);
