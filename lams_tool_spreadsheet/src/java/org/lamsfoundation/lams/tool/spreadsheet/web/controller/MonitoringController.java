@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -108,7 +107,7 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping(path = "/getUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getUsers")
     @ResponseBody
     public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -164,7 +163,7 @@ public class MonitoringController {
 	    rows.add(responseRow);
 	}
 	responsedata.set("rows", rows);
-
+	response.setContentType("application/json;charset=UTF-8");
 	return responsedata.toString();
     }
 
