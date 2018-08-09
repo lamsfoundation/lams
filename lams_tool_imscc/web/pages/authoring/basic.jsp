@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script lang="javascript">
 
@@ -50,30 +49,30 @@
     <label for="commonCartridge.title">
     	<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <html:text property="commonCartridge.title" styleClass="form-control"/>
+    <form:input path="commonCartridge.title" cssClass="form-control"/>
 </div>
 
 <div class="form-group">
     <label for="commonCartridge.instructions">
     	<fmt:message key="label.authoring.basic.instruction"/>
     </label>
-	<lams:CKEditor id="commonCartridge.instructions" value="${formBean.commonCartridge.instructions}"
-			contentFolderID="${formBean.contentFolderID}">
+	<lams:CKEditor id="commonCartridge.instructions" value="${authoringForm.commonCartridge.instructions}"
+			contentFolderID="${authoringForm.contentFolderID}">
 	</lams:CKEditor>
 </div>
 
 <div id="commonCartridgeListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
 <p align="center">
 <!--
-	<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');">
+	<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=1');">
 		<fmt:message key="label.authoring.basic.add.basiclti.tool" />
 	</a>
 -->	
-	<a href="<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-sm thickbox">
+	<a href="<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${authoringForm.sessionMapID}&itemType=2&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-sm thickbox">
 		<fmt:message key="label.authoring.basic.upload.common.cartridge" />
 	</a>
 </p>

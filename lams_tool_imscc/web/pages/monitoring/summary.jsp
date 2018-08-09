@@ -156,9 +156,9 @@ $(document).ready(function(){
 								<c:set var="viewReflection">
 									<c:url value="/monitoring/viewReflection.do?toolSessionID=${item.sessionId}&userUid=${user.userUid}"/>
 								</c:set>
-								<html:link href="javascript:launchPopup('${viewReflection}')" styleClass="btn btn-default btn-xs loffset5">
+								<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-xs loffset5">
 									<fmt:message key="label.view" />
-								</html:link>
+								</a>
 							</td>
 						</tr>
 					</c:forEach>

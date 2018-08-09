@@ -21,30 +21,18 @@
  * ****************************************************************
  */
 
+package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
-package org.lamsfoundation.lams.tool.commonCartridge.web.action;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -66,40 +54,36 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
  * @author Andrey Balan
  */
-public class LearningAction extends Action {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @Autowired
+    private WebApplicationContext applicationContext;
 
-	String param = mapping.getParameter();
-	// -----------------------CommonCartridge Learner function ---------------------------
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("finish")) {
-	    return finish(mapping, form, request, response);
-	}
+    @Autowired
+    @Qualifier("commonCartridgeService")
+    private ICommonCartridgeService commonCartridgeService;
 
-	// ================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(CommonCartridgeConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("commonCartridgeMessageService")
+    private MessageService messageService;
 
     /**
      * Read commonCartridge data from database and put them into HttpSession. It will redirect to init.do directly after
@@ -109,11 +93,12 @@ public class LearningAction extends Action {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+
+    @RequestMapping("/start")
+    private String start(HttpServletRequest request) {
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -126,19 +111,18 @@ public class LearningAction extends Action {
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 
 	// get back the commonCartridge and item list and display them on page
-	ICommonCartridgeService service = getCommonCartridgeService();
 	CommonCartridgeUser commonCartridgeUser = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // commonCartridgeUser may be null if the user was force completed.
-	    commonCartridgeUser = getSpecifiedUser(service, sessionId,
+	    commonCartridgeUser = getSpecifiedUser(commonCartridgeService, sessionId,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    commonCartridgeUser = getCurrentUser(service, sessionId);
+	    commonCartridgeUser = getCurrentUser(commonCartridgeService, sessionId);
 	}
 
-	CommonCartridge commonCartridge = service.getCommonCartridgeBySessionId(sessionId);
-	List<CommonCartridgeItem> items = new ArrayList<CommonCartridgeItem>();
+	CommonCartridge commonCartridge = commonCartridgeService.getCommonCartridgeBySessionId(sessionId);
+	List<CommonCartridgeItem> items = new ArrayList<>();
 	items.addAll(commonCartridge.getCommonCartridgeItems());
 
 	// check whehter finish lock is on/off
@@ -165,8 +149,9 @@ public class LearningAction extends Action {
 	// get notebook entry
 	String entryText = new String();
 	if (commonCartridgeUser != null) {
-	    NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    CommonCartridgeConstants.TOOL_SIGNATURE, commonCartridgeUser.getUserId().intValue());
+	    NotebookEntry notebookEntry = commonCartridgeService.getEntry(sessionId,
+		    CoreNotebookConstants.NOTEBOOK_TOOL, CommonCartridgeConstants.TOOL_SIGNATURE,
+		    commonCartridgeUser.getUserId().intValue());
 	    if (notebookEntry != null) {
 		entryText = notebookEntry.getEntry();
 	    }
@@ -190,16 +175,16 @@ public class LearningAction extends Action {
 
 	// add define later support
 	if (commonCartridge.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/definelater";
 	}
 
 	// set contentInUse flag to true!
 	commonCartridge.setContentInUse(true);
 	commonCartridge.setDefineLater(false);
-	service.saveOrUpdateCommonCartridge(commonCartridge);
+	commonCartridgeService.saveOrUpdateCommonCartridge(commonCartridge);
 
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, getServlet().getServletContext());
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// init commonCartridge item list
@@ -221,20 +206,23 @@ public class LearningAction extends Action {
 
 	// set complete flag for display purpose
 	if (commonCartridgeUser != null) {
-	    service.retrieveComplete(commonCartridgeItemList, commonCartridgeUser);
+	    commonCartridgeService.retrieveComplete(commonCartridgeItemList, commonCartridgeUser);
 	}
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE, commonCartridge);
 
 	if (runAuto) {
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewItem"));
-	    redirect.addParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	    redirect.addParameter(CommonCartridgeConstants.ATTR_TOOL_SESSION_ID, sessionId);
-	    redirect.addParameter(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_UID, runAutoItemUid);
-	    redirect.addParameter(CentralConstants.PARAM_MODE, mode.toString());
-	    return redirect;
-	    
+	    String redirectURL = "redirect:/reviewItem.do";
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CommonCartridgeConstants.ATTR_SESSION_MAP_ID,
+		    sessionMap.getSessionID());
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CommonCartridgeConstants.ATTR_TOOL_SESSION_ID,
+		    sessionId.toString());
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CommonCartridgeConstants.ATTR_RESOURCE_ITEM_UID,
+		    runAutoItemUid.toString());
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CentralConstants.PARAM_MODE, mode.toString());
+	    return redirectURL;
+
 	} else {
-	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	    return "pages/learning/learning";
 	}
     }
 
@@ -247,12 +235,13 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/finish")
+    private String finish(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -271,10 +260,9 @@ public class LearningAction extends Action {
 	}
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return mapping.getInputForward();
+	    return "pages/learning/learning";
 	}
 
-	ICommonCartridgeService service = getCommonCartridgeService();
 	// get sessionId from HttpServletRequest
 	String nextActivityUrl = null;
 	try {
@@ -282,13 +270,13 @@ public class LearningAction extends Action {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
+	    nextActivityUrl = commonCartridgeService.finishToolSession(sessionId, userID);
 	    request.setAttribute(CommonCartridgeConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (CommonCartridgeApplicationException e) {
-	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
+	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/learning/finish";
     }
 
     /**
@@ -300,35 +288,34 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newReflection")
+    private String newReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return mapping.getInputForward();
+	    return "pages/learning/learning";
 	}
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
+	reflectionForm.setUserID(user.getUserID());
+	reflectionForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	ICommonCartridgeService submitFilesService = getCommonCartridgeService();
 
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = commonCartridgeService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		CommonCartridgeConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
+	    reflectionForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/learning/notebook";
     }
 
     /**
@@ -340,64 +327,57 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
+    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
+    private String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request) {
+	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	ICommonCartridgeService service = getCommonCartridgeService();
-
 	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = commonCartridgeService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		CommonCartridgeConstants.TOOL_SIGNATURE, userId);
 
 	if (entry == null) {
 	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    CommonCartridgeConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+	    commonCartridgeService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    CommonCartridgeConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(reflectionForm.getEntryText());
 	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
+	    commonCartridgeService.updateEntry(entry);
 	}
 
-	return finish(mapping, form, request, response);
+	return finish(reflectionForm, request);
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userID = new Long(user.getUserID().longValue());
 
-	ICommonCartridgeService service = getCommonCartridgeService();
-	int miniViewFlag = service.checkMiniView(sessionId, userID);
+	int miniViewFlag = commonCartridgeService.checkMiniView(sessionId, userID);
 	// if current user view less than reqired view count number, then just return error message.
 	if (miniViewFlag > 0) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage("lable.learning.minimum.view.number.less", miniViewFlag));
-	    this.addErrors(request, errors);
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage("lable.learning.minimum.view.number.less",
+		    new Object[] { miniViewFlag }));
+	    request.setAttribute("errorMap", errorMap);
 	    return false;
 	}
 
 	return true;
-    }
-
-    private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
     }
 
     /**
@@ -410,7 +390,7 @@ public class LearningAction extends Action {
 	SortedSet<CommonCartridgeItem> list = (SortedSet<CommonCartridgeItem>) sessionMap
 		.get(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<CommonCartridgeItem>(new CommonCartridgeItemComparator());
+	    list = new TreeSet<>(new CommonCartridgeItemComparator());
 	    sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_LIST, list);
 	}
 	return list;
@@ -451,8 +431,8 @@ public class LearningAction extends Action {
     private CommonCartridgeUser getSpecifiedUser(ICommonCartridgeService service, Long sessionId, Integer userId) {
 	CommonCartridgeUser commonCartridgeUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (commonCartridgeUser == null) {
-	    LearningAction.log
-		    .error("Unable to find specified user for commonCartridge activity. Screens are likely to fail. SessionId="
+	    LearningController.log.error(
+		    "Unable to find specified user for commonCartridge activity. Screens are likely to fail. SessionId="
 			    + sessionId + " UserId=" + userId);
 	}
 	return commonCartridgeUser;
@@ -467,16 +447,17 @@ public class LearningAction extends Action {
     private void doComplete(HttpServletRequest request) {
 	// get back sessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	Long commonCartridgeItemUid = new Long(request.getParameter(CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID));
-	ICommonCartridgeService service = getCommonCartridgeService();
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	Long sessionId = (Long) sessionMap.get(CommonCartridgeConstants.ATTR_TOOL_SESSION_ID);
-	service.setItemComplete(commonCartridgeItemUid, new Long(user.getUserID().intValue()), sessionId);
+	commonCartridgeService.setItemComplete(commonCartridgeItemUid, new Long(user.getUserID().intValue()),
+		sessionId);
 
 	// set commonCartridge item complete tag
 	SortedSet<CommonCartridgeItem> commonCartridgeItemList = getCommonCartridgeItemList(sessionMap);
@@ -486,15 +467,6 @@ public class LearningAction extends Action {
 		break;
 	    }
 	}
-    }
-
-    /**
-     * Return ResourceService bean.
-     */
-    private MessageService getMessageService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (MessageService) wac.getBean("basicLTIMessageService");
     }
 
 }

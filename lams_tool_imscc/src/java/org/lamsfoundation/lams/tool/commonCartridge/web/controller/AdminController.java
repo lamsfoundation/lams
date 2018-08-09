@@ -20,98 +20,76 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.commonCartridge.web.action;
+package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
-import org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeServiceProxy;
 import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeService;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.AdminForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Andrey Balan
  */
-public class AdminAction extends Action {
+@Controller
+@RequestMapping("/laimsc11admin")
+public class AdminController {
+
+    @Autowired
+    @Qualifier("commonCartridgeService")
     private ICommonCartridgeService commonCartridgeService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	// -----------------------BasicLTI Author function ---------------------------
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("saveContent")) {
-	    return saveContent(mapping, form, request, response);
-	}
-
-	return start(mapping, form, request, response);
-    }
-
-    public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	// set up commonCartridgeService
-	if (commonCartridgeService == null) {
-	    commonCartridgeService = CommonCartridgeServiceProxy
-		    .getCommonCartridgeService(this.getServlet().getServletContext());
-	}
-
-	AdminForm adminForm = (AdminForm) form;
+    @RequestMapping("/start")
+    public String start(@ModelAttribute("commonCartridgeAdminForm") AdminForm commonCartridgeAdminForm,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	CommonCartridgeConfigItem allowExposeUserName = commonCartridgeService
 		.getConfigItem(CommonCartridgeConfigItem.KEY_EXPOSE_USER_NAME);
 	if (allowExposeUserName != null) {
-	    adminForm.setAllowExposeUserName(Boolean.parseBoolean(allowExposeUserName.getConfigValue()));
+	    commonCartridgeAdminForm.setAllowExposeUserName(Boolean.parseBoolean(allowExposeUserName.getConfigValue()));
 	}
 
 	CommonCartridgeConfigItem allowExposeUserEmail = commonCartridgeService
 		.getConfigItem(CommonCartridgeConfigItem.KEY_EXPOSE_USER_EMAIL);
 	if (allowExposeUserEmail != null) {
-	    adminForm.setAllowExposeUserEmail(Boolean.parseBoolean(allowExposeUserEmail.getConfigValue()));
+	    commonCartridgeAdminForm
+		    .setAllowExposeUserEmail(Boolean.parseBoolean(allowExposeUserEmail.getConfigValue()));
 	}
 
 	request.setAttribute("error", false);
-	return mapping.findForward("config");
+	return "pages/admin/config";
     }
 
-    public ActionForward saveContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	AdminForm adminForm = (AdminForm) form;
+    @RequestMapping("/saveContent")
+    public String saveContent(@ModelAttribute("commonCartridgeAdminForm") AdminForm commonCartridgeAdminForm,
+	    HttpServletRequest request) {
 
-	ActionErrors errors = validateAdminForm(adminForm);
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    return mapping.findForward("config");
-	}
-
-	// set up commonCartridgeService
-	if (commonCartridgeService == null) {
-	    commonCartridgeService = CommonCartridgeServiceProxy
-		    .getCommonCartridgeService(this.getServlet().getServletContext());
+	MultiValueMap<String, String> errorMap = validateAdminForm(commonCartridgeAdminForm);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/admin/config";
 	}
 
 	CommonCartridgeConfigItem allowExposeUserName = commonCartridgeService
 		.getConfigItem(CommonCartridgeConfigItem.KEY_EXPOSE_USER_NAME);
-	allowExposeUserName.setConfigValue(String.valueOf(adminForm.isAllowExposeUserName()));
+	allowExposeUserName.setConfigValue(String.valueOf(commonCartridgeAdminForm.isAllowExposeUserName()));
 	commonCartridgeService.saveOrUpdateConfigItem(allowExposeUserName);
 
 	CommonCartridgeConfigItem allowExposeUserEmail = commonCartridgeService
 		.getConfigItem(CommonCartridgeConfigItem.KEY_EXPOSE_USER_EMAIL);
-	allowExposeUserEmail.setConfigValue(String.valueOf(adminForm.isAllowExposeUserEmail()));
+	allowExposeUserEmail.setConfigValue(String.valueOf(commonCartridgeAdminForm.isAllowExposeUserEmail()));
 	commonCartridgeService.saveOrUpdateConfigItem(allowExposeUserEmail);
 
 	request.setAttribute("savedSuccess", true);
-	return mapping.findForward("config");
+	return "pages/admin/config";
 
     }
 
@@ -121,8 +99,8 @@ public class AdminAction extends Action {
      * @param adminForm
      * @return
      */
-    private ActionErrors validateAdminForm(AdminForm adminForm) {
-	ActionErrors errors = new ActionErrors();
+    private MultiValueMap<String, String> validateAdminForm(AdminForm commonCartridgeAdminForm) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// if ((adminForm.isAllowExposeUserName() == null) || adminForm.isAllowExposeUserName().equals("")) {
 	// if (!isParsableToInt(adminForm.isAllowExposeUserName())) {
@@ -144,6 +122,6 @@ public class AdminAction extends Action {
 	// BasicLTIConstants.ERROR_MSG_REQUIRED_FIELDS_MISSING));
 	// }
 
-	return errors;
+	return errorMap;
     }
 }

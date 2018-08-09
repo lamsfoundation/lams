@@ -26,9 +26,9 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
@@ -38,10 +38,10 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</div>
 
-			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control" />
+			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control" />
 
 			<div class="voffset10 pull-right">
-				<html:link href="#nogo" styleClass="btn btn-primary " styleId="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary " id="finishButton" onclick="submitForm('finish')">
 					<span class="na">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -52,10 +52,10 @@
 		 					</c:otherwise>
 		 				</c:choose>
 		 			</span>
-				</html:link>
+				</a>
 			</div>
 		</lams:Page>
-	</html:form>
+	</form:form>
 
 	<div id="footer">
 	</div>

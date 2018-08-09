@@ -66,7 +66,7 @@
 			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 				toolSignature="<%=DokumaranConstants.TOOL_SIGNATURE%>" toolContentID="${authoringForm.dokumaran.contentId}" 
-				 customiseSessionID="${authoringForm.sessionMapID}" accessMode="${authoringForm.mode}" defineLater="${mode=='teacher'}"
+				 customiseSessionID="${authoringForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 				 contentFolderID="${authoringForm.contentFolderID}" />
 		</lams:TabBodyArea>
 	

@@ -11,6 +11,6 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgecommon.js'/>"></script>
+<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/commonCartridgecommon.js"></script>
 
 	

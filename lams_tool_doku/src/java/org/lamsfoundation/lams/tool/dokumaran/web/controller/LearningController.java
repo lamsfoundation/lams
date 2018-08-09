@@ -112,7 +112,7 @@ public class LearningController {
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // dokumaranUser may be null if the user was force completed.
-	    user = getSpecifiedUser(dokumaranService, toolSessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+	    user = getSpecifiedUser(toolSessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    // get back login user DTO
 	    HttpSession ss = SessionManager.getSession();
@@ -367,8 +367,8 @@ public class LearningController {
     // Private method
     // *************************************************************************************
 
-    private DokumaranUser getSpecifiedUser(IDokumaranService service, Long sessionId, Integer userId) {
-	DokumaranUser dokumaranUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
+    private DokumaranUser getSpecifiedUser(Long sessionId, Integer userId) {
+	DokumaranUser dokumaranUser = dokumaranService.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (dokumaranUser == null) {
 	    LearningController.log.error(
 		    "Unable to find specified user for dokumaran activity. Screens are likely to fail. SessionId="

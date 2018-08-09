@@ -11,7 +11,7 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/commonCartridgeItem.js>"></script>
 	
 	<script type="text/javascript">
 		function verifyAndSubmit() {
@@ -36,17 +36,16 @@
 </lams:head>
 	
 <body class="stripes">
-	<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm" enctype="multipart/form-data" onsubmit="return verifyAndSubmit()">
-		<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<form:form action="saveOrUpdateItem.do" modelAttribute="commonCartridgeItemForm" method="post" id="commonCartridgeItemForm" enctype="multipart/form-data" onsubmit="return verifyAndSubmit()">
 	
 		<c:set var="title"><fmt:message key="label.authoring.basic.upload.common.cartridge" /></c:set>
 		<lams:Page title="${title}" type="learner">
 
 			<%@ include file="/common/messages.jsp"%>
 							
-			<html:hidden property="sessionMapID" />
+			<form:hidden path="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="2" />
-			<html:hidden property="itemIndex" />
+			<form:hidden path="itemIndex" />
 
 			<div class="form-group">
 				<div id="itemAttachmentArea">
@@ -65,6 +64,6 @@
 			
 		</lams:Page>
 
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

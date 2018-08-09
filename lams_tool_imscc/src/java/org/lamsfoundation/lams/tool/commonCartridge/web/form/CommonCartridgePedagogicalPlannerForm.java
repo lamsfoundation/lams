@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.commonCartridge.web.form;
 
 import java.util.ArrayList;
@@ -28,22 +27,25 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  */
-public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> title;
     private List<String> url;
-    private List<FormFile> file;
+    private List<MultipartFile> file;
     private List<String> fileName;
     private List<Long> fileUuid;
     private List<Long> fileVersion;
@@ -51,9 +53,12 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
     private String instructions;
     private String contentFolderID;
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    @Autowired
+    @Qualifier("commonCartridgeMessageService")
+    private MessageService messageService;
+
+    public MultiValueMap<String, String> validate() {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean allEmpty = true;
 	if (title != null && !title.isEmpty()) {
 	    for (int index = 0; index < title.size(); index++) {
@@ -64,26 +69,25 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 		    // URL should not be blank
 		    if (itemType.equals(CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI)
 			    && StringUtils.isEmpty(url.get(index))) {
-			ActionMessage error = new ActionMessage("error.planner.url.blank", index + 1);
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			errorMap.add("GLOBAL",
+				messageService.getMessage("error.planner.url.blank", new Object[] { index + 1 }));
 
 		    } else if (itemType.equals(CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE)) {
 			/*
 			 * File should be saved already or it should be provided. This functionality required some
 			 * changes in pedagogicalPlanner.js in lams_central (see prepareFormData() there)
 			 */
-			FileValidatorUtil.validateFileSize(file.get(index), true, errors);
+			FileValidatorSpringUtil.validateFileSize(file.get(index), true);
 			if (fileUuid.get(index) == null && file.get(index) == null) {
-			    ActionMessage error = new ActionMessage("error.planner.file.blank", index + 1);
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			    errorMap.add("GLOBAL",
+				    messageService.getMessage("error.planner.file.blank", new Object[] { index + 1 }));
 			}
 		    }
 		}
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("error.planner.no.resource.save");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.planner.no.resource.save"));
 	    title = null;
 	    url = null;
 	    fileName = null;
@@ -92,8 +96,8 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 	    type = null;
 	}
 
-	setValid(errors.isEmpty());
-	return errors;
+	setValid(errorMap.isEmpty());
+	return errorMap;
     }
 
     public void fillForm(CommonCartridge commonCartridge) {
@@ -101,11 +105,11 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 	    setToolContentID(commonCartridge.getContentId());
 	    setInstructions(commonCartridge.getInstructions());
 
-	    title = new ArrayList<String>();
-	    url = new ArrayList<String>();
-	    fileName = new ArrayList<String>();
-	    file = new ArrayList<FormFile>();
-	    type = new ArrayList<Short>();
+	    title = new ArrayList<>();
+	    url = new ArrayList<>();
+	    fileName = new ArrayList<>();
+	    file = new ArrayList<>();
+	    type = new ArrayList<>();
 	    Set<CommonCartridgeItem> items = commonCartridge.getCommonCartridgeItems();
 	    if (items != null) {
 		int topicIndex = 0;
@@ -115,12 +119,16 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 		    setType(topicIndex, itemType);
 		    setUrl(topicIndex,
 			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI ? item.getUrl() : null);
-		    setFileName(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
-			    ? item.getFileName() : null);
-		    setFileUuid(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
-			    ? item.getFileUuid() : null);
-		    setFileVersion(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
-			    ? item.getFileVersionId() : null);
+		    setFileName(topicIndex,
+			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE ? item.getFileName()
+				    : null);
+		    setFileUuid(topicIndex,
+			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE ? item.getFileUuid()
+				    : null);
+		    setFileVersion(topicIndex,
+			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
+				    ? item.getFileVersionId()
+				    : null);
 		    topicIndex++;
 		}
 	    }
@@ -129,7 +137,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 
     public void setTitle(int number, String formTitle) {
 	if (title == null) {
-	    title = new ArrayList<String>();
+	    title = new ArrayList<>();
 	}
 	while (number >= title.size()) {
 	    title.add(null);
@@ -150,7 +158,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 
     public void setUrl(int number, String formUrl) {
 	if (url == null) {
-	    url = new ArrayList<String>();
+	    url = new ArrayList<>();
 	}
 	while (number >= url.size()) {
 	    url.add(null);
@@ -167,7 +175,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 
     public void setType(int number, Short formType) {
 	if (type == null) {
-	    type = new ArrayList<Short>();
+	    type = new ArrayList<>();
 	}
 	while (number >= type.size()) {
 	    type.add(null);
@@ -182,9 +190,9 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 	return type.get(number);
     }
 
-    public void setFile(int number, FormFile formFile) {
+    public void setFile(int number, MultipartFile formFile) {
 	if (file == null) {
-	    file = new ArrayList<FormFile>();
+	    file = new ArrayList<>();
 	}
 	while (number >= file.size()) {
 	    file.add(null);
@@ -192,7 +200,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 	file.set(number, formFile);
     }
 
-    public FormFile getFile(int number) {
+    public MultipartFile getFile(int number) {
 	if (file == null || number >= file.size()) {
 	    return null;
 	}
@@ -201,7 +209,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 
     public void setFileName(int number, String formFileName) {
 	if (fileName == null) {
-	    fileName = new ArrayList<String>();
+	    fileName = new ArrayList<>();
 	}
 	while (number >= fileName.size()) {
 	    fileName.add(null);
@@ -218,7 +226,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 
     public void setFileVersion(int number, Long formFileVersion) {
 	if (fileVersion == null) {
-	    fileVersion = new ArrayList<Long>();
+	    fileVersion = new ArrayList<>();
 	}
 	while (number >= fileVersion.size()) {
 	    fileVersion.add(null);
@@ -235,7 +243,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 
     public void setFileUuid(int number, Long formFileUuid) {
 	if (fileUuid == null) {
-	    fileUuid = new ArrayList<Long>();
+	    fileUuid = new ArrayList<>();
 	}
 	while (number >= fileUuid.size()) {
 	    fileUuid.add(null);

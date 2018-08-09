@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.commonCartridge.web.action;
+package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -44,14 +44,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
@@ -66,84 +59,39 @@ import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeForm
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeItemForm;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Andrey Balan
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
     private static final String ITEM_TYPE = "itemType";
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("commonCartridgeService")
+    private ICommonCartridgeService commonCartridgeService;
 
-	String param = mapping.getParameter();
-	// -----------------------CommonCartridge Author function ---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    ICommonCartridgeService service = getCommonCartridgeService();
-	    CommonCartridge commonCartridge = service.getCommonCartridgeByContentId(contentId);
-
-	    commonCartridge.setDefineLater(true);
-	    service.saveOrUpdateCommonCartridge(commonCartridge);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-	// ----------------------- Add commonCartridge item function ---------------------------
-	if (param.equals("newItemInit")) {
-	    return newItemInit(mapping, form, request, response);
-	}
-	if (param.equals("editItemInit")) {
-	    return editItemInit(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateItem")) {
-	    return saveOrUpdateItem(mapping, form, request, response);
-	}
-	if (param.equals("selectResources")) {
-	    return selectResources(mapping, form, request, response);
-	}
-	if (param.equals("removeItem")) {
-	    return removeItem(mapping, form, request, response);
-	}
-	// -----------------------CommonCartridge Item Instruction function ---------------------------
-	if (param.equals("initPedagogicalPlannerForm")) {
-	    return initPedagogicalPlannerForm(mapping, form, request, response);
-	}
-	if (param.equals("createPedagogicalPlannerItem")) {
-	    return createPedagogicalPlannerItem(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
-	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
-	}
-
-	return mapping.findForward(CommonCartridgeConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("commonCartridgeMessageService")
+    private MessageService messageService;
 
     /**
      * Remove commonCartridge item from HttpSession list and update page display. As authoring rule, all persist only
@@ -155,17 +103,18 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeItem")
+    private String removeItem(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(CommonCartridgeConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<CommonCartridgeItem> commonCartridgeList = getCommonCartridgeItemList(sessionMap);
-	    List<CommonCartridgeItem> rList = new ArrayList<CommonCartridgeItem>(commonCartridgeList);
+	    List<CommonCartridgeItem> rList = new ArrayList<>(commonCartridgeList);
 	    CommonCartridgeItem item = rList.remove(itemIdx);
 	    commonCartridgeList.clear();
 	    commonCartridgeList.addAll(rList);
@@ -175,7 +124,7 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -187,24 +136,28 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+
+    @RequestMapping("/editItemInit")
+    private String editItemInit(
+	    @ModelAttribute("commonCartridgeItemForm") CommonCartridgeItemForm commonCartridgeItemForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(CommonCartridgeConstants.PARAM_ITEM_INDEX), -1);
 	CommonCartridgeItem item = null;
 	if (itemIdx != -1) {
 	    SortedSet<CommonCartridgeItem> commonCartridgeList = getCommonCartridgeItemList(sessionMap);
-	    List<CommonCartridgeItem> rList = new ArrayList<CommonCartridgeItem>(commonCartridgeList);
+	    List<CommonCartridgeItem> rList = new ArrayList<>(commonCartridgeList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
-		populateItemToForm(itemIdx, item, (CommonCartridgeItemForm) form, request);
+		populateItemToForm(itemIdx, item, commonCartridgeItemForm, request);
 	    }
 	}
-	return findForward(item == null ? -1 : item.getType(), mapping);
+	return findForward(item == null ? -1 : item.getType());
     }
 
     /**
@@ -216,13 +169,15 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newItemInit")
+    private String newItemInit(
+	    @ModelAttribute("commonCartridgeItemForm") CommonCartridgeItemForm commonCartridgeItemForm,
+	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	((CommonCartridgeItemForm) form).setSessionMapID(sessionMapID);
+	commonCartridgeItemForm.setSessionMapID(sessionMapID);
 
-	short type = (short) NumberUtils.stringToInt(request.getParameter(AuthoringAction.ITEM_TYPE));
-	return findForward(type, mapping);
+	short type = (short) NumberUtils.stringToInt(request.getParameter(AuthoringController.ITEM_TYPE));
+	return findForward(type);
     }
 
     /**
@@ -238,40 +193,41 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	CommonCartridgeItemForm itemForm = (CommonCartridgeItemForm) form;
-	ActionErrors errors = validateCommonCartridgeItem(itemForm);
+    @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
+    private String saveOrUpdateItem(
+	    @ModelAttribute("commonCartridgeItemForm") CommonCartridgeItemForm commonCartridgeItemForm,
+	    HttpServletRequest request) {
+	MultiValueMap<String, String> errorMap = validateCommonCartridgeItem(commonCartridgeItemForm);
 
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    return findForward(itemForm.getItemType(), mapping);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return findForward(commonCartridgeItemForm.getItemType());
 	}
 
-	short type = itemForm.getItemType();
+	short type = commonCartridgeItemForm.getItemType();
 	try {
 	    if (type == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
-		uploadCommonCartridge(request, itemForm);
+		uploadCommonCartridge(request, commonCartridgeItemForm);
 	    } else {
-		extractFormToCommonCartridgeItem(request, itemForm);
+		extractFormToCommonCartridgeItem(request, commonCartridgeItemForm);
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(CommonCartridgeConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-		return findForward(itemForm.getItemType(), mapping);
+	    errorMap.add("GLOBAL", messageService.getMessage(CommonCartridgeConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
+	    if (!errorMap.isEmpty()) {
+		request.setAttribute("errorMap", errorMap);
+		return findForward(commonCartridgeItemForm.getItemType());
 	    }
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, commonCartridgeItemForm.getSessionMapID());
 	// return null to close this window
 
 	if (type == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
-	    return mapping.findForward("selectResources");
+	    return "pages/authoring/parts/selectResources";
 	} else {
-	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	    return "pages/authoring/parts/itemlist";
 	}
     }
 
@@ -285,11 +241,12 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward selectResources(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/selectResources")
+    private String selectResources(HttpServletRequest request) {
 	//count uploaded resources
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	List<CommonCartridgeItem> uploadedCartridgeResources = getUploadedCartridgeResources(sessionMap);
 	int countUploadedResources = uploadedCartridgeResources.size();
 
@@ -326,7 +283,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	// return null to close this window
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/authoring/parts/itemlist";
 
     }
 
@@ -339,51 +296,75 @@ public class AuthoringAction extends Action {
      * @throws ServletException
      *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+
+    @RequestMapping("/start")
+    private String start(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return starting(authoringForm, request);
+    }
+
+    @RequestMapping("/definelater")
+    private String definelater(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
+	    HttpServletRequest request) throws ServletException {
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	CommonCartridge commonCartridge = commonCartridgeService.getCommonCartridgeByContentId(contentId);
+
+	commonCartridge.setDefineLater(true);
+	commonCartridgeService.saveOrUpdateCommonCartridge(commonCartridge);
+
+	//audit log the teacher has started editing activity in monitor
+	commonCartridgeService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return starting(authoringForm, request);
+    }
+
+    private String starting(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
+	    HttpServletRequest request) throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_TOOL_CONTENT_ID));
 
 	// get back the commonCartridge and item list and display them on page
-	ICommonCartridgeService service = getCommonCartridgeService();
 
 	List<CommonCartridgeItem> items = null;
 	CommonCartridge commonCartridge = null;
-	CommonCartridgeForm commonCartridgeForm = (CommonCartridgeForm) form;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	commonCartridgeForm.setContentFolderID(contentFolderID);
+	authoringForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	commonCartridgeForm.setSessionMapID(sessionMap.getSessionID());
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
-	    commonCartridge = service.getCommonCartridgeByContentId(contentId);
+	    commonCartridge = commonCartridgeService.getCommonCartridgeByContentId(contentId);
 	    // if commonCartridge does not exist, try to use default content instead.
 	    if (commonCartridge == null) {
-		commonCartridge = service.getDefaultContent(contentId);
+		commonCartridge = commonCartridgeService.getDefaultContent(contentId);
 		if (commonCartridge.getCommonCartridgeItems() != null) {
 		    items = new ArrayList<CommonCartridgeItem>(commonCartridge.getCommonCartridgeItems());
 		} else {
 		    items = null;
 		}
 	    } else {
-		items = service.getAuthoredItems(commonCartridge.getUid());
+		items = commonCartridgeService.getAuthoredItems(commonCartridge.getUid());
 	    }
 
-	    commonCartridgeForm.setCommonCartridge(commonCartridge);
+	    authoringForm.setCommonCartridge(commonCartridge);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
 	// init it to avoid null exception in following handling
 	if (items == null) {
-	    items = new ArrayList<CommonCartridgeItem>();
+	    items = new ArrayList<>();
 	} else {
 	    CommonCartridgeUser commonCartridgeUser = null;
 	    // handle system default question: createBy is null, now set it to current user
@@ -404,10 +385,10 @@ public class AuthoringAction extends Action {
 	commonCartridgeItemList.clear();
 	commonCartridgeItemList.addAll(items);
 
-	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_FORM, commonCartridgeForm);
+	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_FORM, authoringForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/authoring/start";
     }
 
     /**
@@ -420,24 +401,26 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    private String initPage(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
+	    HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	CommonCartridgeForm existForm = (CommonCartridgeForm) sessionMap
 		.get(CommonCartridgeConstants.ATTR_RESOURCE_FORM);
 
-	CommonCartridgeForm commonCartridgeForm = (CommonCartridgeForm) form;
 	try {
-	    PropertyUtils.copyProperties(commonCartridgeForm, existForm);
+	    PropertyUtils.copyProperties(authoringForm, existForm);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	authoringForm.setMode(mode.toString());
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/authoring/authoring";
     }
 
     /**
@@ -451,28 +434,28 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	CommonCartridgeForm commonCartridgeForm = (CommonCartridgeForm) form;
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
+    private String updateContent(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
+	    HttpServletRequest request) throws Exception {
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(commonCartridgeForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(authoringForm.getSessionMapID());
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	CommonCartridge commonCartridge = commonCartridgeForm.getCommonCartridge();
-	ICommonCartridgeService service = getCommonCartridgeService();
+	CommonCartridge commonCartridge = authoringForm.getCommonCartridge();
 
 	// **********************************Get CommonCartridge PO*********************
-	CommonCartridge commonCartridgePO = service
-		.getCommonCartridgeByContentId(commonCartridgeForm.getCommonCartridge().getContentId());
+	CommonCartridge commonCartridgePO = commonCartridgeService
+		.getCommonCartridgeByContentId(authoringForm.getCommonCartridge().getContentId());
 	if (commonCartridgePO == null) {
 	    // new CommonCartridge, create it.
 	    commonCartridgePO = commonCartridge;
 	    commonCartridgePO.setCreated(new Timestamp(new Date().getTime()));
 	    commonCartridgePO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = commonCartridgePO.getUid();
 	    PropertyUtils.copyProperties(commonCartridgePO, commonCartridge);
@@ -483,7 +466,7 @@ public class AuthoringAction extends Action {
 	    if (mode.isTeacher()) {
 		commonCartridgePO.setDefineLater(false);
 	    }
-	    
+
 	    commonCartridgePO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -492,8 +475,8 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	CommonCartridgeUser commonCartridgeUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		commonCartridgeForm.getCommonCartridge().getContentId());
+	CommonCartridgeUser commonCartridgeUser = commonCartridgeService.getUserByIDAndContent(
+		new Long(user.getUserID().intValue()), authoringForm.getCommonCartridge().getContentId());
 	if (commonCartridgeUser == null) {
 	    commonCartridgeUser = new CommonCartridgeUser(user, commonCartridgePO);
 	}
@@ -521,7 +504,7 @@ public class AuthoringAction extends Action {
 	    CommonCartridgeItem item = (CommonCartridgeItem) iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
-		service.deleteCommonCartridgeItem(item.getUid());
+		commonCartridgeService.deleteCommonCartridgeItem(item.getUid());
 	    }
 	}
 
@@ -531,26 +514,17 @@ public class AuthoringAction extends Action {
 	}
 	// **********************************************
 	// finally persist commonCartridgePO again
-	service.saveOrUpdateCommonCartridge(commonCartridgePO);
+	commonCartridgeService.saveOrUpdateCommonCartridge(commonCartridgePO);
 
-	commonCartridgeForm.setCommonCartridge(commonCartridgePO);
+	authoringForm.setCommonCartridge(commonCartridgePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/authoring/authoring";
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    /**
-     * Return CommonCartridgeService bean.
-     */
-    private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
-    }
-
     /**
      * List items from fresh uploaded cartridge.
      *
@@ -571,7 +545,7 @@ public class AuthoringAction extends Action {
 	SortedSet<CommonCartridgeItem> list = (SortedSet<CommonCartridgeItem>) sessionMap
 		.get(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<CommonCartridgeItem>(new CommonCartridgeItemComparator());
+	    list = new TreeSet<>(new CommonCartridgeItemComparator());
 	    sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_LIST, list);
 	}
 	return list;
@@ -610,14 +584,14 @@ public class AuthoringAction extends Action {
      * @param mapping
      * @return
      */
-    private ActionForward findForward(short type, ActionMapping mapping) {
-	ActionForward forward;
+    private String findForward(short type) {
+	String forward;
 	switch (type) {
 	    case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
-		forward = mapping.findForward("basiclti");
+		forward = "pages/authoring/parts/addbasiclti";
 		break;
 	    case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
-		forward = mapping.findForward("commoncartridge");
+		forward = "pages/authoring/parts/addcommoncartridge";
 		break;
 	    default:
 		forward = null;
@@ -685,8 +659,7 @@ public class AuthoringAction extends Action {
 	if (itemForm.getFile() != null) {
 	    try {
 		CommonCartridgeItem itemTemp = new CommonCartridgeItem();
-		ICommonCartridgeService service = getCommonCartridgeService();
-		items = service.uploadCommonCartridgeFile(itemTemp, itemForm.getFile());
+		items = commonCartridgeService.uploadCommonCartridgeFile(itemTemp, itemForm.getFile());
 	    } catch (UploadCommonCartridgeFileException e) {
 		throw e;
 	    }
@@ -700,7 +673,8 @@ public class AuthoringAction extends Action {
 	    //item.setDescription(itemForm.getDescription());
 	}
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(itemForm.getSessionMapID());
 	List<CommonCartridgeItem> uploadedCartridgeResources = getUploadedCartridgeResources(sessionMap);
 	uploadedCartridgeResources.clear();
 	uploadedCartridgeResources.addAll(items);
@@ -721,7 +695,8 @@ public class AuthoringAction extends Action {
 	 * be set when persisting this commonCartridge item.
 	 */
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<CommonCartridgeItem> commonCartridgeList = getCommonCartridgeItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -732,7 +707,7 @@ public class AuthoringAction extends Action {
 	    item.setCreateDate(new Timestamp(new Date().getTime()));
 	    commonCartridgeList.add(item);
 	} else { // edit
-	    List<CommonCartridgeItem> rList = new ArrayList<CommonCartridgeItem>(commonCartridgeList);
+	    List<CommonCartridgeItem> rList = new ArrayList<>(commonCartridgeList);
 	    item = rList.get(itemIdx);
 	}
 	short type = itemForm.getItemType();
@@ -770,18 +745,16 @@ public class AuthoringAction extends Action {
      * @param itemForm
      * @return
      */
-    private ActionErrors validateCommonCartridgeItem(CommonCartridgeItemForm itemForm) {
-	ActionErrors errors = new ActionErrors();
+    private MultiValueMap<String, String> validateCommonCartridgeItem(CommonCartridgeItemForm itemForm) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	if (itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI) {
 	    if (StringUtils.isBlank(itemForm.getTitle())) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
+		errorMap.add("GLOBAL", messageService.getMessage(CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
 	    }
 
 	    if (StringUtils.isBlank(itemForm.getUrl())) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(CommonCartridgeConstants.ERROR_MSG_URL_BLANK));
+		errorMap.add("GLOBAL", messageService.getMessage(CommonCartridgeConstants.ERROR_MSG_URL_BLANK));
 		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://
 		// address:port format!!!
 		// UrlValidator validator = new UrlValidator();
@@ -797,59 +770,60 @@ public class AuthoringAction extends Action {
 	// }
 	if (itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
 	    // validate item size
-	    FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
+	    FileValidatorSpringUtil.validateFileSize(itemForm.getFile(), true);
 	    // for edit validate: file already exist
 	    if (!itemForm.isHasFile()
-		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(CommonCartridgeConstants.ERROR_MSG_FILE_BLANK));
+		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getName()))) {
+		errorMap.add("GLOBAL", messageService.getMessage(CommonCartridgeConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
-	return errors;
+	return errorMap;
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	CommonCartridgePedagogicalPlannerForm plannerForm = (CommonCartridgePedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(
+	    @ModelAttribute("pedagogicalPlannerForm") CommonCartridgePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	CommonCartridge taskList = getCommonCartridgeService().getCommonCartridgeByContentId(toolContentID);
+	CommonCartridge taskList = commonCartridgeService.getCommonCartridgeByContentId(toolContentID);
 	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
 	if (command == null) {
-	    plannerForm.fillForm(taskList);
+	    pedagogicalPlannerForm.fillForm(taskList);
 	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	    plannerForm.setContentFolderID(contentFolderId);
-	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	    pedagogicalPlannerForm.setContentFolderID(contentFolderId);
+	    return "pages/authoring/pedagogicalPlannerForm";
 	}
 
 	return null;
 
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	CommonCartridgePedagogicalPlannerForm plannerForm = (CommonCartridgePedagogicalPlannerForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    CommonCartridge taskList = getCommonCartridgeService()
-		    .getCommonCartridgeByContentId(plannerForm.getToolContentID());
-	    taskList.setInstructions(plannerForm.getInstructions());
+    @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
+    public String saveOrUpdatePedagogicalPlannerForm(
+	    @ModelAttribute("pedagogicalPlannerForm") CommonCartridgePedagogicalPlannerForm pedagogicalPlannerForm,
+	    HttpServletRequest request) throws IOException {
+	MultiValueMap<String, String> errorMap = pedagogicalPlannerForm.validate();
+	if (errorMap.isEmpty()) {
+	    CommonCartridge taskList = commonCartridgeService
+		    .getCommonCartridgeByContentId(pedagogicalPlannerForm.getToolContentID());
+	    taskList.setInstructions(pedagogicalPlannerForm.getInstructions());
 
 	    int itemIndex = 0;
 	    String title = null;
 	    CommonCartridgeItem commonCartridgeItem = null;
-	    List<CommonCartridgeItem> newItems = new LinkedList<CommonCartridgeItem>();
+	    List<CommonCartridgeItem> newItems = new LinkedList<>();
 	    Set<CommonCartridgeItem> commonCartridgeItems = taskList.getCommonCartridgeItems();
 	    Iterator<CommonCartridgeItem> taskListItemIterator = commonCartridgeItems.iterator();
 	    // We need to reverse the order, since the items are delivered newest-first
-	    LinkedList<CommonCartridgeItem> reversedCommonCartridgeItems = new LinkedList<CommonCartridgeItem>();
+	    LinkedList<CommonCartridgeItem> reversedCommonCartridgeItems = new LinkedList<>();
 	    while (taskListItemIterator.hasNext()) {
 		reversedCommonCartridgeItems.addFirst(taskListItemIterator.next());
 	    }
 	    taskListItemIterator = reversedCommonCartridgeItems.iterator();
 	    do {
-		title = plannerForm.getTitle(itemIndex);
+		title = pedagogicalPlannerForm.getTitle(itemIndex);
 		if (StringUtils.isEmpty(title)) {
-		    plannerForm.removeItem(itemIndex);
+		    pedagogicalPlannerForm.removeItem(itemIndex);
 		} else {
 		    if (taskListItemIterator.hasNext()) {
 			commonCartridgeItem = taskListItemIterator.next();
@@ -861,18 +835,18 @@ public class AuthoringAction extends Action {
 
 			HttpSession session = SessionManager.getSession();
 			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			CommonCartridgeUser taskListUser = getCommonCartridgeService().getUserByIDAndContent(
-				new Long(user.getUserID().intValue()), plannerForm.getToolContentID());
+			CommonCartridgeUser taskListUser = commonCartridgeService.getUserByIDAndContent(
+				new Long(user.getUserID().intValue()), pedagogicalPlannerForm.getToolContentID());
 			commonCartridgeItem.setCreateBy(taskListUser);
 
 			newItems.add(commonCartridgeItem);
 		    }
 		    commonCartridgeItem.setTitle(title);
-		    Short type = plannerForm.getType(itemIndex);
+		    Short type = pedagogicalPlannerForm.getType(itemIndex);
 		    commonCartridgeItem.setType(type);
 		    boolean hasFile = commonCartridgeItem.getFileUuid() != null;
 		    if (type.equals(CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI)) {
-			commonCartridgeItem.setUrl(plannerForm.getUrl(itemIndex));
+			commonCartridgeItem.setUrl(pedagogicalPlannerForm.getUrl(itemIndex));
 			if (hasFile) {
 			    commonCartridgeItem.setFileName(null);
 			    commonCartridgeItem.setFileUuid(null);
@@ -880,30 +854,29 @@ public class AuthoringAction extends Action {
 			    commonCartridgeItem.setFileType(null);
 			}
 		    } else if (type.equals(CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE)) {
-			FormFile file = plannerForm.getFile(itemIndex);
+			MultipartFile file = pedagogicalPlannerForm.getFile(itemIndex);
 			commonCartridgeItem.setUrl(null);
-			ICommonCartridgeService service = getCommonCartridgeService();
 			if (file != null) {
 			    try {
 				if (hasFile) {
 				    // delete the old file
-				    service.deleteFromRepository(commonCartridgeItem.getFileUuid(),
+				    commonCartridgeService.deleteFromRepository(commonCartridgeItem.getFileUuid(),
 					    commonCartridgeItem.getFileVersionId());
 				}
-				service.uploadCommonCartridgeFile(commonCartridgeItem, file);
+				commonCartridgeService.uploadCommonCartridgeFile(commonCartridgeItem, file);
 			    } catch (Exception e) {
-				AuthoringAction.log.error(e);
+				AuthoringController.log.error(e);
 				ActionMessage error = new ActionMessage("error.msg.io.exception");
-				errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-				saveErrors(request, errors);
-				plannerForm.setValid(false);
-				return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
+				request.setAttribute("erroeMap", errorMap);
+				pedagogicalPlannerForm.setValid(false);
+				return "pages/authoring/pedagogicalPlannerForm";
 			    }
 			}
-			plannerForm.setFileName(itemIndex, commonCartridgeItem.getFileName());
-			plannerForm.setFileUuid(itemIndex, commonCartridgeItem.getFileUuid());
-			plannerForm.setFileVersion(itemIndex, commonCartridgeItem.getFileVersionId());
-			plannerForm.setFile(itemIndex, null);
+			pedagogicalPlannerForm.setFileName(itemIndex, commonCartridgeItem.getFileName());
+			pedagogicalPlannerForm.setFileUuid(itemIndex, commonCartridgeItem.getFileUuid());
+			pedagogicalPlannerForm.setFileVersion(itemIndex, commonCartridgeItem.getFileVersionId());
+			pedagogicalPlannerForm.setFile(itemIndex, null);
 		    }
 		    itemIndex++;
 		}
@@ -914,30 +887,31 @@ public class AuthoringAction extends Action {
 	    while (taskListItemIterator.hasNext()) {
 		commonCartridgeItem = taskListItemIterator.next();
 		taskListItemIterator.remove();
-		getCommonCartridgeService().deleteCommonCartridgeItem(commonCartridgeItem.getUid());
+		commonCartridgeService.deleteCommonCartridgeItem(commonCartridgeItem.getUid());
 	    }
 	    reversedCommonCartridgeItems.addAll(newItems);
 
 	    taskList.getCommonCartridgeItems().addAll(reversedCommonCartridgeItems);
-	    getCommonCartridgeService().saveOrUpdateCommonCartridge(taskList);
+	    commonCartridgeService.saveOrUpdateCommonCartridge(taskList);
 	} else {
-	    saveErrors(request, errors);
+	    request.setAttribute("eerorMap", errorMap);
 	}
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward createPedagogicalPlannerItem(ActionMapping mapping, ActionForm form,
+    @RequestMapping("/createPedagogicalPlannerItem")
+    public String createPedagogicalPlannerItem(
+	    @ModelAttribute("pedagogicalPlannerForm") CommonCartridgePedagogicalPlannerForm pedagogicalPlannerForm,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	CommonCartridgePedagogicalPlannerForm plannerForm = (CommonCartridgePedagogicalPlannerForm) form;
-	int insertIndex = plannerForm.getItemCount();
-	plannerForm.setTitle(insertIndex, "");
-	plannerForm.setType(insertIndex,
+	int insertIndex = pedagogicalPlannerForm.getItemCount();
+	pedagogicalPlannerForm.setTitle(insertIndex, "");
+	pedagogicalPlannerForm.setType(insertIndex,
 		new Short(request.getParameter(CommonCartridgeConstants.ATTR_ADD_RESOURCE_TYPE)));
-	plannerForm.setUrl(insertIndex, null);
-	plannerForm.setFileName(insertIndex, null);
-	plannerForm.setFile(insertIndex, null);
-	plannerForm.setFileUuid(insertIndex, null);
-	plannerForm.setFileVersion(insertIndex, null);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	pedagogicalPlannerForm.setUrl(insertIndex, null);
+	pedagogicalPlannerForm.setFileName(insertIndex, null);
+	pedagogicalPlannerForm.setFile(insertIndex, null);
+	pedagogicalPlannerForm.setFileUuid(insertIndex, null);
+	pedagogicalPlannerForm.setFileVersion(insertIndex, null);
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 }

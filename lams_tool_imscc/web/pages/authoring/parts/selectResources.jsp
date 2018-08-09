@@ -8,7 +8,7 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/commonCartridgeItem.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
@@ -20,7 +20,6 @@
 
 <body class="stripes">
 <form id="itemForm" name="itemForm" action="<c:url value='/authoring/selectResources.do'/>">
-	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	
 	<c:set var="title"><fmt:message key="label.authoring.select.available.resources" /></c:set>
 	<lams:Page title="${title}" type="learner">

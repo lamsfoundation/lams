@@ -533,7 +533,7 @@ public class LearningController {
      * @param response
      * @return
      */
-    @RequestMapping("/submitReflection")
+    @RequestMapping(path="/submitReflection", method = RequestMethod.POST)
     protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
 	    @ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 	Integer userId = messageForm.getUserId();

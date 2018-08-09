@@ -21,23 +21,15 @@
  * ****************************************************************
  */
 
+package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
-package org.lamsfoundation.lams.tool.commonCartridge.web.action;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
@@ -50,50 +42,33 @@ import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeServ
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	String param = mapping.getParameter();
+    public static Logger log = Logger.getLogger(MonitoringController.class);
 
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+    @Autowired
+    @Qualifier("commonCartridgeService")
+    private ICommonCartridgeService commonCartridgeService;
 
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("listuser")) {
-	    return listuser(mapping, form, request, response);
-	}
-	if (param.equals("showitem")) {
-	    return showitem(mapping, form, request, response);
-	}
-	if (param.equals("hideitem")) {
-	    return hideitem(mapping, form, request, response);
-	}
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(CommonCartridgeConstants.ERROR);
-    }
-
-    private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/hideitem")
+    private String hideitem(HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long toolContentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
-	ICommonCartridgeService service = getCommonCartridgeService();
-	service.setItemVisible(itemUid, toolContentId, false);
+	commonCartridgeService.setItemVisible(itemUid, toolContentId, false);
 
 	// update session value
 	List<List> groupList = (List<List>) sessionMap.get(CommonCartridgeConstants.ATTR_SUMMARY_LIST);
@@ -108,21 +83,21 @@ public class MonitoringAction extends Action {
 	    }
 	}
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward showitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/showitem")
+    private String showitem(HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long toolContentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	
+
 	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
-	ICommonCartridgeService service = getCommonCartridgeService();
-	service.setItemVisible(itemUid, toolContentId, true);
+	commonCartridgeService.setItemVisible(itemUid, toolContentId, true);
 
 	// update session value
 	List<List> groupList = (List<List>) sessionMap.get(CommonCartridgeConstants.ATTR_SUMMARY_LIST);
@@ -136,13 +111,13 @@ public class MonitoringAction extends Action {
 		}
 	    }
 	}
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/summary")
+    private String summary(HttpServletRequest request) {
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
@@ -150,12 +125,11 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	ICommonCartridgeService service = getCommonCartridgeService();
-	List<List<Summary>> summaryList = service.getSummary(contentId);
+	List<List<Summary>> summaryList = commonCartridgeService.getSummary(contentId);
 
-	CommonCartridge commonCartridge = service.getCommonCartridgeByContentId(contentId);
+	CommonCartridge commonCartridge = commonCartridgeService.getCommonCartridgeByContentId(contentId);
 
-	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
+	Map<Long, Set<ReflectDTO>> relectList = commonCartridgeService.getReflectList(contentId, false);
 
 	// cache into sessionMap
 	sessionMap.put(CommonCartridgeConstants.ATTR_SUMMARY_LIST, summaryList);
@@ -163,35 +137,33 @@ public class MonitoringAction extends Action {
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE, commonCartridge);
 	sessionMap.put(CommonCartridgeConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECT_LIST, relectList);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/listuser")
+    private String listuser(HttpServletRequest request) {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long itemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID);
 
 	// get user list by given item uid
-	ICommonCartridgeService service = getCommonCartridgeService();
-	List list = service.getUserListBySessionItem(sessionId, itemUid);
+	List list = commonCartridgeService.getUserListBySessionItem(sessionId, itemUid);
 
 	// set to request
 	request.setAttribute(CommonCartridgeConstants.ATTR_USER_LIST, list);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/monitoring/userlist";
     }
 
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewReflection")
+    private String viewReflection(HttpServletRequest request) {
 
 	Long uid = WebUtil.readLongParam(request, CommonCartridgeConstants.ATTR_USER_UID);
 	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	ICommonCartridgeService service = getCommonCartridgeService();
-	CommonCartridgeUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	CommonCartridgeUser user = commonCartridgeService.getUser(uid);
+	NotebookEntry notebookEntry = commonCartridgeService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		CommonCartridgeConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 
-	CommonCartridgeSession session = service.getCommonCartridgeSessionBySessionId(sessionID);
+	CommonCartridgeSession session = commonCartridgeService.getCommonCartridgeSessionBySessionId(sessionID);
 
 	ReflectDTO refDTO = new ReflectDTO(user);
 	if (notebookEntry == null) {
@@ -204,15 +176,6 @@ public class MonitoringAction extends Action {
 	refDTO.setReflectInstrctions(session.getCommonCartridge().getReflectInstructions());
 
 	request.setAttribute("userDTO", refDTO);
-	return mapping.findForward("success");
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
+	return "pages/monitoring/notebook";
     }
 }

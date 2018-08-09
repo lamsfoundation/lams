@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.commonCartridge.web.action;
+package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,10 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
@@ -56,39 +50,25 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class ViewItemAction extends Action {
+@Controller
+public class ViewItemController {
 
-    private static final Logger log = Logger.getLogger(ViewItemAction.class);
+    private static final Logger log = Logger.getLogger(ViewItemController.class);
 
-    private static ICommonCartridgeService commonCartridgeService;
+    @Autowired
+    private WebApplicationContext applicationContext;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	String param = mapping.getParameter();
-	// -----------------------Display Learning Object function ---------------------------
-	if (param.equals("reviewItem")) {
-	    return reviewItem(mapping, form, request, response);
-	}
-	// for preview top frame html page use:
-	if (param.equals("nextInstruction")) {
-	    return nextInstruction(mapping, form, request, response);
-	}
-	// for preview top frame html page use:
-	if (param.equals("openUrlPopup")) {
-	    return openUrlPopup(mapping, form, request, response);
-	}
-	// for launchBasicLTI
-	if (param.equals("launchBasicLTI")) {
-	    return launchBasicLTI(mapping, form, request, response);
-	}
-
-	return mapping.findForward(CommonCartridgeConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("commonCartridgeService")
+    private ICommonCartridgeService commonCartridgeService;;
 
     /**
      * Open url in popup window page.
@@ -99,8 +79,8 @@ public class ViewItemAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/openUrlPopup")
+    private String openUrlPopup(HttpServletRequest request) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -118,7 +98,7 @@ public class ViewItemAction extends Action {
 	}
 	request.setAttribute(CommonCartridgeConstants.PARAM_OPEN_URL_POPUP, launchBasicLTIUrl);
 	request.setAttribute(CommonCartridgeConstants.PARAM_TITLE, item.getTitle());
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/itemreview/openurl";
     }
 
     /**
@@ -130,11 +110,11 @@ public class ViewItemAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/nextInstruction")
+    private String nextInstruction(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/itemreview/instructionsnav";
     }
 
     /**
@@ -147,8 +127,8 @@ public class ViewItemAction extends Action {
      * @return
      * @throws IOException
      */
-    private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/reviewItem")
+    private String reviewItem(HttpServletRequest request) throws IOException {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
@@ -160,15 +140,14 @@ public class ViewItemAction extends Action {
 	Long sessionId = NumberUtils.createLong(idStr);
 	// mark this item access flag if it is learner
 	if (ToolAccessMode.LEARNER.toString().equals(mode)) {
-	    ICommonCartridgeService service = getCommonCartridgeService();
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    service.setItemAccess(item.getUid(), new Long(user.getUserID().intValue()), sessionId);
+	    commonCartridgeService.setItemAccess(item.getUid(), new Long(user.getUserID().intValue()), sessionId);
 	}
 
 	if (item == null) {
-	    return mapping.findForward(CommonCartridgeConstants.ERROR);
+	    return "error";
 	}
 	// set url to content frame
 
@@ -206,7 +185,7 @@ public class ViewItemAction extends Action {
 	request.setAttribute(CommonCartridgeConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	return "pages/itemreview/mainframe";
 
     }
 
@@ -223,20 +202,20 @@ public class ViewItemAction extends Action {
      * @return
      * @throws Exception
      */
-    private ActionForward launchBasicLTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/launchBasicLTI")
+    @ResponseBody
+    private void launchBasicLTI(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	CommonCartridgeItem item = getCommonCartridgeItem(request, sessionMap, mode);
 
-	ICommonCartridgeService service = getCommonCartridgeService();
 	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
+		.getRequiredWebApplicationContext(applicationContext.getServletContext());
 	MessageService messageService = (MessageService) wac.getBean("commonCartridgeMessageService");
 
 	// Get the post data for the placement
-	String returnValues = LamsBasicLTIUtil.postLaunchHTML(service, messageService, item);
+	String returnValues = LamsBasicLTIUtil.postLaunchHTML(commonCartridgeService, messageService, item);
 
 	try {
 	    response.setContentType("text/html; charset=UTF-8");
@@ -261,7 +240,6 @@ public class ViewItemAction extends Action {
 	    throw e;
 	}
 
-	return null;
     }
 
     /**
@@ -277,23 +255,15 @@ public class ViewItemAction extends Action {
 	if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
 	    int itemIdx = NumberUtils.stringToInt(request.getParameter(CommonCartridgeConstants.PARAM_ITEM_INDEX), 0);
 	    // authoring: does not save item yet, so only has ItemList from session and identity by Index
-	    List<CommonCartridgeItem> commonCartridgeList = new ArrayList<CommonCartridgeItem>(
-		    getCommonCartridgeItemList(sessionMap));
+	    List<CommonCartridgeItem> commonCartridgeList = new ArrayList<>(getCommonCartridgeItemList(sessionMap));
 	    item = commonCartridgeList.get(itemIdx);
 	} else {
 	    Long itemUid = NumberUtils
 		    .createLong(request.getParameter(CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID));
 	    // get back the commonCartridge and item list and display them on page
-	    ICommonCartridgeService service = getCommonCartridgeService();
-	    item = service.getCommonCartridgeItemByUid(itemUid);
+	    item = commonCartridgeService.getCommonCartridgeItemByUid(itemUid);
 	}
 	return item;
-    }
-
-    private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
     }
 
     private static Pattern wikipediaPattern = Pattern.compile("wikipedia",
@@ -335,7 +305,7 @@ public class ViewItemAction extends Action {
 	SortedSet<CommonCartridgeItem> list = (SortedSet) sessionMap
 		.get(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<CommonCartridgeItem>(new CommonCartridgeItemComparator());
+	    list = new TreeSet<>(new CommonCartridgeItemComparator());
 	    sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_LIST, list);
 	}
 	return list;
