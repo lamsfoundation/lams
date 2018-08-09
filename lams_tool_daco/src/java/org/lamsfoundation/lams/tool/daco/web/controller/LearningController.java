@@ -488,7 +488,7 @@ public class LearningController {
      */
     @RequestMapping("/startReflection")
     protected String startReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    HttpServletRequest request) {
+	    @ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
@@ -534,8 +534,8 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/submitReflection")
-    protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, @ModelAttribute("recordForm") RecordForm recordForm, 
-	    HttpServletRequest request) {
+    protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
+	    @ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 	Integer userId = messageForm.getUserId();
 	Long sessionId = messageForm.getSessionId();
 	// check for existing notebook entry
