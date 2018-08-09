@@ -27,6 +27,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.springframework.stereotype.Repository;
 
@@ -37,6 +38,8 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 	    + "UNION SELECT content_folder_id FROM lams_outcome_scale WHERE organisation_id ?) AS a WHERE content_folder_id IS NOT NULL LIMIT 1";
 
     private static final String FIND_OUTCOMES_SORTED_BY_NAME = "FROM Outcome o WHERE o.organisation IS NULL ? ORDER BY o.name, o.code";
+
+    private static final String FIND_SCALES_SORTED_BY_NAME = "FROM OutcomeScale o WHERE o.organisation IS NULL ? ORDER BY o.name, o.code";
 
     /**
      * Finds an existing content folder ID for the given organisation outcomes or scales, or for global ones
@@ -54,6 +57,16 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @SuppressWarnings("unchecked")
     public List<Outcome> getOutcomesSortedByName(Integer organisationId) {
 	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replaceAll("\\?",
+		organisationId == null ? "" : "OR o.organisation.organisationId = " + organisationId);
+	return find(queryString);
+    }
+
+    /**
+     * Finds all global scales and ones for the given organisation
+     */
+    @SuppressWarnings("unchecked")
+    public List<OutcomeScale> getScalesSortedByName(Integer organisationId) {
+	String queryString = FIND_SCALES_SORTED_BY_NAME.replaceAll("\\?",
 		organisationId == null ? "" : "OR o.organisation.organisationId = " + organisationId);
 	return find(queryString);
     }

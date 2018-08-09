@@ -42,8 +42,12 @@
 	  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
 	/>
     <form-bean
-      name="outcomeForm"
+      name="OutcomeForm"
       type="org.lamsfoundation.lams.web.outcome.OutcomeForm"
+    />
+    <form-bean
+      name="OutcomeScaleForm"
+      type="org.lamsfoundation.lams.web.outcome.OutcomeScaleForm"
     />
     
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
@@ -874,16 +878,26 @@
     <action
       path="/outcome"
       type="org.lamsfoundation.lams.web.outcome.OutcomeAction"
-      name="outcomeForm"
+      name="OutcomeForm"
       parameter="method"
       validate="false"
       scope="request"
     >
-    <forward name="outcomeManage" path="/outcome/outcomeManage.jsp" />
-    <forward name="outcomeEdit"   path="/outcome/outcomeEdit.jsp" />
+	    <forward name="outcomeManage" path="/outcome/outcomeManage.jsp" />
+	    <forward name="outcomeEdit"   path="/outcome/outcomeEdit.jsp" />
     </action>
 
-
+    <action
+      path="/outcomeScale"
+      type="org.lamsfoundation.lams.web.outcome.OutcomeAction"
+      name="OutcomeScaleForm"
+      parameter="method"
+      validate="false"
+      scope="request"
+    >
+	    <forward name="scaleManage" path="/outcome/scaleManage.jsp" />
+	    <forward name="scaleEdit"   path="/outcome/scaleEdit.jsp" />
+    </action>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

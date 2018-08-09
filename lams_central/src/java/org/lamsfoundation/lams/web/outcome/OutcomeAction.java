@@ -23,7 +23,9 @@
 package org.lamsfoundation.lams.web.outcome;
 
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,11 +40,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
+import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -61,10 +61,7 @@ public class OutcomeAction extends DispatchAction {
     private static Logger log = Logger.getLogger(OutcomeAction.class);
 
     private static IUserManagementService userManagementService;
-    private static ICoreLearnerService learnerService;
-    private static ILessonService lessonService;
     private static ISecurityService securityService;
-    private static IIntegrationService integrationService;
     private static IOutcomeService outcomeService;
 
     public ActionForward outcomeManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -93,7 +90,6 @@ public class OutcomeAction extends DispatchAction {
 	return mapping.findForward("outcomeManage");
     }
 
-    @SuppressWarnings("unchecked")
     public ActionForward outcomeEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -127,7 +123,7 @@ public class OutcomeAction extends DispatchAction {
 	    outcomeForm.setScaleId(outcome.getScale().getScaleId());
 	}
 
-	List<OutcomeScale> scales = getUserManagementService().findAll(OutcomeScale.class);
+	List<OutcomeScale> scales = getOutcomeService().getScalesForManagement(organisationId);
 	request.setAttribute("scales", scales);
 
 	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
@@ -230,6 +226,193 @@ public class OutcomeAction extends DispatchAction {
 	return outcomeManage(mapping, form, request, response);
     }
 
+    public ActionForward scaleManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Integer userId = getUserDTO().getUserID();
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+
+	if (organisationId == null) {
+	    // check if user is allowed to view and edit global outcomes
+	    if (!getSecurityService().isSysadmin(userId, "manage global scales", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
+		return null;
+	    }
+	} else {
+	    // check if user is allowed to view and edit course outcomes
+	    if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
+		    "manage course scales", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
+		return null;
+	    }
+	}
+	List<OutcomeScale> scales = getOutcomeService().getScalesForManagement(organisationId);
+	request.setAttribute("scales", scales);
+
+	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
+	return mapping.findForward("scaleManage");
+    }
+
+    public ActionForward scaleRemove(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Long scaleId = WebUtil.readLongParam(request, "scaleId", false);
+	OutcomeScale scale = (OutcomeScale) getUserManagementService().findById(OutcomeScale.class, scaleId);
+	if (scale == null) {
+	    throw new IllegalArgumentException("Can not find an outcome scale with ID " + scaleId);
+	}
+	Integer organisationId = scale.getOrganisation() == null ? null : scale.getOrganisation().getOrganisationId();
+	Integer userId = getUserDTO().getUserID();
+
+	if (organisationId == null) {
+	    if (!getSecurityService().isSysadmin(userId, "remove global scale", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
+		return null;
+	    }
+	} else {
+	    if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
+		    "remove course scale", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
+		return null;
+	    }
+	}
+	getUserManagementService().delete(scale);
+	return scaleManage(mapping, form, request, response);
+    }
+
+    public ActionForward scaleEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Integer userId = getUserDTO().getUserID();
+	Long scaleId = WebUtil.readLongParam(request, "scaleId", true);
+	OutcomeScale scale = null;
+	Integer organisationId = null;
+	if (scaleId == null) {
+	    organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	} else {
+	    scale = (OutcomeScale) getUserManagementService().findById(OutcomeScale.class, scaleId);
+	    if (scale.getOrganisation() != null) {
+		// get organisation ID from the outcome - the safest way
+		organisationId = scale.getOrganisation().getOrganisationId();
+	    }
+	}
+
+	if (organisationId != null && !getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.AUTHOR }, "add/edit course outcome", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
+	    return null;
+	}
+
+	OutcomeScaleForm scaleForm = (OutcomeScaleForm) form;
+	scaleForm.setOrganisationId(organisationId);
+	scaleForm.setContentFolderId(getOutcomeService().getContentFolderId(organisationId));
+	if (scale != null) {
+	    scaleForm.setScaleId(scale.getScaleId());
+	    scaleForm.setName(scale.getName());
+	    scaleForm.setCode(scale.getCode());
+	    scaleForm.setDescription(scale.getDescription());
+	    scaleForm.setItems(scale.getItemString());
+	}
+
+	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
+	return mapping.findForward("scaleEdit");
+    }
+
+    public ActionForward scaleSave(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	OutcomeScaleForm scaleForm = (OutcomeScaleForm) form;
+	Integer userId = getUserDTO().getUserID();
+	Long scaleId = scaleForm.getScaleId();
+	OutcomeScale scale = null;
+	Integer organisationId = null;
+	if (scaleId == null) {
+	    organisationId = scaleForm.getOrganisationId();
+	} else {
+	    scale = (OutcomeScale) getUserManagementService().findById(OutcomeScale.class, scaleId);
+	    if (scale.getOrganisation() != null) {
+		// get organisation ID from the outcome - the safest way
+		organisationId = scale.getOrganisation().getOrganisationId();
+	    }
+	}
+
+	if (organisationId == null) {
+	    if (!getSecurityService().isSysadmin(userId, "persist global scale", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
+		return null;
+	    }
+	} else {
+	    if (!getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
+		    "persist course scale", false)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
+		return null;
+	    }
+	}
+
+	ActionErrors errors = validateScaleForm(scaleForm);
+	List<String> items = OutcomeScale.parseItems(scaleForm.getItems());
+	if (items == null) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("scale.manage.add.value.error.blank"));
+	}
+	if (errors.isEmpty()) {
+	    try {
+		Organisation organisation = (Organisation) (organisationId == null ? null
+			: getUserManagementService().findById(Organisation.class, organisationId));
+		if (scale == null) {
+		    scale = new OutcomeScale();
+		    scale.setOrganisation(organisation);
+		    User user = (User) getUserManagementService().findById(User.class, userId);
+		    scale.setCreateBy(user);
+		    scale.setCreateDateTime(new Date());
+		}
+
+		scale.setName(scaleForm.getName());
+		scale.setCode(scaleForm.getCode());
+		scale.setDescription(scaleForm.getDescription());
+		scale.setContentFolderId(scaleForm.getContentFolderId());
+		getUserManagementService().save(scale);
+
+		// find existing scales and add new ones
+		Set<OutcomeScaleItem> newItems = new LinkedHashSet<>();
+		int value = 0;
+		for (String itemString : items) {
+		    itemString = itemString.trim();
+		    if (StringUtils.isBlank(itemString)) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,
+				new ActionMessage("scale.manage.add.value.error.blank"));
+			break;
+		    }
+		    OutcomeScaleItem item = null;
+		    for (OutcomeScaleItem exisitngItem : scale.getItems()) {
+			if (itemString.equals(exisitngItem.getName())) {
+			    item = exisitngItem;
+			    break;
+			}
+		    }
+		    if (item == null) {
+			item = new OutcomeScaleItem();
+			item.setScale(scale);
+			item.setName(itemString);
+		    }
+		    item.setValue(value++);
+		    newItems.add(item);
+		}
+		if (errors.isEmpty()) {
+		    scale.getItems().clear();
+		    scale.getItems().addAll(newItems);
+		    getUserManagementService().save(scale);
+
+		    request.setAttribute("saved", true);
+		}
+	    } catch (Exception e) {
+		log.error("Exception while saving an outcome", e);
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("scale.manage.add.error"));
+		this.addErrors(request, errors);
+	    }
+	}
+	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
+	}
+
+	return mapping.findForward("scaleEdit");
+    }
+
     private UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -249,6 +432,17 @@ public class OutcomeAction extends DispatchAction {
 	return errors;
     }
 
+    private ActionErrors validateScaleForm(OutcomeScaleForm scaleForm) {
+	ActionErrors errors = new ActionErrors();
+	if (StringUtils.isBlank(scaleForm.getName())) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("outcome.manage.add.error.name.blank"));
+	}
+	if (StringUtils.isBlank(scaleForm.getCode())) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("outcome.manage.add.error.code.blank"));
+	}
+	return errors;
+    }
+
     private IUserManagementService getUserManagementService() {
 	if (OutcomeAction.userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
@@ -256,24 +450,6 @@ public class OutcomeAction extends DispatchAction {
 	    OutcomeAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return OutcomeAction.userManagementService;
-    }
-
-    private ICoreLearnerService getLearnerService() {
-	if (OutcomeAction.learnerService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    OutcomeAction.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
-	}
-	return OutcomeAction.learnerService;
-    }
-
-    private ILessonService getLessonService() {
-	if (OutcomeAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    OutcomeAction.lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return OutcomeAction.lessonService;
     }
 
     private ISecurityService getSecurityService() {
@@ -292,14 +468,5 @@ public class OutcomeAction extends DispatchAction {
 	    OutcomeAction.outcomeService = (IOutcomeService) ctx.getBean("outcomeService");
 	}
 	return OutcomeAction.outcomeService;
-    }
-
-    private IIntegrationService getIntegrationService() {
-	if (OutcomeAction.integrationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    OutcomeAction.integrationService = (IIntegrationService) ctx.getBean("integrationService");
-	}
-	return OutcomeAction.integrationService;
     }
 }

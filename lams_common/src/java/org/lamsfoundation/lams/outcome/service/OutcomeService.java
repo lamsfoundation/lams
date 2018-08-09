@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.outcome.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.lamsfoundation.lams.util.FileUtil;
 
@@ -16,6 +17,10 @@ public class OutcomeService implements IOutcomeService {
 
     public List<Outcome> getOutcomesForManagement(Integer organisationId) {
 	return outcomeDAO.getOutcomesSortedByName(organisationId);
+    }
+
+    public List<OutcomeScale> getScalesForManagement(Integer organisationId) {
+	return outcomeDAO.getScalesSortedByName(organisationId);
     }
 
     public void setOutcomeDAO(IOutcomeDAO outcomeDAO) {

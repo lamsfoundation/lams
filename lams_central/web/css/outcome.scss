@@ -8,13 +8,13 @@ div#titleDiv {
 	border-bottom: $border-thin-dotted;
 }
 
-.manageOutcomeButton {
+.manageButton {
 	cursor: pointer;
 	width: 16px;
 	height: 16px;
 }
 
-#addOutcomeButton {
+#addButton {
 	float: right;
 	margin: 20px 10px 10px 0;
 }
@@ -29,4 +29,8 @@ div#titleDiv {
 
 .outcomeContainer .row:first-child {
 	border-bottom: $border-thin-solid;
+}
+
+textarea {
+	width: 100%;	
 }

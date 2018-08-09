@@ -17,6 +17,9 @@
 		<property name="code" type="java.lang.String" column="code"
 			length="50">
 		</property>
+		<property name="description" type="java.lang.String" column="description"
+			length="65535">
+		</property>
 		<property name="contentFolderId" type="java.lang.String" column="content_folder_id"
 			length="36">
 		</property>
@@ -35,7 +38,7 @@
 			<column name="organisation_id" />
 		</many-to-one>
 		
-		<set name="items" lazy="false" inverse="true" cascade="all-delete-orphan">
+		<set name="items" lazy="false" inverse="true" cascade="all-delete-orphan" order-by="value">
 	        <key><column name="scale_id" /></key>
 	        <one-to-many class="org.lamsfoundation.lams.outcome.OutcomeScaleItem"/>        
     	</set>

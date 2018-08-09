@@ -585,7 +585,6 @@ function showOutcomeDialog(organisationID) {
 	});
 }
 
-
 function closeAddSingleActivityLessonDialog(action) {
 	var id = 'dialogAddSingleActivityLesson',
 		dialog = $('#' + id),

@@ -6,7 +6,6 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-		<title><fmt:message key="index.outcome.manage" /></title>
 	<lams:css/>
 	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/outcome.css" type="text/css" media="screen" />
@@ -22,12 +21,12 @@
 			
 			decoderDiv = $('<div />'),
 			LABELS = {
-				<fmt:message key="outcome.manage.add" var="ADD_OUTCOME_TITLE_VAR"/>
-				ADD_OUTCOME_TITLE : '<c:out value="${ADD_OUTCOME_TITLE_VAR}" />',
-				<fmt:message key="outcome.manage.edit" var="EDIT_OUTCOME_TITLE_VAR"/>
-				EDIT_OUTCOME_TITLE : '<c:out value="${EDIT_OUTCOME_TITLE_VAR}" />',
-				<fmt:message key="outcome.manage.remove.confirm" var="REMOVE_OUTCOME_CONFIRM_LABEL_VAR"/>
-				REMOVE_OUTCOME_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_OUTCOME_CONFIRM_LABEL_VAR}" />').text()
+				<fmt:message key="scale.manage.add" var="ADD_SCALE_TITLE_VAR"/>
+				ADD_SCALE_TITLE : '<c:out value="${ADD_SCALE_TITLE_VAR}" />',
+				<fmt:message key="outcome.manage.edit" var="EDIT_SCALE_TITLE_VAR"/>
+				EDIT_SCALE_TITLE : '<c:out value="${EDIT_SCALEE_TITLE_VAR}" />',
+				<fmt:message key="scale.manage.remove.confirm" var="REMOVE_SCALE_CONFIRM_LABEL_VAR"/>
+				REMOVE_SCALE_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_SCALE_CONFIRM_LABEL_VAR}" />').text()
 			};
 	</script>
 </lams:head>
@@ -49,17 +48,17 @@
 			<div class="col-xs-1">
 			</div>
 		</div>
-		<c:forEach var="outcome" items="${outcomes}">
+		<c:forEach var="scale" items="${scales}">
 			<div class="row">
 				<div class="col-xs-5">
-					<c:out value="${outcome.name}" />
+					<c:out value="${scale.name}" />
 				</div>
 				<div class="col-xs-3">
-					<c:out value="${outcome.code}" />
+					<c:out value="${scale.code}" />
 				</div>
 				<div class="col-xs-2">
 					<c:choose>
-						<c:when test="${empty outcome.organisation}">
+						<c:when test="${empty scale.organisation}">
 							<fmt:message key='outcome.manage.scope.global' />
 						</c:when>
 						<c:otherwise>
@@ -69,30 +68,30 @@
 				</div>
 				<div class="col-xs-1">
 					<c:choose>
-						<c:when test="${not empty outcome.organisation or canManageGlobal}">
-							<i class="manageButton fa fa-pencil" title="<fmt:message key='outcome.manage.edit' />"
-						   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
+						<c:when test="${not empty scale.organisation or canManageGlobal}">
+							<i class="manageButton fa fa-pencil" title="<fmt:message key='scale.manage.edit' />"
+						   	   onClick="javascript:openEditScaleDialog(${scale.scaleId})" >
 							</i>
 						</c:when>
 						<c:otherwise>
-							<i class="manageButton fa fa-eye" title="<fmt:message key='outcome.manage.view' />"
-						   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
+							<i class="manageButton fa fa-eye" title="<fmt:message key='scale.manage.view' />"
+						   	   onClick="javascript:openEditScaleDialog(${scale.scaleId})" >
 							</i>
 						</c:otherwise>
 					</c:choose>
 				</div>
 				<div class="col-xs-1">
-					<c:if test="${not empty outcome.organisation or canManageGlobal}">
-						<i class="manageButton fa fa-remove" title="<fmt:message key='outcome.manage.remove' />"
-					   	   onClick="javascript:removeOutcome(${outcome.outcomeId})" >
+					<c:if test="${not empty scale.organisation or canManageGlobal}">
+						<i class="manageButton fa fa-remove" title="<fmt:message key='scale.manage.remove' />"
+					   	   onClick="javascript:removeScale(${scale.scaleId})" >
 						</i>
 					</c:if>
 				</div>
 			</div>
 		</c:forEach>
-		<div id="addButton" class="btn btn-primary" onClick="javascript:openEditOutcomeDialog()">
+		<div id="addButton" class="btn btn-primary" onClick="javascript:openEditScaleDialog()">
 			<i class="fa fa-plus"></i>
-			<span><fmt:message key='outcome.manage.add' /></span>
+			<span><fmt:message key='scale.manage.add' /></span>
 		</div>
 	</div>
 </lams:Page>

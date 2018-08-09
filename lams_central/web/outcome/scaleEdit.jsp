@@ -20,41 +20,27 @@
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		<c:if test="${saved}">
-			var outcomesFrame = $('#dialogOutcome iframe', window.parent.document);
-			if (outcomesFrame.length == 0) {
+			var scalesFrame = $('#dialogOutcomeScale iframe', window.parent.document);
+			if (scalesFrame.length == 0) {
 				window.parent.document.location.href = 
-					'<lams:LAMSURL/>outcome.do?method=outcomeManage${empty param.organisationID ? "" : "&organisationID=param.organisationID"}';
+					'<lams:LAMSURL/>outcome.do?method=scaleManage${empty param.organisationID ? "" : "&organisationID=param.organisationID"}';
 			} else {
-				outcomesFrame.attr('src', outcomesFrame.attr('src'));
-				$('#dialogOutcomeEdit', window.parent.document).remove();
+				scalesFrame.attr('src', scalesFrame.attr('src'));
+				$('#dialogOutcomeScaleEdit', window.parent.document).remove();
 			}
 		</c:if>
 		
-		var organisationId = '${param.organisationID}',
-			LAMS_URL = '<lams:LAMSURL/>',
-			decoderDiv = $('<div />'),
-			LABELS = {
-				<fmt:message key="outcome.manage.add" var="ADD_OUTCOME_TITLE_VAR"/>
-				ADD_OUTCOME_TITLE : '<c:out value="${ADD_OUTCOME_TITLE_VAR}" />',
-				<fmt:message key="outcome.manage.edit" var="EDIT_OUTCOME_TITLE_VAR"/>
-				EDIT_OUTCOME_TITLE : '<c:out value="${EDIT_OUTCOME_TITLE_VAR}" />',
-				<fmt:message key="outcome.manage.remove.confirm" var="REMOVE_OUTCOME_CONFIRM_LABEL_VAR"/>
-				REMOVE_OUTCOME_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_OUTCOME_CONFIRM_LABEL_VAR}" />').text(),
-				<fmt:message key="scale.title" var="OUTCOME_MANAGE_SCALE_TITLE_VAR"/>
-				OUTCOME_SCALE_MANAGE_TITLE : '<c:out value="${OUTCOME_MANAGE_SCALE_TITLE_VAR}" />',
-				<fmt:message key="scale.manage.title" var="OUTCOME_SCALE_COURSE_MANAGE_TITLE_VAR"/>
-				OUTCOME_SCALE_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_SCALE_COURSE_MANAGE_TITLE_VAR}" />'
-			};
+		var organisationId = '${param.organisationID}';
 	</script>
 </lams:head>
 <body>
 
-<html:form action="/outcome.do" method="post" styleId="outcomeForm">
+<html:form action="/outcomeScale.do" method="post" styleId="scaleForm">
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="formDisabled" value="${not empty formBean.outcomeId and empty formBean.organisationId and not canManageGlobal}" />
+	<c:set var="formDisabled" value="${not empty formBean.scaleId and empty formBean.organisationId and not canManageGlobal}" />
 
-	<input type="hidden" name="method" value="outcomeSave" />
-	<html:hidden property="outcomeId" />
+	<input type="hidden" name="method" value="scaleSave" />
+	<html:hidden property="scaleId" />
 	<html:hidden property="organisationId" />
 	<html:hidden property="contentFolderId" />
 	
@@ -95,21 +81,12 @@
 							</c:choose>
 						</div>
 						<div class="form-group">
-							<label><fmt:message key="outcome.manage.add.scale" />:
-								<html:select property="scaleId"  styleClass="form-control" disabled="${formDisabled}">
-									<html:option value="0">
-										<fmt:message key="outcome.manage.add.scale.none" />
-									</html:option>
-									<c:forEach items="${scales}" var="scale">
-										<html:option value="${scale.scaleId}">
-											<c:out value="${scale.name}" /> (<c:out value="${scale.code}" />)
-										</html:option>
-									</c:forEach>
-								</html:select>
+							<label><fmt:message key="scale.manage.add.value" />:<br />
+								<html:textarea property="items" disabled="${formDisabled}" />
+								<lams:Alert type="info" close="false">
+							        <fmt:message key="scale.manage.add.value.info" />
+								</lams:Alert>
 							</label>
-							<button type="button" class="btn btn-default" onClick="javascript:openOutcomeScaleDialog()">
-								<fmt:message key="scale.manage" />
-							</button>
 						</div>
 						<div class="form-group">
 							<fmt:message key="outcome.manage.add.description" />:
@@ -128,7 +105,7 @@
 			</div>
 		</div>
 		<c:if test="${not formDisabled}">
-			<button id="addButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
+			<button id="addButton" type="submit" class="btn btn-primary" onClick="javascript:submitScale()">
 				<fmt:message key="outcome.manage.add.save" />
 			</button>
 		</c:if>

@@ -26,9 +26,12 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeScale;
 
 public interface IOutcomeDAO extends IBaseDAO {
     String getContentFolderID(Integer organisationId);
 
     List<Outcome> getOutcomesSortedByName(Integer organisationId);
+
+    List<OutcomeScale> getScalesSortedByName(Integer organisationId);
 }
