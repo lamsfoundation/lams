@@ -571,7 +571,7 @@ public class QaLearningController implements QaAppConstants {
 	return forwardName;
     }
 
-    @RequestMapping(value="/checkLeaderProgress", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value="/checkLeaderProgress")
     @ResponseBody
     public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -584,6 +584,7 @@ public class QaLearningController implements QaAppConstants {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	response.setContentType("application/json;charset=UTF-8");
 	return ObjectNode.toString();
     }
 

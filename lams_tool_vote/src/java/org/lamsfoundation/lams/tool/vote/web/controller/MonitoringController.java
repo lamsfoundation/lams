@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -78,19 +79,19 @@ public class MonitoringController implements VoteAppConstants {
     @Qualifier("voteService")
     private IVoteService voteService;
 
-    @RequestMapping(path = "/hideOpenVote", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/hideOpenVote")
     @ResponseBody
-    public String hideOpenVote(HttpServletRequest request) {
-	return toggleHideShow(request, false);
+    public String hideOpenVote(HttpServletRequest request, HttpServletResponse response) {
+	return toggleHideShow(request, response, false);
     }
 
-    @RequestMapping(path = "/showOpenVote", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/showOpenVote")
     @ResponseBody
-    public String showOpenVote(HttpServletRequest request) {
-	return toggleHideShow(request, true);
+    public String showOpenVote(HttpServletRequest request, HttpServletResponse response) {
+	return toggleHideShow(request, response, true);
     }
 
-    private String toggleHideShow(HttpServletRequest request, boolean show) {
+    private String toggleHideShow(HttpServletRequest request, HttpServletResponse response, boolean show) {
 	Long currentUid = WebUtil.readLongParam(request, "currentUid");
 	logger.info("Current Uid" + currentUid);
 
@@ -110,6 +111,7 @@ public class MonitoringController implements VoteAppConstants {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("currentUid", currentUid);
 	responseJSON.put("nextActionMethod", nextActionMethod);
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 
@@ -135,9 +137,9 @@ public class MonitoringController implements VoteAppConstants {
 	return "/monitoring/VoteNominationViewer";
     }
 
-    @RequestMapping(path = "/getVoteNominationsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getVoteNominationsJSON")
     @ResponseBody
-    public String getVoteNominationsJSON(HttpServletRequest request) {
+    public String getVoteNominationsJSON(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
@@ -182,12 +184,13 @@ public class MonitoringController implements VoteAppConstants {
 	    rows.add(responseRow);
 	}
 	responseJSON.set("rows", rows);
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 
-    @RequestMapping(path = "/getReflectionsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getReflectionsJSON")
     @ResponseBody
-    public String getReflectionsJSON(HttpServletRequest request) {
+    public String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 
@@ -224,6 +227,7 @@ public class MonitoringController implements VoteAppConstants {
 	    rows.add(responseRow);
 	}
 	responseJSON.set("rows", rows);
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 
@@ -236,9 +240,9 @@ public class MonitoringController implements VoteAppConstants {
 	return "/monitoring/Stats";
     }
 
-    @RequestMapping(path = "/getOpenTextNominationsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getOpenTextNominationsJSON")
     @ResponseBody
-    public String getOpenTextNominationsJSON(HttpServletRequest request) {
+    public String getOpenTextNominationsJSON(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
@@ -298,6 +302,7 @@ public class MonitoringController implements VoteAppConstants {
 	    rows.add(responseRow);
 	}
 	responseJSON.set("rows", rows);
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 

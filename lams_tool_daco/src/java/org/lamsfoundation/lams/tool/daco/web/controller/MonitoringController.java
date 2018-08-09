@@ -123,7 +123,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/summary")
-    protected String summary(HttpServletRequest request) {
+    protected String summary(HttpServletRequest request, HttpServletResponse response) {
 	// initial Session Map
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID, true);
 
@@ -173,9 +173,9 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
-    @RequestMapping(path = "/getUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getUsers")
     @ResponseBody
-    protected String getUsers(HttpServletRequest request, HttpServletResponse res)
+    protected String getUsers(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID, true);
@@ -242,6 +242,7 @@ public class MonitoringController {
 	    rows.add(responseRow);
 	}
 	responsedata.set("rows", rows);
+	response.setContentType("application/json;charset=UTF-8");
 	return responsedata.toString();
     }
 

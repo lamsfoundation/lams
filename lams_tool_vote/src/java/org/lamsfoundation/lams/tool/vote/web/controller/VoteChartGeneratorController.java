@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
@@ -58,9 +59,9 @@ public class VoteChartGeneratorController {
     @Qualifier("voteService")
     private IVoteService voteService;
 
-    @RequestMapping(path = "/chartGenerator", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/chartGenerator")
     @ResponseBody
-    public String start(HttpServletRequest request) {
+    public String start(HttpServletRequest request, HttpServletResponse response) {
 	String currentSessionId = request.getParameter("currentSessionId");
 
 	Map<Long, String> nominationNames = new HashMap<>();
@@ -106,6 +107,7 @@ public class VoteChartGeneratorController {
 	    responseJSON.withArray("data").add(nomination);
 	}
 
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 }

@@ -215,7 +215,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/finish")
-    protected String finish(HttpServletRequest request) {
+    protected String finish(@ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
@@ -534,7 +534,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/submitReflection")
-    protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
+    protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, @ModelAttribute("recordForm") RecordForm recordForm, 
 	    HttpServletRequest request) {
 	Integer userId = messageForm.getUserId();
 	Long sessionId = messageForm.getSessionId();
@@ -553,7 +553,7 @@ public class LearningController {
 	    dacoService.updateEntry(entry);
 	}
 
-	return finish(request);
+	return finish(recordForm, request);
     }
 
     // *************************************************************************************

@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
@@ -35,9 +36,9 @@ public class TblMonitoringController {
      * @throws IOException
      * @throws JSONException
      */
-    @RequestMapping(path = "/changeLeader", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/changeLeader")
     @ResponseBody
-    public String changeLeader(HttpServletRequest request) throws IOException {
+    public String changeLeader(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long leaderUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -55,6 +56,7 @@ public class TblMonitoringController {
 	// build JSON
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("isSuccessful", isSuccessful);
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 

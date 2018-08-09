@@ -188,7 +188,7 @@ public class TblMonitorController {
      *
      * @throws JSONException
      */
-    @RequestMapping(value = "/isBurningQuestionsEnabled", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/isBurningQuestionsEnabled")
     @ResponseBody
     public String isBurningQuestionsEnabled(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
@@ -199,6 +199,7 @@ public class TblMonitorController {
 	// build JSON
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("isBurningQuestionsEnabled", scratchie.isBurningQuestionsEnabled());
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
 
     }

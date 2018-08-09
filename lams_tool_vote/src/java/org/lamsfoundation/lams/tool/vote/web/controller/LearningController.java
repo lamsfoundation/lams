@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -497,9 +498,9 @@ public class LearningController implements VoteAppConstants {
 	return "/learning/AnswersContent";
     }
 
-    @RequestMapping(path = "/checkLeaderProgress", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/checkLeaderProgress")
     @ResponseBody
-    public String checkLeaderProgress(HttpServletRequest request) throws IOException {
+    public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -511,6 +512,7 @@ public class LearningController implements VoteAppConstants {
 
 	ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
 	objectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	response.setContentType("application/json;charset=UTF-8");
 	return objectNode.toString();
     }
 

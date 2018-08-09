@@ -346,9 +346,9 @@ public class QaMonitoringController implements QaAppConstants {
      * @param request
      * @return
      */
-    @RequestMapping(path = "/getReflectionsJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getReflectionsJSON")
     @ResponseBody
-    public String getReflectionsJSON(HttpServletRequest request) throws IOException, ServletException, ToolException {
+    public String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response ) throws IOException, ServletException, ToolException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
 
@@ -382,6 +382,7 @@ public class QaMonitoringController implements QaAppConstants {
 	    rows.add(responseRow);
 	}
 	responsedata.set("rows", rows);
+	response.setContentType("application/json;charset=UTF-8");
 	return responsedata.toString();
     }
 
