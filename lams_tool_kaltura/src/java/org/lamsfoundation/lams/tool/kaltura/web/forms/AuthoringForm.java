@@ -21,23 +21,14 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.kaltura.web.forms;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  *
  */
-public class AuthoringForm extends ActionForm {
+public class AuthoringForm {
 
     private static final long serialVersionUID = 3950453134542135495L;
 
@@ -61,8 +52,6 @@ public class AuthoringForm extends ActionForm {
 
     private String currentTab;
 
-    private String dispatch;
-
     private String sessionMapID;
 
     private Long deleteFileUuid;
@@ -72,14 +61,6 @@ public class AuthoringForm extends ActionForm {
     private String reflectInstructions;
 
     private SessionMap sessionMap;
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-
-	return ac;
-    }
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -95,14 +76,6 @@ public class AuthoringForm extends ActionForm {
 
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public String getInstructions() {

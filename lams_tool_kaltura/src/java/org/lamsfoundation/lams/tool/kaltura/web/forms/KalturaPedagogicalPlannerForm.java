@@ -20,16 +20,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.kaltura.web.forms;
 
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 
 /**
  *
  */
-public class KalturaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class KalturaPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     String instructions;
     String contentFolderID;
 

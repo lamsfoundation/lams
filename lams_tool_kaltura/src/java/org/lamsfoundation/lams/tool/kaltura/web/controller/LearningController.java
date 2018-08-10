@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.kaltura.web.actions;
+package org.lamsfoundation.lams.tool.kaltura.web.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -37,13 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -57,7 +50,6 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
 import org.lamsfoundation.lams.tool.kaltura.service.IKalturaService;
-import org.lamsfoundation.lams.tool.kaltura.service.KalturaServiceProxy;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaCommentComparator;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaException;
@@ -65,11 +57,21 @@ import org.lamsfoundation.lams.tool.kaltura.util.KalturaItemComparator;
 import org.lamsfoundation.lams.tool.kaltura.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -86,17 +88,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  *
  */
-public class LearningAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    private IKalturaService service;
+    @Autowired
+    @Qualifier("kalturaService")
+    private IKalturaService kalturaService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    private WebApplicationContext applicationContext;
 
-	initKalturaService();
+    @Autowired
+    @Qualifier("kalturaMessageService")
+    private MessageService messageService;
+
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request) throws Exception {
 
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -111,7 +121,7 @@ public class LearningAction extends LamsDispatchAction {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// Retrieve the session and content.
-	KalturaSession kalturaSession = service.getSessionBySessionId(toolSessionId);
+	KalturaSession kalturaSession = kalturaService.getSessionBySessionId(toolSessionId);
 	if (kalturaSession == null) {
 	    throw new KalturaException("Cannot retrieve session with toolSessionID" + toolSessionId);
 	}
@@ -128,7 +138,7 @@ public class LearningAction extends LamsDispatchAction {
 	KalturaUser user;
 	if (mode.equals(ToolAccessMode.TEACHER) && !isGroupMonitoring) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
-	    user = service.getUserByUserIdAndSessionId(userID, toolSessionId);
+	    user = kalturaService.getUserByUserIdAndSessionId(userID, toolSessionId);
 	} else {
 	    //in case of lerning and group monitoring create new user
 	    user = getCurrentUser(toolSessionId);
@@ -136,22 +146,22 @@ public class LearningAction extends LamsDispatchAction {
 
 	// check defineLater
 	if (kaltura.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/defineLater";
 	}
 
 	// Set the content in use flag.
 	if (!kaltura.isContentInUse()) {
 	    kaltura.setContentInUse(new Boolean(true));
-	    service.saveOrUpdateKaltura(kaltura);
+	    kalturaService.saveOrUpdateKaltura(kaltura);
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil
-		.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet().getServletContext());
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
+		toolSessionId, request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// reflection information
 	String entryText = new String();
-	NotebookEntry notebookEntry = service.getEntry(toolSessionId, user.getUserId().intValue());
+	NotebookEntry notebookEntry = kalturaService.getEntry(toolSessionId, user.getUserId().intValue());
 	if (notebookEntry != null) {
 	    entryText = notebookEntry.getEntry();
 	}
@@ -179,7 +189,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	    // calculate whether deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "pages/learning/submissionDeadline";
 	    }
 	}
 
@@ -193,18 +203,18 @@ public class LearningAction extends LamsDispatchAction {
 	    item.setUid(new Long(-1));
 	    sessionMap.put(KalturaConstants.ATTR_ITEM, item);
 	    sessionMap.put(KalturaConstants.ATTR_IS_ALLOW_UPLOADS, isAllowUpload(sessionMap, items));
-	    return mapping.findForward(KalturaConstants.SUCCESS);
+	    return "pages/learning/learning";
 	}
 
-	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(KalturaConstants.VIEW_ITEM));
-	redirect.addParameter(KalturaConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-	redirect.addParameter(KalturaConstants.PARAM_ITEM_UID, items.first().getUid());
-	return redirect;
+	String redirectURL = "redirect:learning/viewItem.do?";
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, KalturaConstants.ATTR_SESSION_MAP_ID, sessionMapId);
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, KalturaConstants.PARAM_ITEM_UID,
+		items.first().getUid().toString());
+	return redirectURL;
     }
 
-    public ActionForward viewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initKalturaService();
+    @RequestMapping("/viewItem")
+    public String viewItem(HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(KalturaConstants.ATTR_SESSION_MAP_ID);
@@ -218,9 +228,9 @@ public class LearningAction extends LamsDispatchAction {
 
 	//get back item
 	Long itemUid = WebUtil.readLongParam(request, KalturaConstants.PARAM_ITEM_UID);
-	KalturaItem item = service.getKalturaItem(itemUid);
+	KalturaItem item = kalturaService.getKalturaItem(itemUid);
 	if (mode.isLearner()) {
-	    service.logItemWatched(item.getUid(), userId, toolSessionId);
+	    kalturaService.logItemWatched(item.getUid(), userId, toolSessionId);
 	}
 
 	//items from DB
@@ -244,7 +254,7 @@ public class LearningAction extends LamsDispatchAction {
 	    sessionMap.put(KalturaConstants.ATTR_IS_USER_ITEM_AUTHOR, isUserItemAuthor);
 
 	    for (KalturaItem dbItem : items) {
-		AverageRatingDTO averageRatingDto = service.getAverageRatingDto(dbItem.getUid(), toolSessionId);
+		AverageRatingDTO averageRatingDto = kalturaService.getAverageRatingDto(dbItem.getUid(), toolSessionId);
 		dbItem.setAverageRatingDto(averageRatingDto);
 	    }
 	}
@@ -256,15 +266,15 @@ public class LearningAction extends LamsDispatchAction {
 	sessionMap.put(KalturaConstants.ATTR_ITEM, item);
 	sessionMap.put(KalturaConstants.ATTR_ITEMS, items);
 
-	return mapping.findForward(KalturaConstants.SUCCESS);
+	return "pages/learning/learning";
     }
 
     /**
      * Stores uploaded entryId(s).
      */
-    public ActionForward saveNewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initKalturaService();
+    @RequestMapping(path = "/saveNewItem", method = RequestMethod.POST)
+    @ResponseBody
+    public String saveNewItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -272,7 +282,7 @@ public class LearningAction extends LamsDispatchAction {
 	KalturaUser user = (KalturaUser) sessionMap.get(AttributeNames.USER);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	KalturaSession kalturaSession = service.getSessionBySessionId(toolSessionId);
+	KalturaSession kalturaSession = kalturaService.getSessionBySessionId(toolSessionId);
 	Kaltura kaltura = kalturaSession.getKaltura();
 	TreeSet<KalturaItem> allItems = new TreeSet<>(new KalturaItemComparator());
 	allItems.addAll(kaltura.getKalturaItems());
@@ -294,7 +304,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	String title = WebUtil.readStrParam(request, KalturaConstants.PARAM_ITEM_TITLE, true);
 	if (StringUtils.isBlank(title)) {
-	    String itemLocalized = service.getLocalisedMessage("label.authoring.item", null);
+	    String itemLocalized = kalturaService.getLocalisedMessage("label.authoring.item", null);
 	    title = itemLocalized + " " + maxSeq;
 	}
 	item.setTitle(title);
@@ -314,13 +324,12 @@ public class LearningAction extends LamsDispatchAction {
 	item.setCreateByAuthor(false);
 	item.setHidden(false);
 	item.setKalturaUid(kaltura.getUid());
-	service.saveKalturaItem(item);
+	kalturaService.saveKalturaItem(item);
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put(KalturaConstants.PARAM_ITEM_UID, item.getUid());
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	return ObjectNode.toString();
     }
 
     /**
@@ -332,9 +341,8 @@ public class LearningAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward commentItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initKalturaService();
+    @RequestMapping("/commentItem")
+    public String commentItem(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -344,33 +352,33 @@ public class LearningAction extends LamsDispatchAction {
 	String commentMessage = WebUtil.readStrParam(request, KalturaConstants.ATTR_COMMENT, true);
 
 	if (StringUtils.isBlank(commentMessage)) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(KalturaConstants.ERROR_MSG_COMMENT_BLANK));
-	    this.addErrors(request, errors);
-	    return mapping.findForward(KalturaConstants.COMMENT_LIST);
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage(KalturaConstants.ERROR_MSG_COMMENT_BLANK));
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/learning/commentlist";
 	}
 
 	KalturaComment comment = new KalturaComment();
 	comment.setComment(commentMessage);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	KalturaUser kalturaUser = service.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+	KalturaUser kalturaUser = kalturaService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
 		toolSessionId);
 	comment.setCreateBy(kalturaUser);
 	comment.setCreateDate(new Timestamp(new Date().getTime()));
 
 	// persist Kaltura changes in DB
 	Long currentItemUid = new Long(request.getParameter(KalturaConstants.PARAM_ITEM_UID));
-	KalturaItem item = service.getKalturaItem(currentItemUid);
+	KalturaItem item = kalturaService.getKalturaItem(currentItemUid);
 	Set<KalturaComment> dbComments = item.getComments();
 	dbComments.add(comment);
-	service.saveKalturaItem(item);
+	kalturaService.saveKalturaItem(item);
 
 	//refresh comments in the sessisonMap
 	KalturaItem sessionMapItem = (KalturaItem) sessionMap.get(KalturaConstants.ATTR_ITEM);
 	Set<KalturaComment> groupComments = getGroupComments(item, toolSessionId, mode);
 	sessionMapItem.setGroupComments(groupComments);
 
-	return mapping.findForward(KalturaConstants.COMMENT_LIST);
+	return "pages/learning/commentlist";
     }
 
     /**
@@ -386,10 +394,10 @@ public class LearningAction extends LamsDispatchAction {
      * @throws ServletException
      * @throws ToolException
      */
-    public ActionForward rateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/rateItem")
+    @ResponseBody
+    public String rateItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	initKalturaService();
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -399,7 +407,8 @@ public class LearningAction extends LamsDispatchAction {
 	float rating = Float.parseFloat(request.getParameter("rate"));
 	Long itemUid = WebUtil.readLongParam(request, "idBox");
 
-	AverageRatingDTO averageRatingDto = service.rateMessage(itemUid, user.getUserId(), toolSessionId, rating);
+	AverageRatingDTO averageRatingDto = kalturaService.rateMessage(itemUid, user.getUserId(), toolSessionId,
+		rating);
 
 	//refresh averageRatingDto in sessionMap
 	KalturaItem item = (KalturaItem) sessionMap.get(KalturaConstants.ATTR_ITEM);
@@ -409,8 +418,7 @@ public class LearningAction extends LamsDispatchAction {
 	ObjectNode.put("averageRating", averageRatingDto.getRating());
 	ObjectNode.put("numberOfVotes", averageRatingDto.getNumberOfVotes());
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	return ObjectNode.toString();
     }
 
     /**
@@ -422,30 +430,27 @@ public class LearningAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	initKalturaService();
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm, HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
+	messageForm.setUserID(user.getUserID());
+	messageForm.setSessionMapID(sessionMapID);
 
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = service.getEntry(toolSessionID, user.getUserID());
+	NotebookEntry entry = kalturaService.getEntry(toolSessionID, user.getUserID());
 
 	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
+	    messageForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(KalturaConstants.NOTEBOOK);
+	return "pages/learning/notebook";
     }
 
     /**
@@ -457,12 +462,11 @@ public class LearningAction extends LamsDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initKalturaService();
+    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
+    public String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
+	    HttpServletRequest request) {
 
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
+	Integer userId = messageForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -470,25 +474,25 @@ public class LearningAction extends LamsDispatchAction {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, userId);
+	NotebookEntry entry = kalturaService.getEntry(sessionId, userId);
 
 	if (entry == null) {
 	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, KalturaConstants.TOOL_SIGNATURE,
-		    userId, refForm.getEntryText());
+	    kalturaService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    KalturaConstants.TOOL_SIGNATURE, userId, messageForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(messageForm.getEntryText());
 	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
+	    kalturaService.updateEntry(entry);
 	}
 
-	return finishActivity(mapping, form, request, response);
+	return finishActivity(messageForm, request);
     }
 
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initKalturaService();
+    @RequestMapping("/finishActivity")
+    public String finishActivity(@ModelAttribute("messageForm") ReflectionForm messageForm,
+	    HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(KalturaConstants.ATTR_SESSION_MAP_ID);
@@ -504,13 +508,13 @@ public class LearningAction extends LamsDispatchAction {
 	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(userDTO.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
+	    nextActivityUrl = kalturaService.finishToolSession(sessionId, userID);
 	    request.setAttribute(KalturaConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (KalturaException e) {
-	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
+	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(KalturaConstants.FINISH);
+	return "pages/learning/finish";
     }
 
     // *************************************************************************************
@@ -524,7 +528,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// Create set of images, along with this filtering out items added by users from other groups
 	TreeSet<KalturaItem> items = new TreeSet<>(new KalturaItemComparator());
-	items.addAll(service.getGroupItems(kaltura.getToolContentId(), toolSessionId, userId, mode.isTeacher()));
+	items.addAll(kalturaService.getGroupItems(kaltura.getToolContentId(), toolSessionId, userId, mode.isTeacher()));
 
 	for (KalturaItem item : items) {
 	    // initialize login name to avoid session close error in proxy object
@@ -592,22 +596,16 @@ public class LearningAction extends LamsDispatchAction {
 	return comments;
     }
 
-    private void initKalturaService() {
-	if (service == null) {
-	    service = KalturaServiceProxy.getKalturaService(this.getServlet().getServletContext());
-	}
-    }
-
     private KalturaUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	KalturaUser kalturaUser = service.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+	KalturaUser kalturaUser = kalturaService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
 		toolSessionId);
 
 	if (kalturaUser == null) {
-	    KalturaSession kalturaSession = service.getSessionBySessionId(toolSessionId);
-	    kalturaUser = service.createKalturaUser(user, kalturaSession);
+	    KalturaSession kalturaSession = kalturaService.getSessionBySessionId(toolSessionId);
+	    kalturaUser = kalturaService.createKalturaUser(user, kalturaSession);
 	}
 
 	return kalturaUser;

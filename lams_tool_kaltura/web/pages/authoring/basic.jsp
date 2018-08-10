@@ -9,9 +9,8 @@
 <c:set var="KCW_UI_CONF_ID"><%=Configuration.get(ConfigurationKeys.KALTURA_KCW_UI_CONF_ID)%></c:set>
 <c:set var="KDP_UI_CONF_ID"><%=Configuration.get(ConfigurationKeys.KALTURA_KDP_UI_CONF_ID)%></c:set>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
+<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/kaltura.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
@@ -148,9 +147,8 @@
 
 		if (deletionConfirmed) {
 			$(itemListTargetDiv).load(
-				"<c:url value="/authoring.do"/>",
+				"<c:url value="/authoring/removeItem.do"/>",
 				{
-					dispatch: "removeItem",
 					itemIndex: idx, 
 					sessionMapID: "${sessionMapID}"
 				},
@@ -162,9 +160,8 @@
 	}
 	function addItem(entryId, title, duration){
 		$(itemListTargetDiv).load(
-			"<c:url value="/authoring.do"/>",
+			"<c:url value="/authoring/addItem.do"/>",
 			{
-				dispatch: "addItem",
 				sessionMapID: "${sessionMapID}",
 				itemEntryId: entryId,
 				itemTitle: title,
@@ -177,9 +174,8 @@
 	}
 	function upItem(idx){
 		$(itemListTargetDiv).load(
-			"<c:url value="/authoring.do"/>",
+			"<c:url value="/authoring/upItem.do"/>",
 			{
-				dispatch: "upItem",
 				itemIndex: idx, 
 				sessionMapID: "${sessionMapID}"
 			},
@@ -190,9 +186,8 @@
 	}
 	function downItem(idx){
 		$(itemListTargetDiv).load(
-			"<c:url value="/authoring.do"/>",
+			"<c:url value="/authoring/downItem.do"/>",
 			{
-				dispatch: "downItem",
 				itemIndex: idx, 
 				sessionMapID: "${sessionMapID}"
 			},
@@ -209,14 +204,14 @@
     <label for="title">
     	<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <html:text property="title" styleClass="form-control"/>
+    <form:input path="title" cssClass="form-control"/>
 </div>
 
 <div class="form-group">
     <label for="instructions">
     	<fmt:message key="label.authoring.basic.instructions"/>
     </label>
-	<lams:CKEditor id="instructions" value="${formBean.instructions}"
+	<lams:CKEditor id="instructions" value="${authoringForm.instructions}"
 			contentFolderID="${sessionMap.contentFolderID}"/>
 </div>
 

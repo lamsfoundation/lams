@@ -70,9 +70,9 @@
 		<lams:STRUTS-textarea property="comment" rows="3" value="" styleClass="form-control"/>		
 		
 		<div class="pull-right">
-			<html:button property="commentButton" onclick="javascript:addNewComment(document.getElementById('comment__lamshidden').value);" styleClass="btn btn-default" style="vertical-align:bottom;">
+			<button name="commentButton" type="button" onclick="javascript:addNewComment(document.getElementById('comment__lamshidden').value);" class="btn btn-default" style="vertical-align:bottom;">
 				<fmt:message key="label.learning.post.comment" />
-			</html:button>
+			</button>
 		</div>
 	</div>
 </c:if>

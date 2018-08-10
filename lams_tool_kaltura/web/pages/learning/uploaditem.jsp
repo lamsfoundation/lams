@@ -135,9 +135,8 @@
 			
 			function addItem(entryId, title, duration){
 				$.post(
-					"<c:url value="/learning.do"/>", 
+					"<c:url value="/learning/saveNewItem.do"/>", 
 					{
-						dispatch: "saveNewItem",
 						sessionMapID: "${param.sessionMapID}",
 						itemEntryId: entryId,
 						itemTitle: title,
@@ -151,7 +150,7 @@
 			
 			function closeThickbox(){
 				if (lastUploadedItemUid != null) {
-					self.parent.location.href = '<c:url value="/learning.do"/>?dispatch=viewItem&sessionMapID=${param.sessionMapID}&itemUid=' + lastUploadedItemUid;
+					self.parent.location.href = '<c:url value="/learning/viewItem.do"/>?sessionMapID=${param.sessionMapID}&itemUid=' + lastUploadedItemUid;
 				} else {
 					self.parent.tb_remove();
 				}

@@ -22,7 +22,7 @@
 				
 					<td width="100px">
 						<c:set var="previewUrl" >
-							<c:url value='/authoring.do'/>?dispatch=preview&sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true
+							<c:url value='/authoring/preview.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true
 						</c:set>
 					
 						<a href="${previewUrl}" class="thickbox" title="<fmt:message key="label.item.preview" />">
