@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.kaltura.web.actions;
+package org.lamsfoundation.lams.tool.kaltura.web.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -35,33 +34,32 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
 import org.lamsfoundation.lams.tool.kaltura.service.IKalturaService;
-import org.lamsfoundation.lams.tool.kaltura.service.KalturaServiceProxy;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaException;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaItemComparator;
 import org.lamsfoundation.lams.tool.kaltura.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Andrey Balan
@@ -72,20 +70,24 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  *
  */
-public class AuthoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public IKalturaService kalturaService;
+    @Autowired
+    @Qualifier("kalturaService")
+    private IKalturaService kalturaService;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
     private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
     private static final String KEY_MODE = "mode";
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    protected String unspecified(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -93,11 +95,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up kalturaService
-	if (kalturaService == null) {
-	    kalturaService = KalturaServiceProxy.getKalturaService(this.getServlet().getServletContext());
-	}
 
 	// retrieving Kaltura with given toolContentID
 	Kaltura kaltura = kalturaService.getKalturaByContentId(toolContentID);
@@ -113,33 +110,32 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    kaltura.setDefineLater(true);
 	    kalturaService.saveOrUpdateKaltura(kaltura);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    kalturaService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
-	authForm.setTitle(kaltura.getTitle());
-	authForm.setInstructions(kaltura.getInstructions());
-	authForm.setLockOnFinished(kaltura.isLockOnFinished());
-	authForm.setAllowContributeVideos(kaltura.isAllowContributeVideos());
-	authForm.setAllowSeeingOtherUsersRecordings(kaltura.isAllowSeeingOtherUsersRecordings());
-	authForm.setLearnerContributionLimit(kaltura.getLearnerContributionLimit());
-	authForm.setAllowComments(kaltura.isAllowComments());
-	authForm.setAllowRatings(kaltura.isAllowRatings());
-	authForm.setReflectOnActivity(kaltura.isReflectOnActivity());
-	authForm.setReflectInstructions(kaltura.getReflectInstructions());
+	authoringForm.setTitle(kaltura.getTitle());
+	authoringForm.setInstructions(kaltura.getInstructions());
+	authoringForm.setLockOnFinished(kaltura.isLockOnFinished());
+	authoringForm.setAllowContributeVideos(kaltura.isAllowContributeVideos());
+	authoringForm.setAllowSeeingOtherUsersRecordings(kaltura.isAllowSeeingOtherUsersRecordings());
+	authoringForm.setLearnerContributionLimit(kaltura.getLearnerContributionLimit());
+	authoringForm.setAllowComments(kaltura.isAllowComments());
+	authoringForm.setAllowRatings(kaltura.isAllowRatings());
+	authoringForm.setReflectOnActivity(kaltura.isReflectOnActivity());
+	authoringForm.setReflectInstructions(kaltura.getReflectInstructions());
 
 	// Set up sessionMap
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(KalturaConstants.ATTR_SESSION_MAP, sessionMap);
-	authForm.setSessionMapID(sessionMap.getSessionID());
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
 
-	sessionMap.put(AuthoringAction.KEY_MODE, mode);
-	sessionMap.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	sessionMap.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
+	sessionMap.put(AuthoringController.KEY_MODE, mode);
+	sessionMap.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	sessionMap.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	Set<KalturaItem> items = kaltura.getKalturaItems();
 	// init taskList item list
@@ -147,31 +143,31 @@ public class AuthoringAction extends LamsDispatchAction {
 	taskListItemList.clear();
 	taskListItemList.addAll(items);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
+    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 
 	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> sessionMap = getSessionMap(request, authForm);
+	SessionMap<String, Object> sessionMap = getSessionMap(request, authoringForm);
 
 	// get kaltura content.
-	Long toolContentId = (Long) sessionMap.get(AuthoringAction.KEY_TOOL_CONTENT_ID);
+	Long toolContentId = (Long) sessionMap.get(AuthoringController.KEY_TOOL_CONTENT_ID);
 	Kaltura kaltura = kalturaService.getKalturaByContentId(toolContentId);
 
 	// update kaltura content using form inputs
-	kaltura.setTitle(authForm.getTitle());
-	kaltura.setInstructions(authForm.getInstructions());
-	kaltura.setLockOnFinished(authForm.isLockOnFinished());
-	kaltura.setAllowContributeVideos(authForm.isAllowContributeVideos());
-	kaltura.setLearnerContributionLimit(authForm.getLearnerContributionLimit());
-	kaltura.setAllowSeeingOtherUsersRecordings(authForm.isAllowSeeingOtherUsersRecordings());
-	kaltura.setAllowComments(authForm.isAllowComments());
-	kaltura.setAllowRatings(authForm.isAllowRatings());
-	kaltura.setReflectOnActivity(authForm.isReflectOnActivity());
-	kaltura.setReflectInstructions(authForm.getReflectInstructions());
+	kaltura.setTitle(authoringForm.getTitle());
+	kaltura.setInstructions(authoringForm.getInstructions());
+	kaltura.setLockOnFinished(authoringForm.isLockOnFinished());
+	kaltura.setAllowContributeVideos(authoringForm.isAllowContributeVideos());
+	kaltura.setLearnerContributionLimit(authoringForm.getLearnerContributionLimit());
+	kaltura.setAllowSeeingOtherUsersRecordings(authoringForm.isAllowSeeingOtherUsersRecordings());
+	kaltura.setAllowComments(authoringForm.isAllowComments());
+	kaltura.setAllowRatings(authoringForm.isAllowRatings());
+	kaltura.setReflectOnActivity(authoringForm.isReflectOnActivity());
+	kaltura.setReflectInstructions(authoringForm.getReflectInstructions());
 
 	// *******************************Handle user*******************
 	HttpSession ss = SessionManager.getSession();
@@ -214,18 +210,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(sessionMap.getSessionID());
+	authoringForm.setSessionMapID(sessionMap.getSessionID());
 
 	request.setAttribute(KalturaConstants.ATTR_SESSION_MAP, sessionMap);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /**
      * Stores uploaded entryId(s).
      */
-    public ActionForward addItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+
+    @RequestMapping("/addItem")
+    public String addItem(HttpServletRequest request) throws IOException {
 
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -265,14 +262,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	item.setCreateByAuthor(true);
 	item.setHidden(false);
 
-	return mapping.findForward(KalturaConstants.ITEM_LIST);
+	return "pages/authoring/itemlist";
     }
 
     /**
      * Preview uploaded entryId.
      */
-    public ActionForward preview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/preview")
+    public String preview(HttpServletRequest request) throws IOException {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
@@ -282,20 +279,20 @@ public class AuthoringAction extends LamsDispatchAction {
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(KalturaConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<KalturaItem> itemList = getItemList(sessionMap);
-	    List<KalturaItem> rList = new ArrayList<KalturaItem>(itemList);
+	    List<KalturaItem> rList = new ArrayList<>(itemList);
 	    KalturaItem item = rList.get(itemIdx);
 	    request.setAttribute(KalturaConstants.ATTR_ITEM, item);
 	}
 
-	return mapping.findForward(KalturaConstants.PREVIEW);
+	return "pages/authoring/preview";
     }
 
     /**
      * Remove kaltura item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
      */
-    public ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeItem")
+    public String removeItem(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
@@ -306,7 +303,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(KalturaConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<KalturaItem> itemList = getItemList(sessionMap);
-	    List<KalturaItem> rList = new ArrayList<KalturaItem>(itemList);
+	    List<KalturaItem> rList = new ArrayList<>(itemList);
 	    KalturaItem item = rList.remove(itemIdx);
 	    itemList.clear();
 	    itemList.addAll(rList);
@@ -315,26 +312,26 @@ public class AuthoringAction extends LamsDispatchAction {
 	    delList.add(item);
 	}
 
-	return mapping.findForward(KalturaConstants.ITEM_LIST);
+	return "pages/authoring/itemlist";
     }
 
     /**
      * Move up current item.
      */
-    public ActionForward upItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, true);
+    @RequestMapping("/upItem")
+    public String upItem(HttpServletRequest request) {
+	return switchItem(request, true);
     }
 
     /**
      * Move down current item.
      */
-    public ActionForward downItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchItem(mapping, request, false);
+    @RequestMapping("/downItem")
+    public String downItem(HttpServletRequest request) {
+	return switchItem(request, false);
     }
 
-    private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchItem(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -343,7 +340,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(KalturaConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<KalturaItem> kalturaList = getItemList(sessionMap);
-	    List<KalturaItem> rList = new ArrayList<KalturaItem>(kalturaList);
+	    List<KalturaItem> rList = new ArrayList<>(kalturaList);
 	    // get current and the target item, and switch their sequnece
 	    KalturaItem item = rList.get(itemIdx);
 	    KalturaItem repItem;
@@ -361,7 +358,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    kalturaList.addAll(rList);
 	}
 
-	return mapping.findForward(KalturaConstants.ITEM_LIST);
+	return "pages/authoring/itemlist";
     }
 
     /**
@@ -377,7 +374,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private SortedSet<KalturaItem> getItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<KalturaItem> list = (SortedSet<KalturaItem>) sessionMap.get(KalturaConstants.ATTR_ITEM_LIST);
 	if (list == null) {
-	    list = new TreeSet<KalturaItem>(new KalturaItemComparator());
+	    list = new TreeSet<>(new KalturaItemComparator());
 	    sessionMap.put(KalturaConstants.ATTR_ITEM_LIST, list);
 	}
 	return list;

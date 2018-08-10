@@ -1,49 +1,73 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="sessionMapID" value="${param.sessionMapID}" />
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="kaltura" value="${sessionMap.kaltura}" />
-
-<script type="text/javascript">
-	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = true;
-	}
-	function submitForm(methodName) {
-		var f = document.getElementById('messageForm');
-		f.submit();
-	}
-	$(document).ready(function() {
-		document.getElementById("focused").focus();
-	});
-</script>
+<lams:html>
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+	<c:set var="tool">
+		<lams:WebAppURL />
+	</c:set>
 	
-<html:form action="/learning.do?dispatch=submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-	<html:hidden property="userID" />
-	<html:hidden property="sessionMapID" />
-
-	<lams:Page type="learner" title="${kaltura.title}">
-
-		<%@ include file="/common/messages.jsp"%>
-
-		<div class="panel">
-			<lams:out value="${kaltura.reflectInstructions}" escapeHtml="true"/>
-		</div>
-
-		<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control" />
-
-		<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right" styleId="finishButton" onclick="submitForm('finish')">
-			<span class="na">
-				<c:choose>
-	 				<c:when test="${sessionMap.activityPosition.last}">
-	 					<fmt:message key="button.submit" />
-	 				</c:when>
-	 				<c:otherwise>
-	 	 				<fmt:message key="button.finish" />
-	 				</c:otherwise>
-	 			</c:choose>
-	 		</span>
-		</html:link>
+	<lams:head>  
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+		<lams:css/>
 		
-	</lams:Page>
-</html:form>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	</lams:head>
+	<body class="stripes">
+		<c:set var="sessionMapID" value="${param.sessionMapID}" />
+		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		<c:set var="kaltura" value="${sessionMap.kaltura}" />
+		
+		<script type="text/javascript">
+			function disableFinishButton() {
+				document.getElementById("finishButton").disabled = true;
+			}
+			function submitForm(methodName) {
+				var f = document.getElementById('messageForm');
+				f.submit();
+			}
+			$(document).ready(function() {
+				document.getElementById("focused").focus();
+			});
+		</script>
+			
+		<form:form action="submitReflection.do" modelAttribute="messageForm" method="post" onsubmit="disableFinishButton();" id="messageForm">
+			<form:hidden path="userID" />
+			<form:hidden path="sessionMapID" />
+		
+			<lams:Page type="learner" title="${kaltura.title}">
+		
+				<%@ include file="/common/messages.jsp"%>
+		
+				<div class="panel">
+					<lams:out value="${kaltura.reflectInstructions}" escapeHtml="true"/>
+				</div>
+		
+				<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control" />
+		
+				<a href="#nogo" cssClass="btn btn-primary voffset10 pull-right" id="finishButton" onclick="submitForm('finish')">
+					<span class="na">
+						<c:choose>
+			 				<c:when test="${sessionMap.activityPosition.last}">
+			 					<fmt:message key="button.submit" />
+			 				</c:when>
+			 				<c:otherwise>
+			 	 				<fmt:message key="button.finish" />
+			 				</c:otherwise>
+			 			</c:choose>
+			 		</span>
+				</a>
+				
+			</lams:Page>
+		</form:form>		
+	</body>
+</lams:html>
+
+
 	

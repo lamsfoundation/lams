@@ -12,7 +12,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -60,7 +60,7 @@
 		<c:forEach var="session" items="${sessionDTOs}">
 			<tr>
 				<td>
-					<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&TB_iframe=true" class="btn btn-default btn-sm thickbox" title="${session.sessionName}">
+					<a href="<c:url value="/monitoring/showGroupLearning.do"/>?toolSessionID=${session.sessionID}&TB_iframe=true" class="btn btn-default btn-sm thickbox" title="${session.sessionName}">
 						${session.sessionName}
 					</a>
 				</td>

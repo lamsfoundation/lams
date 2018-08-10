@@ -14,9 +14,9 @@
 				<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline"/>
 			</label>
 									
-			<html:link	href="javascript:setSubmissionDeadline();" styleClass="btn btn-sm btn-default loffset5">
+			<a	href="javascript:setSubmissionDeadline();" class="btn btn-sm btn-default loffset5">
 				<fmt:message key="monitor.summary.set.restriction" />
-			</html:link>
+			</a>
 		</div>
 	</div>
 

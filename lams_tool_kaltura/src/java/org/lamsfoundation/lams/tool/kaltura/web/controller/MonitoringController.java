@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.kaltura.web.actions;
+package org.lamsfoundation.lams.tool.kaltura.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -36,41 +35,40 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.tool.kaltura.dto.KalturaSessionDTO;
-import org.lamsfoundation.lams.tool.kaltura.dto.KalturaUserDTO;
 import org.lamsfoundation.lams.tool.kaltura.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
-import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
 import org.lamsfoundation.lams.tool.kaltura.service.IKalturaService;
-import org.lamsfoundation.lams.tool.kaltura.service.KalturaServiceProxy;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaSessionDTOComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Andrey Balan
  */
-public class MonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    public IKalturaService kalturaService;
+    @Autowired
+    @Qualifier("kalturaService")
+    private IKalturaService kalturaService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request) {
 
-	setupService();
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -81,7 +79,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
-	Set<KalturaSessionDTO> sessionDTOs = new TreeSet<KalturaSessionDTO>(new KalturaSessionDTOComparator());
+	Set<KalturaSessionDTO> sessionDTOs = new TreeSet<>(new KalturaSessionDTOComparator());
 	for (KalturaSession session : (Set<KalturaSession>) kaltura.getKalturaSessions()) {
 	    KalturaSessionDTO sessionDTO = new KalturaSessionDTO(session);
 	    sessionDTOs.add(sessionDTO);
@@ -102,36 +100,41 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(KalturaConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute(KalturaConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(KalturaConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	}
+	String dispatch = request.getParameter("dispatch");
+	if("markItem".equals(dispatch)) {
+	    return markItem(request);
 	}
 
-	return mapping.findForward("success");
+
+
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward showGroupLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/showGroupLearning")
+    public String showGroupLearning(HttpServletRequest request) {
 
 	String toolSessionID = WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(KalturaConstants.GROUP_LEARNING));
+	String redirectURL = "redirect:/learning.do";
 	//to distinguish from opening learning page from monitor's Learners tab pass this parameter
-	redirect.addParameter(KalturaConstants.ATTR_IS_GROUP_MONITORING, true);
-	redirect.addParameter(AttributeNames.PARAM_MODE, "teacher");
-	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
-	redirect.addParameter(AttributeNames.PARAM_USER_ID, user.getUserID());
-	return redirect;
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, KalturaConstants.ATTR_IS_GROUP_MONITORING, "true");
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_MODE, "teacher");
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_USER_ID,
+		user.getUserID().toString());
+	return redirectURL;
     }
 
     /**
      * Update item's mark. If it's not long then store 0.
      */
-    public ActionForward markItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/markItem")
+    @ResponseBody
+    public String markItem(HttpServletRequest request) {
 
 	String markStr = WebUtil.readStrParam(request, "content");
 	try {
@@ -141,33 +144,27 @@ public class MonitoringAction extends LamsDispatchAction {
 	} catch (NumberFormatException e) {
 	    log.debug(e.getMessage());
 	}
-
 	return null;
-
     }
 
-    public ActionForward setItemVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/setItemVisibility")
+    @ResponseBody
+    public void setItemVisibility(HttpServletRequest request) {
 
 	Long itemUid = WebUtil.readLongParam(request, KalturaConstants.PARAM_ITEM_UID);
 	boolean isHide = WebUtil.readBooleanParam(request, KalturaConstants.PARAM_IS_HIDING);
 	kalturaService.hideItem(itemUid, isHide);
 
-	return null;
     }
 
-    public ActionForward setCommentVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
+    @RequestMapping("/setCommentVisibility")
+    @ResponseBody
+    public void setCommentVisibility(HttpServletRequest request) {
 
 	Long commentUid = WebUtil.readLongParam(request, KalturaConstants.PARAM_COMMENT_UID);
 	boolean isHide = WebUtil.readBooleanParam(request, KalturaConstants.PARAM_IS_HIDING);
 	kalturaService.hideComment(commentUid, isHide);
 
-	return null;
     }
 
     /**
@@ -178,12 +175,11 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	setupService();
+    @RequestMapping("/setSubmissionDeadline")
+    @ResponseBody
+    public void setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
@@ -206,15 +202,5 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(formattedDate);
-	return null;
-    }
-
-    /**
-     * set up kalturaService
-     */
-    private void setupService() {
-	if (kalturaService == null) {
-	    kalturaService = KalturaServiceProxy.getKalturaService(this.getServlet().getServletContext());
-	}
     }
 }

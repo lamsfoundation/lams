@@ -22,12 +22,21 @@
  */
 
 
-package org.lamsfoundation.lams.tool.kaltura.web.actions;
+package org.lamsfoundation.lams.tool.kaltura.web.controller;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
+import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishController;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
@@ -37,7 +46,16 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  *
  *
  */
-public class ClearSessionAction extends LamsAuthoringFinishAction {
+@Controller
+public class ClearSessionController extends LamsAuthoringFinishController {
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping("/clearsession")
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	super.execute(request, response, applicationContext);
+    }
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
