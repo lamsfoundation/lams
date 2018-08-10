@@ -44,7 +44,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
@@ -866,7 +865,6 @@ public class AuthoringController {
 				commonCartridgeService.uploadCommonCartridgeFile(commonCartridgeItem, file);
 			    } catch (Exception e) {
 				AuthoringController.log.error(e);
-				ActionMessage error = new ActionMessage("error.msg.io.exception");
 				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
 				request.setAttribute("erroeMap", errorMap);
 				pedagogicalPlannerForm.setValid(false);

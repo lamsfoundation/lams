@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
@@ -27,5 +26,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-1.7.7.jbossorg-1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/noStruts"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

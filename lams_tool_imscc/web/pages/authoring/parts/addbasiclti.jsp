@@ -80,7 +80,7 @@
 				    <label for="customStr">
 				    	<fmt:message key="label.authoring.basic.bascilti.custom.parameters" />
 				    </label>
-				    <lams:STRUTS-textarea rows="5" property="customStr" styleClass="form-control" styleId="customStr" tabindex="1"/>
+				    <textarea rows="5" name="customStr" class="form-control" id="customStr" tabindex="1"></textarea>
 				</div>						
 			</c:if>
 
