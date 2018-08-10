@@ -80,12 +80,11 @@
 			  	    		rowid=0; 
 			  	    } 
 			   		var userUid = jQuery("#group${sessionDto.sessionId}").getCell(rowid, 'userUid');
-					var userMasterDetailUrl = '<c:url value="/monitoring.do"/>';
+					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
 		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
 		  	        		userMasterDetailUrl,
 		  	        		{
-		  	        			dispatch: "userMasterDetail",
 		  	        			userUid: userUid
 		  	       		}
 		  	       	);

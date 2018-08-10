@@ -37,7 +37,7 @@
   	<script type="text/javascript">
   		function createTopic(){
   			prepareFormData();
-  			$('#pedagogicalPlannerForm').ajaxSubmit({
+  			$('#plannerForm').ajaxSubmit({
   				url: "<c:url value='/authoring/createPedagogicalPlannerTopic.do' />",
   				success: function(responseText){
  	  				var bodyTag = '<body';
@@ -72,29 +72,29 @@
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
 	
-	<html:form action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" id="plannerForm" modelAttribute="plannerForm" method="post">
+	
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" id="valid" />
+		<form:hidden path="callID" id="callID" />
+		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />
 		
 		<h4 class="space-left"><fmt:message key="label.instructions"/></h4>
 		<lams:CKEditor id="instructions"
-			value="${formBean.instructions}"
-			contentFolderID="${formBean.contentFolderID}"
+			value="${plannerForm.instructions}"
+			contentFolderID="${plannerForm.contentFolderID}"
                toolbarSet="CustomPedplanner" height="150px"
                width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 		
 		<h4 class="space-left small-space-top"><fmt:message key="lable.topic.title.subject"/></h4>
 		<table id="topicTable" cellpadding="0" cellspacing="0">
-			<c:forEach var="topicIndex" begin="1" end="${formBean.topicCount}">
+			<c:forEach var="topicIndex" begin="1" end="${plannerForm.topicCount}">
 				<tr>
 					<td class="FCKcell">
 						<lams:CKEditor id="topic[${topicIndex-1}]"
-							value="${formBean.topicList[topicIndex-1]}"
-							contentFolderID="${formBean.contentFolderID}"
+							value="${plannerForm.topicList[topicIndex-1]}"
+							contentFolderID="${plannerForm.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
 			                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 						</lams:CKEditor>
@@ -107,7 +107,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-	</html:form>
+	</form:form>
 	<a class="button" href="javascript:createTopic();"><fmt:message key="label.authoring.create.new.topic" /></a>
 </body>
 </lams:html>

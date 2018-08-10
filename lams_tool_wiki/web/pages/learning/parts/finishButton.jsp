@@ -8,16 +8,15 @@
     }
 
     function continueOrFinish(dispatch) {
-      document.getElementById("learningButtonForm").action += "?dispatch=" + dispatch;
+      document.getElementById("learningButtonForm").action;
       document.getElementById("learningButtonForm").submit();
     }
   </script>
 
   <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-    <html:form action="/learning" method="get" styleId="reflectEditForm">
-      <html:hidden property="dispatch" value="openNotebook" />
-      <html:hidden property="mode" value="${mode}" />	
-      <html:hidden property="toolSessionID" styleId="toolSessionID"/>
+    <form:form action="openNotebook.do" method="get" id="reflectEditForm">
+      <form:hidden path="mode" value="${mode}" />	
+      <form:hidden path="toolSessionID" id="toolSessionID"/>
       <div class="panel panel-default voffset10">
         <div class="panel-heading">
           <h4 class="panel-title">
@@ -35,14 +34,12 @@
             </c:otherwise>
           </c:choose>
           <hr class="mgs-hr"/>
-          <html:submit styleClass="btn btn-primary">
-            <fmt:message key="button.edit" />
-          </html:submit>	
+          <input type="submit" class="btn btn-primary" value="<fmt:message key="button.edit" />"/>
         </div>
 
       </div>
 
-    </html:form>
+    </form:form>
   </c:if>
 
   <html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningButtonForm">

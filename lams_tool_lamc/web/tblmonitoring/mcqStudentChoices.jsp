@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script>
 	function exportExcel(){
-		location.href = "<lams:LAMSURL/>tool/lamc11/monitoring.do?dispatch=downloadMarks&downloadTokenValue=jjj&toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+		location.href = "<lams:LAMSURL/>tool/lamc11/monitoring/downloadMarks.do?downloadTokenValue=jjj&toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
 	};
 </script>
 

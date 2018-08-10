@@ -53,7 +53,7 @@
 </lams:head>
 
 <body class="stripes">
-	<form:form action="viewAnswers.do" method="POST" target="_self" onsubmit="disableFinishButton();" modelAttribute="mcLearningForm" id="mcLearningForm">
+	<form:form action="displayMc.do" method="POST" target="_self" onsubmit="disableFinishButton();" modelAttribute="mcLearningForm" id="mcLearningForm">
 
 	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}" formID="mcLearningForm">
 		<c:if test="${isLeadershipEnabled}">
@@ -295,24 +295,22 @@
 
 		<!--  now really start the form -->
 		<div class="form-group">
-				<form:hidden property="toolContentID" />
-				<form:hidden property="toolSessionID" />
-				<form:hidden property="httpSessionID" />
-				<form:hidden property="userID" />
-				<form:hidden property="userOverPassMark" />
-				<form:hidden property="passMarkApplicable" />
+				<form:hidden path="toolContentID" />
+				<form:hidden path="toolSessionID" />
+				<form:hidden path="httpSessionID" />
+				<form:hidden path="userID" />
+				<form:hidden path="userOverPassMark" />
+				<form:hidden path="passMarkApplicable" />
 
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
-					<input type="submit" name="redoQuestions" class="btn btn-primary pull-left">
-						<fmt:message key="label.redo.questions" />
-					</input>
+					<input type="submit" name="redoQuestions" class="btn btn-primary pull-left" value="<fmt:message key="label.redo.questions" />"/>
 				</c:if>
 				
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
 						|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
 					<div class="voffset5">
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-							<form:hidden property="learnerFinished" value="Finished" />
+							<form:hidden path="learnerFinished" value="Finished" />
 
 							<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton"
 									onclick="submitForm('finish'); return false;">
@@ -328,9 +326,7 @@
 						</c:if>
 
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<input type="submit" name="forwardtoReflection" class="btn btn-primary pull-right">
-								<fmt:message key="label.continue" />
-							</input>
+							<input type="submit" name="forwardtoReflection" class="btn btn-primary pull-right" value="<fmt:message key="label.continue" />"/>
 						</c:if>
 					</div>
 				</c:if>

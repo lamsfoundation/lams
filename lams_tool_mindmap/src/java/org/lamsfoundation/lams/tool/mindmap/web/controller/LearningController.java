@@ -69,7 +69,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -269,7 +268,7 @@ public class LearningController {
     /**
      * Gets the Notify Requests (Actions) from Flash and returns proper Notify Responses
      */
-    @RequestMapping(path = "/notifyServerActionJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/notifyServerActionJSON")
     @ResponseBody
     public String notifyServerActionJSON(HttpServletRequest request, HttpServletResponse response)
 	    throws JsonProcessingException, IOException {
@@ -396,7 +395,7 @@ public class LearningController {
 		notifyResponse = new NotifyResponseJSON(1, mindmapRequest.getGlobalId(), null);
 	    }
 	}
-
+	response.setContentType("application/json;charset=UTF-8");
 	return notifyResponse.toString();
     }
 
@@ -421,7 +420,7 @@ public class LearningController {
     /**
      * Returns the serialized JSON of the Mindmap Nodes from Database
      */
-    @RequestMapping(path = "/setMindmapContentJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/setMindmapContentJSON")
     @ResponseBody
     public String setMindmapContentJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -478,13 +477,13 @@ public class LearningController {
 		Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid(), toolSessionId);
 		jsonObject.put("lastActionId", lastActionId);
 	    }
-
+	    response.setContentType("application/json;charset=UTF-8");
 	    return jsonObject.toString();
 	}
 	return null;
     }
 
-    @RequestMapping(path = "/saveLastMindmapChanges", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/saveLastMindmapChanges")
     @ResponseBody
     public String saveLastMindmapChanges(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -505,7 +504,7 @@ public class LearningController {
 	} else {
 	    responseJSON = new NotifyResponseJSON(0, null, 0L);
 	}
-
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 

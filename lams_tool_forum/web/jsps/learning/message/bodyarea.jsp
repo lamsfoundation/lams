@@ -5,14 +5,14 @@
 
 	<c:choose>
 		<c:when test="${sessionMap.allowRichEditor}">
-			<lams:CKEditor id="message.body" value="${formBean.message.body}" 
+			<lams:CKEditor id="message.body" value="${messageForm.message.body}" 
 					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 			</lams:CKEditor>
 		</c:when>
 		
 		<c:otherwise>
 			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
-			<lams:STRUTS-textarea rows="10" styleClass="form-control" tabindex="2" property="message.body"/> 
+			<textarea rows="10" class="form-control" tabindex="2" name="message.body" id="messageBody">${messageForm.message.body}</textarea> 
 		</c:otherwise>
 	</c:choose>
  
@@ -20,6 +20,7 @@
 	<div class="row voffset10">
 
 	<div class="col-xs-12 col-sm-6">
+	
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 	<c:if test="${sessionMap.maxCharacters > 0}">
 
@@ -39,7 +40,7 @@
 			var counter = function(evt) {
 				
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea[id="message.body__lamstextarea"]').val();
+						: $('textarea#messageBody').val();
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
 				//limit is not exceeded
@@ -73,8 +74,7 @@
 					this.value = this.value.substring(0, limit);
 					//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
 					//manually handle onchange event. It is a kind of crack coding!
-					filterData(document.getElementById('message.body__lamstextarea'),
-							document.getElementById('message.body__lamshidden'));
+					filterData(document.getElementById('messageBody'));
 						
 				}
 			};
@@ -92,7 +92,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				$('textarea#messageBody').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
@@ -113,7 +113,7 @@
 			//character count fuction
 			var counter = function() {
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea[id="message.body__lamstextarea"]').val();
+						: $('textarea#messageBody').val();
 			    
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
@@ -134,7 +134,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				$('textarea#messageBody').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
@@ -147,8 +147,8 @@
 	<div class="col-xs-12 col-sm-6 text-right ">
 	<c:if test="${sessionMap.allowAnonym}">
 		<div class="checkbox form-control-inline">
-		<label for="isAnonymous"><html:checkbox
-				property="message.isAnonymous" styleId="isAnonymous" /> <fmt:message
+		<label for="isAnonymous"><form:checkbox
+				path="message.isAnonymous" id="isAnonymous" /> <fmt:message
 				key="label.post.anonomously" /></label>
 		</div>&nbsp;<a tabindex="0" role="button" data-toggle="popover"><i class="fa fa-info-circle"></i></a>
 	
@@ -167,5 +167,4 @@
 	</div> <!-- end row -->
 	</c:if>
 	
-	<html:errors property="message.body" />
-
+	<form:errors path="message.body" />

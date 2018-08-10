@@ -3,17 +3,17 @@
 
 <script type="text/javascript">
 	function removeQuestion(questionIndex) {
-		document.forms.McAuthoringForm.questionIndex.value=questionIndex;
-		document.forms.McAuthoringForm.dispatch.value='removeQuestion'; 
+		document.forms.mcAuthoringForm.questionIndex.value=questionIndex;
+		document.forms.mcAuthoringForm.action='removeQuestion.do'; 
 		
-		$('#authoringForm').ajaxSubmit({ 
+		$('#mcAuthoringForm').ajaxSubmit({ 
     		target:  $('#resourceListArea'),
     		data: { 
 				sessionMapId: '${sessionMapId}'
 			},
     		iframe: true,
     		success:    function() { 
-    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
+    			document.forms.mcAuthoringForm.action="submitAllContent.do";
     			refreshThickbox();
     	    }
 	    });
@@ -24,7 +24,7 @@
 	};
         
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc',
+    	window.open('<lams:LAMSURL />questions/questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=240,scrollbars=yes');
     }
 	
@@ -35,7 +35,7 @@
     		target:  $('#resourceListArea'),
     		iframe: true,
     		success:    function() { 
-    			document.forms.McAuthoringForm.dispatch.value="submitAllContent";
+    			document.forms.mcAuthoringForm.action="submitAllContent.do";
     			refreshThickbox();
     	    	form.remove();
     	    }
@@ -45,7 +45,7 @@
     function exportQTI() {
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("title")[0].value);
-    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}" />'
+    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}'
     			+ '&title=' + title;
     }
 </script>

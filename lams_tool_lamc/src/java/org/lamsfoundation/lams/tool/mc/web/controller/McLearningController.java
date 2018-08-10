@@ -96,8 +96,46 @@ public class McLearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/learner")
-    public String execute(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    @RequestMapping("/displayMc")
+    public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	mcLearningForm.setToolSessionID(toolSessionID);
+
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
+
+	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
+	mcLearningForm.setToolContentID(toolContentId);
+
+	LearningUtil.saveFormRequestData(request, mcLearningForm);
+
+	if (mcLearningForm.getNextQuestionSelected() != null && !mcLearningForm.getNextQuestionSelected().equals("")) {
+	    mcLearningForm.resetParameters();
+	    return getNextOptions(mcLearningForm, request, response);
+	}
+	if (mcLearningForm.getContinueOptionsCombined() != null) {
+	    return continueOptionsCombined(mcLearningForm, request, response);
+	} else if (mcLearningForm.getNextOptions() != null) {
+	    return getNextOptions(mcLearningForm, request, response);
+	} else if (mcLearningForm.getRedoQuestions() != null) {
+	    return redoQuestions(mcLearningForm, request, response);
+	} else if (mcLearningForm.getViewAnswers() != null) {
+	    return viewAnswers(mcLearningForm, request, response);
+	} else if (mcLearningForm.getSubmitReflection() != null) {
+	    return submitReflection(mcLearningForm, request, response);
+	} else if (mcLearningForm.getForwardtoReflection() != null) {
+	    return forwardtoReflection(mcLearningForm, request, response);
+	} else if (mcLearningForm.getLearnerFinished() != null) {
+	    return endLearning(mcLearningForm, request, response);
+	}
+
+	return "learning/AnswersContent";
+    }
+
+    @RequestMapping("/learning")
+    public String execute(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	mcLearningForm.setMcService(mcService);
 	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
@@ -110,15 +148,16 @@ public class McLearningController {
 	mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
+	mcLearningForm.setToolSessionID(toolSessionID);
+
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 
 	/*
 	 * by now, we made sure that the passed tool session id exists in the db as a new record Make sure we can
 	 * retrieve it and the relavent content
 	 */
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	if (mcSession == null) {
-	    return "McErrorBox";
+	    return "error";
 	}
 
 	/*
@@ -130,10 +169,12 @@ public class McLearningController {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("error.content.doesNotExist"));
 	    request.setAttribute("errorMap", errorMap);
-	    return "McErrorBox";
+	    return "error";
 	}
 
 	String mode = request.getParameter(McAppConstants.MODE);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+
 	McQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    // monitoring mode - user is specified in URL
@@ -249,61 +290,10 @@ public class McLearningController {
     }
 
     /**
-     * main content/question content management and workflow logic
-     *
-     * if the passed toolContentId exists in the db, we need to get the relevant data into the Map if not, create the
-     * default Map
-     */
-    public String unspecified(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
-	LearningUtil.saveFormRequestData(request, mcLearningForm);
-	return null;
-    }
-
-    /**
-     * responds to learner activity in learner mode.
-     */
-    @RequestMapping("/displayMc")
-    public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	mcLearningForm.setToolSessionID(toolSessionID);
-
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
-
-	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	mcLearningForm.setToolContentID(toolContentId);
-
-	LearningUtil.saveFormRequestData(request, mcLearningForm);
-
-	if (mcLearningForm.getNextQuestionSelected() != null && !mcLearningForm.getNextQuestionSelected().equals("")) {
-	    mcLearningForm.resetParameters();
-	    return getNextOptions(mcLearningForm, request);
-	}
-	if (mcLearningForm.getContinueOptionsCombined() != null) {
-	    return continueOptionsCombined(mcLearningForm, request);
-	} else if (mcLearningForm.getNextOptions() != null) {
-	    return getNextOptions(mcLearningForm, request);
-	} else if (mcLearningForm.getRedoQuestions() != null) {
-	    return redoQuestions(mcLearningForm, request);
-	} else if (mcLearningForm.getViewAnswers() != null) {
-	    return viewAnswers(mcLearningForm, request);
-	} else if (mcLearningForm.getSubmitReflection() != null) {
-	    return submitReflection(mcLearningForm, request, response);
-	} else if (mcLearningForm.getForwardtoReflection() != null) {
-	    return forwardtoReflection(mcLearningForm, request);
-	} else if (mcLearningForm.getLearnerFinished() != null) {
-	    return endLearning(mcLearningForm, request, response);
-	}
-
-	return "learning/AnswersContent";
-    }
-
-    /**
      * ActionForward endLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
      * response)
      */
-    @ModelAttribute("/endLearning")
+    @RequestMapping("/endLearning")
     public String endLearning(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -326,13 +316,13 @@ public class McLearningController {
 	    nextUrl = mcService.leaveToolSession(new Long(toolSessionID), userDto.getUserID().longValue());
 	} catch (DataMissingException e) {
 	    McLearningController.logger.error("failure getting nextUrl: " + e);
-	    return "learningIndex";
+	    return "learning/AnswersContent";
 	} catch (ToolException e) {
 	    McLearningController.logger.error("failure getting nextUrl: " + e);
-	    return "learningIndex";
+	    return "learning/AnswersContent";
 	} catch (Exception e) {
 	    McLearningController.logger.error("unknown exception getting nextUrl: " + e);
-	    return "learningIndex";
+	    return "learning/AnswersContent";
 	}
 
 	response.sendRedirect(nextUrl);
@@ -394,7 +384,8 @@ public class McLearningController {
      * responses to learner when they answer all the questions on a single page
      */
     @RequestMapping("/continueOptionsCombined")
-    public String continueOptionsCombined(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String continueOptionsCombined(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
@@ -417,7 +408,7 @@ public class McLearningController {
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
-	    return viewAnswers(mcLearningForm, request);
+	    return viewAnswers(mcLearningForm, request, response);
 	}
 
 	/* process the answers */
@@ -436,14 +427,15 @@ public class McLearningController {
 	user.setResponseFinalised(true);
 	mcService.updateMcQueUsr(user);
 
-	return viewAnswers(mcLearningForm, request);
+	return viewAnswers(mcLearningForm, request, response);
     }
 
     /**
      * takes the learner to the next set of questions
      */
     @RequestMapping("/getNextOptions")
-    public String getNextOptions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String getNextOptions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -458,7 +450,7 @@ public class McLearningController {
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
-	    return viewAnswers(mcLearningForm, request);
+	    return viewAnswers(mcLearningForm, request, response);
 	}
 
 	//parse learner input
@@ -500,7 +492,8 @@ public class McLearningController {
      * allows the learner to view their answer history
      */
     @RequestMapping("/viewAnswers")
-    public String viewAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String viewAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -638,7 +631,8 @@ public class McLearningController {
     }
 
     @RequestMapping("/redoQuestions")
-    public String redoQuestions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String redoQuestions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -702,9 +696,8 @@ public class McLearningController {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	response.setContentType("application/json;charset=UTF-8");
+	return ObjectNode.toString();
     }
 
     @RequestMapping("/submitReflection")
@@ -733,7 +726,8 @@ public class McLearningController {
     }
 
     @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String forwardtoReflection(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -766,7 +760,8 @@ public class McLearningController {
      * auto saves responses
      */
     @RequestMapping("/autoSaveAnswers")
-    public String autoSaveAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String autoSaveAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -829,12 +824,17 @@ public class McLearningController {
     }
 
     private McQueUsr getCurrentUser(String toolSessionId) {
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionId));
 
 	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());
+
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionId));
+	McQueUsr qaUser = mcService.getMcUserBySession(userId, mcSession.getUid());
+	if (qaUser == null) {
+	    qaUser = mcService.createMcUser(new Long(toolSessionId));
+	}
 
 	return mcService.getMcUserBySession(userId, mcSession.getUid());
     }

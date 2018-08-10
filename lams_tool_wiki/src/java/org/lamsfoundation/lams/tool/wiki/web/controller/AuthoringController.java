@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.wiki.web.actions;
+package org.lamsfoundation.lams.tool.wiki.web.controller;
 
 import java.util.Date;
 import java.util.SortedSet;
@@ -31,11 +30,7 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
@@ -45,12 +40,17 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
-import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * This action handles all the authoring actions, which include opening author, saving, uploading instruction files and
@@ -61,11 +61,15 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *
  * @author lfoxton
  */
-public class AuthoringAction extends WikiPageAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController extends WikiPageController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public IWikiService wikiService;
+    @Autowired
+    @Qualifier("wikiService")
+    private IWikiService wikiService;
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -79,10 +83,11 @@ public class AuthoringAction extends WikiPageAction {
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      *
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/authoring")
+    public String unspecified(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request)
+	    throws Exception {
 
+	AuthoringForm authoringForm = new AuthoringForm();
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -91,14 +96,8 @@ public class AuthoringAction extends WikiPageAction {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
 
-	Long currentPageUid = authForm.getCurrentWikiPageId();
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
+	Long currentPageUid = authoringForm.getCurrentWikiPageId();
 
 	// retrieving Wiki with given toolContentID
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
@@ -115,13 +114,13 @@ public class AuthoringAction extends WikiPageAction {
 	    // are editing. This flag is released when updateContent is called.
 	    wiki.setDefineLater(true);
 	    wikiService.saveOrUpdateWiki(wiki);
-	    
+
 	    //audit log the teacher has started editing activity in monitor
 	    wikiService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// update the form
-	updateAuthForm(authForm, wiki);
+	updateAuthForm(authoringForm, wiki);
 
 	// Set the required main wiki page
 	WikiPageDTO mainPageDTO = new WikiPageDTO(wiki.getMainPage());
@@ -139,17 +138,17 @@ public class AuthoringAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, currentPageDTO);
 
 	// Reset the isEditable field for the form
-	authForm.setIsEditable(currentPageDTO.getEditable());
+	authoringForm.setIsEditable(currentPageDTO.getEditable());
 
 	// Set the current wiki history
-	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<WikiPageContentDTO>();
+	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<>();
 	for (WikiPageContent wikiPageContentHistoryItem : currentWikiPage.getWikiContentVersions()) {
 	    currentWikiPageHistoryDTOs.add(new WikiPageContentDTO(wikiPageContentHistoryItem));
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
 
 	// Get the child wiki pages
-	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
+	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<>();
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
 	    // check if page exists in real, not only phantom proxied object
 	    // (happens after removing a wiki page)
@@ -162,48 +161,44 @@ public class AuthoringAction extends WikiPageAction {
 
 	// Set up sessionMap
 	SessionMap<String, Object> map = createSessionMap(wiki, mode, contentFolderID, toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
+	request.setAttribute("authoringForm", authoringForm);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     @Override
-    public ActionForward removePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String removePage(HttpServletRequest request) throws Exception {
+
+	WikiPageForm wikiForm = new WikiPageForm();
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
 	if (wiki.isDefineLater()) {
 	    // Only mark as removed if editing a live version (monitor/live edit)
-	    return super.removePage(mapping, form, request, response);
+	    return super.removePage(request);
 	}
 	// Completely delete the page
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
 	wikiService.deleteWikiPage(wikiPage);
 
 	// return to the main page, by setting the current page to null
-	return this.returnToWiki(mapping, form, request, response, null);
+	return this.returnToWiki(wikiForm, request, null);
     }
 
     /**
      * Wrapper method to make sure that the correct wiki is returned to from the WikiPageAction class
      */
     @Override
-    protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
-	AuthoringForm authForm = (AuthoringForm) form;
-	authForm.setCurrentWikiPageId(currentWikiPageId);
-	return unspecified(mapping, authForm, request, response);
+    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+	    throws Exception {
+	wikiForm.setCurrentWikiPageId(currentWikiPageId);
+	return unspecified((AuthoringForm) wikiForm, request);
     }
 
     /**
@@ -219,26 +214,19 @@ public class AuthoringAction extends WikiPageAction {
      * Saves the Wiki content including uploaded files and advance options
      *
      * The WikiPage content is not saved here as that is done in the WikiPageAction
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// TODO need error checking.
 
-	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	// get wiki content.
-	Wiki wiki = wikiService.getWikiByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
+	Wiki wiki = wikiService.getWikiByContentId((Long) map.get(AuthoringController.KEY_TOOL_CONTENT_ID));
 
 	// update wiki content using form inputs
-	updateWiki(wiki, authForm);
+	updateWiki(wiki, authoringForm);
 
 	// set the update date
 	wiki.setUpdateDate(new Date());
@@ -251,19 +239,15 @@ public class AuthoringAction extends WikiPageAction {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /**
      * Updates Wiki content using AuthoringForm inputs.
-     *
-     * @param authForm
-     * @param mode
-     * @return
      */
     private void updateWiki(Wiki wiki, AuthoringForm authForm) {
 	// wiki.setTitle(authForm.getTitle());
@@ -288,10 +272,6 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Updates AuthoringForm using Wiki content.
-     *
-     * @param wiki
-     * @param authForm
-     * @return
      */
     private void updateAuthForm(AuthoringForm authForm, Wiki wiki) {
 	authForm.setLockOnFinished(wiki.isLockOnFinished());
@@ -308,30 +288,24 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Updates SessionMap using Wiki content.
-     *
-     * @param wiki
-     * @param mode
      */
     private SessionMap<String, Object> createSessionMap(Wiki wiki, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> map = new SessionMap<>();
 
-	map.put(AuthoringAction.KEY_MODE, mode);
-	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
+	map.put(AuthoringController.KEY_MODE, mode);
+	map.put(AuthoringController.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	map.put(AuthoringController.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
     }
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     *
-     * @param request
-     * @param authForm
-     * @return
      */
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authForm) {
 	return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
     }
+
 }

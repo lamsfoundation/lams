@@ -12,7 +12,7 @@
 			<tr id="row${status.index}">
 				<td>
 					<c:set var="viewtopic">
-						<html:rewrite page="/authoring/viewTopic.do?sessionMapID=${sessionMapID}&topicIndex=${status.index}&create=${topic.message.updated.time}" />
+						<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicIndex=${status.index}&create=${topic.message.updated.time}
 					</c:set> 
 						
 					<c:out value="${topic.message.subject}" />

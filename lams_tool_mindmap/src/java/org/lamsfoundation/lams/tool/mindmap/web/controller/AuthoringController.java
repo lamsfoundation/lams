@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -147,7 +146,7 @@ public class AuthoringController {
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
      */
-    @RequestMapping(path = "/setMindmapContentJSON", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/setMindmapContentJSON")
     @ResponseBody
     public String setMindmapContentJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -166,7 +165,7 @@ public class AuthoringController {
 
 	    ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 	    jsonObject.set("mindmap", new RootJSON(currentNodeModel, false));
-
+	    response.setContentType("application/json;charset=UTF-8");
 	    return jsonObject.toString();
 	}
 

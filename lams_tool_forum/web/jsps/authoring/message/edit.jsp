@@ -15,30 +15,29 @@
 	
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/updateTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId" onsubmit="return validate();">
+		<form:form action="updateTopic.do" focus="message.subject" enctype="multipart/form-data" id="topicFormId" modelAttribute="topicFormId" onsubmit="return validate();">
+			
 			<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
-			<html:hidden property="sessionMapID" />
-			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+			<form:hidden path="sessionMapID" />
+			<c:set var="sessionMap" value="${sessionScope[forumForm.sessionMapID]}" />
 
 			<div class="form-group">
 		    <label for="message.subject"><fmt:message key="message.label.subject" /> *</label>
-		    <html:text size="30" tabindex="1" property="message.subject" maxlength="60" styleClass="form-control"/>
-			<html:errors property="message.subject" />
+			<form:input type="text" size="30" tabindex="1" path="message.subject" value="${message.subject}" maxlength="60" cssClass="form-control"/>
+		    <form:errors path="message.subject" />
 			</div>
 			
 			<div class="form-group">
 		    <label for="forum.instructions"><fmt:message key="message.label.body" /> *</label>
 			<c:set var="body" value=""/>
-			<c:if test="${not empty formBean.message}">
-				<c:set var="body" value="${formBean.message.body}"/>
+			<c:if test="${not empty topicFormId.message}">
+				<c:set var="body" value="${topicFormId.message.body}"/>
 			</c:if>
 			<lams:CKEditor id="message.body" value="${body}" contentFolderID="${sessionMap.contentFolderID}" />
-			<html:errors property="message.body" />
+			<form:errors path="message.body" />
 			</div>
 
-			<c:set var="itemAttachment"
-				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="itemAttachment" value="${topicFormId}" />
 			<div class="form-group">
 				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
 				<div id="itemAttachmentArea" class="small-space-bottom">
@@ -51,7 +50,7 @@
 				<a href="#" onclick="submitMessage()" class="btn btn-default btn-xs loffset5"> <fmt:message key="button.add" /> </a>
 			</div>
 
-		</html:form>
+		</form:form>
 
 		</div>
 		</div>

@@ -1,6 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
-<html:errors />
 
+<c:set var="errorKey" value="GLOBAL" />
+<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+	 <lams:Alert id="error" type="danger" close="false">
+		 <c:forEach var="error" items="${errorMap[errorKey]}">
+			  <c:out value="${error}" />
+		 </c:forEach>
+	 </lams:Alert>
+</c:if>
+		
 <c:if test="${!isPageEditable}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.monitoring.edit.activity.not.editable" />
@@ -29,13 +37,13 @@
 </table>
 
 <c:if test='${isPageEditable}'>
-	<c:url value="/defineLater.do" var="authoringUrl">
+	<c:url value="/authoring/defineLater.do" var="authoringUrl">
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 		<c:param name="toolContentID" value="${toolContentID}" />
 		<c:param name="mode" value="teacher" />
 	</c:url>
-	<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+	<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 		<fmt:message key="label.monitoring.edit.activity.edit" />
-	</html:link>
+	</a>
 </c:if>
 

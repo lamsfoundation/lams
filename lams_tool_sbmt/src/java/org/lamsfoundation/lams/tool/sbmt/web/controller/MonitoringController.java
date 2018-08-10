@@ -161,7 +161,7 @@ public class MonitoringController {
     }
 
     /** Ajax call to populate the tablesorter */
-    @RequestMapping(path = "/getUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getUsers")
     @ResponseBody
     public String getUsers(HttpServletRequest request, HttpServletResponse response) {
 
@@ -231,6 +231,7 @@ public class MonitoringController {
 	}
 
 	responsedata.set("rows", rows);
+	response.setContentType("application/json;charset=UTF-8");
 
 	return responsedata.toString();
 
@@ -393,7 +394,7 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 

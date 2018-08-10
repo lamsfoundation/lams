@@ -20,20 +20,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 
 /**
  *
  */
-public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     String title;
     String wikiBody;
     String contentFolderID;

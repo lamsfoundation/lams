@@ -143,6 +143,14 @@
 			 
 			});
 	  	})
+	  	
+	  	function downloadMarks(sessionId){
+		var url = "<c:url value="/monitoring/downloadMarks.do"/>";
+	    var reqIDVar = new Date();
+		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		url = url + param;
+		location.href = url;
+	}
 
 </script>
 
@@ -208,27 +216,26 @@
 
 		<P style="display: inline"> 
 			<c:set var="viewforum">
-				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true" />
+				<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true
 			</c:set>
-			<html:link href="javascript:launchPopup('${viewforum}');" styleClass="btn btn-default loffset5 voffset10">
+			<a href="javascript:launchPopup('${viewforum}');" class="btn btn-default loffset5 voffset10">
 				<fmt:message key="label.monitoring.summary.view.forum"/>
-			</html:link>
-			<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" styleClass="btn btn-default loffset5 voffset10" >
+			</a>
+			<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" class="btn btn-default loffset5 voffset10" >
 				<fmt:message key="button.release.mark" />
-			</html:button>
-			<html:form action="/monitoring/downloadMarks"  style="display:inline">
-				<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
-				<html:submit property="downloadMarks" styleClass="btn btn-default loffset5 voffset10" >
-					<fmt:message key="message.download.marks" />
-				</html:submit>
-			</html:form>
-			<c:url value="/monitoring.do" var="refreshMonitoring">
+			</button>
+			<c:set value="${sessionDto.sessionID}" var="toolSessionID"/>
+			<a href="javascript:downloadMarks(${toolSessionID});"
+				name="downloadMarks" class="btn btn-default voffset10 loffset5">
+				<fmt:message key="message.download.marks" />
+			</a>
+			<c:url value="/monitoring/monitoring.do" var="refreshMonitoring">
 				<c:param name="contentFolderID" value="${contentFolderID}"/>
 				<c:param name="toolContentID" value="${toolContentID}" />
 			</c:url>
-			<html:link href="${refreshMonitoring}" styleClass="btn btn-default loffset5 voffset10" >
+			<a href="${refreshMonitoring}" class="btn btn-default loffset5 voffset10" >
 					<fmt:message key="label.refresh" />
-			</html:link>
+			</a>
 		</P>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">

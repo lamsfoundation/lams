@@ -21,20 +21,15 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.wiki.web.actions;
+package org.lamsfoundation.lams.tool.wiki.web.controller;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
@@ -45,7 +40,6 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
-import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -53,9 +47,14 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * An abstract class used for wiki actions common to monitor, learner and author
@@ -63,53 +62,43 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author lfoxton
  *
  */
-public abstract class WikiPageAction extends LamsDispatchAction {
+@Controller
+public abstract class WikiPageController {
 
-    private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
-    public IWikiService wikiService;
+    @Autowired
+    @Qualifier("wikiService")
+    private IWikiService wikiService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Default method when no dispatch parameter is specified.
      */
-    @Override
-    protected abstract ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception;
+    protected abstract String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception;
 
     /**
      * This action returns to the current wiki by updating the form accordingly
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    protected abstract ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, Long currentWikiPageId) throws Exception;
+    protected abstract String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+	    throws Exception;
 
     protected abstract WikiUser getCurrentUser(Long toolSessionId);
 
     /**
      * Edit a page and make a new page content entry
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward editPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String editPage(HttpServletRequest request) throws Exception {
+
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
 
 	// Set up the wiki form
-	WikiPageForm wikiForm = (WikiPageForm) form;
 	revertJavascriptTokenReplacement(wikiForm);
 
 	// Get the current wiki page
@@ -156,28 +145,21 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	// Make sure the current page is set correctly then return to the wiki
-	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
+	return returnToWiki(wikiForm, request, currentPageUid);
     }
 
     /**
      * Revert to a previous page content in the page history
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward revertPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String revertPage(HttpServletRequest request) throws Exception {
+	
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
+	
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	// Get the current wiki page
 	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
@@ -190,9 +172,6 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	WikiPageContent content = wikiService.getWikiPageContent(revertPageContentVersion);
-
-	// Set up the authoring form
-	WikiPageForm wikiForm = (WikiPageForm) form;
 
 	// Set the wiki body in the authform
 	wikiForm.setWikiBody(content.getBody());
@@ -210,29 +189,17 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	}
 
-
-	return unspecified(mapping, wikiForm, request, response);
+	return unspecified(wikiForm, request);
     }
 
     /**
      * Compare two page content history items and return the result
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward comparePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String comparePage(HttpServletRequest request) throws Exception {
+
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	// Get the current wiki page content
 	WikiPage currentWikiPage = wikiService.getWikiPageByUid(currentPageUid);
@@ -249,28 +216,17 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	request.setAttribute(WikiConstants.ATTR_COMPARE_TITLE, currentWikiPage.getTitle());
 	request.setAttribute(WikiConstants.ATTR_COMPARE_STRING, diff);
 
-	return mapping.findForward("compareWiki");
+	return "pages/wiki/compare";
     }
 
     /**
      * View a page content from a wiki page's history
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward viewPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String viewPage(HttpServletRequest request) throws Exception {
+	
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	// Get the current wiki page content
 	WikiPage currentWikiPage = wikiService.getWikiPageByUid(currentPageUid);
@@ -285,25 +241,18 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, pageDTO);
 
-	return mapping.findForward("viewWiki");
+	return "pages/wiki/viewWiki";
     }
 
     /**
      * Change the active page of the wiki form
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward changePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
+    public String changePage(HttpServletRequest request) throws Exception {
 
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
+	
 	Wiki wiki = null;
 	WikiSession session = null;
 	WikiPage wikiPage = null;
@@ -333,25 +282,18 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// go through unspecified to display the author screen, using wrapper
 	// method to set the current page
-	return this.returnToWiki(mapping, form, request, response, wikiPage.getUid());
+	return this.returnToWiki(wikiForm, request, wikiPage.getUid());
     }
 
     /**
      * Add a new wiki page to this wiki instance
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward addPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
+    public String addPage(HttpServletRequest request) throws Exception {
 
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
+	
 	Wiki wiki = null;
 	WikiSession session = null;
 	WikiUser user = null;
@@ -359,7 +301,6 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 
 	// Set up the authoring form
-	WikiPageForm wikiForm = (WikiPageForm) form;
 	revertJavascriptTokenReplacement(wikiForm);
 
 	// get the wiki by either toolContentId or tool session
@@ -403,31 +344,24 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	// go to the new wiki page
-	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
+	return returnToWiki(wikiForm, request, currentPageUid);
     }
 
     /**
      * Remove a wiki page from the wiki instance
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward removePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String removePage(HttpServletRequest request) throws Exception {
+	
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
+	
 	// The page to be removed
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
 	// Get the session information for notifications
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	WikiUser user = getCurrentUser(toolSessionID);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
 
@@ -441,26 +375,25 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	// return to the same page with information about being removed displayed
-	return this.returnToWiki(mapping, form, request, response, currentPageUid);
+	return this.returnToWiki(wikiForm, request, currentPageUid);
 
     }
 
     /**
      * Restore a page previously marked as removed.
      */
-    public ActionForward restorePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String restorePage(HttpServletRequest request) throws Exception {
+	
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
+	
 	// The page to be restored
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
 	// Get the session information for notifications
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	WikiUser user = getCurrentUser(toolSessionID);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
 
@@ -473,33 +406,26 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	// return to the same page
-	return this.returnToWiki(mapping, form, request, response, currentPageUid);
+	return this.returnToWiki(wikiForm, request, currentPageUid);
 
     }
 
     /**
      * Toggles whether a learner wants to receive notifications for wiki changes
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward toggleLearnerSubsciption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String toggleLearnerSubsciption(HttpServletRequest request)
+	    throws Exception {
 
+	WikiPageForm wikiForm = new WikiPageForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
+	binder.bind(request);
+	
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
 	// Get the current user
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	IEventNotificationService notificationService = wikiService.getEventNotificationService();
 	notificationService.createEvent(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
@@ -520,17 +446,12 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	}
 
 	// return to the wiki page
-	return returnToWiki(mapping, form, request, response, currentPageUid);
+	return returnToWiki(wikiForm, request, currentPageUid);
 
     }
 
     private void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
 	    HttpServletRequest request) throws Exception {
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionID);
 
@@ -549,7 +470,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 		String contentFolderId = wikiService.getLearnerContentFolder(toolSessionID, monitorUserId.longValue());
 
 		String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
-			+ "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString()
+			+ "/monitoring/showWiki.do?toolSessionID=" + toolSessionID.toString()
 			+ "&contentFolderID=" + contentFolderId;
 
 		String hash = relativePath + "," + toolSessionID.toString() + ",t";

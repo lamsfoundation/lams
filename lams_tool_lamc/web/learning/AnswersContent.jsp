@@ -40,7 +40,7 @@
           window.setInterval(
             function(){
               //ajax form submit
-              $('#learningForm').ajaxSubmit({
+              $('#mcLearningForm').ajaxSubmit({
                 url: "<c:url value='/learning/autoSaveAnswers.do?date='/>" + new Date().getTime(),
                 success: function() {
                   $.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
@@ -52,22 +52,22 @@
 
         function submitNextQuestionSelected() {
           if (verifyAllQuestionsAnswered()) {
-            ++document.forms.McLearningForm.questionIndex.value;
-            document.forms.McLearningForm.nextQuestionSelected.value = 1;
+            ++document.forms.mcLearningForm.questionIndex.value;
+            document.forms.mcLearningForm.nextQuestionSelected.value = 1;
             disableContinueButton();
-            document.forms.McLearningForm.submit();
+            document.forms.mcLearningForm.submit();
           }
         }
 
         function submitAllAnswers() {
-          document.forms.McLearningForm.continueOptionsCombined.value = 1;			
+          document.forms.mcLearningForm.continueOptionsCombined.value = 1;			
           doSubmit();
         }
 
         function doSubmit() {
           if (verifyAllQuestionsAnswered()) {
             disableContinueButton();
-            document.forms.McLearningForm.submit();
+            document.forms.mcLearningForm.submit();
           }
         }
 
@@ -144,10 +144,10 @@
 		<!-- End announcements and advanced settings -->
 
 		<div class="form-group">
-			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="viewAnswers.do" enctype="multipart/form-data"
+			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="displayMc.do" enctype="multipart/form-data"
 				method="POST" target="_self">
 				<form:hidden path="toolContentID" />
-				<form:hidden path="toolSessionID" styleId="tool-session-id" />
+				<form:hidden path="toolSessionID" id="tool-session-id" />
 				<form:hidden path="httpSessionID" />
 				<form:hidden path="userID" />
 				<form:hidden path="userOverPassMark" />

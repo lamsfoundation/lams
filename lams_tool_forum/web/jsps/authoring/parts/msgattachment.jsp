@@ -1,18 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorSpringUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
-<input type="hidden" name="hasAttachment" value="${itemAttachment.hasAttachment}" />
+<c:set var="itemAttachment" value="${topicFormId}" />
+<input type="hidden" name="hasAttachment" value="${not empty itemAttachment and itemAttachment.hasAttachment}" />
 <c:choose>
-	<c:when test="${itemAttachment.hasAttachment}">
+	<c:when test="${not empty itemAttachment and itemAttachment.hasAttachment}">
 		<ul>
 			<li>
 				<c:forEach var="file" items="${topic.message.attachments}">
 					<c:set var="downloadURL">
-						<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
+						<lams:WebAppURL />download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true
 					</c:set>
 					<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 						<c:out value="${file.fileName}" /> 

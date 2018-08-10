@@ -167,7 +167,7 @@ public class MonitoringController {
     /**
      * Refreshes user list.
      */
-    @RequestMapping(path = "/getPagedUsers", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getPagedUsers")
     @ResponseBody
     public String getPagedUsers(HttpServletRequest request, HttpServletResponse res) {
 
@@ -246,16 +246,16 @@ public class MonitoringController {
 	responseJSON.put("page", page);
 	responseJSON.put("records", countSessionUsers);
 	responseJSON.set("rows", rows);
-
+	res.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 
     /**
      * Refreshes user list.
      */
-    @RequestMapping(path = "/getPagedUsersByItem", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping("/getPagedUsersByItem")
     @ResponseBody
-    public String getPagedUsersByItem(HttpServletRequest request) {
+    public String getPagedUsersByItem(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
@@ -374,7 +374,7 @@ public class MonitoringController {
 	responseJSON.put("page", page);
 	responseJSON.put("records", countSessionUsers);
 	responseJSON.set("rows", rows);
-
+	response.setContentType("application/json;charset=UTF-8");
 	return responseJSON.toString();
     }
 

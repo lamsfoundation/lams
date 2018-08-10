@@ -30,7 +30,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 
 	<script type="text/javascript">
-			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
+			var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
 			//var for jquery.jRating.js
 			var pathToImageFolder = "${lams}images/css/";
 		</script>
@@ -50,10 +50,12 @@
 			function setupJRatingSetPath() {
 				setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 			}
-			
+			<c:set var="refresh">
+			<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=${reqIDVar.getTime()};
+		</c:set>
 			function refreshTopic(){
 				var reqIDVar = new Date();
-				location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=" />"+reqIDVar.getTime();;
+				location.href= '${refresh}';
 			}
 		</script>
 
@@ -134,13 +136,12 @@
 								key="label.refresh" />
 						</a>
 						<c:set var="backToForum">
-							<html:rewrite
-								page="/learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
+							<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}
 						</c:set>
-						<html:button property="backToForum" onclick="javascript:location.href='${backToForum}';"
-							styleClass="btn btn-sm btn-primary voffset5 pull-right">
+						<button name="backToForum" onclick="javascript:location.href='${backToForum}';"
+							class="btn btn-sm btn-primary voffset5 pull-right">
 							<fmt:message key="label.back.to.forum" />
-						</html:button>
+						</button>
 					</div>
 				</div>
 				<!--  Button Panel -->

@@ -21,17 +21,15 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * This is a parent class for all wiki forms, it contains all the neccessary
@@ -41,7 +39,11 @@ import org.apache.struts.action.ActionMessages;
  *
  *
  */
-public class WikiPageForm extends ActionForm {
+public class WikiPageForm {
+
+    @Autowired
+    @Qualifier("wikiMessageService")
+    private MessageService messageService;
 
     private static final long serialVersionUID = 234235265633376356L;
 
@@ -134,11 +136,11 @@ public class WikiPageForm extends ActionForm {
 	this.newPageIsEditable = newPageIsEditable;
     }
 
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
+    public MultiValueMap<String, String> validate(HttpServletRequest arg1) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	return ac;
+	errorMap.add("GLOBAL", messageService.getMessage("this is an error"));
+
+	return errorMap;
     }
 }

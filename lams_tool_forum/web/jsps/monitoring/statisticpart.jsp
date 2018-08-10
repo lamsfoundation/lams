@@ -74,11 +74,11 @@
 			<tr>
 				<td valign="MIDDLE" width="48%">
 					<c:set var="viewtopic">
-						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true&pageLastId=0" />
+						<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true&pageLastId=0
 					</c:set>
-					<html:link href="javascript:launchPopup('${viewtopic}');">
+					<a href="javascript:launchPopup('${viewtopic}');">
 						<c:out value="${topic.message.subject}" />
-					</html:link>
+					</a>
 				</td>
 				<td>
 					<c:out value="${topic.message.replyNumber+1}" />

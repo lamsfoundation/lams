@@ -2,8 +2,6 @@
 
 <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
 <!-- ========== Basic Tab ========== -->
 
 <div id="wikimenu" class="panel panel-default">
@@ -162,7 +160,7 @@
 	<div class="panel-body">
 	  	<div class="form-group">
 	  		<label for="title"><fmt:message key="label.authoring.basic.title"></fmt:message></label>
-			<html:text property="title" styleId="title" style="width: 99%;" value="${currentWikiPage.title}" styleClass="form-control"></html:text>
+			<input type="text" name="title" id="title" style="width: 99%;" value="${currentWikiPage.title}" class="form-control"/>
 			<span style="display: none;'" class="title error"><fmt:message key="error.title.invalid.characters"/>
 		</div>
 	  	<div class="form-group">
@@ -175,7 +173,7 @@
 		</div>
 		<div class="checkbox">
 			<label for="isEditable">
-				<html:checkbox property="isEditable" value="1" styleId="isEditable"></html:checkbox>
+				<form:checkbox path="isEditable" value="1" id="isEditable"/>
 				<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
 			</label>
 		</div>
@@ -195,7 +193,7 @@
   <div class="panel-body">
   	  	<div class="form-group">
 	  		<label for="newPageTitle"><fmt:message key="label.authoring.basic.title"></fmt:message></label>
-			<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value="" styleClass="form-control"></html:text>
+			<input type="text" name="newPageTitle" id="newPageTitle" style="width: 99%;" value="" class="form-control"/>
 			<span style="display: none;'" class="newPageTitle error"><fmt:message key="error.title.invalid.characters"/>
 		</div>
 	  	<div class="form-group">
@@ -207,7 +205,7 @@
 		</div>
 		<div class="checkbox">
 			<label for=newPageIsEditable>
-				<html:checkbox property="newPageIsEditable" value="1" styleId="newPageIsEditable"></html:checkbox>
+				<form:checkbox path="newPageIsEditable" value="1" id="newPageIsEditable"/>
 				<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
 			</label>
 		</div>

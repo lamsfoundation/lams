@@ -21,8 +21,7 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.tool.wiki.web.actions;
+package org.lamsfoundation.lams.tool.wiki.web.controller;
 
 import java.io.IOException;
 
@@ -30,18 +29,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
-import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
-import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Marcin Cieslak
@@ -51,35 +49,30 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class PedagogicalPlannerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/pedagogicalPlanner")
+public class PedagogicalPlannerController {
 
     private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
 
-    public IWikiService wikiService;
+    @Autowired
+    @Qualifier("wikiService")
+    private IWikiService wikiService;
 
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
-	return initPedagogicalPlannerForm(mapping, form, request, response);
-    }
-
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	WikiPedagogicalPlannerForm plannerForm = (WikiPedagogicalPlannerForm) form;
+    @RequestMapping("/initPedagogicalPlannerForm")
+    public String initPedagogicalPlannerForm(@ModelAttribute WikiPedagogicalPlannerForm plannerForm,
+	    HttpServletRequest request, HttpServletResponse response) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Wiki wiki = getWikiService().getWikiByContentId(toolContentID);
+	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
 	plannerForm.fillForm(wiki);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
-	return mapping.findForward("success");
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
+    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute WikiPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	WikiPedagogicalPlannerForm plannerForm = (WikiPedagogicalPlannerForm) form;
 //	ActionMessages errors = plannerForm.validate();
 //	if (errors.isEmpty()) {
 //	    String instructions = plannerForm.getWikiBody();
@@ -92,14 +85,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 //	} else {
 //	    saveErrors(request, errors);
 //	}
-	return mapping.findForward("success");
-    }
-
-    private IWikiService getWikiService() {
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
-	return wikiService;
+	return "pages/authoring/pedagogicalPlannerForm";
     }
 
 }
