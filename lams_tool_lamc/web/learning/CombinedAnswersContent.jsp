@@ -84,7 +84,7 @@
 <form:hidden path="continueOptionsCombined" value="Continue" />
 
 <c:if test="${hasEditRight}">
-  <button name="continueButton" class="btn btn-sm btn-primary pull-right" onclick="doSubmit();" id="continueButton">
+  <button name="continueButton" class="btn btn-sm btn-primary pull-right" onclick="doSubmit();" type="button" id="continueButton">
     <fmt:message key="button.continue" />
   </button>
 </c:if>
