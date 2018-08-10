@@ -99,7 +99,6 @@ public class McMonitoringController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping("/monitoring")
-    @SuppressWarnings("unchecked")
     public String execute(HttpServletRequest request) {
 
 	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();

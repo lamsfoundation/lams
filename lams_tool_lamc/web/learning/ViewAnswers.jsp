@@ -53,7 +53,7 @@
 </lams:head>
 
 <body class="stripes">
-	<form:form action="viewAnswers.do" method="POST" target="_self" onsubmit="disableFinishButton();" modelAttribute="mcLearningForm" id="mcLearningForm">
+	<form:form action="displayMc.do" method="POST" target="_self" onsubmit="disableFinishButton();" modelAttribute="mcLearningForm" id="mcLearningForm">
 
 	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}" formID="mcLearningForm">
 		<c:if test="${isLeadershipEnabled}">

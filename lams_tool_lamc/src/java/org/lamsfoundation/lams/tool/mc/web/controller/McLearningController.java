@@ -96,8 +96,46 @@ public class McLearningController {
     @Autowired
     private WebApplicationContext applicationContext;
 
+    @RequestMapping("/displayMc")
+    public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	mcLearningForm.setToolSessionID(toolSessionID);
+
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
+
+	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
+	mcLearningForm.setToolContentID(toolContentId);
+
+	LearningUtil.saveFormRequestData(request, mcLearningForm);
+
+	if (mcLearningForm.getNextQuestionSelected() != null && !mcLearningForm.getNextQuestionSelected().equals("")) {
+	    mcLearningForm.resetParameters();
+	    return getNextOptions(mcLearningForm, request, response);
+	}
+	if (mcLearningForm.getContinueOptionsCombined() != null) {
+	    return continueOptionsCombined(mcLearningForm, request, response);
+	} else if (mcLearningForm.getNextOptions() != null) {
+	    return getNextOptions(mcLearningForm, request, response);
+	} else if (mcLearningForm.getRedoQuestions() != null) {
+	    return redoQuestions(mcLearningForm, request, response);
+	} else if (mcLearningForm.getViewAnswers() != null) {
+	    return viewAnswers(mcLearningForm, request, response);
+	} else if (mcLearningForm.getSubmitReflection() != null) {
+	    return submitReflection(mcLearningForm, request, response);
+	} else if (mcLearningForm.getForwardtoReflection() != null) {
+	    return forwardtoReflection(mcLearningForm, request, response);
+	} else if (mcLearningForm.getLearnerFinished() != null) {
+	    return endLearning(mcLearningForm, request, response);
+	}
+
+	return "learning/AnswersContent";
+    }
+
     @RequestMapping("/learning")
-    public String execute(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String execute(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	mcLearningForm.setMcService(mcService);
 	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
@@ -346,7 +384,8 @@ public class McLearningController {
      * responses to learner when they answer all the questions on a single page
      */
     @RequestMapping("/continueOptionsCombined")
-    public String continueOptionsCombined(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String continueOptionsCombined(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
@@ -369,7 +408,7 @@ public class McLearningController {
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
-	    return viewAnswers(mcLearningForm, request);
+	    return viewAnswers(mcLearningForm, request, response);
 	}
 
 	/* process the answers */
@@ -388,14 +427,15 @@ public class McLearningController {
 	user.setResponseFinalised(true);
 	mcService.updateMcQueUsr(user);
 
-	return viewAnswers(mcLearningForm, request);
+	return viewAnswers(mcLearningForm, request, response);
     }
 
     /**
      * takes the learner to the next set of questions
      */
     @RequestMapping("/getNextOptions")
-    public String getNextOptions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String getNextOptions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -410,7 +450,7 @@ public class McLearningController {
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
-	    return viewAnswers(mcLearningForm, request);
+	    return viewAnswers(mcLearningForm, request, response);
 	}
 
 	//parse learner input
@@ -452,7 +492,8 @@ public class McLearningController {
      * allows the learner to view their answer history
      */
     @RequestMapping("/viewAnswers")
-    public String viewAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String viewAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -590,7 +631,8 @@ public class McLearningController {
     }
 
     @RequestMapping("/redoQuestions")
-    public String redoQuestions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String redoQuestions(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
@@ -684,7 +726,8 @@ public class McLearningController {
     }
 
     @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String forwardtoReflection(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -717,7 +760,8 @@ public class McLearningController {
      * auto saves responses
      */
     @RequestMapping("/autoSaveAnswers")
-    public String autoSaveAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request) {
+    public String autoSaveAnswers(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));

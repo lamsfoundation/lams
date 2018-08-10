@@ -19,8 +19,7 @@
 				<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 				<tr>			
 					<td>
-						<c:url value="monitoring.do" var="openNotebook">
-							<c:param name="dispatch" value="openNotebook" />
+						<c:url value="openNotebook.do" var="openNotebook">
 							<c:param name="uid" value="${reflectionUid}" />
 							<c:param name="userId" value="${userId}" />
 							<c:param name="userName" value="${fn:escapeXml(userName)}" />

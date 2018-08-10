@@ -14,9 +14,8 @@
 			}
 			$(this).data('previousValue', this.value);
 			$.ajax({
-				url: '<c:url value="/monitoring.do"/>',
+				url: '<c:url value="/monitoring/setActivityEvaluation.do"/>',
 				data: {
-					dispatch: "setActivityEvaluation",
 					toolContentID: "${toolContentID}",
 					activityEvaluation: this.value
 				},

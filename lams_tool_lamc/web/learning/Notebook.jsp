@@ -16,11 +16,12 @@
 		</div>
 
 		<div class="form-group">
-			<form:form action="submitReflection.do" modelAttribute="mcLearningForm" id="mcLearningForm" method="POST">
+			<form:form action="displayMc.do" modelAttribute="mcLearningForm" id="mcLearningForm" method="POST">
 				<form:hidden path="toolContentID" />
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="httpSessionID" />
 				<form:hidden path="userID" />
+				<form:hidden path="submitReflection" />
 				<textarea rows="4" name="entryText" class="form-control" id="focusedInput">
 					<c:if test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
 						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />

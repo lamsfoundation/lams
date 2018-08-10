@@ -30,7 +30,7 @@
 
 	<lams:Page type="learner" title="${title}" formID="mcLearningForm">
 
-		<form:form action="learner.do" method="POST" onsubmit="disableFinishButton();"
+		<form:form action="displayMc.do" method="POST" onsubmit="disableFinishButton();"
 			modelAttribute="mcLearningForm" id="mcLearningForm">
 			<form:hidden path="toolContentID" />
 			<form:hidden path="toolSessionID" />
