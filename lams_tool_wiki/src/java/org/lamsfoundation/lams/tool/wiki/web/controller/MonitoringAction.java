@@ -21,11 +21,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.web.controller;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
@@ -49,20 +47,21 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
-import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
-import java.util.Date;
-
-import org.lamsfoundation.lams.util.DateUtil;
-
-import java.util.TimeZone;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * This action handles all the monitoring actions, which include opening
@@ -74,23 +73,23 @@ import java.util.TimeZone;
  *
  * @author lfoxton
  */
-public class MonitoringAction extends WikiPageAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController extends WikiPageController {
 
-    private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    public IWikiService wikiService;
+    @Autowired
+    @Qualifier("wikiService")
+    private IWikiService wikiService;
 
     /**
      * Sets up the main authoring page which lists the tool sessions and allows
      * you to view their respective WikiPages
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/monitoring")
+    public String unspecified(HttpServletRequest request) throws Exception {
 
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
@@ -114,7 +113,7 @@ public class MonitoringAction extends WikiPageAction {
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	wikiDT0.setCurrentTab(currentTab);
-	
+
 	/* Check if submission deadline is null */
 
 	Date submissionDeadline = wikiDT0.getSubmissionDeadline();
@@ -127,15 +126,15 @@ public class MonitoringAction extends WikiPageAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute("submissionDateString", DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
-
+	    request.setAttribute("submissionDateString",
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 
 	}
 
 	request.setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDT0);
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 	request.setAttribute(WikiConstants.ATTR_IS_GROUPED_ACTIVITY, wikiService.isGroupedActivity(toolContentID));
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
     /**
@@ -143,17 +142,14 @@ public class MonitoringAction extends WikiPageAction {
      * WikiPageAction class
      */
     @Override
-    protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
-	MonitoringForm monitoringForm = (MonitoringForm) form;
+    public String returnToWiki(MonitoringForm monitoringForm, HttpServletRequest request, HttpServletResponse response,
+	    Long currentWikiPageId) throws Exception {
 	monitoringForm.setCurrentWikiPageId(currentWikiPageId);
-	return showWiki(mapping, monitoringForm, request, response);
+	return showWiki(monitoringForm, request, response);
     }
 
     /**
      * Gets the current user by toolSessionId
-     *
-     * @param toolSessionId
      */
     @Override
     protected WikiUser getCurrentUser(Long toolSessionId) {
@@ -170,29 +166,18 @@ public class MonitoringAction extends WikiPageAction {
 
 	return wikiUser;
     }
-    
-    
+
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	// set up wikiService
-	if (wikiService == null) {
-		wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
+    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Wiki wiki = wikiService.getWikiByContentId(contentID);
 
-	Long dateParameter = WebUtil.readLongParam(request,WikiConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Long dateParameter = WebUtil.readLongParam(request, WikiConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	String formattedDate = "";
 	if (dateParameter != null) {
@@ -206,28 +191,18 @@ public class MonitoringAction extends WikiPageAction {
 	wiki.setSubmissionDeadline(tzSubmissionDeadline);
 	wikiService.saveOrUpdateWiki(wiki);
 	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 
     /**
      * Shows a specific wiki based on the session id
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward showWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/showWiki")
+    public String showWiki(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionId);
 	WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
@@ -245,12 +220,11 @@ public class MonitoringAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_SESSION_DTO, sessionDTO);
 
 	// Set up the authForm.
-	MonitoringForm monForm = (MonitoringForm) form;
 
-	Long currentPageUid = monForm.getCurrentWikiPageId();
+	Long currentPageUid = monitoringForm.getCurrentWikiPageId();
 
 	// Get the wikipages from the session and the main page
-	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
+	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<>();
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    WikiPageDTO pageDTO = new WikiPageDTO(wikiPage);
 
@@ -270,11 +244,11 @@ public class MonitoringAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, new WikiPageDTO(currentWikiPage));
 
 	// Reset the isEditable and newPageIdEditable field for the form
-	monForm.setIsEditable(currentWikiPage.getEditable());
-	monForm.setNewPageIsEditable(true);
+	monitoringForm.setIsEditable(currentWikiPage.getEditable());
+	monitoringForm.setNewPageIsEditable(true);
 
 	// Set the current wiki history
-	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<WikiPageContentDTO>();
+	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<>();
 	for (WikiPageContent wikiPageContentHistoryItem : currentWikiPage.getWikiContentVersions()) {
 	    currentWikiPageHistoryDTOs.add(new WikiPageContentDTO(wikiPageContentHistoryItem));
 	}
@@ -282,6 +256,6 @@ public class MonitoringAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 	request.setAttribute(WikiConstants.ATTR_IS_GROUPED_ACTIVITY, wikiService.isGroupedActivity(toolContentId));
 
-	return mapping.findForward("wiki_display");
+	return "pages/monitoring/wikiDisplay";
     }
 }

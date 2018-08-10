@@ -26,14 +26,10 @@ package org.lamsfoundation.lams.tool.wiki.web.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
@@ -44,7 +40,6 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
-import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -82,7 +77,6 @@ public abstract class WikiPageController {
     /**
      * Default method when no dispatch parameter is specified.
      */
-    @Override
     protected abstract String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception;
 
     /**
@@ -96,7 +90,6 @@ public abstract class WikiPageController {
     /**
      * Edit a page and make a new page content entry
      */
-    @RequestMapping("/editPage")
     public String editPage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -154,7 +147,6 @@ public abstract class WikiPageController {
     /**
      * Revert to a previous page content in the page history
      */
-    @RequestMapping("/revertPage")
     public String revertPage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
@@ -194,7 +186,6 @@ public abstract class WikiPageController {
     /**
      * Compare two page content history items and return the result
      */
-    @RequestMapping("/comparePage")
     public String comparePage(HttpServletRequest request) throws Exception {
 
 	Long revertPageContentVersion = new Long(
@@ -222,7 +213,6 @@ public abstract class WikiPageController {
     /**
      * View a page content from a wiki page's history
      */
-    @RequestMapping("/viewPage")
     public String viewPage(HttpServletRequest request) throws Exception {
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
@@ -247,7 +237,6 @@ public abstract class WikiPageController {
     /**
      * Change the active page of the wiki form
      */
-    @RequestMapping("/changePage")
     public String changePage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
 	Wiki wiki = null;
@@ -285,7 +274,6 @@ public abstract class WikiPageController {
     /**
      * Add a new wiki page to this wiki instance
      */
-    @RequestMapping("/addPage")
     public String addPage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
 	Wiki wiki = null;
@@ -344,7 +332,6 @@ public abstract class WikiPageController {
     /**
      * Remove a wiki page from the wiki instance
      */
-    @RequestMapping("/removePage")
     public String removePage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 	// The page to be removed
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -372,7 +359,6 @@ public abstract class WikiPageController {
     /**
      * Restore a page previously marked as removed.
      */
-    @RequestMapping("/restorePage")
     public String restorePage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 	// The page to be restored
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -399,8 +385,8 @@ public abstract class WikiPageController {
     /**
      * Toggles whether a learner wants to receive notifications for wiki changes
      */
-    @RequestMapping("/toggleLearnerSubsciption")
-    public String toggleLearnerSubsciption(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+    public String toggleLearnerSubsciption(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request)
+	    throws Exception {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -434,7 +420,6 @@ public abstract class WikiPageController {
 
     private void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
 	    HttpServletRequest request) throws Exception {
-
 
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionID);
 

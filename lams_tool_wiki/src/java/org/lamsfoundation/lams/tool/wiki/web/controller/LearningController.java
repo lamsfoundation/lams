@@ -21,13 +21,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,15 +34,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
@@ -61,10 +56,16 @@ import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * This action handles all the learning actions, which include opening learner,
@@ -85,23 +86,28 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class LearningAction extends WikiPageAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController extends WikiPageController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
+    @Autowired
+    @Qualifier("wikiService")
     private IWikiService wikiService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * unspecified loads the learner window with the current wiki page as well
      * as setting all the advanced options and user-specifice info
      */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/learning")
+    public String unspecified(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	LearningForm learningForm = (LearningForm) form;
 
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
@@ -110,11 +116,6 @@ public class LearningAction extends WikiPageAction {
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	Long currentPageUid = learningForm.getCurrentWikiPageId();
-
-	// set up wikiService
-	if (wikiService == null) {
-	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
-	}
 
 	// Retrieve the session and content.
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionID);
@@ -126,7 +127,7 @@ public class LearningAction extends WikiPageAction {
 
 	// check defineLater
 	if (wiki.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/defineLater";
 	}
 
 	// set mode, toolSessionID and WikiDTO
@@ -143,7 +144,7 @@ public class LearningAction extends WikiPageAction {
 	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+		applicationContext.getServletContext());
 
 	// get the user
 	WikiUser wikiUser;
@@ -172,9 +173,6 @@ public class LearningAction extends WikiPageAction {
 			WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID, wikiUser.getUserId())) {
 	    wikiUserDTO.setNotificationEnabled(true);
 	}
-	
-	
-	
 
 	// add the userDTO to attributes
 	request.setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
@@ -191,7 +189,7 @@ public class LearningAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_MIN_EDITS_REACHED, minEditsReached);
 
 	// Get the wikipages from the session and the main page
-	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
+	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<>();
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    WikiPageDTO pageDTO = new WikiPageDTO(wikiPage);
 
@@ -211,7 +209,7 @@ public class LearningAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, new WikiPageDTO(currentWikiPage));
 
 	// Set the current wiki history
-	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<WikiPageContentDTO>();
+	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<>();
 	for (WikiPageContent wikiPageContentHistoryItem : currentWikiPage.getWikiContentVersions()) {
 	    currentWikiPageHistoryDTOs.add(new WikiPageContentDTO(wikiPageContentHistoryItem));
 	}
@@ -228,13 +226,11 @@ public class LearningAction extends WikiPageAction {
 	    request.setAttribute(WikiConstants.ATTR_CONTENT_EDITAVLE, true);
 	}
 	request.setAttribute(WikiConstants.ATTR_FINISHED_ACTIVITY, wikiUser.isFinishedActivity());
-	
-	
+
 	/* Check if submission deadline is null */
-	
+
 	Date submissionDeadline = wikiDTO.getSubmissionDeadline();
 	request.setAttribute("wikiDTO", wikiDTO);
-	
 
 	if (submissionDeadline != null) {
 
@@ -247,12 +243,12 @@ public class LearningAction extends WikiPageAction {
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "pages/learning/submissionDeadline";
 	    }
 
 	}
-	
-	return mapping.findForward("wiki");
+
+	return "pages/learning/wiki";
     }
 
     /**
@@ -260,19 +256,16 @@ public class LearningAction extends WikiPageAction {
      * WikiPageAction class
      */
     @Override
-    protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
-	LearningForm learnForm = (LearningForm) form;
+    public String returnToWiki(LearningForm learnForm, HttpServletRequest request, HttpServletResponse response,
+	    Long currentWikiPageId) throws Exception {
 	learnForm.setCurrentWikiPageId(currentWikiPageId);
 	// put the tool session id in the attributes so that the progress bar can pick it up.
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnForm.getToolSessionID());
-	return unspecified(mapping, learnForm, request, response);
+	return unspecified(learnForm, request, response);
     }
 
     /**
      * Gets the current user by toolSessionId
-     *
-     * @param toolSessionId
      */
     @Override
     protected WikiUser getCurrentUser(Long toolSessionId) {
@@ -293,14 +286,9 @@ public class LearningAction extends WikiPageAction {
     /**
      * Finish the activity, we dont need to save anything here, as that is done
      * by the wikipage actions
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/finishActivity")
+    public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
@@ -315,7 +303,8 @@ public class LearningAction extends WikiPageAction {
 		    + "and toolSessionID: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = WikiServiceProxy.getWikiSessionManager(getServlet().getServletContext());
+	ToolSessionManager sessionMgrService = WikiServiceProxy
+		.getWikiSessionManager(applicationContext.getServletContext());
 
 	String nextActivityUrl;
 	try {
@@ -334,20 +323,13 @@ public class LearningAction extends WikiPageAction {
 
     /**
      * Opens the notebook page for reflections
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/openNotebook")
+    public String openNotebook(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	LearningForm lrnForm = (LearningForm) form;
-
 	// set the finished flag
-	WikiUser wikiUser = this.getCurrentUser(lrnForm.getToolSessionID());
+	WikiUser wikiUser = this.getCurrentUser(learningForm.getToolSessionID());
 	WikiDTO wikiDTO = new WikiDTO(wikiUser.getWikiSession().getWiki());
 
 	request.setAttribute("wikiDTO", wikiDTO);
@@ -356,32 +338,25 @@ public class LearningAction extends WikiPageAction {
 		CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
 
 	if (notebookEntry != null) {
-	    lrnForm.setEntryText(notebookEntry.getEntry());
+	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
-		getServlet().getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(learningForm.getToolSessionID(), request,
+		applicationContext.getServletContext());
 
-	return mapping.findForward("notebook");
+	return "pages/learning/notebook";
     }
 
     /**
      * Submit reflections
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 
-	LearningForm lrnForm = (LearningForm) form;
-
-	WikiUser wikiUser = this.getCurrentUser(lrnForm.getToolSessionID());
+	WikiUser wikiUser = this.getCurrentUser(learningForm.getToolSessionID());
 	Long toolSessionID = wikiUser.getWikiSession().getSessionId();
 	Integer userID = wikiUser.getUserId().intValue();
 
@@ -392,14 +367,14 @@ public class LearningAction extends WikiPageAction {
 	if (entry == null) {
 	    // create new entry
 	    wikiService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    WikiConstants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+		    WikiConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
 	} else {
 	    // update existing entry
-	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setEntry(learningForm.getEntryText());
 	    entry.setLastModified(new Date());
 	    wikiService.updateEntry(entry);
 	}
 
-	return finishActivity(mapping, form, request, response);
+	return finishActivity(learningForm, request, response);
     }
 }
