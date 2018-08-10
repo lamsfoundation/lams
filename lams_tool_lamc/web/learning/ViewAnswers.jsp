@@ -303,9 +303,7 @@
 				<form:hidden path="passMarkApplicable" />
 
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
-					<input type="submit" name="redoQuestions" class="btn btn-primary pull-left">
-						<fmt:message key="label.redo.questions" />
-					</input>
+					<input type="submit" name="redoQuestions" class="btn btn-primary pull-left" value="<fmt:message key="label.redo.questions" />"/>
 				</c:if>
 				
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
