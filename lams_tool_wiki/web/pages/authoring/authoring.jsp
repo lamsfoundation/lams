@@ -27,9 +27,9 @@
 
 	
 	<body class="stripes" onload="init();">
-		<form:form action="updateContent.do" id="authoringForm" modelAttribute="wikiForm" method="post" enctype="multipart/form-data">
+		<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
 
-			<c:set var="sessionMap" value="${sessionScope[wikiForm.sessionMapID]}" />
+			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 		
 			<form:hidden path="currentTab" id="currentTab" />
 			<form:hidden path="sessionMapID" />
