@@ -30,7 +30,7 @@
 
 
 				<a href="#" name="submitReflection" class="btn btn-primary pull-right voffset10 na"
-					onclick="javascript:document.mcLearningForm.submit();return false">
+					onclick="javascript:document.forms.mcLearningForm.submit();return false">
 					<fmt:message key="button.endLearning" />
 				</a>
 
