@@ -76,7 +76,7 @@ public class MessageService {
     }
     
     /**
-     * The same as getMessage(String key) but allows specifying locale in which to do a loockup.
+     * Wrapper method for getMessage(String key) that allows specifying locale in which to do a loockup.
      * 
      * @param key
      * @param supportedLocale
@@ -120,6 +120,25 @@ public class MessageService {
 	String message;
 	try {
 	    message = messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
+	} catch (NoSuchMessageException e) {
+	    message = "??" + key + "??";
+	}
+	return message;
+    }
+    
+    /**
+     * Wrapper method for getMessage(String key, Object[] args) that allows specifying locale in which to do a loockup.
+     * 
+     * @param key
+     * @param supportedLocale
+     * @return
+     */
+    public String getMessage(String key, Object[] args, SupportedLocale supportedLocale) {
+	Locale locale = new Locale(supportedLocale.getLanguageIsoCode(), supportedLocale.getCountryIsoCode());
+	
+	String message;
+	try {
+	    message = messageSource.getMessage(key, args, locale);
 	} catch (NoSuchMessageException e) {
 	    message = "??" + key + "??";
 	}
