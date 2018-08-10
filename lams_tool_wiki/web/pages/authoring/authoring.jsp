@@ -27,16 +27,16 @@
 
 	
 	<body class="stripes" onload="init();">
-		<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+		<form:form action="updateContent.do" id="authoringForm" modelAttribute="wikiForm" method="post" enctype="multipart/form-data">
 
-			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
+			<c:set var="sessionMap" value="${sessionScope[wikiForm.sessionMapID]}" />
 		
 			<form:hidden path="currentTab" id="currentTab" />
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID"/>
 			<form:hidden path="toolContentID"/>
 			<form:hidden path="mode" value="${sessionMap.mode}"/>
-			<form:hidden path="currentWikiPage" value="${currentWikiPage.uid}" id="currentWikiPage" />
+			<input type ="hidden" name="currentWikiPage" value="${currentWikiPage.uid}" id="currentWikiPage" />
 			<form:hidden path="newPageName" id="newPageName"/>
 			<form:hidden path="historyPageContentId" id="historyPageContentId"/>
 				
@@ -55,14 +55,15 @@
 				</c:if>
 			
 			   <lams:TabBodyArea>
-					<logic:messagesPresent>
-						<lams:Alert type="danger" id="authorErrors" close="false">	
-					        <html:messages id="error">
-					            <c:out value="${error}" escapeXml="false"/><br/>
-					        </html:messages>
-						</lams:Alert>
-					</logic:messagesPresent>			
-				
+			    <c:set var="errorKey" value="GLOBAL" />
+        			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+           				 <lams:Alert id="error" type="danger" close="false">
+          				      <c:forEach var="error" items="${errorMap[errorKey]}">
+              				      <c:out value="${error}" />
+             				  </c:forEach>
+           				 </lams:Alert>
+      			    </c:if>
+s				
 					<%-- Page tabs --%>
 					<lams:TabBodys>
 						<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />

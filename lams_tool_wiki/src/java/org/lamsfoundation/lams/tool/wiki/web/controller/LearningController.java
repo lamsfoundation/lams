@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm;
+import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -106,9 +107,9 @@ public class LearningController extends WikiPageController {
      * as setting all the advanced options and user-specifice info
      */
     @RequestMapping("/learning")
-    public String unspecified(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
+	LearningForm learningForm = new LearningForm();
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, MODE_OPTIONAL);
@@ -232,6 +233,7 @@ public class LearningController extends WikiPageController {
 	Date submissionDeadline = wikiDTO.getSubmissionDeadline();
 	request.setAttribute("wikiDTO", wikiDTO);
 
+	request.setAttribute("learningForm", learningForm);
 	if (submissionDeadline != null) {
 
 	    HttpSession ss = SessionManager.getSession();
@@ -256,12 +258,13 @@ public class LearningController extends WikiPageController {
      * WikiPageAction class
      */
     @Override
-    public String returnToWiki(LearningForm learnForm, HttpServletRequest request, HttpServletResponse response,
-	    Long currentWikiPageId) throws Exception {
-	learnForm.setCurrentWikiPageId(currentWikiPageId);
+    public String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+	    throws Exception {
+	wikiForm.setCurrentWikiPageId(currentWikiPageId);
 	// put the tool session id in the attributes so that the progress bar can pick it up.
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnForm.getToolSessionID());
-	return unspecified(learnForm, request, response);
+	LearningForm learnerForm = new LearningForm();
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnerForm.getToolSessionID());
+	return unspecified((LearningForm) wikiForm, request);
     }
 
     /**
@@ -377,4 +380,5 @@ public class LearningController extends WikiPageController {
 
 	return finishActivity(learningForm, request, response);
     }
+
 }

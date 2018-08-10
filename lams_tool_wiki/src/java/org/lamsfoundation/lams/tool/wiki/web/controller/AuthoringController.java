@@ -84,9 +84,10 @@ public class AuthoringController extends WikiPageController {
      *
      */
     @RequestMapping("/authoring")
-    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String unspecified(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request)
+	    throws Exception {
 
+	AuthoringForm authoringForm = new AuthoringForm();
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -165,18 +166,20 @@ public class AuthoringController extends WikiPageController {
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
+	request.setAttribute("authoringForm", authoringForm);
 
 	return "pages/authoring/authoring";
     }
 
     @Override
-    public String removePage(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+    public String removePage(HttpServletRequest request) throws Exception {
 
+	WikiPageForm wikiForm = new WikiPageForm();
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
 	if (wiki.isDefineLater()) {
 	    // Only mark as removed if editing a live version (monitor/live edit)
-	    return super.removePage(wikiForm, request);
+	    return super.removePage(request);
 	}
 	// Completely delete the page
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -192,10 +195,10 @@ public class AuthoringController extends WikiPageController {
      * Wrapper method to make sure that the correct wiki is returned to from the WikiPageAction class
      */
     @Override
-    protected String returnToWiki(AuthoringForm authoringForm, HttpServletRequest request, HttpServletResponse response,
-	    Long currentWikiPageId) throws Exception {
-	authoringForm.setCurrentWikiPageId(currentWikiPageId);
-	return unspecified(authoringForm, request, response);
+    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+	    throws Exception {
+	wikiForm.setCurrentWikiPageId(currentWikiPageId);
+	return unspecified((AuthoringForm) wikiForm, request);
     }
 
     /**
@@ -304,4 +307,5 @@ public class AuthoringController extends WikiPageController {
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authForm) {
 	return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
     }
+
 }

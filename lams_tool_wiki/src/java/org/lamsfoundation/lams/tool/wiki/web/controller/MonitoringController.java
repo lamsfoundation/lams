@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.MonitoringForm;
+import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -88,7 +89,7 @@ public class MonitoringController extends WikiPageController {
      * you to view their respective WikiPages
      */
     @RequestMapping("/monitoring")
-    public String unspecified(HttpServletRequest request) throws Exception {
+    public String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
@@ -142,10 +143,10 @@ public class MonitoringController extends WikiPageController {
      * WikiPageAction class
      */
     @Override
-    public String returnToWiki(MonitoringForm monitoringForm, HttpServletRequest request, HttpServletResponse response,
-	    Long currentWikiPageId) throws Exception {
-	monitoringForm.setCurrentWikiPageId(currentWikiPageId);
-	return showWiki(monitoringForm, request, response);
+    public String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+	    throws Exception {
+	wikiForm.setCurrentWikiPageId(currentWikiPageId);
+	return showWiki((MonitoringForm) wikiForm, request);
     }
 
     /**
@@ -198,8 +199,7 @@ public class MonitoringController extends WikiPageController {
      * Shows a specific wiki based on the session id
      */
     @RequestMapping("/showWiki")
-    public String showWiki(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String showWiki(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);

@@ -24,13 +24,6 @@
 	</script>
 </lams:head>
 <body>
-	<logic:messagesPresent>
-		<p class="warning">
-	        <html:messages id="error">
-	            <c:out value="${error}" escapeXml="false"/><br/>
-	        </html:messages>
-		</p>
-	</logic:messagesPresent>	
 	
 	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="plannerForm" id="plannerForm" method="post">
 		<form:hidden path="toolContentID" id="toolContentID" />
