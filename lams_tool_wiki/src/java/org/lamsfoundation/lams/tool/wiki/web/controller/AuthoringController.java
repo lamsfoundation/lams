@@ -196,9 +196,8 @@ public class AuthoringController extends WikiPageController {
 
     @RequestMapping("/changePage")
     public String changePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
-	super.changePage(authoringForm, request);
-	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+	Long pageUid = super.changePage(authoringForm, request);
+	return this.returnToWiki(authoringForm, request, pageUid);
     }
 
     @RequestMapping("/addPage")

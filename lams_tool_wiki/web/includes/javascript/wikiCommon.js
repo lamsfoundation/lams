@@ -52,11 +52,12 @@ function doRemove(confirmMessage)
 	var remove = confirm(confirmMessage);
 	if (remove)
 	{
-		submitWiki('removePage');
+		submitWiki("removePage");
 	}
 }
 
 var compareWindow = null;
+
 function doCompareOrView(webAppUrl, historyId, currentPageId, actionMethod)
 {
 	var url = webAppUrl + "/learning/"+ actionMethod +".do?";

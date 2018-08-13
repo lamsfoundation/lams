@@ -8,13 +8,13 @@
     }
 
     function continueOrFinish(action) {
-      document.getElementById("learningButtonForm").action;
+      document.getElementById("learningButtonForm").action += action + ".do";
       document.getElementById("learningButtonForm").submit();
     }
   </script>
 
   <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-    <form:form action="openNotebook.do" method="get" id="learningForm" modelAttribute="learningForm">
+    <form:form action="learning.do" method="get" id="learningButtonForm" modelAttribute="learningForm">
       <form:hidden path="mode" value="${mode}" />	
       <form:hidden path="toolSessionID" id="toolSessionID"/>
       <div class="panel panel-default voffset10">

@@ -1,7 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
-
 <!-- ========== Basic Tab ========== -->
 
 <div id="wikimenu" class="panel panel-default">

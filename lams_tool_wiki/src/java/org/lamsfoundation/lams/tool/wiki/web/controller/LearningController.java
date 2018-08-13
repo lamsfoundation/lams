@@ -276,9 +276,8 @@ public class LearningController extends WikiPageController {
 
     @RequestMapping("/changePage")
     public String changePage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
-	super.changePage(learningForm, request);
-	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(learningForm, request, currentWikiPageId);
+	Long pageUid = super.changePage(learningForm, request);
+	return this.returnToWiki(learningForm, request, pageUid);
     }
 
     @RequestMapping("/addPage")
@@ -290,7 +289,6 @@ public class LearningController extends WikiPageController {
 
     @RequestMapping("/removePage")
     public String removePage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
-
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 	super.removePage(learningForm, request);
 	// return to the main page, by setting the current page to null
@@ -312,6 +310,7 @@ public class LearningController extends WikiPageController {
 	return this.returnToWiki(learningForm, request, currentWikiPageId);
     }
 
+    @Override
     @RequestMapping("/notifyWikiChange")
     public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
 	    HttpServletRequest request) throws Exception {

@@ -218,7 +218,7 @@ public abstract class WikiPageController {
     /**
      * Change the active page of the wiki form
      */
-    protected void changePage(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+    protected Long changePage(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
 	Wiki wiki = null;
 	WikiSession session = null;
@@ -246,6 +246,7 @@ public abstract class WikiPageController {
 	if (wikiPage == null) {
 	    // TODO: Error handling page does not exist
 	}
+	return wikiPage.getUid();
     }
 
     /**

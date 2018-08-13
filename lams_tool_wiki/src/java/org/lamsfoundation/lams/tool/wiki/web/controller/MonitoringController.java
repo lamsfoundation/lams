@@ -168,9 +168,8 @@ public class MonitoringController extends WikiPageController {
     @RequestMapping("/changePage")
     public String changePage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
 	    throws Exception {
-	super.changePage(monitoringForm, request);
-	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+	Long pageUid = super.changePage(monitoringForm, request);
+	return this.returnToWiki(monitoringForm, request, pageUid);
     }
 
     @RequestMapping("/addPage")

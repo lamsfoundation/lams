@@ -16,6 +16,7 @@
 
 		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/validation.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>

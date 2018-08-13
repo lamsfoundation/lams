@@ -21,7 +21,7 @@
 		
 		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	    <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	    <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
+	    <script language="JavaScript" type="text/javascript" src="${tool}includes/javascript/validation.js"></script>
 	    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
 	    <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
