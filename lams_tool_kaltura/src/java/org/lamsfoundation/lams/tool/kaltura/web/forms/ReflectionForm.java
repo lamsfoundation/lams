@@ -20,11 +20,9 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.kaltura.web.forms;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.validator.ValidatorForm;
 
 /**
  *
@@ -33,7 +31,7 @@ import org.apache.struts.validator.ValidatorForm;
  *
  *
  */
-public class ReflectionForm{
+public class ReflectionForm {
     private static final long serialVersionUID = -9054365604649146735L;
     private static Logger logger = Logger.getLogger(ReflectionForm.class.getName());
 

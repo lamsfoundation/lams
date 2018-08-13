@@ -68,6 +68,11 @@ public class MonitoringController {
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request) {
+	
+	String dispatch = request.getParameter("dispatch");
+	if ("markItem".equals(dispatch)) {
+	    return markItem(request);
+	}
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -102,10 +107,6 @@ public class MonitoringController {
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
 	    request.setAttribute(KalturaConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
-	}
-	String dispatch = request.getParameter("dispatch");
-	if("markItem".equals(dispatch)) {
-	    return markItem(request);
 	}
 
 
