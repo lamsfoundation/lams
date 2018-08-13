@@ -51,7 +51,7 @@
 		
 				<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control" />
 		
-				<a href="#nogo" cssClass="btn btn-primary voffset10 pull-right" id="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary voffset10 pull-right" id="finishButton" onclick="submitForm('finish')">
 					<span class="na">
 						<c:choose>
 			 				<c:when test="${sessionMap.activityPosition.last}">

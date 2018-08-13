@@ -21,13 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -37,20 +35,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
-import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -62,25 +52,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @Controller
 @RequestMapping("/monitoring")
-public class MonitoringController{
-    
+public class MonitoringController {
+
     public static Logger log = Logger.getLogger(MonitoringController.class);
-    
+
     @Autowired
     @Qualifier("dokumaranService")
     private IDokumaranService dokumaranService;
 
-
     @RequestMapping("/summary")
-    private String summary(HttpServletRequest request,
-	    HttpServletResponse response) throws DokumaranConfigurationException, URISyntaxException {
+    private String summary(HttpServletRequest request, HttpServletResponse response)
+	    throws DokumaranConfigurationException, URISyntaxException {
 	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(DokumaranConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
@@ -101,7 +88,7 @@ public class MonitoringController{
 	    List<ReflectDTO> relectList = dokumaranService.getReflectList(contentId);
 	    sessionMap.put(DokumaranConstants.ATTR_REFLECT_LIST, relectList);
 	}
-	
+
 	//time limit
 	boolean isTimeLimitEnabled = dokumaran.getTimeLimit() != 0;
 	long secondsLeft = isTimeLimitEnabled ? dokumaranService.getSecondsLeft(dokumaran) : 0;
@@ -114,35 +101,36 @@ public class MonitoringController{
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(DokumaranConstants.ATTR_IS_GROUPED_ACTIVITY, dokumaranService.isGroupedActivity(contentId));
-	
+
 	// get the API key from the config table and add it to the session
-	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
+	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService
+		.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
 	if (etherpadServerUrlConfig == null || etherpadServerUrlConfig.getConfigValue() == null) {
 	    return "pages/learning/notconfigured";
 	}
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
-	
+
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	
+
 	//no need to store cookie if there are no sessions created yet
 	if (!groupList.isEmpty()) {
 	    // add new sessionID cookie in order to access pad
 	    Cookie etherpadSessionCookie = dokumaranService.createEtherpadCookieForMonitor(user, contentId);
 	    response.addCookie(etherpadSessionCookie);
 	}
-	
+
 	return "pages/monitoring/monitoring";
     }
-    
+
     @RequestMapping("/fixFaultySession")
-    private void fixFaultySession(HttpServletRequest request,
-	    HttpServletResponse response) throws DokumaranConfigurationException, ServletException, IOException {
+    private void fixFaultySession(HttpServletRequest request, HttpServletResponse response)
+	    throws DokumaranConfigurationException, ServletException, IOException {
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
-	
+
 	try {
 	    log.debug("Fixing faulty session (sessionId=" + toolSessionId + ").");
 	    dokumaranService.createPad(session.getDokumaran(), session);
@@ -157,30 +145,32 @@ public class MonitoringController{
 	    out.close();
 	    log.error("Failed! " + e.getMessage());
 	}
-	
+
     }
-    
+
     /**
      * Stores date when user has started activity with time limit
-     * @throws IOException 
-     * @throws JSONException 
+     * 
+     * @throws IOException
+     * @throws JSONException
      */
     @RequestMapping("/launchTimeLimit")
     private void launchTimeLimit(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
-	
+
 	dokumaranService.launchTimeLimit(toolContentId);
     }
-    
+
     /**
      * Stores date when user has started activity with time limit
-     * @throws IOException 
-     * @throws JSONException 
+     * 
+     * @throws IOException
+     * @throws JSONException
      */
     @RequestMapping("/addOneMinute")
     private void addOneMinute(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
-	
+
 	dokumaranService.addOneMinute(toolContentId);
 
     }

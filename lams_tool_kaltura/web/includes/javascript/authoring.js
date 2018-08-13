@@ -14,6 +14,6 @@ function doSelectTab(tabId) {
 	selectTab(tabId);
 }
 function doSubmit(method) {
-	document.authoringForm.dispatch.value = method;
-	document.authoringForm.submit();
+	document.forms.authoringForm.action = method+".do";
+	document.forms.authoringForm.submit();
 }

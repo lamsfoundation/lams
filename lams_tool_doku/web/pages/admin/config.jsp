@@ -27,7 +27,7 @@
 				</lams:Alert>
 			</c:if>
 			
-			<form:form action="saveContent.do" modelAttribute="ladoku11adminForm" id="ladoku11adminForm" method="post" enctype="multipart/form-data">
+			<form:form action="/lams/tool/ladoku11/ladoku11admin/saveContent.do" modelAttribute="ladoku11adminForm" id="ladoku11adminForm" method="post" enctype="multipart/form-data">
 				
 				<div class="form-group voffset5">
 					<label for="etherpadUrl">
