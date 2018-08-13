@@ -22,22 +22,16 @@
  */
 /* $$Id$$ */
 
-package org.lamsfoundation.lams.tool.wookie.web.actions;
+package org.lamsfoundation.lams.tool.wookie.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.RedirectingActionForward;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-
-public class MonitoringAction extends LamsDispatchAction {
-
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return new RedirectingActionForward("/index.html");
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
+    @RequestMapping("")
+    protected String unspecified() {
+	return "index";
     }
 }
