@@ -107,7 +107,7 @@
 					</th>
 				</tr>
 				
-				<c:forEach var="wikiContentPageVersion"items="${wikiPageContentHistory}">
+				<c:forEach var="wikiContentPageVersion" items="${wikiPageContentHistory}">
 					<c:if test="${wikiContentPageVersion.version != currentWikiPage.currentWikiContentDTO.version}">
 						<tr>
 							<td>
@@ -249,9 +249,10 @@
 		
 	}
 	
-	function submitWiki(dispatch)
+	function submitWiki(actionMethod)
 	{
-		document.getElementById("dispatch").value=dispatch;
+		document.forms.authoringForm.action=actionMethod+".do"; 
+		document.forms.authoringForm.submit();
 		replaceJavascriptTokenAndSubmit("authoringForm");
 	}
 	
@@ -260,10 +261,10 @@
 		editorInstance.wikiLinkArray = wikiLinkArray;
 	});
 
-	function doEditOrAdd(dispatch)
+	function doEditOrAdd(actionMethod)
 	{
 		var title="";
-		if(dispatch == "editPage")
+		if(actionMethod == "editPage")
 		{
 			title = document.getElementById("title").value;
 		}
@@ -282,7 +283,7 @@
 		
 		for (i=0; i<wikiLinkArray.length; i++)
 		{
-			if(dispatch == "editPage" && wikiLinkArray[i] == '${fn:escapeXml(currentWikiPage.javaScriptTitle)}')
+			if(actionMethod == "editPage" && wikiLinkArray[i] == '${fn:escapeXml(currentWikiPage.javaScriptTitle)}')
 			{
 				continue;
 			}
@@ -296,7 +297,7 @@
 		
 		// if all validation fulfilled, we can continue
 		document.getElementById("title").value = trim(title);
-		submitWiki(dispatch);
+		submitWiki(actionMethod);
 	}
 
 	

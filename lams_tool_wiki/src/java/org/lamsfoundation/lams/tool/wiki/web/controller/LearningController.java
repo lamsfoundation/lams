@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm;
-import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -64,7 +63,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
@@ -108,9 +106,8 @@ public class LearningController extends WikiPageController {
      * as setting all the advanced options and user-specifice info
      */
     @RequestMapping("/learning")
-    public String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+    public String unspecified(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
 
-	LearningForm learningForm = new LearningForm();
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, MODE_OPTIONAL);
@@ -234,7 +231,6 @@ public class LearningController extends WikiPageController {
 	Date submissionDeadline = wikiDTO.getSubmissionDeadline();
 	request.setAttribute("wikiDTO", wikiDTO);
 
-	request.setAttribute("learningForm", learningForm);
 	if (submissionDeadline != null) {
 
 	    HttpSession ss = SessionManager.getSession();
@@ -248,22 +244,91 @@ public class LearningController extends WikiPageController {
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		return "pages/learning/submissionDeadline";
 	    }
-
 	}
 
 	return "pages/learning/wiki";
+    }
+
+    @RequestMapping("/editPage")
+    public String editPage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.editPage(learningForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(learningForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/revertPage")
+    public String revertPage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.revertPage(learningForm, request);
+	return unspecified(learningForm, request);
+    }
+
+    @RequestMapping("/comparePage")
+    public String comparePage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.comparePage(learningForm, request);
+	return "pages/wiki/compare";
+    }
+
+    @RequestMapping("/viewPage")
+    public String viewPage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.viewPage(learningForm, request);
+	return "pages/wiki/viewWiki";
+    }
+
+    @RequestMapping("/changePage")
+    public String changePage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.changePage(learningForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(learningForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/addPage")
+    public String addPage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.addPage(learningForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(learningForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/removePage")
+    public String removePage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	super.removePage(learningForm, request);
+	// return to the main page, by setting the current page to null
+	return this.returnToWiki(learningForm, request, currentPageUid);
+    }
+
+    @RequestMapping("/restorePage")
+    public String restorePage(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
+	super.restorePage(learningForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(learningForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/toggleLearnerSubsciption")
+    public String toggleLearnerSubsciption(@ModelAttribute LearningForm learningForm, HttpServletRequest request)
+	    throws Exception {
+	super.toggleLearnerSubsciption(learningForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(learningForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/notifyWikiChange")
+    public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
+	    HttpServletRequest request) throws Exception {
+	super.notifyWikiChange(toolSessionID, subjectLangKey, bodyLangKey, wikiUser, request);
+    }
+
+    @RequestMapping("/revertJavascriptTokenReplacement")
+    public void revertJavascriptTokenReplacement(LearningForm learningForm) {
+	super.revertJavascriptTokenReplacement(learningForm);
     }
 
     /**
      * Wrapper method to make sure that the correct wiki is returned to from the
      * WikiPageAction class
      */
-    @Override
-    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+    protected String returnToWiki(LearningForm learnForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	LearningForm learnForm = new LearningForm();
-	ServletRequestDataBinder binder = new ServletRequestDataBinder(learnForm);
-	binder.bind(request);
 	learnForm.setCurrentWikiPageId(currentWikiPageId);
 	// put the tool session id in the attributes so that the progress bar can pick it up.
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnForm.getToolSessionID());

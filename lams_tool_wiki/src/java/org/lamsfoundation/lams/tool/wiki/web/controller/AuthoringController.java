@@ -42,14 +42,12 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
-import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -170,35 +168,99 @@ public class AuthoringController extends WikiPageController {
 	return "pages/authoring/authoring";
     }
 
-    @Override
-    public String removePage(HttpServletRequest request) throws Exception {
+    @RequestMapping("/editPage")
+    public String editPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.editPage(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+    }
 
-	AuthoringForm authoringForm = new AuthoringForm();
-	ServletRequestDataBinder binder = new ServletRequestDataBinder(authoringForm);
-	binder.bind(request);
+    @RequestMapping("/revertPage")
+    public String revertPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.revertPage(authoringForm, request);
+	return unspecified(authoringForm, request);
+    }
+
+    @RequestMapping("/comparePage")
+    public String comparePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.comparePage(authoringForm, request);
+	return "pages/wiki/compare";
+    }
+
+    @RequestMapping("/viewPage")
+    public String viewPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.viewPage(authoringForm, request);
+	return "pages/wiki/viewWiki";
+    }
+
+    @RequestMapping("/changePage")
+    public String changePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.changePage(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/addPage")
+    public String addPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.addPage(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/removePage")
+    public String removePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
 	if (wiki.isDefineLater()) {
 	    // Only mark as removed if editing a live version (monitor/live edit)
-	    return super.removePage(request);
+	    super.removePage(authoringForm, request);
+	    return returnToWiki(authoringForm, request, currentPageUid);
 	}
-	super.removePage(request);
+	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
+	wikiService.deleteWikiPage(wikiPage);
 
-	return unspecified(authoringForm, request);
+	// return to the main page, by setting the current page to null
+	return this.returnToWiki(authoringForm, request, null);
+    }
+
+    @RequestMapping("/restorePage")
+    public String restorePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.restorePage(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/toggleLearnerSubsciption")
+    public String toggleLearnerSubsciption(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.toggleLearnerSubsciption(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @Override
+    @RequestMapping("/notifyWikiChange")
+    public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
+	    HttpServletRequest request) throws Exception {
+	super.notifyWikiChange(toolSessionID, subjectLangKey, bodyLangKey, wikiUser, request);
+    }
+
+    @RequestMapping("/revertJavascriptTokenReplacement")
+    public void revertJavascriptTokenReplacement(AuthoringForm authoringForm) {
+	super.revertJavascriptTokenReplacement(authoringForm);
     }
 
     /**
      * Wrapper method to make sure that the correct wiki is returned to from the WikiPageAction class
      */
-    @Override
-    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+    protected String returnToWiki(AuthoringForm authoringForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	AuthoringForm authForm = new AuthoringForm();
-	ServletRequestDataBinder binder = new ServletRequestDataBinder(authForm);
-	binder.bind(request);
-	authForm.setCurrentWikiPageId(currentWikiPageId);
-	return unspecified(authForm, request);
+	authoringForm.setCurrentWikiPageId(currentWikiPageId);
+	return unspecified(authoringForm, request);
     }
 
     /**

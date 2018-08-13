@@ -7,14 +7,14 @@
       }
     }
 
-    function continueOrFinish(dispatch) {
+    function continueOrFinish(action) {
       document.getElementById("learningButtonForm").action;
       document.getElementById("learningButtonForm").submit();
     }
   </script>
 
   <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-    <form:form action="openNotebook.do" method="get" id="reflectEditForm">
+    <form:form action="openNotebook.do" method="get" id="learningForm" modelAttribute="learningForm">
       <form:hidden path="mode" value="${mode}" />	
       <form:hidden path="toolSessionID" id="toolSessionID"/>
       <div class="panel panel-default voffset10">
@@ -42,9 +42,9 @@
     </form:form>
   </c:if>
 
-  <html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningButtonForm">
-    <html:hidden property="toolSessionID" styleId="toolSessionID"/>
-    <html:hidden property="mode" value="${mode}" />	
+  <form:form action="openNotebook.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningButtonForm">
+    <form:hidden path="toolSessionID" id="toolSessionID"/>
+    <form:hidden path="mode" value="${mode}" />	
     <div class="pull-right voffset5" id="finishButtonDiv">
       <c:choose>
         <c:when test="${!userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
@@ -55,7 +55,7 @@
         <c:otherwise>
 
           <div class="pull-right voffset5">
-            <html:link href="#nogo" styleClass="btn btn-primary na" styleId="finishButton"
+            <a href="#nogo" class="btn btn-primary na" id="finishButton"
                        onclick="javascript:continueOrFinish('finishActivity'); return false">
               <c:choose>
                 <c:when test="${activityPosition.last}">
@@ -65,9 +65,9 @@
                   <fmt:message key="button.finish" />
                 </c:otherwise>
               </c:choose>
-            </html:link>
+            </a>
           </div>
         </c:otherwise>
       </c:choose>
     </div>
-  </html:form>
+  </form:form>

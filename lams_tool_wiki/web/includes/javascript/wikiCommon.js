@@ -57,12 +57,11 @@ function doRemove(confirmMessage)
 }
 
 var compareWindow = null;
-function doCompareOrView(webAppUrl, historyId, currentPageId, dispatch)
+function doCompareOrView(webAppUrl, historyId, currentPageId, actionMethod)
 {
-	var url = webAppUrl + "/learning.do?";
+	var url = webAppUrl + "/learning/"+ actionMethod +".do?";
 	url += "&historyPageContentId=" + historyId;
 	url += "&currentWikiPage=" + currentPageId;
-	url += "&dispatch=" + dispatch;
 	
 	if(compareWindow && compareWindow.open && !compareWindow.closed){
 		compareWindow.close();

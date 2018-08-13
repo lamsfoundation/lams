@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.MonitoringForm;
-import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -60,7 +59,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -90,7 +88,8 @@ public class MonitoringController extends WikiPageController {
      * you to view their respective WikiPages
      */
     @RequestMapping("/monitoring")
-    public String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+    public String unspecified(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
@@ -139,16 +138,92 @@ public class MonitoringController extends WikiPageController {
 	return "pages/monitoring/monitoring";
     }
 
+    @RequestMapping("/editPage")
+    public String editPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) throws Exception {
+	super.editPage(monitoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/revertPage")
+    public String revertPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.revertPage(monitoringForm, request);
+	return unspecified(monitoringForm, request);
+    }
+
+    @RequestMapping("/comparePage")
+    public String comparePage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.comparePage(monitoringForm, request);
+	return "pages/wiki/compare";
+    }
+
+    @RequestMapping("/viewPage")
+    public String viewPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) throws Exception {
+	super.viewPage(monitoringForm, request);
+	return "pages/wiki/viewWiki";
+    }
+
+    @RequestMapping("/changePage")
+    public String changePage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.changePage(monitoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/addPage")
+    public String addPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) throws Exception {
+	super.addPage(monitoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/removePage")
+    public String removePage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
+
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	super.removePage(monitoringForm, request);
+	// return to the main page, by setting the current page to null
+	return this.returnToWiki(monitoringForm, request, currentPageUid);
+    }
+
+    @RequestMapping("/restorePage")
+    public String restorePage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.restorePage(monitoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping("/toggleLearnerSubsciption")
+    public String toggleLearnerSubsciption(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.toggleLearnerSubsciption(monitoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+    }
+
+    @Override
+    @RequestMapping("/notifyWikiChange")
+    public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
+	    HttpServletRequest request) throws Exception {
+	super.notifyWikiChange(toolSessionID, subjectLangKey, bodyLangKey, wikiUser, request);
+    }
+
+    @RequestMapping("/revertJavascriptTokenReplacement")
+    public void revertJavascriptTokenReplacement(MonitoringForm monitoringForm) {
+	super.revertJavascriptTokenReplacement(monitoringForm);
+    }
+
     /**
      * Wrapper method to make sure that the correct wiki is returned to from the
      * WikiPageAction class
      */
-    @Override
-    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+    protected String returnToWiki(MonitoringForm monitoringForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	MonitoringForm monitoringForm = new MonitoringForm();
-	ServletRequestDataBinder binder = new ServletRequestDataBinder(monitoringForm);
-	binder.bind(request);
 	monitoringForm.setCurrentWikiPageId(currentWikiPageId);
 	return showWiki(monitoringForm, request);
     }

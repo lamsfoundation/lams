@@ -84,7 +84,7 @@
 			<c:forEach var="session" items="${dto.sessionDTOs}">
 			<tr>
 				<td>
-					<a href='javascript:openViewWindow("./monitoring/showWiki.do?amp;toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
+					<a href='javascript:openViewWindow("<lams:WebAppURL />monitoring/showWiki.do?toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
 				</td>	
 				<td>
 					${session.numberOfLearners}
