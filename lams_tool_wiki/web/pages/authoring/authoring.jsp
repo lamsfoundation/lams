@@ -54,7 +54,7 @@
 					</lams:Alert>
 				</c:if>
 			
-			   <lams:TabBodyArea>
+			<lams:TabBodyArea>
 			    <c:set var="errorKey" value="GLOBAL" />
         			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
            				 <lams:Alert id="error" type="danger" close="false">
@@ -80,17 +80,12 @@ s
 							contentFolderID="${sessionMap.contentFolderID}" />
 					</div>
 		
-				</lams:TabBodyArea>
+			</lams:TabBodyArea>
 					
 			<div id="footer"></div>
 		
 			</lams:Page>
 		</form:form>
 
-
 	</body>
 </lams:html>
-
-
-
-

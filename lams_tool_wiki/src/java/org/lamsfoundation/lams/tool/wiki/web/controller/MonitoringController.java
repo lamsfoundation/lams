@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -143,10 +144,13 @@ public class MonitoringController extends WikiPageController {
      * WikiPageAction class
      */
     @Override
-    public String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	wikiForm.setCurrentWikiPageId(currentWikiPageId);
-	return showWiki((MonitoringForm) wikiForm, request);
+	MonitoringForm monitoringForm = new MonitoringForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(monitoringForm);
+	binder.bind(request);
+	monitoringForm.setCurrentWikiPageId(currentWikiPageId);
+	return showWiki(monitoringForm, request);
     }
 
     /**

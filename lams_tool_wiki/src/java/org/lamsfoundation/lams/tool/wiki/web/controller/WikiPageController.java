@@ -53,7 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -77,7 +76,7 @@ public abstract class WikiPageController {
     /**
      * Default method when no dispatch parameter is specified.
      */
-    protected abstract String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception;
+//    protected abstract String unspecified(WikiPageForm wikiForm, HttpServletRequest request) throws Exception;
 
     /**
      * This action returns to the current wiki by updating the form accordingly
@@ -90,7 +89,7 @@ public abstract class WikiPageController {
     /**
      * Edit a page and make a new page content entry
      */
-    public String editPage(HttpServletRequest request) throws Exception {
+    protected String editPage(HttpServletRequest request) throws Exception {
 
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
@@ -151,12 +150,8 @@ public abstract class WikiPageController {
     /**
      * Revert to a previous page content in the page history
      */
-    public String revertPage(HttpServletRequest request) throws Exception {
-	
-	WikiPageForm wikiForm = new WikiPageForm();
-	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
-	binder.bind(request);
-	
+    protected void revertPage(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -188,14 +183,12 @@ public abstract class WikiPageController {
 	    // put the tool session id in the attributes so that the progress bar can pick it up.
 	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	}
-
-	return unspecified(wikiForm, request);
     }
 
     /**
      * Compare two page content history items and return the result
      */
-    public String comparePage(HttpServletRequest request) throws Exception {
+    protected String comparePage(HttpServletRequest request) throws Exception {
 
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
@@ -222,8 +215,8 @@ public abstract class WikiPageController {
     /**
      * View a page content from a wiki page's history
      */
-    public String viewPage(HttpServletRequest request) throws Exception {
-	
+    protected String viewPage(HttpServletRequest request) throws Exception {
+
 	Long revertPageContentVersion = new Long(
 		WebUtil.readLongParam(request, WikiConstants.ATTR_HISTORY_PAGE_CONTENT_ID));
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
@@ -247,12 +240,12 @@ public abstract class WikiPageController {
     /**
      * Change the active page of the wiki form
      */
-    public String changePage(HttpServletRequest request) throws Exception {
+    protected String changePage(HttpServletRequest request) throws Exception {
 
 	WikiPageForm wikiForm = new WikiPageForm();
 	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
 	binder.bind(request);
-	
+
 	Wiki wiki = null;
 	WikiSession session = null;
 	WikiPage wikiPage = null;
@@ -288,12 +281,12 @@ public abstract class WikiPageController {
     /**
      * Add a new wiki page to this wiki instance
      */
-    public String addPage(HttpServletRequest request) throws Exception {
+    protected String addPage(HttpServletRequest request) throws Exception {
 
 	WikiPageForm wikiForm = new WikiPageForm();
 	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
 	binder.bind(request);
-	
+
 	Wiki wiki = null;
 	WikiSession session = null;
 	WikiUser user = null;
@@ -350,12 +343,12 @@ public abstract class WikiPageController {
     /**
      * Remove a wiki page from the wiki instance
      */
-    public String removePage(HttpServletRequest request) throws Exception {
-	
+    protected String removePage(HttpServletRequest request) throws Exception {
+
 	WikiPageForm wikiForm = new WikiPageForm();
 	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
 	binder.bind(request);
-	
+
 	// The page to be removed
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
@@ -373,21 +366,18 @@ public abstract class WikiPageController {
 	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageRemoved.subject", "notify.pageRemoved.body", user, request);
 	}
-
-	// return to the same page with information about being removed displayed
-	return this.returnToWiki(wikiForm, request, currentPageUid);
-
+	return null;
     }
 
     /**
      * Restore a page previously marked as removed.
      */
-    public String restorePage(HttpServletRequest request) throws Exception {
-	
+    protected String restorePage(HttpServletRequest request) throws Exception {
+
 	WikiPageForm wikiForm = new WikiPageForm();
 	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
 	binder.bind(request);
-	
+
 	// The page to be restored
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
@@ -413,13 +403,12 @@ public abstract class WikiPageController {
     /**
      * Toggles whether a learner wants to receive notifications for wiki changes
      */
-    public String toggleLearnerSubsciption(HttpServletRequest request)
-	    throws Exception {
+    protected String toggleLearnerSubsciption(HttpServletRequest request) throws Exception {
 
 	WikiPageForm wikiForm = new WikiPageForm();
 	ServletRequestDataBinder binder = new ServletRequestDataBinder(wikiForm);
 	binder.bind(request);
-	
+
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
@@ -450,7 +439,7 @@ public abstract class WikiPageController {
 
     }
 
-    private void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
+    protected void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
 	    HttpServletRequest request) throws Exception {
 
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionID);
@@ -469,9 +458,8 @@ public abstract class WikiPageController {
 		Integer monitorUserId = monitor.getUserId();
 		String contentFolderId = wikiService.getLearnerContentFolder(toolSessionID, monitorUserId.longValue());
 
-		String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
-			+ "/monitoring/showWiki.do?toolSessionID=" + toolSessionID.toString()
-			+ "&contentFolderID=" + contentFolderId;
+		String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE + "/monitoring/showWiki.do?toolSessionID="
+			+ toolSessionID.toString() + "&contentFolderID=" + contentFolderId;
 
 		String hash = relativePath + "," + toolSessionID.toString() + ",t";
 		hash = new String(Base64.encodeBase64(hash.getBytes()));

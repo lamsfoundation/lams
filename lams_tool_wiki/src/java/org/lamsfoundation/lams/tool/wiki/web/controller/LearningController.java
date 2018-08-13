@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
@@ -258,13 +259,15 @@ public class LearningController extends WikiPageController {
      * WikiPageAction class
      */
     @Override
-    public String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	wikiForm.setCurrentWikiPageId(currentWikiPageId);
+	LearningForm learnForm = new LearningForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(learnForm);
+	binder.bind(request);
+	learnForm.setCurrentWikiPageId(currentWikiPageId);
 	// put the tool session id in the attributes so that the progress bar can pick it up.
-	LearningForm learnerForm = new LearningForm();
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnerForm.getToolSessionID());
-	return unspecified((LearningForm) wikiForm, request);
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnForm.getToolSessionID());
+	return unspecified(learnForm, request);
     }
 
     /**

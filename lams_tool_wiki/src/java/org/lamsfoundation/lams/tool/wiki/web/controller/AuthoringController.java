@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -84,10 +85,9 @@ public class AuthoringController extends WikiPageController {
      *
      */
     @RequestMapping("/authoring")
-    public String unspecified(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request)
+    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 
-	AuthoringForm authoringForm = new AuthoringForm();
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -166,7 +166,6 @@ public class AuthoringController extends WikiPageController {
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
-	request.setAttribute("authoringForm", authoringForm);
 
 	return "pages/authoring/authoring";
     }
@@ -174,21 +173,19 @@ public class AuthoringController extends WikiPageController {
     @Override
     public String removePage(HttpServletRequest request) throws Exception {
 
-	WikiPageForm wikiForm = new WikiPageForm();
+	AuthoringForm authoringForm = new AuthoringForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(authoringForm);
+	binder.bind(request);
+
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
 	if (wiki.isDefineLater()) {
 	    // Only mark as removed if editing a live version (monitor/live edit)
 	    return super.removePage(request);
 	}
-	// Completely delete the page
-	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	super.removePage(request);
 
-	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
-	wikiService.deleteWikiPage(wikiPage);
-
-	// return to the main page, by setting the current page to null
-	return this.returnToWiki(wikiForm, request, null);
+	return unspecified(authoringForm, request);
     }
 
     /**
@@ -197,8 +194,11 @@ public class AuthoringController extends WikiPageController {
     @Override
     protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	wikiForm.setCurrentWikiPageId(currentWikiPageId);
-	return unspecified((AuthoringForm) wikiForm, request);
+	AuthoringForm authForm = new AuthoringForm();
+	ServletRequestDataBinder binder = new ServletRequestDataBinder(authForm);
+	binder.bind(request);
+	authForm.setCurrentWikiPageId(currentWikiPageId);
+	return unspecified(authForm, request);
     }
 
     /**
