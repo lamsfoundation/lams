@@ -2275,6 +2275,7 @@ public class ScratchieServiceImpl
 	scratchie.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 	scratchie.setShowScrachiesInResults(JsonUtil.opt(toolContentJSON, "showScrachiesInResults", Boolean.TRUE));
+	scratchie.setConfidenceLevelsActivityUiid(JsonUtil.opt(toolContentJSON, RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID, (Integer) null));
 	
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();

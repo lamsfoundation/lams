@@ -53,6 +53,8 @@ public class RestTags {
     public static String USE_SELECT_LEADER_TOOL_OUTPUT = "useSelectLeaderToolOuput";
     public static String MINIMUM_RATES = "minimumRates";
     public static String MAXIMUM_RATES = "maximumRates";
+    public static String ENABLE_CONFIDENCE_LEVELS = "enableConfidenceLevels";
+    public static String CONFIDENCE_LEVELS_ACTIVITY_UIID = "confidenceLevelsActivityUiid";
 
     public static String QUESTIONS = "questions";
     public static String QUESTION_TEXT = "questionText";

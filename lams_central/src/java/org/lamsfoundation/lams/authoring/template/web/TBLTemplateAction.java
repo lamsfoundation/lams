@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
 import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -116,9 +117,11 @@ public class TBLTemplateAction extends LdTemplateAction {
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	activityTitle = data.getText("boilerplate.ira.title");
 	Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
-		data.getText("boilerplate.ira.instructions"), false, new JSONArray(data.testQuestions.values()));
-	activities.put(createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
-		data.contentFolderID, groupingUIID, null, null, activityTitle));
+		data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable,
+		new JSONArray(data.testQuestions.values()));
+	JSONObject iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
+		data.contentFolderID, groupingUIID, null, null, activityTitle);
+	activities.put(iraActivityJSON);
 
 	// Stop!
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
@@ -135,8 +138,11 @@ public class TBLTemplateAction extends LdTemplateAction {
 	// tRA Test
 	currentActivityPosition = calcPositionNextRight(firstActivityInRowPosition);
 	activityTitle = data.getText("boilerplate.tra.title");
+	Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable
+		? iraActivityJSON.getInt(AuthoringJsonTags.ACTIVITY_UIID) : null;
 	Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
-		data.getText("boilerplate.tra.instructions"), false, new JSONArray(data.testQuestions.values()));
+		data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
+		new JSONArray(data.testQuestions.values()));
 	activities.put(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		data.contentFolderID, groupingUIID, null, null, activityTitle));
 
@@ -220,6 +226,7 @@ public class TBLTemplateAction extends LdTemplateAction {
 	Integer numLearners;
 	Integer numGroups;
 	SortedMap<Integer, JSONObject> testQuestions;
+	boolean confidenceLevelEnable;
 	SortedMap<Integer, Assessment> applicationExercises;
 	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
 	
@@ -269,6 +276,7 @@ public class TBLTemplateAction extends LdTemplateAction {
 		    processInputPeerReviewRequestField(name, request);
 		}
 	    }
+	    confidenceLevelEnable = WebUtil.readBooleanParam(request,  "confidenceLevelEnable", false);
 	    
 	    updateCorrectAnswers(correctAnswers);
 

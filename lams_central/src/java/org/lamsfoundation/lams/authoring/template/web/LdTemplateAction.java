@@ -938,11 +938,12 @@ public abstract class LdTemplateAction extends DispatchAction {
      * details of questions). Other fields are optional.
      */
     protected Long createMCQToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, JSONArray questions) throws JSONException, HttpException, IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, JSONArray questions) throws JSONException, HttpException, IOException {
 
 	JSONObject toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
 	toolContentJSON.put(RestTags.QUESTIONS, questions);
+	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevel);
 	return createToolContent(user, LdTemplateAction.MCQ_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -1087,10 +1088,13 @@ public abstract class LdTemplateAction extends DispatchAction {
      * full details of questions). Other fields are optional.
      */
     protected Long createScratchieToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, JSONArray questions) throws JSONException, HttpException, IOException {
+	    boolean useSelectLeaderToolOuput, Integer confidenceLevelsActivityUiid, JSONArray questions) throws JSONException, HttpException, IOException {
 
 	JSONObject toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.QUESTIONS, questions);
+	if ( confidenceLevelsActivityUiid != null ) {
+	    toolContentJSON.put(RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID, confidenceLevelsActivityUiid);
+	}
 	return createToolContent(user, LdTemplateAction.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
     }
 
