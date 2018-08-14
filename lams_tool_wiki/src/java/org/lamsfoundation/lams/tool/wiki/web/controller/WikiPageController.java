@@ -252,7 +252,7 @@ public abstract class WikiPageController {
     /**
      * Add a new wiki page to this wiki instance
      */
-    protected void addPage(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
+    protected Long addPage(WikiPageForm wikiForm, HttpServletRequest request) throws Exception {
 
 	Wiki wiki = null;
 	WikiSession session = null;
@@ -302,6 +302,7 @@ public abstract class WikiPageController {
 	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageAdded.subject", "notify.pageAdded.body", user, request);
 	}
+	return currentPageUid;
     }
 
     /**

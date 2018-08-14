@@ -8,13 +8,13 @@
     }
 
     function continueOrFinish(action) {
-      document.getElementById("learningButtonForm").action += action + ".do";
-      document.getElementById("learningButtonForm").submit();
+      document.getElementById("learningForm").action = action + ".do";
+      document.getElementById("learningForm").submit();
     }
   </script>
 
   <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-    <form:form action="learning.do" method="get" id="learningButtonForm" modelAttribute="learningForm">
+    <form:form action="openNotebook.do" method="get" id="learningForm" modelAttribute="learningForm">
       <form:hidden path="mode" value="${mode}" />	
       <form:hidden path="toolSessionID" id="toolSessionID"/>
       <div class="panel panel-default voffset10">
@@ -42,7 +42,7 @@
     </form:form>
   </c:if>
 
-  <form:form action="openNotebook.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningButtonForm">
+  <form:form action="openNotebook.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
     <form:hidden path="toolSessionID" id="toolSessionID"/>
     <form:hidden path="mode" value="${mode}" />	
     <div class="pull-right voffset5" id="finishButtonDiv">

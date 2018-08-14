@@ -174,18 +174,15 @@ public class MonitoringController extends WikiPageController {
 
     @RequestMapping("/addPage")
     public String addPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) throws Exception {
-	super.addPage(monitoringForm, request);
-	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	Long currentWikiPageId = super.addPage(monitoringForm, request);
 	return returnToWiki(monitoringForm, request, currentWikiPageId);
     }
 
     @RequestMapping("/removePage")
     public String removePage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
 	    throws Exception {
-
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 	super.removePage(monitoringForm, request);
-	// return to the main page, by setting the current page to null
 	return this.returnToWiki(monitoringForm, request, currentPageUid);
     }
 
