@@ -56,8 +56,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * This action handles all the authoring actions, which include opening author, saving, uploading instruction files and
  * all the wikipage actions
  *
- * It inherits from the WikiPageAction which inherits from the LamsDispatchAction so that common actions can be used in
- * learner, monitor and author
  *
  * @author lfoxton
  */
@@ -78,11 +76,6 @@ public class AuthoringController extends WikiPageController {
 
     private static final String KEY_MODE = "mode";
 
-    /**
-     * Default method when no dispatch parameter is specified. It is expected that the parameter
-     * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     *
-     */
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws Exception {
