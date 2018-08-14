@@ -21,12 +21,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web.form;
 
 import java.util.ArrayList;
 
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 
 /**
@@ -43,7 +41,7 @@ import org.lamsfoundation.lams.admin.web.dto.UserBean;
  *
  *
  */
-public class UserOrgRoleForm extends ActionForm {
+public class UserOrgRoleForm {
 
     private ArrayList userBeans = new ArrayList();
     private Integer orgId;

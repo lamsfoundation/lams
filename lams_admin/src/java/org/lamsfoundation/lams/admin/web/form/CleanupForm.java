@@ -22,32 +22,16 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
+public class CleanupForm {
 
-/**
- * @author jliew
- *
- *
- */
-public class ImportExcelForm {
+    private Integer numDays;
 
-    private Integer orgId;
-    private MultipartFile file;
-
-    public Integer getOrgId() {
-	return orgId;
+    public Integer getNumDays() {
+	return numDays;
     }
 
-    public void setOrgId(Integer orgId) {
-	this.orgId = orgId;
-    }
-
-    public MultipartFile getFile() {
-	return file;
-    }
-
-    public void setFile(MultipartFile file) {
-	this.file = file;
+    public void setNumDays(Integer numDays) {
+	this.numDays = numDays;
     }
 
 }

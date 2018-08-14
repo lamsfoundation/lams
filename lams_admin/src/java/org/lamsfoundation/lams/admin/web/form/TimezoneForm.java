@@ -22,32 +22,27 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
+public class TimezoneForm {
 
-/**
- * @author jliew
- *
- *
- */
-public class ImportExcelForm {
+    private String[] selected;
 
-    private Integer orgId;
-    private MultipartFile file;
+    private String method;
 
-    public Integer getOrgId() {
-	return orgId;
+    public String[] getSelected() {
+	return selected;
     }
 
-    public void setOrgId(Integer orgId) {
-	this.orgId = orgId;
+    public void setSelected(String[] selected) {
+	this.selected = selected;
     }
 
-    public MultipartFile getFile() {
-	return file;
+    public String getMethod() {
+	return method;
     }
 
-    public void setFile(MultipartFile file) {
-	this.file = file;
+    public void setMethod(String method) {
+	this.method = method;
     }
 
 }
+

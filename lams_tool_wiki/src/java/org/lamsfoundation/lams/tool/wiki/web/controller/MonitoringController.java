@@ -68,9 +68,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * This action handles all the monitoring actions, which include opening
  * monitor, and all the wikipage actions
  *
- * It inherits from the WikiPageAction which inherits from the
- * LamsDispatchAction so that common actions can be used in learner, monitor and
- * author
  *
  * @author lfoxton
  */
@@ -194,7 +191,7 @@ public class MonitoringController extends WikiPageController {
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
     }
-    
+
     @RequestMapping(path = "/toggleLearnerSubsciption", method = RequestMethod.POST)
     public String toggleLearnerSubsciption(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request)
 	    throws Exception {

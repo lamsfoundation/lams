@@ -22,32 +22,36 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
+public class ConfigForm {
 
-/**
- * @author jliew
- *
- *
- */
-public class ImportExcelForm {
+    private String[] key;
 
-    private Integer orgId;
-    private MultipartFile file;
+    private String[] value;
 
-    public Integer getOrgId() {
-	return orgId;
+    private String method;
+
+    public String[] getKey() {
+	return key;
     }
 
-    public void setOrgId(Integer orgId) {
-	this.orgId = orgId;
+    public void setKey(String[] key) {
+	this.key = key;
     }
 
-    public MultipartFile getFile() {
-	return file;
+    public String[] getValue() {
+	return value;
     }
 
-    public void setFile(MultipartFile file) {
-	this.file = file;
+    public void setValue(String[] value) {
+	this.value = value;
+    }
+
+    public String getMethod() {
+	return method;
+    }
+
+    public void setMethod(String method) {
+	this.method = method;
     }
 
 }

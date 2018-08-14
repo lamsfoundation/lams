@@ -32,7 +32,7 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class ThemeForm extends ActionForm {
+public class ThemeForm {
 
     private static final long serialVersionUID = -3127221000563399156L;
 

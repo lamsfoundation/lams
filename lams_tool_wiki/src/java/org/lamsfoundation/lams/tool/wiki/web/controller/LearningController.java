@@ -72,9 +72,6 @@ import org.springframework.web.context.WebApplicationContext;
  * This action handles all the learning actions, which include opening learner,
  * relection, going to the next activity, and all the wikipage actions
  *
- * It inherits from the WikiPageAction which inherits from the
- * LamsDispatchAction so that common actions can be used in learner, monitor and
- * author
  *
  * @author lfoxton
  * @version

@@ -32,9 +32,8 @@ function deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan
 	}
 	$.ajax({
 		'cache'   : false,
-		'url'     : '<lams:WebAppURL />cleanupPreviewLessons.do',
+		'url'     : '<lams:WebAppURL />cleanupPreviewLessons/delete.do',
 		'data'    : {
-			'method' : 'deletePreviewLessons',
 			'limit'  : 5
 		},
 		'success' : function(response){

@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
@@ -22,17 +23,13 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
-
-/**
- * @author jliew
- *
- *
- */
-public class ImportExcelForm {
+public class UserRolesForm {
 
     private Integer orgId;
-    private MultipartFile file;
+
+    private Integer userId;
+
+    private String[] roles; // String []
 
     public Integer getOrgId() {
 	return orgId;
@@ -42,12 +39,20 @@ public class ImportExcelForm {
 	this.orgId = orgId;
     }
 
-    public MultipartFile getFile() {
-	return file;
+    public Integer getUserId() {
+	return userId;
     }
 
-    public void setFile(MultipartFile file) {
-	this.file = file;
+    public void setUserId(Integer userId) {
+	this.userId = userId;
+    }
+
+    public String[] getRoles() {
+	return roles;
+    }
+
+    public void setRoles(String[] roles) {
+	this.roles = roles;
     }
 
 }

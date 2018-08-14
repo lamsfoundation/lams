@@ -4,17 +4,26 @@
 
 <p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-<html:errors />
+<%-- Error Messages --%>
+ <c:set var="errorKey" value="GLOBAL" />
+   <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+      <lams:Alert id="error" type="danger" close="false">
+        <c:forEach var="error" items="${errorMap[errorKey]}">
+           <c:out value="${error}" />
+        </c:forEach>
+      </lams:Alert>
+  </c:if>
 
 <lams:Alert type="warn" id="cleanup-warning" close="false">
 	<fmt:message key="msg.cleanup.warning" /><br />
 </lams:Alert>
 
-<logic:notEmpty name="filesDeleted">
+<c:set var="filesDeleted" value="${filesDeleted}"/>
+<c:if test="${not empty filesDeleted}">
 	<p><c:out value="${filesDeleted}" /></p>
-</logic:notEmpty>
+</c:if>
 
-	<input class="btn btn-default" type="submit" value="Calculate" onClick="javascript:document.location='cleanup.do?action=refresh'" />
+	<input class="btn btn-default" type="submit" value="Calculate" onClick="javascript:document.location='cleanup/refresh.do'" />
 	<span class="loffset10"><c:out value="<%= FileUtil.getTempDir() %>" /></span>
 	
 	<ul class="list-group voffset5">
@@ -28,14 +37,14 @@
 <fmt:message key="msg.cleanup.recommended" />
 </p>
 
-<html:form action="/cleanup" method="post">
+<form:form action="start.do" modelAttribute="dynaForm" id="dynaForm" method="post">
 
 	<p><fmt:message key="label.cleanup.delete" />:
-	<html:text property="numDays" maxlength="4" size="4" styleClass="form-control form-control-inline"/></p>
+	<input type="text" name="numDays" maxlength="4" size="4" class="form-control form-control-inline" /></p>
 	
 	<div class="pull-right">
 		<html:cancel styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html:cancel>	
-		<html:submit styleClass="btn btn-primary loffset5"><fmt:message key="admin.delete"/></html:submit>
+		<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.delete"/>" />
 	</div>
 	
-</html:form>
+</form:form>

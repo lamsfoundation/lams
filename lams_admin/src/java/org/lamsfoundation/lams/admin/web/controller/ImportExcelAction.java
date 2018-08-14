@@ -20,34 +20,42 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.admin.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
+package org.lamsfoundation.lams.admin.web.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author jliew
  *
  *
+ *
+ *
+ *
+ *
+ *
  */
-public class ImportExcelForm {
+public class ImportExcelAction extends Action {
 
-    private Integer orgId;
-    private MultipartFile file;
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-    public Integer getOrgId() {
-	return orgId;
-    }
+	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
+	//if (orgId==null) orgId = (Integer)request.getAttribute("orgId");
 
-    public void setOrgId(Integer orgId) {
-	this.orgId = orgId;
-    }
+	ImportExcelForm importExcelForm = (ImportExcelForm) form;
+	importExcelForm.setOrgId(orgId);
 
-    public MultipartFile getFile() {
-	return file;
-    }
-
-    public void setFile(MultipartFile file) {
-	this.file = file;
+	return mapping.findForward("importexcel");
     }
 
 }
