@@ -22,11 +22,12 @@
  */
 
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -34,11 +35,17 @@ import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.web.action.LamsAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
+ * Action class to forward the user to a Tool.
+ *
  * @author daveg
  *
  *         XDoclet definition:
@@ -46,43 +53,40 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *
  */
-public class ChooseActivityAction extends ActivityAction {
-
-    protected static String className = "ChooseActivity";
+@Controller
+public class DisplayToolActivityController extends ActivityController {
+    
+    private static Logger log = Logger.getLogger(DisplayToolActivityController.class);
+    
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
 
     /**
-     * Gets an activity from the request (attribute) and forwards onto the required jsp (SingleActivity or
-     * ParallelActivity).
+     * Gets a tool activity from the request (attribute) and uses a redirect to forward the user to the tool.
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("//DisplayToolActivity")
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
+	//ActivityForm form = (ActivityForm)actionForm;
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-	// check token
-	if (!this.isTokenValid(request, true)) {
-	    // didn't come here from options page
-	    LamsAction.log.info(ChooseActivityAction.className + ": No valid token in request");
-	    return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
-	}
-
-	ICoreLearnerService learnerService = getLearnerService();
-
-	// Get learner and lesson details.
-	Integer learnerId = LearningWebUtil.getUserId();
-	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Lesson lesson = progress.getLesson();
-
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
-	if (activity != null) {
-	    progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity, false);
-	} else {
-	    // Something has gone wrong - maybe due to Live Edit. Need to recalculate their current location.
-	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
+	if (!(activity instanceof ToolActivity)) {
+	    log.error("activity not ToolActivity");
+	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 
-	ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
-	return forward;
+	ToolActivity toolActivity = (ToolActivity) activity;
+
+	String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity,
+		learnerProgress.getUser());
+	try {
+	    response.sendRedirect(url);
+	} catch (java.io.IOException e) {
+	    return mapping.findForward(ActivityMapping.ERROR);
+	}
+	return null;
     }
 }

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -56,7 +56,7 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *
  */
-public class LoadToolActivityAction extends ActivityAction {
+public class LoadToolActivityAction extends ActivityController {
 
     public static final String PARAM_ACTIVITY_URL = "activityURL";
     public static final String PARAM_IS_BRANCHING = "isBranching";

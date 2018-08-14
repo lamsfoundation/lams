@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.UnsupportedEncodingException;
 
@@ -40,6 +40,10 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Action class to display an activity. This is used when UI calls starts of the learning process. It is needed to put
@@ -63,14 +67,19 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class DisplayActivityAction extends ActivityAction {
+@Controller
+public class DisplayActivityController extends ActivityController {
 
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-    private static Logger log = Logger.getLogger(DisplayActivityAction.class);
+    private static Logger log = Logger.getLogger(DisplayActivityController.class);
 
     public static final String PARAM_INITIAL_DISPLAY = "initialDisplay";
+    
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
@@ -78,10 +87,8 @@ public class DisplayActivityAction extends ActivityAction {
      *
      * @throws UnsupportedEncodingException
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws UnsupportedEncodingException {
-	ICoreLearnerService learnerService = getLearnerService();
+    @RequestMapping("/DisplayActivity")
+    public String execute( HttpServletRequest request) throws UnsupportedEncodingException {
 
 	// UI can only send the lessonID as that is all it has...
 	Integer learnerId = LearningWebUtil.getUserId();
@@ -94,15 +101,15 @@ public class DisplayActivityAction extends ActivityAction {
 
 	// Normally this is used to display the initial page, so initialDisplay=true. But if called from the
 	// special handling for completed activities (ie close window) then we need to set it to false.
-	boolean displayParallelFrames = WebUtil.readBooleanParam(request, DisplayActivityAction.PARAM_INITIAL_DISPLAY,
+	boolean displayParallelFrames = WebUtil.readBooleanParam(request, DisplayActivityController.PARAM_INITIAL_DISPLAY,
 		true);
 
 	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
 	ActionForward forward = actionMappings.getProgressForward(learnerProgress, false, displayParallelFrames,
 		request, learnerService);
 
-	if (DisplayActivityAction.log.isDebugEnabled()) {
-	    DisplayActivityAction.log.debug(forward);
+	if (DisplayActivityController.log.isDebugEnabled()) {
+	    DisplayActivityController.log.debug(forward);
 	}
 
 	return forward;

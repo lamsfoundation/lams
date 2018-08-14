@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.UnsupportedEncodingException;
 
@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *
  */
-public class SequenceActivityAction extends ActivityAction {
+public class SequenceActivityAction extends ActivityController {
 
     /**
      * Gets an sequence activity from the request (attribute) and forwards to either the first activity in the sequence

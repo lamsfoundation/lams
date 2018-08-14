@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
@@ -42,7 +42,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Action class run when the learner finishes a lesson.
  */
-public class LessonCompleteActivityAction extends ActivityAction {
+public class LessonCompleteActivityAction extends ActivityController {
 
     private static IntegrationService integrationService = null;
     private static ILessonService lessonService = null;
@@ -64,7 +64,7 @@ public class LessonCompleteActivityAction extends ActivityAction {
 		releasedLessonNames.append(releasedLesson.getLessonName()).append(", ");
 	    }
 	    releasedLessonNames.delete(releasedLessonNames.length() - 2, releasedLessonNames.length());
-	    request.setAttribute(ActivityAction.RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
+	    request.setAttribute(ActivityController.RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
 	}
 
 	//checks for lessonFinishUrl parameter

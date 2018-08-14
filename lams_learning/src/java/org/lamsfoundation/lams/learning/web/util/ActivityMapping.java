@@ -30,11 +30,9 @@ import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ForwardingActionForward;
-import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.action.DisplayActivityAction;
+import org.lamsfoundation.lams.learning.web.controller.DisplayActivityController;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -78,26 +76,26 @@ public class ActivityMapping implements Serializable {
      * @param progress,
      *            the LearnerProgress associated with the Activity and learner
      */
-    public ActionForward getActivityForward(Activity activity, LearnerProgress progress, boolean redirect) {
-	ActionForward actionForward = null;
+    public String getActivityForward(Activity activity, LearnerProgress progress, boolean redirect) {
+	String forward = null;
 
-	String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
-	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
+	String action = this.activityMappingStrategy.getActivityAction(activity);
+	action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		progress.getLearnerProgressId().toString());
-	if ( activity != null ) {
-	    strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_ACTIVITY_ID,
+	if (activity != null) {
+	    action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_ACTIVITY_ID,
 		    activity.getActivityId().toString());
 	}
 
 	if ((activity != null) && activity.isToolActivity()) {
 	    // always use redirect false for a ToolActivity as ToolDisplayActivity
 	    // does it's own redirect
-	    actionForward = strutsActionToForward(strutsAction, activity, false);
+	    forward = actionToForward(action, activity, false);
 	} else {
-	    actionForward = strutsActionToForward(strutsAction, activity, redirect);
+	    forward = actionToForward(action, activity, redirect);
 	}
 
-	return actionForward;
+	return forward;
     }
 
     /**
@@ -114,9 +112,9 @@ public class ActivityMapping implements Serializable {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public ActionForward getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
+    public String getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
 	    HttpServletRequest request, ICoreLearnerService learnerService) throws UnsupportedEncodingException {
-	ActionForward actionForward = null;
+	String forward = null;
 
 	if (progress.isComplete()) {
 	    // If lesson complete forward to lesson complete action. This action will
@@ -124,30 +122,30 @@ public class ActivityMapping implements Serializable {
 	    // id as getting to the end from an activity can't have the progress in the request
 	    // and there isn't an activity from which we can determine the lesson and hence
 	    // the progress.
-	    String strutsAction = this.getActivityMappingStrategy().getLessonCompleteAction();
-	    strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
+	    String action = this.getActivityMappingStrategy().getLessonCompleteAction();
+	    action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		    progress.getLearnerProgressId().toString());
-	    strutsAction = ActivityMapping.strutsActionToURL(strutsAction, null, true);
-	    actionForward = this.getClearFramesForward(strutsAction, progress.getLearnerProgressId().toString());
+	    action = ActivityMapping.actionToURL(action, null, true);
+	    forward = this.getClearFramesForward(action, progress.getLearnerProgressId().toString());
 	} else {
 	    if (!displayParallelFrames && (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING)) {
 		// processing the screen WITHIN parallel activity frames.
 		// progress is waiting, goto waiting page
-		String strutsAction = this.getActivityMappingStrategy().getWaitingAction();
-		actionForward = this.strutsActionToForward(strutsAction, null, redirect);
+		String action = this.getActivityMappingStrategy().getWaitingAction();
+		forward = this.actionToForward(action, null, redirect);
 	    } else {
 		// display next activity
 		if (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE) {
 		    // if previous activity was a parallel activity then we need to
 		    // clear frames.
 		    String activityURL = this.getActivityURL(progress.getNextActivity());
-		    actionForward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
+		    forward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
 		} else {
-		    actionForward = getActivityForward(progress.getNextActivity(), progress, redirect);
+		    forward = getActivityForward(progress.getNextActivity(), progress, redirect);
 		}
 	    }
 	}
-	return actionForward;
+	return forward;
     }
 
     /**
@@ -160,18 +158,17 @@ public class ActivityMapping implements Serializable {
      * @return actionForward to which to forward
      * @throws UnsupportedEncodingException
      */
-    private ActionForward getClearFramesForward(String activityURL, String progressId)
-	    throws UnsupportedEncodingException {
+    private String getClearFramesForward(String activityURL, String progressId) throws UnsupportedEncodingException {
 
 	String encodedURL = URLEncoder.encode(activityURL, "UTF-8");
 
-	ActionForward actionForward = null;
+	String forward = null;
 
-	String strutsAction = "/requestDisplay.do?url=" + encodedURL;
-	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId);
+	String action = "/requestDisplay.do?url=" + encodedURL;
+	action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId);
 
-	actionForward = strutsActionToForward(strutsAction, null, false);
-	return actionForward;
+	forward = actionToForward(action, null, false);
+	return forward;
 
     }
 
@@ -185,8 +182,8 @@ public class ActivityMapping implements Serializable {
      *            the LearnerProgress associated with the Activity and learner
      */
     public String getActivityURL(Activity activity) {
-	String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
-	return ActivityMapping.strutsActionToURL(strutsAction, activity, true);
+	String action = this.activityMappingStrategy.getActivityAction(activity);
+	return ActivityMapping.actionToURL(action, activity, true);
     }
 
     /**
@@ -220,8 +217,8 @@ public class ActivityMapping implements Serializable {
      * @param useContext,
      *            if true prepends the server and context to the URL.
      */
-    public static String strutsActionToURL(String strutsAction, Activity activity, boolean useContext) {
-	String url = strutsAction;
+    public static String actionToURL(String action, Activity activity, boolean useContext) {
+	String url = action;
 
 	if (activity != null && !url.contains(AttributeNames.PARAM_ACTIVITY_ID)) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID,
@@ -246,19 +243,12 @@ public class ActivityMapping implements Serializable {
      *            should the action be a client redirect
      * @return
      */
-    protected ActionForward strutsActionToForward(String strutsAction, Activity activity, boolean redirect) {
-	ActionForward actionForward;
+    protected String actionToForward(String action, Activity activity, boolean redirect) {
 	if (redirect) {
-	    String activityURL = ActivityMapping.strutsActionToURL(strutsAction, activity, false);
-	    actionForward = new RedirectingActionForward(activityURL);
-	    actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
-	} else {
-	    actionForward = new ForwardingActionForward(strutsAction);
-	    actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
-
+	    String activityURL = ActivityMapping.actionToURL(action, activity, false);
+	    return "redirect:" + WebUtil.getStrutsForwardNameFromPath(activityURL);
 	}
-
-	return actionForward;
+	return "forward:" + WebUtil.getStrutsForwardNameFromPath(action);
     }
 
     /**
@@ -312,16 +302,15 @@ public class ActivityMapping implements Serializable {
      * the window name. so prepare the urls for (2), (3) and (4) then call the close window screen and it will sort it
      * out.
      */
-    public ActionForward getCloseForward(Activity justCompletedActivity, Long lessonId)
-	    throws UnsupportedEncodingException {
+    public String getCloseForward(Activity justCompletedActivity, Long lessonId) throws UnsupportedEncodingException {
 
 	String closeWindowURLAction = activityMappingStrategy.getCloseWindowAction();
 
 	// Always calculate the url for the "normal" next case as we won't know till we reach the close window if we need it.
 
 	String action = getDisplayActivityAction(lessonId);
-	action = ActivityMapping.strutsActionToURL(action, null, true);
-	action = WebUtil.appendParameterToURL(action, DisplayActivityAction.PARAM_INITIAL_DISPLAY, "false");
+	action = ActivityMapping.actionToURL(action, null, true);
+	action = WebUtil.appendParameterToURL(action, DisplayActivityController.PARAM_INITIAL_DISPLAY, "false");
 	action = URLEncoder.encode(action, "UTF-8");
 
 	if (!justCompletedActivity.isFloating()) {
@@ -332,20 +321,20 @@ public class ActivityMapping implements Serializable {
 	if ((justCompletedActivity.getParentActivity() != null)
 		&& justCompletedActivity.getParentActivity().isParallelActivity()) {
 	    action = getActivityMappingStrategy().getWaitingAction();
-	    action = ActivityMapping.strutsActionToURL(action, null, true);
+	    action = ActivityMapping.actionToURL(action, null, true);
 	    action = URLEncoder.encode(action, "UTF-8");
 	    closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "waitURL", action);
 	}
 
-	return strutsActionToForward(closeWindowURLAction, null, false);
+	return actionToForward(closeWindowURLAction, null, false);
     }
 
     public String getProgressBrokenURL() {
-	return ActivityMapping.strutsActionToURL(activityMappingStrategy.getProgressBrokenAction(), null, true);
+	return ActivityMapping.actionToURL(activityMappingStrategy.getProgressBrokenAction(), null, true);
     }
 
     public String getCompleteActivityURL(Long activityId, Long progressId) {
-	String url = ActivityMapping.strutsActionToURL(activityMappingStrategy.getCompleteActivityAction(), null, true);
+	String url = ActivityMapping.actionToURL(activityMappingStrategy.getCompleteActivityAction(), null, true);
 	if (activityId != null) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID, activityId.toString());
 	}

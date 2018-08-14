@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
 
@@ -29,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -41,6 +42,11 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -51,11 +57,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  *
  */
-public class CompleteActivityAction extends ActivityAction {
+@Controller
+public class CompleteActivityController extends ActivityController {
+    
+    private static Logger log = Logger.getLogger(CompleteActivityController.class);
 
     protected static String className = "CompleteActivity";
     private static IntegrationService integrationService = null;
 
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+    
+    @Autowired
+    private WebApplicationContext applicationContext;
+    
     /**
      * Sets the current activity as complete and uses the progress engine to find the next activity (may be null).
      *
@@ -65,12 +81,9 @@ public class CompleteActivityAction extends ActivityAction {
      * @throws IOException
      * @throws ServletException
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-
-	ICoreLearnerService learnerService = getLearnerService();
+    @RequestMapping("/CompleteActivity")
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.applicationContext.getServletContext());
 
 	Integer learnerId = LearningWebUtil.getUserId();
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
@@ -112,10 +125,10 @@ public class CompleteActivityAction extends ActivityAction {
     }
 
     private IntegrationService getIntegrationService() {
-	if (CompleteActivityAction.integrationService == null) {
-	    CompleteActivityAction.integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
+	if (CompleteActivityController.integrationService == null) {
+	    CompleteActivityController.integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext()).getBean("integrationService");
 	}
-	return CompleteActivityAction.integrationService;
+	return CompleteActivityController.integrationService;
     }
 }

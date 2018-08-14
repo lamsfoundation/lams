@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.gradebook.web.action;
+package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
@@ -58,11 +55,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -73,20 +72,35 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  *         Handles the general requests for content in gradebook
  */
-public class GradebookAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/gradebook")
+public class GradebookController {
 
-    private static Logger logger = Logger.getLogger(GradebookAction.class);
+    private static Logger logger = Logger.getLogger(GradebookController.class);
 
+    @Autowired
+    @Qualifier("gradebookService")
     private static IGradebookService gradebookService;
+
+    @Autowired
+    @Qualifier("userService")
     private static IUserManagementService userService;
+
+    @Autowired
+    @Qualifier("lessonService")
     private static ILessonService lessonService;
+
+    @Autowired
+    @Qualifier("securityService")
     private static ISecurityService securityService;
+
+    @Autowired
+    @Qualifier("learnerService")
     private static ICoreLearnerService learnerService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	return null;
+    @RequestMapping("")
+    @ResponseBody
+    public void unspecified() throws Exception {
     }
 
     /**
@@ -106,8 +120,9 @@ public class GradebookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getActivityGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getActivityGridData")
+    @ResponseBody
+    public String getActivityGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
@@ -120,7 +135,7 @@ public class GradebookAction extends LamsDispatchAction {
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonParticipant(lessonID, getUser().getUserID(), "get activity gradebook data",
+	if (!securityService.isLessonParticipant(lessonID, getUser().getUserID(), "get activity gradebook data",
 		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 	    return null;
@@ -137,16 +152,16 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
 	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID,
+	    gradebookActivityDTOs = gradebookService.getGBActivityRowsForLearner(lessonID, userID,
 		    currentUserDTO.getTimeZone());
 	} else if (view == GBGridView.MON_ACTIVITY) {
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID,
-		    currentUserDTO.getTimeZone(), true);
+	    gradebookActivityDTOs = gradebookService.getGBActivityRowsForLesson(lessonID, currentUserDTO.getTimeZone(),
+		    true);
 	}
 
 	if ((sortBy == null) || sortBy.equals("")) {
@@ -156,23 +171,23 @@ public class GradebookAction extends LamsDispatchAction {
 	String ret = GradebookUtil.toGridXML(gradebookActivityDTOs, view, sortBy, isSearch, searchField, searchOper,
 		searchString, sortOrder, rowLimit, page);
 
-	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
-	return null;
+	response.setContentType("text/xml; charset=utf-8");
+	return ret;
     }
 
     @SuppressWarnings("unchecked")
-    public ActionForward getLessonCompleteGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getLessonCompleteGridData")
+    @ResponseBody
+    public String getLessonCompleteGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	UserDTO currentUserDTO = getUser();
 	Integer userId = currentUserDTO.getUserID();
-	if (!getSecurityService().isLessonParticipant(lessonId, userId, "get lesson complete gradebook data", false)) {
+	if (!securityService.isLessonParticipant(lessonId, userId, "get lesson complete gradebook data", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
-	    return null;
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = getGradebookService().getGBLessonComplete(lessonId, userId);
+	List<GradebookGridRowDTO> gradebookActivityDTOs = gradebookService.getGBLessonComplete(lessonId, userId);
 
 	ObjectNode resultJSON = JsonNodeFactory.instance.objectNode();
 	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
@@ -204,7 +219,7 @@ public class GradebookAction extends LamsDispatchAction {
 
 	// make a mapping of activity ID -> URL, same as in progress bar
 	ObjectNode activityURLJSON = JsonNodeFactory.instance.objectNode();
-	Object[] ret = getLearnerService().getStructuredActivityURLs(userId, lessonId);
+	Object[] ret = learnerService.getStructuredActivityURLs(userId, lessonId);
 	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
 	    String url = activity.getUrl();
 	    if (url != null) {
@@ -221,18 +236,18 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 	resultJSON.set("urls", activityURLJSON);
 
-	boolean isWeighted = getGradebookService().isWeightedMarks(lessonId);
-	GradebookUserLesson gradebookUserLesson = getGradebookService().getGradebookUserLesson(lessonId, userId);
+	boolean isWeighted = gradebookService.isWeightedMarks(lessonId);
+	GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId, userId);
 	resultJSON.put("learnerLessonMark",
 		gradebookUserLesson == null || gradebookUserLesson.getMark() == null ? GradebookConstants.CELL_EMPTY
 			: GradebookUtil.niceFormatting(gradebookUserLesson.getMark(), isWeighted));
-	Double averageLessonMark = getGradebookService().getAverageMarkForLesson(lessonId);
+	Double averageLessonMark = gradebookService.getAverageMarkForLesson(lessonId);
 	resultJSON.put("averageLessonMark", averageLessonMark == null ? GradebookConstants.CELL_EMPTY
 		: GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(resultJSON.toString());
-	return null;
+	return resultJSON.toString();
     }
 
     /**
@@ -255,8 +270,9 @@ public class GradebookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getUserGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping
+    @ResponseBody
+    public String getUserGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
@@ -279,21 +295,21 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 
 	// Get the user gradebook list from the db
-	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<>();
 
 	int totalUsers = 0;
 	// if leesonID is specified show results based on lesson
 	if (lessonID != null) {
-	    if (!getSecurityService().isLessonMonitor(lessonID, user.getUserID(), "get gradebook", false)) {
+	    if (!securityService.isLessonMonitor(lessonID, user.getUserID(), "get gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
 
-	    Lesson lesson = getLessonService().getLesson(lessonID);
+	    Lesson lesson = lessonService.getLesson(lessonID);
 	    //GBGridView.MON_USER - 1st table of gradebook lesson monitor
 	    //GBGridView.MON_COURSE - Subgrid of 1st table of gradebook course monitor
 	    if (view == GBGridView.MON_USER || view == GBGridView.MON_COURSE) {
-		gradebookUserDTOs = getGradebookService().getGBUserRowsForLesson(lesson, page - 1, rowLimit, sortBy,
+		gradebookUserDTOs = gradebookService.getGBUserRowsForLesson(lesson, page - 1, rowLimit, sortBy,
 			sortOrder, searchString, user.getTimeZone());
 		totalUsers = lesson.getAllLearners().size();
 
@@ -314,15 +330,15 @@ public class GradebookAction extends LamsDispatchAction {
 		// Getting the group id if it is there
 		Long groupId = WebUtil.readLongParam(request, GradebookConstants.PARAM_GROUP_ID, true);
 
-		Activity activity = getGradebookService().getActivityById(activityID);
+		Activity activity = gradebookService.getActivityById(activityID);
 		if ((activity != null) && (activity instanceof ToolActivity)) {
-		    gradebookUserDTOs = getGradebookService().getGBUserRowsForActivity(lesson, (ToolActivity) activity,
+		    gradebookUserDTOs = gradebookService.getGBUserRowsForActivity(lesson, (ToolActivity) activity,
 			    groupId, page - 1, rowLimit, sortBy, sortOrder, searchString, user.getTimeZone());
 
 		    //calculate totalUsers
 		    totalUsers = lesson.getAllLearners().size();
 		    if (groupId != null) {
-			Group group = (Group) getUserService().findById(Group.class, groupId);
+			Group group = (Group) userService.findById(Group.class, groupId);
 			if (group != null) {
 			    totalUsers = group.getUsers().size();
 			}
@@ -330,7 +346,7 @@ public class GradebookAction extends LamsDispatchAction {
 
 		} else {
 		    // return null and the grid will report an error
-		    GradebookAction.logger.error("No activity found for: " + activityID);
+		    GradebookController.logger.error("No activity found for: " + activityID);
 		    return null;
 		}
 	    }
@@ -338,18 +354,18 @@ public class GradebookAction extends LamsDispatchAction {
 	    // 2nd table of gradebook course monitor
 	    // if organisationID is specified (but not lessonID) then show results for organisation
 	} else if (organisationID != null) {
-	    if (!getSecurityService().isGroupMonitor(organisationID, user.getUserID(), "get gradebook", false)) {
+	    if (!securityService.isGroupMonitor(organisationID, user.getUserID(), "get gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
 
-	    Organisation org = (Organisation) getUserService().findById(Organisation.class, organisationID);
-	    gradebookUserDTOs = getGradebookService().getGBUserRowsForOrganisation(org, page - 1, rowLimit, sortOrder,
+	    Organisation org = (Organisation) userService.findById(Organisation.class, organisationID);
+	    gradebookUserDTOs = gradebookService.getGBUserRowsForOrganisation(org, page - 1, rowLimit, sortOrder,
 		    searchString);
 	    totalUsers = gradebookService.getCountUsersByOrganisation(organisationID, searchString);
 
 	} else {
-	    LamsDispatchAction.log.error("Missing parameters: either lessonID or organisationID should be specified.");
+	    logger.error("Missing parameters: either lessonID or organisationID should be specified.");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters");
 	    return null;
 	}
@@ -359,8 +375,9 @@ public class GradebookAction extends LamsDispatchAction {
 		Math.ceil(new Integer(totalUsers).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
 	String ret = GradebookUtil.toGridXML(gradebookUserDTOs, page, totalPages, view);
 
-	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
-	return null;
+	response.setContentType("text/xml; charset=utf-8");
+	;
+	return ret;
     }
 
     /**
@@ -380,8 +397,9 @@ public class GradebookAction extends LamsDispatchAction {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getCourseGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getCourseGridData")
+    @ResponseBody
+    public String getCourseGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
@@ -393,7 +411,7 @@ public class GradebookAction extends LamsDispatchAction {
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 	Integer courseID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	Organisation organisation = (Organisation) getUserService().findById(Organisation.class, courseID);
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, courseID);
 
 	// in case of toolbar searching (which uses different parameters than a single field searching) get those
 	// parameters
@@ -420,20 +438,20 @@ public class GradebookAction extends LamsDispatchAction {
 	User viewer = getRealUser();
 	if (view == GBGridView.MON_USER) {
 	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
-	    user = (User) getUserService().findById(User.class, userID);
+	    user = (User) userService.findById(User.class, userID);
 	} else {
 	    user = getRealUser();
 	}
 
 	//permission check
 	if (view == GBGridView.MON_USER) {
-	    if (!getSecurityService().isGroupMonitor(courseID, viewer.getUserId(), "get course gradebook", false)) {
+	    if (!securityService.isGroupMonitor(courseID, viewer.getUserId(), "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
 
 	} else if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
-	    if (!getSecurityService().hasOrgRole(courseID, viewer.getUserId(),
+	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(),
 		    new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"User is not a group manager or admin in the organisation");
@@ -441,7 +459,7 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 
 	} else if (view == GBGridView.LRN_COURSE) {
-	    if (!getSecurityService().hasOrgRole(courseID, viewer.getUserId(), new String[] { Role.LEARNER },
+	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(), new String[] { Role.LEARNER },
 		    "get course gradebook for learner", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the organisation");
 		return null;
@@ -453,11 +471,11 @@ public class GradebookAction extends LamsDispatchAction {
 
 	if ((organisation == null) || (user == null) || (viewer == null)) {
 	    // Grid will handle error, just log and return null
-	    GradebookAction.logger
+	    GradebookController.logger
 		    .error("Error: request for course gradebook data with null course or user. CourseID: " + courseID);
 	    return null;
 	}
-	List<GBLessonGridRowDTO> gradebookLessonDTOs = getGradebookService().getGBLessonRows(organisation, user, viewer,
+	List<GBLessonGridRowDTO> gradebookLessonDTOs = gradebookService.getGBLessonRows(organisation, user, viewer,
 		view, page - 1, rowLimit, sortBy, sortOrder, searchString, getUser().getTimeZone());
 
 	String ret;
@@ -472,8 +490,9 @@ public class GradebookAction extends LamsDispatchAction {
 		    searchString, sortOrder, rowLimit, page);
 	}
 
-	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_XML, LamsDispatchAction.ENCODING_UTF8, ret);
-	return null;
+	response.setContentType("text/xml; charset=utf-8");
+	;
+	return ret;
     }
 
     /**
@@ -486,36 +505,37 @@ public class GradebookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getLessonMarkAggregate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getLessonMarkAggregate")
+    @ResponseBody
+    public String getLessonMarkAggregate(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 
 	if (getUser().getUserID().equals(userID)) {
-	    if (!getSecurityService().isLessonParticipant(lessonID, userID, "get lesson mark aggregate", false)) {
+	    if (!securityService.isLessonParticipant(lessonID, userID, "get lesson mark aggregate", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the lesson");
 		return null;
 	    }
 	} else {
-	    if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark aggregate",
-		    false)) {
+	    if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark aggregate", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
 	}
 
-	Lesson lesson = getLessonService().getLesson(lessonID);
-	User learner = (User) getUserService().findById(User.class, userID);
+	Lesson lesson = lessonService.getLesson(lessonID);
+	User learner = (User) userService.findById(User.class, userID);
 
 	if ((lesson != null) && (learner != null)) {
-	    GradebookUserLesson lessonMark = getGradebookService().getGradebookUserLesson(lessonID, userID);
+	    GradebookUserLesson lessonMark = gradebookService.getGradebookUserLesson(lessonID, userID);
 	    if (lessonMark.getMark() != null) {
-		writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-			GradebookUtil.niceFormatting(lessonMark.getMark()));
+		response.setContentType("text/plain; charset=utf-8");
+
+		return GradebookUtil.niceFormatting(lessonMark.getMark());
 	    }
 	} else {
 	    // Grid will handle error, just log and return null
-	    GradebookAction.logger
+	    GradebookController.logger
 		    .error("Error: request for course gradebook data with null user or lesson. lessonID: " + lessonID);
 	}
 	return null;
@@ -532,8 +552,9 @@ public class GradebookAction extends LamsDispatchAction {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getActivityMarkAverage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getActivityMarkAverage")
+    @ResponseBody
+    public String getActivityMarkAverage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
 	Long activityID = null;
@@ -548,32 +569,30 @@ public class GradebookAction extends LamsDispatchAction {
 	    activityID = Long.parseLong(rowID);
 	}
 
-	Activity activity = getGradebookService().getActivityById(activityID);
+	Activity activity = gradebookService.getActivityById(activityID);
 	if (activity == null) {
-	    LamsDispatchAction.log.error(
-		    "Activity with ID: " + activityID + " could not be found when getting activity mark average");
+	    logger.error("Activity with ID: " + activityID + " could not be found when getting activity mark average");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters");
 	    return null;
 	}
 	Integer userID = getUser().getUserID();
 	for (Lesson lesson : (Set<Lesson>) activity.getLearningDesign().getLessons()) {
-	    if (!getSecurityService().isLessonMonitor(lesson.getLessonId(), userID, "get activity mark average",
-		    false)) {
+	    if (!securityService.isLessonMonitor(lesson.getLessonId(), userID, "get activity mark average", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
 	}
 
-	Double averageMark = getGradebookService().getAverageMarkForActivity(activityID, groupID);
+	Double averageMark = gradebookService.getAverageMarkForActivity(activityID, groupID);
+	response.setContentType("text/plain, charset=utf-8");
 	if (averageMark != null) {
-	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		    GradebookUtil.niceFormatting(averageMark));
+
+	    return GradebookUtil.niceFormatting(averageMark);
 	} else {
-	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		    GradebookConstants.CELL_EMPTY);
+
+	    return GradebookConstants.CELL_EMPTY;
 	}
 
-	return null;
     }
 
     /**
@@ -586,24 +605,24 @@ public class GradebookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getAverageMarkForLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getAverageMarkForLesson")
+    public String getAverageMarkForLesson(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average", false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 
-	Double averageMark = getGradebookService().getAverageMarkForLesson(lessonID);
+	Double averageMark = gradebookService.getAverageMarkForLesson(lessonID);
 
+	response.setContentType("text/plain; charset=utf-8");
 	if (averageMark != null) {
-	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		    GradebookUtil.niceFormatting(averageMark));
+
+	    return GradebookUtil.niceFormatting(averageMark);
 	} else {
-	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		    GradebookConstants.CELL_EMPTY);
+
+	    return GradebookConstants.CELL_EMPTY;
 	}
-	return null;
     }
 
     private UserDTO getUser() {
@@ -614,55 +633,10 @@ public class GradebookAction extends LamsDispatchAction {
     private User getRealUser() {
 	UserDTO userDTO = getUser();
 	if (userDTO != null) {
-	    return getUserService().getUserByLogin(userDTO.getLogin());
+	    return userService.getUserByLogin(userDTO.getLogin());
 	} else {
 	    return null;
 	}
     }
 
-    private IUserManagementService getUserService() {
-	if (GradebookAction.userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return GradebookAction.userService;
-    }
-
-    private ILessonService getLessonService() {
-	if (GradebookAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return GradebookAction.lessonService;
-    }
-
-    private IGradebookService getGradebookService() {
-	if (GradebookAction.gradebookService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.gradebookService = (IGradebookService) ctx.getBean("gradebookService");
-	}
-	return GradebookAction.gradebookService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (GradebookAction.securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.securityService = (ISecurityService) webContext.getBean("securityService");
-	}
-
-	return GradebookAction.securityService;
-    }
-
-    private ICoreLearnerService getLearnerService() {
-	if (GradebookAction.learnerService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
-	}
-	return GradebookAction.learnerService;
-    }
 }

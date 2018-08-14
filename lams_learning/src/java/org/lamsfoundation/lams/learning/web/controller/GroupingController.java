@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.IOException;
 import java.util.SortedSet;
@@ -39,6 +39,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.form.GroupingForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -53,6 +54,12 @@ import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
@@ -69,7 +76,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Jacky Fang
  *
  */
-public class GroupingAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/grouping")
+public class GroupingController {
 
     /** Input parameter. Boolean value */
     public static final String PARAM_FORCE_GROUPING = "force";
@@ -77,7 +86,14 @@ public class GroupingAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
-    private static Logger log = Logger.getLogger(GroupingAction.class);
+    private static Logger log = Logger.getLogger(GroupingController.class);
+    
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+    
+    @Autowired
+    private WebApplicationContext applicationContext;
     // ---------------------------------------------------------------------
     // Class level constants - Session Attributes
     // ---------------------------------------------------------------------
@@ -111,32 +127,30 @@ public class GroupingAction extends LamsDispatchAction {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward performGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/performGrouping")
+    public String performGrouping(@ModelAttribute GroupingForm groupForm,HttpServletRequest request) throws IOException, ServletException {
 
-	boolean forceGroup = WebUtil.readBooleanParam(request, GroupingAction.PARAM_FORCE_GROUPING, false);
+	boolean forceGroup = WebUtil.readBooleanParam(request, GroupingController.PARAM_FORCE_GROUPING, false);
 
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof GroupingActivity)) {
-	    GroupingAction.log.error(LamsDispatchAction.className + ": activity not GroupingActivity");
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    log.error("activity not GroupingActivity");
+	    return "error";
 	}
 	Long lessonId = learnerProgress.getLesson().getLessonId();
 	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
 		LearningWebUtil.getUserId(), forceGroup);
 
-	DynaActionForm groupForm = (DynaActionForm) form;
-	groupForm.set("previewLesson", learnerProgress.getLesson().isPreviewLesson());
-	groupForm.set("title", activity.getTitle());
-	groupForm.set(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
+	groupForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
+	groupForm.setTitle(activity.getTitle());
+	groupForm.setActivityID(activity.getActivityId());
 
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {
-	    request.setAttribute(GroupingAction.FINISHED_BUTTON, Boolean.TRUE);
-	    return mapping.findForward(GroupingAction.VIEW_GROUP);
+	    request.setAttribute(GroupingController.FINISHED_BUTTON, Boolean.TRUE);
+	    return "redirect: grouping/viewGroup.do";
 	}
 	// forward to group choosing page
 	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
@@ -146,13 +160,13 @@ public class GroupingAction extends LamsDispatchAction {
 
 	    LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
 	    prepareGroupData(request);
-	    request.setAttribute(GroupingAction.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
-	    request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
-	    request.setAttribute(GroupingAction.VIEW_STUDENTS_BEFORE_SELECTION,
+	    request.setAttribute(GroupingController.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
+	    request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
+	    request.setAttribute(GroupingController.VIEW_STUDENTS_BEFORE_SELECTION,
 		    grouping.getViewStudentsBeforeSelection());
-	    return mapping.findForward(GroupingAction.CHOOSE_GROUP);
+	    return "grouping/choose";
 	}
-	return mapping.findForward(GroupingAction.WAIT_GROUP);
+	return "grouping/wait";
     }
 
     /**
@@ -166,31 +180,29 @@ public class GroupingAction extends LamsDispatchAction {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward viewGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	return viewGrouping(mapping, form, request, response, null);
+    @RequestMapping("/viewGroup")
+    public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
+	return viewGrouping(request,null);
     }
 
-    public ActionForward viewGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, LearnerProgress learnerProgress) throws IOException, ServletException {
+    @RequestMapping("/viewGroup")
+    public String viewGrouping(HttpServletRequest request, LearnerProgress learnerProgress) throws IOException, ServletException {
 	prepareGroupData(request);
-	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
+	request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	request.setAttribute(GroupingAction.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
+	request.setAttribute(GroupingController.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
 
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	LearningWebUtil.putActivityPositionInRequest(activityId, request, getServlet().getServletContext());
+	LearningWebUtil.putActivityPositionInRequest(activityId, request, applicationContext.getServletContext());
 
 	// make sure the lesson id is always in the request for the progress bar.
 	if (request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null) {
 	    if (learnerProgress == null) {
-		ICoreLearnerService learnerService = LearnerServiceProxy
-			.getLearnerService(getServlet().getServletContext());
 		learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	    }
 	    request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
 	}
-	return mapping.findForward(GroupingAction.SHOW_GROUP);
+	return "grouping/show";
     }
 
     /**
@@ -240,8 +252,8 @@ public class GroupingAction extends LamsDispatchAction {
 	    }
 	}
 
-	request.setAttribute(GroupingAction.GROUPS, groups);
-	request.setAttribute(GroupingAction.TITLE, activity.getTitle());
+	request.setAttribute(GroupingController.GROUPS, groups);
+	request.setAttribute(GroupingController.TITLE, activity.getTitle());
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
     }
 

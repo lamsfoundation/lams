@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +31,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -44,6 +45,11 @@ import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.web.action.LamsAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Action class to display a ParallelActivity.
@@ -56,17 +62,22 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *
  */
-public class DisplayParallelActivityAction extends ActivityAction {
+@Controller
+public class DisplayParallelActivityController extends ActivityController {
+    
+    private static Logger log = Logger.getLogger(DisplayParallelActivityController.class);
+    
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
 
     /**
      * Gets a parallel activity from the request (attribute) and forwards to the display JSP.
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+    @RequestMapping("/DisplayParallelActivity")
+    public String execute(@ModelAttribute ActivityForm form,HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	ActivityForm form = (ActivityForm) actionForm;
-	ICoreLearnerService learnerService = getLearnerService();
 
 	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 
@@ -74,7 +85,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof ParallelActivity)) {
-	    LamsAction.log.error(LamsAction.className + ": activity not ParallelActivity " + activity.getActivityId());
+	    log.error("activity not ParallelActivity " + activity.getActivityId());
 	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 
@@ -92,8 +103,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 	    activityURLs.add(activityURL);
 	}
 	if (activityURLs.size() == 0) {
-	    LamsAction.log
-		    .error(LamsAction.className + ": No sub-activity URLs for activity " + activity.getActivityId());
+	    log.error("No sub-activity URLs for activity " + activity.getActivityId());
 	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 	form.setActivityURLs(activityURLs);

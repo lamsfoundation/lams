@@ -2,7 +2,6 @@
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
@@ -26,7 +25,7 @@
 				autoencode:false,
 				caption: "${organisationName}",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=lrnCourse&organisationID=${organisationID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook/getCourseGridData.do?view=lrnCourse&organisationID=${organisationID}",
 				height: 'auto',
 				width: $(window).width() - 100,
 				shrinkToFit: false,
@@ -75,7 +74,7 @@
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=lrnActivity&lessonID=" + lessonID,
+						     url: "<lams:LAMSURL />/gradebook/gradebook/getActivityGridData.do?view=lrnActivity&lessonID=" + lessonID,
 						     height: "100%",
 						     autowidth:true,
 						     pager: subgrid_table_id + "_pager",

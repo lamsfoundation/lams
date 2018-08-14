@@ -2,7 +2,6 @@
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
@@ -60,7 +59,7 @@
 				autoencode:false,
 				caption: "<fmt:message key="gradebook.gridtitle.lesson.view"/>",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monCourse&organisationID=${organisationID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook/getCourseGridData.do?view=monCourse&organisationID=${organisationID}",
 			    height: "100%",
 			    width: jqgridWidth,
 				shrinkToFit: false,
@@ -102,11 +101,11 @@
 						 iconSet: 'fontAwesome',
 						 autoencode:false,
 					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monCourse&lessonID=" + lessonID,
+					     url: "<lams:LAMSURL />/gradebook/gradebook/getUserGridData.do?view=monCourse&lessonID=" + lessonID,
 					     height: "100%",
 					     autowidth:true,
 					     cellEdit:true,
-					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=" + lessonID,
+					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID,
 					     sortorder: "asc", 
 						 sortname: "rowName", 
 						 pager: subgrid_table_id + "_pager",
@@ -157,7 +156,7 @@
 					     	// update the lesson average mark
 					     	if (cellname == "mark") {
 					     		// Update the average activity mark
-						     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getAverageMarkForLesson", lessonID:lessonID}, function(xml) {
+						     	$.get("<lams:LAMSURL/>/gradebook/gradebook/getAverageMarkForLesson.do", {lessonID:lessonID}, function(xml) {
 							    	if (xml!=null) {
 							    		jQuery("#organisationGrid").setCell(row_id, "avgMark", xml, "", "");
 							    	} 
@@ -192,7 +191,7 @@
 				autoencode:false,
 				caption: "<fmt:message key="gradebook.gridtitle.learner.view"/>",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=listView&organisationID=${organisationID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook/getUserGridData.do?view=listView&organisationID=${organisationID}",
 			    height: "100%",
 			    width: jqgridWidth,
 			    shrinkToFit: false,
@@ -226,7 +225,7 @@
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monUserView&organisationID=${organisationID}&userID=" + userID,
+						     url: "<lams:LAMSURL />/gradebook/gradebook/getCourseGridData.do?view=monUserView&organisationID=${organisationID}&userID=" + userID,
 						     height: "100%",
 						     autowidth:true,
 						     cellEdit:true,
@@ -311,7 +310,7 @@
 					    	 	
 					    	 	//modify cellurl setting to include lessonid
 					    	 	var lessonID = jQuery("#"+subgrid_table_id).getRowData(rowid)["id"];
-					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=" + lessonID + "&id=" + userID});
+					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID + "&id=" + userID});
 					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 						     	
@@ -350,7 +349,7 @@
 			
 			$("#export-course-button").click(function() {
 				var areaToBlock = "export-link-area";
-				var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}";
+				var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring/exportExcelCourseGradebook.do?organisationID=${organisationID}";
 				blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				
 				return false;
@@ -369,7 +368,7 @@
 					var areaToBlock = "select-lessons-area";
 					var simplified = jQuery("#export-selected-simplified").prop('checked');
 					simplified = "&simplified="+simplified;
-					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelSelectedLessons"+simplified+"&organisationID=${organisationID}" + lessonIds;
+					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring/exportExcelSelectedLessons"+simplified+".do?organisationID=${organisationID}" + lessonIds;
 					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				}
 				

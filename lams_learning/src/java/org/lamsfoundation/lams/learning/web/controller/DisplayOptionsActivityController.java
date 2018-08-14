@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,9 +32,11 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.util.TokenProcessor;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
@@ -45,6 +47,12 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display an OptionsActivity.
@@ -59,23 +67,32 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class DisplayOptionsActivityAction extends ActivityAction {
+@Controller
+public class DisplayOptionsActivityController extends ActivityController {
+    
+    private static Logger log = Logger.getLogger(DisplayOptionsActivityController.class);
+    
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+    
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Gets an options activity from the request (attribute) and forwards to the display JSP.
      */
     @SuppressWarnings("unchecked")
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+    @RequestMapping("/DisplayOptionsActivity")
+    public ActionForward execute(@ModelAttribute OptionsActivityForm form,HttpServletRequest request,
 	    HttpServletResponse response) {
-	OptionsActivityForm form = (OptionsActivityForm) actionForm;
+	 
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-	ICoreLearnerService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof OptionsActivity)) {
-	    LamsAction.log.error(LamsAction.className + ": activity not OptionsActivity " + activity.getActivityId());
+	    log.error("activity not OptionsActivity " + activity.getActivityId());
 	    return mapping.findForward(ActivityMapping.ERROR);
 	}
 
@@ -112,9 +129,9 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 	form.setLessonID(learnerProgress.getLesson().getLessonId());
 	form.setProgressID(learnerProgress.getLearnerProgressId());
 
-	this.saveToken(request);
+	TokenProcessor.getInstance().saveToken(request);
 
-	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, getServlet().getServletContext());
+	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, applicationContext.getServletContext());
 
 	// lessonId needed for the progress bar
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());

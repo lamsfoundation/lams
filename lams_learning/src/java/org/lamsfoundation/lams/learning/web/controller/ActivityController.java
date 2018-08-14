@@ -21,28 +21,27 @@
  * ****************************************************************
  */
 
-
-package org.lamsfoundation.lams.learning.web.action;
+package org.lamsfoundation.lams.learning.web.controller;
 
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Base class for all activity action classes. Each subclass should call
  * super.execute() to set up the progress data in the ActivityForm.
  */
-public abstract class ActivityAction extends LamsAction {
+@Controller
+@RequestMapping("/activity")
+public abstract class ActivityController{
 
     public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
-    private ICoreLearnerService learnerService = null;
-
-    protected ICoreLearnerService getLearnerService() {
-	if (learnerService == null) {
-	    learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-	}
-	return learnerService;
-    }
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
 
 }

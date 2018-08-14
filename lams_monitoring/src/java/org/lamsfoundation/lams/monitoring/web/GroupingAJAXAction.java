@@ -43,7 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.action.GroupingAction;
+import org.lamsfoundation.lams.learning.web.controller.GroupingController;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
@@ -164,7 +164,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    group.setUsers(sortedUsers);
 	}
 
-	request.setAttribute(GroupingAction.GROUPS, groups);
+	request.setAttribute(GroupingController.GROUPS, groups);
 	// go to a view only screen for random grouping
 	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
     }
@@ -204,7 +204,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    }
 	}
 
-	request.setAttribute(GroupingAction.GROUPS, groups);
+	request.setAttribute(GroupingController.GROUPS, groups);
 	request.setAttribute("isCourseGrouping", true); // flag to page it is a course grouping so use the field names for OrganisationGroup
 	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
     }

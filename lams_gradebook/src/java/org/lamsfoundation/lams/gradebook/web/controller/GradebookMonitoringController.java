@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.gradebook.web.action;
+package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,9 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
@@ -57,11 +54,13 @@ import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -73,81 +72,93 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  *         This is where marking for an activity/lesson takes place
  */
-public class GradebookMonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/gradebookMonitoring")
+public class GradebookMonitoringController {
 
-    private static Logger log = Logger.getLogger(GradebookMonitoringAction.class);
+    private static Logger log = Logger.getLogger(GradebookMonitoringController.class);
 
+    @Autowired
+    @Qualifier("gradebookService")
     private static IGradebookService gradebookService;
+
+    @Autowired
+    @Qualifier("userService")
     private static IUserManagementService userService;
+
+    @Autowired
+    @Qualifier("lessonService")
     private static ILessonService lessonService;
+
+    @Autowired
+    @Qualifier("securityService")
     private static ISecurityService securityService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	try {
 	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    if (GradebookMonitoringAction.log.isDebugEnabled()) {
-		GradebookMonitoringAction.log.debug("Getting gradebook for lesson " + lessonId);
+	    if (GradebookMonitoringController.log.isDebugEnabled()) {
+		GradebookMonitoringController.log.debug("Getting gradebook for lesson " + lessonId);
 	    }
 	    UserDTO user = getUser();
 	    if (user == null) {
-		GradebookMonitoringAction.log.error("User missing from session. ");
-		return mapping.findForward("error");
+		GradebookMonitoringController.log.error("User missing from session. ");
+		return "error";
 	    }
-	    if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "get lesson gradebook", false)) {
+	    if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "get lesson gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
 
-	    Lesson lesson = getLessonService().getLesson(lessonId);
+	    Lesson lesson = lessonService.getLesson(lessonId);
 	    boolean marksReleased = (lesson.getMarksReleased() != null) && lesson.getMarksReleased();
 	    LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
 	    request.setAttribute("lessonDetails", lessonDetatilsDTO);
 	    request.setAttribute("marksReleased", marksReleased);
 
-	    List<String[]> weights = getGradebookService().getWeights(lesson.getLearningDesign());
-	    if ( weights.size() > 0 ) {
+	    List<String[]> weights = gradebookService.getWeights(lesson.getLearningDesign());
+	    if (weights.size() > 0) {
 		request.setAttribute("weights", weights);
 	    }
-	    
+
 	    request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
 
-	    return mapping.findForward("monitorgradebook");
+	    return "gradebookMonitor";
 	} catch (Exception e) {
-	    GradebookMonitoringAction.log.error("Failed to load lesson gradebook", e);
-	    return mapping.findForward("error");
+	    GradebookMonitoringController.log.error("Failed to load lesson gradebook", e);
+	    return "error";
 	}
     }
 
-    public ActionForward courseMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/courseMonitor")
+    public String courseMonitor(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	try {
 	    Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	    if (GradebookMonitoringAction.log.isDebugEnabled()) {
-		GradebookMonitoringAction.log.debug("Getting gradebook for organisation " + organisationID);
+	    if (GradebookMonitoringController.log.isDebugEnabled()) {
+		GradebookMonitoringController.log.debug("Getting gradebook for organisation " + organisationID);
 	    }
 
 	    UserDTO user = getUser();
 	    if (user == null) {
-		GradebookMonitoringAction.log.error("User missing from session. ");
-		return mapping.findForward("error");
+		GradebookMonitoringController.log.error("User missing from session. ");
+		return "error";
 	    }
-	    if (!getSecurityService().hasOrgRole(organisationID, user.getUserID(),
+	    if (!securityService.hasOrgRole(organisationID, user.getUserID(),
 		    new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook page", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
 
-	    Organisation organisation = (Organisation) getUserService().findById(Organisation.class, organisationID);
+	    Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationID);
 	    request.setAttribute("organisationID", organisationID);
 	    request.setAttribute("organisationName", organisation.getName());
 
-	    return mapping.findForward("monitorcoursegradebook");
+	    return "gradebookCourseMonitor";
 	} catch (Exception e) {
-	    GradebookMonitoringAction.log.error("Failed to load course gradebook", e);
-	    return mapping.findForward("error");
+	    GradebookMonitoringController.log.error("Failed to load course gradebook", e);
+	    return "error";
 	}
     }
 
@@ -161,35 +172,34 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward updateUserLessonGradebookData(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping("/updateUserLessonGradebookData")
+    @ResponseBody
+    public void updateUserLessonGradebookData(HttpServletRequest request, HttpServletResponse response)
+	    throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "update lesson gradebook", false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "update lesson gradebook", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
 	}
 
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
-	User learner = (User) getUserService().findById(User.class, userID);
+	User learner = (User) userService.findById(User.class, userID);
 	if (learner == null) {
-	    GradebookMonitoringAction.log
+	    GradebookMonitoringController.log
 		    .error("User with ID " + userID + " could not be found to update his lesson gradebook");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "User could not be found");
-	    return null;
 	}
 
 	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
 	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
-	Lesson lesson = getLessonService().getLesson(lessonID);
+	Lesson lesson = lessonService.getLesson(lessonID);
 	if ((markStr != null) && !markStr.equals("")) {
 	    Double mark = Double.parseDouble(markStr);
-	    getGradebookService().updateUserLessonGradebookMark(lesson, learner, mark);
+	    gradebookService.updateUserLessonGradebookMark(lesson, learner, mark);
 	}
 	if (feedback != null) {
-	    getGradebookService().updateUserLessonGradebookFeedback(lesson, learner, feedback);
+	    gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
 	}
 
-	return null;
     }
 
     /**
@@ -202,13 +212,13 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward updateUserActivityGradebookData(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping("/updateUserActivityGradebookData")
+    @ResponseBody
+    public void updateUserActivityGradebookData(HttpServletRequest request, HttpServletResponse response)
+	    throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "update activity gradebook",
-		false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "update activity gradebook", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
 	}
 
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
@@ -227,35 +237,32 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	}
 
-	Activity activity = getGradebookService().getActivityById(activityID);
+	Activity activity = gradebookService.getActivityById(activityID);
 	if ((activity == null) || !activity.isToolActivity()) {
-	    GradebookMonitoringAction.log
+	    GradebookMonitoringController.log
 		    .error("Activity with ID " + activityID + " could not be found or it is not a Tool Activity");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong activity");
-	    return null;
 	}
 
-	User learner = (User) getUserService().findById(User.class, userID);
+	User learner = (User) userService.findById(User.class, userID);
 	if (learner == null) {
-	    GradebookMonitoringAction.log
+	    GradebookMonitoringController.log
 		    .error("User with ID " + userID + " could not be found to update his activity gradebook");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "User could not be found");
-	    return null;
 	}
 
 	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
 	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
-	Lesson lesson = getLessonService().getLesson(lessonID);
+	Lesson lesson = lessonService.getLesson(lessonID);
 	if ((markStr != null) && !markStr.equals("")) {
 	    Double mark = Double.parseDouble(markStr);
-	    getGradebookService().updateUserActivityGradebookMark(lesson, learner, activity, mark, true, true);
+	    gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true, true);
 	}
 
 	if (feedback != null) {
-	    getGradebookService().updateUserActivityGradebookFeedback(activity, learner, feedback);
+	    gradebookService.updateUserActivityGradebookFeedback(activity, learner, feedback);
 	}
 
-	return null;
     }
 
     private Long getActivityFromParameter(String rowID) {
@@ -263,9 +270,9 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	// Splitting the rowID param to get the activity/group id pair
 	String[] split = rowID.split("_");
 	if (split.length == 2) {
-	activityID = Long.parseLong(split[0]);
+	    activityID = Long.parseLong(split[0]);
 	} else {
-	activityID = Long.parseLong(rowID);
+	    activityID = Long.parseLong(rowID);
 	}
 	return activityID;
     }
@@ -280,45 +287,44 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/toggleReleaseMarks")
+    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 
-	getGradebookService().toggleMarksReleased(lessonID);
-	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		"success");
-	return null;
+	gradebookService.toggleMarksReleased(lessonID);
+	response.setContentType("text/plain; charset=utf-8");
+	return "success";
     }
 
     /**
      * Exports Lesson Gradebook into excel.
      */
-    public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/exportExcelLessonGradebook")
+    @ResponseBody
+    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(),
-		"export lesson gradebook spreadsheet", false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet",
+		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
 	}
 
-	if (GradebookMonitoringAction.log.isDebugEnabled()) {
-	    GradebookMonitoringAction.log.debug("Exporting to a spreadsheet lesson: " + lessonID);
+	if (GradebookMonitoringController.log.isDebugEnabled()) {
+	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet lesson: " + lessonID);
 	}
-	Lesson lesson = getLessonService().getLesson(lessonID);
+	Lesson lesson = lessonService.getLesson(lessonID);
 	String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-	GradebookMonitoringAction.log.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
+	GradebookMonitoringController.log.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
 	ServletOutputStream out = response.getOutputStream();
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService().exportLessonGradebook(lesson);
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportLessonGradebook(lesson);
 
 	// set cookie that will tell JS script that export has been finished
 	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
@@ -326,30 +332,29 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	fileDownloadTokenCookie.setPath("/");
 	response.addCookie(fileDownloadTokenCookie);
 
-	ExcelUtil.createExcel(out, dataToExport, getGradebookService().getMessage("gradebook.export.dateheader"), true);
+	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
 
-	return null;
     }
 
     /**
      * Exports Course Gradebook into excel.
      */
-    public ActionForward exportExcelCourseGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/exportExcelCourseGradebook")
+    @ResponseBody
+    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
-	if (!getSecurityService().hasOrgRole(organisationID, user.getUserID(),
+	if (!securityService.hasOrgRole(organisationID, user.getUserID(),
 		new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook spreadsheet", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
-	    return null;
 	}
 
-	Organisation organisation = (Organisation) getUserService().findById(Organisation.class, organisationID);
-	if (GradebookMonitoringAction.log.isDebugEnabled()) {
-	    GradebookMonitoringAction.log.debug("Exporting to a spreadsheet course: " + organisationID);
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationID);
+	if (GradebookMonitoringController.log.isDebugEnabled()) {
+	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet course: " + organisationID);
 	}
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService()
-		.exportCourseGradebook(user.getUserID(), organisationID);
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportCourseGradebook(user.getUserID(),
+		organisationID);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -365,33 +370,32 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, getGradebookService().getMessage("gradebook.export.dateheader"), true);
+	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
 
-	return null;
     }
 
     /**
      * Exports selected lessons Gradebook into excel.
      */
-    public ActionForward exportExcelSelectedLessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/exportExcelSelectedLessons")
+    @ResponseBody
+    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
-	if (!getSecurityService().isGroupMonitor(organisationID, user.getUserID(),
+	if (!securityService.isGroupMonitor(organisationID, user.getUserID(),
 		"export selected lessons gradebook spreadsheet", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
-	    return null;
 	}
 
 	boolean simplified = WebUtil.readBooleanParam(request, "simplified", false);
 
-	Organisation organisation = (Organisation) getUserService().findById(Organisation.class, organisationID);
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationID);
 	String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
-	if (GradebookMonitoringAction.log.isDebugEnabled()) {
-	    GradebookMonitoringAction.log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds)
+	if (GradebookMonitoringController.log.isDebugEnabled()) {
+	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds)
 		    + " from course: " + organisationID);
 	}
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService()
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService
 		.exportSelectedLessonsGradebook(user.getUserID(), organisationID, lessonIds, simplified);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
@@ -410,23 +414,23 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, dataToExport, null, false);
 
-	return null;
     }
 
     /**
      * Get the raw marks for display in a histogram.
      */
-    public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/getMarkChartData")
+    @ResponseBody
+    public String getMarkChartData(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(),
-		"export lesson gradebook spreadsheet", false)) {
+	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet",
+		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
 	}
 
-	List<Number> results = getGradebookService().getMarksArray(lessonID);
+	List<Number> results = gradebookService.getMarksArray(lessonID);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	if (results != null) {
@@ -436,8 +440,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
 
     }
 
@@ -446,39 +449,4 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 
-    private IUserManagementService getUserService() {
-	if (GradebookMonitoringAction.userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookMonitoringAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return GradebookMonitoringAction.userService;
-    }
-
-    private ILessonService getLessonService() {
-	if (GradebookMonitoringAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookMonitoringAction.lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return GradebookMonitoringAction.lessonService;
-    }
-
-    private IGradebookService getGradebookService() {
-	if (GradebookMonitoringAction.gradebookService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookMonitoringAction.gradebookService = (IGradebookService) ctx.getBean("gradebookService");
-	}
-	return GradebookMonitoringAction.gradebookService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (GradebookMonitoringAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookMonitoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return GradebookMonitoringAction.securityService;
-    }
 }
