@@ -50,6 +50,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * This action handles all the authoring actions, which include opening author, saving, uploading instruction files and
@@ -168,45 +169,45 @@ public class AuthoringController extends WikiPageController {
 	return "pages/authoring/authoring";
     }
 
-    @RequestMapping("/editPage")
+    @RequestMapping(path = "/editPage", method = RequestMethod.POST)
     public String editPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	super.editPage(authoringForm, request);
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 	return returnToWiki(authoringForm, request, currentPageUid);
     }
 
-    @RequestMapping("/revertPage")
+    @RequestMapping(path = "/revertPage", method = RequestMethod.POST)
     public String revertPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	super.revertPage(authoringForm, request);
 	return unspecified(authoringForm, request);
     }
 
-    @RequestMapping("/comparePage")
+    @RequestMapping(path = "/comparePage")
     public String comparePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 	super.comparePage(authoringForm, request);
 	return "pages/wiki/compare";
     }
 
-    @RequestMapping("/viewPage")
+    @RequestMapping(path = "/viewPage")
     public String viewPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	super.viewPage(authoringForm, request);
 	return "pages/wiki/viewWiki";
     }
 
-    @RequestMapping("/changePage")
+    @RequestMapping(path = "/changePage", method = RequestMethod.POST)
     public String changePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	Long pageUid = super.changePage(authoringForm, request);
 	return this.returnToWiki(authoringForm, request, pageUid);
     }
 
-    @RequestMapping("/addPage")
+    @RequestMapping(path = "/addPage", method = RequestMethod.POST)
     public String addPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	Long currentWikiPageId = super.addPage(authoringForm, request);
 	return returnToWiki(authoringForm, request, currentWikiPageId);
     }
 
-    @RequestMapping("/removePage")
+    @RequestMapping(path = "/removePage", method = RequestMethod.POST)
     public String removePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -224,7 +225,7 @@ public class AuthoringController extends WikiPageController {
 	return this.returnToWiki(authoringForm, request, null);
     }
 
-    @RequestMapping("/restorePage")
+    @RequestMapping(path = "/restorePage", method = RequestMethod.POST)
     public String restorePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 	super.restorePage(authoringForm, request);
@@ -232,7 +233,7 @@ public class AuthoringController extends WikiPageController {
 	return this.returnToWiki(authoringForm, request, currentWikiPageId);
     }
 
-    @RequestMapping("/toggleLearnerSubsciption")
+    @RequestMapping(path = "/toggleLearnerSubsciption", method = RequestMethod.POST)
     public String toggleLearnerSubsciption(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 	super.toggleLearnerSubsciption(authoringForm, request);
@@ -241,7 +242,7 @@ public class AuthoringController extends WikiPageController {
     }
 
     @Override
-    @RequestMapping("/notifyWikiChange")
+    @RequestMapping(path = "/notifyWikiChange", method = RequestMethod.POST)
     public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
 	    HttpServletRequest request) throws Exception {
 	super.notifyWikiChange(toolSessionID, subjectLangKey, bodyLangKey, wikiUser, request);
@@ -275,7 +276,7 @@ public class AuthoringController extends WikiPageController {
      *
      * The WikiPage content is not saved here as that is done in the WikiPageAction
      */
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// TODO need error checking.

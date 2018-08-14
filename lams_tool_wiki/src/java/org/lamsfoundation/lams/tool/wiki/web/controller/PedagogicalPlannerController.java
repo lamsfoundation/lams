@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Marcin Cieslak
@@ -70,7 +71,7 @@ public class PedagogicalPlannerController {
 	return "pages/authoring/pedagogicalPlannerForm";
     }
 
-    @RequestMapping("/saveOrUpdatePedagogicalPlannerForm")
+    @RequestMapping(path = "/saveOrUpdatePedagogicalPlannerForm", method = RequestMethod.POST)
     public String saveOrUpdatePedagogicalPlannerForm(@ModelAttribute WikiPedagogicalPlannerForm plannerForm,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 //	ActionMessages errors = plannerForm.validate();
