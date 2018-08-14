@@ -142,7 +142,7 @@ public class MonitoringController extends WikiPageController {
     public String editPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) throws Exception {
 	super.editPage(monitoringForm, request);
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+	return returnToWiki(monitoringForm, request, currentWikiPageId);
     }
 
     @RequestMapping("/revertPage")
@@ -176,7 +176,7 @@ public class MonitoringController extends WikiPageController {
     public String addPage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request) throws Exception {
 	super.addPage(monitoringForm, request);
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+	return returnToWiki(monitoringForm, request, currentWikiPageId);
     }
 
     @RequestMapping("/removePage")
@@ -202,7 +202,7 @@ public class MonitoringController extends WikiPageController {
 	    throws Exception {
 	super.toggleLearnerSubsciption(monitoringForm, request);
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(monitoringForm, request, currentWikiPageId);
+	return returnToWiki(monitoringForm, request, currentWikiPageId);
     }
 
     @Override

@@ -172,7 +172,7 @@ public class AuthoringController extends WikiPageController {
     public String editPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	super.editPage(authoringForm, request);
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+	return returnToWiki(authoringForm, request, currentWikiPageId);
     }
 
     @RequestMapping("/revertPage")
@@ -204,7 +204,7 @@ public class AuthoringController extends WikiPageController {
     public String addPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
 	super.addPage(authoringForm, request);
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+	return returnToWiki(authoringForm, request, currentWikiPageId);
     }
 
     @RequestMapping("/removePage")
@@ -238,10 +238,9 @@ public class AuthoringController extends WikiPageController {
 	    throws Exception {
 	super.toggleLearnerSubsciption(authoringForm, request);
 	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+	return returnToWiki(authoringForm, request, currentWikiPageId);
     }
 
-    @Override
     @RequestMapping("/notifyWikiChange")
     public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
 	    HttpServletRequest request) throws Exception {
