@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.outcome;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -10,7 +11,9 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
-public class OutcomeScale {
+public class OutcomeScale implements Serializable {
+    private static final long serialVersionUID = 216274187123917942L;
+
     private Long scaleId;
     private Organisation organisation;
     private String name;

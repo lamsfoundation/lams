@@ -23,9 +23,11 @@
 package org.lamsfoundation.lams.outcome.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 
 public interface IOutcomeDAO extends IBaseDAO {
@@ -33,5 +35,11 @@ public interface IOutcomeDAO extends IBaseDAO {
 
     List<Outcome> getOutcomesSortedByName(Integer organisationId);
 
+    List<Outcome> getOutcomesSortedByName(String search, Set<Integer> organisationIds);
+
+    List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId);
+
     List<OutcomeScale> getScalesSortedByName(Integer organisationId);
+
+    List<Integer> getAuthorOrganisations(Integer userId);
 }

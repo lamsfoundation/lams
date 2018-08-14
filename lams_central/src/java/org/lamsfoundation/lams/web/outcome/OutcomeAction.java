@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.web.outcome;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +41,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
@@ -83,7 +87,7 @@ public class OutcomeAction extends DispatchAction {
 		return null;
 	    }
 	}
-	List<Outcome> outcomes = getOutcomeService().getOutcomesForManagement(organisationId);
+	List<Outcome> outcomes = getOutcomeService().getOutcomes(organisationId);
 	request.setAttribute("outcomes", outcomes);
 
 	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
@@ -123,7 +127,7 @@ public class OutcomeAction extends DispatchAction {
 	    outcomeForm.setScaleId(outcome.getScale().getScaleId());
 	}
 
-	List<OutcomeScale> scales = getOutcomeService().getScalesForManagement(organisationId);
+	List<OutcomeScale> scales = getOutcomeService().getScales(organisationId);
 	request.setAttribute("scales", scales);
 
 	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
@@ -226,6 +230,146 @@ public class OutcomeAction extends DispatchAction {
 	return outcomeManage(mapping, form, request, response);
     }
 
+    public ActionForward outcomeSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	String search = WebUtil.readStrParam(request, "term", true);
+	String organisationIdString = WebUtil.readStrParam(request, "organisationIds", true);
+	Set<Integer> organisationIds = null;
+	Integer userId = getUserDTO().getUserID();
+	if (StringUtils.isNotBlank(organisationIdString)) {
+	    String[] split = organisationIdString.split(",");
+	    organisationIds = new HashSet<Integer>(split.length);
+	    for (String organisationId : split) {
+		organisationIds.add(Integer.valueOf(organisationId));
+	    }
+	}
+	if (organisationIds == null) {
+	    if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
+		String error = "User " + userId + " is not sysadmin nor an author and can not search outcome";
+		log.error(error);
+		throw new SecurityException(error);
+	    }
+	} else {
+	    for (Integer organisationId : organisationIds) {
+		getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "search outcome",
+			true);
+	    }
+	}
+
+	List<Outcome> outcomes = getOutcomeService().getOutcomes(search, organisationIds);
+	JSONArray responseJSON = new JSONArray();
+	for (Outcome outcome : outcomes) {
+	    JSONObject outcomeJSON = new JSONObject();
+	    outcomeJSON.put("value", outcome.getOutcomeId());
+	    outcomeJSON.put("label", outcome.getName() + " (" + outcome.getCode() + ")");
+	    responseJSON.put(outcomeJSON);
+	}
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(responseJSON);
+	return null;
+    }
+
+    public ActionForward outcomeMap(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Long outcomeId = WebUtil.readLongParam(request, "outcomeId");
+	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
+	if (lessonId == null && toolContentId == null) {
+	    throw new IllegalArgumentException(
+		    "Either lesson ID or tool content ID must not be null when creating an outcome mapping");
+	}
+	Long itemId = WebUtil.readLongParam(request, "itemId", true);
+
+	Outcome outcome = (Outcome) getUserManagementService().findById(Outcome.class, outcomeId);
+	Integer organisationId = outcome.getOrganisation() == null ? null
+		: outcome.getOrganisation().getOrganisationId();
+	Integer userId = getUserDTO().getUserID();
+
+	if (organisationId == null) {
+	    if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
+		String error = "User " + userId + " is not sysadmin nor an author and can not map outcome";
+		log.error(error);
+		throw new SecurityException(error);
+	    }
+	} else {
+	    getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "map outcome", true);
+	}
+
+	List<OutcomeMapping> outcomeMappings = getOutcomeService().getOutcomeMappings(lessonId, toolContentId, itemId);
+	for (OutcomeMapping existingMapping : outcomeMappings) {
+	    if (existingMapping.getOutcome().getOutcomeId().equals(outcome.getOutcomeId())) {
+		throw new IllegalArgumentException(
+			"Trying to map an already mapped outcome with ID " + outcome.getOutcomeId());
+	    }
+	}
+
+	OutcomeMapping outcomeMapping = new OutcomeMapping();
+	outcomeMapping.setOutcome(outcome);
+	outcomeMapping.setLessonId(lessonId);
+	outcomeMapping.setToolContentId(toolContentId);
+	outcomeMapping.setItemId(itemId);
+	getUserManagementService().save(outcomeMapping);
+
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(outcomeMapping.getMappingId());
+	return null;
+    }
+
+    public ActionForward outcomeGetMappings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
+	if (lessonId == null && toolContentId == null) {
+	    throw new IllegalArgumentException(
+		    "Either lesson ID or tool content ID must not be null when fetching outcome mappings");
+	}
+	Long itemId = WebUtil.readLongParam(request, "itemId", true);
+	Integer userId = getUserDTO().getUserID();
+	if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
+	    String error = "User " + userId + " is not sysadmin nor an author and can not map outcome";
+	    log.error(error);
+	    throw new SecurityException(error);
+	}
+
+	List<OutcomeMapping> outcomeMappings = getOutcomeService().getOutcomeMappings(lessonId, toolContentId, itemId);
+	JSONArray responseJSON = new JSONArray();
+	for (OutcomeMapping outcomeMapping : outcomeMappings) {
+	    JSONObject outcomeJSON = new JSONObject();
+	    outcomeJSON.put("mappingId", outcomeMapping.getMappingId());
+	    outcomeJSON.put("outcomeId", outcomeMapping.getOutcome().getOutcomeId());
+	    outcomeJSON.put("label",
+		    outcomeMapping.getOutcome().getName() + " (" + outcomeMapping.getOutcome().getCode() + ")");
+	    responseJSON.put(outcomeJSON);
+	}
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(responseJSON);
+	return null;
+    }
+
+    public ActionForward outcomeRemoveMapping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Long mappingId = WebUtil.readLongParam(request, "mappingId");
+	OutcomeMapping outcomeMapping = (OutcomeMapping) getUserManagementService().findById(OutcomeMapping.class,
+		mappingId);
+	Organisation organisation = outcomeMapping.getOutcome().getOrganisation();
+	Integer organisationId = organisation == null ? null : organisation.getOrganisationId();
+	Integer userId = getUserDTO().getUserID();
+	if (organisationId == null) {
+	    if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
+		String error = "User " + userId
+			+ " is not sysadmin nor an author and can not remove an outcome mapping";
+		log.error(error);
+		throw new SecurityException(error);
+	    }
+	} else {
+	    getSecurityService().hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
+		    "remove outcome mapping", true);
+	}
+	getUserManagementService().delete(outcomeMapping);
+	return null;
+    }
+
     public ActionForward scaleManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -245,7 +389,7 @@ public class OutcomeAction extends DispatchAction {
 		return null;
 	    }
 	}
-	List<OutcomeScale> scales = getOutcomeService().getScalesForManagement(organisationId);
+	List<OutcomeScale> scales = getOutcomeService().getScales(organisationId);
 	request.setAttribute("scales", scales);
 
 	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());

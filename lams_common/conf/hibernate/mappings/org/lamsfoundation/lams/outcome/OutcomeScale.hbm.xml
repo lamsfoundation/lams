@@ -29,12 +29,14 @@
 		<!-- Associations -->
 
 		<many-to-one name="createBy"
-			class="org.lamsfoundation.lams.usermanagement.User">
+			class="org.lamsfoundation.lams.usermanagement.User"
+			not-null="false">
 			<column name="create_by" />
 		</many-to-one>
 
 		<many-to-one name="organisation"
-			class="org.lamsfoundation.lams.usermanagement.Organisation">
+			class="org.lamsfoundation.lams.usermanagement.Organisation"
+			not-null="false">
 			<column name="organisation_id" />
 		</many-to-one>
 		

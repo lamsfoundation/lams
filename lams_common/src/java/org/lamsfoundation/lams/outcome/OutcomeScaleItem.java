@@ -1,6 +1,10 @@
 package org.lamsfoundation.lams.outcome;
 
-public class OutcomeScaleItem {
+import java.io.Serializable;
+
+public class OutcomeScaleItem implements Serializable {
+    private static final long serialVersionUID = -4386671601427980092L;
+
     private Long itemId;
     private OutcomeScale scale;
     private Integer value;

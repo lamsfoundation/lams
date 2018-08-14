@@ -1,11 +1,14 @@
 package org.lamsfoundation.lams.outcome;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
-public class Outcome {
+public class Outcome implements Serializable {
+    private static final long serialVersionUID = -7175245687448269571L;
+
     private Long outcomeId;
     private Organisation organisation;
     private OutcomeScale scale;
@@ -81,10 +84,10 @@ public class Outcome {
     }
 
     public String getContentFolderId() {
-        return contentFolderId;
+	return contentFolderId;
     }
 
     public void setContentFolderId(String contentFolderId) {
-        this.contentFolderId = contentFolderId;
+	this.contentFolderId = contentFolderId;
     }
 }
