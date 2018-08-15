@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -229,6 +230,36 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().write("true");
+	return null;
+    }
+    
+    /**
+     * Renames lesson. Invoked by Ajax call from general LAMS monitoring.
+     */
+    public ActionForward renameLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	long lessonId = WebUtil.readLongParam(request, "pk");
+	
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "rename lesson", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
+	String newLessonName = request.getParameter("value");
+	if (StringUtils.isBlank(newLessonName)) {
+	    return null;
+	}
+
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	lesson.setLessonName(newLessonName);
+	getUserManagementService().save(lesson);
+
+	JSONObject jsonObject = new JSONObject();
+	jsonObject.put("successful", true);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(jsonObject);
 	return null;
     }
 
