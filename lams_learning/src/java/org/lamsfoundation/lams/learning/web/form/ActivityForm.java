@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.form;
 
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 
 /**
@@ -39,7 +36,7 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
  *         XDoclet definition:
  *
  */
-public class ActivityForm extends ActionForm {
+public class ActivityForm {
 
     /**
      * Unique identifier specifying the session for this activity, maps back to LearnerProgress (or Learner) and
@@ -62,8 +59,8 @@ public class ActivityForm extends ActionForm {
      * @param mapping
      * @param request
      */
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+
+    public void reset(HttpServletRequest request) {
 	activityURLs = null;
     }
 

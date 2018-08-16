@@ -27,34 +27,48 @@ import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Action class run when the learner finishes a lesson.
  */
-public class LessonCompleteActivityAction extends ActivityController {
+@Controller
+public class LessonCompleteActivityController extends ActivityController {
 
-    private static IntegrationService integrationService = null;
-    private static ILessonService lessonService = null;
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+
+    @Autowired
+    private static IntegrationService integrationService;
+
+    @Autowired
+    @Qualifier("lessonService")
+    private static ILessonService lessonService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
      * If no activity is in request then use the current activity in learnerProgress.
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws UnsupportedEncodingException {
-	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, getLearnerService());
+
+    @RequestMapping("/LessonComplete")
+    public String execute(HttpServletRequest request) throws UnsupportedEncodingException {
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Lesson lesson = learnerProgress.getLesson();
 	Set<Lesson> releasedLessons = getLessonService().getReleasedSucceedingLessons(lesson.getLessonId(),
 		learnerProgress.getUser().getUserId());
@@ -76,22 +90,23 @@ public class LessonCompleteActivityAction extends ActivityController {
 	request.setAttribute("lessonID", lesson.getLessonId());
 	request.setAttribute("gradebookOnComplete", lesson.getGradebookOnComplete());
 
-	return mapping.findForward("lessonComplete");
+	return "lessonComplete";
     }
 
     private IntegrationService getIntegrationService() {
-	if (LessonCompleteActivityAction.integrationService == null) {
-	    LessonCompleteActivityAction.integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
+	if (LessonCompleteActivityController.integrationService == null) {
+	    LessonCompleteActivityController.integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext())
+		    .getBean("integrationService");
 	}
-	return LessonCompleteActivityAction.integrationService;
+	return LessonCompleteActivityController.integrationService;
     }
 
     private ILessonService getLessonService() {
-	if (LessonCompleteActivityAction.lessonService == null) {
-	    LessonCompleteActivityAction.lessonService = (ILessonService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("lessonService");
+	if (LessonCompleteActivityController.lessonService == null) {
+	    LessonCompleteActivityController.lessonService = (ILessonService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext()).getBean("lessonService");
 	}
-	return LessonCompleteActivityAction.lessonService;
+	return LessonCompleteActivityController.lessonService;
     }
 }

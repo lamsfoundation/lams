@@ -57,14 +57,19 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -88,11 +93,38 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @since 3/03/2005
  * @version 1.1
  */
-public class LearnerAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/learner")
+public class LearnerController {
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
-    private static Logger log = Logger.getLogger(LearnerAction.class);
+    private static Logger log = Logger.getLogger(LearnerController.class);
+
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+
+    @Autowired
+    private UserManagementService userManagementService;
+
+    @Autowired
+    @Qualifier("gradebookService")
+    private IGradebookService gradebookService;
+
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+
+    @Autowired
+    @Qualifier("lessonService")
+    private ILessonService lessonService;
+
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     private static final String[] MONITOR_MESSAGE_KEYS = new String[] {
 	    "label.learner.progress.activity.current.tooltip", "label.learner.progress.activity.completed.tooltip",
@@ -107,8 +139,9 @@ public class LearnerAction extends LamsDispatchAction {
     // Class level constants - Struts forward
     // ---------------------------------------------------------------------
 
-    private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url)
-	    throws IOException, ServletException {
+    @RequestMapping("/redirectToURL")
+    @ResponseBody
+    private String redirectToURL(HttpServletResponse response, String url) throws IOException, ServletException {
 	if (url != null) {
 	    String fullURL = WebUtil.convertToFullURL(url);
 	    response.sendRedirect(response.encodeRedirectURL(fullURL));
@@ -139,10 +172,11 @@ public class LearnerAction extends LamsDispatchAction {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward joinLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+
+    @RequestMapping("/joinLesson")
+    public String joinLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Integer learner = null;
 	try {
 
@@ -152,41 +186,41 @@ public class LearnerAction extends LamsDispatchAction {
 
 	    // security check
 	    Lesson lesson = learnerService.getLesson(lessonID);
-	    User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+	    User user = (User) LearnerServiceProxy.getUserManagementService(applicationContext.getServletContext())
 		    .findById(User.class, learner);
 	    if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().getLearners().contains(user)) {
 		request.setAttribute("messageKey",
 			"User " + user.getLogin() + " is not a learner in the requested lesson.");
-		return mapping.findForward("message");
+		return "msgContent";
 	    }
 	    // check lesson's state if its suitable for learner's access
 	    if (!lesson.isLessonAccessibleForLearner()) {
 		request.setAttribute("messageKey", "Lesson is inaccessible");
-		return mapping.findForward("message");
+		return "msgContent";
 	    }
 
-	    if (LearnerAction.log.isDebugEnabled()) {
-		LearnerAction.log.debug("The learner [" + learner + "] is joining the lesson [" + lessonID + "]");
+	    if (LearnerController.log.isDebugEnabled()) {
+		LearnerController.log.debug("The learner [" + learner + "] is joining the lesson [" + lessonID + "]");
 	    }
 
 	    // join user to the lesson on the server
 	    LearnerProgress learnerProgress = learnerService.joinLesson(learner, lessonID);
 
-	    if (LearnerAction.log.isDebugEnabled()) {
-		LearnerAction.log.debug("The learner [" + learner + "] joined lesson. The" + "progress data is:"
+	    if (LearnerController.log.isDebugEnabled()) {
+		LearnerController.log.debug("The learner [" + learner + "] joined lesson. The" + "progress data is:"
 			+ learnerProgress.toString());
 	    }
 
 	    ActivityMapping activityMapping = LearnerServiceProxy
-		    .getActivityMapping(this.getServlet().getServletContext());
+		    .getActivityMapping(this.applicationContext.getServletContext());
 	    String url = "learning/" + activityMapping.getDisplayActivityAction(lessonID);
 
-	    redirectToURL(mapping, response, url);
+	    redirectToURL(response, url);
 
 	} catch (Exception e) {
-	    LearnerAction.log.error("An error occurred while learner " + learner + " attempting to join the lesson.",
-		    e);
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    LearnerController.log
+		    .error("An error occurred while learner " + learner + " attempting to join the lesson.", e);
+	    return "error";
 	}
 
 	return null;
@@ -195,11 +229,11 @@ public class LearnerAction extends LamsDispatchAction {
     /**
      * Archives current learner progress and moves a learner back to the start of lesson.
      */
-    public ActionForward restartLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/restartLesson")
+    public String restartLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	// fetch necessary parameters
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	User user = LearningWebUtil.getUser(learnerService);
 	Integer userID = user.getUserId();
 
@@ -224,32 +258,23 @@ public class LearnerAction extends LamsDispatchAction {
 	LearnerProgressArchive learnerProgressArchive = new LearnerProgressArchive(user, learnerProgress.getLesson(),
 		attemptID, attemptedActivities, completedActivities, learnerProgress.getCurrentActivity(),
 		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate());
-
-	IUserManagementService userManagementService = LearnerServiceProxy
-		.getUserManagementService(getServlet().getServletContext());
 	userManagementService.save(learnerProgressArchive);
-
-	IGradebookService gradebookService = LearnerServiceProxy.getGradebookService(getServlet().getServletContext());
-	gradebookService.archiveLearnerMarks(lessonID, userID);
 	gradebookService.removeLearnerFromLesson(lessonID, userID);
-
-	IMonitoringService monitoringService = LearnerServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	monitoringService.removeLearnerContent(lessonID, userID);
 	// remove learner progress
-	ILessonService lessonService = LearnerServiceProxy.getLessonService(getServlet().getServletContext());
 	lessonService.removeLearnerProgress(lessonID, userID);
 
 	// display Learner interface with updated data
-	return joinLesson(mapping, form, request, response);
+	return joinLesson(request, response);
     }
 
     /**
      * Produces necessary data for learner progress bar.
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getLearnerProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/getLearnerProgress")
+    @ResponseBody
+    public String getLearnerProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer learnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
 	Integer monitorId = null;
 	HttpSession ss = SessionManager.getSession();
@@ -268,14 +293,13 @@ public class LearnerAction extends LamsDispatchAction {
 	if (lessonId == null) {
 	    // depending on when this is called, there may only be a toolSessionId known, not the lessonId.
 	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(getServlet().getServletContext())
+	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(applicationContext.getServletContext())
 		    .getToolSession(toolSessionId);
 	    lessonId = toolSession.getLesson().getLessonId();
 	}
 
 	responseJSON.set("messages", getProgressBarMessages());
 
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
 	if (ret == null) {
 	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -298,26 +322,27 @@ public class LearnerAction extends LamsDispatchAction {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON.toString());
 
-	return null;
+	return responseJSON.toString();
     }
 
-    public ActionForward getPresenceChatActiveUserCount(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @RequestMapping("/getPresenceChatActiveUserCount")
+    @ResponseBody
+    public String getPresenceChatActiveUserCount(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	int count = PresenceWebsocketServer.getActiveUserCount(lessonId);
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(count);
-	return null;
+
+	return String.valueOf(count);
     }
 
     /**
      * Forces a move to a destination Activity in the learning sequence, redirecting to the new page rather.
      */
-    public ActionForward forceMoveRedirect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+    @RequestMapping("/forceMoveRedirect")
+    public String forceMoveRedirect(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	Long fromActivityId = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_ACTIVITY_ID, true);
 	Long toActivityId = WebUtil.readLongParam(request, AttributeNames.PARAM_DEST_ACTIVITY_ID, true);
@@ -337,19 +362,20 @@ public class LearnerAction extends LamsDispatchAction {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	learnerService.moveToActivity(learnerId, lessonId, fromActivity, toActivity);
 
-	if (LearnerAction.log.isDebugEnabled()) {
-	    LearnerAction.log.debug("Force move for learner " + learnerId + " lesson " + lessonId + ". ");
+	if (LearnerController.log.isDebugEnabled()) {
+	    LearnerController.log.debug("Force move for learner " + learnerId + " lesson " + lessonId + ". ");
 	}
 
 	String url = null;
-	ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+	ActivityMapping activityMapping = LearnerServiceProxy
+		.getActivityMapping(this.applicationContext.getServletContext());
 	if (!toActivity.isFloating()) {
 	    url = "/learning" + activityMapping.getDisplayActivityAction(lessonId);
 	} else {
 	    url = activityMapping.getActivityURL(toActivity);
 	}
 
-	return redirectToURL(mapping, response, url);
+	return redirectToURL(response, url);
     }
 
     /**
@@ -407,12 +433,12 @@ public class LearnerAction extends LamsDispatchAction {
     private ObjectNode getProgressBarMessages() {
 	ObjectNode progressBarMessages = JsonNodeFactory.instance.objectNode();
 	MessageService messageService = LearnerServiceProxy
-		.getMonitoringMessageService(getServlet().getServletContext());
+		.getMonitoringMessageService(applicationContext.getServletContext());
 	for (String key : MONITOR_MESSAGE_KEYS) {
 	    String value = messageService.getMessage(key);
 	    progressBarMessages.put(key, value);
 	}
-	messageService = LearnerServiceProxy.getMessageService(getServlet().getServletContext());
+	messageService = LearnerServiceProxy.getMessageService(applicationContext.getServletContext());
 	for (String key : LEARNER_MESSAGE_KEYS) {
 	    String value = messageService.getMessage(key);
 	    progressBarMessages.put(key, value);
@@ -431,11 +457,11 @@ public class LearnerAction extends LamsDispatchAction {
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	if (lessonID != null) {
-	    lesson = LearnerServiceProxy.getLearnerService(getServlet().getServletContext()).getLesson(lessonID);
+	    lesson = lessonService.getLesson(lessonID);
 
 	} else {
 	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(getServlet().getServletContext())
+	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(applicationContext.getServletContext())
 		    .getToolSession(toolSessionId);
 	    lesson = toolSession.getLesson();
 	}

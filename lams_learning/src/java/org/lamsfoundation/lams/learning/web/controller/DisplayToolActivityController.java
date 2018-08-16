@@ -21,27 +21,23 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to forward the user to a Tool.
@@ -55,27 +51,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class DisplayToolActivityController extends ActivityController {
-    
+
     private static Logger log = Logger.getLogger(DisplayToolActivityController.class);
-    
+
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
 
+    @Autowired
+    private WebApplicationContext applicationContext;
+
     /**
      * Gets a tool activity from the request (attribute) and uses a redirect to forward the user to the tool.
      */
-    @RequestMapping("//DisplayToolActivity")
+    @RequestMapping("/DisplayToolActivity")
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 	//ActivityForm form = (ActivityForm)actionForm;
-	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+	ActivityMapping actionMappings = LearningWebUtil
+		.getActivityMapping(this.applicationContext.getServletContext());
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
 	if (!(activity instanceof ToolActivity)) {
 	    log.error("activity not ToolActivity");
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    return "error";
 	}
 
 	ToolActivity toolActivity = (ToolActivity) activity;
@@ -85,7 +85,7 @@ public class DisplayToolActivityController extends ActivityController {
 	try {
 	    response.sendRedirect(url);
 	} catch (java.io.IOException e) {
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    return "error";
 	}
 	return null;
     }

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.util.ArrayList;
@@ -32,9 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
@@ -44,12 +40,12 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display a ParallelActivity.
@@ -64,29 +60,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class DisplayParallelActivityController extends ActivityController {
-    
+
     private static Logger log = Logger.getLogger(DisplayParallelActivityController.class);
-    
+
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Gets a parallel activity from the request (attribute) and forwards to the display JSP.
      */
     @RequestMapping("/DisplayParallelActivity")
-    public String execute(@ModelAttribute ActivityForm form,HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
 
-
-	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+	ActivityMapping actionMappings = LearnerServiceProxy
+		.getActivityMapping(this.applicationContext.getServletContext());
 
 	actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof ParallelActivity)) {
 	    log.error("activity not ParallelActivity " + activity.getActivityId());
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    return "error";
 	}
 
 	ParallelActivity parallelActivity = (ParallelActivity) activity;
@@ -104,10 +102,10 @@ public class DisplayParallelActivityController extends ActivityController {
 	}
 	if (activityURLs.size() == 0) {
 	    log.error("No sub-activity URLs for activity " + activity.getActivityId());
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    return "error";
 	}
 	form.setActivityURLs(activityURLs);
 
-	return mapping.findForward("displayParallel");
+	return "parallelActivity";
     }
 }

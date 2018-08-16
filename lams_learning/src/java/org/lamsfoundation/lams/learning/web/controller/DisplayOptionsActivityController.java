@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.util.ArrayList;
@@ -33,9 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.TokenProcessor;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
@@ -45,7 +41,6 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,13 +64,13 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 public class DisplayOptionsActivityController extends ActivityController {
-    
+
     private static Logger log = Logger.getLogger(DisplayOptionsActivityController.class);
-    
+
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
-    
+
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -84,23 +79,24 @@ public class DisplayOptionsActivityController extends ActivityController {
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/DisplayOptionsActivity")
-    public ActionForward execute(@ModelAttribute OptionsActivityForm form,HttpServletRequest request,
+    public String execute(@ModelAttribute OptionsActivityForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	 
-	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+
+	ActivityMapping actionMappings = LearningWebUtil
+		.getActivityMapping(this.applicationContext.getServletContext());
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof OptionsActivity)) {
 	    log.error("activity not OptionsActivity " + activity.getActivityId());
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    return "error";
 	}
 
 	OptionsActivity optionsActivity = (OptionsActivity) activity;
 
 	form.setActivityID(activity.getActivityId());
 
-	List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
+	List<ActivityURL> activityURLs = new ArrayList<>();
 	Set<Activity> subActivities = optionsActivity.getActivities();
 	Iterator<Activity> i = subActivities.iterator();
 	int completedCount = 0;
@@ -131,12 +127,12 @@ public class DisplayOptionsActivityController extends ActivityController {
 
 	TokenProcessor.getInstance().saveToken(request);
 
-	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, applicationContext.getServletContext());
+	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request,
+		applicationContext.getServletContext());
 
 	// lessonId needed for the progress bar
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
-			
-	String forward = "displayOptions";
-	return mapping.findForward(forward);
+
+	return "optionsActivity";
     }
 }

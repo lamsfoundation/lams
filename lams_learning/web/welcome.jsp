@@ -19,7 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
@@ -30,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 <script language="JavaScript" type="text/JavaScript">
 <!--
-	var contentURL = '<lams:WebAppURL />learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='true' />';
+	var contentURL = '<lams:WebAppURL />learner/joinLesson.do?lessonID=<c:out value='${lessonID}' escapeXml='true' />';
 	window.location.href = contentURL;
 //-->
 </script>

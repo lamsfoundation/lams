@@ -19,16 +19,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<c:set var="formAction">/branching.do?method=performBranching&type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
+	<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
 
-	<html:form action="${formAction}" target="_self">
+	<form:form action="${formAction}" modelAttribute="BranchingForm" target="_self">
 
 		<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
 		<lams:Page type="learner" title="${title}">
@@ -36,9 +34,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<p><fmt:message key="label.branching.wait.message"/></p>
 			<p><fmt:message key="label.branching.refresh.message"/></p>
 
-			<html:submit styleClass="btn btn-default pull-right"><fmt:message key="label.next.button"/></html:submit>
+			<button class="btn btn-default pull-right"><fmt:message key="label.next.button"/></button>
 
 			<div id="footer"></div>
 		</lams:Page>
 
-	</html:form>
+	</form:form>

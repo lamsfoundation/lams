@@ -32,15 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
-import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.GroupingForm;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -52,7 +45,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -87,11 +79,11 @@ public class GroupingController {
     // Instance variables
     // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(GroupingController.class);
-    
+
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
-    
+
     @Autowired
     private WebApplicationContext applicationContext;
     // ---------------------------------------------------------------------
@@ -128,7 +120,8 @@ public class GroupingController {
      * @throws ServletException
      */
     @RequestMapping("/performGrouping")
-    public String performGrouping(@ModelAttribute GroupingForm groupForm,HttpServletRequest request) throws IOException, ServletException {
+    public String performGrouping(@ModelAttribute GroupingForm GroupingForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
 	boolean forceGroup = WebUtil.readBooleanParam(request, GroupingController.PARAM_FORCE_GROUPING, false);
 
@@ -143,9 +136,9 @@ public class GroupingController {
 	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
 		LearningWebUtil.getUserId(), forceGroup);
 
-	groupForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
-	groupForm.setTitle(activity.getTitle());
-	groupForm.setActivityID(activity.getActivityId());
+	GroupingForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
+	GroupingForm.setTitle(activity.getTitle());
+	GroupingForm.setActivityID(activity.getActivityId());
 
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {
@@ -182,11 +175,12 @@ public class GroupingController {
      */
     @RequestMapping("/viewGroup")
     public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
-	return viewGrouping(request,null);
+	return viewGrouping(request, null);
     }
 
     @RequestMapping("/viewGroup")
-    public String viewGrouping(HttpServletRequest request, LearnerProgress learnerProgress) throws IOException, ServletException {
+    public String viewGrouping(HttpServletRequest request, LearnerProgress learnerProgress)
+	    throws IOException, ServletException {
 	prepareGroupData(request);
 	request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
@@ -216,18 +210,18 @@ public class GroupingController {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward completeActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/completeActivity")
+    public String completeActivity(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// so manually resume the progress. The completeActivity code can cope with a missing activity.
 	return LearningWebUtil.completeActivity(request, response,
-		LearningWebUtil.getActivityMapping(this.getServlet().getServletContext()), progress, groupingActivity,
-		learnerId, learnerService, true);
+		LearningWebUtil.getActivityMapping(this.applicationContext.getServletContext()), progress,
+		groupingActivity, learnerId, learnerService, true);
     }
 
     /**
@@ -236,11 +230,10 @@ public class GroupingController {
      * @param request
      */
     @SuppressWarnings("unchecked")
+    @RequestMapping("/prepareGroupData")
     private void prepareGroupData(HttpServletRequest request) {
 
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-
-	SortedSet<GroupDTO> groups = new TreeSet<GroupDTO>(GroupDTO.GROUP_NAME_COMPARATOR);
+	SortedSet<GroupDTO> groups = new TreeSet<>(GroupDTO.GROUP_NAME_COMPARATOR);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
 	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
@@ -268,9 +261,8 @@ public class GroupingController {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward learnerChooseGroup(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+    @RequestMapping("/learnerChooseGroup")
+    public String learnerChooseGroup(HttpServletRequest request) throws IOException, ServletException {
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
@@ -281,7 +273,7 @@ public class GroupingController {
 	redirectURL = WebUtil.appendParameterToURL(redirectURL, "method", "performGrouping");
 	redirectURL = WebUtil.appendParameterToURL(redirectURL, "activityID", activity.getActivityId().toString());
 
-	return new RedirectingActionForward(redirectURL);
+	return redirectURL;
     }
 
 }

@@ -19,16 +19,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <lams:Page type="learner" title="${GroupingForm.map.title}">
-	<html:form action="/grouping.do" target="_self">
-		<input type="hidden" name="method" value="performGrouping" />
+	<form:form action="grouping/performGrouping.do" modelAttribute="GroupingForm" target="_self">
 		<input type="hidden" name="activityID" value="${GroupingForm.map.activityID}" />
 		<input type="hidden" name="force" value="${GroupingForm.map.previewLesson}" />
 		
@@ -44,10 +41,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>
 
 		<div class="right-buttons">
-			<html:submit styleClass="btn btn-primary pull-right">
+			<button class="btn btn-primary pull-right">
 				<fmt:message key="label.next.button" />
-			</html:submit>
+			</button>
 		</div>
 
-	</html:form>
+	</form:form>
 </lams:Page>

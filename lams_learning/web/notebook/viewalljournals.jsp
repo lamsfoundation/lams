@@ -18,7 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -66,8 +66,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<tr>
 			<td class="align-left" width="28%">
 				<c:set var="viewnote">
-					<html:rewrite page="/notebook.do?method=viewEntry&mode=teacher&uid=${entry.uid}&currentLessonID=${lessonID}" />
-				</c:set> <html:link href="${viewnote}">
+					<c:url value="/notebook/viewEntry.do?mode=teacher&uid=${entry.uid}&currentLessonID=${lessonID}" />
+				</c:set> <a href="${viewnote}">
 					<c:choose>
 						<c:when test="${empty entry.title}">
 							<fmt:message key="mynotes.entry.no.title.label" />
@@ -76,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:out value="${entry.title}" escapeXml="false" />
 						</c:otherwise>
 					</c:choose>
-				</html:link></td>
+				</a></td>
 			<td>&nbsp;</td>
 			<td><lams:Date value="${entry.createDate}" /></td>
 			<td><lams:Date value="${entry.lastModified}" /></td>

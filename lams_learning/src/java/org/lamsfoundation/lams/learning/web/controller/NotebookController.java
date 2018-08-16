@@ -29,14 +29,10 @@ import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.form.NotebookForm;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -45,15 +41,21 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author M Seaton
  */
-public class NotebookAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/notebook")
+public class NotebookController {
+
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
@@ -61,30 +63,31 @@ public class NotebookAction extends LamsDispatchAction {
     private static final String VIEW_SINGLE = "viewSingle";
     private static final String VIEW_JOURNALS = "viewJournals";
 
-    public ICoreNotebookService getNotebookService() {
-	WebApplicationContext webContext = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (ICoreNotebookService) webContext.getBean(CoreNotebookConstants.NOTEBOOK_SERVICE_BEAN_NAME);
-    }
+    @Autowired
+    @Qualifier("notebookService")
+    private ICoreNotebookService notebookService;
+
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * View all notebook entries
      */
-    public ActionForward viewAll(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	// initialize service object
-	ICoreNotebookService notebookService = getNotebookService();
-
-	DynaActionForm notebookForm = (DynaActionForm) actionForm;
+    @RequestMapping("/viewAll")
+    public String viewAll(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
 	// getting requested object according to coming parameters
 	Integer learnerID = LearningWebUtil.getUserId();
 
 	// lessonID
-	Long lessonID = (Long) notebookForm.get("currentLessonID");
+	Long lessonID = notebookForm.getCurrentLessonID();
 	if (lessonID == null || lessonID == 0) {
-	    lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+	    lessonID = notebookForm.getLessonID();
 	}
 
 	// get all notebook entries for the learner
@@ -95,30 +98,27 @@ public class NotebookAction extends LamsDispatchAction {
 	request.getSession().setAttribute("entries", entries.values());
 	request.setAttribute("lessonID", lessonID);
 
-	return mapping.findForward(NotebookAction.VIEW_ALL);
+	return "notebook/viewall";
 
     }
 
     /**
      * View all journals entries from a lesson call
      */
-    public ActionForward viewAllJournals(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-
-	DynaActionForm notebookForm = (DynaActionForm) actionForm;
+    @RequestMapping("/viewAllJournals")
+    public String viewAllJournals(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
 	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-	User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+	User user = (User) LearnerServiceProxy.getUserManagementService(applicationContext.getServletContext())
 		.findById(User.class, userID);
-	
+
 	// lesson service
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-	Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
+	Long lessonID = notebookForm.getLessonID();
 	Lesson lesson = learnerService.getLesson(lessonID);
-	
-	if ( ! hasStaffAccessToJournals(user, lesson) ) {
+
+	if (!hasStaffAccessToJournals(user, lesson)) {
 	    throw new UserAccessDeniedException(
 		    "User " + userID + " may not retrieve journal entries for lesson " + lessonID);
 	}
@@ -128,12 +128,12 @@ public class NotebookAction extends LamsDispatchAction {
 	request.getSession().setAttribute("journals", journals);
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonID);
 
-	return mapping.findForward(NotebookAction.VIEW_JOURNALS);
+	return "notebook/viewalljournals";
     }
 
     // check user has permission to access all the journals for a lesson
     private boolean hasStaffAccessToJournals(User user, Lesson lesson) {
-	
+
 	if (lesson == null) {
 	    return false;
 	}
@@ -146,11 +146,11 @@ public class NotebookAction extends LamsDispatchAction {
 	// staff member okay
 	if ((lesson.getLessonClass() != null) && lesson.getLessonClass().isStaffMember(user)) {
 	    return true;
-	} 
-	
+	}
+
 	return false;
     }
-    
+
     /**
      *
      * @param lessonID
@@ -159,7 +159,6 @@ public class NotebookAction extends LamsDispatchAction {
      */
     private List<NotebookEntry> getJournals(Long lessonID) {
 	// initialize service object
-	ICoreNotebookService notebookService = getNotebookService();
 
 	if (lessonID == null) {
 	    return null;
@@ -172,31 +171,27 @@ public class NotebookAction extends LamsDispatchAction {
     /**
      * View single notebook entry
      */
-    public ActionForward viewEntry(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/viewEntry")
+    public String viewEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	// initialize service object
-	ICoreNotebookService notebookService = getNotebookService();
-
-	DynaActionForm notebookForm = (DynaActionForm) actionForm;
-	Long uid = (Long) notebookForm.get("uid");
-	Long currentLessonID = (Long) notebookForm.get("currentLessonID");
+	Long uid = notebookForm.getUid();
+	Long currentLessonID = notebookForm.getCurrentLessonID();
 	String mode = WebUtil.readStrParam(request, "mode", true);
 
 	NotebookEntry entry = notebookService.getEntry(uid);
 
 	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-	User user = (User) LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+	User user = (User) LearnerServiceProxy.getUserManagementService(applicationContext.getServletContext())
 		.findById(User.class, userID);
 
-	if ( entry.getUser() != null && ! entry.getUser().getUserId().equals(user.getUserId()) ) {
+	if (entry.getUser() != null && !entry.getUser().getUserId().equals(user.getUserId())) {
 	    // wants to look at someone else's entry - check they are a teacher
-	    ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	    Lesson lesson = learnerService.getLesson(currentLessonID);
-	    if ( ! hasStaffAccessToJournals(user, lesson) ) {
+	    if (!hasStaffAccessToJournals(user, lesson)) {
 		throw new UserAccessDeniedException(
-		    "User " + userID + " may not retrieve journal entries for lesson " + currentLessonID);
+			"User " + userID + " may not retrieve journal entries for lesson " + currentLessonID);
 	    }
 	}
 
@@ -212,46 +207,39 @@ public class NotebookAction extends LamsDispatchAction {
 	    request.setAttribute("currentLessonID", currentLessonID);
 	}
 
-	return mapping.findForward(NotebookAction.VIEW_SINGLE);
+	return "notebook/view";
     }
 
     /**
      *
      */
-    public ActionForward processNewEntry(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/processNewEntry")
+    public String processNewEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	// initialize service object
-	ICoreNotebookService notebookService = getNotebookService();
-
-	DynaActionForm notebookForm = (DynaActionForm) actionForm;
-	Long id = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
-	String title = (String) notebookForm.get("title");
-	String entry = (String) notebookForm.get("entry");
-	String signature = (String) notebookForm.get("signature");
+	Long id = notebookForm.getLessonID();
+	String title = notebookForm.getTitle();
+	String entry = notebookForm.getEntry();
+	String signature = notebookForm.getSignature();
 	Integer userID = LearningWebUtil.getUserId();
 
 	notebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature, userID, title, entry);
 
 	boolean skipViewAll = WebUtil.readBooleanParam(request, "skipViewAll", false);
-	return skipViewAll ? null : viewAll(mapping, actionForm, request, response);
+	return skipViewAll ? null : viewAll(notebookForm, request);
     }
 
     /**
      *
      */
-    public ActionForward updateEntry(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/updateEntry")
+    public String updateEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 
-	// initialize service object
-	ICoreNotebookService notebookService = getNotebookService();
-
-	// get form data
-	DynaActionForm notebookForm = (DynaActionForm) actionForm;
-	Long uid = (Long) notebookForm.get("uid");
-	String title = (String) notebookForm.get("title");
-	String entry = (String) notebookForm.get("entry");
-	String signature = (String) notebookForm.get("signature");
+	Long uid = notebookForm.getUid();
+	String title = notebookForm.getTitle();
+	String entry = notebookForm.getEntry();
+	String signature = notebookForm.getSignature();
 
 	// get existing entry to edit
 	NotebookEntry entryObj = notebookService.getEntry(uid);
@@ -269,7 +257,7 @@ public class NotebookAction extends LamsDispatchAction {
 
 	notebookService.updateEntry(entryObj);
 
-	return viewAll(mapping, actionForm, request, response);
+	return viewAll(notebookForm, request);
 
     }
 

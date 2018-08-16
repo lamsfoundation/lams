@@ -45,7 +45,7 @@
 
 	<div class="group-box">
 
-		<html:form action="/ChooseActivity" method="post" onsubmit="return validate();">
+		<form:form action="ChooseActivity.do mo`" modelAttribute="activityForm" method="post" onsubmit="return validate();">
 			<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
 
 			<div class="options">
@@ -113,14 +113,14 @@
 
 					</c:when>
 					<c:otherwise>
-						<html:submit styleClass="btn btn-default">
+						<button class="btn btn-default">
 							<fmt:message key="label.activity.options.choose" />
-						</html:submit>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
 
-		</html:form>
+		</form:form>
 	</div>
 
 
@@ -135,7 +135,7 @@
 		//-->
 		</script>
 
-		<html:form action="/CompleteActivity" method="post" styleId="messageForm">
+		<form:form action="CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
 			<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
 			<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">
 			<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />">
@@ -174,7 +174,7 @@
 			<hr class="msg-hr">
 
 			<div class="voffset10">
-				<html:link href="javascript:;" styleClass="btn btn-primary pull-right na" styleId="finishButton"
+				<a href="javascript:;" class="btn btn-primary pull-right na" id="finishButton"
 					onclick="submitForm('finish')">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
@@ -184,9 +184,9 @@
 							<fmt:message key="label.finish.button" />
 						</c:otherwise>
 					</c:choose>
-				</html:link>
+				</a>
 			</div>
 
-		</html:form>
+		</form:form>
 	</c:if>
 </lams:Page>

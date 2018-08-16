@@ -2,16 +2,18 @@ package org.lamsfoundation.lams.learning.web.form;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+
 public class BranchingForm {
 
     private Long activityID;
     private Long progressID;
-    private Long previewLesson;
-    private boolean showNextButton;
-    private boolean showFinishButton;
+    private Boolean previewLesson;
+    private Boolean showNextButton;
+    private Boolean showFinishButton;
     private String title;
     private String type;
-    private List<String> activityURLs;
+    private List<ActivityURL> activityURLs;
 
 //	used for updating the the progress bar
     private Long lessonID;
@@ -34,27 +36,27 @@ public class BranchingForm {
 	this.progressID = progressID;
     }
 
-    public Long getPreviewLesson() {
+    public Boolean getPreviewLesson() {
 	return previewLesson;
     }
 
-    public void setPreviewLesson(Long previewLesson) {
+    public void setPreviewLesson(Boolean previewLesson) {
 	this.previewLesson = previewLesson;
     }
 
-    public boolean isShowNextButton() {
+    public Boolean isShowNextButton() {
 	return showNextButton;
     }
 
-    public void setShowNextButton(boolean showNextButton) {
+    public void setShowNextButton(Boolean showNextButton) {
 	this.showNextButton = showNextButton;
     }
 
-    public boolean isShowFinishButton() {
+    public Boolean isShowFinishButton() {
 	return showFinishButton;
     }
 
-    public void setShowFinishButton(boolean showFinishButton) {
+    public void setShowFinishButton(Boolean showFinishButton) {
 	this.showFinishButton = showFinishButton;
     }
 
@@ -74,11 +76,11 @@ public class BranchingForm {
 	this.type = type;
     }
 
-    public List<String> getActivityURLs() {
+    public List<ActivityURL> getActivityURLs() {
 	return activityURLs;
     }
 
-    public void setActivityURLs(List<String> activityURLs) {
+    public void setActivityURLs(List<ActivityURL> activityURLs) {
 	this.activityURLs = activityURLs;
     }
 

@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><c:out value="${title}" /></title>
 	<lams:css />
 	<META HTTP-EQUIV="Refresh"
-		CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
+		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 		

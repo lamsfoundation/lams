@@ -20,8 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -47,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <script type="text/javascript">
 	function restartLesson(){
 		if (confirm('<fmt:message key="message.learner.progress.restart.confirm"/>')) {
-			window.location.href = "<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}";
+			window.location.href = "<lams:WebAppURL/>learner/restartLesson.do?lessonID=${lessonID}";
 		}
 	}
 	
@@ -81,7 +80,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			// Create the organisation view grid with sub grid for users	
 			$("#userGradebookGrid").jqGrid({
 			    datatype		   : "json",
-			    url				   : "<lams:LAMSURL />gradebook/gradebook.do?dispatch=getLessonCompleteGridData&lessonID=${lessonID}",
+			    url				   : "<lams:LAMSURL />gradebook/gradebook/getLessonCompleteGridData.do?lessonID=${lessonID}",
 			    height			   : "100%",
 			    // use new theme
 			    guiStyle 		   : "bootstrap",

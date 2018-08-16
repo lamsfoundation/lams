@@ -1,5 +1,5 @@
 <c:set var="formAction"
-	value="/gate?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }" />
+	value="/gate/knockGate.do?activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }" />
 <c:if test="${GateForm.map.monitorCanOpenGate}">
 	<div class="voffset5">
 		<fmt:message key="label.gate.refresh.message" />
@@ -14,10 +14,10 @@
 	</div>
 </c:if>
 
-<html:form action="${formAction}" target="_self">
+<form:form action="${formAction}" modelAttribute="GateForm" target="_self">
 	<div class="voffset10 pull-right">
-		<html:submit styleClass="btn btn-default">
+		<button class="btn btn-default">
 			<fmt:message key="label.next.button" />
-		</html:submit>
+		</button>
 	</div>
-</html:form>
+</form:form>

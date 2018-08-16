@@ -29,9 +29,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
@@ -41,7 +39,12 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
-import org.lamsfoundation.lams.web.action.LamsAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
@@ -56,24 +59,32 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *
  */
-public class LoadToolActivityAction extends ActivityController {
+@Controller
+public class LoadToolActivityController extends ActivityController {
+
+    private static Logger log = Logger.getLogger(LoadToolActivityController.class);
+
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     public static final String PARAM_ACTIVITY_URL = "activityURL";
     public static final String PARAM_IS_BRANCHING = "isBranching";
 
-    private static final Map<Long, Object> toolSessionCreationLocks = new TreeMap<Long, Object>();
+    private static final Map<Long, Object> toolSessionCreationLocks = new TreeMap<>();
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a loading page.
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/LoadToolActivity")
+    public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
 
-	ActivityForm form = (ActivityForm) actionForm;
-	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+	ActivityMapping actionMappings = LearnerServiceProxy
+		.getActivityMapping(this.applicationContext.getServletContext());
 
-	ICoreLearnerService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
@@ -110,14 +121,13 @@ public class LoadToolActivityAction extends ActivityController {
 	} catch (RequiredGroupMissingException e) {
 
 	    //got here when activity requires existing grouping but no group for user exists yet
-	    LamsAction.log.warn(e.getMessage());
+	    log.warn(e.getMessage());
 	    request.setAttribute("messageKey", e.getMessage());
-	    return mapping.findForward("message");
+	    return "msgContent";
 	}
 
 	form.setActivityID(activity.getActivityId());
 
-	String mappingName = "displayTool";
 	if (activity.isToolActivity() || activity.isSystemToolActivity()) {
 
 	    String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), activity,
@@ -125,9 +135,9 @@ public class LoadToolActivityAction extends ActivityController {
 	    form.addActivityURL(new ActivityURL(activity.getActivityId(), url));
 
 	} else {
-	    LamsAction.log.error(LamsAction.className + ": activity not ToolActivity");
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    log.error("activity not ToolActivity");
+	    return "error";
 	}
-	return mapping.findForward(mappingName);
+	return "loadToolActivity";
     }
 }

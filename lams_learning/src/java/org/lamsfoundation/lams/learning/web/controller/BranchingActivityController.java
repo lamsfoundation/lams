@@ -31,11 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.form.BranchingForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -84,7 +82,7 @@ public class BranchingActivityController {
      * Gets an options activity from the request (attribute) and forwards to the display JSP.
      */
     @RequestMapping("/performBranching")
-    public String performBranching(@ModelAttribute("BranchingForm") DynaActionForm branchForm,
+    public String performBranching(@ModelAttribute("BranchingForm") BranchingForm branchForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 
 	ActivityMapping actionMappings = LearningWebUtil
@@ -111,17 +109,17 @@ public class BranchingActivityController {
 	    SequenceActivity branch = learnerService.determineBranch(learnerProgress.getLesson(), branchingActivity,
 		    learnerId);
 
-	    branchForm.set("activityID", activity.getActivityId());
-	    branchForm.set("progressID", learnerProgress.getLearnerProgressId());
-	    branchForm.set("showFinishButton", Boolean.TRUE);
-	    branchForm.set("title", activity.getTitle());
+	    branchForm.setActivityID(activity.getActivityId());
+	    branchForm.setProgressID(learnerProgress.getLearnerProgressId());
+	    branchForm.setShowFinishButton(Boolean.TRUE);
+	    branchForm.setTitle(activity.getTitle());
 
 	    if (learnerProgress.getLesson().isPreviewLesson()) {
 
 		// The preview version gives you a choice of branches
 		// If a "normal" branch can be determined based on the group, tool marks, etc then it is marked as the default branch
 
-		branchForm.set("previewLesson", Boolean.TRUE);
+		branchForm.setPreviewLesson(Boolean.TRUE);
 		forward = "branching/preview";
 
 		List<ActivityURL> activityURLs = new ArrayList<>();
@@ -136,21 +134,21 @@ public class BranchingActivityController {
 		    }
 		    activityURLs.add(activityURL);
 		}
-		branchForm.set("activityURLs", activityURLs);
+		branchForm.setActivityURLs(activityURLs);
 
 	    } else if (branch == null) {
 
 		// show the learner waiting page
-		branchForm.set("previewLesson", Boolean.FALSE);
+		branchForm.setPreviewLesson(Boolean.FALSE);
 		forward = "branching/wait";
-		branchForm.set("showNextButton", Boolean.TRUE);
+		branchForm.setShowNextButton(Boolean.TRUE);
 
 		if (branchingActivity.isChosenBranchingActivity()) {
-		    branchForm.set("type", BranchingActivity.CHOSEN_TYPE);
+		    branchForm.setType(BranchingActivity.CHOSEN_TYPE);
 		} else if (branchingActivity.isGroupBranchingActivity()) {
-		    branchForm.set("type", BranchingActivity.GROUP_BASED_TYPE);
+		    branchForm.setType(BranchingActivity.GROUP_BASED_TYPE);
 		} else if (branchingActivity.isToolBranchingActivity()) {
-		    branchForm.set("type", BranchingActivity.TOOL_BASED_TYPE);
+		    branchForm.setType(BranchingActivity.TOOL_BASED_TYPE);
 		}
 		// lessonId needed for the progress bar
 		request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
@@ -174,8 +172,8 @@ public class BranchingActivityController {
      * We are in the preview lesson and the author has selected a particular branch. Force it to take that branch.
      */
     @RequestMapping("/forceBranching")
-    public String forceBranching(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String forceBranching(@ModelAttribute("BranchingForm") BranchingForm branchForm,
+	    HttpServletRequest request) {
 
 	ActivityMapping actionMappings = LearningWebUtil
 		.getActivityMapping(this.applicationContext.getServletContext());

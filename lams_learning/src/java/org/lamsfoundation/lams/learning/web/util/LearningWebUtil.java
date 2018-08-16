@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
@@ -81,7 +80,8 @@ public class LearningWebUtil {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null
-		? (User) learnerService.getUserManagementService().findById(User.class, learner.getUserID()) : null;
+		? (User) learnerService.getUserManagementService().findById(User.class, learner.getUserID())
+		: null;
     }
 
     /**
@@ -142,7 +142,7 @@ public class LearningWebUtil {
      * @throws InterruptedException
      *
      */
-    public static ActionForward completeActivity(HttpServletRequest request, HttpServletResponse response,
+    public static String completeActivity(HttpServletRequest request, HttpServletResponse response,
 	    ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity, Integer learnerId,
 	    ICoreLearnerService learnerService, boolean redirect)
 	    throws LearnerServiceException, UnsupportedEncodingException {

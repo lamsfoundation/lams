@@ -20,7 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants"%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -54,11 +54,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <lams:Page type="learner" title="${title}"  hideProgressBar="true">
 
-	<html:form action="/notebook.do?method=updateEntry" styleId="notebookForm" method="post">
-		<html:hidden property="uid" value="${entry.uid}" />
-		<html:hidden property="signature" />
-		<html:hidden property="lessonID" value="${entry.externalID}" />
-		<html:hidden property="currentLessonID" value="${empty currentLessonID ? param.currentLessonID : currentLessonID}" />
+	<form:form action="updateEntry.do" modelAttribute="notebookForm" id="notebookForm" method="post">
+		<form:hidden path="uid" value="${entry.uid}" />
+		<form:hidden path="signature" />
+		<form:hidden path="lessonID" value="${entry.externalID}" />
+		<form:hidden path="currentLessonID" value="${empty currentLessonID ? param.currentLessonID : currentLessonID}" />
 		
 		<!-- set title -->
 		<c:set var="title">
@@ -96,11 +96,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:when test="${param.mode == 'edit'}">
 						<div class="form-group" style="text-align: left;">
 							<label for="${entry.title}"><fmt:message key="mynotes.entry.title.label"></fmt:message></label>
-							<html:text property="title" styleClass="form-control" styleId="${entry.title}" value="${entry.title}"></html:text>
+							<form:input path="title" cssClass="form-control" id="${entry.title}" value="${entry.title}"/>
 						</div>
 						<div class="form-group" style="text-align: left;">
 							<label><fmt:message key="mynotes.entry.entry.label"></fmt:message></label>
-							<html:textarea property="entry" styleClass="form-control" styleId="entry" style="width: 100%" rows="10"
+							<form:textarea path="entry" cssClass="form-control" id="entry" style="width: 100%" rows="10"
 								value="${entry.entry}" />
 						</div>
 						</td>
@@ -140,7 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:when>
 						<c:otherwise>
 							<c:set var="editnote">
-								<html:rewrite page="/notebook.do?method=viewEntry&mode=edit&currentLessonID=${param.currentLessonID}&uid=" />
+								<c:url value="/notebook/viewEntry.do?&mode=edit&currentLessonID=${param.currentLessonID}&uid=" />
 								<c:out value="${entry.uid}" />
 							</c:set>
 							<c:if test="${entry.externalSignature != scratchJournalSig}">
@@ -151,12 +151,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:choose>
 								<c:when test="${mode == 'teacher'}">
 									<c:set var="viewAll">
-										<html:rewrite page="/notebook.do?method=viewAllJournals&lessonID=${param.currentLessonID}" />
+										<c:url value="/notebook/viewAllJournals.do?lessonID=${param.currentLessonID}" />
 									</c:set>
 								</c:when>
 								<c:otherwise>
 									<c:set var="viewAll">
-										<html:rewrite page="/notebook.do?method=viewAll&currentLessonID=${param.currentLessonID}" />
+										<c:url value="/notebook/viewAll.do?currentLessonID=${param.currentLessonID}" />
 									</c:set>
 								</c:otherwise>
 							</c:choose>
@@ -170,5 +170,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 		</div>
 
-	</html:form>
+	</form:form>
 </lams:Page>

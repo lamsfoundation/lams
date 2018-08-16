@@ -21,18 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.controller;
 
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -44,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display an activity. This is used when UI calls starts of the learning process. It is needed to put
@@ -76,10 +72,13 @@ public class DisplayActivityController extends ActivityController {
     private static Logger log = Logger.getLogger(DisplayActivityController.class);
 
     public static final String PARAM_INITIAL_DISPLAY = "initialDisplay";
-    
+
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
@@ -88,7 +87,7 @@ public class DisplayActivityController extends ActivityController {
      * @throws UnsupportedEncodingException
      */
     @RequestMapping("/DisplayActivity")
-    public String execute( HttpServletRequest request) throws UnsupportedEncodingException {
+    public String execute(HttpServletRequest request) throws UnsupportedEncodingException {
 
 	// UI can only send the lessonID as that is all it has...
 	Integer learnerId = LearningWebUtil.getUserId();
@@ -101,12 +100,12 @@ public class DisplayActivityController extends ActivityController {
 
 	// Normally this is used to display the initial page, so initialDisplay=true. But if called from the
 	// special handling for completed activities (ie close window) then we need to set it to false.
-	boolean displayParallelFrames = WebUtil.readBooleanParam(request, DisplayActivityController.PARAM_INITIAL_DISPLAY,
-		true);
+	boolean displayParallelFrames = WebUtil.readBooleanParam(request,
+		DisplayActivityController.PARAM_INITIAL_DISPLAY, true);
 
-	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
-	ActionForward forward = actionMappings.getProgressForward(learnerProgress, false, displayParallelFrames,
-		request, learnerService);
+	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(applicationContext.getServletContext());
+	String forward = actionMappings.getProgressForward(learnerProgress, false, displayParallelFrames, request,
+		learnerService);
 
 	if (DisplayActivityController.log.isDebugEnabled()) {
 	    DisplayActivityController.log.debug(forward);

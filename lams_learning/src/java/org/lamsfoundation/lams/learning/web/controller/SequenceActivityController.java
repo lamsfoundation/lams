@@ -28,9 +28,7 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -39,7 +37,11 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.web.action.LamsAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display a sequence activity.
@@ -50,7 +52,17 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *
  *
  */
-public class SequenceActivityAction extends ActivityController {
+@Controller
+public class SequenceActivityController extends ActivityController {
+
+    private static Logger log = Logger.getLogger(SequenceActivityController.class);
+
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Gets an sequence activity from the request (attribute) and forwards to either the first activity in the sequence
@@ -59,22 +71,22 @@ public class SequenceActivityAction extends ActivityController {
      * @throws UnsupportedEncodingException
      * @throws LearnerServiceException
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws LearnerServiceException, UnsupportedEncodingException {
+    @RequestMapping("/SequenceActivity")
+    public String execute(HttpServletRequest request, HttpServletResponse response)
+	    throws LearnerServiceException, UnsupportedEncodingException {
 
-	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+	ActivityMapping actionMappings = LearningWebUtil
+		.getActivityMapping(this.applicationContext.getServletContext());
 	Integer learnerId = LearningWebUtil.getUserId();
 
-	ICoreLearnerService learnerService = getLearnerService();
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof SequenceActivity)) {
-	    LamsAction.log.error(LamsAction.className + ": activity not SequenceActivity " + activity.getActivityId());
-	    return mapping.findForward(ActivityMapping.ERROR);
+	    log.error("activity not SequenceActivity " + activity.getActivityId());
+	    return "error";
 	}
 
-	ActionForward forward = null;
+	String forward = null;
 	SequenceActivity sequenceActivity = (SequenceActivity) activity;
 	Activity firstActivityInSequence = sequenceActivity.getNextActivityByParent(new NullActivity());
 

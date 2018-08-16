@@ -21,27 +21,24 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.TokenProcessor;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -54,33 +51,34 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-public class ChooseActivityController extends ActivityController{
+public class ChooseActivityController extends ActivityController {
 
     protected static String className = "ChooseActivity";
-    
+
     private static Logger log = Logger.getLogger(ChooseActivityController.class);
 
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
-    
+
     @Autowired
     private WebApplicationContext applicationContext;
-    
+
     /**
      * Gets an activity from the request (attribute) and forwards onto the required jsp (SingleActivity or
      * ParallelActivity).
      */
     @RequestMapping("/ChooseActivity")
-    public String execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+    public String execute(@ModelAttribute("activityForm") ActivityForm activityForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.applicationContext.getServletContext());
+	ActivityMapping actionMappings = LearningWebUtil
+		.getActivityMapping(this.applicationContext.getServletContext());
 
 	// check token
 	if (!TokenProcessor.getInstance().isTokenValid(request, true)) {
 	    // didn't come here from options page
 	    log.info("No valid token in request");
-	    return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
+	    return "error";
 	}
 
 	// Get learner and lesson details.
@@ -97,7 +95,7 @@ public class ChooseActivityController extends ActivityController{
 	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
 	}
 
-	ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
+	String forward = actionMappings.getActivityForward(activity, progress, true);
 	return forward;
     }
 }

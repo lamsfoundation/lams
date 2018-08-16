@@ -18,7 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <lams:Page type="learner" title="${title}" hideProgressBar="true">
 	<c:set var="addnote">
-		<html:rewrite page="/notebook/add.do?lessonID=" />
+		<c:url value="/notebook/add.do?lessonID=" />
 		<c:out value="${lessonID}" />
 	</c:set>
 	<div class="pull-right">
@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<c:forEach var="entryList" items="${entries}" varStatus="list_status">
 		<c:forEach var="entry" items="${entryList}" varStatus="entry_status">
-			<html:link href="#" linkName="lesson${entry.externalID}" />
+			<a href="#" linkName="lesson${entry.externalID}" />
 
 			<!-- set sig check flag -->
 			<c:if test="${entry_status.first}">
@@ -61,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:set>
 
 				<c:set var="addnote">
-					<html:rewrite page="/notebook/add.do?currentLessonID=${lessonID}&lessonID=" />
+					<c:url value="/notebook/add.do?currentLessonID=${lessonID}&lessonID=" />
 					<c:out value="${entry.externalID}" />
 				</c:set>
 
@@ -118,9 +118,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 							<tr>
 								<td class="align-left" width="28%"><c:set var="viewnote">
-										<html:rewrite page="/notebook.do?method=viewEntry&currentLessonID=${lessonID}&uid=" />
+										<c:url value="/notebook/viewEntry.do?currentLessonID=${lessonID}&uid=" />
 										<c:out value="${entry.uid}" />
-									</c:set> <html:link href="${viewnote}">
+									</c:set> <a href="${viewnote}">
 										<c:choose>
 											<c:when test="${empty entry.title}">
 												<fmt:message key="mynotes.entry.no.title.label" />
@@ -129,7 +129,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:out value="${entry.title}" escapeXml="false" />
 											</c:otherwise>
 										</c:choose>
-									</html:link></td>
+									</a></td>
 								<td>&nbsp;</td>
 								<td><lams:Date value="${entry.createDate}" timeago="true"/></td>
 								<td><lams:Date value="${entry.lastModified}" timeago="true"/></td>

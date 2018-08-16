@@ -58,9 +58,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div class="group-box">
 
-		<html:form
-			action="/branching.do?method=forceBranching&amp;type=${BranchingForm.map.type}&amp;activityID=${BranchingForm.map.activityID}&amp;progressID=${BranchingForm.map.progressID}"
-			target="_self" onsubmit="return validate();">
+		<form:form
+			action="branching/forceBranching.do?amp;type=${BranchingForm.map.type}&amp;activityID=${BranchingForm.map.activityID}&amp;progressID=${BranchingForm.map.progressID}"
+			modelAttribute="BranchingForm" target="_self" onsubmit="return validate();">
 
 			<table class="table table-condensed table-striped">
 				<c:forEach items="${BranchingForm.map.activityURLs}"
@@ -119,11 +119,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:forEach>
 			</table>
 
-			<html:submit styleClass="btn btn-primary pull-right">
+			<button class="btn btn-primary pull-right">
 				<fmt:message key="label.activity.options.choose" />
-			</html:submit>
+			</button>
 
-		</html:form>
+		</form:form>
 	</div>
 <!--closes content-->
 

@@ -19,9 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -36,9 +34,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </style>
 <lams:Page type="learner" title="${title}">
 
-	<html:form
-		action="/grouping.do?method=completeActivity&userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
-		target="_self" styleId="messageForm">
+	<form:form
+		action="/grouping/completeActivity.do?userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
+		target="_self" modelAttribute="messageForm" id="messageForm">
 
 		<c:set var="userId" value="${user.userID}" />
 
@@ -78,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="row no-gutter">
 				<div class="col-xs-12">
 					<div id="right-buttons" class="pull-right voffset10">
-						<html:link href="javascript:;" styleClass="btn btn btn-primary na" styleId="finishButton"
+						<a href="javascript:;" class="btn btn btn-primary na" id="finishButton"
 							onclick="submitForm('finish')">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${activityPosition.last}">
@@ -89,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:otherwise>
 								</c:choose>
 							</span>
-						</html:link>
+						</a>
 					</div>
 
 				</div>
@@ -110,5 +108,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>
 
 
-	</html:form>
+	</form:form>
 </lams:Page>

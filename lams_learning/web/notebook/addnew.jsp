@@ -20,7 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants"%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -45,11 +45,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 <lams:Page type="learner" title="${title}"  hideProgressBar="true">
-	<html:form action="/notebook.do?method=processNewEntry" styleId="notebookForm" method="post">
+	<form:form action="processNewEntry.do" modelAttribute="notebookForm" id="notebookForm" method="post">
 
-		<html:hidden property="signature" />
-		<html:hidden property="currentLessonID" value="${param.currentLessonID}" />
-		<html:hidden property="lessonID" value="${param.lessonID}" />
+		<form:hidden path="signature" />
+		<form:hidden path="currentLessonID" value="${param.currentLessonID}" />
+		<form:hidden path="lessonID" value="${param.lessonID}" />
 
 		<div class="lead">
 			<fmt:message key="mynotes.add.new.button" />
@@ -57,11 +57,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<div class="form-group">
 						<label for="title"><fmt:message key="mynotes.entry.title.label"></fmt:message></label>
-						<html:text property="title" styleId="title" styleClass="form-control"></html:text>
+						<form:input path="title" id="title" cssClass="form-control"/>
 					</div> 
 					<div class="form-group">
 						<label for="entry"><fmt:message key="mynotes.entry.entry.label"></fmt:message></label>
-						<html:textarea property="entry" styleId="entry" styleClass="form-control" rows="8" />
+						<form:textarea path="entry" id="entry" cssClass="form-control" rows="8" />
 					</div> 
 					<div class="voffset10 pull-right">
 						<a href="#" class="btn btn-default" id="saveInNotebookBtn"
@@ -73,5 +73,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</td>
 			</tr>
 		</table>
-	</html:form>
+	</form:form>
 </lams:Page>

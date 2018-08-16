@@ -19,9 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
@@ -83,10 +81,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<fmt:message key="label.learner.choice.group.full" />
 							</c:when>
 							<c:otherwise>
-								<html:form
-									action="/grouping.do?method=learnerChooseGroup&userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
-									styleId="form${user.userID}${activityID}${group.groupID}" target="_self">
-								</html:form>							
+								<form:form
+									action="/grouping/learnerChooseGroup.do?userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
+									modelAttribute="form${user.userID}${activityID}${group.groupID}" id="form${user.userID}${activityID}${group.groupID}" target="_self">
+								</form:form>							
 								<button type="button" class="btn btn-sm btn-primary" 
 									data-toggle="modal" data-target="#confirmationModal" 
 									data-u="form${user.userID}${activityID}${group.groupID}" 

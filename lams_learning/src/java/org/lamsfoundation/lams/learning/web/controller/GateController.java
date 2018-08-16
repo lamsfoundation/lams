@@ -33,13 +33,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.form.GateForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -52,13 +47,13 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * <p>
@@ -92,11 +87,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/gate")
-public class GateController{
+public class GateController {
 
     @Autowired
     @Qualifier("learnerService")
     private ICoreLearnerService learnerService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
@@ -127,15 +125,16 @@ public class GateController{
      * @throws ServletException
      */
     @RequestMapping("")
-    public ActionForward knockGate(@ModelAttribute GateForm gateForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    public String knockGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	boolean forceGate = WebUtil.readBooleanParam(request, GateController.PARAM_FORCE_GATE_OPEN, false);
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	// initialize service object
 	Activity activity = learnerService.getActivity(activityId);
-	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
+	ActivityMapping actionMappings = LearningWebUtil
+		.getActivityMapping(this.applicationContext.getServletContext());
 
 	User learner = LearningWebUtil.getUser(learnerService);
 	Lesson lesson = learnerService.getLesson(lessonId);
@@ -152,7 +151,7 @@ public class GateController{
 
 	    // if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
 	    if (!gateDTO.getAllowToPass()) {
-		ActionForward forward = findViewByGateType(mapping, gateForm, gateDTO, lesson);
+		String forward = findViewByGateType(gateForm, gateDTO, lesson);
 		return forward;
 	    }
 	}
@@ -182,8 +181,7 @@ public class GateController{
      *         next.
      */
     @RequestMapping("/findViewByGateType")
-    private String findViewByGateType(@ModelAttribute GateForm gateForm, GateActivityDTO gateDTO,
-	    Lesson lesson) {
+    private String findViewByGateType(@ModelAttribute GateForm gateForm, GateActivityDTO gateDTO, Lesson lesson) {
 	gateForm.setTotalLearners(gateDTO.getExpectedLearnerCount());
 	gateForm.setWaitingLearners(gateDTO.getWaitingLearnerCount());
 	gateForm.setPreviewLesson(lesson.isPreviewLesson());
@@ -193,12 +191,12 @@ public class GateController{
 	gateForm.setLessonID(lesson.getLessonId());
 	gateForm.setGate(gate);
 	if (gate.isSynchGate()) {
-	    return mapping.findForward(GateController.VIEW_SYNCH_GATE);
+	    return "gate/synchGateContent";
 	} else if (gate.isScheduleGate()) {
 	    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
 	    if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
 		// so it is in seconds
-		gateForm.set("startOffset", scheduleGate.getGateStartTimeOffset() * 60);
+		gateForm.setStartOffset(scheduleGate.getGateStartTimeOffset() * 60);
 
 		User learner = LearningWebUtil.getUser(learnerService);
 		Date reachTime = ScheduleGateActivityStrategy.getPreviousActivityCompletionDate(scheduleGate, learner);
@@ -210,7 +208,7 @@ public class GateController{
 		gateForm.setStartingTime(startingTime.getTime());
 		long diff = startingTime.getTimeInMillis() - new Date().getTime();
 		long remainTime = diff / 1000;
-		gateForm.setRemainTime(remainTime);(remainTime);
+		gateForm.setRemainTime(remainTime);
 		gateForm.setEndingTime(null);
 	    } else {
 		gateForm.setStartOffset(null);
@@ -224,12 +222,12 @@ public class GateController{
 		gateForm.setRemainTime(remainTime);
 		gateForm.setEndingTime(null);
 	    }
-	    return mapping.findForward(GateController.VIEW_SCHEDULE_GATE);
+	    return "gate/scheduleGateContent";
 	} else if (gate.isConditionGate()) {
 	    gateForm.setMonitorCanOpenGate(false);
-	    return mapping.findForward(GateController.VIEW_CONDITION_GATE);
+	    return "gate/conditionGateContent";
 	} else if (gate.isPermissionGate() || gate.isSystemGate()) {
-	    return mapping.findForward(GateController.VIEW_PERMISSION_GATE);
+	    return "gate/permissionGateContent";
 	} else {
 	    throw new LearnerServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
 		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");
