@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.lamsfoundation.lams.admin.web.form.CleanupForm;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -77,7 +76,7 @@ public class CleanupTempFilesController {
 	    return "error";
 	}
 
-	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
+	if (request.getAttribute("CANCEL") != null) {
 	    return "redirect:/sysadminstart.do";
 	}
 

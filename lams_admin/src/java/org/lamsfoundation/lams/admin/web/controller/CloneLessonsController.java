@@ -32,8 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -76,8 +74,7 @@ public class CloneLessonsController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping("/start")
-    public String execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UserAccessDeniedException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws UserAccessDeniedException {
 
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    throw new UserAccessDeniedException();
