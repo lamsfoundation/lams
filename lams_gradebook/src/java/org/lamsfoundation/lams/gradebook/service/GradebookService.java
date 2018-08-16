@@ -211,9 +211,7 @@ public class GradebookService implements IGradebookService {
 	List<GradebookUserActivityArchive> activityArchives = gradebookDAO.getArchivedActivityMarks(activityId, userId);
 	for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
 	    Date archiveDate = lessonArchive.getArchiveDate();
-	    Date adjustedArchiveDate = userTimezone == null ? archiveDate
-		    : DateUtil.convertToTimeZoneFromDefault(userTimezone, archiveDate);
-	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder, adjustedArchiveDate,
+	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder,
 		    lessonArchive.getMark());
 	    for (GradebookUserActivityArchive activityArchive : activityArchives) {
 		if (archiveDate.equals(activityArchive.getArchiveDate())) {

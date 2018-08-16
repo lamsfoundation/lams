@@ -23,19 +23,16 @@
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 
 public class GBActivityArchiveGridRowDTO extends GradebookGridRowDTO {
 
-    private Date archiveDate;
     private Double lessonMark;
 
-    public GBActivityArchiveGridRowDTO(int attemptNumber, Date archiveDate, Double lessonMark) {
+    public GBActivityArchiveGridRowDTO(int attemptNumber, Double lessonMark) {
 	this.id = String.valueOf(attemptNumber);
-	this.archiveDate = archiveDate;
 	this.lessonMark = lessonMark;
     }
 
@@ -43,7 +40,6 @@ public class GBActivityArchiveGridRowDTO extends GradebookGridRowDTO {
     public ArrayList<String> toStringArray(GBGridView view) {
 	ArrayList<String> ret = new ArrayList<String>();
 	ret.add(id);
-	ret.add(archiveDate != null ? convertDateToString(archiveDate, null) : CELL_EMPTY);
 	ret.add(lessonMark.toString());
 	ret.add(status);
 	ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
