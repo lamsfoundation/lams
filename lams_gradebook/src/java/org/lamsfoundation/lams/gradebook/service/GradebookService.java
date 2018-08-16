@@ -1019,7 +1019,6 @@ public class GradebookService implements IGradebookService {
     public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
 
 	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());
-	;
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
@@ -1239,6 +1238,8 @@ public class GradebookService implements IGradebookService {
 	    titleRow[4] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
 	    rowList.add(titleRow);
 
+	    Map<Long, String> activityIdToName = new HashMap<Long, String>();
+
 	    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 
 		//find userDto corresponding to the user
@@ -1265,6 +1266,7 @@ public class GradebookService implements IGradebookService {
 		    String activityRowName = (groupName != null && groupId != null)
 			    ? activity.getTitle() + " (" + groupName + ")"
 			    : activity.getTitle();
+		    activityIdToName.put(activity.getActivityId(), activityRowName);
 
 		    String startDate = (userDto.getStartDate() == null) ? ""
 			    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getStartDate());
@@ -1278,6 +1280,68 @@ public class GradebookService implements IGradebookService {
 		    activityDataRow[3] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
 		    activityDataRow[4] = new ExcelCell(userDto.getMark(), false);
 		    rowList.add(activityDataRow);
+		}
+	    }
+
+	    // check if learner has restarted the lesson and has archived marks
+	    boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
+	    if (hasArchivedMarks) {
+		// "Previous attempts" row
+		ExcelCell[] attemptsRow = new ExcelCell[1];
+		attemptsRow[0] = new ExcelCell(getMessage("gradebook.columntitle.attempts"), true);
+		rowList.add(attemptsRow);
+
+		List<GradebookUserLessonArchive> lessonArchives = gradebookDAO
+			.getArchivedLessonMarks(lesson.getLessonId(), learner.getUserId());
+		int attemptOrder = lessonArchives.size();
+		// go through each lesson attempt
+		for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
+		    // lesson attempt header
+		    ExcelCell[] attemptRow = new ExcelCell[4];
+		    attemptRow[0] = new ExcelCell(getMessage("gradebook.columntitle.attempt"), true);
+		    attemptRow[1] = new ExcelCell(attemptOrder, true);
+		    attemptRow[1].setAlignment(ExcelCell.ALIGN_LEFT);
+		    attemptRow[2] = new ExcelCell(getMessage("gradebook.columntitle.lesson.mark"), true);
+		    attemptRow[3] = new ExcelCell(lessonArchive.getMark(), false);
+		    rowList.add(attemptRow);
+
+		    // go throuch each activity and see if there is an archived mark for it
+		    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
+			ExcelCell[] activityDataRow = null;
+			List<GradebookUserActivityArchive> activityArchives = gradebookDAO
+				.getArchivedActivityMarks(activity.getActivityId(), learner.getUserId());
+			Date archiveDate = lessonArchive.getArchiveDate();
+			for (GradebookUserActivityArchive activityArchive : activityArchives) {
+			    // if it matches, we found an archived mark for this activity and this attempt
+			    if (archiveDate.equals(activityArchive.getArchiveDate())) {
+				LearnerProgressArchive learnerProgress = learnerProgressDAO.getLearnerProgressArchive(
+					lesson.getLessonId(), learner.getUserId(), lessonArchive.getArchiveDate());
+				activityDataRow = new ExcelCell[5];
+				activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()),
+					false);
+				Date startDate = getActivityStartDate(learnerProgress, activity, null);
+				activityDataRow[1] = new ExcelCell(
+					startDate == null ? ""
+						: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(startDate),
+					false);
+				Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
+				activityDataRow[2] = new ExcelCell(
+					finishDate == null ? ""
+						: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate),
+					false);
+				activityDataRow[3] = new ExcelCell(
+					getActivityDuration(learnerProgress, activity) / 1000, false);
+				activityDataRow[4] = new ExcelCell(activityArchive.getMark(), false);
+				break;
+			    }
+			}
+			if (activityDataRow == null) {
+			    activityDataRow = new ExcelCell[1];
+			    activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()), false);
+			}
+			rowList.add(activityDataRow);
+		    }
+		    attemptOrder--;
 		}
 	    }
 
