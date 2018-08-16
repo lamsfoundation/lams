@@ -22,6 +22,17 @@
 <c:set var="outcomeTagId" value="${empty outcomeTagId ? 1 : outcomeTagId + 1}" />
 
 <%-- ---------------------------------------%>
+<style type="text/css">
+	.outcomeMappings {
+		display: inline-block;
+	}
+	
+	.outcomeButton {
+		padding-top: 2px;
+		padding-bottom: 2px;
+	}
+</style>
+
 <script type="text/javascript">
 	// Adding jquery-ui.js if it hasn't been loaded already
 	if (!jQuery.ui) {
@@ -39,7 +50,7 @@
 		outcomeMappingIds${outcomeTagId} = [],
 		
 		outcomeExistingNoneLabel = '<fmt:message key="advanced.outcome.existing.none" />',
-		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5" style="cursor: pointer" onClick="javascript:removeOutcomeMapping(this)"></i>';
+		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>';
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({
@@ -84,13 +95,13 @@
 	 */
 	function refreshOutcomeMappings(outcomeTagId) {
 		$.ajax({
-			'url' : '<lams:LAMSURL/>outcome.do',
-			'data': $.extend({
-				'method' : 'outcomeGetMappings'
-			}, outcomeData${outcomeTagId}),
-			'cache' : false,
+			'url' 	   : '<lams:LAMSURL/>outcome.do',
+			'data'	   : $.extend({
+							'method' : 'outcomeGetMappings'
+						 }, outcomeData${outcomeTagId}),
+			'cache'    : false,
 			'dataType' : 'json',
-			'success' : function(outcomeMappings) {
+			'success'  : function(outcomeMappings) {
 				// clear mappings list
 				var mappingDiv = $('#outcomeMappings' + outcomeTagId).empty();
 				// clear cached outcome IDs
@@ -103,7 +114,11 @@
 						// cache already mapped outcomes
 						outcomeMappingIds${outcomeTagId}.push(this.outcomeId);
 						// add a label with outcome information
-						$('<span class="roffset10" />').attr('mappingId', this.mappingId).html(this.label + outcomeMappingRemoveButton).appendTo(mappingDiv);
+						var outcomeButton = $('<button type="button" class="roffset10 btn btn-primary outcomeButton" />').attr('mappingId', this.mappingId)
+												.html(this.label + outcomeMappingRemoveButton).appendTo(mappingDiv);
+						outcomeButton.click(function(){
+							removeOutcomeMapping(this);
+						});
 					});
 				}
 			}
@@ -114,12 +129,11 @@
 	 * Removes an existing mapping
 	 */
 	function removeOutcomeMapping(button) {
-		var mappingId = $(button).parent().attr('mappingId');
 		$.ajax({
 			'url' : '<lams:LAMSURL/>outcome.do',
 			'data': {
-					'method' : 'outcomeRemoveMapping',
-					'mappingId' : mappingId
+					'method' 	: 'outcomeRemoveMapping',
+					'mappingId' :  $(button).attr('mappingId')
 				}, 
 			'cache' : false,
 			'success' : function() {
@@ -130,10 +144,12 @@
 </script>
 
 <lams:SimplePanel titleKey="advanced.outcome.title">
-	<label>
-		<fmt:message key="advanced.outcome.input" />
-		<input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input loffset20"></input>
-	</label>
-	<br />
-	<fmt:message key="advanced.outcome.existing" />: <span id="outcomeMappings${outcomeTagId}"></span>
+	<div class="input-group">
+	    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+	    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
+	    	   placeholder='<fmt:message key="advanced.outcome.input" />'></input>
+	</div>
+	<div class="voffset10">
+		<fmt:message key="advanced.outcome.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
+	</div>
 </lams:SimplePanel>
