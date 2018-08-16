@@ -51,6 +51,8 @@
 
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${formBean.peerreview.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 	<label for="lockWhenFinished"><html:checkbox property="peerreview.lockWhenFinished" styleId="lockWhenFinished" />

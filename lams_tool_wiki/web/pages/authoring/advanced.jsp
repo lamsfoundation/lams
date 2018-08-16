@@ -68,6 +68,8 @@
 	
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${sessionMap.toolContentID}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 	<div class="checkbox">

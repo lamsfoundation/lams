@@ -121,6 +121,8 @@
 	</div>
 </lams:AdvancedAccordian>
 
+<lams:OutcomeAuthor toolContentId="${formBean.scratchie.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="reflect-on">
