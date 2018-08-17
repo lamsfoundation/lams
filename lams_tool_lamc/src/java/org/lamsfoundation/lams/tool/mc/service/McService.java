@@ -1941,7 +1941,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setShowMarks(JsonUtil.opt(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
-	mcq.setEnableConfidenceLevels(JsonUtil.opt(toolContentJSON, "enableConfidenceLevels", Boolean.FALSE));
+	mcq.setEnableConfidenceLevels(JsonUtil.opt(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);

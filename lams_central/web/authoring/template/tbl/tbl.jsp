@@ -109,7 +109,14 @@
 	    </div>
 		<div class="tab-pane" id="tab3">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.question" /></span>
-	
+
+			<div class="form-group voffset10">
+				<label for="confidenceLevelEnable">
+				<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable"/>&nbsp;
+				<fmt:message key="authoring.enable.confidence.levels"/>
+			</label>
+			</div>
+			
 		 	<input type="hidden" name="numQuestions" id="numQuestions" value="1"/>
 			
 			<div id="divquestions">

@@ -18,7 +18,8 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
 	<lams:css suffix="progressBar"/>
 	<lams:css suffix="chart"/>
 	<lams:css webapp="monitoring" suffix="monitorLesson"/>
@@ -44,7 +45,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
-
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	
 	<script type="text/javascript">
 		var lessonId = ${lesson.lessonID},
@@ -307,7 +308,10 @@
 							   href="#" onClick="javascript:refreshMonitor('lesson')">
 							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>				
 							<p id="tabLessonLessonName">
-								<span class="lead"><strong><c:out value="${lesson.lessonName}" /></strong></span>
+								<span class="lead">
+									<strong id="lesson-name-strong"><c:out value="${lesson.lessonName}" /></strong>
+									<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+								</span>
 								<br/>
 								<span class="text-muted"><small><c:out value="${lesson.organisationName}" escapeXml="true"/></small></span>
 							</p>
