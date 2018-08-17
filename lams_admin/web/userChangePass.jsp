@@ -35,7 +35,7 @@
 
 	$(function() {
 		// Setup form validation 
-		$("#UserChangePassForm").validate({
+		$("#userForm").validate({
 							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
@@ -86,8 +86,7 @@
 
 
 <body class="stripes">
-	<form id="UserChangePassForm" action="usersave.do?method=changePass"
-		method="post">
+	<form id="userForm" modelAttribute="userForm" action="changePass.do" method="post">
 		<input type='hidden' value="${param.userId}" name="userId" />
 		<div class="panel panel-default">
 			<div
@@ -132,14 +131,14 @@
 								</c:if>
 							</ul>
 						</lams:Alert>
-						<logic:messagesPresent>
-							<lams:Alert type="danger" id="form-error" close="false">
-								<html:messages id="error">
-									<c:out value="${error}" escapeXml="false" />
-									<br />
-								</html:messages>
-							</lams:Alert>
-						</logic:messagesPresent>
+						 <c:set var="errorKey" value="GLOBAL" />
+					        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+					            <lams:Alert id="error" type="danger" close="false">
+					                <c:forEach var="error" items="${errorMap[errorKey]}">
+					                    <c:out value="${error}" />
+					                </c:forEach>
+					            </lams:Alert>
+					        </c:if>
 						<div>
 							<label for="login"><fmt:message key="admin.user.login" />:</label>
 							<span>${param.login}</span>

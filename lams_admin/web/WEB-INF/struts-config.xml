@@ -453,7 +453,7 @@
     <action
       path="/importexcel"
       type="org.lamsfoundation.lams.admin.web.action.ImportExcelAction"
-      name="ImportExcelForm"
+      name=" "
       scope="request"
       unknown="false"
       validate="false"

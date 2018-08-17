@@ -1,8 +1,9 @@
+<!DOCTYPE html>
+
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>

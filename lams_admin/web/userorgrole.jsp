@@ -1,63 +1,154 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 
-<script language="javascript" type="text/JavaScript">
-function toggleCheckboxes(roleIndex, object){
-	<logic:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex" >
-	document.UserOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}" />*(<c:out value="${beanIndex}" />+1)].checked=object.checked;
-	</logic:iterate>
-}
-</script>
+<lams:html>
+<lams:head>
+	<c:set var="title" value="${admin.user.management}"/>
+	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<title>${title}</title>
 
-<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-    <logic:notEmpty name="pOrgId">
-        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />" class="btn btn-default"><bean:write name="pOrgName"/></a>
-    </logic:notEmpty>
-    <logic:notEqual name="UserOrgRoleForm" property="orgId" value="1">
-		: <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />" class="btn btn-default">
-		<bean:write name="orgName"/></a>
-	</logic:notEqual>
-	<logic:equal name="UserOrgRoleForm" property="orgId" value="1">
-		: <a href="usermanage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
-	</logic:equal>
-</h4>
+	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
+	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
+	<script language="javascript" type="text/JavaScript">
+	function toggleCheckboxes(roleIndex, object){
+		<c:forEach var="userBean" items="${UserOrgRoleForm.userBeans}" indexId="beanIndex" >
+		document.forms.UserOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}" />*(<c:out value="${beanIndex}" />+1)].checked=object.checked;
+		</c:forEach>
+	}
+	</script>
+</lams:head>
+    
+<body class="stripes">
+	<c:set var="subtitle" value="${admin.user.assign.roles}">	
+	<c:if test="${not empty subtitle}">
+		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
+	</c:if>
+	
+	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
+	<c:choose>
+		<c:when test="${not empty help}">
+			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+				<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+			    <c:if test=${not empty pOrgId}>
+			        : <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
+			    </c:if>
+			    <c:if test="${UserOrgRoleForm.orgId != 1}">
+					: <a href="<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${UserOrgRoleForm.orgId}" />" class="btn btn-default">
+					<c:out value="${orgName}"/></a>
+				</c:if>
+				<c:if test="${UserOrgRoleForm.orgId == 1}">
+					: <a href="usermanage.do?org=<c:out value="${UserOrgRoleForm.orgId}"/>" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
+				</c:if>
+			</h4>
+			
+			<h1><fmt:message key="admin.user.assign.roles" /></h1>
+			
+			<p><fmt:message key="msg.roles.mandatory.users"/></p>
+			
+			<form:form action="userorgrolesave.do" method="post" modelAttribute="userOrgRoleForm" id="userOrgRoleForm">
+			<form:hidden path="orgId" />
+			
+			<table class="table table-condensed table-no-border">
+			<tr>
+				<th><fmt:message key="admin.user.login"/></th>
+				<c:forEach var="role" items="${roles}" indexId="roleIndex">
+					<th><input type="checkbox" 
+								name="<c:out value="${roleIndex}" />" 
+								onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
+								onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />&nbsp;
+						<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
+				</c:forEach>
+			</tr>
+			<c:forEach var="userBean" items="${UserOrgRoleForm.userBeans}" indexId="beanIndex">
+				<tr>
+					<td>
+						<c:out value="${userBean.login}" /><c:if test="${!userBean.memberOfParent}"> *<c:set var="parentFlag" value="true" /></c:if>
+					</td>
+					<c:forEach var="role" items="${roles}">
+						<td>
+							<form:checkbox id="${userBean.login}Role${role.roleId}" path="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
+						</td>
+					</c:forEach>
+				</tr>
+			</c:forEach>
+			</table>
+			<c:if test="${parentFlag}">
+			<p><fmt:message key="msg.user.add.to.parent.group" /></p>
+			</c:if>
+			
+			<div class="pull-right">
+				<html-el:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html-el:cancel>
+				<input typye="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
+			</div>
+			</form:form>
+			</lams:Page>
+		</c:when>
+		<c:otherwise>
+			<lams:Page type="admin" title="${title}" >
+						<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+			    <c:if test=${not empty pOrgId}>
+			        : <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
+			    </c:if>
+			    <c:if test="${UserOrgRoleForm.orgId != 1}">
+					: <a href="<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${UserOrgRoleForm.orgId}" />" class="btn btn-default">
+					<c:out value="${orgName}"/></a>
+				</c:if>
+				<c:if test="${UserOrgRoleForm.orgId == 1}">
+					: <a href="usermanage.do?org=<c:out value="${UserOrgRoleForm.orgId}"/>" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
+				</c:if>
+			</h4>
+			
+			<h1><fmt:message key="admin.user.assign.roles" /></h1>
+			
+			<p><fmt:message key="msg.roles.mandatory.users"/></p>
+			
+			<form:form action="userorgrolesave.do" method="post" modelAttribute="userOrgRoleForm" id="userOrgRoleForm">
+			<form:hidden path="orgId" />
+			
+			<table class="table table-condensed table-no-border">
+			<tr>
+				<th><fmt:message key="admin.user.login"/></th>
+				<c:forEach var="role" items="${roles}" indexId="roleIndex">
+					<th><input type="checkbox" 
+								name="<c:out value="${roleIndex}" />" 
+								onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
+								onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />&nbsp;
+						<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
+				</c:forEach>
+			</tr>
+			<c:forEach var="userBean" items="${UserOrgRoleForm.userBeans}" indexId="beanIndex">
+				<tr>
+					<td>
+						<c:out value="${userBean.login}" /><c:if test="${!userBean.memberOfParent}"> *<c:set var="parentFlag" value="true" /></c:if>
+					</td>
+					<c:forEach var="role" items="${roles}">
+						<td>
+							<form:checkbox id="${userBean.login}Role${role.roleId}" path="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
+						</td>
+					</c:forEach>
+				</tr>
+			</c:forEach>
+			</table>
+			<c:if test="${parentFlag}">
+			<p><fmt:message key="msg.user.add.to.parent.group" /></p>
+			</c:if>
+			
+			<div class="pull-right">
+				<html-el:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html-el:cancel>
+				<input typye="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
+			</div>
+			</form:form>
+			</lams:Page>
+		</c:otherwise>
+	</c:choose>
 
-<h1><fmt:message key="admin.user.assign.roles" /></h1>
 
-<p><fmt:message key="msg.roles.mandatory.users"/></p>
+</body>
+</lams:html>
 
-<html-el:form action="/userorgrolesave.do" method="post">
-<html-el:hidden property="orgId" />
-
-<table class="table table-condensed table-no-border">
-<tr>
-	<th><fmt:message key="admin.user.login"/></th>
-	<logic:iterate id="role" name="roles" indexId="roleIndex">
-		<th><input type="checkbox" 
-					name="<c:out value="${roleIndex}" />" 
-					onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
-					onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />&nbsp;
-			<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
-	</logic:iterate>
-</tr>
-<logic:iterate id="userBean" name="UserOrgRoleForm" property="userBeans" indexId="beanIndex">
-	<tr>
-		<td>
-			<c:out value="${userBean.login}" /><c:if test="${!userBean.memberOfParent}"> *<c:set var="parentFlag" value="true" /></c:if>
-		</td>
-		<logic:iterate id="role" name="roles">
-			<td>
-				<html-el:multibox styleId="${userBean.login}Role${role.roleId}" property="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
-			</td>
-		</logic:iterate>
-	</tr>
-</logic:iterate>
-</table>
-<c:if test="${parentFlag}">
-<p><fmt:message key="msg.user.add.to.parent.group" /></p>
-</c:if>
-
-<div class="pull-right">
-	<html-el:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html-el:cancel>
-	<html-el:submit styleId="saveButton"   styleClass="btn btn-primary loffset5"><fmt:message key="admin.save"/></html-el:submit>
-</div>
-</html-el:form>

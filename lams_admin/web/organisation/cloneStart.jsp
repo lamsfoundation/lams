@@ -199,8 +199,7 @@
 			</div>
 			
 			
-			<form name="cloneForm" id="cloneForm" action="<lams:LAMSURL/>/admin/clone.do" method="post">
-				<input type="hidden" name="method" value="clone">
+			<form name="cloneForm" id="cloneForm" action="clone.do" method="post">
 				<input type="hidden" name="groupId" value="<c:out value="${org.organisationId}" />">
 				<input type="hidden" name="lessons">
 				<input type="hidden" name="staff">
@@ -308,8 +307,7 @@
 			</div>
 			
 			
-			<form name="cloneForm" id="cloneForm" action="<lams:LAMSURL/>/admin/clone.do" method="post">
-				<input type="hidden" name="method" value="clone">
+			<form name="cloneForm" id="cloneForm" action="clone.do" method="post">
 				<input type="hidden" name="groupId" value="<c:out value="${org.organisationId}" />">
 				<input type="hidden" name="lessons">
 				<input type="hidden" name="staff">
