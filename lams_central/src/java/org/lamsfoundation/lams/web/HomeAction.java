@@ -184,7 +184,7 @@ public class HomeAction extends DispatchAction {
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/content.do?lessonID=" + lessonId).forward(req, res);
+		    .getRequestDispatcher("/welcome.jsp?lessonID=" + lessonId).forward(req, res);
 	    return null;
 
 	} catch (Exception e) {

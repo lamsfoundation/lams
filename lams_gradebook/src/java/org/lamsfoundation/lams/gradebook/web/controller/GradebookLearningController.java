@@ -63,10 +63,10 @@ public class GradebookLearningController {
 
     @RequestMapping("")
     public String unspecified() throws Exception {
-	return null;
+	return "gradebookCourseLearner";
     }
 
-    @RequestMapping
+    @RequestMapping("/courseLearner")
     public String courseLearner(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	try {
