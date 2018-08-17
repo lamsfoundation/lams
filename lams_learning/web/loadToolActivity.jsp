@@ -18,65 +18,86 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<!-- Load Tool Activity (comment needed for the test harness) -->
 
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<c:set var="learnerAppUrl">
-	<lams:WebAppURL />
-</c:set>
-<lams:css/>
-<%-- nprogress.css contents in learner.css --%>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/nprogress.js"></script>
+<!DOCTYPE html>
 
-<c:if test="${!empty activityForm.activityURLs}">
+<%@ include file="/common/taglibs.jsp"%>
 
-	<script type="text/javascript">
-		function redirectPage() {
-			NProgress.configure({
-				easing : 'ease',
-				speed : 30
-			});
-			NProgress.configure({
-				showSpinner: false, 
-				trickleRate : 0.2,
-				trickleSpeed : 110
-			});
-			NProgress.start();
-			setTimeout("doRedirect()", 1000);
+<lams:html>
 
-		}
+<lams:head>
+	<title><fmt:message key="learner.title" />
+	</title>
 
-		function doRedirect() {
-			var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
-			if (url.substring(0, 4) != "http") {
-				if (url.substring(0, 1) == "/") {
-					url = "${learnerAppUrl}.." + url;
-				} else {
-					url = "${learnerAppUrl}../" + url;
-				}
-			}
-			window.location.href = url;
-		}
-	</script>
+	<lams:css />
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
 
-	<script language="JavaScript" type="text/JavaScript">
-		$(document).ready(function(){
-			redirectPage();
-		});
-	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript"
+		src="${lams}includes/javascript/common.js"></script>
+</lams:head>
 
-	<lams:Page type="admin">
-		<div class="text-center" style="margin-top: 10px; margin-bottom: 15px;">
-			<i class="fa fa-2x fa-refresh fa-spin text-primary"></i>
-			<p class="voffset5">
-				<fmt:message key="message.activity.loading" />
-			</p>
-		</div>
-	</lams:Page>
-	 
+<c:choose>
+			<body class="stripes">
+			<c:set var="learnerAppUrl">
+				<lams:WebAppURL />
+			</c:set>
+			<lams:css/>
+			<%-- nprogress.css contents in learner.css --%>
+			<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/nprogress.js"></script>
+			
+			<c:if test="${!empty activityForm.activityURLs}">
+			
+				<script type="text/javascript">
+					function redirectPage() {
+						NProgress.configure({
+							easing : 'ease',
+							speed : 30
+						});
+						NProgress.configure({
+							showSpinner: false, 
+							trickleRate : 0.2,
+							trickleSpeed : 110
+						});
+						NProgress.start();
+						setTimeout("doRedirect()", 1000);
+			
+					}
+			
+					function doRedirect() {
+						var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
+						if (url.substring(0, 4) != "http") {
+							if (url.substring(0, 1) == "/") {
+								url = "${learnerAppUrl}.." + url;
+							} else {
+								url = "${learnerAppUrl}../" + url;
+							}
+						}
+						window.location.href = url;
+					}
+				</script>
+			
+				<script language="JavaScript" type="text/JavaScript">
+					$(document).ready(function(){
+						redirectPage();
+					});
+				</script>
+			
+				<lams:Page type="admin">
+					<div class="text-center" style="margin-top: 10px; margin-bottom: 15px;">
+						<i class="fa fa-2x fa-refresh fa-spin text-primary"></i>
+						<p class="voffset5">
+							<fmt:message key="message.activity.loading" />
+						</p>
+					</div>
+				</lams:Page>
+				 
+			
+			</c:if>
+		</body>
+</c:choose>
 
-</c:if>
+</lams:html>

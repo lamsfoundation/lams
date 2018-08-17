@@ -121,6 +121,7 @@ public class LearnerController {
     private ILessonService lessonService;
 
     @Autowired
+    @Qualifier("learningMessageService")
     private MessageService messageService;
 
     @Autowired

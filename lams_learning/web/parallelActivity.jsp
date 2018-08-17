@@ -19,24 +19,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<!DOCTYPE html>
 
+<%@ include file="/common/taglibs.jsp"%>
 
-<%-- TODO: use type --%>
-<frameset rows="*,*" bordercolor="1" id="lamsDynamicFrameSet">
-	<c:forEach items="${activityForm.activityURLs}" var="activityURL" varStatus="loop">
-		<frame src="<c:out value="${activityURL.url}" />" 
-			name="TaskFrame<c:out value="${loop.index}" />"
-			frameborder="" bordercolor="#E0E7EB"
-			id="lamsDynamicFrame<c:out value="${loop.index}" />">
-	</c:forEach>
-</frameset>
+<lams:html>
 
-<noframes>
-	<body>
-		<fmt:message key="message.activity.parallel.noFrames" />
-	</body>
-</noframes>
+<lams:head>
+	<title><fmt:message key="learner.title" />
+	</title>
 
+	<lams:css />
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript"
+		src="${lams}includes/javascript/common.js"></script>
+</lams:head>
+
+	<frameset rows="*,*" bordercolor="1" id="lamsDynamicFrameSet">
+		<c:forEach items="${activityForm.activityURLs}" var="activityURL" varStatus="loop">
+			<frame src="<c:out value="${activityURL.url}" />" 
+				name="TaskFrame<c:out value="${loop.index}" />"
+				frameborder="" bordercolor="#E0E7EB"
+				id="lamsDynamicFrame<c:out value="${loop.index}" />">
+		</c:forEach>
+	</frameset>
+
+	<noframes>
+		<body>
+			<fmt:message key="message.activity.parallel.noFrames" />
+		</body>
+	</noframes>
+
+</lams:html>

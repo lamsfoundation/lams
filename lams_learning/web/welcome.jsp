@@ -19,19 +19,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE html>
 
-<c:if test="${empty lessonID}">
-	<bean:parameter id="lessonID" name="lessonID" />
-</c:if>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-<script language="JavaScript" type="text/JavaScript">
-<!--
-	var contentURL = '<lams:WebAppURL />learner/joinLesson.do?lessonID=<c:out value='${lessonID}' escapeXml='true' />';
-	window.location.href = contentURL;
-//-->
-</script>
+<%@ include file="/common/taglibs.jsp"%>
+
+<lams:html>
+
+<lams:head>
+	<title><fmt:message key="learner.title" />
+	</title>
+
+	<lams:css />
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript"
+		src="${lams}includes/javascript/common.js"></script>
+</lams:head>
+
+<body class="stripes">
+	<c:if test="${empty lessonID}">
+		<c:set var="lessonID" value="${param.lessonID}" scope="page" />
+	</c:if>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+	<script language="JavaScript" type="text/JavaScript">
+	<!--
+		var contentURL = '<lams:WebAppURL />learner/joinLesson.do?lessonID=<c:out value='${lessonID}' escapeXml='true' />';
+		window.location.href = contentURL;
+	//-->
+	</script>
+</body>
+
+</lams:html>
 
 

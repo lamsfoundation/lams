@@ -64,7 +64,7 @@ public class NotebookController {
     private static final String VIEW_JOURNALS = "viewJournals";
 
     @Autowired
-    @Qualifier("notebookService")
+    @Qualifier("coreNotebookService")
     private ICoreNotebookService notebookService;
 
     @Autowired

@@ -19,24 +19,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE html>
 
-	<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
+<%@ include file="/common/taglibs.jsp"%>
 
-	<form:form action="${formAction}" modelAttribute="BranchingForm" target="_self">
+<lams:html>
 
-		<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
-		<lams:Page type="learner" title="${title}">
+	<lams:head>
+		<title><fmt:message key="label.branching.title"/></title>
+		<lams:css/>
+		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
+		<c:if test="${BranchingForm.map.previewLesson == true}">
+			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
+		</c:if>
+		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>${formAction}">
+	  </lams:head>
 
-			<p><fmt:message key="label.branching.wait.message"/></p>
-			<p><fmt:message key="label.branching.refresh.message"/></p>
+	<body class="stripes">
+	
+		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
+	
+		<form:form action="${formAction}" modelAttribute="BranchingForm" target="_self">
+	
+			<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
+			<lams:Page type="learner" title="${title}">
+	
+				<p><fmt:message key="label.branching.wait.message"/></p>
+				<p><fmt:message key="label.branching.refresh.message"/></p>
+	
+				<button class="btn btn-default pull-right"><fmt:message key="label.next.button"/></button>
+	
+				<div id="footer"></div>
+			</lams:Page>
+	
+		</form:form>
+	</body>
 
-			<button class="btn btn-default pull-right"><fmt:message key="label.next.button"/></button>
-
-			<div id="footer"></div>
-		</lams:Page>
-
-	</form:form>
+</lams:html>
