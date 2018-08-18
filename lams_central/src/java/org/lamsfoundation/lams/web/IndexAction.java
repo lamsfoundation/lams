@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -42,6 +41,9 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.index.IndexLinkBean;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  *
@@ -67,6 +70,8 @@ public class IndexAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
+    private static IIntegrationService integrationService;
+    private static IPolicyService policyService;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -76,7 +81,7 @@ public class IndexAction extends LamsDispatchAction {
 	setHeaderLinks(request);
 	setAdminLinks(request);
 
-	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
+	// check if this is user's first login; some action (like displaying a tour) can be
 	// taken based on that parameter; immediatelly, the value in DB is updated
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -99,6 +104,11 @@ public class IndexAction extends LamsDispatchAction {
 		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
 	    return mapping.findForward("twoFactorAuthentication");
 	}
+	
+	// check if user needs to get his shared two-factor authorization secret
+	if (getPolicyService().isPolicyConsentRequiredForUser(loggedInUser.getUserId())) {
+	    return mapping.findForward("policyConsents");
+	}
 
 	User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
@@ -114,6 +124,22 @@ public class IndexAction extends LamsDispatchAction {
 	    return mapping.findForward("portrait");
 	} else if (StringUtils.equals(method, "lessons")) {
 	    return mapping.findForward("lessons");
+	}
+
+	
+	// This test also appears in LoginAsAction
+	Boolean allowDirectAccessIntegrationLearner = Configuration
+		.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+	if (!allowDirectAccessIntegrationLearner) {
+	    boolean isIntegrationUser = getIntegrationService().isIntegrationUser(userDTO.getUserID());
+	    //prevent integration users with mere learner rights from accessing index.do
+	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
+		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.GROUP_ADMIN)
+		    && !request.isUserInRole(Role.SYSADMIN)) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			"Integration users with learner right are not allowed to access this page");
+		return null;
+	    }
 	}
 	
 	// only show the growl warning the first time after a user has logged in & if turned on in configuration
@@ -209,7 +235,7 @@ public class IndexAction extends LamsDispatchAction {
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("id", orgDto.getOrganisationID());
 	    String orgName = orgDto.getName() == null ? "" : orgDto.getName();
-	    responseRow.put("name", StringEscapeUtils.escapeHtml(orgName));
+	    responseRow.put("name", HtmlUtils.htmlEscape(orgName));
 
 	    rows.put(responseRow);
 	}
@@ -264,6 +290,14 @@ public class IndexAction extends LamsDispatchAction {
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null ? learner.getUserID() : null;
     }
+    
+    private IIntegrationService getIntegrationService() {
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
+	}
+	return integrationService;
+    }
 
     private IUserManagementService getUserManagementService() {
 	if (userManagementService == null) {
@@ -272,6 +306,14 @@ public class IndexAction extends LamsDispatchAction {
 	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return userManagementService;
+    }
+    
+    private IPolicyService getPolicyService() {
+	if (policyService == null) {
+	    policyService = (IPolicyService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("policyService");
+	}
+	return policyService;
     }
 
     private static boolean isPedagogicalPlannerAvailable() {

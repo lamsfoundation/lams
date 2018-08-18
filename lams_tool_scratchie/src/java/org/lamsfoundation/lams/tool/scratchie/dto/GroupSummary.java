@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.scratchie.dto;
 import java.util.Collection;
 
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
@@ -36,9 +35,10 @@ public class GroupSummary {
     private String sessionName;
     private int mark;
     private int totalAttempts;
+    private String totalPercentage;
 
     private Collection<ScratchieUser> users;
-    private Collection<ScratchieItem> items;
+    private Collection<ScratchieItemDTO> itemDtos;
     private Collection<ScratchieAnswer> answers;
 
     public GroupSummary() {
@@ -90,17 +90,25 @@ public class GroupSummary {
     public void setTotalAttempts(int totalAttempts) {
 	this.totalAttempts = totalAttempts;
     }
+    
+    public String getTotalPercentage() {
+	return totalPercentage;
+    }
+
+    public void setTotalPercentage(String totalPercentage) {
+	this.totalPercentage = totalPercentage;
+    }
 
     public Collection<ScratchieUser> getUsers() {
 	return users;
     }
 
-    public void setItems(Collection<ScratchieItem> items) {
-	this.items = items;
+    public void setItemDtos(Collection<ScratchieItemDTO> itemDtos) {
+	this.itemDtos = itemDtos;
     }
 
-    public Collection<ScratchieItem> getItems() {
-	return items;
+    public Collection<ScratchieItemDTO> getItemDtos() {
+	return itemDtos;
     }
 
     public void setUsers(Collection<ScratchieUser> users) {

@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -76,7 +77,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * An implementation of the IKalturaService interface.
@@ -110,7 +110,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 
     private IToolContentHandler kalturaToolContentHandler = null;
 
-    private IAuditService auditService = null;
+    private ILogEventService logEventService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -647,12 +647,12 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	return kalturaUser;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     @Override

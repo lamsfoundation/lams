@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -91,6 +92,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * This class is a facade over the Learning middle tier.
@@ -118,6 +120,7 @@ public class LearnerService implements ILearnerFullService {
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
     private IKumaliveService kumaliveService;
+    private MessageService messageService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -220,6 +223,10 @@ public class LearnerService implements ILearnerFullService {
     
     public void setKumaliveService(IKumaliveService kumaliveService) {
 	this.kumaliveService = kumaliveService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
     }
 
     // ---------------------------------------------------------------------
@@ -645,9 +652,11 @@ public class LearnerService implements ILearnerFullService {
 	    updateGradebookMark(activity, progress);
 	}
 	// }
-	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
-		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
-		activity.getActivityId());
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId, learnerId,
+		progress.getLesson().getLessonId(), activity.getActivityId(),
+		messageService.getMessage(ProgressEngine.AUDIT_ACTIVITY_STOP_KEY,
+			new Object[] { progress.getUser().getLogin(), progress.getUser().getUserId(),
+				activity.getTitle(), activity.getActivityId() }));
     }
 
     @Override
@@ -714,7 +723,7 @@ public class LearnerService implements ILearnerFullService {
      * {@inheritDoc}
      */
     @Override
-    public boolean learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
+    public void learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
 	    throws LearnerServiceException {
 	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId,
 		GroupingActivity.class);
@@ -725,7 +734,7 @@ public class LearnerService implements ILearnerFullService {
 
 		User learner = (User) userManagementService.findById(User.class, learnerId);
 		if (grouping.doesLearnerExist(learner)) {
-		    return true;
+		    return;
 		}
 		if (learner != null) {
 		    Integer maxNumberOfLearnersPerGroup = null;
@@ -747,18 +756,16 @@ public class LearnerService implements ILearnerFullService {
 			for (Group group : groups) {
 			    if (group.getGroupId().equals(groupId)) {
 				if (group.getUsers().size() >= maxNumberOfLearnersPerGroup) {
-				    return false;
+				    return;
 				}
 			    }
 			}
 		    }
 
 		    lessonService.performGrouping(grouping, groupId, learner);
-		    return true;
 		}
 	    }
 	}
-	return false;
     }
 
     private boolean forceGrouping(Lesson lesson, Grouping grouping, Group group, User learner) {
@@ -820,6 +827,8 @@ public class LearnerService implements ILearnerFullService {
 	    if (lesson.isPreviewLesson()) {
 		// special case for preview - if forceGate is true then brute force open the gate
 		gate.setGateOpen(true);
+		gate.setGateOpenUser(knocker);
+		gate.setGateOpenTime(new Date());
 		gateOpen = true;
 	    }
 	}
@@ -890,8 +899,8 @@ public class LearnerService implements ILearnerFullService {
     public Lesson getLessonByActivity(Activity activity) {
 	Lesson lesson = lessonDAO.getLessonForActivity(activity.getActivityId());
 	if (lesson == null) {
-	    LearnerService.log
-		    .warn("Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
+	    LearnerService.log.warn(
+		    "Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
 			    + activity);
 	}
 	return lesson;
@@ -1031,8 +1040,8 @@ public class LearnerService implements ILearnerFullService {
 		    SequenceActivity.class);
 	} else {
 	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log
-			.debug("No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
+		LearnerService.log.debug(
+			"No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
 				+ branchingActivity.getActivityId() + ":" + branchingActivity.getTitle()
 				+ " for learner " + learner.getUserId() + ":" + learner.getLogin());
 	    }
@@ -1241,11 +1250,11 @@ public class LearnerService implements ILearnerFullService {
      * {@inheritDoc}
      */
     @Override
-    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping) {
-	Lesson lesson = getLesson(lessonId);
-	LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
+    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId) {
+	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) getGrouping(groupingId);
+	LearnerChoiceGrouping learnerChoiceGrouping = grouping;
 	Integer maxNumberOfLearnersPerGroup = null;
-	int learnerCount = lesson.getAllLearners().size();
+	int learnerCount = lessonService.getCountLessonLearners(lessonId, null);
 	int groupCount = grouping.getGroups().size();
 	if (learnerChoiceGrouping.getLearnersPerGroup() == null) {
 	    if (groupCount == 0) {
@@ -1367,6 +1376,23 @@ public class LearnerService implements ILearnerFullService {
     /**
      * Used by <code>CommandWebsocketServer</code>.
      */
+    @Override
+    public void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand) {
+	// find lesson for given tool content ID
+	ToolActivity activity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	LearningDesign learningDesign = activity.getLearningDesign();
+	Lesson lesson = (Lesson) learningDesign.getLessons().iterator().next();
+	Long lessonId = lesson.getLessonId();
+
+	// go through each user, find his user name and add a command for him
+	for (Integer userId : userIds) {
+	    User user = (User) activityDAO.find(User.class, userId);
+	    Command command = new Command(lessonId, user.getLogin(), jsonCommand);
+	    commandDAO.insert(command);
+	}
+    }
+
+    @Override
     public List<Command> getCommandsForLesson(Long lessonId, Date laterThan) {
 	return commandDAO.getNewCommands(lessonId, laterThan);
     }

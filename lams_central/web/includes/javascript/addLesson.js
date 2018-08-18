@@ -1,4 +1,4 @@
-﻿﻿// ********** MAIN FUNCTIONS **********
+﻿﻿﻿// ********** MAIN FUNCTIONS **********
 var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
@@ -230,9 +230,11 @@ function initAdvancedTab(){
 	
 	$('#schedulingEnableField').change(function(){
 		if ($(this).is(':checked')) {
-			$('#schedulingDatetimeField').show('slow');
+			$('#scheduleStartTime').show('slow');
+			$('#scheduleEndTime').show('slow');
 		} else {
-			$('#schedulingDatetimeField').hide('slow');
+			$('#scheduleStartTime').hide('slow');
+			$('#scheduleEndTime').hide('slow');
 		}
 	});
 	
@@ -242,15 +244,42 @@ function initAdvancedTab(){
 			$('#schedulingEnableField, #precedingLessonEnableField, ' +
 	          '#timeLimitEnableField, #timeLimitIndividualField').prop('checked', false).change();
 			$('#schedulingDatetimeField').val(null);
+			$('#schedulingEndDatetimeField').val(null);
 		}
 		
 		$('#schedulingEnableField, #precedingLessonEnableField, #timeLimitEnableField, #timeLimitIndividualField,' +
-		  '#precedingLessonIdField, #schedulingDatetimeField').prop('disabled', !checked);
+		  '#precedingLessonIdField, #schedulingDatetimeField, #schedulingEndDatetimeField').prop('disabled', !checked);
 	});
 	
 	$('#schedulingDatetimeField').datetimepicker({
 		'minDate' : 0
 	});
+	$('#schedulingEndDatetimeField').datetimepicker({
+		'minDate' : 0
+	});
+	
+	
+	$('#schedulingEndDatetimeField').change(function(){
+		if ( $('#schedulingEndDatetimeField').val() == "" ) {
+			$('#timeLimitIndividualField').prop('disabled', false);
+		} else {
+			checkScheduleDate();
+		}
+	});
+
+	$('#schedulingDatetimeField').change(function(){
+		checkScheduleDate();
+	});
+}
+
+function checkScheduleDate() {
+	var startDate = $('#schedulingDatetimeField').val() > "" ? Date.parse($('#schedulingDatetimeField').val()) : 0;
+	var endDate = $('#schedulingEndDatetimeField').val() > "" ? Date.parse($('#schedulingEndDatetimeField').val()) : 0;
+	if ( endDate > 0 && startDate >= endDate  ) {
+		$("#schedulingError").css("display","block");
+	} else {
+		$("#schedulingError").css("display","none");
+	}
 }
 
 function initConditionsTab(){
@@ -271,6 +300,10 @@ function initConditionsTab(){
 	$('#timeLimitEnableField').change(function(){
 		if ($(this).is(':checked')) {
 			$('#timeLimitDiv').show('slow');
+			if ( $('#schedulingEndDatetimeField').val() > "" ) {
+				$('#timeLimitIndividualField').prop('checked', true);
+				$('#timeLimitIndividualField').prop('disabled', true);
+			}
 		} else {
 			$('#timeLimitDiv').hide('slow');
 		}
@@ -332,6 +365,16 @@ function addLesson(){
 		return;
 	}
 	$('#monitorsField').val(monitors);
+
+	if ( $("#schedulingEnableField").is(':checked') && $("#timeLimitEnableField").is(':checked') ) {
+		if ( $('#schedulingEndDatetimeField').val() > "" && $("#schedulingEnableField").is(':checked') && ! $("#timeLimitIndividualField").is(':checked') ) {
+			$("#timelimitError").css("display","block");
+			doSelectTab(4);
+			return;
+		} else {
+			$("#timelimitError").css("display","none");
+		}
+	}
 	
 	if ($('#splitLearnersField').is(':checked')) {
 		var maxLearnerCount = $('#selected-learners div.draggableItem').length,
@@ -555,7 +598,7 @@ function fillUserContainer(users, containerId) {
 									'userId'  : userJSON.userID
 									})
 			                    .addClass('draggableItem')
-    						    .text(userJSON.firstName + ' ' + userJSON.lastName 
+    						    .text(userJSON.lastName + ', ' + userJSON.firstName 
     						    		  + ' (' + userJSON.login + ')'
     						    	 )
     		);

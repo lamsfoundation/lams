@@ -158,6 +158,7 @@ public class McLearningStarterAction extends Action {
 
 	Boolean displayAnswers = mcContent.isDisplayAnswers();
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
+	mcGeneralLearnerFlowDTO.setDisplayFeedbackOnly(((Boolean)mcContent.isDisplayFeedbackOnly()).toString());	
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
 	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());

@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
@@ -56,19 +57,11 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Update mark.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
      */
     public ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
-
 	MarkForm markForm = (MarkForm) form;
+	getSubmitFilesService();
 
 	ActionMessages errors = new ActionMessages();
 	// Check whether the mark is valid.
@@ -82,8 +75,7 @@ public class MarkAction extends LamsDispatchAction {
 
 	String comments = WebUtil.readStrParam(request, "comments", true);
 	if (!errors.isEmpty()) {
-	    submitFilesService = getSubmitFilesService();
-	    List report = new ArrayList<FileDetailsDTO>();
+	    List<FileDetailsDTO> report = new ArrayList<FileDetailsDTO>();
 	    FileDetailsDTO fileDetail = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	    // echo back the input, even they are wrong.
 	    fileDetail.setComments(comments);
@@ -97,22 +89,20 @@ public class MarkAction extends LamsDispatchAction {
 	    return mapping.findForward("updateMark");
 	}
 
-	if (submitFilesService == null) {
-	    submitFilesService = getSubmitFilesService();
-	}
-
 	// Update the mark based on the form
-	submitFilesService.updateMarks(markForm.getReportID(), marks, comments, markForm.getMarkFile(),markForm.getToolSessionID());
-	
+	submitFilesService.updateMarks(markForm.getReportID(), marks, comments, markForm.getMarkFile(),
+		markForm.getToolSessionID());
+
 	// Return to the appropriate screen based upon the updateMode
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 	if (StringUtils.equals(markForm.getUpdateMode(), "listMark")) {
-	    List report = submitFilesService.getFilesUploadedByUser(markForm.getUserID(), markForm.getToolSessionID(),
-		    request.getLocale(), true);
+	    List<FileDetailsDTO> report = submitFilesService.getFilesUploadedByUser(markForm.getUserID(),
+		    markForm.getToolSessionID(), request.getLocale(), true);
 	    request.setAttribute("report", report);
 	    return mapping.findForward("listMark");
 	} else {
-	    Map report = submitFilesService.getFilesUploadedBySession(markForm.getToolSessionID(), request.getLocale());
+	    Map<SubmitUserDTO, List<FileDetailsDTO>> report = submitFilesService
+		    .getFilesUploadedBySession(markForm.getToolSessionID(), request.getLocale());
 	    request.setAttribute("reports", report);
 	    return mapping.findForward("listAllMarks");
 	}
@@ -120,12 +110,6 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Display update mark initial page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward newMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -139,7 +123,7 @@ public class MarkAction extends LamsDispatchAction {
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);
 
-	List report = new ArrayList<FileDetailsDTO>();
+	List<FileDetailsDTO> report = new ArrayList<FileDetailsDTO>();
 	report.add(submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale()));
 
 	request.setAttribute("updateMode", markForm.getUpdateMode());
@@ -151,9 +135,6 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Update the form
-     * 
-     * @param markForm
-     * @param fileDetailsDTO
      */
     private void updateMarkForm(MarkForm markForm, FileDetailsDTO fileDetailsDTO) {
 
@@ -168,14 +149,6 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Remove a mark file
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws RepositoryCheckedException 
-     * @throws InvalidParameterException 
      */
     public ActionForward removeMarkFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
@@ -186,7 +159,7 @@ public class MarkAction extends LamsDispatchAction {
 	}
 
 	submitFilesService.removeMarkFile(markForm.getReportID(), markForm.getMarkFileUUID(),
-		markForm.getMarkFileVersionID());
+		markForm.getMarkFileVersionID(), markForm.getToolSessionID());
 
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);

@@ -23,6 +23,9 @@
 
 package org.lamsfoundation.lams.util;
 
+import java.util.Locale;
+
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -71,6 +74,25 @@ public class MessageService {
 	}
 	return message;
     }
+    
+    /**
+     * Wrapper method for getMessage(String key) that allows specifying locale in which to do a loockup.
+     * 
+     * @param key
+     * @param supportedLocale
+     * @return
+     */
+    public String getMessage(String key, SupportedLocale supportedLocale) {
+	Locale locale = new Locale(supportedLocale.getLanguageIsoCode(), supportedLocale.getCountryIsoCode());
+
+	String message;
+	try {
+	    message = messageSource.getMessage(key, null, locale);
+	} catch (NoSuchMessageException e) {
+	    message = "??" + key + "??";
+	}
+	return message;
+    }
 
     /**
      * @see org.springframework.context.support.MessageSourceAccessor#getMessage(java.lang.String, java.lang.String)
@@ -98,6 +120,25 @@ public class MessageService {
 	String message;
 	try {
 	    message = messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
+	} catch (NoSuchMessageException e) {
+	    message = "??" + key + "??";
+	}
+	return message;
+    }
+    
+    /**
+     * Wrapper method for getMessage(String key, Object[] args) that allows specifying locale in which to do a loockup.
+     * 
+     * @param key
+     * @param supportedLocale
+     * @return
+     */
+    public String getMessage(String key, Object[] args, SupportedLocale supportedLocale) {
+	Locale locale = new Locale(supportedLocale.getLanguageIsoCode(), supportedLocale.getCountryIsoCode());
+	
+	String message;
+	try {
+	    message = messageSource.getMessage(key, args, locale);
 	} catch (NoSuchMessageException e) {
 	    message = "??" + key + "??";
 	}

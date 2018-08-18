@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
  */
 public class SubmitFilesPedagogicalPlannerAction extends LamsDispatchAction {
 

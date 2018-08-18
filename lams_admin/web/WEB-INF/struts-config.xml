@@ -37,7 +37,6 @@
 	<form-property name="name" type="java.lang.String" />
 	<form-property name="code" type="java.lang.String" />
 	<form-property name="description" type="java.lang.String" />
-	<form-property name="localeId" type="java.lang.Integer" initial="1"/>
 	<form-property name="typeId" type="java.lang.Integer" />
 	<form-property name="stateId" type="java.lang.Integer" />
 	<form-property name="courseAdminCanAddNewUsers" type="java.lang.Boolean" initial="false"/>
@@ -80,7 +79,6 @@
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
-	<form-property name="tutorialsDisabled" type="java.lang.Boolean" initial="false" />
 	<form-property name="firstLogin" type="java.lang.Boolean" initial="true" />
 	<form-property name="timeZone" type="java.lang.String" />
 	<form-property name="userTheme" type="java.lang.Long" />
@@ -152,12 +150,40 @@
 	<form-property name="addAsStaff" type="java.lang.Boolean" initial="0" />
 	<form-property name="addWithAuthor" type="java.lang.Boolean" initial="0" />
 	<form-property name="addWithMonitor" type="java.lang.Boolean" initial="0" />
+	<form-property name="emailVerify" type="java.lang.Boolean" initial="0" />
 	<form-property name="courseKey" type="java.lang.String" />
 	<form-property name="confirmCourseKey" type="java.lang.String" />
 	<form-property name="blurb" type="java.lang.String" />
 	<form-property name="disabled" type="java.lang.Boolean" initial="0" />
 	<form-property name="loginTabActive" type="java.lang.Boolean" initial="0" />
 	<form-property name="context" type="java.lang.String" />
+</form-bean>
+
+<form-bean name="PolicyForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="policyUid" type="java.lang.Long" />
+	<form-property name="policyId" type="java.lang.Long" />
+	<form-property name="policyName" type="java.lang.String" />
+	<form-property name="summary" type="java.lang.String" />
+	<form-property name="fullPolicy" type="java.lang.String" />
+	<form-property name="policyTypeId" type="java.lang.Integer" />
+	<form-property name="version" type="java.lang.String" />
+	<form-property name="policyStateId" type="java.lang.Integer" initial="1"/>
+	<form-property name="minorChange" type="java.lang.Boolean" initial="0" />
+</form-bean>
+
+<form-bean name="OrgPasswordChangeForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="organisationID" type="java.lang.Integer" />
+	<form-property name="orgName" type="java.lang.String" />
+	<form-property name="isStaffChange" type="java.lang.Boolean" initial="false" />
+	<form-property name="isLearnerChange" type="java.lang.Boolean" initial="false" />
+	<form-property name="includedLearners" type="java.lang.String" initial=""/>
+	<form-property name="excludedLearners" type="java.lang.String" initial="[]"/>
+	<form-property name="includedStaff" type="java.lang.String" initial=""/>
+	<form-property name="excludedStaff" type="java.lang.String" initial="[]"/>
+	<form-property name="learnerPass" type="java.lang.String" />
+	<form-property name="staffPass" type="java.lang.String" />
+	<form-property name="email" type="java.lang.Boolean" initial="false" />
+	<form-property name="force" type="java.lang.Boolean" initial="false" />
 </form-bean>
   </form-beans>
 
@@ -848,6 +874,41 @@
         redirect="false"
       />
     </action>
+     <action
+      path="/policyManagement"
+      type="org.lamsfoundation.lams.admin.web.action.PolicyManagementAction"
+      name="PolicyForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="policyList"
+        path=".policyList"
+        redirect="false"
+      />
+      <forward
+        name="editPolicy"
+        path=".editPolicy"
+        redirect="false"
+      />
+      <forward
+        name="policyListRedirect"
+        path="/policyManagement.do?method=list"
+        redirect="true"
+      />
+      <forward
+        name="policyTable"
+        path="/policies/policyTable.jsp"
+        redirect="false"
+      />
+      <forward
+        name="userConsents"
+        path="/policies/userConsents.jsp"
+        redirect="false"
+      />
+    </action>
     <action
       path="/statistics"
       type="org.lamsfoundation.lams.admin.web.action.StatisticsAction"
@@ -866,6 +927,27 @@
       <forward
         name="groupStats"
         path="/groupStatistics.jsp"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/logevent"
+      type="org.lamsfoundation.lams.admin.web.action.LogEventAction"
+      name="logevent"
+      scope="request"
+      input=".logevent"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".logevent"
         redirect="false"
       />
       <forward
@@ -954,6 +1036,19 @@
       path="/uploadPortraits"
       type="org.lamsfoundation.lams.admin.web.action.PortraitBatchUploadAction"
     />
+    <action
+      path="/orgPasswordChange"
+      type="org.lamsfoundation.lams.admin.web.action.OrgPasswordChangeAction"
+      name="OrgPasswordChangeForm"
+      parameter="method"
+      scope="request"
+    >
+      <forward
+        name="display"
+        path=".orgPasswordChange"
+        redirect="false"
+      />
+    </action>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

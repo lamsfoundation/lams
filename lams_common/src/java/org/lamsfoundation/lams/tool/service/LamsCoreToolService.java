@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -531,10 +532,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession) {
-	
+
 	if (toolSession == null) {
 	    String error = "The toolSession is null. Unable to get confidence levels";
 	    LamsCoreToolService.log.error(error);
@@ -547,7 +548,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    LamsCoreToolService.log.error(error);
 	    throw new DataMissingException(error);
 	}
-	
+
 	try {
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
 	    return sessionManager.getConfidenceLevels(toolSession.getToolSessionId());
@@ -561,7 +562,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
-	}	
+	}
     }
 
     @Override
@@ -666,16 +667,40 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     @Override
     public Long getLessonMaxPossibleMark(Lesson lesson) {
+	Set<ToolActivity> activities = getLearningDesignActivities(lesson.getLearningDesign());
+
 	// calculate lesson's MaxPossibleMark
-	Set<ToolActivity> activities = getLessonActivities(lesson);
 	Long lessonMaxPossibleMark = 0L;
-	for (ToolActivity activity : activities) {
-	    Long activityMaxPossibleMark = getActivityMaxPossibleMark(activity);
-	    if (activityMaxPossibleMark != null) {
-		lessonMaxPossibleMark += activityMaxPossibleMark;
+	//take into account whether learning design uses grade weight
+	if (isWeightedMarks(activities)) {
+	    lessonMaxPossibleMark = 100L;
+
+	} else {
+	    for (ToolActivity toolActivity : activities) {
+		Long activityMaxPossibleMark = getActivityMaxPossibleMark(toolActivity);
+		if (activityMaxPossibleMark != null) {
+		    lessonMaxPossibleMark += activityMaxPossibleMark;
+		}
 	    }
 	}
+
 	return lessonMaxPossibleMark;
+    }
+
+    @Override
+    public boolean isWeightedMarks(LearningDesign design) {
+	Set<ToolActivity> activities = getLearningDesignActivities(design);
+	return isWeightedMarks(activities);
+    }
+
+    private boolean isWeightedMarks(Set<ToolActivity> activities) {
+	for (ToolActivity toolActivity : activities) {
+	    ActivityEvaluation eval = toolActivity.getEvaluation();
+	    if (eval != null && eval.getWeight() != null && eval.getWeight() > 0) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     /**
@@ -683,7 +708,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
      * solves problem with first activity unable to cast to ToolActivity.
      */
     @SuppressWarnings("unchecked")
-    private Set<ToolActivity> getLessonActivities(Lesson lesson) {
+    private Set<ToolActivity> getLearningDesignActivities(LearningDesign design) {
 	Set<Activity> activities = new TreeSet<Activity>();
 	Set<ToolActivity> toolActivities = new TreeSet<ToolActivity>();
 
@@ -694,10 +719,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
+	Activity firstActivity = activityDAO.getActivityByActivityId(design.getFirstActivity().getActivityId());
 	activities.add(firstActivity);
-	activities.addAll(lesson.getLearningDesign().getActivities());
+	activities.addAll(design.getActivities());
 
 	for (Activity activity : activities) {
 	    if (activity instanceof ToolActivity) {
@@ -819,6 +843,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    if (sysTool != null) {
 		return setupURLWithActivityLessonID(activity, lessonID, sysTool.getContributeUrl());
 	    }
+	} else if (activity.isToolActivity()) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
+	    ToolContentManager toolContentManager = (ToolContentManager) findToolService(toolActivity.getTool());
+	    return toolContentManager.getContributionURL(toolActivity.getToolContentId());
 	}
 	return null;
     }

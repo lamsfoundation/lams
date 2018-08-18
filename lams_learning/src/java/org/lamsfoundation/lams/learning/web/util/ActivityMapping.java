@@ -84,8 +84,10 @@ public class ActivityMapping implements Serializable {
 	String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
 	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		progress.getLearnerProgressId().toString());
-	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_ACTIVITY_ID,
-		activity.getActivityId().toString());
+	if ( activity != null ) {
+	    strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_ACTIVITY_ID,
+		    activity.getActivityId().toString());
+	}
 
 	if ((activity != null) && activity.isToolActivity()) {
 	    // always use redirect false for a ToolActivity as ToolDisplayActivity

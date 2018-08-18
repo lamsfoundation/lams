@@ -52,10 +52,11 @@ public interface ILeaderselectionService {
      *
      * @param userId
      * @param toolSessionId
+     * @return 
      * @throws IOException 
      * @throws JSONException 
      */
-    void setGroupLeader(Long userId, Long toolSessionId) throws JSONException, IOException;
+    boolean setGroupLeader(Long userId, Long toolSessionId) throws JSONException, IOException;
 
     /**
      * Makes a copy of the default content and assigns it a newContentID
@@ -109,6 +110,8 @@ public interface ILeaderselectionService {
      * @return
      */
     LeaderselectionUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+    
+    LeaderselectionUser getUserByUserIdAndContentId(Long userId, Long toolContentId);
 
     /**
      *

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import java.util.Map;
@@ -34,7 +33,7 @@ import org.quartz.JobExecutionException;
 /**
  * The Quartz sheduling job that opens the gate. It is configured as a Spring
  * bean and will be triggered by the scheduler to perform its work.
- * 
+ *
  * @author Jacky Fang
  * @since 2005-4-12
  *
@@ -56,12 +55,13 @@ public class OpenScheduleGateJob extends MonitoringJob {
 	//getting gate id set from scheduler
 	Map properties = context.getJobDetail().getJobDataMap();
 	Long gateId = (Long) properties.get("gateId");
+	Integer openerId = (Integer) properties.get("userId");
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Openning gate......[" + gateId.longValue() + "]");
 	}
 
-	monitoringService.openGate(gateId);
+	monitoringService.openGate(gateId, openerId);
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Gate......[" + gateId.longValue() + "] opened");

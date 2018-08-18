@@ -173,4 +173,12 @@ public class MindmapRequest implements Cloneable {
     public void setMindmap(Mindmap mindmap) {
 	this.mindmap = mindmap;
     }
+    
+    
+    @Override
+    public String toString() {
+	return "MindmapRequest [uid=" + uid + ", uniqueId=" + uniqueId + ", globalId=" + globalId + ", type=" + type
+		+ ", nodeId=" + nodeId + ", nodeChildId=" + nodeChildId + ", user=" + user + ", mindmap=" + mindmap
+		+ "]";
+    }
 }

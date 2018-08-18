@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -73,6 +74,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
@@ -83,6 +85,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -148,6 +151,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	request.setAttribute("licenses", getAuthoringService().getAvailableLicenses());
 
+	boolean canSetReadOnly = getUserManagementService().isUserSysAdmin()
+		|| getUserManagementService().isUserGlobalGroupAdmin();
+	request.setAttribute("canSetReadOnly", canSetReadOnly);
+
 	return mapping.findForward("openAutoring");
     }
 
@@ -195,7 +202,28 @@ public class AuthoringAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	JSONObject responseJSON = new JSONObject();
 	Gson gson = new GsonBuilder().create();
-	responseJSON.put("ld", new JSONObject(gson.toJson(learningDesignDTO)));
+	JSONObject ldJSON = new JSONObject(gson.toJson(learningDesignDTO));
+
+	// get all parent folders of the LD
+	List<Integer> folderPath = new LinkedList<Integer>();
+	WorkspaceFolder folder = (WorkspaceFolder) getUserManagementService().findById(WorkspaceFolder.class,
+		learningDesignDTO.getWorkspaceFolderID());
+	while (folder != null) {
+	    Integer folderID = folder.getWorkspaceFolderId();
+	    if (folderID.equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
+		// we reached the top folder, finish
+		folder = null;
+	    } else {
+		folderPath.add(folderID);
+		folder = folder.getParentWorkspaceFolder();
+	    }
+	}
+	// we'll go from top to bottom
+	Collections.reverse(folderPath);
+	ldJSON.put("folderPath", new JSONArray(gson.toJson(folderPath)));
+
+	ldJSON.put("readOnlyEnabled", true);
+	responseJSON.put("ld", ldJSON);
 
 	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
 	accessList = accessList.subList(0,

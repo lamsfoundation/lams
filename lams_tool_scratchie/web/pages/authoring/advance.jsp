@@ -46,6 +46,13 @@
 	</div>
 	
 	<div class="checkbox">
+		<label for="show-scratchies-in-results">
+			<html:checkbox property="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
+			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
 		<label for="shuffle-items">
 			<html:checkbox property="scratchie.shuffleItems" styleId="shuffle-items"/>
 			<fmt:message key="label.authoring.advanced.shuffle.items" />

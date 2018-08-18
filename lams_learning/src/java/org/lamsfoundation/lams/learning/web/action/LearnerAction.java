@@ -210,6 +210,7 @@ public class LearnerAction extends LamsDispatchAction {
 	attemptID++;
 
 	// make a copy of attempted and completed activities
+	Date archiveDate = new Date();
 	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
 	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
 	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
@@ -222,14 +223,15 @@ public class LearnerAction extends LamsDispatchAction {
 	// save the historic attempt
 	LearnerProgressArchive learnerProgressArchive = new LearnerProgressArchive(user, learnerProgress.getLesson(),
 		attemptID, attemptedActivities, completedActivities, learnerProgress.getCurrentActivity(),
-		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate());
+		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate(),
+		archiveDate);
 
 	IUserManagementService userManagementService = LearnerServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
 	userManagementService.save(learnerProgressArchive);
 
 	IGradebookService gradebookService = LearnerServiceProxy.getGradebookService(getServlet().getServletContext());
-	gradebookService.archiveLearnerMarks(lessonID, userID);
+	gradebookService.archiveLearnerMarks(lessonID, userID, archiveDate);
 	gradebookService.removeLearnerFromLesson(lessonID, userID);
 
 	IMonitoringService monitoringService = LearnerServiceProxy

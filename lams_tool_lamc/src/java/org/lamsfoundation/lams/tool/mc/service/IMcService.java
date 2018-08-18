@@ -89,6 +89,14 @@ public interface IMcService {
     void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos);
 
     void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
+    
+    /**
+     * Count how many attempts done to this option
+     *
+     * @param optionUid
+     * @return
+     */
+    int getAttemptsCountPerOption(Long optionUid);
 
     void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
@@ -108,6 +116,8 @@ public interface IMcService {
     McQueContent getQuestionByUid(Long uid);
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
+    
+    McQueUsr getMcUserByContentId(Long userId, Long contentId);
 
     List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);

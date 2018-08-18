@@ -381,7 +381,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesign.setTitle((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.TITLE));
 	learningDesign.setMaxID((Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.MAX_ID));
 	learningDesign.setReadOnly((Boolean) JsonUtil.opt(ldJSON, AuthoringJsonTags.READ_ONLY));
-	learningDesign.setEditOverrideLock((Boolean) JsonUtil.opt(ldJSON, AuthoringJsonTags.EDIT_OVERRIDE_LOCK));
 	learningDesign.setDateReadOnly(
 		DateUtil.convertFromString((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.DATE_READ_ONLY)));
 	learningDesign.setHelpText((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.HELP_TEXT));
@@ -1233,7 +1232,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivity.setGateActivityLevelId(
 		(Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
-	gateActivity.setGateOpen((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_OPEN));
 
     }
 

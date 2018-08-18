@@ -71,6 +71,15 @@ public class GradebookConstants {
     public static final String VIEW_LRN_COURSE = "lrnCourse";
     public static final String VIEW_LRN_ACTIVITY = "lrnActivity";
     public static final String VIEW_LIST = "listView";
+    
+    // XML Elemetns
+    public static final String ELEMENT_ROWS = "rows";
+    public static final String ELEMENT_PAGE = "page";
+    public static final String ELEMENT_TOTAL = "total";
+    public static final String ELEMENT_RECORDS = "records";
+    public static final String ELEMENT_ROW = "row";
+    public static final String ELEMENT_ID = "id";
+    public static final String ELEMENT_CELL = "cell";
 
     // Misc
     public static final String CONTENT_TYPE_TEXTXML = "text/xml";

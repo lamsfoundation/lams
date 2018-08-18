@@ -104,6 +104,11 @@ public interface ILamsToolService {
 	    Boolean markedInGradebook);
 
     /**
+     * Delete user activity mark and updates aggregates
+     */
+    void removeActivityMark(Integer userID, Long toolSessionID);
+
+    /**
      * Allows the tool to ask whether or not the activity is grouped and therefore it should expect more than one tool
      * session.
      *

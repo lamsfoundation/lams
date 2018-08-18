@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.kumalive.service;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.util.ExcelCell;
 
@@ -59,4 +61,16 @@ public interface IKumaliveService {
     LinkedHashMap<String, ExcelCell[][]> exportKumalives(List<Long> kumaliveIds);
 
     LinkedHashMap<String, ExcelCell[][]> exportKumalives(Integer organisationId);
+
+    KumalivePoll getPollByKumaliveId(Long kumaliveId);
+
+    KumalivePoll startPoll(Long kumaliveId, String name, JSONArray answersJSON) throws JSONException;
+
+    void finishPoll(Long pollId) throws JSONException;
+
+    void saveVote(Long answerId, Integer userId);
+
+    void releasePollResults(Long pollId, boolean votesReleased, boolean votersReleased);
+
+    void log(Long kumaliveId, Integer userId, Date date, short type);
 }

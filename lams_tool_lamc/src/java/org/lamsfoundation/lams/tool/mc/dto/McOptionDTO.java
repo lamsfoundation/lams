@@ -34,6 +34,11 @@ public class McOptionDTO implements Comparable {
     private Long uid;
     private String candidateAnswer;
     private String correct;
+    
+    /**
+     * used for TBL monitoring
+     */
+    private float percentage;
 
     public McOptionDTO() {
 
@@ -94,6 +99,14 @@ public class McOptionDTO implements Comparable {
      */
     public void setCorrect(String correct) {
 	this.correct = correct;
+    }
+    
+    public float getPercentage() {
+	return percentage;
+    }
+    
+    public void setPercentage(float percentage) {
+	this.percentage = percentage;
     }
 
     @Override

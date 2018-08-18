@@ -44,15 +44,6 @@
         />
 
         <property
-            name="dateMarksReleased"
-            type="java.util.Date"
-            update="true"
-            insert="true"
-            column="date_marks_released"
-            length="19"
-        />
-
-        <property
             name="markFileUUID"
             type="java.lang.Long"
             update="true"

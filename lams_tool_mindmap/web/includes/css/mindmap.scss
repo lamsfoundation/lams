@@ -1,0 +1,40 @@
+@import "_lams_variables.scss";
+
+#mindmap-controls {
+	height: auto;
+	padding: 5px;
+}
+
+#mindmap-container {
+	background-color: $body-bg;
+	height: calc(100vh - 240px);
+	width: 100%;
+	border: $border-thin-solid;
+}	
+
+#fullPageContentDiv:-webkit-full-screen #mindmap-container {
+ 	height: calc(100vh - 150px);
+}
+#fullPageContentDiv:-moz-full-screen  #mindmap-container {
+ 	height: calc(100vh - 150px);
+}
+#fullPageContentDiv:-ms-fullscreen  #mindmap-container {
+ 	height: calc(100vh - 150px);
+}
+#fullPageContentDiv:fullscreen #mindmap-container {
+ 	height: calc(100vh - 150px);
+}
+
+// Override the default mapjs styles
+.mapjs-node .mapjs-label {
+	background: white;
+	opacity: 0.5;
+	color: white;
+	display: inline-block;
+	font-size: $font-size-small;
+}
+
+.mapjs-node:hover .mapjs-label {
+	color: black;
+}
+

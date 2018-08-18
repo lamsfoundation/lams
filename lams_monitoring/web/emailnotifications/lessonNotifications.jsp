@@ -225,9 +225,9 @@
 				
 				<div id="additionalParameters">
 					<div id="activityDiv">
-						<h3>
+						<h4>
 							<fmt:message key="email.notifications.activity" />
-						</h3>
+						</h4>
 						<select id="activityId" onchange="getUsers();">
 							<c:forEach var="activity" items="${activities}" varStatus="i">
 								<option <c:if test="${i.index==0}">selected="selected"</c:if> value="${activity.activityId}"><c:out value="${activity.title}"/></option>

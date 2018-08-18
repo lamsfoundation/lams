@@ -35,6 +35,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -42,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -498,7 +502,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			+ ldDto.getContentFolderID() + ExportToolContentService.EXPORT_LDCONTENT_ZIP_SUFFIX;
 		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
-		String ldContentDir = FileUtil.getFullPath(secureDir, ldDto.getContentFolderID());
+
+		String ldContentDir = ExportToolContentService.getContentDirPath(ldDto.getContentFolderID(), true);
+		ldContentDir = FileUtil.getFullPath(secureDir, ldContentDir);
 
 		if (!FileUtil.isEmptyDirectory(ldContentDir, true)) {
 		    log.debug("Create export Learning Design content target zip file. File name is "
@@ -689,6 +695,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Map<Long, ToolContent> toolMapper = new HashMap<Long, ToolContent>();
 	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
+	    // LDs with version 3.0.2 have already correct paths
+	    boolean rewriteResourcePaths = !VersionUtil.isSameOrLaterVersion("3.0.2", importedFileVersion);
+	    // for rewriting in tool content paths like secure/4028813915760eb301157a04abe7005a/
+	    // into new format of paths like secure/40/28/81/39/15/76/
+	    String oldResourcePath = FileUtil.LAMS_WWW_SECURE_DIR + '/' + ldDto.getContentFolderID() + '/';
+	    String newResourcePath = FileUtil.LAMS_WWW_SECURE_DIR + '/'
+		    + ExportToolContentService.getContentDirPath(ldDto.getContentFolderID(), false);
+	    if (rewriteResourcePaths && ldDto.getDescription() != null) {
+		ldDto.setDescription(ldDto.getDescription().replaceAll(oldResourcePath, newResourcePath));
+	    }
 	    for (AuthoringActivityDTO activity : activities) {
 		getLearningDesignService().fillLearningLibraryID(activity);
 		// skip non-tool activities
@@ -730,6 +746,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    log.debug("Tool begin to import content : " + activity.getActivityTitle() + " by contentID :"
 			    + activity.getToolContentID());
 
+		    if (rewriteResourcePaths) {
+			ExportToolContentService.rewriteToolResourcePaths(toolPath, oldResourcePath, newResourcePath);
+		    }
+
 		    // tool's importToolContent() method
 		    // get from and to version
 		    String toVersion = newTool.getToolVersion();
@@ -767,13 +787,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		return -1L;
 	    }
 
-	    // begin fckeditor content folder import
+	    // begin ckeditor content folder import
 	    try {
 		String contentZipFileName = ExportToolContentService.EXPORT_LDCONTENT_ZIP_PREFIX
 			+ ldDto.getContentFolderID() + ExportToolContentService.EXPORT_LDCONTENT_ZIP_SUFFIX;
 		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator
-			+ ldDto.getContentFolderID();
+			+ ExportToolContentService.getContentDirPath(ldDto.getContentFolderID(), true);
 		File contentZipFile = new File(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
 
 		// unzip file to target secure dir if exists
@@ -1000,6 +1020,23 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	return toolPOJO;
+    }
+
+    /**
+     * Rewrites each line of tool.xml and converts old resource paths into new format.
+     */
+    private static void rewriteToolResourcePaths(String toolContentPath, String oldPath, String newPath)
+	    throws IOException {
+	String toolFilePath = FileUtil.getFullPath(toolContentPath, ExportToolContentService.TOOL_FILE_NAME);
+	File toolFile = new File(toolFilePath);
+	Path path = toolFile.toPath();
+	List<String> oldLines = Files.readAllLines(path);
+	List<String> newLines = new LinkedList<String>();
+	for (String oldLine : oldLines) {
+	    String newLine = oldLine.replaceAll(oldPath, newPath);
+	    newLines.add(newLine);
+	}
+	Files.write(path, newLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     // ******************************************************************
@@ -1956,6 +1993,19 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	return newTitle;
+    }
+
+    /**
+     * Convert content folder ID to real path inside secure dir or on server
+     */
+    private static String getContentDirPath(String contentFolderID, boolean isFileSystemPath) {
+	String contentFolderIDClean = contentFolderID.replaceAll("-", "");
+	String contentDir = "";
+	for (int charIndex = 0; charIndex < 6; charIndex++) {
+	    contentDir += contentFolderIDClean.substring(charIndex * 2, charIndex * 2 + 2)
+		    + (isFileSystemPath ? File.separator : "/");
+	}
+	return contentDir;
     }
 
     // ******************************************************************

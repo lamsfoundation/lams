@@ -155,10 +155,14 @@ public interface IScratchieService {
     /**
      * Get users by given toolSessionId.
      *
-     * @param long1
+     * @param toolSessionId
      * @return
      */
     List<ScratchieUser> getUsersBySession(Long toolSessionId);
+    
+    ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId);
+    
+    int countUsersByContentId(Long contentId);
 
     /**
      * Save specified user.
@@ -197,6 +201,14 @@ public interface IScratchieService {
      * @return
      */
     ScratchieSession getScratchieSessionBySessionId(Long sessionId);
+    
+    /**
+     * Return all sessions realted to the specified toolContentId.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    int countSessionsByContentId(Long toolContentId);
 
     /**
      * Save or update scratchie session.

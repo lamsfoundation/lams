@@ -99,17 +99,6 @@
                 </formatter>
             </console-handler>
 
-            <periodic-rotating-file-handler name="AUDITFILE"
-                autoflush="true">
-                <level name="INFO" />
-                <formatter>
-                    <named-formatter name="AUDITPATTERN" />
-                </formatter>
-                <file relative-to="jboss.server.log.dir" path="audit.log" />
-                <suffix value="'.'yyyy-MM-dd" />
-                <append value="true" />
-            </periodic-rotating-file-handler>
-
             <size-rotating-file-handler name="LAMSFILE"
                 autoflush="true">
                 <level name="DEBUG" />
@@ -153,11 +142,6 @@
                 <pattern-formatter
                     pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
             </formatter>
-            <formatter name="AUDITPATTERN">
-                <pattern-formatter
-                    pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t:%x] %-5p %c - %m%n" />
-            </formatter>
-
             <!-- ABSOLUTE date format -->
             <formatter name="CONSOLEPATTERN">
                 <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c{1}] %m%n" />
@@ -190,14 +174,6 @@
                 <handlers>
                     <handler name="LAMSFILE" />
                     <handler name="LAMSCONSOLE" />
-                </handlers>
-            </logger>
-
-            <logger category="org.lamsfoundation.lams.util.audit"
-                use-parent-handlers="false">
-                <level name="INFO" />
-                <handlers>
-                    <handler name="AUDITFILE" />
                 </handlers>
             </logger>
 
@@ -494,7 +470,7 @@
         <subsystem xmlns="urn:jboss:domain:undertow:1.2">
             <buffer-cache name="default"/>
             <server name="default-server">
-                <http-listener name="default" socket-binding="http" max-post-size="104857600"/>
+                <http-listener name="default" socket-binding="http" max-post-size="209715200"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                 	 <!-- Removing server headers

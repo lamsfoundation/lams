@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
-import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -128,7 +127,7 @@ public class ViewItemAction extends Action {
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX));
 	request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,
-		getReviewUrl(item, sessionMapID, mode, itemIdx));
+		getReviewUrl(request, item, sessionMapID, mode, itemIdx));
 
 	request.setAttribute(ResourceConstants.ATTR_ALLOW_COMMENTS, item.isAllowComments());
 	
@@ -238,7 +237,7 @@ public class ViewItemAction extends Action {
     // Private method
     // *************************************************************************************
     /**
-     * Return resoruce item according to ToolAccessMode.
+     * Return resource item according to ToolAccessMode.
      *
      * @param request
      * @param sessionMap
@@ -268,23 +267,42 @@ public class ViewItemAction extends Action {
 	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
     }
 
-    private static Pattern wikipediaPattern = Pattern.compile("wikipedia",
+    private static Pattern usePopupButtonForURL = Pattern.compile("wikipedia|google",
 	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static Pattern protocolExists = Pattern.compile("http://|https://|ftp://|nntp://",
+	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static Pattern httpPattern = Pattern.compile("http://", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    public static final String DEFAULT_PROTOCOL = "http://";
+    public static final String HTTPS_SCHEME = "https";
 
-    private Object getReviewUrl(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
+
+    private Object getReviewUrl(HttpServletRequest request, ResourceItem item, String sessionMapID, String mode, int itemIdx) {
 	short type = item.getType();
 	String url = null;
 	switch (type) {
 	    case ResourceConstants.RESOURCE_TYPE_URL:
-		// See LDEV-1736 regarding wikipedia regex
-		Matcher matcher = wikipediaPattern.matcher(item.getUrl());
-		boolean wikipediaInURL = matcher.find();
-
-		if (item.isOpenUrlNewWindow() || wikipediaInURL) {
-		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-		} else {
-		    url = ResourceWebUtils.protocol(item.getUrl());
+		// protocol missing? Assume http. Must do before the popup checks otherwise LDEV-4503 case may be missed.
+		url = item.getUrl();
+		if (!protocolExists.matcher(url).find()) {
+		    url = DEFAULT_PROTOCOL + url;
 		}
+
+		// check all three cases that trigger popup - first is set in authoring
+		boolean usePopup = item.isOpenUrlNewWindow();
+		// See LDEV-4503 regarding https/http issues
+		if ( ! usePopup ) {
+		    String serverScheme = request.getScheme();
+		    usePopup = HTTPS_SCHEME.equalsIgnoreCase(serverScheme) && httpPattern.matcher(url).find();
+		}
+    		// See LDEV-1736 regarding wikipedia regex
+		if ( ! usePopup ) {
+            		Matcher matcher = usePopupButtonForURL.matcher(url);
+            		usePopup = matcher.find();
+		}
+
+		if ( usePopup ) {
+		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
+		} 
 		break;
 
 	    case ResourceConstants.RESOURCE_TYPE_FILE:

@@ -132,7 +132,10 @@ var paper = null,
 			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
-			'transition'   		  : 'rgb(119,126,157)'
+			'transition'   		  : 'rgb(119,126,157)',
+			// highlight TBL activities which should be grouped
+			'activityRequireGrouping' : 'red',
+			'activityReadOnly'	  : 'red'
 		},
 	
 		'defaultTextAttributes' : {
@@ -479,7 +482,7 @@ GeneralInitLib = {
     			return;
     		}
     		if (!ldNode.data.canModify) {
-    			alert("You can not modify this");
+    			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
     		var isFolder = !ldNode.data.learningDesignId,
@@ -554,8 +557,7 @@ GeneralInitLib = {
 				return;
 			}
 			
-			var learningDesignID = null,
-				folderNode = null,
+			var folderNode = null,
 				folderID = null,
 				tree = dialog.data('ldTree'),
 				node = tree.getHighlightedNode();
@@ -586,21 +588,27 @@ GeneralInitLib = {
 			// if a node is highlighted but user modified the title,
 			// it is considered a new sequence
 			// otherwise check if there is no other sequence with the same name
+			var nodeData = null;
 			if (folderNode && folderNode.children) {
 				$.each(folderNode.children, function(){
 					if (this.label == title) {
 						this.highlight();
-						learningDesignID = this.data.learningDesignId;
+						nodeData = this.data;
 						return false;
 					}
 				});
 			}
-			if (learningDesignID
-					&& !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+			if (nodeData && (!nodeData.canModify || (!canSetReadOnly && nodeData.readOnly))){
+				alert(LABELS.READONLY_FORBIDDEN_ERROR);
 				return;
 			}
-	
-			var result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title);
+			if (nodeData && !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+				return;
+			}
+			var readOnly = (nodeData && !nodeData.canModify) || 
+						   (canSetReadOnly && $('#ldStoreDialogReadOnlyCheckbox', dialog).prop('checked')),
+				learningDesignID = nodeData ? nodeData.learningDesignId : null,
+				result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title, readOnly);
 			if (result) {
 				GeneralLib.openLearningDesign();
 				dialog.modal('hide');
@@ -724,7 +732,7 @@ GeneralInitLib = {
 				});
 				// limit size of the canvas so dialog does not resize after SVG loads
 				$('#ldStoreDialogCanvasDiv', dialog).css({
-					'max-width' : $(window).width() - 275 + 'px',
+					'max-width' : $(window).width() - 425 + 'px',
 					'max-height':  $(window).height() - 190 + 'px',
 				});
 				
@@ -743,18 +751,32 @@ GeneralInitLib = {
 			},
 			'close' : null,
 			'data' : {
-				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFirstTreeChild){
-					var tree = MenuLib.loadLearningDesignTree();
-					if (highlightFirstTreeChild) {
-						tree.getRoot().children[0].highlight();
-					}
+				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
+					// only Save As uses highlightFolder; otherwise the first folder in top level gets expanded and highlighted
+					layout.folderPathCurrent = highlightFolder && layout.ld.folderPath ? layout.ld.folderPath.slice() : [];
+					MenuLib.loadLearningDesignTree();
 					
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
 					var rightButtons = $('#ldStoreDialogRightButtonContainer', layout.ldStoreDialog);
 					$('button', rightButtons).hide();
+					$('#ldStoreDialogReadOnlyLabel *', layout.ldStoreDialog).hide();
 					$('#ldStoreDialogNameContainer, #ldStoreDialogImportPartFrame', layout.ldStoreDialog).hide();
 					$(shownElementIDs, layout.ldStoreDialog).show();
+					
+					var isOpenDialog = shownElementIDs.indexOf('ldStoreDialogOpenButton') >= 0;
+					if (isOpenDialog) {
+						// in open dialog display only information
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).css('color', layout.colors.activityReadOnly);
+					} else if (canSetReadOnly) {
+							// the first highlighted folder is user's private folder
+							$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog).show()
+								.prop('disabled', false).prop('checked', false);
+							$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show().css('color', 'initial');
+					} else {
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).css('color', layout.colors.activityReadOnly);
+					}
+					
 				},
 				/**
 				 * Extracts a selected activity from another LD.
@@ -926,20 +948,24 @@ GeneralInitLib = {
 		// make folder contents load dynamically on open
 		tree.setDynamicLoad(function(node, callback){
 			// load subfolder contents
-			var childNodeData = MenuLib.getFolderContents(node.data.folderID);
+			var childNodeData = MenuLib.getFolderContents(node.data.folderID, node.data.canSave, node.data.canHaveReadOnly);
 			if (childNodeData) {
 				$.each(childNodeData, function(){
 						// create and add a leaf
-						new YAHOO.widget.TextNode(this, node);
+						new YAHOO.widget.HTMLNode(this, node);
 					});
 			}
+			
+			// expand the folder where existing LD resides, if applicable
+			MenuLib.highlightFolder(node);
 			
 			// required by YUI
 			callback();
 		});
 		tree.singleNodeHighlight = true;
 		tree.subscribe('clickEvent', function(event) {
-			var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden');
+			var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden')
+				nodeData = event.node.data;
 			
 			//prevent item from being deselected on any subsequent clicks
 			if (isOpenDialog && event.node.highlightState == 1) {
@@ -949,15 +975,36 @@ GeneralInitLib = {
 			//disable edit buttons if no elements is selected
 			$('#ldStoreDialogLeftButtonContainer button', layout.ldStoreDialog)
 				.prop('disabled', event.node.highlightState > 0);
-
+			
+			if (canSetReadOnly && !isOpenDialog) {
+				// detect which folders/sequences are marked as read-only
+				// and which ones are immutable
+				if (event.node.isLeaf) {
+					$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
+						.prop('disabled', !nodeData.canModify || !nodeData.canHaveReadOnly)
+						.prop('checked', nodeData.readOnly || !nodeData.canModify);
+				} else {
+					$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
+						.prop('disabled', !nodeData.canSave || !nodeData.canHaveReadOnly)
+						.prop('checked', !nodeData.canSave);
+				}
+			} else {
+				// is this is normal user or open dialog, only show/hide read-only label
+				if (event.node.isLeaf ? nodeData.readOnly || !nodeData.canModify : !nodeData.canSave){
+					$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show();
+				} else {
+					$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).hide();
+				}
+			}
+			
 			// if it's a folder in load sequence dialog - highlight but stop processing
-			if (isOpenDialog && !event.node.data.learningDesignId){
+			if (isOpenDialog && !nodeData.learningDesignId){
 				return true;
 			}
 			
 			//show LearningDesign thumbnail and title
-			var learningDesignID = event.node.highlightState == 0   ? +event.node.data.learningDesignId : null,
-				title            = !isOpenDialog && learningDesignID ? event.node.label : null;
+			var learningDesignID = event.node.highlightState == 0   ? +nodeData.learningDesignId : null,
+				title            = !isOpenDialog && learningDesignID ? nodeData.label : null;
 			GeneralLib.showLearningDesignThumbnail(learningDesignID, title);				
 		});
 		tree.subscribe('clickEvent', tree.onEventToggleHighlight);
@@ -974,26 +1021,71 @@ GeneralInitLib = {
 		});
 		
 		GeneralLib.updateAccess(initAccess);
-
+		
+		var infoDialogContents = $('#infoDialogContents');
+		$('#infoDialogOKButton', infoDialogContents).click(function(){
+			layout.infoDialog.modal('hide');
+		});
+		
 		layout.infoDialog = showDialog('infoDialog',{
 			'autoOpen'      : false,
 			'modal'			: false,
 			'resizable'     : false,
 			'draggable'     : false,
 			'width'			: 290,
+			'title'			: LABELS.INFO_DIALOG_TITLE,
 			'close' : null,
 			'data' : {
 				'position' : {
-					'my' : 'right top',
-					'at' : 'right+10px top+10px',
+					'my' : 'center top',
+					'at' : 'center top+20px',
 					'of' : '#canvas'
+				},
+				'show' : function(html, temporary){
+					var timeout = layout.infoDialog.data('temporaryTimeout');
+					if (timeout) {
+						clearTimeout(timeout);
+					}
+					
+					var body = $('#infoDialogBody', layout.infoDialog),
+						// is dialog already open?
+						visible = layout.infoDialog.hasClass('in'),
+						// should be initialised/kept in temporary mode?
+						temporaryMode = visible ? body.hasClass('temporary') : temporary;
+					if (visible) {
+						if (temporaryMode) {
+							body.html(html);
+						} else {
+							body.html(body.html() + '<br /><br />' + html);
+						}
+					} else {
+						body.html(html);
+					}
+					
+					if (temporaryMode) {
+						// temporary dialog hides after 5 seconds or on click
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).hide();
+						body.addClass('temporary').one('click', function(){
+							layout.infoDialog.modal('hide');
+						});
+						var timeout = setTimeout(function(){
+							body.off('click');
+							layout.infoDialog.modal('hide');
+						}, 5000);
+						layout.infoDialog.data('temporaryTimeout', timeout);
+					} else {
+						$('.modal-header, #infoDialogButtons', layout.infoDialog).show();
+						body.removeClass('temporary');
+					}
+					
+					if (!visible) {
+						layout.infoDialog.modal('show');
+					}
 				}
 			}
 		});
 		
-		// remove the title along with X button
-		$('.modal-header', layout.infoDialog).remove();
-
+		$('.modal-body', layout.infoDialog).empty().append(infoDialogContents.show());
 		layout.dialogs.push(layout.infoDialog);
 		
 		
@@ -1479,6 +1571,95 @@ GeneralLib = {
 	},
 	
 	/**
+	 * If sequence starts with of Grouping->(MCQ or Assessment)->Leader Selection->Scratchie,
+	 * there is a good chance this is a TBL sequence and all activities must be grouped.
+	 */
+	checkTBLGrouping : function(){
+		var firstActivity = null,
+			activities = [],
+			getNextActivity = function(activity) {
+				var nextActivity = activity;
+				do {
+					nextActivity = nextActivity.transitions.from.length > 0 ? nextActivity.transitions.from[0].toActivity : null;
+					// skip gates along the way
+				} while (nextActivity instanceof ActivityDefs.GateActivity);
+				return nextActivity;
+			};
+		// find first activity in the sequence
+		// it can be wrong if not all activities are connected
+		$.each(layout.activities, function(){
+			if (this.transitions && this.transitions.to.length === 0 && this.transitions.from.length > 0){
+				firstActivity = this;
+				return false;
+			}
+		});
+		if (!firstActivity) {
+			return null;
+		}
+		// the first activity can be grouping or the second or third one (Live Edit gate and notebook can be in front)
+		var firstGroupingActivity = firstActivity instanceof ActivityDefs.GroupingActivity ? firstActivity : null;
+		if (!firstGroupingActivity) {
+			firstGroupingActivity = getNextActivity(firstActivity);
+			if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
+				firstGroupingActivity = getNextActivity(firstGroupingActivity);
+				if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
+					return null;
+				}
+			}
+		}
+
+		// then it is Assessment or MCQ
+		var secondActivity = getNextActivity(firstGroupingActivity),
+			templateContainer = $('#templateContainerCell'),
+			isTBL = secondActivity instanceof ActivityDefs.ToolActivity
+			&& (secondActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')
+			    || secondActivity.learningLibraryID == $('.template[learningLibraryTitle="MCQ"]', templateContainer).attr('learningLibraryId'));
+		if (!isTBL){
+			return null;
+		}
+		activities.push(secondActivity);
+		// then leader selection
+		var thirdActivity = getNextActivity(secondActivity);
+		isTBL = thirdActivity instanceof ActivityDefs.ToolActivity 
+				&& thirdActivity.learningLibraryID == $('.template[learningLibraryTitle="Leaderselection"]', templateContainer).attr('learningLibraryId');
+		if (!isTBL){
+			return null;
+		}
+		activities.push(thirdActivity);
+		// then scratchie
+		var fourthActivity = getNextActivity(thirdActivity);
+		isTBL = fourthActivity instanceof ActivityDefs.ToolActivity 
+				&& fourthActivity.learningLibraryID == $('.template[learningLibraryTitle="Scratchie"]', templateContainer).attr('learningLibraryId');
+		if (!isTBL){
+			return null;
+		}
+		activities.push(fourthActivity);
+		
+		// then optional assessments
+		var nextActivity = fourthActivity;
+		do {
+			nextActivity = getNextActivity(nextActivity);
+			if (nextActivity instanceof ActivityDefs.ToolActivity
+				&& nextActivity.learningLibraryID == $('.template[learningLibraryTitle="Assessment"]', templateContainer).attr('learningLibraryId')) {
+				activities.push(nextActivity);
+			} else {
+				nextActivity = null;
+			}
+		} while (nextActivity);
+		
+		// check which ones are not grouped
+		var activitiesToGroup = [];
+		$.each(activities, function(){
+			if (!this.grouping){
+				activitiesToGroup.push(this);
+				this.requireGrouping = true;
+				this.draw();
+			}
+		});
+		return activitiesToGroup.length === 0 ? null : activitiesToGroup;
+	},
+	
+	/**
 	 * Escapes HTML tags to prevent XSS injection.
 	 */
 	escapeHtml : function(unsafe) {
@@ -1504,8 +1685,7 @@ GeneralLib = {
 		
 		if (force) {
 			layout.ld = {
-				'maxUIID' : 0,
-				'designType' : null
+				'maxUIID' : 0
 			};
 			layout.activities = [];
 			layout.regions = [];
@@ -1554,7 +1734,7 @@ GeneralLib = {
 			success : function(response) {
 				if (!response) {
 					if (!isReadOnlyMode) {
-						alert(LABELS.SEQUENCE_LOAD_ERROR);
+						layout.infoDialog.data('show')(LABELS.SEQUENCE_LOAD_ERROR);
 					}
 					return;
 				}
@@ -1566,10 +1746,12 @@ GeneralLib = {
 				layout.ld = {
 					'learningDesignID' : ld.learningDesignID,
 					'folderID'		   : ld.workspaceFolderID,
+					'folderPath'	   : ld.folderPath,
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
 					'maxUIID'		   : 0,
-					'designType'	   : ld.designType
+					'readOnly'		   : ld.readOnly,
+					'canModify'		   : ld.copyTypeID == 1
 				};
 				
 				if (!isReadOnlyMode) {
@@ -1582,6 +1764,8 @@ GeneralLib = {
 				var arrangeNeeded = false,
 					// if system gate is found, it is Live Edit
 					systemGate = null,
+					// should we allow the author to enter activity authoring
+					activitiesReadOnly = !layout.ld.canModify || (!canSetReadOnly && layout.ld.readOnly),
 					branchToBranching = {},
 					// helper for finding last activity in a branch
 					branchToActivityDefs = {};
@@ -1610,7 +1794,7 @@ GeneralLib = {
 											activityData.xCoord ? activityData.xCoord : 1,
 											activityData.yCoord ? activityData.yCoord : 1,
 											activityData.activityTitle,
-											activityData.readOnly,
+											activityData.readOnly || activitiesReadOnly,
 											activityData.evaluation);
 							// for later reference
 							activityData.activity = activity;
@@ -1640,15 +1824,16 @@ GeneralLib = {
 									// get groups names
 									$.each(groupingData.groups, function(){
 										groups.push({
-											'name' : this.groupName,
-											'id'   : this.groupID,
-											'uiid' : this.groupUIID
+											'name' 	  : this.groupName,
+											'id'   	  : this.groupID,
+											'uiid' 	  : this.groupUIID,
+											'orderID' : this.orderID
 											});
 									});
 									
-									// sort groups by asceding UIID
+									// sort groups by asceding order ID
 									groups.sort(function(a,b) {
-										return a.uiid - b.uiid;
+										return a.orderID - b.orderID;
 									});
 									
 									activity = new ActivityDefs.GroupingActivity(
@@ -1657,7 +1842,7 @@ GeneralLib = {
 											activityData.xCoord,
 											activityData.yCoord,
 											activityData.activityTitle,
-											activityData.readOnly,
+											activityData.readOnly || activitiesReadOnly,
 											groupingData.groupingID,
 											groupingData.groupingUIID,
 											groupingType,
@@ -1687,7 +1872,7 @@ GeneralLib = {
 								activityData.yCoord,
 								activityData.activityTitle,
 								activityData.description,
-								activityData.readOnly,
+								activityData.readOnly || activitiesReadOnly,
 								gateType,
 								activityData.gateStartTimeOffset,
 								activityData.gateActivityCompletionBased);
@@ -1706,7 +1891,7 @@ GeneralLib = {
 									activityData.xCoord,
 									activityData.yCoord,
 									activityData.activityTitle,
-									activityData.readOnly);
+									activityData.readOnly || activitiesReadOnly);
 							// for later reference
 							activityData.activity = activity;
 							// for later reference
@@ -1721,7 +1906,7 @@ GeneralLib = {
 									activityData.xCoord,
 									activityData.yCoord,
 									activityData.activityTitle,
-									activityData.readOnly,
+									activityData.readOnly || activitiesReadOnly,
 									activityData.minOptions,
 									activityData.maxOptions);
 							break;
@@ -1740,7 +1925,7 @@ GeneralLib = {
 										arrangeNeeded ? 0 : activityData.startXCoord,
 										arrangeNeeded ? 0 : activityData.startYCoord,
 										activityData.activityTitle,
-										activityData.readOnly,
+										activityData.readOnly || activitiesReadOnly,
 										branchingType);
 							layout.activities.push(branchingEdge);
 							// for later reference
@@ -2087,13 +2272,7 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					$('.modal-body', layout.infoDialog).html(LABELS.SEQUENCE_NOT_VALID);
-					layout.infoDialog.modal('show');
-					
-					setTimeout(function(){
-						$('.modal-body', layout.infoDialog).empty();
-						layout.infoDialog.modal('hide');
-					}, 5000);
+					layout.infoDialog.data('show')(LABELS.SEQUENCE_NOT_VALID);
 				}
 			}
 		});
@@ -2133,7 +2312,7 @@ GeneralLib = {
 		
 		if (weightsSum != null && weightsSum != 100) {
 			if (displayErrors) {
-				alert(LABELS.WEIGHTS_SUM_ERROR);
+				layout.infoDialog.data('show')(LABELS.WEIGHTS_SUM_ERROR);
 			}
 			return false;
 		}
@@ -2205,7 +2384,7 @@ GeneralLib = {
 									// the branch is shared between two branchings
 									// it should have been detected when adding a transition
 									if (displayErrors) {
-										alert(LABELS.CROSS_BRANCHING_ERROR);
+										layout.infoDialog.data('show')(LABELS.CROSS_BRANCHING_ERROR);
 									}
 									return false;
 								}
@@ -2223,7 +2402,7 @@ GeneralLib = {
 						
 						if (error) {
 							if (displayErrors) {
-								alert(branchingActivity.title + LABELS.END_MATCH_ERROR);
+								layout.infoDialog.data('show')(branchingActivity.title + LABELS.END_MATCH_ERROR);
 							}
 							return false;
 						}
@@ -2480,7 +2659,7 @@ GeneralLib = {
 		
 		if (error) {
 			if (displayErrors) {
-				alert(error);
+				layout.infoDialog.data('show')(error);
 			}
 			return false;
 		}
@@ -2518,7 +2697,6 @@ GeneralLib = {
 			'licenseText'   	 : $('#ldDescriptionLicenseSelect').val() == "0"
 								   || $('#ldDescriptionLicenseSelect option:selected').attr('url')
 								   ? null : $('#ldDescriptionLicenseText').val(),
-			'designType'		 : layout.ld.designType,
 			'systemGate'		 : systemGate,
 			'activities'		 : activities,
 			'transitions'		 : transitions,
@@ -2590,7 +2768,7 @@ GeneralLib = {
 	/**
 	 * Stores the sequece in database.
 	 */
-	saveLearningDesign : function(folderID, learningDesignID, title) {
+	saveLearningDesign : function(folderID, learningDesignID, title, readOnly) {
 		var ld = GeneralLib.prepareLearningDesignData(true);
 		if (!ld) {
 			return false;
@@ -2606,6 +2784,7 @@ GeneralLib = {
 		ld.description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData();
 		ld.saveMode = layout.ld.learningDesignID && layout.ld.learningDesignID != learningDesignID
 		   			  ? 1 : 0;
+		ld.readOnly = readOnly;
 		ld.systemGate = null;
 
 		$.ajax({
@@ -2625,7 +2804,7 @@ GeneralLib = {
 				
 				// check if there were any validation errors
 				if (layout.ld.invalid) {
-					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '\n';
+					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '<br/>';
 					$.each(response.validation, function() {
 						var uiid = this.UIID,
 							title = '';
@@ -2637,10 +2816,10 @@ GeneralLib = {
 								}
 							});
 						}
-						message += title + this.message + '\n';
+						message += title + this.message + '<br/>';
 					});
 					
-					alert(message);
+					layout.infoDialog.data('show')(message);
 				}
 				
 				// if save (even partially) was successful
@@ -2649,6 +2828,16 @@ GeneralLib = {
 					layout.ld.learningDesignID = response.learningDesignID;
 					
 					if (layout.liveEdit) {
+						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
+						if (missingGroupingOnActivities) {
+							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
+							$.each(missingGroupingOnActivities, function(){
+									info += '<br /> * ' + this.title; 
+							});
+							layout.infoDialog.data('show')(info);
+							// do not close Live Edit if TBL errors appear
+							return;
+						}
 						// let backend know that system gate needs to be removed
 						$.ajax({
 							type  : 'POST',
@@ -2687,7 +2876,7 @@ GeneralLib = {
 								// create the updated LD image
 								var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 								if (!svgSaveSuccessful) {
-									alert(LABELS.SVG_SAVE_ERROR);
+									layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
 									return;
 								}
 								
@@ -2695,8 +2884,10 @@ GeneralLib = {
 								GeneralLib.setModified(false);
 								
 								// close the Live Edit dialog
-								alert(LABELS.LIVEEDIT_SAVE_SUCCESSFUL);
-								window.parent.closeDialog('dialogAuthoring');
+								layout.infoDialog.data('show')(LABELS.LIVEEDIT_SAVE_SUCCESSFUL, true);
+								setTimeout(function(){
+									window.parent.closeDialog('dialogAuthoring');
+								}, 5000);
 							}
 						});
 						
@@ -2706,11 +2897,21 @@ GeneralLib = {
 					
 					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 					if (!svgSaveSuccessful) {
-						alert(LABELS.SVG_SAVE_ERROR);
+						layout.infoDialog.data('show')(LABELS.SVG_SAVE_ERROR);
 					}
 					
-					if (response.validation.length == 0) {
-						alert(LABELS.SAVE_SUCCESSFUL);
+					if (!layout.ld.invalid) {
+						var missingGroupingOnActivities = GeneralLib.checkTBLGrouping();
+						if (missingGroupingOnActivities) {
+							var info = LABELS.SAVE_SUCCESSFUL_CHECK_GROUPING;
+							$.each(missingGroupingOnActivities, function(){
+								info += '<br /> * ' + this.title; 
+							});
+							layout.infoDialog.data('show')(info);
+
+						} else {
+							layout.infoDialog.data('show')(LABELS.SAVE_SUCCESSFUL, true);
+						}
 					}
 					
 					GeneralLib.setModified(false);
@@ -2718,7 +2919,7 @@ GeneralLib = {
 				}
 			},
 			error : function(){
-				alert(LABELS.SEQUENCE_SAVE_ERROR);
+				layout.infoDialog.data('show')(LABELS.SEQUENCE_SAVE_ERROR);
 			}
 		});
 		return result;

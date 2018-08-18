@@ -62,8 +62,8 @@
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>
-   		<property name="auditService">
-   			<ref bean="auditService"/>
+   		<property name="logEventService">
+   			<ref bean="logEventService"/>
    		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>

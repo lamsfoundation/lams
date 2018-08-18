@@ -16,125 +16,137 @@
 <script src="/lams/includes/javascript/jquery.validate.js"></script>
 <script src="/lams/includes/javascript/portrait.js"></script>
 <script type="text/javascript">
-var mustHaveUppercase = ${mustHaveUppercase},
-mustHaveNumerics  = ${mustHaveNumerics},
-mustHaveLowercase  = ${mustHaveLowercase},
-mustHaveSymbols   = ${mustHaveSymbols};
+	var mustHaveUppercase = ${mustHaveUppercase},
+	mustHaveNumerics  = ${mustHaveNumerics},
+	mustHaveLowercase  = ${mustHaveLowercase},
+	mustHaveSymbols   = ${mustHaveSymbols};
 
-$.validator.addMethod("pwcheck", function(value) {
- return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
-(!mustHaveNumerics || /\d/.test(value)) && // has a digit
-(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
-(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
-});
+	$.validator.addMethod("pwcheck", function(value) {
+	 	return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+			(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+			(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+			(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+	});
 
 	$.validator.addMethod("charactersAllowed", function(value) {
 		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
 				.test(value)
 	});
 
+	$.validator.addMethod("notEqualTo", function(value, element, param) {
+		return this.optional(element) || value != param;
+	}, "Please specify a different (non-default) value");
+
 	$(function() {
 		// Setup form validation 
 		$("#UserForm").validate({
-							debug : true,
-							errorClass : 'help-block',
-							//  validation rules
-							rules : {
-								login : {
-									required: true,
-									maxlength : 50
-								},
-								password : {
-									required: true,
-									minlength : <c:out value="${minNumChars}"/>,
-									maxlength : 25,
-									charactersAllowed : true,
-									pwcheck : true
-								},
-								password2 : {
-									equalTo : "#password"
-								},
-								firstName : {
-									required : true
-								},
-								lastName : {
-									required : true
-								},
-								email : {
-									required: true,
-									email: true
-								}
-							},
+			debug : true,
+			errorClass : 'help-block',
+			//  validation rules
+			rules : {
+				login : {
+					required: true,
+					maxlength : 50
+				},
+				password : {
+					required: true,
+					minlength : <c:out value="${minNumChars}"/>,
+					maxlength : 25,
+					charactersAllowed : true,
+					pwcheck : true
+				},
+				password2 : {
+					equalTo : "#password"
+				},
+				firstName : {
+					required : true
+				},
+				lastName : {
+					required : true
+				},
+				email : {
+					required: true,
+					email: true
+				},
+				country : {
+					required: true,
+					notEqualTo: "0"
+				}
+			},
 
-							// Specify the validation error messages
-							messages : {
-								login : {
-									required: "<fmt:message key='error.login.required'/>"
-								},
-								password : {
-									required : "<fmt:message key='error.password.empty'/>",
-									minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-									maxlength : "<fmt:message key='label.password.max.length'/>",
-									charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
-									pwcheck : "<fmt:message key='label.password.restrictions'/>"
-								},
-								password2: {
-									equalTo : "<fmt:message key='error.password.mismatch'/>"
-								},
-								firstName: {
-									required: "<fmt:message key='error.firstname.required'/>"
-								},
-								lastName: {
-									required: "<fmt:message key='error.lastname.required'/>"
-								},
-								email: {
-									required: "<fmt:message key='error.email.required'/>",
-									email: "<fmt:message key='error.valid.email.required'/>"
-								}
-							},
-
-							submitHandler : function(form) {
-								form.submit();
-							}
+			// Specify the validation error messages
+			messages : {
+				login : {
+					required: "<fmt:message key='error.login.required'/>"
+				},
+				password : {
+					required : "<fmt:message key='error.password.empty'/>",
+					minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
+					maxlength : "<fmt:message key='label.password.max.length'/>",
+					charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
+					pwcheck : "<fmt:message key='label.password.restrictions'/>"
+				},
+				password2: {
+					equalTo : "<fmt:message key='error.password.mismatch'/>"
+				},
+				firstName: {
+					required: "<fmt:message key='error.firstname.required'/>"
+				},
+				lastName: {
+					required: "<fmt:message key='error.lastname.required'/>"
+				},
+				email: {
+					required: "<fmt:message key='error.email.required'/>",
+					email: "<fmt:message key='error.valid.email.required'/>"
+				},
+				country: {
+					required: "<fmt:message key='error.country.required'/>",
+					notEqualTo: "<fmt:message key='error.country.required'/>"
+				}
+			},
+			submitHandler : function(form) {
+				form.submit();
+			}
 		});
 
 	});
 	
 	<logic:notEmpty name="UserForm" property="userId">
-	$(document).ready(function(){
-		var portraitId = '<bean:write name="UserForm" property="initialPortraitId" />';
-		loadPortrait(portraitId);
-	});
-
-	function loadPortrait(portraitId) {
-		$("#portraitPicture").removeClass();
-		$("#portraitPicture").css('background-image','');
-		addPortrait( $("#portraitPicture"), portraitId, 
-				'<bean:write name="UserForm" property="userId" />', 'large', true, '/lams/' );
-		<c:if test="${isSysadmin}">
-		if ( portraitId.length > 0 )  {
-			$("#portraitButton").css('display','block');
-		} else {
-			$("#portraitButton").css('display','none');
-		}
-		</c:if>
-	}
+		$(document).ready(function(){
+			var portraitId = '<bean:write name="UserForm" property="initialPortraitId" />';
+			loadPortrait(portraitId);
+		});
 	
-	<c:if test="${isSysadmin}">
-	function deletePortrait() {
-		$("#portraitButton").css('display','none');
-		$.ajax({
-			url : '/lams/saveportrait.do?method=deletePortrait',
-			data : { 	'userId'  : '<bean:write name="UserForm" property="userId" />' },		
-		success : function(response) {
-			if ( response == 'deleted') {
-				loadPortrait('');
-			} else {
-				alert("<fmt:message key='error.portrait.removal.failed'/>");
+		function loadPortrait(portraitId) {
+			$("#portraitPicture").removeClass();
+			$("#portraitPicture").css('background-image','');
+			addPortrait( $("#portraitPicture"), portraitId, 
+					'<bean:write name="UserForm" property="userId" />', 'large', true, '/lams/' );
+			<c:if test="${isSysadmin}">
+				if ( portraitId.length > 0 )  {
+					$("#portraitButton").css('display','block');
+				} else {
+					$("#portraitButton").css('display','none');
+				}
+			</c:if>
+		}
+		
+		<c:if test="${isSysadmin}">
+			function deletePortrait() {
+				$("#portraitButton").css('display','none');
+				$.ajax({
+					url : '/lams/saveportrait.do?method=deletePortrait',
+					data : { 	'userId'  : '<bean:write name="UserForm" property="userId" />' },		
+					success : function(response) {
+						if ( response == 'deleted') {
+							loadPortrait('');
+						} else {
+							alert("<fmt:message key='error.portrait.removal.failed'/>");
+						}
+					}
+				});
 			}
-		}});
-	}
-	</c:if>
+		</c:if>
 	</logic:notEmpty>
 </script>
 
@@ -304,15 +316,20 @@ $.validator.addMethod("pwcheck", function(value) {
 							maxlength="64" styleClass="form-control" /></td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message
-							key="admin.user.address_line_3" />:</td>
-					<td><html-el:text property="addressLine3" 
-							maxlength="64" styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.address_line_3" />:
+					</td>
+					<td>
+						<html-el:text property="addressLine3" maxlength="64" styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message key="admin.user.city" />:</td>
-					<td><html-el:text property="city"  maxlength="64"
-							styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.city" />:
+					</td>
+					<td>
+						<html-el:text property="city" maxlength="64" styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
 					<td class="align-right">
@@ -326,16 +343,26 @@ $.validator.addMethod("pwcheck", function(value) {
 					<td class="align-right">	
 						<fmt:message key="admin.user.state" />:
 					</td>
-					<td><html-el:text property="state"  maxlength="64"
-							styleClass="form-control" />
+					<td>
+						<html-el:text property="state"  maxlength="64" styleClass="form-control" />
 					</td>
 				</tr>
 				<tr>
 					<td class="align-right">
-						<fmt:message key="admin.user.country" />:
+						<fmt:message key="admin.user.country" /> *:
 					</td>
-					<td><html-el:text property="country"  maxlength="64"
-							styleClass="form-control" />
+					<td>
+						<html:select property="country" styleClass="form-control">
+							<html:option value="0">
+								<fmt:message key="label.select.country" />
+							</html:option>
+							
+							<c:forEach items="${countryCodes}" var="countryCode">
+								<html:option value="${countryCode.key}">
+									${countryCode.value}
+								</html:option>
+							</c:forEach>
+						</html:select>
 					</td>
 				</tr>
 				<tr>
@@ -364,7 +391,8 @@ $.validator.addMethod("pwcheck", function(value) {
 				</tr>
 				<tr>
 					<td class="align-right">
-						<fmt:message key="admin.user.fax" />:</td>
+						<fmt:message key="admin.user.fax" />:
+					</td>
 					<td>
 						<html-el:text property="fax"  maxlength="64" styleClass="form-control" />
 					</td>
@@ -432,6 +460,18 @@ $.validator.addMethod("pwcheck", function(value) {
 						</td>
 					</tr>
 				</c:if>
+				
+				<c:if test="${not empty createDate}">
+					<tr>
+						<td class="align-right">
+							<fmt:message key="admin.user.create.date" />:
+						</td>
+						<td>
+							<lams:Date value="${createDate}"/>
+						</td>
+					</tr>
+				</c:if>
+				
 				
 			</table>
 		</div>

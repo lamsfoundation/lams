@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -106,7 +107,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -129,7 +129,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     private IMcUsrAttemptDAO mcUsrAttemptDAO;
     private MCOutputFactory mcOutputFactory;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
     private IToolContentHandler mcToolContentHandler = null;
@@ -196,7 +196,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			leaderAttempt.isAttemptCorrect(), leaderAttempt.getConfidenceLevel());
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
-	    // if it's been changed by the leader
+		// if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
 		userAttempt.setMcOptionsContent(leaderAttempt.getMcOptionsContent());
 		userAttempt.setConfidenceLevel(leaderAttempt.getConfidenceLevel());
@@ -245,7 +245,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	//update questions' hash
 	String newHash = mcQueContent.getQuestion() == null ? null : HashUtil.sha1(mcQueContent.getQuestion());
 	mcQueContent.setQuestionHash(newHash);
-	
+
 	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
     }
 
@@ -371,23 +371,24 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public McQueUsr getMcUserByUID(Long uid) throws McApplicationException {
-	try {
-	    return mcUserDAO.getMcUserByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting the mc QueUsr by uid." + e.getMessage(), e);
-	}
+    public McQueUsr getMcUserByUID(Long uid) {
+	return mcUserDAO.getMcUserByUID(uid);
+    }
+
+    @Override
+    public McQueUsr getMcUserByContentId(Long userId, Long contentId) {
+	return mcUserDAO.getMcUserByContentId(userId, contentId);
     }
 
     @Override
     public Long getPortraitId(Long userId) {
-	if ( userId != null ) {
+	if (userId != null) {
 	    User user = (User) userManagementService.findById(User.class, userId.intValue());
 	    return user != null ? user.getPortraitUuid() : null;
 	}
 	return null;
     }
+
     @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
@@ -429,22 +430,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (userAttempt != null) {
-
-		    McOptsContent previosAnswer = userAttempt.getMcOptionsContent();
-		    // check if answer hasn't been changed since the last time
-		    if (previosAnswer.getUid().equals(answerOption.getUid())) {
-			// don't save anything
-			continue;
-
-		    } else {
-			// in case answer has been changed update userttempt
-			userAttempt.setAttemptTime(attemptTime);
-			userAttempt.setMcOptionsContent(answerOption);
-			userAttempt.setMark(mark);
-			userAttempt.setPassed(passed);
-			userAttempt.setAttemptCorrect(isAttemptCorrect);
-			userAttempt.setConfidenceLevel(confidenceLevel);
-		    }
+		    userAttempt.setAttemptTime(attemptTime);
+		    userAttempt.setMcOptionsContent(answerOption);
+		    userAttempt.setMark(mark);
+		    userAttempt.setPassed(passed);
+		    userAttempt.setAttemptCorrect(isAttemptCorrect);
+		    userAttempt.setConfidenceLevel(confidenceLevel);
 
 		} else {
 		    // create new userAttempt
@@ -466,6 +457,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    throw new McApplicationException("Exception occured when lams is updating mc UsrAttempt: " + e.getMessage(),
 		    e);
 	}
+    }
+
+    @Override
+    public int getAttemptsCountPerOption(Long optionUid) {
+	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
     }
 
     @Override
@@ -570,7 +566,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    for (McUsrAttempt attempt : finalizedUserAttempts) {
 			Integer displayOrder = attempt.getMcQueContent().getDisplayOrder();
 			int arrayIndex = (displayOrder != null) && (displayOrder.intValue() > 0)
-				? displayOrder.intValue() - 1 : 1;
+				? displayOrder.intValue() - 1
+				: 1;
 			if (userMarks[arrayIndex] == null) {
 
 			    // We get the mark for the attempt if the answer is correct and we don't allow
@@ -629,7 +626,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException {
 	return mcUsrAttemptDAO.getUserAttemptByQuestion(queUsrUid, mcQueContentId);
     }
-    
+
     @Override
     public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
 	return mcUsrAttemptDAO.getLearnerMarksByContentId(toolContentId);
@@ -750,9 +747,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    } else {
 		String error = new StringBuilder(
 			"Attempting to update the mark for a non-leader. Cannot update. Session ")
-			.append(mcSession.getSession_name()).append(":").append(mcSession.getMcSessionId())
-			.append(" user ").append(selectedUser.getUsername()).append(":")
-			.append(selectedUser.getQueUsrId()).toString();
+				.append(mcSession.getSession_name()).append(":").append(mcSession.getMcSessionId())
+				.append(" user ").append(selectedUser.getUsername()).append(":")
+				.append(selectedUser.getQueUsrId()).toString();
 		logger.warn(error);
 	    }
 	} else {
@@ -761,7 +758,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	}
 
 	for (McUsrAttempt attempt : userAttempts) {
-	    
+
 	    attempt.setMark(newMark);
 	    mcUsrAttemptDAO.saveMcUsrAttempt(attempt);
 
@@ -771,12 +768,16 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    updateMcQueUsr(user);
 
 	    // propagate changes to Gradebook
-	    toolService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(), 
+	    toolService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(),
 		    mcSession.getMcSessionId(), false);
 
 	    // record mark change with audit service
-	    auditService.logMarkChange(McAppConstants.TOOL_SIGNATURE, user.getQueUsrId(),
-		    user.getUsername(), "" + oldMark, "" + totalMark);
+	    Long toolContentId = null;
+	    if (mcSession.getMcContent() != null) {
+		toolContentId = mcSession.getMcContent().getMcContentId();
+	    }
+	    logEventService.logMarkChange(user.getQueUsrId(), user.getUsername(), toolContentId, "" + oldMark,
+		    "" + totalMark);
 
 	}
     }
@@ -904,7 +905,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		if (newTotalMark != oldTotalMark) {
 		    user.setLastAttemptTotalMark(newTotalMark);
 		    updateMcQueUsr(user);
-		    
 		    toolService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
 			    toolSessionId, false);
 		}
@@ -1302,8 +1302,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    }
 
 		    mcUserDAO.removeMcUser(user);
-
-		    toolService.updateActivityMark(null, null, userId, session.getMcSessionId(), false);
+		    toolService.removeActivityMark(userId, session.getMcSessionId());
 		}
 	    }
 	}
@@ -1512,7 +1511,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return mcOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return mcOutputFactory.getToolOutputs(name, this, toolContentId);
@@ -1524,9 +1523,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	if (toolSessionId == null) {
 	    return confidenceLevelDtos;
 	}
-	
+
 	McContent content = getMcSessionById(toolSessionId).getMcContent();
-	
+
 	//in case McContent is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
 	List<Object[]> userAttemptsAndPortraits = content.isUseSelectLeaderToolOuput()
 		? mcUsrAttemptDAO.getLeadersFinalizedAttemptsByContentId(content.getMcContentId())
@@ -1608,10 +1607,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -1708,8 +1707,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			    new Integer(user.getQueUsrId().toString()));
 
 		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO(user, 
-				mcSession.getMcSessionId().toString(), notebookEntry);
+			ReflectionDTO reflectionDTO = new ReflectionDTO(user, mcSession.getMcSessionId().toString(),
+				notebookEntry);
 			reflectionsContainerDTO.add(reflectionDTO);
 		    }
 		}
@@ -1755,18 +1754,18 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     /**
-     * @return Returns the auditService.
+     * @return Returns the logEventService.
      */
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
     /**
-     * @param auditService
-     *            The auditService to set.
+     * @param logEventService
+     *            The logEventService to set.
      */
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     /**
@@ -1820,15 +1819,21 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
 	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
 	Object[] markStats = mcUserDAO.getStatsMarksForLeaders(contentId);
-	if ( markStats != null ) {
-	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	if (markStats != null) {
+	    newDto.setMinMark(
+		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setAvgMark(
+		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setMaxMark(
+		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
 	}
 	return newDto;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
@@ -1849,11 +1854,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    Object[] markStats = mcUserDAO.getStatsMarksBySession(session.getMcSessionId());
 		    if (markStats != null) {
 			sessionDto.setMinMark(markStats[0] != null
-				? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2) : "0.00");
+				? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+				: "0.00");
 			sessionDto.setAvgMark(markStats[1] != null
-				? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2) : "0.00");
+				? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+				: "0.00");
 			sessionDto.setMaxMark(markStats[2] != null
-				? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2) : "0.00");
+				? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+				: "0.00");
 		    }
 		}
 
@@ -1862,7 +1870,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	}
 	return sessionDtos;
     }
-	
+
     @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return mcUserDAO.getRawUserMarksBySession(sessionId);
@@ -1909,10 +1917,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setRandomize(JsonUtil.opt(toolContentJSON, "randomize", Boolean.FALSE));
 	mcq.setShowReport(JsonUtil.opt(toolContentJSON, "showReport", Boolean.FALSE));
 	mcq.setDisplayAnswers(JsonUtil.opt(toolContentJSON, "displayAnswers", Boolean.FALSE));
+	mcq.setDisplayFeedbackOnly(JsonUtil.opt(toolContentJSON, "displayFeedbackOnly", Boolean.FALSE));
 	mcq.setShowMarks(JsonUtil.opt(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.opt(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.opt(toolContentJSON, "passMark", 0));
-	mcq.setEnableConfidenceLevels(JsonUtil.opt(toolContentJSON, "enableConfidenceLevels", Boolean.FALSE));
+	mcq.setEnableConfidenceLevels(JsonUtil.opt(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);

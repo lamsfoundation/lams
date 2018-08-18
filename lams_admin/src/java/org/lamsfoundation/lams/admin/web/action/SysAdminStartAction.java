@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -61,12 +62,14 @@ public class SysAdminStartAction extends Action {
 	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
 	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement.do", "label.manage.tool.consumers"));
+	    links.add(new LinkBean("policyManagement.do?method=list", "admin.policies.title"));
 	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
 	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
 	    links.add(new LinkBean("sessionmaintain.do?method=list", "sysadmin.maintain.session"));
 	    groupedLinks.add(new Object[]{AdminConstants.START_CONFIG_LINKS,links});
 
 	    links = new ArrayList<LinkBean>();
+	    links.add(new LinkBean("logevent.do", "label.event.log"));
 	    links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
 	    links.add(new LinkBean("cleanupPreviewLessons.do", "sysadmin.batch.preview.lesson.delete"));
 	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));

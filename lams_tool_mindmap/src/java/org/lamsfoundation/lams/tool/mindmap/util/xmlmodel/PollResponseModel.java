@@ -37,6 +37,10 @@ public class PollResponseModel {
     // list of Requests (Actions)
     ArrayList<NotifyRequestModel> actions = new ArrayList<NotifyRequestModel>();
 
+    public ArrayList<NotifyRequestModel> getActions() {
+        return actions;
+    }
+
     /** Default Constructor */
     public PollResponseModel() {
     }

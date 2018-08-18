@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,9 +54,11 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -110,7 +113,6 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author Andrey Balan
@@ -142,7 +144,9 @@ public class AssessmentServiceImpl
 
     private ILamsToolService toolService;
 
-    private IAuditService auditService;
+    private ILearnerService learnerService;
+
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -158,7 +162,7 @@ public class AssessmentServiceImpl
     @Override
     public boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId) {
 
-	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	AssessmentUser groupLeader = session.getGroupLeader();
 
 	return (groupLeader != null) && user.getUserId().equals(groupLeader.getUserId());
@@ -170,7 +174,7 @@ public class AssessmentServiceImpl
 	    return null;
 	}
 
-	AssessmentSession assessmentSession = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession assessmentSession = getSessionBySessionId(toolSessionId);
 	AssessmentUser leader = assessmentSession.getGroupLeader();
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
@@ -329,13 +333,18 @@ public class AssessmentServiceImpl
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, 
-		searchString, userManagementService);
+	return assessmentUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString,
+		userManagementService);
     }
 
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
 	return assessmentUserDao.getCountUsersBySession(sessionId, searchString);
+    }
+
+    @Override
+    public int getCountUsersByContentId(Long contentId) {
+	return assessmentUserDao.getCountUsersByContentId(contentId);
     }
 
     @Override
@@ -347,13 +356,13 @@ public class AssessmentServiceImpl
 
     @Override
     public Long getPortraitId(Long userId) {
-	if ( userId != null ) {
+	if (userId != null) {
 	    User user = (User) userManagementService.findById(User.class, userId.intValue());
 	    return user != null ? user.getPortraitUuid() : null;
 	}
 	return null;
     }
-    
+
     @Override
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);
@@ -390,8 +399,13 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public AssessmentUser getUserByIDAndContent(Long userId, Long contentId) {
-	return assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
+    public AssessmentUser getUserCreatedAssessment(Long userId, Long contentId) {
+	return assessmentUserDao.getUserCreatedAssessment(userId, contentId);
+    }
+
+    @Override
+    public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
+	return assessmentUserDao.getUserByIdAndContent(userId, contentId);
     }
 
     @Override
@@ -406,9 +420,19 @@ public class AssessmentServiceImpl
 	    String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
 	    question.setQuestionHash(newHash);
 	}
-	
+
 	//store object in DB
 	assessmentDao.saveObject(assessment);
+    }
+
+    @Override
+    public void updateAssessmentQuestion(AssessmentQuestion question) {
+	//update question's hash in case question's title or description got changed
+	String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
+	question.setQuestionHash(newHash);
+
+	//store object in DB
+	assessmentQuestionDao.update(question);
     }
 
     @Override
@@ -436,14 +460,19 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public AssessmentSession getAssessmentSessionBySessionId(Long sessionId) {
+    public AssessmentSession getSessionBySessionId(Long sessionId) {
 	return assessmentSessionDao.getSessionBySessionId(sessionId);
+    }
+
+    @Override
+    public List<AssessmentSession> getSessionsByContentId(Long toolContentId) {
+	return assessmentSessionDao.getByContentId(toolContentId);
     }
 
     @Override
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	Set<AssessmentQuestion> questions = assessment.getQuestions();
-	
+
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
 	if (lastResult != null) {
 
@@ -472,7 +501,7 @@ public class AssessmentServiceImpl
 		assessmentResultDao.saveObject(lastResult);
 		return;
 
-	    // mark previous attempt as being not the latest any longer
+		// mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(null);
 		assessmentResultDao.saveObject(lastResult);
@@ -544,7 +573,8 @@ public class AssessmentServiceImpl
 	    for (QuestionDTO questionDto : questionsForOnePage) {
 
 		// in case single MarkHedging question needs to be stored -- search for that question
-		if ((singleMarkHedgingQuestionUid != null) && !questionDto.getUid().equals(singleMarkHedgingQuestionUid)) {
+		if ((singleMarkHedgingQuestionUid != null)
+			&& !questionDto.getUid().equals(singleMarkHedgingQuestionUid)) {
 		    continue;
 		}
 
@@ -601,13 +631,14 @@ public class AssessmentServiceImpl
      * @param isAutosave
      *            in case of autosave there is no need to calculate marks
      * @return grade that user scored by answering that question
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    private float storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private float storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto, boolean isAutosave)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	Assessment assessment = assessmentResult.getAssessment();
-	
+
 	AssessmentQuestionResult questionResult = null;
 	// get questionResult from DB instance of AssessmentResult
 	for (AssessmentQuestionResult questionResultIter : assessmentResult.getQuestionResults()) {
@@ -615,10 +646,9 @@ public class AssessmentServiceImpl
 		questionResult = questionResultIter;
 	    }
 	}
-	
-	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult 
-	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())
-		 && questionResult == null) {
+
+	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult
+	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate()) && questionResult == null) {
 	    //update questionDto
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
 	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
@@ -649,7 +679,7 @@ public class AssessmentServiceImpl
 		optionAnswer.setAnswerInt(j++);
 	    }
 	}
-	
+
 	// store confidence levels entered by the learner
 	if (assessment.isEnableConfidenceLevels()) {
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
@@ -691,7 +721,7 @@ public class AssessmentServiceImpl
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    //clear previous answer
 	    questionResult.setSubmittedOptionUid(null);
-	    
+
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
 		//prepare regex which takes into account only * special character
@@ -716,7 +746,8 @@ public class AssessmentServiceImpl
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
 		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswerString() != null)
-			? pattern.matcher(questionDto.getAnswerString().trim()).matches() : false;
+			? pattern.matcher(questionDto.getAnswerString().trim()).matches()
+			: false;
 
 		if (isAnswerMatchedCurrentOption) {
 		    mark = optionDto.getGrade() * maxMark;
@@ -732,7 +763,8 @@ public class AssessmentServiceImpl
 		    boolean isAnswerMatchedCurrentOption = false;
 		    try {
 			float answerFloat = Float.valueOf(questionDto.getAnswerString());
-			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat() - optionDto.getAcceptedError()))
+			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat()
+				- optionDto.getAcceptedError()))
 				&& (answerFloat <= (optionDto.getOptionFloat() + optionDto.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
@@ -750,7 +782,8 @@ public class AssessmentServiceImpl
 				    answerFloat = answerFloat / unit.getMultiplier();
 				    isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat()
 					    - optionDto.getAcceptedError()))
-					    && (answerFloat <= (optionDto.getOptionFloat() + optionDto.getAcceptedError())));
+					    && (answerFloat <= (optionDto.getOptionFloat()
+						    + optionDto.getAcceptedError())));
 				    if (isAnswerMatchedCurrentOption) {
 					break;
 				    }
@@ -768,7 +801,8 @@ public class AssessmentServiceImpl
 	    }
 
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
-	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer()) && (questionDto.getAnswerString() != null)) {
+	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer())
+		    && (questionDto.getAnswerString() != null)) {
 		mark = maxMark;
 	    }
 
@@ -843,6 +877,11 @@ public class AssessmentServiceImpl
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
     }
+    
+    @Override
+    public Boolean isLastAttemptFinishedByUser(AssessmentUser user) {
+	return assessmentResultDao.isLastAttemptFinishedByUser(user);
+    }  
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
@@ -895,10 +934,24 @@ public class AssessmentServiceImpl
     }
 
     @Override
+    public int countAttemptsPerOption(Long optionUid) {
+	return assessmentResultDao.countAttemptsPerOption(optionUid);
+    }
+
+    @Override
     public AssessmentResult getLastFinishedAssessmentResultNotFromChache(Long assessmentUid, Long userId) {
-	AssessmentResult result = getLastFinishedAssessmentResult(assessmentUid, userId);
-	assessmentQuestionDao.evict(result);
-	return getLastFinishedAssessmentResult(assessmentUid, userId);
+	AssessmentResult finishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
+
+	//in case user played tricks with accessing Assessment using two tabs, finishedResult can be null and thus we need to request the last *not finished* result
+	if (finishedResult == null) {
+	    AssessmentResult notFinishedResult = getLastAssessmentResult(assessmentUid, userId);
+	    assessmentQuestionDao.evict(notFinishedResult);
+	    return getLastAssessmentResult(assessmentUid, userId);
+
+	} else {
+	    assessmentQuestionDao.evict(finishedResult);
+	    return getLastFinishedAssessmentResult(assessmentUid, userId);
+	}
     }
 
     @Override
@@ -1004,14 +1057,20 @@ public class AssessmentServiceImpl
 	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
 
 	    //for statistics tab
-	    if ( includeStatistics ) {
+	    if (includeStatistics) {
 		int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
 		sessionDto.setNumberLearners(countUsers);
 		Object[] markStats = assessmentUserDao.getStatsMarksBySession(sessionId);
-		if ( markStats != null ) {
-		    sessionDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-		    sessionDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-		    sessionDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
+		if (markStats != null) {
+		    sessionDto.setMinMark(markStats[0] != null
+			    ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+		    sessionDto.setAvgMark(markStats[1] != null
+			    ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+		    sessionDto.setMaxMark(markStats[2] != null
+			    ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
 		}
 	    }
 
@@ -1025,20 +1084,26 @@ public class AssessmentServiceImpl
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
 	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
 	Object[] markStats = assessmentUserDao.getStatsMarksForLeaders(contentId);
-	if ( markStats != null ) {
-	    newDto.setMinMark(markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2) : "0.00");
-	    newDto.setAvgMark(markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2) : "0.00");
-	    newDto.setMaxMark(markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2) : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer)markStats[3]);
+	if (markStats != null) {
+	    newDto.setMinMark(
+		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setAvgMark(
+		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setMaxMark(
+		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
+	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
 	}
 	return newDto;
     }
-    
+
     @Override
     public AssessmentResultDTO getUserMasterDetail(Long sessionId, Long userId) {
 	AssessmentResultDTO resultDto = new AssessmentResultDTO();
 	resultDto.setSessionId(sessionId);
-	
+
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
 	if (lastFinishedResult != null) {
@@ -1053,7 +1118,7 @@ public class AssessmentServiceImpl
 	    if (assessment.hasRandomQuestion()) {
 		questionResultsToDisplay.addAll(questionResults);
 
-	    //otherwise show only questions from the question list
+		//otherwise show only questions from the question list
 	    } else {
 		for (QuestionReference reference : questionReferences) {
 		    for (AssessmentQuestionResult questionResult : questionResults) {
@@ -1063,7 +1128,7 @@ public class AssessmentServiceImpl
 		    }
 		}
 	    }
-	    
+
 	    resultDto.setQuestionResults(questionResultsToDisplay);
 
 	    //escaping
@@ -1076,7 +1141,7 @@ public class AssessmentServiceImpl
     @Override
     public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
 	Assessment assessment = assessmentDao.getByContentId(contentId);
-	
+
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
@@ -1091,7 +1156,7 @@ public class AssessmentServiceImpl
 	if (lastFinishedResult != null) {
 	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
 	}
-	
+
 	if (!results.isEmpty()) {
 
 	    //prepare list of the questions to display, filtering out questions that aren't supposed to be answered
@@ -1260,12 +1325,12 @@ public class AssessmentServiceImpl
 		    ExcelCell[] sessionTitle = new ExcelCell[1];
 		    sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		    summaryTab.add(sessionTitle);
-		    
+
 		    List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
 		    // in case of UseSelectLeaderToolOuput - display only one user
 		    if (assessment.isUseSelectLeaderToolOuput()) {
 
-			AssessmentSession session = getAssessmentSessionBySessionId(sessionId);
+			AssessmentSession session = getSessionBySessionId(sessionId);
 			AssessmentUser groupLeader = session.getGroupLeader();
 
 			if (groupLeader != null) {
@@ -1288,11 +1353,14 @@ public class AssessmentServiceImpl
 		    }
 
 		    ArrayList<ExcelCell[]> summaryTabLearnerList = new ArrayList<ExcelCell[]>();
-			    
+
 		    ExcelCell[] summaryRowTitle = new ExcelCell[3];
-		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTabLearnerList.add(summaryRowTitle);
 
 		    float minGrade = -9999999;
@@ -1307,18 +1375,22 @@ public class AssessmentServiceImpl
 			userResultRow[2] = new ExcelCell(grade, false);
 			summaryTabLearnerList.add(userResultRow);
 
-			if ( grade < minGrade || minGrade == -9999999  )
+			if (grade < minGrade || minGrade == -9999999) {
 			    minGrade = grade;
-			if ( grade > maxGrade )
+			}
+			if (grade > maxGrade) {
 			    maxGrade = grade;
+			}
 		    }
-		    if ( minGrade == -9999999)
+		    if (minGrade == -9999999) {
 			minGrade = 0;
+		    }
 
-		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade, 10);
+		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
+			    10);
 		    // work out total marks so we can do percentages. need as float for the correct divisions
 		    int totalNumEntries = 0;
-		    for ( Map.Entry<String, Integer> entry : markSummary.entrySet() ) {
+		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 			totalNumEntries += entry.getValue();
 		    }
 
@@ -1330,25 +1402,29 @@ public class AssessmentServiceImpl
 		    summaryTab.add(minMaxRow);
 		    minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.lowest.mark"), true);
-		    minMaxRow[1] = new ExcelCell((double)minGrade, false);
+		    minMaxRow[1] = new ExcelCell((double) minGrade, false);
 		    summaryTab.add(minMaxRow);
 		    minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.highest.mark"), true);
-		    minMaxRow[1] = new ExcelCell((double)maxGrade, false);
+		    minMaxRow[1] = new ExcelCell((double) maxGrade, false);
 		    summaryTab.add(minMaxRow);
-		    
+
 		    summaryTab.add(EMPTY_ROW);
 		    ExcelCell[] binSummaryRow = new ExcelCell[3];
-		    binSummaryRow[0] = new ExcelCell(getMessage("label.authoring.basic.list.header.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow[1] = new ExcelCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow[2] = new ExcelCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[0] = new ExcelCell(getMessage("label.authoring.basic.list.header.mark"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[1] = new ExcelCell(getMessage("label.number.learners"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[2] = new ExcelCell(getMessage("label.percentage"), true,
+			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTab.add(binSummaryRow);
-		    float totalNumEntriesAsFloat = (float) totalNumEntries; 
-		    for ( Map.Entry<String, Integer> entry : markSummary.entrySet() ) {
+		    float totalNumEntriesAsFloat = totalNumEntries;
+		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 			binSummaryRow = new ExcelCell[3];
-			binSummaryRow[0] = new ExcelCell(entry.getKey(),false);
-			binSummaryRow[1] = new ExcelCell(entry.getValue(),false);
-			binSummaryRow[2] = new ExcelCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100),false);
+			binSummaryRow[0] = new ExcelCell(entry.getKey(), false);
+			binSummaryRow[1] = new ExcelCell(entry.getValue(), false);
+			binSummaryRow[2] = new ExcelCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100),
+				false);
 			summaryTab.add(binSummaryRow);
 		    }
 		    summaryTab.add(EMPTY_ROW);
@@ -1405,13 +1481,13 @@ public class AssessmentServiceImpl
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
 	    int questionNumber = 1;
-	    
+
 	    for (AssessmentQuestion question : questions) {
 		int colsNum = showUserNames ? 10 : 9;
 
 		ExcelCell[] questionTitle = new ExcelCell[1];
-		questionTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question") + " "
-			+ questionNumber++, true);
+		questionTitle[0] = new ExcelCell(
+			getMessage("label.monitoring.question.summary.question") + " " + questionNumber++, true);
 		questionSummaryTab.add(questionTitle);
 
 		// set up the summary table data for the top of the question area.
@@ -1428,7 +1504,7 @@ public class AssessmentServiceImpl
 		if (doSummaryTable) {
 		    questionSummaryTab.add(startSummaryTable(question, summaryOfAnswers, trueKey, falseKey));
 		}
-		
+
 		ArrayList<ExcelCell[]> questionSummaryTabTemp = new ArrayList<ExcelCell[]>();
 
 		//add question title row
@@ -1511,9 +1587,10 @@ public class AssessmentServiceImpl
 			} else {
 			    userResultRow[count++] = new ExcelCell(
 				    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
-			    
-			    if ( doSummaryTable ) { 
-				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers, summaryNACount);
+
+			    if (doSummaryTable) {
+				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers,
+					summaryNACount);
 			    }
 
 			}
@@ -1541,10 +1618,11 @@ public class AssessmentServiceImpl
 		}
 
 		if (doSummaryTable) {
-		    questionSummaryTab.add(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
+		    questionSummaryTab
+			    .add(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
 		    questionSummaryTab.add(EMPTY_ROW);
 		}
-		
+
 		// Calculating the averages
 		ExcelCell[] averageRow;
 
@@ -1580,7 +1658,7 @@ public class AssessmentServiceImpl
 		questionSummaryTab.addAll(questionSummaryTabTemp);
 		questionSummaryTab.add(averageRow);
 		questionSummaryTab.add(EMPTY_ROW);
-		
+
 	    }
 
 	}
@@ -1598,11 +1676,16 @@ public class AssessmentServiceImpl
 	userSummaryTab.add(userSummaryTitle);
 
 	ExcelCell[] summaryRowTitle = new ExcelCell[5];
-	summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[1] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[2] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[3] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[1] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[2] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[3] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	userSummaryTab.add(summaryRowTitle);
 	Float totalGradesPossible = new Float(0);
 	Float totalAverage = new Float(0);
@@ -1676,7 +1759,7 @@ public class AssessmentServiceImpl
 		sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		userSummaryTab.add(sessionTitle);
 
-		AssessmentSession assessmentSession = getAssessmentSessionBySessionId(sessionDTO.getSessionId());
+		AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
 
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 
@@ -1775,30 +1858,26 @@ public class AssessmentServiceImpl
 	    summaryTable = new ExcelCell[question.getOptions().size() + 1];
 	    for (AssessmentQuestionOption option : question.getOptions()) {
 		summaryOfAnswers.put(option.getUid(), 0);
-		StringBuilder bldr = new StringBuilder(getMessage("label.authoring.basic.option.answer"))
-			.append(" ")
-			.append(i + 1)
-			.append(" - ");
-		if ( question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL ) {
-		    bldr.append(option.getOptionFloat())
-		    	.append(" +- ")
-		    	.append(option.getAcceptedError());
+		StringBuilder bldr = new StringBuilder(getMessage("label.authoring.basic.option.answer")).append(" ")
+			.append(i + 1).append(" - ");
+		if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+		    bldr.append(option.getOptionFloat()).append(" +- ").append(option.getAcceptedError());
 		} else {
 		    bldr.append(option.getOptionString().replaceAll("\\<.*?\\>", ""));
 		}
 		summaryTable[i] = new ExcelCell(bldr.toString(), false);
 		i++;
 	    }
-	    if ( question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE ) {
-		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"), false); 
+	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"), false);
 	    } else {
-		summaryTable[i++] = new ExcelCell(getMessage("label.other"), false); 
+		summaryTable[i++] = new ExcelCell(getMessage("label.other"), false);
 	    }
 	} else {
 	    summaryTable = new ExcelCell[3];
 	    summaryTable[0] = new ExcelCell(getMessage("label.authoring.true.false.true"), false);
 	    summaryTable[1] = new ExcelCell(getMessage("label.authoring.true.false.false"), false);
-	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"), false); 
+	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"), false);
 	    summaryOfAnswers.put(trueKey, 0);
 	    summaryOfAnswers.put(falseKey, 0);
 	}
@@ -1815,11 +1894,10 @@ public class AssessmentServiceImpl
 		    if (optionAnswer.getAnswerBoolean()) {
 			Integer currentCount = summaryOfAnswers.get(optionAnswer.getOptionUid());
 			if (currentCount == null) {
-			    log.error("Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
-				    + questionResult.getUid()
-				    + " OptionUid "
-				    + optionAnswer.getOptionUid()
-				    + " question " + question.getUid());
+			    log.error(
+				    "Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
+					    + questionResult.getUid() + " OptionUid " + optionAnswer.getOptionUid()
+					    + " question " + question.getUid());
 			} else {
 			    summaryOfAnswers.put(optionAnswer.getOptionUid(), currentCount + 1);
 			    foundOption = true;
@@ -1836,12 +1914,10 @@ public class AssessmentServiceImpl
 	    if (submittedUid != null) {
 		Integer currentCount = summaryOfAnswers.get(submittedUid);
 		if (currentCount == null) {
-		    log.error("Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
-			    + questionResult.getUid()
-			    + " submittedOptionUid "
-			    + submittedUid
-			    + " question "
-			    + question.getUid());
+		    log.error(
+			    "Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
+				    + questionResult.getUid() + " submittedOptionUid " + submittedUid + " question "
+				    + question.getUid());
 		} else {
 		    summaryOfAnswers.put(submittedUid, currentCount + 1);
 		}
@@ -1862,39 +1938,38 @@ public class AssessmentServiceImpl
 
     private String valueAsPercentage(Integer value, int total) {
 	Double percentage = (double) value / total * 100;
-	return NumberUtil.formatLocalisedNumber(percentage, (Locale)null, 2) + "%";
-    } 
-    
+	return NumberUtil.formatLocalisedNumber(percentage, (Locale) null, 2) + "%";
+    }
+
     private ExcelCell[] outputSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
 	    Integer summaryNACount, Long trueKey, Long falseKey) {
-	ExcelCell[] summaryTable = new ExcelCell[summaryOfAnswers.size()+1];
+	ExcelCell[] summaryTable = new ExcelCell[summaryOfAnswers.size() + 1];
 	int total = summaryNACount;
-	for ( int value : summaryOfAnswers.values() ) {
-	total += value;
+	for (int value : summaryOfAnswers.values()) {
+	    total += value;
 	}
 	int i = 0;
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
-		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL ) {
-	for (AssessmentQuestionOption option : question.getOptions()) {
-	    summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
-	    if ( option.getGrade() > 0 ) {
-		summaryTable[i].setColor(IndexedColors.GREEN);
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    for (AssessmentQuestionOption option : question.getOptions()) {
+		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
+		if (option.getGrade() > 0) {
+		    summaryTable[i].setColor(IndexedColors.GREEN);
+		}
+		i++;
 	    }
-	    i++;
-	}
-	summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	    summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
 	} else {
-	summaryTable = new ExcelCell[3];
-	summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total), false);
-	summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total), false);
-	summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount,total), false);
-	summaryTable[question.getCorrectAnswer() ? 0 : 1].setColor(IndexedColors.GREEN);
+	    summaryTable = new ExcelCell[3];
+	    summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total), false);
+	    summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total), false);
+	    summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	    summaryTable[question.getCorrectAnswer() ? 0 : 1].setColor(IndexedColors.GREEN);
 	}
 	return summaryTable;
     }
 
- 
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
@@ -1970,7 +2045,7 @@ public class AssessmentServiceImpl
 	    toolService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
-	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
+	    logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
 		    "" + totalMark);
 	}
 
@@ -2068,7 +2143,7 @@ public class AssessmentServiceImpl
 			user.getUserId());
 		AssessmentResult lastFinishedAssessmentResult = (assessmentResults.isEmpty()) ? null
 			: assessmentResults.get(assessmentResults.size() - 1);
-		
+
 		//add autosave assessmentResult as well
 		AssessmentResult lastAssessmentResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
 		if (lastAssessmentResult != null && lastAssessmentResult.getFinishDate() == null) {
@@ -2257,7 +2332,7 @@ public class AssessmentServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
@@ -2283,7 +2358,7 @@ public class AssessmentServiceImpl
 	String message = messageService.getMessage("event.learner.completes.attempt.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
-    
+
     @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return assessmentUserDao.getRawUserMarksBySession(sessionId);
@@ -2294,66 +2369,70 @@ public class AssessmentServiceImpl
 	return assessmentUserDao.getRawLeaderMarksByToolContentId(toolContentId);
     }
 
-    private LinkedHashMap<String, Integer> getMarksSummaryForSession(List<AssessmentUserDTO> userDtos, float minGrade, float maxGrade, Integer numBuckets) {
+    private LinkedHashMap<String, Integer> getMarksSummaryForSession(List<AssessmentUserDTO> userDtos, float minGrade,
+	    float maxGrade, Integer numBuckets) {
 
 	LinkedHashMap<String, Integer> summary = new LinkedHashMap<String, Integer>();
 	TreeMap<Integer, Integer> inProgress = new TreeMap<Integer, Integer>();
-	
-	if ( numBuckets == null )
+
+	if (numBuckets == null) {
 	    numBuckets = 10;
-	
+	}
+
 	int bucketSize = 1;
-	int intMinGrade = (int)Math.floor(minGrade);
+	int intMinGrade = (int) Math.floor(minGrade);
 	float gradeDifference = maxGrade - minGrade;
-	if ( gradeDifference <= 10 ) {
-	    for ( int i= intMinGrade; i <= (int)Math.ceil(maxGrade); i++ ) {
+	if (gradeDifference <= 10) {
+	    for (int i = intMinGrade; i <= (int) Math.ceil(maxGrade); i++) {
 		inProgress.put(i, 0);
 	    }
 	} else {
 	    int intGradeDifference = (int) Math.ceil(gradeDifference);
-	    bucketSize = (int) Math.ceil(intGradeDifference / numBuckets); 
-	    for ( int i=intMinGrade; i <= maxGrade; i = i+bucketSize ) {
+	    bucketSize = (int) Math.ceil(intGradeDifference / numBuckets);
+	    for (int i = intMinGrade; i <= maxGrade; i = i + bucketSize) {
 		inProgress.put(i, 0);
 	    }
 	}
-	
+
 	for (AssessmentUserDTO userDto : userDtos) {
 	    float grade = userDto.getGrade();
 	    int bucketStart = intMinGrade;
-	    int bucketStop = bucketStart+bucketSize;
+	    int bucketStop = bucketStart + bucketSize;
 	    boolean looking = true;
-	    while ( bucketStart <= maxGrade && looking ) {
-		if ( grade >= bucketStart && grade < bucketStop ) {
+	    while (bucketStart <= maxGrade && looking) {
+		if (grade >= bucketStart && grade < bucketStop) {
 		    inProgress.put(bucketStart, inProgress.get(bucketStart) + 1);
 		    looking = false;
 		} else {
 		    bucketStart = bucketStop;
-		    bucketStop = bucketStart+bucketSize;
+		    bucketStop = bucketStart + bucketSize;
 		}
 	    }
 	}
-	
-	for ( Map.Entry<Integer, Integer> entry : inProgress.entrySet() ) {
+
+	for (Map.Entry<Integer, Integer> entry : inProgress.entrySet()) {
 	    String key;
-	    if ( bucketSize == 1 )
+	    if (bucketSize == 1) {
 		key = entry.getKey().toString();
-	    else {
-		if ( maxGrade >= entry.getKey() && maxGrade <= entry.getKey()+bucketSize-1) {
-		    if ( (int)maxGrade == entry.getKey() )
-			key = NumberUtil.formatLocalisedNumber(maxGrade, (Locale)null, 2);    
-		    else 
+	    } else {
+		if (maxGrade >= entry.getKey() && maxGrade <= entry.getKey() + bucketSize - 1) {
+		    if ((int) maxGrade == entry.getKey()) {
+			key = NumberUtil.formatLocalisedNumber(maxGrade, (Locale) null, 2);
+		    } else {
 			key = new StringBuilder().append(entry.getKey()).append(" - ")
-		    		.append(NumberUtil.formatLocalisedNumber(maxGrade, (Locale)null, 2)).toString();
+				.append(NumberUtil.formatLocalisedNumber(maxGrade, (Locale) null, 2)).toString();
+		    }
 		} else {
-		    key = new StringBuilder().append(entry.getKey()).append(" - ").append(entry.getKey()+bucketSize-.01).toString();
+		    key = new StringBuilder().append(entry.getKey()).append(" - ")
+			    .append(entry.getKey() + bucketSize - .01).toString();
 		}
 	    }
 	    summary.put(key, entry.getValue());
 	}
-	
+
 	return summary;
     }
-    
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -2385,8 +2464,8 @@ public class AssessmentServiceImpl
     // set methods for Spring Bean
     // *****************************************************************************
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setMessageService(MessageService messageService) {
@@ -2470,7 +2549,7 @@ public class AssessmentServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
+	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(new Long(newUserUid.longValue()),
 		    toolContentId);
 	    if (user == null) {
 		user = new AssessmentUser();
@@ -2581,7 +2660,7 @@ public class AssessmentServiceImpl
 		}
 
 		// propagade changes to Gradebook
-		toolService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		toolService.removeActivityMark(userId, session.getSessionId());
 
 		assessmentUserDao.removeObject(AssessmentUser.class, user.getUid());
 	    }
@@ -2653,16 +2732,16 @@ public class AssessmentServiceImpl
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return assessmentOutputFactory.getToolOutputs(name, this, toolContentId);
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<ConfidenceLevelDTO>();
 	if (toolSessionId == null) {
 	    return confidenceLevelDtos;
 	}
-	
+
 	Assessment assessment = getAssessmentBySessionId(toolSessionId);
-	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor  
+	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor
 	List<Object[]> assessmentResultsAndPortraits = assessment.isUseSelectLeaderToolOuput()
 		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
 		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
@@ -2672,18 +2751,19 @@ public class AssessmentServiceImpl
 	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
 		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
 	    Long userId = assessmentResult.getUser().getUserId();
-	    
-	    //fill in question's and user answer's hashes 
+
+	    //fill in question's and user answer's hashes
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		AssessmentQuestion question = questionResult.getAssessmentQuestion();
-		
+
 		List<String> answers = new LinkedList<String>();
-		
+
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-		    
+
 		    for (AssessmentQuestionOption option : question.getOptions()) {
 			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-			    if (optionAnswer.getAnswerBoolean() && (optionAnswer.getOptionUid().equals(option.getUid()))) {
+			    if (optionAnswer.getAnswerBoolean()
+				    && (optionAnswer.getOptionUid().equals(option.getUid()))) {
 				answers.add(option.getOptionString());
 			    }
 			}
@@ -2701,16 +2781,16 @@ public class AssessmentServiceImpl
 		    if (questionResult.getAnswerString() != null) {
 			answers.add("" + questionResult.getAnswerBoolean());
 		    }
-		    
+
 		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY) {
 		    answers.add(questionResult.getAnswerString());
 
 		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 
 		} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-		    
+
 		}
-		
+
 		for (String answer : answers) {
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(userId.intValue());
@@ -2718,11 +2798,11 @@ public class AssessmentServiceImpl
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setQuestion(question.getQuestion());
 		    confidenceLevelDto.setAnswer(answer);
-		    
+
 		    confidenceLevelDtos.add(confidenceLevelDto);
 		}
 	    }
-	    
+
 	}
 
 	return confidenceLevelDtos;
@@ -2732,7 +2812,7 @@ public class AssessmentServiceImpl
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
-	AssessmentSession session = getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	if ((session == null) || (session.getAssessment() == null)) {
 	    return;
 	}
@@ -2751,7 +2831,7 @@ public class AssessmentServiceImpl
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    // check if leader has submitted answers
-	    if ((groupLeader != null) && groupLeader.isSessionFinished()) {
+	    if ((groupLeader != null) && isLastAttemptFinishedByUser(groupLeader)) {
 
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(assessmentUser, groupLeader);
@@ -2795,6 +2875,10 @@ public class AssessmentServiceImpl
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
+    
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
 
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
@@ -2835,16 +2919,19 @@ public class AssessmentServiceImpl
 	Date startDate = null;
 	Date finishDate = null;
 	for (AssessmentResult result : results) {
-	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate)))
+	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate))) {
 		startDate = result.getStartDate();
-	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate)))
+	    }
+	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate))) {
 		finishDate = result.getFinishDate();
+	    }
 	}
 
-	if (learner.isSessionFinished())
+	if (learner.isSessionFinished()) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, finishDate);
-	else
+	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+	}
     }
     // ****************** REST methods *************************
 
@@ -2906,7 +2993,7 @@ public class AssessmentServiceImpl
 		    "Assessment Tool does not support Overall Feedback for REST Authoring. " + toolContentJSON);
 	}
 
-	AssessmentUser assessmentUser = getUserByIDAndContent(userID.longValue(), toolContentID);
+	AssessmentUser assessmentUser = getUserCreatedAssessment(userID.longValue(), toolContentID);
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser();
 	    assessmentUser.setFirstName(toolContentJSON.getString("firstName"));
@@ -3030,5 +3117,25 @@ public class AssessmentServiceImpl
 	// public static final short QUESTION_TYPE_NUMERICAL = 4;
 	// public static final short QUESTION_TYPE_TRUE_FALSE = 5;
 	// public static final short QUESTION_TYPE_ORDERING = 7;
+    }
+
+    @Override
+    public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
+	return assessmentQuestionDao.getByUid(questionUid);
+    }
+
+    @Override
+    public void notifyLearnersOnAnswerDisclose(long toolContentId) throws JSONException {
+	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
+	Set<Integer> userIds = new HashSet<Integer>();
+	for (AssessmentSession session : sessions) {
+	    for (AssessmentUser user : session.getAssessmentUsers()) {
+		userIds.add(user.getUserId().intValue());
+	    }
+	}
+
+	JSONObject jsonCommand = new JSONObject();
+	jsonCommand.put("hookTrigger", "assessment-results-refresh-" + toolContentId);
+	learnerService.createCommandForLearners(toolContentId, userIds, jsonCommand.toString());
     }
 }

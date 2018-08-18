@@ -242,6 +242,8 @@ public interface IVoteService {
 
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
+    void updateEntry(NotebookEntry notebookEntry);
+    
     void removeQuestionsFromCache(VoteContent voteContent);
 
     void removeVoteContentFromCache(VoteContent voteContent);

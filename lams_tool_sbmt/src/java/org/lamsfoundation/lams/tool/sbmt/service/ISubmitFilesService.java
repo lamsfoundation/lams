@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -113,7 +114,7 @@ public interface ISubmitFilesService {
      * 		  Should files removed in monitor be included.
      * @return List The list of required objects.
      */
-    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale, boolean includeRemovedFiles);
+    public List<FileDetailsDTO> getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale, boolean includeRemovedFiles);
 
     /**
      * This method returns a SortedMap of all files that were submitted users within a given <code>sessionID</code>.
@@ -122,7 +123,8 @@ public interface ISubmitFilesService {
      *            The <code>session_id</code> to be looked up
      * @return SortedMap, the key is UserDTO, the value is a List of FileDetailsDTO objects
      */
-    public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale);
+    public SortedMap<SubmitUserDTO, List<FileDetailsDTO>> getFilesUploadedBySession(Long sessionID,
+	    Locale currentLocale);
 
     /**
      * Updates the marks for a file, and also allows a file to be uploaded
@@ -145,7 +147,7 @@ public interface ISubmitFilesService {
      * @throws RepositoryCheckedException 
      * @throws InvalidParameterException 
      */
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID) throws InvalidParameterException, RepositoryCheckedException;
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID) throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
@@ -174,9 +176,8 @@ public interface ISubmitFilesService {
      * Release marks and comments information to learners, for a special session.
      *
      * @param sessionID
-     * @return success return true, otherwise return false.
      */
-    public boolean releaseMarksForSession(Long sessionID);
+    public void releaseMarksForSession(Long sessionID);
 
     /**
      * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.

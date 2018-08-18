@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.tool.IToolVO;
@@ -43,7 +44,6 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * This interface define the contract that all Q/A service provider must follow.
@@ -225,7 +225,7 @@ public interface IQaService extends ToolRatingManager {
      * Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer, so the log entry
      * must be made by the web layer.
      */
-    IAuditService getAuditService();
+    ILogEventService getLogEventService();
 
     void updateEntry(NotebookEntry notebookEntry);
 

@@ -143,11 +143,19 @@ public class RatingService implements IRatingService {
 	    rating.setToolSessionId(toolSessionId);
 	}
 
+	// LDEV-4590 Star Rating can never be more than 5 stars
+	if (ratingCriteria.isStarStyleRating()
+		&& Float.compare(ratingFloat, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+	    ratingFloat = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
+	}
+	
 	rating.setRating(ratingFloat);
 	ratingDAO.saveOrUpdate(rating);
 
 	// to make available new changes be visible on a jsp page
-	return ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, toolSessionId, itemId);
+	ItemRatingCriteriaDTO averageDTO = ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, toolSessionId, itemId);
+	averageDTO.setUserRating(Float.toString(ratingFloat));
+	return averageDTO;
     }
 
     @Override
@@ -174,8 +182,16 @@ public class RatingService implements IRatingService {
 	    rating.setItemId(entry.getKey());
 	    rating.setLearner(learner);
 	    rating.setRatingCriteria(ratingCriteria);
-	    rating.setRating(entry.getValue());
 	    rating.setToolSessionId(toolSessionId);
+
+	    // LDEV-4590 Star Rating can never be more than 5 stars
+	    float rawRating = entry.getValue();
+	    if (ratingCriteria.isStarStyleRating()
+		    && Float.compare(rawRating, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+		rawRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
+	    }
+	    rating.setRating(rawRating);
+		
 	    ratingDAO.saveOrUpdate(rating);
 	    numRatings++;
 	}
@@ -390,23 +406,9 @@ public class RatingService implements IRatingService {
 	criteria.setTitle(title);
 	criteria.setCommentsEnabled(withComments);
 	criteria.setCommentsMinWordsLimit(minWordsInComment);
-	criteria.setMinimumRates(null);
-	criteria.setMaximumRates(null);
-	
-	Integer maxRating = null;
-	switch (ratingStyle) {
-	    case RatingCriteria.RATING_STYLE_STAR:
-		maxRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX;
-		break;
-	    case RatingCriteria.RATING_STYLE_RANKING:
-		maxRating = RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
-		break;
-	    case RatingCriteria.RATING_STYLE_HEDGING:
-	    case RatingCriteria.RATING_STYLE_COMMENT:
-		maxRating = 0;
-		break;
-	}
-	criteria.setMaxRating(maxRating);
+	criteria.setMinimumRates(0);
+	criteria.setMaximumRates(0);
+	criteria.setMaxRating(RatingCriteria.getDefaultMaxRating(ratingStyle));
 	return criteria;
     }
     
@@ -416,7 +418,7 @@ public class RatingService implements IRatingService {
 	LearnerItemRatingCriteria criteria = null;
 	if ( criterias.size() > 0 ) {
 	    for ( RatingCriteria c : criterias ) {
-		if ( c.getOrderId().equals(orderId) )
+		if ( c.getOrderId().equals(orderId) ) {
 		    if ( ! c.isLearnerItemRatingCriteria() ) {
 			String msg = new StringBuilder("Wrong type of criteria found - needs to be a AuthoredItemRatingCriteria for toolContentId ")
 					.append(toolContentId)
@@ -428,6 +430,7 @@ public class RatingService implements IRatingService {
 		    }
 		criteria = (LearnerItemRatingCriteria)c;
 		break;
+		}
 	    }
 	} 
 	criteria = updateLearnerItemRatingCriteria(criteria, toolContentId, title, orderId, ratingStyle, withComments, minWordsInComment);
@@ -476,18 +479,7 @@ public class RatingService implements IRatingService {
 	    
 	    Integer maxRating = WebUtil.readIntParam(request, "maxRating" + i, true);
 	    if (maxRating == null) {
-		switch (ratingStyle) {
-		    case RatingCriteria.RATING_STYLE_STAR:
-			maxRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX;
-			break;
-		    case RatingCriteria.RATING_STYLE_RANKING:
-			maxRating = RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
-			break;
-		    case RatingCriteria.RATING_STYLE_HEDGING:
-		    case RatingCriteria.RATING_STYLE_COMMENT:
-			maxRating = 0;
-			break;
-		}
+		maxRating = RatingCriteria.getDefaultMaxRating(ratingStyle);
 	    }
 
 	    Integer minRatings = 0;

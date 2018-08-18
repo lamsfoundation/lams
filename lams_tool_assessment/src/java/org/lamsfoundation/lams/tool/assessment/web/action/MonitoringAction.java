@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
@@ -40,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -78,6 +76,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
@@ -126,7 +125,13 @@ public class MonitoringAction extends Action {
 	if (param.equals("statistic")) {
 	    return statistic(mapping, form, request, response);
 	}
-	
+	if (param.equals("discloseCorrectAnswers")) {
+	    return discloseCorrectAnswers(mapping, form, request, response);
+	}
+	if (param.equals("discloseGroupsAnswers")) {
+	    return discloseGroupsAnswers(mapping, form, request, response);
+	}
+
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
 
@@ -153,7 +158,8 @@ public class MonitoringAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 
 	}
 
@@ -198,13 +204,13 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	initAssessmentService();
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);	
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	AssessmentResultDTO result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
@@ -270,7 +276,7 @@ public class MonitoringAction extends Action {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -319,10 +325,10 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 
 	Long contentID = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION);
+	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION, true);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
-	// update the session ready for stats tab to be reloaded otherwise flicking between tabs 
+	// update the session ready for stats tab to be reloaded otherwise flicking between tabs
 	// causes the old value to be redisplayed
 	sessionMap.put(AssessmentConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
 
@@ -361,7 +367,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -396,11 +402,12 @@ public class MonitoringAction extends Action {
 	    JSONArray userData = new JSONArray();
 	    userData.put(userDto.getUserId());
 	    userData.put(sessionId);
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 	    userData.put(fullName);
 	    userData.put(userDto.getGrade());
-	    if (userDto.getPortraitId() != null ) 
+	    if (userDto.getPortraitId() != null) {
 		userData.put(userDto.getPortraitId());
+	    }
 
 	    JSONObject userRow = new JSONObject();
 	    userRow.put("id", i++);
@@ -449,7 +456,7 @@ public class MonitoringAction extends Action {
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    AssessmentUser groupLeader = session.getGroupLeader();
 
 	    if (groupLeader != null) {
@@ -490,7 +497,7 @@ public class MonitoringAction extends Action {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
 
 	    JSONArray userData = new JSONArray();
 	    if (questionResultUid != null) {
@@ -499,16 +506,17 @@ public class MonitoringAction extends Action {
 		userData.put(questionResultUid);
 		userData.put(questionResult.getMaxMark());
 		userData.put(fullName);
-		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-		// show confidence levels if this feature is turned ON 
+		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
+		userData.put(questionResult.getMark());
+		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.put(questionResult.getConfidenceLevel());
 		}
-		
-		userData.put(questionResult.getMark());
-		if (userDto.getPortraitId() != null ) 
+		userData.put(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		if (userDto.getPortraitId() != null) {
 		    userData.put(userDto.getPortraitId());
-		
+		}
+
 	    } else {
 		userData.put("");
 		userData.put("");
@@ -538,7 +546,7 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-   /**
+    /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
     private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -554,21 +562,22 @@ public class MonitoringAction extends Action {
 	Long contentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	List<Number> results = null;
-	
-	if ( assessment != null ) {
-	    if ( assessment.isUseSelectLeaderToolOuput() ) {
+
+	if (assessment != null) {
+	    if (assessment.isUseSelectLeaderToolOuput()) {
 		results = service.getMarksArrayForLeaders(contentId);
 	    } else {
 		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
 		results = service.getMarksArray(sessionId);
 	    }
 	}
-	
+
 	JSONObject responseJSON = new JSONObject();
-	if ( results != null )
+	if (results != null) {
 	    responseJSON.put("data", results);
-	else 
+	} else {
 	    responseJSON.put("data", new Float[0]);
+	}
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().write(responseJSON.toString());
@@ -590,14 +599,14 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws IOException {
 	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
 	String fileName = null;
 	boolean showUserNames = true;
 
 	Long contentId = null;
 	List<SessionDTO> sessionDtos;
-	if (sessionMap != null) {
+	if (sessionMapID != null) {
+	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	    showUserNames = true;
@@ -638,7 +647,7 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
-    
+
     private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -650,8 +659,8 @@ public class MonitoringAction extends Action {
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	if ( assessment != null ) {
-	    if ( assessment.isUseSelectLeaderToolOuput() ) {
+	if (assessment != null) {
+	    if (assessment.isUseSelectLeaderToolOuput()) {
 		LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(contentId);
 		sessionMap.put("leaderDto", leaderDto);
 	    } else {
@@ -662,6 +671,51 @@ public class MonitoringAction extends Action {
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
+    /**
+     * Allows displaying correct answers to learners
+     */
+    private ActionForward discloseCorrectAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	question.setCorrectAnswersDisclosed(true);
+	service.updateAssessmentQuestion(question);
+
+	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
+		    + questionUid);
+	}
+
+	return null;
+    }
+
+    /**
+     * Allows displaying other groups' answers to learners
+     */
+    private ActionForward discloseGroupsAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+
+	initAssessmentService();
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	question.setGroupsAnswersDisclosed(true);
+	service.updateAssessmentQuestion(question);
+
+	service.notifyLearnersOnAnswerDisclose(toolContentId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
+		    + " and question ID " + questionUid);
+	}
+
+	return null;
+    }
 
     // *************************************************************************************
     // Private method

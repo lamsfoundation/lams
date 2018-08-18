@@ -1,13 +1,24 @@
 package org.lamsfoundation.lams.gradebook.service;
 
+import java.util.Date;
 import java.util.List;
 
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 public interface IGradebookService {
+
+    /**
+     * Gets all available gradebookUserActivity objects for the specified activity
+     *
+     * @param activityID
+     * @param userID
+     * @return
+     */
+    List<GradebookUserActivity> getGradebookUserActivities(Long activityId);
 
     /**
      * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
@@ -64,7 +75,14 @@ public interface IGradebookService {
     List<GradebookUserLesson> getGradebookUserLesson(Long lessonID);
 
     void removeLearnerFromLesson(Long lessonId, Integer learnerId);
+    
+    void removeActivityMark(Long toolContentID);
+    
+    /**
+     * Delete user activity mark and updates aggregates
+     */
+    void removeActivityMark(Integer userID, Long toolSessionID);
 
-    void archiveLearnerMarks(Long lessonId, Integer learnerId);
+    void archiveLearnerMarks(Long lessonId, Integer learnerId, Date archiveDate);
 
 }

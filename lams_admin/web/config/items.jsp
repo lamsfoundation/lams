@@ -18,6 +18,24 @@
 						<html:hidden property="key" name="key" value="${row.key}"/>
 						<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
 						<c:choose>
+						<c:when test="${row.key == 'ServerCountry'}">
+							<html:select styleId="${row.key}" name="row" property="value" styleClass="form-control form-control-sm">
+								<c:forEach items="${countryCodes}" var="countryCode">
+									<html:option value="${countryCode.key}" >
+										${countryCode.value}
+									</html:option>
+								</c:forEach>
+							</html:select>
+						</c:when>
+						<c:when test="${row.key == 'SMTPAuthSecurity'}">
+							<html:select styleId="${row.key}" name="row" property="value" styleClass="form-control form-control-sm">
+								<c:forEach items="${smtpAuthTypes}" var="authType">
+									<html:option value="${authType.key}" >
+										${authType.value}
+									</html:option>
+								</c:forEach>
+							</html:select>
+						</c:when>
 						<c:when test="${row.format==BOOLEAN}">
 							<html:select styleId="${row.key}" name="row" property="value" styleClass="form-control form-control-sm">
 							<html:option value="true">true</html:option>

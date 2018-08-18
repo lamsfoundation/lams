@@ -158,8 +158,8 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				modalDialog.on('drag', function(event, ui){
 					// pass the event to the dialog, not its internal element
 					dialog.offset({
-						'top'  : ui.offset.top + 5,
-						'left' : ui.offset.left + 5
+						'top'  : Math.min(window.innerHeight - 30, Math.max(0, ui.offset.top + 5)),
+						'left' : Math.min(window.innerWidth - 200, Math.max(0, ui.offset.left + 5))
 					});
 					modalDialog.css({
 						'position' : 'static'
@@ -312,7 +312,7 @@ function moveDialogToTop(id) {
 
 
 //used by both /lams_central/web/main.jsp and /lams_central/web/lti/addlesson.jsp pages
-function showAuthoringDialog(learningDesignID){
+function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 	var dialog = showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 30),
 		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
@@ -340,6 +340,10 @@ function showAuthoringDialog(learningDesignID){
 			$('iframe', this).attr('src', url);
 		}
 	}, true);
+	
+	if (relaunchMonitorLessonID) {
+		dialog.data('relaunchMonitorLessonID', relaunchMonitorLessonID);
+	}
 	
 	// resize the paper when dialog is resized
 	$('.modal-content', dialog).on('resizestop', function() {
@@ -373,7 +377,7 @@ function showNotificationsDialog(orgID, lessonID) {
 		"isCreateInParentWindow" : !isTopLevelWindow,		
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
-			var dialog = $(this),
+			var dialog = this,
 				lessonID = dialog.data('lessonID');
 			// if lesson ID is given, use lesson view; otherwise use course view
 			if (lessonID) {

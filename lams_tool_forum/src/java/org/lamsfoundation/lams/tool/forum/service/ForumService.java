@@ -56,9 +56,12 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -104,7 +107,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  *
@@ -137,7 +139,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     private ForumToolContentHandler forumToolContentHandler;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private MessageService messageService;
 
@@ -160,13 +162,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     @Override
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
     public void setMessageService(MessageService messageService) {
@@ -274,8 +276,15 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public void updateContainedReport(Message message) {
+    public void updateMark(Message message) {
 	messageDao.saveOrUpdate(message);
+	
+	// send marks to gradebook, if marks are released for that session
+	ForumUser user = message.getCreatedBy();
+	ForumToolSession session = user.getSession();
+	if (session.isMarkReleased()) {
+	    sendMarksToGradebook(user, session.getSessionId());
+	}
     }
 
     @Override
@@ -285,14 +294,18 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (message != null) {
 	    Long userId = 0L;
 	    String loginName = "Default";
+	    Long toolContentId = null;
 	    if (message.getCreatedBy() != null) {
 		userId = message.getCreatedBy().getUserId();
 		loginName = message.getCreatedBy().getLoginName();
 	    }
+	    if (message.getToolSession() != null && message.getToolSession().getForum() != null) {
+		toolContentId = message.getToolSession().getForum().getContentId();
+	    }
 	    if (hideFlag) {
-		auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, userId, loginName, message.toString());
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, message.toString());
 	    } else {
-		auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE, userId, loginName, message.toString());
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, message.toString());
 	    }
 
 	    message.setHideFlag(hideFlag);
@@ -400,7 +413,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getTopicThread(Long rootTopicId) {
+    public List<MessageDTO> getTopicThread(Long rootTopicId) {
 	List unsortedThread = messageSeqDao.getCompleteTopic(rootTopicId);
 	Iterator iter = unsortedThread.iterator();
 	MessageSeq msgSeq;
@@ -580,51 +593,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public void releaseMarksForSession(Long sessionID) {
 	// udate release mark date for each message.
-	List<Message> list = messageDao.getBySession(sessionID);
-	Iterator<Message> iter = list.iterator();
+	List<Message> messages = messageDao.getBySession(sessionID);
 	ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
 	Forum forum = session.getForum();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
 		ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId());
-	Map<Integer, StringBuilder> notificationMessages = null;
-	Object[] notificationMessageParameters = null;
-	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<>();
-	    notificationMessageParameters = new Object[3];
-	}
-
-	while (iter.hasNext()) {
-	    Message msg = iter.next();
-	    ForumReport report = msg.getReport();
-	    if (report != null) {
-		report.setDateMarksReleased(new Date());
-		if (notifyLearnersOnMarkRelease) {
-		    ForumUser user = msg.getCreatedBy();
-		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
-		    if (notificationMessage == null) {
-			notificationMessage = new StringBuilder();
-		    }
-		    notificationMessageParameters[0] = msg.getSubject();
-		    notificationMessageParameters[1] = msg.getUpdated();
-		    notificationMessageParameters[2] = report.getMark();
-		    notificationMessage
-			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
-		}
-	    }
-	    messageDao.saveOrUpdate(msg);
-
-	}
-	if (notifyLearnersOnMarkRelease) {
-	    notificationMessageParameters = new Object[1];
-	    for (Integer userID : notificationMessages.keySet()) {
-		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
-		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
-			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
-			notificationMessageParameters);
-
-	    }
-	}
 
 	List<ForumUser> users = getUsersBySessionId(sessionID);
 	if (users != null) {
@@ -634,9 +607,46 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	}
 
-	// update session to set MarkRelease flag.
+	// update session to set MarkRelease flag
 	session.setMarkReleased(true);
 	forumToolSessionDao.saveOrUpdate(session);
+	
+	// notify learners on mark release
+	if (notifyLearnersOnMarkRelease) {
+	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
+
+	    for (Message message : messages) {
+		ForumReport report = message.getReport();
+		if (report != null) {
+		    ForumUser user = message.getCreatedBy();
+		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
+		    if (notificationMessage == null) {
+			notificationMessage = new StringBuilder();
+		    }
+		    Object[] notificationMessageParameters = new Object[3];
+		    notificationMessageParameters[0] = message.getSubject();
+		    notificationMessageParameters[1] = message.getUpdated();
+		    notificationMessageParameters[2] = report.getMark();
+		    notificationMessage
+			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
+		}
+	    }
+
+	    for (Integer userID : notificationMessages.keySet()) {
+		Object[] notificationMessageParameters = new Object[1];
+		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
+		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
+			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
+			notificationMessageParameters);
+
+	    }
+	}
+	
+	//audit log event
+	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionId() + ")"; 
+	String message = messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, forum.getContentId(), null, message);
 
     }
 
@@ -657,6 +667,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    messageRating = new MessageRating();
 	    messageRating.setUser(imageGalleryUser);
 	    messageRating.setMessage(message);
+	}
+	
+	// LDEV-4590 Star Rating can never be more than 5 stars
+	if ( Float.compare(rating, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+	    rating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
 	}
 	messageRating.setRating(rating);
 	messageRatingDao.saveObject(messageRating);
@@ -681,7 +696,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @param map
      * @return
      */
-    private List getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
+    private List<MessageDTO> getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
 	Iterator iter;
 	MessageSeq msgSeq;
 	Message message;
@@ -921,7 +936,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		user.setSessionFinished(false);
 		forumUserDao.save(user);
 
-		toolService.updateActivityMark(null, null, userId, session.getSessionId(), false);
+		toolService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -1154,7 +1169,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;

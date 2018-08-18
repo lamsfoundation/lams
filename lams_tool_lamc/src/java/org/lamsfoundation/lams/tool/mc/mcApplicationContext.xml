@@ -79,7 +79,7 @@
 					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>	
 					<property name="toolService"><ref bean="lamsToolService"/></property>	
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
-					<property name="auditService"><ref bean="auditService"/></property>					
+					<property name="logEventService"><ref bean="logEventService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
 			   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>	

@@ -1,0 +1,424 @@
+/*!
+ * Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ * **LAMS** Heavily customized by LAMS.d
+ */
+
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 150px;
+}
+
+#sidebar-wrapper {
+    z-index: 101;
+    position: fixed;
+    left: 154px;
+    width: 0;
+    height: 100%;
+    margin-left:-154px;
+    overflow-y: auto;
+    background: $main_offcanvas_background;
+    color: $main_offcanvas_color;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+	font-size:20px;
+	text-align:center;
+	color: #eee;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width:154px;
+}
+
+#page-content-wrapper {
+    width:100%;
+    position:absolute;
+    padding: 10px 20px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-right:-154px;
+}
+
+.content {
+	padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 0 0 6px 6px;
+}
+
+#refresh-button {
+	margin-right: 15px;
+}
+
+/* Sidebar Styles */
+
+table.tablesorter {
+	text-align: left;
+	width: 100%;
+}
+
+.tablesorter a:hover {
+	text-decoration: none;
+}
+
+.courses-title {
+    padding-left: 0;
+    word-break: break-all;
+    line-height: 10px;
+    font-size: 19px;
+}
+
+.offcanvas-header {
+    max-height: 160px;
+    overflow-y: hidden;
+}
+
+.tablesorter .active > a,
+.tablesorter .active > a:hover,
+.tablesorter .active > a:focus {
+	background: $main_offcanvas_link;
+}
+.tablesorter .active > a {
+    color: $main_offcanvas_link_color;
+}
+.tablesorter td.active {
+    border-right: 9px solid $brand-primary-bright;
+    background: $main_offcanvas_link;
+}
+.tablesorter a {
+    padding-left: 10px;
+}
+
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    width:154px;
+    margin:0;
+    padding:0;
+    list-style: none;  
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: $body-bg;
+    background: rgba(255,255,255,0.2);
+}
+
+.li.active {
+  border-left: 4px solid $brand-primary;
+  background: #edbae9;
+}
+
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 22px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: $body-bg;
+    background: none;
+}
+
+.top-nav div {
+    padding-top: 13px;
+}
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 154px;
+    }
+
+    #wrapper.toggled {
+        padding-left: 0;
+    }
+
+    #sidebar-wrapper {
+        width: 154px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        width: 0;
+    }
+
+    #page-content-wrapper {
+        position: relative;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-right: 0;
+    }
+   
+   .top-nav div {
+	    padding-top: 20px;
+	}
+
+}
+
+@media (max-width: 500px) {
+
+  h1 {
+    font-size: 20px;
+  }
+  
+  * {
+    font-size: 12px;
+  }
+  
+  .no-gutter > [class*='col-'] {
+    padding-right:5px;
+    padding-left:5px;
+    padding-top:3px;
+  }
+  
+}
+
+.fa bars {
+  background-color: $brand-primary;
+  border-color: $brand-primary;
+}
+
+.btn-gate-open {
+    float: right;
+	padding:5px;
+}
+
+.btn-success {
+    float: right;
+}
+
+.btn-gate-open {
+    background-color:lightgreen;
+    float: right;
+	padding:5px;
+}
+
+
+.timeline {
+    list-style: none;
+    text-align: left;
+}
+
+.timeline > li {
+    margin-left: -40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: $body-bg;   
+    position: relative;
+}
+
+.timeline > li.active {
+    background: $brand-primary-light;   
+}
+
+.timeline > li.active > a {
+	color: $body-bg;
+}
+
+.timeline > li a:hover {
+    text-decoration: none;
+    color: $body-bg;
+}
+
+.timeline > li:hover {
+    color: $body-bg;
+    background: $brand-primary-light;
+}
+ 
+ i.fa.fa-sign-in{
+	 color:#2E6DA4;
+	 font-size:1.2em;
+	 margin-top:-8px;
+	 padding: 3px 5px 3px 5px;
+}
+
+i.fa.fa-check-square{
+     float: right;
+     color:green;
+	 font-size:2.2em;
+	 margin-top:-8px;
+	 padding: 0px 5px 0px 5px;
+}
+
+i.fa.fa-minus-square{
+     float: right;
+     color:red;
+	 font-size:2.2em;
+	 margin-top:-8px;
+	 padding: 3px 5px 3px 5px;
+}
+ 
+i.fa.fa-user{
+	 color:#F0AD4E;
+	 font-size:1.2em;
+	 margin-top:-8px;
+	 padding: 3px 5px 3px 5px;
+ }
+
+ i.fa.fa-users, i.fa.fa-comments {
+	 color:#3F903F;
+	 font-size:1.2em;
+	 margin-top:-8px;
+	 padding: 3px 5px 3px 5px;
+ }
+
+ i.fa.fa-users-at-gate {
+	 color:darkorange;
+	 font-size:1.0em;
+ }
+ 
+ i.fa.fa-question-circle {
+	 color:#D9534F;
+	 font-size:1.2em;
+	 margin-top:-8px;
+     padding: 3px 5px 3px 5px;
+ }
+
+ i.fa.fa-dashboard {
+	 color:#D9534F;
+	 font-size:1.2em;
+	 margin-top:-8px;
+     padding: 3px 5px 3px 5px;
+ }
+ 
+ i.fa.fa-cubes {
+	 color:#D9534F;
+	 font-size:1.2em;
+	 margin-top:-8px;
+     padding: 3px 5px 3px 5px;
+ }
+
+
+.lesson {
+	padding-top:10px;
+	padding-bottom:10px;
+	background-color:#F0F0F0;
+	font-size:0.6em;
+    font-weight: bold;
+}
+
+.form-group {
+	padding:15px;	
+}
+
+.m-r {
+    font-size:0.7em;
+    margin-right: 15px;
+}
+
+.panel-heading a:after {
+    font-family: FontAwesome;
+    content:"\f139";
+    float: right;
+    color: grey;
+}
+.panel-heading a.collapsed:after {
+    content:"\f13a";
+}
+
+.burning-question-title {
+   	cursor: pointer;
+}
+
+.table > tbody > tr > td.success,
+.table > tbody > tr > td.warning,
+.table > tbody > tr > td.normal,
+.table > tbody > tr > td.danger {
+    text-align: center;
+}
+
+.float-left {
+	float: left;
+} 
+.space-right {
+	margin-right: 10px;
+}
+div#sequenceCanvas {
+	text-align: center;
+	overflow: auto;
+	padding: 40px !important;
+}
+div#sequenceCanvas text {
+	font-size: 10px;
+}
+div#sequenceCanvas svg {
+	display: block;
+	overflow: hidden;
+}
+
+.table > tbody > tr > td.danger {
+	background-color: $brand-danger;
+} 
+.table > tbody > tr > td.success {
+	background-color: $brand-success;
+} 
+
+span.user-response {
+	padding: 1px 3px;
+    color: white;
+    border-radius: 3px;
+} 
+
+span.successful-response {
+	background-color: $brand-success;
+} 
+
+span.wrong-response {
+	background-color: $brand-danger;
+} 
+
+#closeBranchingButton {
+	font-weight: inherit !important;
+	margin-left: 7px;
+}
+#disable-sequence-button {
+	display: inline;
+}
+.voffset10 {
+  margin-top: 10px;
+}
+
+.burning-question-description div, .burning-question-count {
+	display: inline; 
+}
+
+.disclose-button-group {
+	margin-top: -2px;
+}
+
+.disclose-all-button-group {
+	margin-bottom: 10px;
+}

@@ -61,6 +61,8 @@ public class NbAuthoringForm extends ActionForm {
 
     private boolean allowComments;
     private boolean commentsLikeAndDislike;
+    private boolean allowAnonymous;
+
     private boolean reflectOnActivity;
     private String reflectInstructions;
 
@@ -95,6 +97,14 @@ public class NbAuthoringForm extends ActionForm {
 
     public void setCommentsLikeAndDislike(boolean commentsLikeAndDislike) {
 	this.commentsLikeAndDislike = commentsLikeAndDislike;
+    }
+
+    public boolean isAllowAnonymous() {
+	return allowAnonymous;
+    }
+
+    public void setAllowAnonymous(boolean allowAnonymous) {
+	this.allowAnonymous = allowAnonymous;
     }
 
     public boolean getReflectOnActivity() {
@@ -209,6 +219,7 @@ public class NbAuthoringForm extends ActionForm {
 	setBasicContent(nbContent.getContent());
 	setAllowComments(nbContent.isAllowComments());
 	setCommentsLikeAndDislike(nbContent.isCommentsLikeAndDislike());
+	setAllowAnonymous(nbContent.isAllowAnonymous());
 	setReflectOnActivity(nbContent.getReflectOnActivity());
 	setReflectInstructions(nbContent.getReflectInstructions());
     }
@@ -218,6 +229,7 @@ public class NbAuthoringForm extends ActionForm {
 	nbContent.setContent(getBasicContent());
 	nbContent.setAllowComments(isAllowComments());
 	nbContent.setCommentsLikeAndDislike(isCommentsLikeAndDislike());
+	nbContent.setAllowAnonymous(isAllowAnonymous());
 	nbContent.setReflectOnActivity(getReflectOnActivity());
 	nbContent.setReflectInstructions(getReflectInstructions());
 	nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
@@ -230,5 +242,6 @@ public class NbAuthoringForm extends ActionForm {
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
     }
+
 
 }

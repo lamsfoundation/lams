@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -72,6 +74,20 @@ public interface ILearnerService {
      */
     void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress);
     
+    /**
+     * Marks an tool session as complete and calculates the next activity against the learning design. This method is
+     * for tools to redirect the client on complete.
+     *
+     * Do not change learnerId to Integer (to match the other calls) as all the tools expect this to be a Long.
+     *
+     * @param toolSessionId
+     *            , session ID for completed tool
+     * @param learnerId
+     *            the learner who is completing the tool session.
+     * @return the URL for the next activity
+     * @throws LearnerServiceException
+     *             in case of problems.
+     */
     String completeToolSession(Long toolSessionId, Long learnerId);
 
     /**
@@ -157,4 +173,6 @@ public interface ILearnerService {
     ActivityPositionDTO getActivityPositionByToolSessionId(Long toolSessionId);
 
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
+
+    void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand);
 }

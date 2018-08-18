@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -93,6 +93,33 @@ function initLessonTab(){
 	});
 	
 	$('#openImButton').click(openChatWindow);
+
+	//turn to inline mode for x-editable.js
+	$.fn.editable.defaults.mode = 'inline';
+	//enable renaming of lesson title  
+	$('#lesson-name-strong').editable({
+	    type: 'text',
+	    pk: lessonId,
+	    url: LAMS_URL + 'monitoring/monitoring.do?method=renameLesson',
+	    validate: function(value) {
+		    //close editing area on validation failure
+            if (!value.trim()) {
+                $('.editable-open').editableContainer('hide', 'cancel');
+                return 'Can not be empty!';
+            }
+        },
+	    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+	    success: function(response, newValue) {
+	        if(response.status == 'error') {
+	        	return response.msg; //msg will be shown in editable form
+	        }
+	    }
+    //hide and show pencil on showing and hiding editing widget
+	}).on('shown', function(e, editable) {
+		$(this).nextAll('i.fa-pencil').hide();
+	}).on('hidden', function(e, reason) {
+		$(this).nextAll('i.fa-pencil').show();
+	});
 	
 	// sets up calendar for schedule date choice
 	$('#scheduleDatetimeField').datetimepicker({
@@ -106,7 +133,7 @@ function initLessonTab(){
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
-		'width'     : 510,
+		'width'     : 950,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'open'      : function(){
@@ -219,8 +246,13 @@ function lessonStateFieldChanged() {
 	switch (state) {
 		//'disable' is chosen
 		case 4: 
-			$('#lessonDisableApply').show();
+			$('#lessonScheduler').show();
+			$('#lessonStartApply').hide();
 			$('#lessonStateApply').hide();
+			$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
+			$("#scheduleDisableLessonButton").css('display', 'inline'); // must be inline or it will be wrong size
+			$("#disableLessonButton").show();
+			$('#lessonDisableApply').show();
 			break;
 		default:
 			$('#lessonDisableApply').hide();
@@ -233,6 +265,7 @@ function lessonStateFieldChanged() {
  * Apply the lesson state change and update widgets.
  */
 function changeLessonState(){
+	
 	var method = null;
 	
 	//state chosen in the dropdown menu
@@ -278,7 +311,11 @@ function changeLessonState(){
 function scheduleDisableLesson() {
 	var date = $('#disableDatetimeField').val();
 	if (date) {
-		applyStateChange(4, "suspendLesson", date);
+		if ( checkScheduleDate(lessonStartDate, date) ) {
+			applyStateChange(4, "suspendLesson", date);
+		} else {
+			alert(LABELS.LESSON_ERROR_START_END_DATE);
+		}
 	} else {
 		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
 	}
@@ -288,13 +325,13 @@ function disableLesson() {
 	applyStateChange(4, "suspendLesson");
 }			
 
-function applyStateChange(state, method, lessonEndDate) {
+function applyStateChange(state, method, newLessonEndDate) {
 	var params = {
 			'method'    : method,
 			'lessonID'  : lessonId,
 		};
-	if ( lessonEndDate ) {
-		params.lessonEndDate = lessonEndDate;
+	if ( newLessonEndDate ) {
+		params.lessonEndDate = newLessonEndDate;
 	}
 	
 	$.ajax({
@@ -308,6 +345,9 @@ function applyStateChange(state, method, lessonEndDate) {
 			} else {
 				refreshMonitor('lesson');
 			}
+			if ( state == 4 ) {
+				lessonEndDate = newLessonEndDate;
+			} 	
 		}
 	});
 }
@@ -368,7 +408,9 @@ function updateLessonTab(){
 			selectField.children('option:not([value="-1"])').remove();
 			switch (lessonStateId) {
 				case 3:
-					$('<option />').attr('value', 4).text(LABELS.LESSON_STATE_ACTION_DISABLE).appendTo(selectField);
+					if ( ! ( lessonEndDate && lessonEndDate > "") ) {
+						$('<option />').attr('value', 4).text(LABELS.LESSON_STATE_ACTION_DISABLE).appendTo(selectField);
+					}
 					$('<option />').attr('value', 6).text(LABELS.LESSON_STATE_ACTION_ARCHIVE).appendTo(selectField);
 					$('<option />').attr('value', 7).text(LABELS.LESSON_STATE_ACTION_REMOVE).appendTo(selectField);
 					break;
@@ -386,7 +428,7 @@ function updateLessonTab(){
 			}
 			
 			// show/remove widgets for lesson scheduling
-			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler'),
+			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler, #scheduleDisableLessonButton, #disableLessonButton'),
 				startDateField = $('#lessonStartDateSpan'),
 				lessonFinishDateSpan = $('#lessonFinishDateSpan'),
 				disableDateSpan = $('#lessonDisableApply'),
@@ -396,6 +438,11 @@ function updateLessonTab(){
 				//created but not started lesson
 				case 1:
 					scheduleControls.css('display','inline');
+				 	if ( response.finishDate ) {
+				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
+						$("#disableLessonButton").css('display', 'none');
+				 	}
 					startDateField.hide();
 					lessonFinishDateSpan.hide();
 					lessonStateChanger.hide();
@@ -404,26 +451,37 @@ function updateLessonTab(){
 				case 2:
 					scheduleControls.css('display','inline');
 					startDateField.text(LABELS.LESSON_START.replace("%0",response.startDate)).add('#startLessonButton').css('display','inline');
-					lessonFinishDateSpan.hide();
+					$("#scheduleLessonButton").html(LABELS.RESCHEDULE);
+				 	if ( response.finishDate ) {
+				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','block');
+						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
+						$("#disableLessonButton").css('display', 'none');
+				 	} else {
+				 		lessonFinishDateSpan.css('display','none');
+				 	}
 					lessonStateChanger.hide();
 					break;
 				//started lesson
-				default: 			
-					scheduleControls.hide();
-				 	startDateField.text(response.startDate).hide();
+				default: 	
+					startDateField.text("").css('display','none'); // we may have just started the lesson and needed to clear the scheduled date message
 				 	if ( response.finishDate ) {
+						scheduleControls.css('display','inline');
+						$("#lessonStartApply").css('display','none');
 				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
 				 	} else {
+						scheduleControls.css('display','none');
+						$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
 				 		lessonFinishDateSpan.text("").css('display','none');
 				 	}
-				 	disableDateSpan.hide();
+
 				 	lessonStateChanger.css('display','inline');
 				 	stateLabel.attr('title',response.startDate);
 				 	break;
 			}
 			
 			updateContributeActivities(response.contributeActivities);
-			$('.lead','#tabLessonLessonName').html('<strong>'+response.lessonName+'</strong>');
+			$('#lesson-name-strong').html(response.lessonName);
 			$('#description').html(response.lessonDescription);
 		}
 	});
@@ -435,22 +493,33 @@ function updateLessonTab(){
 	updatePresenceAvailableCount();
 }
 
+function checkScheduleDate(startDateString, endDateString) {
+	var startDate = startDateString && startDateString > "" ? Date.parse(startDateString) : 0;
+	var endDate =  endDateString && endDateString > "" ? Date.parse(endDateString) : 0;
+	return ( endDate == 0 || startDate < endDate );
+}
 
 function scheduleLesson(){
+	
 	var date = $('#scheduleDatetimeField').val();
 	if (date) {
-		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
-			cache : false,
-			data : {
-				'method'          : 'startOnScheduleLesson',
-				'lessonID'        : lessonId,
-				'lessonStartDate' : date
-			},
-			success : function() {
-				refreshMonitor('lesson');
-			}
-		});
+		if ( checkScheduleDate (date, lessonEndDate) ) {
+			$.ajax({
+				url : LAMS_URL + 'monitoring/monitoring.do',
+				cache : false,
+				data : {
+					'method'          : 'startOnScheduleLesson',
+					'lessonID'        : lessonId,
+					'lessonStartDate' : date
+				},
+				success : function() {
+					lessonStartDate = date;
+					refreshMonitor('lesson');
+				}
+			});
+		} else {
+			alert(LABELS.LESSON_ERROR_START_END_DATE);
+		}
 	} else {
 		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
 	}
@@ -564,6 +633,7 @@ function updateContributeActivities(contributeActivities) {
 				switch(this.contributionType) {
 					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
+					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
 					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 				}
@@ -935,7 +1005,7 @@ function initSequenceTab(){
 	});
 
 	// small info box on Sequence tab, activated when the tab is showed
-	showDialog('sequenceInfoDialog', {
+	var sequenceInfoDialog = showDialog('sequenceInfoDialog', {
 		'autoOpen'   : false,
 		'width'      : 300,
 		'modal'      : false, 
@@ -956,7 +1026,8 @@ function initSequenceTab(){
 				'of' : '#sequenceCanvas'
 			}
 		}
-	}, false).click(function(){
+	}, false);
+	$(sequenceInfoDialog).click(function(){
 		$('#sequenceInfoDialog').modal('hide');
 	}).find('.modal-header').remove();
 	
@@ -1813,7 +1884,7 @@ function openLiveEdit(){
 				if (response) {
 					alert(response);
 				} else {
-					window.parent.showAuthoringDialog(ldId, 'editonfly');
+					window.parent.showAuthoringDialog(ldId, lessonId);
 					closeMonitorLessonDialog();
 				}
 			}
@@ -2306,8 +2377,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
  * Formats learner name.
  */
 function getLearnerDisplayName(learner, raw) {
-	return raw ? learner.firstName + ' ' + learner.lastName + ' (' + learner.login + ')'
-			   : escapeHtml(learner.firstName) + ' ' + escapeHtml(learner.lastName) + ' (' + escapeHtml(learner.login) + ')';
+	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')'
+			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')';
 }
 
 

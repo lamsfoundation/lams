@@ -37,7 +37,7 @@ public class SbmtConstants {
 
     public static final String USER_ID = "userID";
 
-    public static final String PAGE_EDITABLE = "isPageEditable";
+    public static final String CONTENT_IN_USE = "isContentInUse";
 
     public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 
@@ -86,6 +86,8 @@ public class SbmtConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";    
+    
+    public static final String ATTR_IS_MARKS_RELEASED = "isMarksReleased";
     
     public static final String ATTR_SUBMIT_FILES = "submittedFilesMap";
     

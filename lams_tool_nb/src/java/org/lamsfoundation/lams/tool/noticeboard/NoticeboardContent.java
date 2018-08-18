@@ -80,6 +80,9 @@ public class NoticeboardContent implements Serializable {
     /** nullable persistent field */
     private boolean commentsLikeAndDislike;
 
+    /** nullable persistent field */
+    private boolean allowAnonymous;
+    
     /** persistent field */
     private Set<NoticeboardSession> nbSessions = new HashSet<NoticeboardSession>();
 
@@ -90,7 +93,8 @@ public class NoticeboardContent implements Serializable {
     /** full constructor */
     public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater,
 	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId,
-	    Date dateCreated, Date dateUpdated, boolean allowComments, boolean commentsLikeAndDislike) {
+	    Date dateCreated, Date dateUpdated, boolean allowComments, boolean commentsLikeAndDislike,
+	    boolean allowAnonymous) {
 	this.nbContentId = nbContentId;
 	this.title = title;
 	this.content = content;
@@ -103,6 +107,7 @@ public class NoticeboardContent implements Serializable {
 	this.dateUpdated = dateUpdated;
 	this.allowComments = allowComments;
 	this.commentsLikeAndDislike = commentsLikeAndDislike;
+	this.allowAnonymous = allowAnonymous;
     }
 
     /**
@@ -123,6 +128,7 @@ public class NoticeboardContent implements Serializable {
 	this.dateUpdated = null;
 	this.allowComments = false;
 	this.commentsLikeAndDislike = false;
+	this.allowAnonymous = false;
     }
 
     /**
@@ -254,6 +260,14 @@ public class NoticeboardContent implements Serializable {
 	this.commentsLikeAndDislike = commentsLikeAndDislike;
     }
 
+    public boolean isAllowAnonymous() {
+	return allowAnonymous;
+    }
+
+    public void setAllowAnonymous(boolean allowAnonymous) {
+	this.allowAnonymous = allowAnonymous;
+    }
+
     /**
      *
      */
@@ -320,9 +334,10 @@ public class NoticeboardContent implements Serializable {
 	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
 		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(), nb.isContentInUse(),
 		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments(),
-		nb.isCommentsLikeAndDislike());
+		nb.isCommentsLikeAndDislike(), nb.isAllowAnonymous());
 
 	return newContent;
     }
+
 
 }

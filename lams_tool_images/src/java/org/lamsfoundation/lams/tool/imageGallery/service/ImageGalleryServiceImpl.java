@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -96,7 +97,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 
 /**
@@ -135,7 +135,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     private ILamsToolService toolService;
 
-    private IAuditService auditService;
+    private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
 
@@ -301,7 +301,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public void toggleImageVisibility(Long itemUid) {
+    public void toggleImageVisibility(Long itemUid, Long toolContentId) {
 	ImageGalleryItem image = imageGalleryItemDao.getByUid(itemUid);
 	if (image != null) {
 	    boolean isHidden = image.isHide();
@@ -312,9 +312,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    Long userId = image.getCreateBy() == null ? 0L : image.getCreateBy().getUserId();
 	    String loginName = image.getCreateBy() == null ? "No user" : image.getCreateBy().getLoginName();
 	    if (isHidden) {
-		auditService.logShowEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, image.toString());
+		logEventService.logShowLearnerContent(userId, loginName, toolContentId, image.toString());
 	    } else {
-		auditService.logHideEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, image.toString());
+		logEventService.logHideLearnerContent(userId, loginName, toolContentId, image.toString());
 	    }
 	}
     }
@@ -651,8 +651,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setMessageService(MessageService messageService) {

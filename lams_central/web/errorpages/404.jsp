@@ -8,8 +8,8 @@
 </c:set>
 
 <!DOCTYPE html>
-
-<lams:html>
+<!-- CUSTOMERRORPAGE404: authoring templates string -->
+ <lams:html>
 	<lams:head>
 		<title><fmt:message key="404.title" /></title>
 		<lams:css />

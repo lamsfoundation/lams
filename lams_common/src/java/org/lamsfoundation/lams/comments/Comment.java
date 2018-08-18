@@ -54,6 +54,7 @@ public class Comment implements Cloneable {
     private boolean hideFlag;
     private boolean sticky;
     private boolean monitor;
+    private boolean anonymous;
 
     private Comment rootComment;
     private Comment threadComment;
@@ -191,6 +192,14 @@ public class Comment implements Cloneable {
 	this.sticky = sticky;
     }
 
+    public boolean isAnonymous() {
+	return anonymous;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+	this.anonymous = anonymous;
+    }
+
     public Comment getParent() {
 	return parent;
     }
@@ -257,7 +266,7 @@ public class Comment implements Cloneable {
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("uid", uid).append("body", body).toString();
+	return new ToStringBuilder(this).append("uid", uid).append(" body", body).toString();
     }
 
 }

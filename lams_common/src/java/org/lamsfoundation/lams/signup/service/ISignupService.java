@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.signup.service;
 
 import java.util.List;
@@ -47,4 +46,6 @@ public interface ISignupService {
     void signinUser(String login, String context);
 
     User getUserByLogin(String login);
+
+    boolean emailVerify(String login, String hash);
 }

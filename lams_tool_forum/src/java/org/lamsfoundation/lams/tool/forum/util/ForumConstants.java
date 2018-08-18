@@ -87,6 +87,8 @@ public interface ForumConstants {
 
     public static final String ATTR_ALLOW_RATE_MESSAGES = "allowRateMessages";
 
+    public static final String ATTR_ALLOW_ANONYMOUS = "allowAnonym";
+
     public static final String ATTR_MINIMUM_RATE = "minimumRate";
 
     public static final String ATTR_MAXIMUM_RATE = "maximumRate";

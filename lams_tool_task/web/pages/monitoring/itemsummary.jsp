@@ -94,23 +94,18 @@
 </lams:head>
 	
 <body class="stripes">
-	<div id="content">
 
-		<h2>
-			<fmt:message key="label.monitoring.tasksummary.task.summary" />
-		</h2>
+	<c:set var="title"><fmt:message key="label.monitoring.tasksummary.task.summary" /></c:set>
+	<lams:Page type="admin" title="${title}">
+
+		<h4><c:out value="${item.title}" escapeXml="true"/></h4>
 				
-		<div>
-			<c:out value="${item.title}" escapeXml="true"/>
-				
-			<c:if test="${item.required}">
-					(<fmt:message key="label.monitoring.tasksummary.task.required.to.finish" />)
-			</c:if>				
-		</div>
-		<br/>
-				
+		<c:if test="${item.required}">
+		<div><em><fmt:message key="label.monitoring.tasksummary.task.required.to.finish" /></em></div>
+		</c:if>				
+
 		<c:if test="${item.childTask || item.commentsFilesAllowed || item.commentsAllowed || item.filesAllowed}">
-			<ul>
+			<ul class="list-unstyled">
 				<c:if test="${item.childTask}">
 					<li>
 						(<fmt:message key="label.monitoring.tasksummary.parent.activity" />: ${item.parentTaskName})
@@ -152,30 +147,40 @@
 				</c:if>
 			</ul>
 		</c:if>
-		<br>
-		<br>
 			
+			
+		<c:if test="${sessionMap.isGroupedActivity}">
+			<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+		</c:if>
+
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
+
+		<c:if test="${sessionMap.isGroupedActivity}">	
+		    <div class="panel panel-default" >
+		       <div class="panel-heading" id="heading${sessionDto.sessionId}">
+		       	<span class="panel-title collapsable-icon-left">
+		       	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
+				<fmt:message key="monitoring.label.group" />&nbsp;${sessionDto.sessionName}</a>
+				</span>
+		       </div>
+		       
+		       <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionId}">
+		</c:if>
 		
-			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<div style="padding-bottom: 5px; font-size: small;">
-						<B><fmt:message key="monitoring.label.group" /></B> ${sessionDto.sessionName}
-					</div>
-				</c:if>
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<h1>
-						<fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}
-					</h1>
-				</c:if>
-					
-				<table id="group${sessionDto.sessionId}"></table>
-				<div id="pager-${sessionDto.sessionId}"></div>
-			</div>
+		<table id="group${sessionDto.sessionId}"></table>
+		<div id="pager-${sessionDto.sessionId}"></div>
+
+
+		<c:if test="${sessionMap.isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+		${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 							
 		</c:forEach>
 
-	</div>
+	</lams:Page>
 	<!--closes content-->
 	
 	<div id="footer">

@@ -20,7 +20,7 @@
 	<div class="col-xs-12 col-sm-offset-2 col-sm-8">
 		<div id="${idName}" class="alert alert-info leader-display">
 			<h4><fmt:message key="${messageKey}">
-				<fmt:param>${username}</fmt:param>
+				<fmt:param><c:out value="${username}" escapeXml="true"/></fmt:param>
 			</fmt:message>&nbsp;
 			<lams:Portrait userId="${userId}"/></h4>
 		</div>

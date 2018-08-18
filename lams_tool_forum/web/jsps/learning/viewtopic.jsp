@@ -19,7 +19,6 @@
 	<title><fmt:message key="activity.title" /></title>
 
 	<!-- ********************  CSS ********************** -->
-
 	<lams:css />
 	<lams:css suffix="jquery.jRating"/>
 	<lams:css suffix="treetable"/>
@@ -30,10 +29,10 @@
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 
 	<script type="text/javascript">
-			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
-			//var for jquery.jRating.js
-			var pathToImageFolder = "${lams}images/css/";
-		</script>
+		var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
+		//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/";
+	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
@@ -42,21 +41,20 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 	<script type="text/javascript">
-			$(document).ready(function(){
-				$.ajaxSetup({ cache: true });
-				setupJRatingSetPath();
-			});
+		$(document).ready(function(){
+			$.ajaxSetup({ cache: true });
+			setupJRatingSetPath();
+		});
 				
-			function setupJRatingSetPath() {
-				setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
-			}
+		function setupJRatingSetPath() {
+			setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+		}
 			
-			function refreshTopic(){
-				var reqIDVar = new Date();
-				location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=" />"+reqIDVar.getTime();;
-			}
-		</script>
-
+		function refreshTopic(){
+			var reqIDVar = new Date();
+			location.href= "<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=" />"+reqIDVar.getTime();;
+		}
+	</script>
 </lams:head>
 <body class="stripes">
 	<lams:Page type="learner" title="${sessionMap.title}">

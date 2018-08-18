@@ -115,6 +115,7 @@
 				});
 				
 				$(".toggle-image-visibility").click(function() {
+					debugger;
 					var imageToggleLink = $(this);
 					var imageUid = $(this).data("image-uid");
 					
@@ -122,7 +123,8 @@
 				    	type: 'POST',
 				    	url: "<c:url value='/monitoring/toggleImageVisibility.do'/>",
 				    	data : {
-							'imageUid' : imageUid
+							'imageUid' : imageUid,
+							'sessionMapID' : '${sessionMapID}'
 						},
 				    	success: function(data) {
 				    		var isHidden = imageToggleLink.data("is-hidden");

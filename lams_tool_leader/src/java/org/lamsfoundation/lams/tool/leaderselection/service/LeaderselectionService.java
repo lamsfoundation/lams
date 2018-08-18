@@ -322,9 +322,9 @@ public class LeaderselectionService
     /* ********** ILeaderselectionService Methods ********************************* */
 
     @Override
-    public void setGroupLeader(Long userUid, Long toolSessionId) throws JSONException, IOException {
+    public boolean setGroupLeader(Long userUid, Long toolSessionId) throws JSONException, IOException {
 	if ((userUid == null) || (toolSessionId == null)) {
-	    return;
+	    return false;
 	}
 
 	LeaderselectionSession session = getSessionBySessionId(toolSessionId);
@@ -332,11 +332,12 @@ public class LeaderselectionService
 	if ((session == null) || (newLeader == null)) {
 	    LeaderselectionService.logger
 		    .error("Wrong parameters supplied. SessionId=" + toolSessionId + " UserId=" + userUid);
-	    return;
+	    return false;
 	}
 
 	session.setGroupLeader(newLeader);
 	saveOrUpdateSession(session);
+	return true;
     }
 
     @Override
@@ -435,6 +436,11 @@ public class LeaderselectionService
     @Override
     public LeaderselectionUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return leaderselectionUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+    }
+    
+    @Override
+    public LeaderselectionUser getUserByUserIdAndContentId(Long userId, Long toolContentId) {
+	return leaderselectionUserDAO.getByUserIdAndContentId(userId, toolContentId);
     }
 
     @Override

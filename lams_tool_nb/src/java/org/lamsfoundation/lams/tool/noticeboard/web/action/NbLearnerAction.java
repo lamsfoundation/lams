@@ -195,6 +195,7 @@ public class NbLearnerAction extends LamsDispatchAction {
 	request.setAttribute("title", nbContent.getTitle());
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
+	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
 
 	// get the existing reflection entry
 	NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,

@@ -31,7 +31,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -46,6 +45,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author jliew
@@ -118,7 +118,7 @@ public class UserSearchAction extends LamsDispatchAction {
 	    sortOrder = isSort5.equals(0) ? "ASC" : "DESC";
 	}
 
-	List<UserDTO> userDtos = service.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
+	List<UserDTO> userDtos = service.getAllUsers(page, size, sortBy, sortOrder, searchString);
 
 	JSONObject responcedata = new JSONObject();
 	responcedata.put("total_rows", service.getCountUsers(searchString));
@@ -128,14 +128,15 @@ public class UserSearchAction extends LamsDispatchAction {
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("userId", userDto.getUserID());
-	    responseRow.put("login", StringEscapeUtils.escapeHtml(userDto.getLogin()));
+	    responseRow.put("login", HtmlUtils.htmlEscape(userDto.getLogin()));
 	    String firstName = userDto.getFirstName() == null ? "" : userDto.getFirstName();
-	    responseRow.put("firstName", StringEscapeUtils.escapeHtml(firstName));
+	    responseRow.put("firstName", HtmlUtils.htmlEscape(firstName));
 	    String lastName = userDto.getLastName() == null ? "" : userDto.getLastName();
-	    responseRow.put("lastName", StringEscapeUtils.escapeHtml(lastName));
+	    responseRow.put("lastName", HtmlUtils.htmlEscape(lastName));
 	    String email = userDto.getEmail() == null ? "" : userDto.getEmail();
-	    responseRow.put("email", StringEscapeUtils.escapeHtml(email));
-
+	    responseRow.put("email", HtmlUtils.htmlEscape(email));
+	    if ( userDto.getPortraitUuid() != null )
+		responseRow.put("portraitId", userDto.getPortraitUuid());
 	    rows.put(responseRow);
 	}
 	responcedata.put("rows", rows);

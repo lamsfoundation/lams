@@ -13,9 +13,9 @@
 
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
-		<c:forEach var="option" items="${question.optionDtos}">
+		<c:forEach var="option" items="${question.optionDtos}"  varStatus="answerStatus">
 			<tr>
-				<td class="has-radio-button">
+				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
 							<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}"
@@ -30,9 +30,12 @@
 							/>
 						</c:otherwise>
 					</c:choose>
+			 		<c:if test="${question.prefixAnswersWithLetters}">
+			 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
+ 	                </c:if>				
 				</td>
 				
-				<td>
+				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
 			</tr>

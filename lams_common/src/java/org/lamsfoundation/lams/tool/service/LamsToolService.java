@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -61,7 +62,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * @author Jacky Fang
@@ -74,12 +74,12 @@ public class LamsToolService implements ILamsToolService {
 
     // Leader selection tool Constants
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
-    
+
     private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
     private static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     private IActivityDAO activityDAO;
-    private IAuditService auditService;
+    private ILogEventService logEventService;
     private IToolDAO toolDAO;
     private IToolSessionDAO toolSessionDAO;
     private IToolContentDAO toolContentDAO;
@@ -149,6 +149,11 @@ public class LamsToolService implements ILamsToolService {
 	gradebookService.updateGradebookUserActivityMark(mark, feedback, userID, toolSessionID, markedInGradebook);
     }
 
+    @Override
+    public void removeActivityMark(Integer userID, Long toolSessionID) {
+	gradebookService.removeActivityMark(userID, toolSessionID);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public Boolean isGroupedActivity(long toolContentID) {
@@ -160,7 +165,7 @@ public class LamsToolService implements ILamsToolService {
 
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-	auditService.logStartEditingActivityInMonitor(toolContentID);
+	logEventService.logStartEditingActivityInMonitor(toolContentID);
     }
 
     @Override
@@ -172,12 +177,18 @@ public class LamsToolService implements ILamsToolService {
 
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
+	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+	ActivityEvaluation evaluation = toolActivity.getEvaluation();
+
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
+	    if (evaluation != null) {
+		toolActivity.setEvaluation(null);
+		activityDAO.delete(evaluation);
+	    }
+	    gradebookService.removeActivityMark(toolContentId);
 	    return;
 	}
 
-	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	ActivityEvaluation evaluation = toolActivity.getEvaluation();
 	boolean isToolOutputDefinitionChanged = true;
 	if (evaluation == null) {
 	    evaluation = new ActivityEvaluation();
@@ -298,7 +309,7 @@ public class LamsToolService implements ILamsToolService {
 		return activity;
 	    }
 
-	//in case of a floating activity
+	    //in case of a floating activity
 	} else if (activityClass.equals(FloatingActivity.class)) {
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
 	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
@@ -343,34 +354,36 @@ public class LamsToolService implements ILamsToolService {
 
 	return null;
     }
-    
+
     @Override
     public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
 	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	
+
 	//if specifiedActivity is null - most likely author hasn't saved the sequence yet
 	if (specifiedActivity == null) {
 	    return null;
 	}
-	
+
 	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<Long>();
 	findPrecedingConfidenceProvidingActivities(specifiedActivity, confidenceProvidingActivityIds);
-	
+
 	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<ToolActivity>();
 	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
-	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO.getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
+	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO
+		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
 	    confidenceProvidingActivities.add(confidenceProvidingActivity);
 	}
 
 	return confidenceProvidingActivities;
     }
-    
+
     /**
      * Finds all preceding activities that can provide confidence levels (currently only Assessment and MCQ provide
      * them). Please note, it does not check whether enableConfidenceLevels advanced option is ON in those activities.
      */
     @SuppressWarnings("rawtypes")
-    private void findPrecedingConfidenceProvidingActivities(Activity activity, Set<Long> confidenceProvidingActivityIds) {
+    private void findPrecedingConfidenceProvidingActivities(Activity activity,
+	    Set<Long> confidenceProvidingActivityIds) {
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
 	if (activityClass.equals(ToolActivity.class)) {
@@ -391,7 +404,7 @@ public class LamsToolService implements ILamsToolService {
 		confidenceProvidingActivityIds.add(toolActivity.getActivityId());
 	    }
 
-	//in case of a floating activity - return all available confidence providing activities
+	    //in case of a floating activity - return all available confidence providing activities
 	} else if (activityClass.equals(FloatingActivity.class)) {
 	    Set<Activity> activities = activity.getLearningDesign().getActivities();
 	    for (Activity activityIter : activities) {
@@ -421,10 +434,10 @@ public class LamsToolService implements ILamsToolService {
 	    return;
 	}
     }
-    
+
     @Override
-    public List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
-	    Long requestorToolSessionId) {
+    public List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid,
+	    Integer requestorUserId, Long requestorToolSessionId) {
 	User user = (User) activityDAO.find(User.class, requestorUserId);
 	if (user == null) {
 	    throw new ToolException("No user found for userId=" + requestorUserId);
@@ -439,7 +452,8 @@ public class LamsToolService implements ILamsToolService {
 		requestorSession.getToolActivity().getLearningDesign());
 	ToolSession confidenceLevelSession = toolSessionDAO.getToolSessionByLearner(user, confidenceLevelActivity);
 
-	List<ConfidenceLevelDTO> confidenceLevelDtos = lamsCoreToolService.getConfidenceLevelsByToolSession(confidenceLevelSession);
+	List<ConfidenceLevelDTO> confidenceLevelDtos = lamsCoreToolService
+		.getConfidenceLevelsByToolSession(confidenceLevelSession);
 
 	return confidenceLevelDtos;
     }
@@ -466,8 +480,8 @@ public class LamsToolService implements ILamsToolService {
 	this.activityDAO = activityDAO;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {

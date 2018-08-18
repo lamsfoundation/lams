@@ -177,6 +177,44 @@
         redirect="false"
       />
     </action>
+	<action
+      path="/tblmonitor"
+      type="org.lamsfoundation.lams.monitoring.web.TblMonitoringAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="tblmonitor"
+        path="/tblmonitor/tblmonitor.jsp"
+        redirect="false"
+      />
+      <forward
+        name="teams"
+        path="/tblmonitor/teams.jsp"
+        redirect="false"
+      />
+      <forward
+        name="gates"
+        path="/tblmonitor/gates.jsp"
+        redirect="false"
+      />
+      <forward
+        name="forum"
+        path="/tblmonitor/forum.jsp"
+        redirect="false"
+      />
+      <forward
+        name="peerreview"
+        path="/tblmonitor/peerreview.jsp"
+        redirect="false"
+      />
+      <forward
+        name="sequence"
+        path="/tblmonitor/sequence.jsp"
+        redirect="false"
+      />
+    </action>
     <action
       path="/toolBranching"
       type="org.lamsfoundation.lams.monitoring.web.ToolOutputBranchingAction"

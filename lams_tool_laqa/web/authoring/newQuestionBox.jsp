@@ -23,7 +23,7 @@
 				</label>
 			</div>
 
-			<a data-toggle="collapse" data-target="#extra"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.other.options"/></a>
+			<a data-toggle="collapse" data-target="#extra" href="#xta"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.other.options"/></a>
 <div id="extra" class="panel-body collapse" >  	        
 	<div class="form-group form-inline">
 	  	<label for="minWordsLimit">

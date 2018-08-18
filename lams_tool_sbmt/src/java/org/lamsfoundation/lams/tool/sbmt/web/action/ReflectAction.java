@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.sbmt.web.action;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,9 +26,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- *
  * @author steven
- *
  */
 public class ReflectAction extends Action {
 
@@ -51,12 +48,6 @@ public class ReflectAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -96,12 +87,6 @@ public class ReflectAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -148,13 +133,7 @@ public class ReflectAction extends Action {
 	ActionErrors errors = new ActionErrors();
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Integer userID = user.getUserID();
-
-	List list = submitFilesService.getFilesUploadedByUser(userID, sessionId, request.getLocale(), false);
 	int minUpload = (Integer) sessionMap.get(SbmtConstants.PARAM_MIN_UPLOAD);
 	if (minUpload > 0) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.learning.minimum.upload.number.less"));

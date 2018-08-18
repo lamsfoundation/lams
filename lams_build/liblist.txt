@@ -32,6 +32,8 @@ jlatexmath		  jlatexmath-1.0.3.jar                  1.0.3
 
 json-simple       json-simple-1.1.1.jar                 1.1.1                  Apache License 2.0            fangyidong                       A simple Java toolkit for JSON
 
+jsonwebtoken	  jjwt-0.9.0.jar						0.9.0				   JWTK							 Apache
+
 lucene			  lucene-core-2.4.0.jar					2.4.0				   Apache License 2.0			 Apache							  text search engine library
 				  lucene-snowball-2.4.0.jar				2.4.0
 

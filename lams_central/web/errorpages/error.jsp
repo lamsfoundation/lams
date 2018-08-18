@@ -19,6 +19,7 @@
 		function closeWin() {
 			window.close();
 		}
+		<c:if test="${showErrorStack1}">
 		function showHide() {
 			if (Element.visible("messageDetail")) {
 				$("showButt").innerHTML = "<fmt:message key='msg.show.detail'/>";
@@ -28,6 +29,7 @@
 				Element.show("messageDetail");
 			}
 		}
+		</c:if>
 	</script>
 </lams:head>
 

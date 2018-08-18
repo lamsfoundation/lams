@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" type="text/css" href="mapjs-default-styles.css"></link>
+	</head>
+	<body>
+		<style>
+			body {
+				margin: 0;
+			}
+			#testcontrols {
+				height: 50px;
+				overflow-y: scroll;
+				padding: 5px;
+			}
+			#container {
+				background-color: #FFFFFF;
+
+				height: calc(100% - 60px);
+				width: 100%;
+				border: 1px dashed black;
+			}
+
+		</style>
+		<div id="testcontrols">
+			<input type="button" class="resetView" value="0"></input>
+			<input type="button" class="scaleUp" value="+"></input>
+			<input type="button" class="scaleDown" value="-"></input>
+			<input type="button" class="addSubIdea" value="add"></input>
+			<input type="button" onclick="mapModel.insertIntermediateGroup('click', {group:'supporting'})" value="parent reason"></input>
+			<input type="button" onclick="mapModel.addGroupSubidea('click', {group:'supporting'})" value="supporting group"></input>
+			<input type="button" onclick="mapModel.addGroupSubidea('click', {group:'opposing'})" value="opposing group"></input>
+			<input type="button" class="editNode" value="edit"></input>
+			<input type="button" class="removeSubIdea" value="delete"></input>
+			<input type="button" class="insertIntermediate" value="insert parent"></input>
+			<input type="button" class="toggleCollapse" value="exp/col"></input>
+			<input type="button" onclick="mapModel.setInputEnabled(false)" value="disable"></input>
+			<input type="button" onclick="mapModel.setInputEnabled(true)" value="enable"></input>
+			<input type="button" class="undo" value="undo"></input>
+			<input type="button" class="redo" value="redo"></input>
+			<input type="button" data-mm-action="export-image" value="Export To Image"/>
+			<input type="button" class="cut" value="cut"></input>
+			<input type="button" class="copy" value="copy"></input>
+			<input type="button" class="paste" value="paste"></input>
+			<input type="button" class="openAttachment" value="open attachment"></input>
+			<input type="button" class="toggleAddLinkMode" value="add link"></input>
+			<input type="button" class="insertRoot" value="add root node"></input>
+			<input type="button" class="makeSelectedNodeRoot" value="make root"></input>
+			Background: <input type="text" class='updateStyle' data-mm-target-property='background'></input>
+			Frames: <span id="framerate"></span>
+			Cycle: <span id="cyclerate"></span>
+			<div id="linkEditWidget">
+				<input class="delete" type="button" value="Delete"></input>
+				<select class="color">
+					<option value="red">Red</option>
+					<option value="blue">Blue</option>
+				</select>
+				<select class="lineStyle">
+					<option value="solid">Solid</option>
+					<option value="dashed">Dashed</option>
+				</select>
+				<button class="arrow">Arrow</button>
+			</div>
+		</div>
+		<div id="container"></div>
+		<style id="themecss">
+		</style>
+		<script src="site/main.js"></script>
+	</body>
+</html>

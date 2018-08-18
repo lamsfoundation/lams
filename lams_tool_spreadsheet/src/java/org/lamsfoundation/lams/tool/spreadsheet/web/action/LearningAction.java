@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -59,6 +58,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  *
@@ -178,7 +178,7 @@ public class LearningAction extends Action {
 	} else {
 	    code = spreadsheet.getCode();
 	}
-	sessionMap.put(SpreadsheetConstants.ATTR_CODE, StringEscapeUtils.escapeHtml(code));
+	sessionMap.put(SpreadsheetConstants.ATTR_CODE, HtmlUtils.htmlEscape(code));
 	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, spreadsheet);
 
 	if ((spreadsheetUser != null) && (spreadsheetUser.getUserModifiedSpreadsheet() != null)

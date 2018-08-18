@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
  * @author Jacky Fang 2/02/2005
  * @author Manpreet Minhas
  */
-public interface IMonitoringService {
+public interface IMonitoringService {    
 
     /**
      * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.

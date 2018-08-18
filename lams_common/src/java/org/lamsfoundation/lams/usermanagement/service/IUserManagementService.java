@@ -52,9 +52,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public interface IUserManagementService {
-    static int PORTRAIT_LARGEST_DIMENSION_LARGE = 200;
-    static int PORTRAIT_LARGEST_DIMENSION_MEDIUM = 80;
-    static int PORTRAIT_LARGEST_DIMENSION_SMALL = 35;
 
     /**
      * save(insert or update)
@@ -377,6 +374,8 @@ public interface IUserManagementService {
      */
     Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase);
 
+    Integer getCountRoleForOrg(Integer orgId, Integer[] roleIds, String searchPhrase);
+
     /**
      * Get default html theme of server.
      *
@@ -384,9 +383,10 @@ public interface IUserManagementService {
      */
     Theme getDefaultTheme();
 
-    void auditPasswordChanged(User user, String moduleName);
+    void logPasswordChanged(User user, User modifiedBy);
 
-    void auditUserCreated(User user, String moduleName);
+    void logUserCreated(User user, User createdBy);
+    void logUserCreated(User user, UserDTO createdBy);
 
     Integer getCountUsers();
 
@@ -464,7 +464,10 @@ public interface IUserManagementService {
      *            filters results by course name. It can be null and then doesn't affect results
      * @return paged list of users
      */
-    List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
+    List<UserDTO> getAllUsers(Integer page, Integer size, String sortBy, String sortOrder, String searchString);
+
+    List<UserDTO> getAllUsers(Integer organisationID, String[] roleNames, Integer page, Integer size, String sortBy,
+	    String sortOrder, String searchString);
 
     /**
      * Get all users, except for disabled users and users that are members of filteredOrg.

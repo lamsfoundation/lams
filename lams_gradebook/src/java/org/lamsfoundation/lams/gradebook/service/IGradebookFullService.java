@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -44,12 +45,16 @@ public interface IGradebookFullService extends IGradebookService {
 
     /**
      * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the
-     * lesson
+     * lesson. Only set escapeTitles to false if the output is *not* going to a webpage, but is instead going to a
+     * spreadsheet.
      *
      * @param lesson
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone);
+    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone, boolean escapeTitles);
+
+    List<GradebookGridRowDTO> getGBActivityArchiveRowsForLearner(Long activityId, Integer userId,
+	    TimeZone userTimezone);
 
     /**
      * Gets all the activity rows for a user, with the mark for the activity being the user's individual mark
@@ -122,6 +127,24 @@ public interface IGradebookFullService extends IGradebookService {
 	    String sortOrder, String searchString);
 
     int getCountUsersByOrganisation(Integer orgId, String searchString);
+
+    /**
+     * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and
+     * UserLessonGradebooks.
+     *
+     * @param activity
+     */
+    void recalculateGradebookMarksForActivity(Activity activity);
+
+    /**
+     * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
+     * affect anyhow gradebookUserActivity objects. If total mark is positive but there is no gradebookUserLesson
+     * available - throws exception.
+     *
+     * @param lessonId
+     * @throws Exception
+     */
+    void recalculateTotalMarksForLesson(Long lessonId) throws Exception;
 
     /**
      * Updates a user's lesson mark, this will make it desynchronised with the aggregated marks from the activities
@@ -216,12 +239,25 @@ public interface IGradebookFullService extends IGradebookService {
     Double getAverageMarkForLesson(Long lessonID);
 
     /**
+     * Method for updating an activity mark that tools can call
+     *
+     * @param mark
+     * @param feedback
+     * @param userID
+     * @param toolSessionID
+     */
+    void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
+	    Boolean markedInGradebook);
+
+    /**
      * Get an activity from the db by id
      *
      * @param activityID
      * @return
      */
     Activity getActivityById(Long activityID);
+
+    void removeLearnerFromLesson(Long lessonId, Integer learnerId);
 
     /**
      * Get a language label
@@ -260,19 +296,15 @@ public interface IGradebookFullService extends IGradebookService {
 
     /**
      * Get the raw overall marks for a lesson for charting purposes
-     * 
+     *
      * @param lessonId
      * @return
      */
     List<Number> getMarksArray(Long lessonId);
 
     /** Will the marks caculation take into account weighting? */
-    boolean isWeightedMarks(LearningDesign design);
-
-    /** Will the marks caculation take into account weighting? */
     boolean isWeightedMarks(Long lessonId);
 
     /** Get a summary of the weightings */
     List<String[]> getWeights(LearningDesign design);
-
 }

@@ -40,6 +40,35 @@
 	        padding-top: 3px;
 	        padding-bottom: 3px
 	    }
+	    
+	    /* when item is editable - show pencil icon on hover */
+	    .burning-question-text:hover +span+ i, /* when link is hovered select i */
+		.burning-question-text + span:hover+ i, /* when space after link is hovered select i */
+		.burning-question-text + span + i:hover { /* when icon is hovered select i */
+		  visibility: visible;
+		}
+		.burning-question-text +span+ i { /* in all other case hide it */
+		  visibility: hidden;
+		}
+		
+		/* hide edit button background */
+		div.btn.ui-inline-edit {
+			background-color:rgba(0, 0, 0, 0) !important;
+		}
+		
+		/* make cell borders less prominent */
+		.ui-jqgrid .ui-jqgrid-bdiv tr.ui-row-ltr>td {
+    		border-right-style: dotted;
+		}
+		.ui-jqgrid tr.jqfoot>td, .ui-jqgrid tr.jqgroup>td, .ui-jqgrid tr.jqgrow>td, .ui-jqgrid tr.ui-subgrid>td, .ui-jqgrid tr.ui-subtblcell>td {
+	    	border-bottom-style: dotted;
+		}
+		
+		/* links to burning questions */
+		.scroll-down-to-bq {
+			overflow:auto; 
+			margin-top: -20px;
+		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -122,8 +151,20 @@
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 				   		{name:'isUserAuthor', width:0, hidden: true},
-				   		{name:'groupName', index:'groupName', width:200},
-				   		{name:'burningQuestion', index:'burningQuestion', width:401, edittype: 'textarea', editoptions:{rows:"5"},
+				   		{name:'groupName', index:'groupName', width:100, title: false},
+				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', title: false, editoptions:{rows:"8"},
+					   		formatter:function(cellvalue, options, rowObject) {
+					   			var item = $(this).jqGrid("getLocalRow", options.rowId);
+
+					   			//when item is editable - show pencil icon on hover
+								return ${isUserLeader} && eval(item.isUserAuthor) ? 
+								   		"<span class='burning-question-text'>" +cellvalue + "</span><span>&nbsp;</span><i class='fa fa-pencil'></i>" 
+								   		: cellvalue;
+			   				},
+			   				unformat:function(cellvalue, options, rowObject) {
+			   					var text = $('<div>' + cellvalue + '</div>').text();
+								return text.trim();
+			   				},
 				   			editable: function (options) {
 				   	            var item = $(this).jqGrid("getLocalRow", options.rowid);
 				   	            return ${isUserLeader} && eval(item.isUserAuthor);
@@ -134,11 +175,36 @@
 								return cellvalue;
 			   				}
 						},
-				   		{name:'count', index:'count', width:50, align:"right"}
+				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
-				   	caption: "${scratchieItem.title}",
-					cellurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
-	  				cellEdit: true,
+                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
+                    editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
+	  	          	beforeEditRow: function (options, rowid) {
+		  	          	alert("aaa");
+	  	          	},
+	  				inlineEditing: { keys: true, defaultFocusField: "burningQuestion", focusField: "burningQuestion" },
+	  				onSelectRow: function (rowid, status, e) {
+	  	                var $self = $(this), 
+	  	                	savedRow = $self.jqGrid("getGridParam", "savedRow");
+
+	  	                if (savedRow.length > 0 && savedRow[0].id !== rowid) {
+	  	                    $self.jqGrid("restoreRow", savedRow[0].id);
+	  	                }
+
+	  	                //edit row on its selection, unless "thumbs up" button is pressed
+	  	                if (e.target.classList.contains("fa") && e.target.classList.contains("fa-2x") 
+	  		  	                && (e.target.classList.contains("fa-thumbs-o-up") || e.target.classList.contains("fa-thumbs-up"))) { 
+	  	                	return;
+		  	            } else {
+		  	            	$self.jqGrid("editRow", rowid, { focusField: "burningQuestion" });
+
+		  	            	//Modify event handler to save on blur
+		  	            	var gridId = "#burningQuestions${scratchieItem.uid}";
+		  	              	$("textarea[id^='"+rowid+"_burningQuestion']", gridId).bind('blur',function(){
+		  	                	$(gridId).saveRow(rowid);
+		  	              	});
+			  	        }
+	  	            },
 	  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
 	  					var itemUid = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
 	  					return {itemUid:itemUid};
@@ -217,6 +283,41 @@
 			
 			// trigger the resize when the window first opens so that the grid uses all the space available.
 			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
+			//hide links to burning questions that were not created by the user
+			$(".scroll-down-to-bq a").each(function()  {
+				var itemUid = $(this).data("item-uid");
+				if ( $( "#burningQuestions" + itemUid ).length == 0) {
+					$(this).parent().hide();
+				}
+			});
+
+			//handler for expand/collapse all button
+			$("#toggle-burning-questions-button").click(function() {
+				var isExpanded = eval($(this).data("expanded"));
+				
+				//fire the actual buttons so burning questions can be closed/expanded
+				$(".ui-jqgrid-titlebar-close").each(function() {
+					if (!isExpanded && $('span', this).hasClass('fa-chevron-circle-down')
+							|| isExpanded && $('span', this).hasClass('fa-chevron-circle-up')) {
+						this.click();
+					}
+				});
+
+				//change button label
+				var newButtonLabel = isExpanded ? "<fmt:message key='label.expand.all' />" : "<fmt:message key='label.collapse.all' />";
+				$(".hidden-xs", $(this)).text(newButtonLabel);
+
+				//change button icon
+				if (isExpanded) {
+					$(".fa", $(this)).removeClass("fa-minus-square").addClass("fa-plus-circle");
+				} else {
+					$(".fa", $(this)).removeClass("fa-plus-circle").addClass("fa-minus-square");
+				}
+
+				//change button's data-expanded attribute
+				$(this).data("expanded", !isExpanded);
+			});
 		    
 		})
 	
@@ -259,15 +360,33 @@
 				<strong><fmt:param>${score}%</fmt:param></strong>
 			</fmt:message>
 		</lams:Alert>
-	
+<!--	
 		<div class="row voffset5" >
-			<html:button property="refreshButton" onclick="return refresh();" styleClass="btn btn-default voffset5 roffset5 pull-right">
-				<fmt:message key="label.refresh" />
-			</html:button>
+            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();">
+                <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="label.refresh" /></span></a>
 		</div>
-
+-->		
+		<c:if test="${showResults}">
+			<%@ include file="scratchies.jsp"%>
+		</c:if>
+		
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled}">
+            
+            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refresh();">
+            	<i class="fa fa-refresh"></i> 
+            	<span class="hidden-xs">
+            		<fmt:message key="label.refresh" />
+            	</span>
+            </a>
+
+            <a id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right roffset10" data-expanded="true" href="#nogo">
+            	<i class="fa fa-minus-square"></i> 
+            	<span class="hidden-xs">
+            		<fmt:message key="label.collapse.all" />
+            	</span>
+            </a>
+            
 			<div class="voffset5">
 				<div class="lead">
 					<fmt:message key="label.burning.questions" />

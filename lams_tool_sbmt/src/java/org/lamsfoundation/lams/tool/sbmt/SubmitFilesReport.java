@@ -51,9 +51,6 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     /** nullable persistent field */
     private Float marks;
 
-    /** nullable persistent field */
-    private Date dateMarksReleased;
-
     /** persistent field */
     private Long markFileUUID;
 
@@ -64,10 +61,9 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     private Long markFileVersionID;
 
     /** full constructor */
-    public SubmitFilesReport(String comments, Float marks, Date dateMarksReleased) {
+    public SubmitFilesReport(String comments, Float marks) {
 	this.comments = comments;
 	this.marks = marks;
-	this.dateMarksReleased = dateMarksReleased;
     }
 
     /** default constructor */
@@ -111,17 +107,6 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     /**
      *
      */
-    public Date getDateMarksReleased() {
-	return this.dateMarksReleased;
-    }
-
-    public void setDateMarksReleased(Date dateMarksReleased) {
-	this.dateMarksReleased = dateMarksReleased;
-    }
-
-    /**
-     *
-     */
     public Long getMarkFileUUID() {
 	return markFileUUID;
     }
@@ -155,7 +140,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("reportID", getReportID()).append("comments", getComments())
-		.append("marks", getMarks()).append("dateMarksReleased", getDateMarksReleased()).toString();
+		.append("marks", getMarks()).toString();
     }
 
     /*
@@ -188,12 +173,11 @@ public class SubmitFilesReport implements Serializable, Cloneable {
 	SubmitFilesReport castOther = (SubmitFilesReport) other;
 	return new EqualsBuilder().append(this.getReportID(), castOther.getReportID())
 		.append(this.getComments(), castOther.getComments()).append(this.getMarks(), castOther.getMarks())
-		.append(this.getDateMarksReleased(), castOther.getDateMarksReleased()).isEquals();
+		.isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(getReportID()).append(getComments()).append(getMarks())
-		.append(getDateMarksReleased()).toHashCode();
+	return new HashCodeBuilder().append(getReportID()).append(getComments()).append(getMarks()).toHashCode();
     }
 }

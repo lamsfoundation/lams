@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -61,6 +60,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author Manpreet Minhas
@@ -130,7 +131,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 	request.setAttribute(SbmtConstants.AUTHORING_DTO, authorDto);
-	request.setAttribute(SbmtConstants.PAGE_EDITABLE, !persistContent.isContentInUse());
+	request.setAttribute(SbmtConstants.CONTENT_IN_USE, persistContent.isContentInUse());
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, persistContent.isReflectOnActivity());
 
@@ -198,7 +199,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    SubmitUser user = (SubmitUser) userAndReflection[0];
 	    responseRow.put(SbmtConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
-	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
+	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(user.getFullName()));
 
 	    if (userAndReflection.length > 2) {
 		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (Integer)userAndReflection[1]);
@@ -278,18 +279,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	submitFilesService.releaseMarksForSession(sessionID);
 
-	try {
-	    response.setContentType("text/html;charset=utf-8");
-	    PrintWriter out = response.getWriter();
-	    SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
-	    String sessionName = "";
-	    if (session != null) {
-		sessionName = session.getSessionName();
-	    }
-	    out.write(getMessageService().getMessage("msg.mark.released", new String[] { sessionName }));
-	    out.flush();
-	} catch (IOException e) {
-	}
 	return null;
     }
 
@@ -308,7 +297,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	submitFilesService = getSubmitFilesService();
 	// return FileDetailsDTO list according to the given sessionID
-	Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	Map<SubmitUserDTO, List<FileDetailsDTO>> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,
+		request.getLocale());
 	// construct Excel file format and download
 	String errors = null;
 	try {
@@ -452,14 +442,17 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward listMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	getSubmitFilesService();
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	Integer userID = WebUtil.readIntParam(request, "userID");
 
-	submitFilesService = getSubmitFilesService();
 	// return FileDetailsDTO list according to the given userID and sessionID
-	List files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), true);
+	List<FileDetailsDTO> files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(),
+		true);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
+	request.setAttribute(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 	request.setAttribute("report", files);
 	return mapping.findForward("listMark");
     }
@@ -476,13 +469,17 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward listAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
+	getSubmitFilesService();
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-	submitFilesService = getSubmitFilesService();
+	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+
 	// return FileDetailsDTO list according to the given sessionID
-	Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	Map<SubmitUserDTO, List<FileDetailsDTO>> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,
+		request.getLocale());
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	// request.setAttribute("user",submitFilesService.getUserDetails(userID));
 	request.setAttribute("reports", userFilesMap);
+	request.setAttribute(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
 	return mapping.findForward("listAllMarks");
 
@@ -552,7 +549,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
-	List files = submitFilesService.getFilesUploadedByUser(learnerUserID, sessionID, request.getLocale(), true);
+	List<FileDetailsDTO> files = submitFilesService.getFilesUploadedByUser(learnerUserID, sessionID,
+		request.getLocale(), true);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	request.setAttribute("report", files);
@@ -607,20 +605,6 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Save file mark information into HttpRequest
-     *
-     * @param request
-     * @param sessionID
-     * @param userID
-     * @param detailID
-     * @param updateMode
-     */
-    private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID,
-	    String updateMode) {
-
-    }
-
-    /**
      * Save Summary information into HttpRequest.
      *
      * @param request
@@ -638,6 +622,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Long sessionID = sfs.getSessionID();
 	    sessionDto.setSessionID(sessionID);
 	    sessionDto.setSessionName(sfs.getSessionName());
+	    sessionDto.setMarksReleased(sfs.isMarksReleased());
 	    sessions.add(sessionDto);
 	}
 

@@ -47,6 +47,8 @@ public class ConfigurationKeys {
     public static String LAMS_EAR_DIR = "EARDir";
 
     public static String SMTP_SERVER = "SMTPServer";
+    
+    public static String SMTP_PORT = "SMTPPort";
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
@@ -80,16 +82,15 @@ public class ConfigurationKeys {
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
     /** Values for client updates */
-    public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
-
-    public static String LEARNER_CLIENT_VERSION = "LearnerClientVersion";
-
-    public static String MONITOR_CLIENT_VERSION = "MonitorClientVersion";
-
     public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
 
     /** Default locale for the server. Originally en_AU */
     public static String SERVER_LANGUAGE = "ServerLanguage";
+    
+    /**
+     * Default country for the server. Originally AU
+     */
+    public static String SERVER_COUNTRY = "ServerCountry";
 
     /**
      * Direction (left to right, right to left) for writing on HTML pages. Originally LTR
@@ -218,6 +219,8 @@ public class ConfigurationKeys {
     public static String SMTP_AUTH_USER = "SMTPUser";
 
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
+    
+    public static String SMTP_AUTH_SECURITY = "SMTPAuthSecurity";
 
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
 
@@ -275,5 +278,8 @@ public class ConfigurationKeys {
 
     // LDEV-4144
     public static String SHOW_TIMEZONE_WARNING = "ShowTimezoneWarning";
+
+    // LDEV-4594 / LDEV-4583 Allow/Block access to index.do for integration learners. Default to false - do not allow direct access.
+    public static String ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS = "AllowDirectAccessIntgrtnLrnr";
 
 }

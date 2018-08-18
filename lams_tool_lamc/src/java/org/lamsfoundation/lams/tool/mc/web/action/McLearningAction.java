@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.mc.web.action;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -416,13 +417,13 @@ public class McLearningAction extends LamsDispatchAction {
 	    List listQuestionOptions = mcService.findOptionsByQuestionUid(new Long(currentQuestionUid));
 
 	    //builds a questions map from questions list
-	    Map<String, String> mapOptsContent = new TreeMap<String, String>(new McComparator());
+	    Map<String, String> mapOptsContent = new TreeMap<String, String>();
 	    Iterator<McOptsContent> iter = listQuestionOptions.iterator();
-	    Long mapIndex2 = new Long(1);
+	    int mapIndex2 = 0;
 	    while (iter.hasNext()) {
 		McOptsContent option = iter.next();
-		mapOptsContent.put(mapIndex2.toString(), option.getMcQueOptionText());
-		mapIndex2 = new Long(mapIndex2.longValue() + 1);
+		String stringIndex = mcContent.isPrefixAnswersWithLetters() ? option.formatPrefixLetter(mapIndex2++) : Integer.toString(++mapIndex2);
+		mapOptsContent.put(stringIndex, option.getMcQueOptionText());
 	    }
 
 	    mapStartupGeneralOptionsContent.put(mapIndex.toString(), mapOptsContent);
@@ -489,6 +490,7 @@ public class McLearningAction extends LamsDispatchAction {
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 	mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+	mcGeneralLearnerFlowDTO.setDisplayFeedbackOnly(((Boolean)mcContent.isDisplayFeedbackOnly()).toString());	
 	mcGeneralLearnerFlowDTO.setLearnerMark(user.getLastAttemptTotalMark());
 	
 	Object[] markStatistics = null;
@@ -620,6 +622,7 @@ public class McLearningAction extends LamsDispatchAction {
 
 	if (notebookEntry != null) {
 	    notebookEntry.setEntry(reflectionEntry);
+	    notebookEntry.setLastModified(new Date());
 	    mcService.updateEntry(notebookEntry);
 	} else {
 	    mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,

@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * * @author Ozgur Demirtas
@@ -75,18 +76,39 @@ public class McMonitoringAction extends LamsDispatchAction {
     private static Logger logger = Logger.getLogger(McMonitoringAction.class.getName());
 
     /**
-     * displayAnswers
+     * Turn on displayAnswers
      */
     public ActionForward displayAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	
+
 	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
 	mcContent.setDisplayAnswers(new Boolean(true));
+	mcContent.setDisplayFeedbackOnly(new Boolean(false));
 	mcService.updateMc(mcContent);
-	
+
+	// use redirect to prevent resubmition of the same request
+	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("monitoringStarterRedirect"));
+	redirect.addParameter(McAppConstants.TOOL_CONTENT_ID, strToolContentID);
+	redirect.addParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	return redirect;
+    }
+
+    /**
+     * Turn on displayFeedbackOnly
+     */
+    public ActionForward displayFeedbackOnly(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+
+	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
+	mcContent.setDisplayFeedbackOnly(new Boolean(true));
+	mcService.updateMc(mcContent);
+
 	// use redirect to prevent resubmition of the same request
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("monitoringStarterRedirect"));
 	redirect.addParameter(McAppConstants.TOOL_CONTENT_ID, strToolContentID);
@@ -173,7 +195,8 @@ public class McMonitoringAction extends LamsDispatchAction {
 
     /**
      * Set Submission Deadline
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -218,7 +241,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	IMcService service = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	String activityEvaluation = WebUtil.readStrParam(request, McAppConstants.ATTR_ACTIVITY_EVALUATION);
+	String activityEvaluation = WebUtil.readStrParam(request, McAppConstants.ATTR_ACTIVITY_EVALUATION, true);
 	service.setActivityEvaluation(contentID, activityEvaluation);
 
 	JSONObject responseJSON = new JSONObject();
@@ -293,22 +316,21 @@ public class McMonitoringAction extends LamsDispatchAction {
 	int countVisitLogs = 0;
 	//in case of UseSelectLeaderToolOuput - display only one user
 	if (groupLeader != null) {
-	    
-		Integer totalMark = groupLeader.getLastAttemptTotalMark();
-		Long portraitId = mcService.getPortraitId(groupLeader.getQueUsrId());
-		
-		McUserMarkDTO userDto = new McUserMarkDTO();
-		userDto.setQueUsrId(groupLeader.getUid().toString());
-		userDto.setUserId(groupLeader.getQueUsrId().toString());
-		userDto.setFullName(groupLeader.getFullname());
-		userDto.setTotalMark(totalMark != null ? totalMark.longValue() : null);
-		userDto.setPortraitId(portraitId==null ? null : portraitId.toString());
-		userDtos.add(userDto);
-		countVisitLogs = 1;
+
+	    Integer totalMark = groupLeader.getLastAttemptTotalMark();
+	    Long portraitId = mcService.getPortraitId(groupLeader.getQueUsrId());
+
+	    McUserMarkDTO userDto = new McUserMarkDTO();
+	    userDto.setQueUsrId(groupLeader.getUid().toString());
+	    userDto.setUserId(groupLeader.getQueUsrId().toString());
+	    userDto.setFullName(groupLeader.getFullname());
+	    userDto.setTotalMark(totalMark != null ? totalMark.longValue() : null);
+	    userDto.setPortraitId(portraitId == null ? null : portraitId.toString());
+	    userDtos.add(userDto);
+	    countVisitLogs = 1;
 
 	} else {
-	    userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
-	    		sortOrder, searchString);
+	    userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder, searchString);
 	    countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
 	}
 
@@ -324,7 +346,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    visitLogData.put(userUid);
 	    visitLogData.put(userDto.getUserId());
 
-	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
 		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
 	    }
@@ -367,7 +389,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
@@ -378,20 +400,20 @@ public class McMonitoringAction extends LamsDispatchAction {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(contentID);
 	List<Number> results = null;
-	
-	if ( mcContent != null ) {
-	    if ( mcContent.isUseSelectLeaderToolOuput() ) {
+
+	if (mcContent != null) {
+	    if (mcContent.isUseSelectLeaderToolOuput()) {
 		results = mcService.getMarksArrayForLeaders(contentID);
 	    } else {
 		Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 		results = mcService.getMarksArray(sessionID);
 	    }
 	}
-	
+
 	JSONObject responseJSON = new JSONObject();
-	if ( results != null )
+	if (results != null)
 	    responseJSON.put("data", results);
-	else 
+	else
 	    responseJSON.put("data", new Float[0]);
 
 	res.setContentType("application/json;charset=utf-8");
@@ -399,7 +421,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	return null;
 
     }
-    
+
     public ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -407,8 +429,8 @@ public class McMonitoringAction extends LamsDispatchAction {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentID);
 	McContent mcContent = mcService.getMcContent(contentID);
-	if ( mcContent != null ) {
-	    if ( mcContent.isUseSelectLeaderToolOuput() ) {
+	if (mcContent != null) {
+	    if (mcContent.isUseSelectLeaderToolOuput()) {
 		LeaderResultsDTO leaderDto = mcService.getLeaderResultsDTOForLeaders(contentID);
 		request.setAttribute("leaderDto", leaderDto);
 	    } else {
@@ -417,7 +439,7 @@ public class McMonitoringAction extends LamsDispatchAction {
 	    }
 	    request.setAttribute("useSelectLeaderToolOutput", mcContent.isUseSelectLeaderToolOuput());
 	}
-	
+
 	// prepare toolOutputDefinitions and activityEvaluation
 	List<String> toolOutputDefinitions = new ArrayList<String>();
 	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_MARK);
@@ -428,6 +450,5 @@ public class McMonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward(McAppConstants.STATISTICS);
     }
-
 
 }

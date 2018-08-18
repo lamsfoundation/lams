@@ -107,6 +107,7 @@
                 <path name="sun/security/pkcs11"/>
                 <path name="sun/security/provider"/>
                 <path name="sun/text"/>
+                <path name="sun/net/www/protocol/https"/>
                 <path name="META-INF/services"/>
             </paths>
             <exports>

@@ -1,9 +1,11 @@
 /**
- * Prepares SVG area for drawing and runs concrete chart function.
+ * Identifies data source and runs chart drawing function.
  */
-function drawChart(type, chartID, url, legendOnHover){
+function drawChart(type, chartID, dataSource, legendOnHover){
+	switch (typeof dataSource) {
+		case 'string': 
 	// get data with the given URL
-	d3.json(url, function(error, response){
+			d3.json(dataSource, function(error, response){
 		if (error) {
 			// forward error to browser
 			throw error;
@@ -14,13 +16,24 @@ function drawChart(type, chartID, url, legendOnHover){
 			return;
 		}
 		
+				_drawChart(type, chartID, response.data, legendOnHover);
+			});
+			break;
+		case 'object':
+			_drawChart(type, chartID, dataSource, legendOnHover);
+			break;
+	}
+}
+
+/**
+ * Prepares SVG area for drawing and runs concrete chart function.
+ */
+function _drawChart(type, chartID, rawData, legendOnHover) {
 		// clear previous chart
-		var rawData = response.data, 
-			chartDiv = $('#' + chartID).empty().show(),
+	var chartDiv = $('#' + chartID).empty().show(),
 			width = chartDiv.width(),
 			//Changed for LDEV-4475 Missing information in Legend for Pie Chart when more than 7 items
-		//	height = 410,
-			height = chartDiv.height()*1.5,
+			height = chartDiv.height(),
 			// add SVG elem
 		    svg = d3.select(chartDiv[0])
 					.append('svg')
@@ -45,23 +58,24 @@ function drawChart(type, chartID, url, legendOnHover){
 					  .attr('height', 15)
 					  .attr('fill', scaleColor(d.name));
 				// label
+				var val = Math.round(+d.value);
+				if (isNaN(val)) {
+					val = 0;
+				}
 				legend.append('text')
 					  .attr('x', 20)
 					  .attr('y', index * 30 + 11)
 					  .attr('text-anchor', 'start')
-					  .text(d.name + ' (' + Math.round(+d.value) + ' %)');
+					  .text(d.name + ' (' + val + ' %)');
 			});
 		}
 		
 		// draw proper chart
 		if (type == 'bar') {
-			_drawBarChart(svg, legend, width, height, rawData, domainX, scaleColor);
+		_drawBarChart(chartDiv, legend, width, height, rawData, domainX, scaleColor);
 		} else if (type == 'pie') {
-			_drawPieChart(svg, legend, width, height, rawData, scaleColor);
+		_drawPieChart(chartDiv, legend, width, height, rawData, scaleColor);
 		}
-	});
-
-	
 }
 
 // margins are needed so bar chart Y axis is not clipped
@@ -71,10 +85,11 @@ var CHART_MARGIN = {'top' : 10, 'left' : 40, 'right' : 20},
 /**
  * Draws a bar chart.
  */
-function _drawBarChart(svg, legend, width, height, rawData, domainX, scaleColor) {
+function _drawBarChart(chartDiv, legend, width, height, rawData, domainX, scaleColor) {
 	// if all bars easily fit in a half of SVG width, limit the drawing width
 	// otherwise the chart would be too wide
-	var tooltip = legend ? null : d3.select($(svg.node()).parent()[0])
+	var svg = d3.select(chartDiv[0]).select('svg'),
+		tooltip = legend ? null : d3.select(chartDiv[0])
 									.append('div')
 								    .attr('class', 'chartTooltip'),
 		legendWidth = legend ? legend.node().getBBox().width : 0,
@@ -114,8 +129,8 @@ function _drawBarChart(svg, legend, width, height, rawData, domainX, scaleColor)
 		.attr('class', 'bar')
 		.attr("x", function(d) {return scaleX(d.name)})
 		.attr("width", scaleX.bandwidth())
-		.attr("y", function(d) {return y(d.value)})
-		.attr("height", function(d){return height - y(d.value)})
+		.attr("y", function(d) {return isNaN(d.value) ? 0 : y(d.value)})
+		.attr("height", function(d){return height - (isNaN(d.value) ? height : y(d.value))})
 		.attr('fill', function(d) {return scaleColor(d.name)})
 		.on('mouseover', function(d) {
 			if (tooltip) {
@@ -142,14 +157,21 @@ function _drawBarChart(svg, legend, width, height, rawData, domainX, scaleColor)
 		// move the legend to the right of the chart
 		legend.attr('transform', 'translate(' + (canvasWidth + CHART_MARGIN.right) + ',' + (CHART_MARGIN.top + 20) + ')');
 	}
+	
+	// functions to animate changed data
+	chartDiv.data('updateFunctions', {
+		'y' 	 :  function(d) {return y(d.value);},
+		'height' :  function(d) {return height - y(d.value);}
+	});
 }
 
 /**
  * Draws a pie chart.
  */
-function _drawPieChart(svg, legend, width, height, rawData, scaleColor){
+function _drawPieChart(chartDiv, legend, width, height, rawData, scaleColor){
 	// calculate how much space we've got for the chart
-	var tooltip = legend ? null : d3.select($(svg.node()).parent()[0])
+	var svg = d3.select(chartDiv[0]).select('svg'),
+		tooltip = legend ? null : d3.select(chartDiv[0])
 									.append('div')
 								    .attr('class', 'chartTooltip'),
 		legendWidth = legend ? legend.node().getBBox().width : 0,
@@ -201,6 +223,21 @@ function _drawPieChart(svg, legend, width, height, rawData, scaleColor){
 		// move the legend to the right of the chart
 		legend.attr('transform', 'translate(' + (radius * 2 + CHART_MARGIN.right)  + ',' + (CHART_MARGIN.top + 20) + ')');
 	}
+	
+	// function to animate changed data
+	canvas.selectAll("path").each(function(d){
+		this.currentData = d;
+	});
+	chartDiv.data('updateFunctions', {
+		'pie' : pie,
+		'arcTween' : function(a) {
+			var interpolation = d3.interpolate(this.currentData, a);
+			this.currentData = interpolation(0);
+			return function(t) {
+				return arc(interpolation(t));
+			};
+		}
+	});
 }
 
 function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){

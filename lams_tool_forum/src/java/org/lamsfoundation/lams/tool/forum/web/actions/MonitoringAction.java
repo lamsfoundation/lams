@@ -44,7 +44,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -86,6 +85,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
 
@@ -125,7 +125,6 @@ public class MonitoringAction extends Action {
 	if (param.equals("updateMark")) {
 	    return updateMark(mapping, form, request, response);
 	}
-
 	if (param.equals("releaseMark")) {
 	    return releaseMark(mapping, form, request, response);
 	}
@@ -172,12 +171,6 @@ public class MonitoringAction extends Action {
 
     /**
      * The initial method for monitoring. List all users according to given Content ID.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private void summary(HttpServletRequest request) {
 	Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -197,10 +190,7 @@ public class MonitoringAction extends Action {
 	// build a map with all users in the forumSessionList
 	for (ForumToolSession session : sessions) {
 	    Long sessionId = session.getSessionId();
-	    SessionDTO sessionDto = new SessionDTO();
-
-	    sessionDto.setSessionID(sessionId);
-	    sessionDto.setSessionName(session.getSessionName());
+	    SessionDTO sessionDto = new SessionDTO(session);
 
 	    // used for storing data for MonitoringAction.getUsers() serving tablesorter paging
 	    List<MessageDTO> topics = forumService.getAllTopicsFromSession(sessionId);
@@ -308,7 +298,7 @@ public class MonitoringAction extends Action {
 
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(ForumConstants.ATTR_USER_ID, user.getUserId());
-	    responseRow.put("userName", StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put("userName", HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 
 	    int numberOfPosts = 0;
 	    boolean isAnyPostsMarked = false;
@@ -337,7 +327,7 @@ public class MonitoringAction extends Action {
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
+		responseRow.put("notebookEntry", HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
 	    
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
@@ -354,18 +344,12 @@ public class MonitoringAction extends Action {
 
     /**
      * Download marks for all users in a speical session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	forumService = getForumService();
-	List topicList = forumService.getAllTopicsFromSession(sessionID);
+	List<MessageDTO> topicList = forumService.getAllTopicsFromSession(sessionID);
 	// construct Excel file format and download
 	ActionMessages errors = new ActionMessages();
 	try {
@@ -474,8 +458,6 @@ public class MonitoringAction extends Action {
 
     /**
      * View activity for content.
-     *
-     * @param request
      */
     private void viewActivity(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -493,8 +475,6 @@ public class MonitoringAction extends Action {
 
     /**
      * View instruction information for a content.
-     *
-     * @param request
      */
     private void viewInstructions(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -509,12 +489,6 @@ public class MonitoringAction extends Action {
 
     /**
      * Show statisitc page for a session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -524,36 +498,34 @@ public class MonitoringAction extends Action {
 
     /**
      * Performs all necessary actions for showing statistic page.
-     *
-     * @param request
      */
     private void statistic(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	forumService = getForumService();
-	Map sessionTopicsMap = new TreeMap<SessionDTO, List<MessageDTO>>(new SessionDTOComparator());
-	Map sessionAvaMarkMap = new HashMap();
-	Map sessionTotalMsgMap = new HashMap();
+	Map<SessionDTO, List<MessageDTO>> sessionTopicsMap = new TreeMap<SessionDTO, List<MessageDTO>>(new SessionDTOComparator());
+	Map<Long, Float> sessionAvaMarkMap = new HashMap<Long, Float>();
+	Map<Long, Integer> sessionTotalMsgMap = new HashMap<Long, Integer>();
 
-	List sessList = forumService.getSessionsByContentId(toolContentID);
-	Iterator sessIter = sessList.iterator();
+	List<ForumToolSession> sessList = forumService.getSessionsByContentId(toolContentID);
+	Iterator<ForumToolSession> sessIter = sessList.iterator();
 	while (sessIter.hasNext()) {
-	    ForumToolSession session = (ForumToolSession) sessIter.next();
-	    List topicList = forumService.getRootTopics(session.getSessionId());
-	    Iterator iter = topicList.iterator();
+	    ForumToolSession session = sessIter.next();
+	    List<MessageDTO> topicList = forumService.getRootTopics(session.getSessionId());
+	    Iterator<MessageDTO> iter = topicList.iterator();
 	    int totalMsg = 0;
 	    int msgNum;
 	    float totalMsgMarkSum = 0;
 	    float msgMarkSum = 0;
 	    for (; iter.hasNext();) {
-		MessageDTO msgDto = (MessageDTO) iter.next();
+		MessageDTO msgDto = iter.next();
 		// get all message under this topic
-		List topicThread = forumService.getTopicThread(msgDto.getMessage().getUid());
+		List<MessageDTO> topicThread = forumService.getTopicThread(msgDto.getMessage().getUid());
 		// loop all message under this topic
 		msgMarkSum = 0;
-		Iterator threadIter = topicThread.iterator();
+		Iterator<MessageDTO> threadIter = topicThread.iterator();
 		for (msgNum = 0; threadIter.hasNext(); msgNum++) {
-		    MessageDTO dto = (MessageDTO) threadIter.next();
+		    MessageDTO dto = threadIter.next();
 		    if (dto.getMark() != null) {
 			msgMarkSum += dto.getMark().floatValue();
 		    }
@@ -567,9 +539,7 @@ public class MonitoringAction extends Action {
 
 	    float averMark = totalMsg == 0 ? 0 : totalMsgMarkSum / totalMsg;
 
-	    SessionDTO sessionDto = new SessionDTO();
-	    sessionDto.setSessionID(session.getSessionId());
-	    sessionDto.setSessionName(session.getSessionName());
+	    SessionDTO sessionDto = new SessionDTO(session);
 
 	    sessionTopicsMap.put(sessionDto, topicList);
 	    sessionAvaMarkMap.put(session.getSessionId(), averMark);
@@ -584,12 +554,6 @@ public class MonitoringAction extends Action {
 
     /**
      * View all messages under one topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward viewTopicTree(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -604,13 +568,7 @@ public class MonitoringAction extends Action {
     }
 
     /**
-     * View topic subject, content and attachement.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
+     * View topic subject, content and attachement
      */
     private ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -631,19 +589,6 @@ public class MonitoringAction extends Action {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	forumService.releaseMarksForSession(sessionID);
 
-	try {
-	    response.setContentType("text/html;charset=utf-8");
-	    PrintWriter out = response.getWriter();
-	    ForumToolSession session = forumService.getSessionBySessionId(sessionID);
-	    String sessionName = "";
-	    if (session != null) {
-		sessionName = session.getSessionName();
-	    }
-	    out.write(getMessageService().getMessage("msg.mark.released", new String[] { sessionName }));
-	    out.flush();
-
-	} catch (IOException e) {
-	}
 	return null;
     }
 
@@ -653,12 +598,6 @@ public class MonitoringAction extends Action {
 
     /**
      * View a special user's mark
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward viewUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -682,17 +621,13 @@ public class MonitoringAction extends Action {
 	ForumUser user = forumService.getUser(userUid);
 	request.setAttribute(ForumConstants.ATTR_USER, user);
 
+	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+	request.setAttribute("isMarksReleased", session.isMarkReleased());
 	return mapping.findForward("success");
     }
 
     /**
      * Edit a special user's mark.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -738,15 +673,10 @@ public class MonitoringAction extends Action {
 
     /**
      * Update mark for a special user
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	forumService = getForumService();
 	MarkForm markForm = (MarkForm) form;
 
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
@@ -765,7 +695,6 @@ public class MonitoringAction extends Action {
 	    }
 	}
 
-	forumService = getForumService();
 	// echo back to web page
 	Message msg = forumService.getMessage(markForm.getTopicID());
 	ForumUser user = msg.getCreatedBy();
@@ -779,8 +708,6 @@ public class MonitoringAction extends Action {
 	}
 
 	// update message report
-
-	forumService = getForumService();
 	ForumReport report = msg.getReport();
 	if (report == null) {
 	    report = new ForumReport();
@@ -794,7 +721,7 @@ public class MonitoringAction extends Action {
 
 	report.setMark(mark);
 	report.setComment(markForm.getComment());
-	forumService.updateContainedReport(msg);
+	forumService.updateMark(msg);
 
 	// echo back to topic list page: it depends which screen is come from: view special user mark, or view all user
 	// marks.
@@ -820,13 +747,6 @@ public class MonitoringAction extends Action {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException 
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {

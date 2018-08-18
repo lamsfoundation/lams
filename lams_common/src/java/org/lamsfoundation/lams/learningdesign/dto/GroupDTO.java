@@ -24,14 +24,31 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.AlphanumComparator;
 
 /** Grouping object, suitable for sending to Authoring */
 public class GroupDTO {
+
+    public static final Comparator<GroupDTO> GROUP_NAME_COMPARATOR = new Comparator<GroupDTO>() {
+	/**
+	 * Compare the group names
+	 */
+	@Override
+	public int compare(GroupDTO grp1, GroupDTO grp2) {
+	    String grp1Name = grp1 != null ? grp1.getGroupName() : "";
+
+	    String grp2Name = grp2 != null ? grp2.getGroupName() : "";
+
+	    AlphanumComparator comparator = new AlphanumComparator();
+	    return comparator.compare(grp1Name, grp2Name);
+	}
+    };
 
     private Long groupID;
     private String groupName;
@@ -40,10 +57,14 @@ public class GroupDTO {
     private List userList;
     private Integer groupUIID;
 
+    public GroupDTO() {
+
+    }
+
     /**
      * Get the DTO for this group. Does not include the GroupBranchActivities as they will
      * be in a separate array for Authoring.
-     * 
+     *
      * @param group
      */
     @SuppressWarnings("unchecked")

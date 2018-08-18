@@ -376,7 +376,7 @@ public class AuthoringAction extends Action {
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    assessmentUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+	    assessmentUser = service.getUserCreatedAssessment(new Long(user.getUserID().intValue()),
 		    assessmentPO.getContentId());
 	    if (assessmentUser == null) {
 		assessmentUser = new AssessmentUser(user, assessmentPO);
@@ -603,6 +603,7 @@ public class AuthoringAction extends Action {
 		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
 		    assessmentQuestion.setMultipleAnswersAllowed(false);
 		    assessmentQuestion.setShuffle(false);
+		    assessmentQuestion.setPrefixAnswersWithLetters(false);
 
 		} else {
 		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER);
@@ -660,6 +661,7 @@ public class AuthoringAction extends Action {
 		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
 		assessmentQuestion.setMultipleAnswersAllowed(true);
 		assessmentQuestion.setShuffle(false);
+		assessmentQuestion.setPrefixAnswersWithLetters(false);
 
 		if (question.getAnswers() != null) {
 		    float totalScore = 0;
@@ -761,6 +763,7 @@ public class AuthoringAction extends Action {
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
 		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
 		assessmentQuestion.setShuffle(false);
+		assessmentQuestion.setPrefixAnswersWithLetters(false);
 
 		String correctAnswer = null;
 		if (question.getAnswers() != null) {
@@ -1747,6 +1750,7 @@ public class AuthoringAction extends Action {
 	form.setFeedbackOnPartiallyCorrect(question.getFeedbackOnPartiallyCorrect());
 	form.setFeedbackOnIncorrect(question.getFeedbackOnIncorrect());
 	form.setShuffle(question.isShuffle());
+	form.setPrefixAnswersWithLetters(question.isPrefixAnswersWithLetters());
 	form.setCaseSensitive(question.isCaseSensitive());
 	form.setCorrectAnswer(question.getCorrectAnswer());
 	form.setAllowRichEditor(question.isAllowRichEditor());
@@ -1826,6 +1830,7 @@ public class AuthoringAction extends Action {
 	    question.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setShuffle(questionForm.isShuffle());
+	    question.setPrefixAnswersWithLetters(questionForm.isPrefixAnswersWithLetters());
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());

@@ -82,7 +82,7 @@
 		<property name="target">
 				<bean class="org.lamsfoundation.lams.tool.service.LamsToolService">
 					<property name="activityDAO"><ref bean="activityDAO"/></property>
-					<property name="auditService"><ref bean="auditService"/></property>
+					<property name="logEventService"><ref bean="logEventService"/></property>
 					<property name="toolDAO"><ref bean="toolDAO"/></property>	
 					<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 					<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>	

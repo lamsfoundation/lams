@@ -213,6 +213,29 @@
 		</property>
 	</bean>
 	
+	<bean id="policyServiceTarget" class="org.lamsfoundation.lams.policies.service.PolicyService">
+		<property name="policyDAO"><ref bean="policyDAO" /></property>
+		<property name="userManagementService"><ref bean="userManagementService" /></property>
+		<property name="lessonService"><ref bean="lessonService" /></property>
+	</bean>
+
+	<bean id="policyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager" /></property>
+		<property name="target"><ref bean="policyServiceTarget" /></property>
+		<property name="proxyTargetClass"><value>true</value></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
+				<prop key="change*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
@@ -316,6 +339,7 @@
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
 				<prop key="rateItem">PROPAGATION_REQUIRED</prop>
 				<prop key="commentItem">PROPAGATION_REQUIRED</prop>
 			</props>
@@ -408,7 +432,9 @@
 		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.logevent.service.LogEventService">
+				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 				<property name="logEventDAO"><ref bean="logEventDAO"/></property>
+				<property name="messageService"><ref bean="commonMessageService"/></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
 			</bean>	
 		</property>
@@ -445,17 +471,10 @@
 		</property>
 	</bean>
 
-	
-	<!-- auditing service -->
-	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService" >
-		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="activityDao"><ref bean="activityDAO"/></property>
-    </bean>
-
 	<!-- Security service -->
 	<bean id="securityServiceTarget" class="org.lamsfoundation.lams.security.SecurityService">
 		<property name="securityDAO"><ref bean="securityDAO"/></property>
-		<property name="auditService"><ref bean="auditService"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
 	</bean>	
 	
 	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -556,6 +575,11 @@
 	
 	<!--  Signup service related beans -->
 	<bean id="signupDAO" class="org.lamsfoundation.lams.signup.dao.hibernate.SignupDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory" /></property>
+	</bean>
+	
+	<!--  Policy service related beans -->
+	<bean id="policyDAO" class="org.lamsfoundation.lams.policies.dao.hibernate.PolicyDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory" /></property>
 	</bean>
 	

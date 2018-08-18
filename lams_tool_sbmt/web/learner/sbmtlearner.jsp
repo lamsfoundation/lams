@@ -99,8 +99,9 @@
 			}
 		}
 		
-		function deleteLearnerFile(detailId) {
+		function deleteLearnerFile(detailId, filename) {
 			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			msg = msg.replace('{0}', filename);
 			var answer = confirm(msg);
 			if (answer) {	
 				 $.ajax({
@@ -202,7 +203,7 @@
 								</td>
 								<td>
 								<c:if test="${empty file.marks && hasEditRight}">
-								 <html:link href="javascript:deleteLearnerFile(${file.submissionID});" styleClass="btn btn-default btn-disable-on-submit pull-right">
+								 <html:link href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" styleClass="btn btn-default btn-disable-on-submit pull-right">
 					                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
 				                 </html:link>
 				                 </c:if>
@@ -228,7 +229,7 @@
 					</tr>
 
 				<!--Fourth row displaying the comments -->
-				<c:if test="${not empty file.dateMarksReleased and not empty file.comments}">
+				<c:if test="${sessionMap.isMarksReleased and not empty file.comments}">
 					<tr>
 						<td style="vertical-align:top"><fmt:message key="label.learner.comments" /></td>
 						<td colspan="2">
@@ -238,7 +239,7 @@
 				</c:if>
 
 				<!--Fifth row displaying the marks-->
-				<c:if test="${not empty file.dateMarksReleased and not empty file.marks}">
+				<c:if test="${sessionMap.isMarksReleased and not empty file.marks}">
 					<tr>
 						<td><fmt:message key="label.learner.marks" /></td>
 						<td>
@@ -247,7 +248,7 @@
 					</tr>
 				</c:if>
 				<!--Sixth row displaying the marked file-->
-				<c:if  test="${not empty file.markFileUUID}">	
+				<c:if  test="${sessionMap.isMarksReleased and not empty file.markFileUUID}">	
 					<tr>
 						<td><fmt:message key="label.monitor.mark.markedFile" /></td>
 						<td>

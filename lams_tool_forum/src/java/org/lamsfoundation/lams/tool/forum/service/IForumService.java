@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
@@ -40,7 +41,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * User: conradb Date: 8/06/2005 Time: 14:49:59
@@ -179,7 +179,7 @@ public interface IForumService {
      * @param rootTopicId
      * @return List of MessageDTO
      */
-    List getTopicThread(Long rootTopicId);
+    List<MessageDTO> getTopicThread(Long rootTopicId);
 
     /**
      * Get topic and its children list by given root topic ID, starting from after the sequence number specified.
@@ -342,12 +342,12 @@ public interface IForumService {
     ForumUser getUserByID(Long userId);
 
     /**
-     * Update report contained inside specified message.
+     * Update mark and mark comment. Send marks to gradebook, if marks are released for that session
      *
      * @param message
      *            specified message
      */
-    void updateContainedReport(Message message);
+    void updateMark(Message message);
 
     // ************************************************************************************
     // Report Method
@@ -359,7 +359,7 @@ public interface IForumService {
     void releaseMarksForSession(Long sessionID);
 
     /** The topic updates (for monitoring) are done in the web layer, so need the audit service to log the updates */
-    IAuditService getAuditService();
+    ILogEventService getLogEventService();
 
     /**
      * Mark user completing a session.

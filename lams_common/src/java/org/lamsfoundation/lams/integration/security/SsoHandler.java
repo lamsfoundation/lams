@@ -20,15 +20,6 @@
  */
 package org.lamsfoundation.lams.integration.security;
 
-import io.undertow.Handlers;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.session.Session;
-import io.undertow.servlet.ServletExtension;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.handlers.ServletRequestContext;
-import io.undertow.servlet.spec.HttpSessionImpl;
-import io.undertow.util.Headers;
-
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Date;
@@ -42,19 +33,29 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+
+import io.undertow.Handlers;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
+import io.undertow.servlet.ServletExtension;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.servlet.spec.HttpSessionImpl;
+import io.undertow.util.Headers;
 
 /**
  * Allows access to LAMS WARs when an user logs in.
@@ -63,7 +64,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
  *
  */
 public class SsoHandler implements ServletExtension {
-    private static IAuditService auditService = null;
+    private static ILogEventService logEventService = null;
     private static IUserManagementService userManagementService = null;
 
     protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
@@ -153,7 +154,7 @@ public class SsoHandler implements ServletExtension {
 
 		// prevent session fixation attack
 		// This will become obsolete on Undertow upgrade to version 1.1.10+
-		SessionManager.removeSessionByID(session.getId(), false);
+		SessionManager.removeSessionByID(session.getId(), false, false);
 		request.changeSessionId();
 		session = request.getSession();
 
@@ -204,9 +205,12 @@ public class SsoHandler implements ServletExtension {
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
-			getAuditService(session.getServletContext()).log(userDTO, "sso",
-				"User is locked out for " + Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)
-					+ " mins after " + failedAttempts + " failed attempts.");
+			String message = new StringBuilder("User ").append(user.getLogin()).append("(")
+				.append(user.getUserId()).append(") is locked out for ")
+				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
+				.append(failedAttempts).append(" failed attempts.").toString();
+			getLogEventService(session.getServletContext()).logEvent(LogEvent.TYPE_ACCOUNT_LOCKED,
+				user.getUserId(), user.getUserId(), null, null, message);
 		    }
 		    getUserManagementService(session.getServletContext()).save(user);
 		}
@@ -220,12 +224,12 @@ public class SsoHandler implements ServletExtension {
      * Forward to the login page with a specific error message. Avoids a redirect. Based on the
      * ServletFormAuthenticationMechanism method. The location should be relative to the current
      * context and start with "/" e.g. /login.jsp
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
-    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location) throws ServletException,
-	    IOException {
+    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location)
+	    throws ServletException, IOException {
 
 	ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
 	HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
@@ -300,11 +304,11 @@ public class SsoHandler implements ServletExtension {
 	return SsoHandler.userManagementService;
     }
 
-    protected IAuditService getAuditService(ServletContext context) {
-	if (SsoHandler.auditService == null) {
+    protected ILogEventService getLogEventService(ServletContext context) {
+	if (SsoHandler.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
-	    SsoHandler.auditService = (IAuditService) ctx.getBean("auditService");
+	    SsoHandler.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return SsoHandler.auditService;
+	return SsoHandler.logEventService;
     }
 }

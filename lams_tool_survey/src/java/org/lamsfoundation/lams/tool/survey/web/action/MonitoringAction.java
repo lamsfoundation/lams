@@ -40,10 +40,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.HtmlUtils;
 
 public class MonitoringAction extends Action {
 
@@ -84,6 +85,7 @@ public class MonitoringAction extends Action {
     private static final String MSG_LABEL_POSSIBLE_ANSWERS = "message.possible.answers";
     private static final String MSG_LABEL_LEARNER_NAME = "monitoring.label.user.name";
     private static final String MSG_LABEL_LOGIN = "monitoring.label.user.loginname";
+    private static final String MSG_LABEL_TIMESTAMP = "label.timestamp";
 
     public static Logger log = Logger.getLogger(MonitoringAction.class);
 
@@ -230,7 +232,7 @@ public class MonitoringAction extends Action {
 
 	    SurveyUser user = (SurveyUser) userAndAnswers[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 
 	    if (userAndAnswers.length > 1 && userAndAnswers[1] != null) {
@@ -249,7 +251,7 @@ public class MonitoringAction extends Action {
 		    answer = (String) userAndAnswers[2];
 		} else {
 		    // need to escape it, as it isn't escaped in the database
-		    answer = StringEscapeUtils.escapeHtml((String) userAndAnswers[2]);
+		    answer = HtmlUtils.htmlEscape((String) userAndAnswers[2]);
 		    answer = answer.replaceAll("\n", "<br>");
 		}
 		responseRow.put("answerText", answer);
@@ -307,11 +309,11 @@ public class MonitoringAction extends Action {
 
 	    SurveyUser user = (SurveyUser) userAndReflection[0];
 	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
 	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 	    
 	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[1]);
+		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[1]);
 		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
 	    }
 
@@ -349,6 +351,11 @@ public class MonitoringAction extends Action {
 	try {
 	    // create an empty excel file
 	    Workbook workbook = new SXSSFWorkbook();
+	    
+	    // Date format for the timestamp field
+	    CellStyle dateStyle = workbook.createCellStyle();
+	    dateStyle.setDataFormat((short)0x16); // long date/time format e.g. DD/MM/YYYY MM:HH
+	    		
 	    Sheet sheet = workbook.createSheet("Survey");
 	    sheet.setColumnWidth(0, 5000);
 	    Row row;
@@ -363,12 +370,12 @@ public class MonitoringAction extends Action {
 		// survey title
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(removeHTMLTags(survey.getTitle()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getTitle()));
 
 		// survey instruction
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(removeHTMLTags(survey.getInstructions()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getInstructions()));
 
 		// display 2 empty row
 		row = sheet.createRow(idx++);
@@ -383,7 +390,7 @@ public class MonitoringAction extends Action {
 		cell = row.createCell(0);
 		cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_SESSION_NAME));
 		cell = row.createCell(1);
-		cell.setCellValue(removeHTMLTags(session.getSessionName()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(session.getSessionName()));
 
 		// begin to display question and its answers
 		Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
@@ -403,7 +410,7 @@ public class MonitoringAction extends Action {
 		    cell = row.createCell(0);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_QUESTION) + " " + questionIdx);
 		    cell = row.createCell(1);
-		    cell.setCellValue(removeHTMLTags(question.getDescription()));
+		    cell.setCellValue(SurveyWebUtils.removeHTMLTags(question.getDescription()));
 
 		    // display options content
 		    Set<SurveyOption> options = question.getOptions();
@@ -419,7 +426,7 @@ public class MonitoringAction extends Action {
 			cell = row.createCell(0);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 			cell = row.createCell(1);
-			cell.setCellValue(removeHTMLTags(option.getDescription()));
+			cell.setCellValue(SurveyWebUtils.removeHTMLTags(option.getDescription()));
 		    }
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optionIdx++;
@@ -447,6 +454,9 @@ public class MonitoringAction extends Action {
 		    cellIdx++;
 		    cell = row.createCell(cellIdx);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LEARNER_NAME));
+		    cellIdx++;
+		    cell = row.createCell(cellIdx);
+		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_TIMESTAMP));
 
 		    int optionsNum = options.size();
 
@@ -468,6 +478,10 @@ public class MonitoringAction extends Action {
 			cell = row.createCell(cellIdx);
 			cell.setCellValue(
 				answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
+			cellIdx++;
+			cell = row.createCell(cellIdx);
+			cell.setCellStyle(dateStyle);
+			cell.setCellValue(answer.getAnswer().getUpdateDate()); 
 			// for answer's options
 			for (SurveyOption option : options) {
 			    cellIdx++;
@@ -486,7 +500,7 @@ public class MonitoringAction extends Action {
 			if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			    cell = row.createCell(++cellIdx);
 			    if (answer.getAnswer() != null) {
-				cell.setCellValue(removeHTMLTags(answer.getAnswer().getAnswerText()));
+				cell.setCellValue(SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText()));
 			    }
 			}
 
@@ -558,16 +572,6 @@ public class MonitoringAction extends Action {
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(formattedDate);
 	return null;
-    }
-
-    /**
-     * Removes all the html tags from a string
-     * 
-     * @param string
-     * @return
-     */
-    private String removeHTMLTags(String string) {
-	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
     // *************************************************************************************

@@ -85,8 +85,8 @@ public class LoginRequestServlet extends HttpServlet {
 	String timestamp = request.getParameter(LoginRequestDispatcher.PARAM_TIMESTAMP);
 	String hash = request.getParameter(LoginRequestDispatcher.PARAM_HASH);
 	String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
-	String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
-	String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
+	String country = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
+	String locale = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	boolean isUpdateUserDetails = WebUtil.readBooleanParam(request,
@@ -119,7 +119,7 @@ public class LoginRequestServlet extends HttpServlet {
 		userMap = getIntegrationService().getExtUserUseridMap(extServer, extUsername, prefix);
 	    } else {
 		userMap = getIntegrationService().getImplicitExtUserUseridMap(extServer, extUsername, firstName,
-			lastName, langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
+			lastName, locale, country, email, prefix, isUpdateUserDetails);
 	    }
 
 	    // in case of request for learner with strict authentication check cache should also contain lsid
@@ -144,8 +144,8 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    if (extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode,
-			langIsoCode, courseName, method, prefix);
+		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
+			prefix);
 	    }
 
 	    User user = userMap.getUser();
@@ -154,7 +154,8 @@ public class LoginRequestServlet extends HttpServlet {
 	    String loggedInLogin = loggedInUserDTO == null ? null : loggedInUserDTO.getLogin();
 	    // for checking if requested role is the same as already assigned
 	    String role = method.equals(LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION)
-		    ? LoginRequestDispatcher.METHOD_LEARNER : method;
+		    ? LoginRequestDispatcher.METHOD_LEARNER
+		    : method;
 	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
 		String url = LoginRequestDispatcher.getRequestURL(request);
 		response.sendRedirect(response.encodeRedirectURL(url));

@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -39,11 +40,11 @@ public class Emailer {
      */
     public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat)
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
-	sendFromSupportEmail(subject, to, body, isHtmlFormat, null);
+	Emailer.sendFromSupportEmail(subject, to, body, isHtmlFormat, null);
     }
 
-    public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat, String attachmentFilename)
-	    throws AddressException, MessagingException, UnsupportedEncodingException {
+    public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat,
+	    String attachmentFilename) throws AddressException, MessagingException, UnsupportedEncodingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
 	Emailer.send(subject, to, "", supportEmail, "", body, isHtmlFormat, attachmentFilename);
     }
@@ -57,17 +58,26 @@ public class Emailer {
      */
     public static Session getMailSession() {
 	String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	String smtpPort = Configuration.get(ConfigurationKeys.SMTP_PORT);
 	Properties properties = new Properties();
 	properties.put("mail.smtp.host", smtpServer);
+	properties.put("mail.smtp.port", smtpPort);
 
 	String smtpAuthUser = Configuration.get(ConfigurationKeys.SMTP_AUTH_USER);
 	String smtpAuthPass = Configuration.get(ConfigurationKeys.SMTP_AUTH_PASSWORD);
+	String smtpAuthSecurity = Configuration.get(ConfigurationKeys.SMTP_AUTH_SECURITY);
 	Session session = null;
 	if (StringUtils.isBlank(smtpAuthUser)) {
 	    session = Session.getInstance(properties);
 	} else {
 	    properties.setProperty("mail.smtp.submitter", smtpAuthUser);
 	    properties.setProperty("mail.smtp.auth", "true");
+
+	    if (smtpAuthSecurity.equals("starttls")) {
+		properties.put("mail.smtp.starttls.enable", "true");
+	    } else if (smtpAuthSecurity.equals("ssl")) {
+		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+	    }
 	    SMTPAuthenticator auth = new SMTPAuthenticator(smtpAuthUser, smtpAuthPass);
 	    session = Session.getInstance(properties, auth);
 	}
@@ -94,10 +104,10 @@ public class Emailer {
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
 	    boolean isHtmlFormat) throws AddressException, MessagingException, UnsupportedEncodingException {
-	
-	send(subject, to, toPerson, from, fromPerson, body, isHtmlFormat, null);
+
+	Emailer.send(subject, to, toPerson, from, fromPerson, body, isHtmlFormat, null);
     }
-    
+
     /**
      * Send email to recipients
      *
@@ -116,10 +126,11 @@ public class Emailer {
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
      * @param file
-     * 		  file to attach
+     *            file to attach
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
-	    boolean isHtmlFormat, String filename) throws AddressException, MessagingException, UnsupportedEncodingException {
+	    boolean isHtmlFormat, String filename)
+	    throws AddressException, MessagingException, UnsupportedEncodingException {
 
 	Session session = Emailer.getMailSession();
 
@@ -127,6 +138,7 @@ public class Emailer {
 	message.setFrom(new InternetAddress(from, fromPerson));
 	message.addRecipient(RecipientType.TO, new InternetAddress(to, toPerson));
 	message.setSubject(subject, "UTF-8");
+	message.setSentDate(new Date());
 
 	if (filename == null) {
 	    message.setText(body, "UTF-8");
@@ -150,7 +162,6 @@ public class Emailer {
 	    message.setContent(mp);
 
 	}
-
 	Transport.send(message);
     }
 }

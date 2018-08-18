@@ -177,7 +177,19 @@ td.sectionHeader {
 	margin-right: 5px;
 }
 
-#lessonStateLabel{
+#disableLessonButton {
+	display: none;
+}
+
+#lessonScheduler label {
+	margin-top: 5px;
+}
+
+#lessonStartApply {
+	margin-bottom: 5px;
+}
+
+#lessonStateLabel, #lessonScheduler input {
 	font-size:13px; // Larger than buttons but smaller than the date text next to it.
 }
 
@@ -416,4 +428,34 @@ td.progressBarLabel {
 }
 .group-table>tbody>tr>td, .table>tfoot>tr>td {
     border-top: none;
+}
+
+/********** RENAME LESSON FEATURE **********/
+
+/* Overwrite gliphicon class used by x-editable.js*/
+.glyphicon{
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-ok:before { 
+	content: "\f00c"; 
+}
+.glyphicon-remove:before { 
+	content: "\f00d"; 
+}
+/* Overwrite properties set in x-editable.css*/
+.editable-click, a.editable-click, a.editable-click:hover {
+    border-bottom: none;
+}
+
+/* when item is editable - show pencil icon on hover */
+#lesson-name-strong:hover +span+ i {  /* when link is hovered select i */
+	visibility: visible;
+}
+#lesson-name-strong +span+ i { /* in all other case hide it */
+	visibility: hidden;
 }

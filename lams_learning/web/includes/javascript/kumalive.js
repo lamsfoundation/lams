@@ -1,3 +1,5 @@
+"use strict"
+
 var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') 
 		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' +role),
 	kumaliveWebsocketPingTimeout = null,
@@ -14,6 +16,10 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	speakerId = null,
 	// rubrics to evaluate speaker
 	rubrics = null,
+	// is a poll running now and what ID
+	pollId = null,
+	// answers will be numbered 
+	pollAnswerBullets = 'abcdefghij',
 	// index of user icon colour currently used
 	learnerColorIndex = 1,
 	// template of a HTML structure of a learner
@@ -23,7 +29,6 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 	REFRESH_DELAY = 1000,
 	ANIMATION_DURATION = 1000,
 	PING_DELAY = 3*60*1000;
-
 
 kumaliveWebsocketPingFunc = function(skipPing){
 	if (kumaliveWebsocket.readyState == kumaliveWebsocket.CLOSING 
@@ -165,15 +170,31 @@ function init(message) {
 	roleTeacher = message.isTeacher && message.roleTeacher;
 	
 	// hide all buttons and enable ones appropriate for the role
-	$('#mainDiv button').hide();
+	$('#actionCell button').hide();
+	$('#pollRunChartSwitch').click(switchPollChart);
 	if (roleTeacher) {
 		$('#raiseHandPromptButton').click(raiseHandPrompt);
 		$('#downHandPromptButton').click(downHandPrompt);
 		$('#score i').click(score);
+		$('#actionCell .pollButton').click(setupPoll).show();
+		$('#pollSetupAnswer').change(function(){
+			if ($('#pollSetupAnswer option:selected').val() === 'custom') {
+				$('#pollSetupAnswerCustom').show();
+			} else {
+				$('#pollSetupAnswerCustom').hide();
+			}
+		});
+		$('#pollSetupCancelButton').click(setupPollCancel);
+		$('#pollSetupStartButton').click(startPoll);
+		$('#pollRunReleaseVotesButton').click(releaseVotes);
+		$('#pollRunReleaseVotersButton').click(releaseVoters);
+		$('#pollRunFinishButton').click(finishPoll);
+		$('#pollRunCloseButton').click(closePoll);
 		$('#finishButton').click(finish).show();
 	} else {
 		$('#raiseHandButton').click(raiseHand);
 		$('#downHandButton').click(downHand);
+		$('#pollRunVoteButton').click(votePoll);
 	}
 	
 	// set dialog name
@@ -203,11 +224,12 @@ function processRefresh(message) {
 	repeat |= processParticipants(message);
 	repeat |= processRaisedHand(message);
 	repeat |= toggleSpeak(message);
+	processPoll(message);
 
 	if (repeat || queuedMessage) {
 		setTimeout(function() {
 			// get the newest message
-			nextMessage = queuedMessage || message;
+			var nextMessage = queuedMessage || message;
 			queuedMessage = null;
 			processRefresh(nextMessage);
 		}, REFRESH_DELAY);
@@ -290,7 +312,6 @@ function processParticipants(message) {
 		}
 		learnerFadeIn(learnerDiv);
 	});
-	
 	// remove learners who left
 	$('.learner', learnersContainer).each(function(){
 		var learnerDiv = $(this),
@@ -303,6 +324,188 @@ function processParticipants(message) {
 	});
 	
 	return result;
+}
+
+/**
+ * Display current poll results
+ */
+function processPoll(message) {
+	var poll = message.poll;
+	// is there a poll running now?
+	if (!poll) {
+		if (pollId) {
+			// there is no poll anymore, i.e. current poll was closed
+			pollId = null;
+			// close the panel
+			$('#pollCell').hide();
+			$('#actionCell .pollButton').prop('disabled', false);
+			
+			$('#learnersCell .learner .badge, #pollCell .pollVoters').remove();
+		}
+		return;
+	}
+	
+	// open panel if closed
+	$('#actionCell .pollButton').prop('disabled', true);
+	$('#pollCell').show();
+	var pollRunDiv = $('#pollRun').show();
+	
+	// init poll fields or make them read only after voting
+	if (poll.id != pollId || (poll.finished && $('#pollRunVoteButton', pollRunDiv).is(':visible'))) {
+		initPoll(poll);
+	}
+	if (poll.voted != null) {
+		// highlight the answer user voted for
+		$('#pollAnswer' + poll.voted, pollRunDiv).addClass('voted');
+	}
+	
+	// update counters and charts
+	if (poll.votes) {
+		$('#pollRunChart, #pollRunChartSwitch', pollRunDiv).show();
+		
+		var chartData = [],
+			voterCount = 0;
+		// show votes if user is teacher or votes were released
+		$.each(poll.votes, function(answerIndex, count) {
+			var answerElement = $('#pollAnswer' + answerIndex, pollRunDiv),
+				badge = $('.badge', answerElement);
+			// missing badge means that votes were made available just now
+			if (badge.length === 0) {
+				// its colour corresponds to chart
+				badge = $('<span />').addClass('badge').css('background-color', d3.schemeCategory10[answerIndex])
+									 .appendTo(answerElement);
+			}
+			// update visual counter
+			badge.text(count);
+			
+			// build data to feed chart
+			chartData.push({
+				'name' : pollAnswerBullets[answerIndex],
+				'value': count
+			});
+			
+			// count all voters, no matter what they chose
+			voterCount += count;
+		});
+
+		// rewrite number of voters into percent
+		var	learnerCount = voterCount + poll.missingVotes,
+			chartPieDiv = $('#pollRunChartPie', pollRunDiv),
+			chartBarDiv = $('#pollRunChartBar', pollRunDiv);
+		$('#pollRunTotalVotes').text(voterCount + '/' + learnerCount + ' (' 
+				+ (learnerCount > 0 ? Math.round(voterCount / learnerCount * 100) : 0) + '%)');
+		$.each(chartData, function() {
+			this.value = Math.round(this.value / learnerCount * 100);
+		});
+		// add missing voters
+		chartData.push({
+			'name' : LABELS.MISSING_VOTERS,
+			'value': Math.round(poll.missingVotes / learnerCount * 100)
+		});
+		
+		if (chartPieDiv.is(':empty')) {
+			// draw new charts
+			drawChart('pie', 'pollRunChartPie', chartData, false);
+			drawChart('bar', 'pollRunChartBar', chartData, false);
+			chartBarDiv.hide();
+		} else {
+			// update pie chart data using functions stored in chart.js
+			var updateFunctions = chartPieDiv.data('updateFunctions');
+			d3.select(chartPieDiv[0]).selectAll('path').data(updateFunctions.pie(chartData))
+			  .transition().duration(750).attrTween("d", updateFunctions.arcTween);
+			// update legend
+			chartPieDiv.find('text').each(function(answerIndex, legendItem){
+				$(legendItem).text(chartData[answerIndex].name + ' (' + chartData[answerIndex].value + '%)');
+			});
+			
+			// update bar chart
+			updateFunctions = chartBarDiv.data('updateFunctions');
+			d3.select(chartBarDiv[0]).selectAll('.bar').data(chartData).transition().duration(750)
+			  .attr("y", updateFunctions.y)
+			  .attr("height", updateFunctions.height);
+		}
+	}
+	
+	// update voter icons and counters
+	if (poll.voters) {
+		// no voters yet, i.e. page refreshed or voters just released
+		if ($('.pollVoters', pollRunDiv).length === 0){
+			$.each(poll.voters, function(answerIndex, answerVoters) {
+				// build a container for each answer
+				var answerVotersContainer = $('#pollVoters' + answerIndex, pollRunDiv);
+				answerVotersContainer = $('<div />').attr('id', 'pollVoters' + answerIndex).addClass('pollVoters')
+											  .appendTo(pollRunDiv);
+				$('<span />').addClass('badge').css('background-color', d3.schemeCategory10[answerIndex])
+							 .appendTo(answerVotersContainer);
+				$('<h4 />').text(pollAnswerBullets[answerIndex] + ') ' + poll.answers[answerIndex])
+						   .appendTo(answerVotersContainer);
+			});
+			// build a container for missing voters
+			var missingVotersContainer = $('<div />').attr('id', 'pollVotersMissing').addClass('pollVoters').appendTo(pollRunDiv);
+			$('<span />').addClass('badge').css('background-color', d3.schemeCategory10[poll.voters.length])
+						 .appendTo(missingVotersContainer);
+			$('<h4 />').text("Not voted").appendTo(missingVotersContainer);
+		}
+		
+		// fill each voter container with voters
+		var learnerDivs = $('#learnersContainer .learner');
+		$.each(poll.voters, function(answerIndex, answerVoters) {
+			// update counter
+			var answerVotersContainer = $('#pollVoters' + answerIndex, pollRunDiv);
+			$('.badge', answerVotersContainer).text(poll.votes[answerIndex]);
+			
+			$.each(answerVoters, function(voterIndex, voter) {
+				// if a voter is already added, skip
+				if ($('.learner[userId="' + voter.id + '"]', answerVotersContainer).length !== 0) {
+					return true;
+				}
+				// create a voter icon
+				var voterDiv = learnerDivTemplate.clone()
+								.attr('userId', voter.id)
+								.appendTo(answerVotersContainer),
+					profilePicture = $('.profilePicture', voterDiv);
+				// use profile picture or a coloured icon
+				addPortrait(profilePicture, voter.portraitUuid, voter.id, "large", true, LAMS_URL);
+				$('.name', voterDiv).text(voter.firstName + ' ' + voter.lastName);
+				
+				if (roleTeacher) {
+					// teacher can see logins and chooses who speaks
+					voterDiv.attr('title', message.logins['user' + voter.id]);
+				}
+				learnerFadeIn(voterDiv);
+				
+				// add bagde to user in Learners section
+				var learnerDiv = learnerDivs.filter('[userId="' + voter.id + '"]');
+				if ( $('.badge', learnerDiv).length === 0) {
+					$('<span />').addClass('badge').css('background-color', d3.schemeCategory10[answerIndex])
+								 .text(pollAnswerBullets[answerIndex]).prependTo(learnerDiv);
+				}
+			});
+		});
+		
+		// fill missing voters container
+		var missingVotersContainer = $('#pollVotersMissing'),
+			missingVoters = $('.learner', missingVotersContainer);
+		
+		$('.badge', missingVotersContainer).text(poll.missingVotes);
+		
+		// remove missing voters because they voted or logged out
+		missingVoters.filter(function(){
+			return poll.missingVoters.indexOf(+$(this).attr('userId')) === -1;
+		}).each(function(){
+			learnerFadeOut($(this));
+		});
+		
+		// add missing voters
+		$.each(poll.missingVoters, function(){
+			if (missingVoters.index('.learner[userId="' + this + '"]') === -1) {
+				var learnerDiv = learnerDivs.filter('.learner[userId="' + this + '"]'),
+					voterDiv = learnerDiv.clone().removeClass('changing').css('cursor', 'default').appendTo(missingVotersContainer);
+				$('.badge', voterDiv).remove();
+				$('.profilePicture', voterDiv).removeClass('profilePictureHidden').css('opacity', '');
+			}
+		});
+	}
 }
 
 /**
@@ -552,6 +755,9 @@ function downHand() {
  * Set a learner as a speaker
  */
 function speak() {
+	if (!$('#raiseHandPrompt').is(':visible')) {
+		return;
+	}
 	var speakerId = $(this).attr('userId');
 	// the learner did not raise a hand; is the teacher sure to set him as a speaker?
 	if ($('#raiseHandContainer .learner[userId="' + speakerId + '"]').length == 0 
@@ -601,6 +807,239 @@ function score(){
 	}
 }
 
+/**
+ * Show form where teacher can build poll
+ */
+function setupPoll() {
+	$('#actionCell .pollButton').prop('disabled', true);
+	$('#pollRun').hide();
+	// reset form inputs
+	$('#pollSetup input').val(null);
+	$('#pollSetup select option:first-child').prop('selected', true);
+	$('#pollSetupAnswerCustom').hide();
+	$('#pollCell, #pollSetup').show();
+	$('#pollSetupQuestion').focus();
+}
+
+/**
+ * Cancel poll building
+ */
+function setupPollCancel() {
+	$('#pollSetup').hide();
+	if (pollId) {
+		$('#pollRun').show();
+	} else {
+		$('#pollCell').hide();
+		$('#actionCell .pollButton').prop('disabled', false);
+	}
+}
+
+/**
+ * Create poll widgets: answer list, radio buttons etc.
+ */
+function initPoll(poll) {
+	pollId = poll.id;
+	$('#pollRun button').hide();
+	$('#pollRunQuestion').text(poll.name);
+	var radioList = $('#pollRunAnswerRadios').empty(),
+		answerList = $('#pollRunAnswerList').empty();
+
+	// teachers can't vote; learner can't vote twice; learner can't vote for finished poll
+	if (roleTeacher || (poll.voted != null) || poll.finished) {
+		// build simple list of answers
+		$.each(poll.answers, function(index, answer){
+			var answerElement = $('<li />').addClass('list-group-item').attr('id', 'pollAnswer' + index)
+										   .text(pollAnswerBullets[index] + ') ' + answer)
+										   .appendTo(answerList);
+		});
+		$('#pollRunAnswerList').show();
+		// extra options for teacher
+	
+		if (roleTeacher) {
+			if (poll.votesReleased)
+				$('#pollRunReleaseVotesButton').hide();
+			else {
+				$('#pollRunReleaseVotesButton').show();
+			}
+			if (poll.votersReleased)
+				$('#pollRunReleaseVotersButton').hide();
+			else {
+				$('#pollRunReleaseVotersButton').show();
+			}
+			if (poll.finished) {
+				$('#pollRunCloseButton').show();
+			} else {
+				$('#pollRunFinishButton').show();
+			}
+		}
+	} else {
+		// learner can vote, build radio buttons
+		$.each(poll.answers, function(index, answer){
+			$('#pollRunAnswerRadioTemplate').clone().attr('id', null).appendTo(radioList)
+				.find('label').append($('<span />').text(pollAnswerBullets[index] + ') ' + answer))
+				.find('input').val(index);
+		});
+		radioList.append('<br />');
+		$('#pollRunVoteButton').show();
+	}
+}
+
+/**
+ * Create a poll with parameters set up in form
+ */
+function startPoll(){
+	var question = $('#pollSetupQuestion').val(),
+		poll = {};
+	// validation
+	if (question) {
+		$('#pollSetupQuestionGroup').removeClass('has-error');
+		poll.name = question;
+	} else {
+		$('#pollSetupQuestionGroup').addClass('has-error');
+	}
+	
+	var selectedOption = $('#pollSetupAnswer option:selected');
+	if (selectedOption.val() === 'custom'){
+		$('#pollSetupAnswerCustomParseError, #pollSetupAnswerCustomCountError').hide();
+		var answerString = $('#pollSetupAnswerCustom').val();
+		// check if brackets are closed and there is nothing between them, for example "{aaa} {bb" or "{aaa} bb {ccc}"
+		if (answerString) {
+			var index = -1,
+				indexEnd = -1,
+				answers = [];
+			do {
+				// find opening bracket
+				index = answerString.indexOf('{', index + 1);
+				if (index >= 0) {
+					// is there anything other than whitespace between } and {
+					if (answerString.substring(indexEnd + 1, index).trim()) {
+						answers = [];
+						break;
+					}
+					// is there a matching }
+					indexEnd = answerString.indexOf('}', index + 1);
+					if (indexEnd < 0) {
+						answers = [];
+						break;
+					}
+					var answer = answerString.substring(index + 1, indexEnd);
+					// is the answer not empty, i.e. {   }
+					if (answer.trim()) {
+						answers.push(answer);
+					} else {
+						answers = [];
+						break;
+					}
+				} else if (indexEnd && answerString.substring(indexEnd + 1).trim()) {
+					// is there anything after last }
+					answers = [];
+					break;
+				}
+			} while (index >= 0);
+			if (answers.length === 0) {
+				$('#pollSetupAnswerCustomGroup').addClass('has-error');
+				$('#pollSetupAnswerCustomParseError').show();
+			} else if (answers.length > 9) {
+				$('#pollSetupAnswerCustomGroup').addClass('has-error');
+				$('#pollSetupAnswerCustomCountError').show();
+			} else {
+				$('#pollSetupAnswerCustomGroup').removeClass('has-error');
+				poll.answers = answers;
+			}
+		} else {
+			$('#pollSetupAnswerCustomGroup').addClass('has-error');
+		}
+	} else {
+		// parse simple options, for example "True, False"
+		var answers = [];
+		$.each(selectedOption.text().split(','), function() {
+			answers.push(this.trim());
+		});
+		poll.answers = answers;
+	}
+	
+	// there were errors, do not carry on
+	if (!poll.name || !poll.answers) {
+		return;
+	}
+
+	$('#pollSetup').hide();
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' : 'startPoll',
+		'poll' : poll
+	}));
+}
+
+/**
+ * Send vote to the server
+ */ 
+function votePoll() {
+	var checkedAnswer = $('#pollRunAnswerRadios input[name="pollAnswer"]:checked');
+	if (checkedAnswer.length !== 1) {
+		return;
+	}
+	pollId = null;
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' 		  : 'votePoll',
+		'answerIndex' : checkedAnswer.val()
+	}));
+}
+
+/**
+ * Tell server that votes were released
+ */ 
+function releaseVotes() {
+	if (!confirm(LABELS.POLL_RELEASE_VOTES_CONFIRM)){
+		return;
+	}
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' 		    : 'releasePollResults',
+		'votesReleased' : true
+	}));
+	$('#pollRunReleaseVotesButton').hide();
+}
+
+/**
+ * Tell server that voters were released
+ */ 
+function releaseVoters() {
+	if (!confirm(LABELS.POLL_RELEASE_VOTERS_CONFIRM)){
+		return;
+	}
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' 		     : 'releasePollResults',
+		'votersReleased' : true
+	}));
+	$('#pollRunReleaseVotesButton, #pollRunReleaseVotersButton').hide();
+}
+
+function switchPollChart() {
+	$('#pollRunChartPie, #pollRunChartBar').toggle();
+}
+
+/**
+ * Prevent learners from voting
+ */
+function finishPoll() {
+	if (!confirm(LABELS.POLL_FINISH_CONFIRM)) {
+		return;
+	}
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' : 'finishPoll',
+		'pollId' : pollId
+	}));
+	$('#pollRunFinishButton').hide();
+	$('#pollRunCloseButton').show();
+}
+
+/**
+ * Hide poll for everyone
+ */
+function closePoll() {
+	kumaliveWebsocket.send(JSON.stringify({
+		'type' : 'closePoll'
+	}));
+}
 
 /**
  * Create a new Kumalive

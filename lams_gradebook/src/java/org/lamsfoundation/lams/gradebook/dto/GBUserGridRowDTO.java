@@ -20,15 +20,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.web.util.HtmlUtils;
 
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
@@ -44,12 +43,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     private String currentActivity;
     private Long portraitId;
 
+    private boolean hasArchivedMarks;
+
     public GBUserGridRowDTO() {
     }
 
     public GBUserGridRowDTO(User user) {
 	this.id = user.getUserId().toString();
-	this.rowName = StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName());
+	this.rowName = HtmlUtils.htmlEscape(user.getLastName() + ", " + user.getFirstName());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.login = user.getLogin();
@@ -72,6 +73,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark, displayMarkAsPercent) : CELL_EMPTY);
 	    ret.add(portraitId != null ? portraitId.toString() : "");
+	    ret.add(String.valueOf(hasArchivedMarks));
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 
@@ -86,7 +88,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(portraitId != null ? portraitId.toString() : "");
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>");
-	    } 
+	    }
 
 	} else if (view == GBGridView.MON_COURSE) {
 	    ret.add(rowName);
@@ -155,4 +157,11 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.portraitId = portraitId;
     }
 
+    public boolean getHasArchivedMarks() {
+	return hasArchivedMarks;
+    }
+
+    public void setHasArchivedMarks(boolean hasArchivedAttempts) {
+	this.hasArchivedMarks = hasArchivedAttempts;
+    }
 }

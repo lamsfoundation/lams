@@ -94,10 +94,10 @@
 			<td>
 				<c:choose>
 					<c:when test="${question.allowRichEditor && hasEditRight}">
-						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
+						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px"></lams:CKEditor>
 					</c:when>
 					<c:otherwise>
-						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${!hasEditRight}" />
+						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${!hasEditRight}" rows="8"/>
 					</c:otherwise>
 				</c:choose>
 			</td>

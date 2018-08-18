@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Andrey Balan
  */
 public interface IMonitoringFullService extends IMonitoringService {
-
+    
     /** Get the message service, which gives access to the I18N text */
     MessageService getMessageService();
 
@@ -115,7 +115,6 @@ public interface IMonitoringFullService extends IMonitoringService {
      */
     void unsuspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
-
     /**
      * Set the gate to open to let all the learners through. This learning service is triggerred by the system
      * scheduler. Will return true GateActivity (or subclass) object, rather than a hibernate proxy. This is needed so
@@ -124,7 +123,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * @param gate
      *            the id of the gate we need to open.
      */
-    GateActivity openGate(Long gateId);
+    GateActivity openGate(Long gateId, Integer openerId);
 
     /**
      * Allows a single learner to pass the gate.
@@ -360,4 +359,18 @@ public interface IMonitoringFullService extends IMonitoringService {
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
     
     List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
+
+    /**
+     * Finish a lesson.A Finished lesson can be viewed on the monitoring interface. It should be an "inactive" lesson. A
+     * Finished lesson is listed on the learner interface but all the learner can do is view the progress - they cannot
+     * access any of the tool screens.
+     *
+     * @param lessonId
+     * @param userId
+     *            checks that the user is a staff member for this lesson
+     * @param endDate
+     *            teh lesson end date and time.
+     */
+    void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+
 }

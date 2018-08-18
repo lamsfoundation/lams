@@ -19,8 +19,11 @@
    		<property name="messageService">
    			<ref bean="adminMessageService"/>
    		</property>
-		<property name="auditService">
-			<ref bean="auditService"/>
-		</property>   		
+		<property name="logEventService">
+			<ref bean="logEventService"/>
+		</property>
+   		<property name="timezoneService">
+   			<ref bean="timezoneService"/>
+   		</property>	
     </bean>
 </beans>

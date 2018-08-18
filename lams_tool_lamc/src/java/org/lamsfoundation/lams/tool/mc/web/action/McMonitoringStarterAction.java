@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.mc.web.action;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -112,6 +111,7 @@ public class McMonitoringStarterAction extends Action {
 	request.setAttribute("prefixAnswersWithLetters", mcContent.isPrefixAnswersWithLetters());
 	request.setAttribute("randomize", mcContent.isRandomize());
 	request.setAttribute("displayAnswers", mcContent.isDisplayAnswers());
+	request.setAttribute("displayFeedbackOnly", mcContent.isDisplayFeedbackOnly());
 	request.setAttribute("retries", mcContent.isRetries());
 	request.setAttribute("reflect", mcContent.isReflect());
 	request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
@@ -139,6 +139,7 @@ public class McMonitoringStarterAction extends Action {
 	/* this section is needed for Edit Activity screen, from here... */
 
 	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+	mcGeneralMonitoringDTO.setDisplayFeedbackOnly(new Boolean(mcContent.isDisplayFeedbackOnly()).toString());
 
 	List<ReflectionDTO> reflectionsContainerDTO = service.getReflectionList(mcContent, null);
 	request.setAttribute(McAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);

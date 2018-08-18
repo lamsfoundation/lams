@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -64,6 +63,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author Ozgur Demirtas
@@ -90,8 +90,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	 * write out the audit log entry. If you move this after the update of the response, then make sure you update
 	 * the audit call to use a copy of the original answer
 	 */
-	qaService.getAuditService().logChange(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(),
-		qaUsrResp.getQaQueUser().getUsername(), qaUsrResp.getAnswer(), updatedResponse);
+	Long toolContentId = null;
+	if (qaUsrResp.getQaQuestion() != null && qaUsrResp.getQaQuestion().getQaContent() != null) {
+	    toolContentId = qaUsrResp.getQaQuestion().getQaContent().getQaContentId();
+	}
+	qaService.getLogEventService().logChangeLearnerContent(qaUsrResp.getQaQueUser().getQueUsrId(),
+		qaUsrResp.getQaQueUser().getUsername(), toolContentId, qaUsrResp.getAnswer(), updatedResponse);
 
 	qaUsrResp.setAnswer(updatedResponse);
 	qaService.updateUserResponse(qaUsrResp);
@@ -213,9 +217,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	for (Object[] userAndReflection : users) {
 	    JSONObject responseRow = new JSONObject();
-	    responseRow.put("username", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
+	    responseRow.put("username", HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[2]);
+		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[2]);
 		responseRow.put(QaAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
 	    rows.put(responseRow);

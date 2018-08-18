@@ -28,6 +28,7 @@ import javax.servlet.ServletContext;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.statistics.service.IStatisticsService;
@@ -37,7 +38,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -51,7 +51,7 @@ public class AdminServiceProxy {
     private static IUserManagementService manageService;
     private static MessageService messageService;
     private static IIntegrationService integrationService;
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
     private static IImportService importService;
     private static LdapService ldapService;
     private static IStatisticsService statisticsService;
@@ -88,12 +88,12 @@ public class AdminServiceProxy {
 	return AdminServiceProxy.integrationService;
     }
 
-    public static final IAuditService getAuditService(ServletContext servletContext) {
-	if (AdminServiceProxy.auditService == null) {
-	    AdminServiceProxy.auditService = (IAuditService) AdminServiceProxy.getDomainService(servletContext,
-		    "auditService");
+    public static final ILogEventService getLogEventService(ServletContext servletContext) {
+	if (AdminServiceProxy.logEventService == null) {
+	    AdminServiceProxy.logEventService = (ILogEventService) AdminServiceProxy.getDomainService(servletContext,
+		    "logEventService");
 	}
-	return AdminServiceProxy.auditService;
+	return AdminServiceProxy.logEventService;
     }
 
     public static final IImportService getImportService(ServletContext servletContext) {

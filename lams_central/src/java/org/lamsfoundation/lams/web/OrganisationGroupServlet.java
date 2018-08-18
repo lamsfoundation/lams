@@ -98,7 +98,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
 		    username);
 	    ExtCourseClassMap orgMap = OrganisationGroupServlet.integrationService.getExtCourseClassMap(extServer,
-		    userMap, courseId, null, null, null, LoginRequestDispatcher.METHOD_MONITOR);
+		    userMap, courseId, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    user = userMap.getUser();
 	    organisation = orgMap.getOrganisation();
 

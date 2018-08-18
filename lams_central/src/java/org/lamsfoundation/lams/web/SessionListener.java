@@ -97,7 +97,7 @@ public class SessionListener implements HttpSessionListener {
 	if (session != null) {
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
 	    if (userDTO == null) {
-		SessionManager.removeSessionByID(session.getId(), false);
+		SessionManager.removeSessionByID(session.getId(), false, true);
 	    } else {
 		// this is set in SsoHandler
 		// if user logs in from another browser, cache must not be flushed,

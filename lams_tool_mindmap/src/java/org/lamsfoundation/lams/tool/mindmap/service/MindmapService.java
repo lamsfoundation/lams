@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -76,7 +77,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
@@ -99,7 +99,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     private IMindmapRequestDAO mindmapRequestDAO = null;
     private ILamsToolService toolService;
     private IToolContentHandler mindmapToolContentHandler = null;
-    private IAuditService auditService = null;
+    private ILogEventService logEventService = null;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
     private MindmapOutputFactory mindmapOutputFactory;
@@ -316,7 +316,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      */
     @Override
     public NodeModel getMindmapXMLFromDatabase(Long rootNodeId, Long mindmapId, NodeModel rootNodeModel,
-	    MindmapUser mindmapUser) {
+	    MindmapUser mindmapUser, boolean isMonitor, boolean isAuthor, boolean isUserLocked) {
 	List mindmapNodes = getMindmapNodeByParentId(rootNodeId, mindmapId);
 
 	if ((mindmapNodes != null) && (mindmapNodes.size() > 0)) {
@@ -330,24 +330,20 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		    mindmapUserName = mindmapNode.getUser().getFirstName() + " " + mindmapNode.getUser().getLastName();
 		}
 
-		NodeModel nodeModel = null;
-		if (mindmapUser != null) {
-		    int edit = 1;
-		    if (mindmapNode.getUser() == mindmapUser) {
-			edit = 1;
-		    } else {
-			edit = 0;
-		    }
-
-		    nodeModel = new NodeModel(new NodeConceptModel(mindmapNode.getUniqueId(), mindmapNode.getText(),
-			    mindmapNode.getColor(), mindmapUserName, edit));
+		int edit;
+		if ( isAuthor ){
+		    edit = 1;
+		} else if ( isMonitor || isUserLocked || mindmapUser == null) {
+		    edit = 0;
 		} else {
-		    nodeModel = new NodeModel(new NodeConceptModel(mindmapNode.getUniqueId(), mindmapNode.getText(),
-			    mindmapNode.getColor(), mindmapUserName, 1));
+		    edit = mindmapUser.equals(mindmapNode.getUser()) ? 1 : 0;
 		}
 
+		NodeModel nodeModel = new NodeModel(new NodeConceptModel(mindmapNode.getUniqueId(), mindmapNode.getText(),
+			    mindmapNode.getColor(), mindmapUserName, edit));
+
 		rootNodeModel.addNode(nodeModel);
-		getMindmapXMLFromDatabase(mindmapNode.getNodeId(), mindmapId, nodeModel, mindmapUser);
+		getMindmapXMLFromDatabase(mindmapNode.getNodeId(), mindmapId, nodeModel, mindmapUser, isMonitor, isAuthor, isUserLocked);
 	    }
 	}
 
@@ -383,27 +379,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		getChildMindmapNodes(nodeModel.getBranch(), currentMindmapNode, mindmapUser, mindmap, mindmapSession);
 	    }
 	}
-    }
-
-    @Override
-    public String getLanguageXML() {
-	ArrayList<String> languageCollection = new ArrayList<String>();
-	languageCollection.add(new String("local.title"));
-	languageCollection.add(new String("local.delete_question"));
-	languageCollection.add(new String("local.yes"));
-	languageCollection.add(new String("local.no"));
-	languageCollection.add(new String("local.node_creator"));
-
-	String languageOutput = "<xml><language>";
-
-	for (int i = 0; i < languageCollection.size(); i++) {
-	    languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>"
-		    + mindmapMessageService.getMessage(languageCollection.get(i)) + "</name></entry>";
-	}
-
-	languageOutput += "</language></xml>";
-
-	return languageOutput;
     }
 
     @Override
@@ -531,7 +506,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
 		    rootMindmapNode.getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
 	    NodeModel currentNodeModel = getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), mindmap.getUid(),
-		    rootNodeModel, null);
+		    rootNodeModel, null, false, false, false);
 
 	    mindmapContent = xstream.toXML(currentNodeModel);
 	}
@@ -775,12 +750,12 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	return mindmapUser;
     }
 
-    public IAuditService getAuditService() {
-	return auditService;
+    public ILogEventService getLogEventService() {
+	return logEventService;
     }
 
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 
     // =========================================================================================
@@ -914,8 +889,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
+    public MindmapNode getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
 	return mindmapNodeDAO.getMindmapNodeByUniqueIdSessionId(uniqueId, mindmapId, sessionId);
+	
     }
 
     @Override
@@ -952,8 +928,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
-	return mindmapRequestDAO.getLastRequestsAfterGlobalId(globalId, mindmapId, userId, sessionId);
+    public List<MindmapRequest> getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long sessionId) {
+	return mindmapRequestDAO.getLastRequestsAfterGlobalId(globalId, mindmapId, sessionId);
     }
 
     @Override

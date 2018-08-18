@@ -38,6 +38,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -45,7 +46,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.web.context.WebApplicationContext;
@@ -72,7 +72,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 
     private static final String RE_EDIT_URL = "reEditUrl";
     
-    private static IAuditService auditService;
+    private static ILogEventService logEventService;
 
     /**
      * Action method, will handle save/cancel action.
@@ -117,7 +117,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	
 	//audit log content has been finished being edited 
 	if (StringUtils.equals(action, DEFINE_LATER_ACTION)) {
-	    getAuditService().logFinishEditingActivityInMonitor(toolContentId);
+	    getLogEventService().logFinishEditingActivityInMonitor(toolContentId);
 	}
 	
 	//reset defineLater task
@@ -127,7 +127,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(signature);
 	    contentManager.resetDefineLater(toolContentId);
 	    
-	    getAuditService().logCancelEditingActivityInMonitor(toolContentId);
+	    getLogEventService().logCancelEditingActivityInMonitor(toolContentId);
 	}
 
 	return null;
@@ -166,15 +166,15 @@ public abstract class LamsAuthoringFinishAction extends Action {
     }
     
     /**
-     * Get AuditService bean
+     * Get LogEventService bean
      */
-    private IAuditService getAuditService() {
-	if (auditService == null) {
+    private ILogEventService getLogEventService() {
+	if (logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    auditService = (IAuditService) ctx.getBean("auditService");
+	    logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
-	return auditService;
+	return logEventService;
     }
 
     /**

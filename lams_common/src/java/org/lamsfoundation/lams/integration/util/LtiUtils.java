@@ -7,6 +7,8 @@ import java.util.List;
 public class LtiUtils {
 
     public static final String OAUTH_CONSUMER_KEY = "oauth_consumer_key";
+    public static final String LTI_MESSAGE_TYPE_CONTENTITEMSELECTIONREQUEST = "ContentItemSelectionRequest";
+    public static final String CONTENT_ITEM_RETURN_URL = "content_item_return_url";
     
     /**
      * Return <code>true</code> if the user is an administrator.

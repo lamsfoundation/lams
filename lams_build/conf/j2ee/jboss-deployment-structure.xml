@@ -53,7 +53,8 @@
   	  <module name="io.undertow.servlet" export="true" />
   	  <module name="org.joda.time" export="true" />
   	  <module name="javax.mail.api" export="true" />
-      
+      <module name="io.jsonwebtoken" export="true" />
+       	  
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>
        -->

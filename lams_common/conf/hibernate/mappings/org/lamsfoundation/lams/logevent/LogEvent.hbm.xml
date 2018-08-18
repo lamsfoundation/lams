@@ -58,13 +58,18 @@
             not-null="true"
         />
 
-        <property
-            name="learningDesignId"
-            type="java.lang.Long"
+        <many-to-one
+            name="targetUser"
+            class="org.lamsfoundation.lams.usermanagement.User"
+            cascade="none"
+            
             update="true"
             insert="true"
-            column="learning_design_id"
-        />
+        >
+            <column
+                name="target_user_id" 
+            />
+        </many-to-one>
 
         <property
             name="lessonId"
@@ -81,6 +86,15 @@
             insert="true"
             column="activity_id"
         />
+
+        <property
+            name="description"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="description"
+        />
+
 
         <!--
             To add non XDoclet property mappings, create a file named

@@ -30,7 +30,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -54,6 +53,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * @author
@@ -217,7 +217,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put(GmapConstants.ATTR_USER_ID, userAndReflection[0]);
 	    String fullName = new StringBuilder((String)userAndReflection[1]).append(" ").append((String)userAndReflection[2]).toString();
-	    responseRow.put(GmapConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(fullName));
+	    responseRow.put(GmapConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(fullName));
 
 	    if (userAndReflection.length > 3) {
 		responseRow.put(GmapConstants.ATTR_PORTRAIT_ID, (Integer)userAndReflection[3]);

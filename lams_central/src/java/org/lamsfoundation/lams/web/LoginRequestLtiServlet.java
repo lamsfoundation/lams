@@ -81,8 +81,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String email = request.getParameter(BasicLTIConstants.LIS_PERSON_CONTACT_EMAIL_PRIMARY);
 
 	String locale = request.getParameter(BasicLTIConstants.LAUNCH_PRESENTATION_LOCALE);
-	String country = LoginRequestLtiServlet.getCountry(locale);
-	String lang = LoginRequestLtiServlet.getLanguage(locale);
+	String countryIsoCode = LoginRequestLtiServlet.getCountry(locale);
+	String langIsoCode = LoginRequestLtiServlet.getLanguage(locale);
 
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
@@ -125,6 +125,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 
 	//Determine method based on role parameter. Monitor roles can be either LTI standard ones or tool consumer's custom ones set
+	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
 	String method;
 	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
 		extServer.getLtiToolConsumerMonitorRoles());
@@ -153,6 +154,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
 	    // constructing redirectUrl by getting request.getQueryString() for POST requests 
 	    URIBuilder redirectUrl = new URIBuilder("lti.do");
+	    redirectUrl.addParameter("_" + LoginRequestDispatcher.PARAM_METHOD, method);
 	    for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
 		String paramName = e.nextElement();
 
@@ -161,7 +163,6 @@ public class LoginRequestLtiServlet extends HttpServlet {
 			|| !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
 		    redirectUrl.addParameter(paramName, request.getParameter(paramName));
 		}
-		redirectUrl.addParameter("_" + LoginRequestDispatcher.PARAM_METHOD, method);
 	    }
 
 	    URIBuilder url = new URIBuilder("LoginRequest");
@@ -172,8 +173,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    url.addParameter(LoginRequestDispatcher.PARAM_HASH, hash);
 	    url.addParameter(LoginRequestDispatcher.PARAM_COURSE_ID, contextId);
 	    url.addParameter(CentralConstants.PARAM_COURSE_NAME, contextLabel);
-	    url.addParameter(LoginRequestDispatcher.PARAM_COUNTRY, country);
-	    url.addParameter(LoginRequestDispatcher.PARAM_LANGUAGE, lang);
+	    url.addParameter(LoginRequestDispatcher.PARAM_COUNTRY, countryIsoCode);
+	    url.addParameter(LoginRequestDispatcher.PARAM_LANGUAGE, langIsoCode);
 	    url.addParameter(LoginRequestDispatcher.PARAM_FIRST_NAME, firstName);//TODO ?? URLEncoder.encode(queryString, "UTF-8");
 	    url.addParameter(LoginRequestDispatcher.PARAM_LAST_NAME, lastName);//TODO ?? URLEncoder.encode(queryString, "UTF-8");
 	    url.addParameter(LoginRequestDispatcher.PARAM_LESSON_ID, lessonId);

@@ -38,7 +38,7 @@
 				<property name="mindmapRequestDAO"><ref bean="mindmapRequestDAO"/></property>
 				<property name="mindmapDAO"><ref bean="mindmapDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="auditService"><ref bean="auditService"/></property>		
+				<property name="logEventService"><ref bean="logEventService"/></property>
  				<property name="mindmapToolContentHandler"><ref bean="mindmapToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>

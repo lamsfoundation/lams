@@ -8,6 +8,7 @@
 </c:set>
 
 <lams:head>  
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 	<title>
 		<fmt:message key="activity.title" />
 	</title>

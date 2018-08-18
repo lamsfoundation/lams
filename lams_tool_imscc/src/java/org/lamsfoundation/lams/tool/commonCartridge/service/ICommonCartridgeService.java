@@ -197,7 +197,7 @@ public interface ICommonCartridgeService {
      * @param visible
      *            true, item is visible. False, item is invisible.
      */
-    void setItemVisible(Long itemUid, boolean visible);
+    void setItemVisible(Long itemUid, Long toolContentId, boolean visible);
 
     /**
      * Create refection entry into notebook tool.

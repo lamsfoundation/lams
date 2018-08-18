@@ -81,6 +81,7 @@
 		    			$('#assessmentQuestionForm').ajaxSubmit(options);
 		    		}
 		  		});
+		    	
 			});
     		// post-submit callback 
     		function afterRatingSubmit(responseText, statusText)  { 
@@ -153,7 +154,7 @@
 				</div>
 								
 				<div class="generalFeedback">
-				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
+				  <a data-toggle="collapse" data-target="#general-feedback" href="#general-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
 					<div id="general-feedback"  class="voffset5 collapse <c:if test="${not empty formBean.generalFeedback}">in</c:if> form-group">
 						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
 					</div>
@@ -176,7 +177,7 @@
 						
 			<!-- Overall feedback -->
 			<div class="overallFeedback">
-			  <a data-toggle="collapse" data-target="#overall-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
+			  <a data-toggle="collapse" data-target="#overall-feedback" href="#overall-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
 
 				<div id="overall-feedback" class="collapse <c:if test="${(not empty formBean.feedbackOnCorrect) || (not empty formBean.feedbackOnIncorrect)}">in</c:if>">				
 					<div class="form-group">

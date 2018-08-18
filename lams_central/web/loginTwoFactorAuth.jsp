@@ -34,6 +34,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 		<script type="text/javascript">
 			function submitForm() {
+				$('#loginButton').addClass('disabled');
 				$('#loginForm').submit();
 			}
 

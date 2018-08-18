@@ -46,6 +46,9 @@ import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.policies.Policy;
+import org.lamsfoundation.lams.policies.PolicyDTO;
+import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.timezone.Timezone;
@@ -56,12 +59,17 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.LanguageUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -81,6 +89,8 @@ public class ProfileAction extends LamsDispatchAction {
     private static IThemeService themeService;
 
     private static ITimezoneService timezoneService;
+    
+    private static IPolicyService policyService;
 
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -183,6 +193,26 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	return null;
     }
+    
+    public ActionForward policyConsents(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	Integer userId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+	List<PolicyDTO> policyDtos = getPolicyService().getPolicyDtosByUser(userId);
+	request.setAttribute("policyDtos", policyDtos);
+
+	return mapping.findForward("profilePolicyConsents");
+    }
+    
+    public ActionForward displayPolicyDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	long policyUid = WebUtil.readLongParam(request, "policyUid");
+	Policy policy = policyService.getPolicyByUid(policyUid);
+	request.setAttribute("policy", policy);
+
+	return mapping.findForward("policyDetails");
+    }
 
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -211,6 +241,8 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
+	
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 
 	themeService = getThemeService();
 
@@ -287,5 +319,14 @@ public class ProfileAction extends LamsDispatchAction {
 	    timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
 	}
 	return timezoneService;
+    }
+    
+    private IPolicyService getPolicyService() {
+	if (policyService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    policyService = (IPolicyService) wac.getBean("policyService");
+	}
+	return policyService;
     }
 }

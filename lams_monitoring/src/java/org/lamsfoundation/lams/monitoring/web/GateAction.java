@@ -105,6 +105,7 @@ public class GateAction extends LamsDispatchAction {
     private static final String SCHEDULE_DATE = "scheduleDate";
 
     private static final DateFormat SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
+
     // ---------------------------------------------------------------------
     // Struts Dispatch Method
     // ---------------------------------------------------------------------
@@ -188,7 +189,8 @@ public class GateAction extends LamsDispatchAction {
 
 	DynaActionForm gateForm = (DynaActionForm) form;
 
-	GateActivity gate = monitoringService.openGate((Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD));
+	GateActivity gate = monitoringService.openGate((Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD),
+		getUserId());
 
 	return findViewByGateType(mapping, gateForm, gate);
     }
@@ -243,14 +245,15 @@ public class GateAction extends LamsDispatchAction {
 	}
 	return findViewByGateType(mapping, gateForm, gate);
     }
+
     // ---------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------
     private Integer getUserId() {
- 	HttpSession ss = SessionManager.getSession();
- 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
- 	return user != null ? user.getUserID() : null;
-     }
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 
     /**
      * Dispatch view the according to the gate type.

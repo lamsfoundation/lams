@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.logevent.service;
 
 import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.LogEventType;
 
 /**
  * Manages <code>LogEvent</code>s.
@@ -35,13 +35,38 @@ import org.lamsfoundation.lams.logevent.LogEvent;
  */
 public interface ILogEventService {
 
+    /** Constants used for sorting */
+    static final int SORT_BY_DATE_ASC = 0;
+    static final int SORT_BY_DATE_DESC = 1;
+
     /**
      * Records event of specified type in database.
      *
      * @param logEventTypeId
      * @param userId
      */
-    void logEvent(Integer logEventTypeId, Integer userId, Long learningDesignId, Long lessonId, Long activityId);
+    void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
+	    String description, Date eventDate);
+
+    /**
+     * Records event of specified type in database.
+     *
+     * @param logEventTypeId
+     * @param userId
+     */
+    void logEvent(Integer logEventTypeId, Integer userId, Integer targetUserId, Long lessonId, Long activityId,
+	    String description);
+    
+    /**
+     * Records event of specified type in database. Designed to be called from tools, i.e. pass toolContentId instead of
+     * lessonId and activityId.
+     * 
+     * @param eventType
+     * @param toolContentId
+     * @param learnerUserId optional parameter
+     * @param message
+     */
+    void logToolEvent(int eventType, Long toolContentId, Long learnerUserId, String message);
 
     /**
      * Returns event by the given id.
@@ -69,4 +94,34 @@ public interface ILogEventService {
      */
     List<LogEvent> getEventsOccurredBetween(Date startDate, Date finishDate);
 
+    /** Get the Log Event Types in a structured form */
+    List<LogEventType> getEventTypes();
+
+    /** Get the date of the oldest event log entry. Handy for letting a user select a date range */
+    Date getOldestEventDate();
+
+    /** Used for displaying paged lists of events */
+    List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
+	    Date endDate, String area, Integer typeId);
+
+    int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId);
+
+    /* ***************************** Helper methods used by tools to keep the audit entries consistent *****************/
+    void logChangeLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalText,
+	    String newText);
+    void logChangeLearnerArbitraryChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String message);
+
+    void logMarkChange(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalMark,
+	    String newMark);
+
+    void logHideLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String hiddenItem);
+
+    void logShowLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String hiddenItem);
+
+    void logStartEditingActivityInMonitor(Long toolContentId);
+
+    void logFinishEditingActivityInMonitor(Long toolContentId);
+
+    void logCancelEditingActivityInMonitor(Long toolContentId);
+    
 }

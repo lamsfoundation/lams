@@ -207,6 +207,17 @@ a:focus {
 .msg .panel-footer {
   font-size: $font-size-small;
 }
+
+.msg .checkbox {
+	margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.comment-entry .checkbox {
+	margin-top: 5px;
+    margin-bottom: 0px;
+}
+   
 .panel-heading-sm {
   padding: 3px 5px;
   font-size: smaller;
@@ -498,6 +509,11 @@ ul.dropdown-menu {
 	left: auto;
 	right: 0;
 }
+
+ul.dropdown-menu-right {
+	left: 0;
+	right: auto;
+}    
 
 /** Authoring */
 /*layout of adding a topic button */
@@ -1111,4 +1127,115 @@ $portrait-size-image-xl: 400px;
 .popover-content-with-portrait {
 	min-height: $portrait-size-image-lg + 20;
 	min-width:  $portrait-size-image-lg + 20;
+}
+
+// Use the same offset as the radio buttons in Bootstrap so that ticks line up with radio buttons on pages like Optional Activities
+.radio-button-offset {
+	margin-left: -20px;
+}
+
+// Reformat the spinner used by Mottie tablesorter to use fa-refresh. The spinner appears on every column and if you only want one column
+// make the other columns <th class="no-spinner"
+.tablesorter-bootstrap .tablesorter-processing {
+	background-image: none !important;
+    content: none !important;
+}
+
+.tablesorter-bootstrap .tablesorter-processing .tablesorter-header-inner:before {
+  content: "\f021"; // fa-refresh
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-animation: fa-spin 2s infinite linear;  // fa-spin
+  animation: fa-spin 2s infinite linear;  // fa-spin
+  text-decoration: inherit;
+  margin-right: 3px;
+  color: inherit;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  left: calc(50% + 14px);
+  /* 14px = 1/2 of 18px padding for sort arrows + 1/2 of 10px width of this block */
+  display: inline-block;
+}
+
+.tablesorter-bootstrap .tablesorter-processing .tablesorter-header-inner {
+    margin-left: -15px; // the spinner moves the title slightly
+}
+    
+.tablesorter-bootstrap .tablesorter-processing.no-spinner .tablesorter-header-inner:before {
+	background-image: none !important;
+    content: none !important;
+}
+
+.tablesorter-bootstrap .tablesorter-processing.no-spinner  .tablesorter-header-inner {
+    margin-left: 0px; 
+}
+
+// Full screen sizing - expects the div to be fullscreened to be called fullPageContentDiv, which contains a flexDiv and a mainDiv
+// You may need to tweak complicated structures within the div (e.g. see Mindmap's height control)
+@mixin fullPageContentDivDefn() {
+	width: 100%;
+	height: 100vh;
+	background-color: $body-bg;
+	display: flex;
+	align-items: center;
+}
+
+@mixin flexDivDefn() {
+    margin-left: 5%;
+    margin-right: 5%;
+    display: block;
+}
+
+@mixin mainDivDefn() {
+	width: 90vw;
+}
+
+#fullPageContentDiv:-webkit-full-screen {
+  @include fullPageContentDivDefn;
+}
+
+#fullPageContentDiv:-webkit-full-screen #flexDiv {
+  @include flexDivDefn;
+}
+
+#fullPageContentDiv:-webkit-full-screen #mainDiv {
+  @include mainDivDefn;
+}
+
+#fullPageContentDiv:-moz-full-screen {
+  @include fullPageContentDivDefn;
+}
+
+#fullPageContentDiv:-moz-full-screen  #flexDiv {
+  @include flexDivDefn;
+}
+
+#fullPageContentDiv:-moz-full-screen #mainDiv {
+  @include mainDivDefn;
+}
+
+#fullPageContentDiv:-ms-fullscreen {
+  @include fullPageContentDivDefn;
+}
+
+#fullPageContentDiv:-ms-fullscreen  #flexDiv {
+  @include flexDivDefn;
+}
+
+#fullPageContentDiv:-ms-full-screen #mainDiv {
+  @include mainDivDefn;
+}
+
+#fullPageContentDiv:fullscreen {
+  @include fullPageContentDivDefn;
+}
+
+#fullPageContentDiv:fullscreen #flexDiv {
+  @include flexDivDefn;
+}
+
+#fullPageContentDiv:fullscreen #mainDiv {
+  @include mainDivDefn;
 }
