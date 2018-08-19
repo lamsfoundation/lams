@@ -28,6 +28,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 
 public interface IOutcomeDAO extends IBaseDAO {
@@ -42,4 +43,8 @@ public interface IOutcomeDAO extends IBaseDAO {
     List<OutcomeScale> getScalesSortedByName(Integer organisationId);
 
     List<Integer> getAuthorOrganisations(Integer userId);
+
+    List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId);
+
+    OutcomeResult getOutcomeResult(Integer userId, Long mappingId);
 }

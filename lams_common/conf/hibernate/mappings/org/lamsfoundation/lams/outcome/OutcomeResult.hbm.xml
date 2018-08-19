@@ -21,7 +21,7 @@
 		<many-to-one name="mapping" 
 			class="org.lamsfoundation.lams.outcome.OutcomeMapping"
 			>
-			<column name="outcome_id" />
+			<column name="mapping_id" />
 		</many-to-one>
 		
 		<many-to-one name="user"

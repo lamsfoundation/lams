@@ -14,6 +14,8 @@
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="chart"/>
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
@@ -23,6 +25,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
  	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />gradebook/includes/javascript/blockexportbutton.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	
 	<script type="text/javascript">
 	
@@ -221,7 +224,8 @@
 						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
-						     	"<fmt:message key="gradebook.columntitle.mark"/>"
+						     	"<fmt:message key="gradebook.columntitle.mark"/>",
+						     	"<fmt:message key="gradebook.columntitle.outcome"/>"
 						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -232,7 +236,8 @@
 							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
 							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
-								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
+								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" },
+								{name:'outcome', index:'outcome', sortable:false, editable: false, width:100, align:"left" }
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -308,6 +313,70 @@
 						     },
 							 gridComplete: function(){
 							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
+
+							 	// if there are outcomes mapped to this activity, make them editable
+							 	var subgrid = $(this);
+							 	$('tr[role="row"]', subgrid).each(function(){
+								 	// find out row ID
+								 	var row = $(this),
+								 		id = row.attr('id');
+							 		// first row does not have ID
+								 	if (id) {
+									 	// content is JSON code sent from server
+								 		var content = $(subgrid).jqGrid('getCell', id, 'outcome');
+										if (content) {
+											var outcomes = JSON.parse(content),
+												outcomeValues = {},
+												result = '';
+											// go through each JSON item
+											$.each(outcomes, function() {
+												// assign values 0..n to ordered value names
+												var editablePossibleValues = this.possibleValues.map(function(value, index){
+													return {
+														value : index,
+														text  : value
+													}
+												});
+												// add a marker for unsetting result
+												editablePossibleValues.unshift({
+													value : -1,
+													text  : '<fmt:message key="outcome.result.not.set"/>'
+												});
+												outcomeValues[this.mappingId] = editablePossibleValues;
+												// build HTML code for x-editable
+												result += '<span title="' + this.name + '">' + this.code + 
+														': <a href="#" class="outcome" mappingId="' + this.mappingId + '"></a></span><br />';
+											});
+											// set HTML to the cell
+											$(subgrid).jqGrid('setCell', id, 'outcome', result);
+
+											// enable editable for each outcome
+											$('.outcome', row).each(function() {
+												var editable = $(this),
+													mappingId = editable.attr('mappingId');
+												editable.editable({
+												    type: 'select',
+												    emptytext : '<fmt:message key="outcome.result.error"/>',
+												    pk : mappingId,
+												    // a trick to send extra param to the server
+												    name : userID,
+												    url : '<lams:LAMSURL/>outcome.do?method=outcomeSetResult',
+												    mode : 'inline',
+												    source : outcomeValues[mappingId],
+												    // sending -1 removes the result
+												    value : typeof this.value == 'undefined' ? -1 : this.value,
+												    success: function(response, newValue) {
+													    if (response != "OK"){
+														    // it will set the value to empty and display emptytext, i.e. "ERROR!"
+														    return {'newValue' : null}
+														}
+													}
+												});
+											});
+										}
+							 		}
+								 });
+							 	
 							 },
 							 subGrid : hasArchivedMarks,
 							 subGridRowExpanded: function(subgrid_id, row_id) {

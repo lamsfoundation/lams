@@ -20,6 +20,7 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="progressBar"/>
 	<lams:css suffix="chart"/>
 	<lams:css webapp="monitoring" suffix="monitorLesson"/>

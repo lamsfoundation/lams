@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -41,6 +42,27 @@ public class OutcomeService implements IOutcomeService {
 
     public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
 	return outcomeDAO.getOutcomeMappings(lessonId, toolContentId, itemId);
+    }
+
+    public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
+	return outcomeDAO.getOutcomeResults(userId, lessonId, toolContentId, itemId);
+    }
+
+    public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
+	return outcomeDAO.getOutcomeResult(userId, mappingId);
+    }
+
+    public void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId,
+	    Long targetLessonId, Long targetToolContentId, Long targetItemId) {
+	List<OutcomeMapping> sourceMappings = getOutcomeMappings(sourceLessonId, sourceToolContentId, sourceItemId);
+	for (OutcomeMapping sourceMapping : sourceMappings) {
+	    OutcomeMapping targetMapping = new OutcomeMapping();
+	    targetMapping.setOutcome(sourceMapping.getOutcome());
+	    targetMapping.setLessonId(targetLessonId);
+	    targetMapping.setToolContentId(targetToolContentId);
+	    targetMapping.setItemId(targetItemId);
+	    outcomeDAO.insert(targetMapping);
+	}
     }
 
     public void setOutcomeDAO(IOutcomeDAO outcomeDAO) {

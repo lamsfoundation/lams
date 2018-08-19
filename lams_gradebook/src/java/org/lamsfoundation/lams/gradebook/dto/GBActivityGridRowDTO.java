@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
@@ -56,33 +55,34 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	this.groupId = groupId;
     }
 
-    /** The Spring htmlEscape method escapes Greek letters (https://jira.spring.io/browse/SPR-9293)
-     * so when the escaping is done for the Excel Exports, any Greek activity names are escaped. 
+    /**
+     * The Spring htmlEscape method escapes Greek letters (https://jira.spring.io/browse/SPR-9293)
+     * so when the escaping is done for the Excel Exports, any Greek activity names are escaped.
      * So we default to escaping (works fine sent to the browser) and then we have XSS protection for the
      * web pages. But do not escape when it will be saved in an Excel file. This issue will be resolved
      * when we upgrade Spring to v4.1.2 and then we can go back to one single creator method.
      */
-   public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId) {
+    public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId) {
 	this(activity, groupName, groupId, true);
     }
 
-   public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId, boolean escapeTitles) {
-     
+    public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId, boolean escapeTitles) {
+
 	if (groupName != null && groupId != null) {
 	    // Need to make the id unique, so appending the group id for this row
 	    this.id = activity.getActivityId().toString() + "_" + groupId.toString();
 
 	    this.groupId = groupId;
 	    // If grouped acitivty, append group name
-	    if ( escapeTitles ) {
+	    if (escapeTitles) {
 		this.rowName = HtmlUtils.htmlEscape(activity.getTitle()) + " (" + groupName + ")";
 	    } else {
-		this.rowName = activity.getTitle() + " (" + groupName + ")"; 
+		this.rowName = activity.getTitle() + " (" + groupName + ")";
 	    }
 	} else {
 	    this.id = activity.getActivityId().toString();
 
-	    if ( escapeTitles ) {
+	    if (escapeTitles) {
 		this.rowName = HtmlUtils.htmlEscape(activity.getTitle());
 	    } else {
 		this.rowName = activity.getTitle();
@@ -90,23 +90,23 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	}
 
 	String competenceMappingsStr = "";
-	if ( activity.isToolActivity() ) {
+	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
-        	//Constructs the competences for this activity.
-        	Set<CompetenceMapping> competenceMappings = toolActivity.getCompetenceMappings();
-        	
-        	if (competenceMappings != null) {
-        	    for (CompetenceMapping mapping : competenceMappings) {
-        		competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
-        	    }
-        
-        	    // trim the last comma off
-        	    if (competenceMappingsStr.length() > 0) {
-        		competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
-        	    }
-        	}
-        
-	} 
+	    //Constructs the competences for this activity.
+	    Set<CompetenceMapping> competenceMappings = toolActivity.getCompetenceMappings();
+
+	    if (competenceMappings != null) {
+		for (CompetenceMapping mapping : competenceMappings) {
+		    competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
+		}
+
+		// trim the last comma off
+		if (competenceMappingsStr.length() > 0) {
+		    competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
+		}
+	    }
+
+	}
 	this.competences = competenceMappingsStr;
 
     }
@@ -131,6 +131,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    ret.add(outcomes != null ? outcomes : CELL_EMPTY);
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 

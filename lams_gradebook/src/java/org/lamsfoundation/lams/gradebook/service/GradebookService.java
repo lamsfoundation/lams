@@ -37,6 +37,9 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivityArchive;
@@ -76,6 +79,11 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.OutcomeResult;
+import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -107,7 +115,6 @@ import org.springframework.web.util.HtmlUtils;
  *
  */
 public class GradebookService implements IGradebookService {
-
     private static Logger logger = Logger.getLogger(GradebookService.class);
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
@@ -128,9 +135,11 @@ public class GradebookService implements IGradebookService {
     private MessageService messageService;
     private ILogEventService logEventService;
     private static ICoreLearnerService learnerService;
+    private IOutcomeService outcomeService;
 
     @Override
-    public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone) {
+    public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone)
+	    throws JSONException {
 	GradebookService.logger.debug("Getting gradebook user data for lesson: " + lessonId + ". For user: " + userId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
@@ -187,6 +196,30 @@ public class GradebookService implements IGradebookService {
 			    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 			    + "&toolSessionID=" + toolSession.getToolSessionId().toString());
 		}
+	    }
+
+	    List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(null, activity.getToolContentId(),
+		    null);
+	    if (!outcomeMappings.isEmpty()) {
+		JSONArray outcomeMappingsJSON = new JSONArray();
+		for (OutcomeMapping outcomeMapping : outcomeMappings) {
+		    JSONObject outcomeMappingJSON = new JSONObject();
+		    Outcome outcome = outcomeMapping.getOutcome();
+		    outcomeMappingJSON.put("mappingId", outcomeMapping.getMappingId());
+		    outcomeMappingJSON.put("name", outcome.getName());
+		    outcomeMappingJSON.put("code", outcome.getCode());
+		    JSONArray possibleValues = new JSONArray();
+		    for (OutcomeScaleItem possibleValue : outcome.getScale().getItems()) {
+			possibleValues.put(possibleValue.getName());
+		    }
+		    outcomeMappingJSON.put("possibleValues", possibleValues);
+		    OutcomeResult result = outcomeService.getOutcomeResult(userId, outcomeMapping.getMappingId());
+		    if (result != null) {
+			outcomeMappingJSON.put("value", result.getValue());
+		    }
+		    outcomeMappingsJSON.put(outcomeMappingJSON);
+		}
+		activityDTO.setOutcomes(outcomeMappingsJSON.toString());
 	    }
 
 	    gradebookActivityDTOs.add(activityDTO);
@@ -2485,6 +2518,10 @@ public class GradebookService implements IGradebookService {
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+
+    public void setOutcomeService(IOutcomeService outcomeService) {
+	this.outcomeService = outcomeService;
     }
     // -------------------------------------------------------------------------
 }

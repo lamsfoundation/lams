@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
@@ -63,8 +64,10 @@ public interface IGradebookService {
      * @param
      * @param learner
      * @return
+     * @throws JSONException
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone);
+    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone)
+	    throws JSONException;
 
     /**
      * Gets the GBActivityDTO list for an activity, which provides the marks for all users in an activity

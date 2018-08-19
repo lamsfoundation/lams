@@ -32,6 +32,7 @@ import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -120,5 +121,32 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @SuppressWarnings("unchecked")
     public List<Integer> getAuthorOrganisations(Integer userId) {
 	return find(FIND_AUTHOR_ORGANISATIONS, new Object[] { userId });
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	if (lessonId != null) {
+	    properties.put("mapping.outcome.lessonId", lessonId);
+	}
+	if (toolContentId != null) {
+	    properties.put("mapping.outcome.toolContentId", toolContentId);
+	}
+	if (itemId != null) {
+	    properties.put("mapping.outcome.itemId", itemId);
+	}
+	if (userId != null) {
+	    properties.put("user.userId", userId);
+	}
+	return findByProperties(OutcomeResult.class, properties);
+    }
+
+    @SuppressWarnings("unchecked")
+    public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("user.userId", userId);
+	properties.put("mapping.mappingId", mappingId);
+	List<OutcomeResult> result = findByProperties(OutcomeResult.class, properties);
+	return result.isEmpty() ? null : result.get(0);
     }
 }

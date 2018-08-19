@@ -43,8 +43,11 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
@@ -190,6 +193,10 @@ public class OutcomeAction extends DispatchAction {
 		    outcome.setScale(scale);
 		}
 		getUserManagementService().save(outcome);
+
+		if (log.isDebugEnabled()) {
+		    log.debug("Saved outcome " + outcome.getOutcomeId());
+		}
 		request.setAttribute("saved", true);
 	    } catch (Exception e) {
 		log.error("Exception while saving an outcome", e);
@@ -227,6 +234,9 @@ public class OutcomeAction extends DispatchAction {
 	    }
 	}
 	getUserManagementService().delete(outcome);
+	if (log.isDebugEnabled()) {
+	    log.debug("Deleted outcome " + outcomeId);
+	}
 	return outcomeManage(mapping, form, request, response);
     }
 
@@ -310,6 +320,11 @@ public class OutcomeAction extends DispatchAction {
 	outcomeMapping.setItemId(itemId);
 	getUserManagementService().save(outcomeMapping);
 
+	if (log.isDebugEnabled()) {
+	    log.debug("Mapped outcome " + outcome.getOutcomeId() + " to lesson ID " + lessonId + " and tool content ID "
+		    + toolContentId + " and item ID " + itemId);
+	}
+
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(outcomeMapping.getMappingId());
 	return null;
@@ -367,6 +382,72 @@ public class OutcomeAction extends DispatchAction {
 		    "remove outcome mapping", true);
 	}
 	getUserManagementService().delete(outcomeMapping);
+	if (log.isDebugEnabled()) {
+	    log.debug("Deleted outcome mapping " + outcomeMapping);
+	}
+	return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ActionForward outcomeSetResult(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Long mappingId = WebUtil.readLongParam(request, "pk");
+	Integer value = WebUtil.readIntParam(request, "value");
+	Integer targetUserId = WebUtil.readIntParam(request, "name");
+	OutcomeMapping outcomeMapping = (OutcomeMapping) getUserManagementService().findById(OutcomeMapping.class,
+		mappingId);
+	Long lessonId = outcomeMapping.getLessonId();
+	if (lessonId == null) {
+	    ToolActivity toolActivity = ((List<ToolActivity>) getUserManagementService()
+		    .findByProperty(ToolActivity.class, "toolContentId", outcomeMapping.getToolContentId())).get(0);
+	    lessonId = ((Lesson) toolActivity.getLearningDesign().getLessons().iterator().next()).getLessonId();
+	}
+	Integer userId = getUserDTO().getUserID();
+	getSecurityService().isLessonMonitor(lessonId, userId, "set outcome result", true);
+
+	OutcomeResult result = getOutcomeService().getOutcomeResult(userId, mappingId);
+	if (result == null) {
+	    // result does not exist; if value == -1, it means it is not meant to exist, otherwise create
+	    if (value > -1) {
+		result = new OutcomeResult();
+		User user = (User) getUserManagementService().findById(User.class, userId);
+		result.setCreateBy(user);
+		result.setCreateDateTime(new Date());
+		result.setMapping(outcomeMapping);
+		User targetUser = (User) getUserManagementService().findById(User.class, targetUserId);
+		result.setUser(targetUser);
+		result.setValue(value);
+		getUserManagementService().save(result);
+		if (log.isDebugEnabled()) {
+		    log.debug("Added outcome result " + result.getResultId());
+		}
+	    }
+	    // modify only if value is different
+	} else if (!result.getValue().equals(value)) {
+	    // if value is -1, remove the result
+	    if (value == -1) {
+		Long resultId = result.getResultId();
+		getUserManagementService().delete(result);
+		if (log.isDebugEnabled()) {
+		    log.debug("Deleted outcome result " + resultId);
+		}
+	    } else {
+		// update existing result
+		result.setValue(value);
+		User user = (User) getUserManagementService().findById(User.class, userId);
+		result.setCreateBy(user);
+		result.setCreateBy(user);
+		result.setValue(value);
+		getUserManagementService().save(result);
+		if (log.isDebugEnabled()) {
+		    log.debug("Edited outcome result " + result.getResultId());
+		}
+	    }
+	}
+
+	// if something else than OK is sent, x-editable will print ERROR!
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print("OK");
 	return null;
     }
 
@@ -419,6 +500,9 @@ public class OutcomeAction extends DispatchAction {
 	    }
 	}
 	getUserManagementService().delete(scale);
+	if (log.isDebugEnabled()) {
+	    log.debug("Deleted outcome scale " + scaleId);
+	}
 	return scaleManage(mapping, form, request, response);
     }
 
@@ -541,6 +625,10 @@ public class OutcomeAction extends DispatchAction {
 		    scale.getItems().clear();
 		    scale.getItems().addAll(newItems);
 		    getUserManagementService().save(scale);
+
+		    if (log.isDebugEnabled()) {
+			log.debug("Saved outcome scale " + scale.getScaleId());
+		    }
 
 		    request.setAttribute("saved", true);
 		}
