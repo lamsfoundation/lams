@@ -10,7 +10,7 @@
 	<title>Course Gradebook Learner</title>
 	
 	<lams:css />
-	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 

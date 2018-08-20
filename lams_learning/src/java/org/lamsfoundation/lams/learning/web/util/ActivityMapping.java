@@ -164,7 +164,7 @@ public class ActivityMapping implements Serializable {
 
 	String forward = null;
 
-	String action = "/requestDisplay.do?url=" + encodedURL;
+	String action = "requestDisplay.do?url=" + encodedURL;
 	action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId);
 
 	forward = actionToForward(action, null, false);
@@ -351,10 +351,10 @@ public class ActivityMapping implements Serializable {
      */
     public String getDisplayActivityAction(Long lessonID) {
 	if (lessonID != null) {
-	    return WebUtil.appendParameterToURL("/DisplayActivity.do", AttributeNames.PARAM_LESSON_ID,
+	    return WebUtil.appendParameterToURL("DisplayActivity.do", AttributeNames.PARAM_LESSON_ID,
 		    lessonID.toString());
 	} else {
-	    return "/DisplayActivity.do";
+	    return "DisplayActivity.do";
 	}
     }
 }

@@ -494,7 +494,7 @@ function showGradebookLearnerDialog(orgID){
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
+				+ 'gradebook/gradebookLearning/courseLearner.do?organisationID=' + orgID);
 		}
 	}, true);
 }

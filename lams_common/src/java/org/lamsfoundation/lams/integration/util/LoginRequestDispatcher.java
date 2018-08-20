@@ -96,7 +96,7 @@ public class LoginRequestDispatcher {
 
     private static final String URL_AUTHOR = "/home.do?method=author";
 
-    private static final String URL_LEARNER = "/home.do?method=learner&lessonID=";
+    private static final String URL_LEARNER = "/home/learner.do?lessonID=";
 
     private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
 

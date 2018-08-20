@@ -10,7 +10,7 @@
 	<title><fmt:message key="gradebook.title.window.courseMonitor"/></title>
 	
 	<lams:css />
-	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
