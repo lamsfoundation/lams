@@ -407,7 +407,6 @@
 									     pager: false,
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
-									    	"<fmt:message key="gradebook.columntitle.restart"/>",
 									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.progress"/>",
 									     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
@@ -417,9 +416,8 @@
 									     	"<fmt:message key="gradebook.columntitle.mark"/>"
 									     ],
 									     colModel: [
-									       	{name:'id', index:'id',  sortable:false, editable: false ,width:40, align:"right"},
-									       	{name:'restart',index:'restart', sortable:false, editable: false, width:60,align:"left"},
-											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:50, align:"center" },
+									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
 											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
 											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
 												cellattr: function(rowID, val, rawObject, cm, rdata) {
