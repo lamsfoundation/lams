@@ -75,25 +75,23 @@ public class ServerSaveController {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl" };
 	for (String requiredField : requiredFields) {
-	    if (StringUtils.trimToNull(extServerForm.getString(requiredField)) == null) {
-		errorMap.add(requiredField, "error.required", messageService.getMessage("sysadmin." + requiredField));
+	    if (StringUtils.trimToNull(requiredField) == null) {
+		errorMap.add("error.required", messageService.getMessage("sysadmin." + requiredField));
 	    }
 	}
 
 	Integer sid = extServerForm.getSid();
 	if (errorMap.isEmpty()) {//check duplication
-	    String[] uniqueFields = { "serverid", "prefix" };
+	    String[] uniqueFields = extServerForm.getUniqueFields();
 	    for (String uniqueField : uniqueFields) {
-		List list = userService.findByProperty(ExtServer.class, uniqueField, extServerForm.get(uniqueField));
+		List list = userService.findByProperty(ExtServer.class, "uniqueField", uniqueField);
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(-1)) {//new map
-			errorMap.add(uniqueField, "error.not.unique",
-				messageService.getMessage("sysadmin." + uniqueField));
+			errorMap.add("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
 		    } else {
 			ExtServer map = (ExtServer) list.get(0);
 			if (!map.getSid().equals(sid)) {
-			    errorMap.add(uniqueField, "error.not.unique",
-				    messageService.getMessage("sysadmin." + uniqueField));
+			    errorMap.add("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
 			}
 		    }
 

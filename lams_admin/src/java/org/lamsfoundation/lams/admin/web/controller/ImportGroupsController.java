@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.admin.web.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
@@ -35,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,10 +55,9 @@ public class ImportGroupsController {
 
     @Autowired
     private WebApplicationContext applicationContext;
-    
-    @RequestMapping("/importgroups")
-    public String execute(@ModelAttribute ImportExcelForm importForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+
+    @RequestMapping(path = "/importgroups", method = RequestMethod.POST)
+    public String execute(@ModelAttribute ImportExcelForm importForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
 	    return "redirect:/sysadminstart.do";

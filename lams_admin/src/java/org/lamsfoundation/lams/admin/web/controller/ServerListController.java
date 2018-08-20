@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.integration.ExtServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -44,7 +45,7 @@ public class ServerListController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/serverlist")
+    @RequestMapping(path = "/serverlist", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 	List<ExtServer> extServers = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext())
 		.getAllExtServers();

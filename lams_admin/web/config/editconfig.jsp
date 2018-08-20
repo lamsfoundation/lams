@@ -6,8 +6,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title" value="${sysadmin.config.settings.edit}"/>
-	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><fmt:message key="sysadmin.config.settings.edit"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -18,63 +17,64 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
+
+	<c:set var="title"><fmt:message key="sysadmin.config.settings.edit"/></c:set>
+	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
+	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="configForm">
+		
+		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+
+		<c:if test="${not empty error}">
+			<lams:Alert type="danger" id="error-messages" close="false">
+				<c:out value="${error}" />
+			</lams:Alert>
+		</c:if>
+				
+		<form:form action="save.do" modelAttribute="configForm" id="configForm" method="post">
+				
+			<c:forEach items="${config}" var="group">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="panel-title"><fmt:message key="${group.key}"/></div>
+					</div>
+									
+					<table class="table table-striped table-condensed" >
+						<c:forEach items="${group}" path="value" var="row">
+							<tr>
+								<td>
+									<fmt:message key="${row.descriptionKey}"/>
+									<c:if test="${row.required}">&nbsp;&nbsp;*</c:if>
+								</td>
+								<td>
+									<form:hidden path="key" name="key" value="${row.key}"/>
+									<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
+									<c:choose>
+									<c:when test="${row.format==BOOLEAN}">
+										<form:select id="${row.key}" name="row" path="value" cssClass="form-control form-control-sm">
+										<form:option value="true">true</form:option>
+										<form:option value="false">false&nbsp;&nbsp;</form:option>
+										</form:select>
+									</c:when>
+									<c:otherwise>
+										<form:input id="${row.key}" path="value" name="row" value="${row.value}" size="50" maxlength="255" cssClass="form-control"/>
+									</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+						</c:forEach>
+					</table>
+				</div>
+			</c:forEach>
+				
+			<div class="pull-right">
+				<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+				<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+			</div>
+		</form:form>
+		
+	</lams:Page>
 	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
-				<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
-				<c:if test="${not empty error}">
-					<lams:Alert type="danger" id="error-messages" close="false">
-							<c:out value="${error}" />
-					</lams:Alert>
-				</c:if>
-				
-				<form:form action="save.do" method="post">
-				
-					<%@ include file="/config/items.jsp"%>
-				
-					<div class="pull-right">
-						<html:cancel cssClass="btn btn-default">
-							<fmt:message key="admin.cancel" />
-						</html:cancel>
-						<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
-					</div>
-				</form:form>
-			</lams:Page>
-		</c:when>
-		<c:otherwise>
-			<lams:Page type="admin" title="${title}" >
-				<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
-				<c:if test="${not empty error}">
-					<lams:Alert type="danger" id="error-messages" close="false">
-							<c:out value="${error}" />
-					</lams:Alert>
-				</c:if>
-				
-				<form:form action="save.do" method="post">
-				
-					<%@ include file="/config/items.jsp"%>
-				
-					<div class="pull-right">
-						<html:cancel cssClass="btn btn-default">
-							<fmt:message key="admin.cancel" />
-						</html:cancel>
-						<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
-					</div>
-				</form:form>
-			</lams:Page>
-		</c:otherwise>
-	</c:choose>
-
-
 </body>
 </lams:html>
 

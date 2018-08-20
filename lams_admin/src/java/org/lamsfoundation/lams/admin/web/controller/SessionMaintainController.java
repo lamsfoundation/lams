@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Marcin Cieslak
@@ -36,13 +37,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/sessionmaintain")
 public class SessionMaintainController {
 
-    @RequestMapping("/list")
+    @RequestMapping(path = "/list", method = RequestMethod.POST)
     public String list(HttpServletRequest request) {
 	request.setAttribute("sessions", SessionManager.getLoginToSessionIDMappings());
 	return "sessionmaintain";
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) {
 	String login = request.getParameter("login");
 	if (StringUtils.isNotBlank(login)) {

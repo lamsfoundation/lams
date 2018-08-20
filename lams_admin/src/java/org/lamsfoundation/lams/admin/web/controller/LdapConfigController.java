@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -93,7 +94,7 @@ public class LdapConfigController {
 	return configurationService;
     }
 
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 
 	String action = WebUtil.readStrParam(request, "action", true);
@@ -117,7 +118,7 @@ public class LdapConfigController {
 	return "ldap";
     }
 
-    @RequestMapping("/sync")
+    @RequestMapping(path = "/sync", method = RequestMethod.POST)
     public String sync(HttpServletRequest request) throws Exception {
 
 	String sessionId = SessionManager.getSession().getId();
@@ -129,7 +130,7 @@ public class LdapConfigController {
 	return "ldap";
     }
 
-    @RequestMapping("/waiting")
+    @RequestMapping(path = "/waiting", method = RequestMethod.POST)
     public String waiting(HttpServletRequest request) throws Exception {
 
 	request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
@@ -137,7 +138,7 @@ public class LdapConfigController {
 	return "ldap";
     }
 
-    @RequestMapping("/results")
+    @RequestMapping(path = "/results", method = RequestMethod.POST)
     public String results(HttpServletRequest request) throws Exception {
 
 	HttpSession ss = SessionManager.getSession();

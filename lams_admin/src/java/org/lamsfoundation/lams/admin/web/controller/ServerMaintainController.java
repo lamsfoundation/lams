@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -50,7 +51,7 @@ public class ServerMaintainController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/edit")
+    @RequestMapping(path = "/edit", method = RequestMethod.POST)
     public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
@@ -61,31 +62,31 @@ public class ServerMaintainController {
 	return "servermaintain";
     }
 
-    @RequestMapping("/edit")
+    @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
 	IIntegrationService service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	ExtServer map = service.getExtServer(sid);
 	map.setDisabled(true);
 	service.saveExtServer(map);
-	return "forward:/serverlist.do";
+	return "redirect:/serverlist.do";
     }
 
-    @RequestMapping("/edit")
+    @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enable(HttpServletRequest request) throws Exception {
 	IIntegrationService service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	ExtServer map = service.getExtServer(sid);
 	map.setDisabled(false);
 	service.saveExtServer(map);
-	return "forward:/serverlist.do";
+	return "redirect:/serverlist.do";
     }
 
-    @RequestMapping("/edit")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	AdminServiceProxy.getService(applicationContext.getServletContext()).deleteById(ExtServer.class, sid);
-	return "forward:/serverlist.do";
+	return "redirect:/serverlist.do";
     }
 
 }

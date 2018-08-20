@@ -179,6 +179,6 @@ public class SignupManagementController {
 	    userManagementService.deleteById(SignupOrganisation.class, soid);
 	}
 
-	return "forward:signupManagement/list.do";
+	return "redirect:signupManagement/list.do";
     }
 }

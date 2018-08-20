@@ -5,7 +5,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="${title.clone.lessons}"/></c:set>
+	<c:set var="title"><fmt:message key="title.clone.lessons"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -133,16 +133,9 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+
+	<c:set var="title"><fmt:message key="title.clone.lessons"/></c:set>
+	<lams:Page type="admin" title="${title}" formID="cloneForm">
 			
 			<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
 				<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
@@ -248,119 +241,7 @@
 				</div>
 				
 			</form>
-			</lams:Page>
-		</c:when>
-		<c:otherwise>
-			<lams:Page type="admin" title="${title}" >
-
-			<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
-				<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
-				<c:if test="${org.organisationType.organisationTypeId eq classTypeId}">
-					<a href="orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />" class="btn btn-default">
-						<c:out value="${org.parentOrganisation.name}" />
-					</a> :
-				</c:if>
-				<a href="orgmanage.do?org=<c:out value="${org.organisationId}" />" class="btn btn-default">
-					<c:out value="${org.name}" />
-				</a>
-			</p>			
-			<h4><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h4>
-			
-			<c:if test="${not empty errors}">
-				<lams:Alert type="danger" id="errorKey" close="false">			
-					<c:forEach items="${errors}" var="error">
-						<c:out value="${error}" />
-					</c:forEach>
-				</lams:Alert>
-			</c:if>
-			
-			<div class="panel panel-default voffset5" >
-				<div class="panel-heading">
-					<span class="panel-title">
-						<fmt:message key="title.choose.group" />
-					</span>
-				</div>
-				<div class="panel-body">
-					<div class="form-group">
-						<fmt:message key="admin.course" />:
-						<select id="sourceGroupId" class="form-control">
-							<option value="">...</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<fmt:message key="admin.class" />:
-						<select id="sourceSubgroupId" class="form-control">
-						</select>
-					</div>
-					<div class="form-group">
-						<input type="submit" class="btn btn-default" value="<fmt:message key="label.choose" />" onclick="javascript:loadGroupAttributes(chosenGroup());">
-					</div>
-				</div>
-			</div>
-			
-			<div id="staffDialog" title="<fmt:message key="label.configure.staff" />" style="display:none;">
-			
-			</div>
-			
-			<div id="learnerDialog" title="<fmt:message key="label.configure.learners" />" style="display:none;">
-			
-			</div>
-			
-			
-			<form name="cloneForm" id="cloneForm" action="clone.do" method="post">
-				<input type="hidden" name="groupId" value="<c:out value="${org.organisationId}" />">
-				<input type="hidden" name="lessons">
-				<input type="hidden" name="staff">
-				<input type="hidden" name="learners">
-			
-				<div style="display:none;" id="cloneOptionsDiv">
-				
-					<div class="panel panel-default voffset5" >
-					<div class="panel-heading">
-						<span class="panel-title">
-							<fmt:message key="title.select.lessons" />
-						</span>
-					</div>
-					<div class="panel-body">
-						<p id="availableLessons"></p>
-					</div>
-					</div>
-				
-					<div class="panel panel-default voffset5" >
-					<div class="panel-heading">
-						<span class="panel-title">
-							<fmt:message key="title.select.staff" />
-						</span>
-					</div>
-					<div class="panel-body">
-						<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> <fmt:message key="message.add.all.monitors" />
-						<a onclick="staffDialog();" class="btn btn-default pull-right"><fmt:message key="label.configure.staff" /></a>
-					</div>
-					</div>
-					
-					<div class="panel panel-default voffset5" >
-					<div class="panel-heading">
-						<span class="panel-title">
-							<fmt:message key="title.select.learners" />
-						</span>
-					</div>
-					<div class="panel-body">
-						<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked"> <fmt:message key="message.add.all.learners" />
-						<a onclick="learnerDialog();" class="btn btn-default pull-right"><fmt:message key="label.configure.learners" /></a>
-					</div>
-					</div>
-			
-					<div class="pull-right">
-						<input type="submit" class="btn btn-primary" onclick="return clone();" value="<fmt:message key="label.clone" />">
-					</div>
-				</div>
-				
-			</form>
-			</lams:Page>
-		</c:otherwise>
-	</c:choose>
-
-
+	</lams:Page>	
 </body>
 </lams:html>
 

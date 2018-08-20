@@ -9,8 +9,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><tiles:getAsString name="title"/></c:set>
-	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -59,15 +58,10 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+
+	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
+	<c:set var="help"><fmt:message key="Import+Users"/></c:set>
+	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 				<p>
 					<a href="<lams:LAMSURL/>/admin/sysadminstart.do"
@@ -125,7 +119,7 @@
 					<fmt:message key="msg.import.conclusion" />
 				</p>
 				
-				<form:form action="importexcelsave.do" modelAttribute="ImportExcelForm" method="post"
+				<form:form action="importexcelsave.do" modelAttribute="importExcelForm" id="importExcelForm" method="post"
 					enctype="multipart/form-data" onsubmit="return goToStatus();">
 					<form:hidden path="orgId" />
 				
@@ -133,92 +127,14 @@
 					<lams:WaitingSpinner id="fileUpload_Busy"/> 
 				
 					<div class="pull-right">
-						<html:cancel styleId="cancelButton" styleClass="btn btn-default">
-							<fmt:message key="admin.cancel" />
-						</html:cancel>
-						<input type="submit" id="importButton" class="btn btn-primary loffset5"> value="<fmt:message key="label.import" />" />
+						<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" id="cancelButton" class="btn btn-default">
+						<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import" />" />
 						&nbsp;
 					</div>
 				
 				</form:form>
 			</lams:Page>
-		</c:when>
-		<c:otherwise>
-			<lams:Page type="admin" title="${title}" >
-				<p>
-					<a href="<lams:LAMSURL/>/admin/sysadminstart.do"
-						class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
-				</p>
-				
-				<p>
-					<fmt:message key="msg.import.intro" />
-				</p>
-				<p>
-				<ul>
-					<li><fmt:message key="msg.import.1" /></li>
-					<li><fmt:message key="msg.import.2" />
-						<ul>
-							<li><p>
-									<a href="file/lams_users_template.xls">lams_users_template.xls</a>
-								</p></li>
-						</ul></li>
-					<li><fmt:message key="msg.import.3" />
-						<ul>
-							<li><p>
-									<a href="file/lams_roles_template.xls">lams_roles_template.xls</a>
-								</p></li>
-						</ul></li>
-				</ul>
-				</p>
-				<div class ="pull-left">
-					<lams:Alert type="info" close="false">
-						<strong><fmt:message key='label.password.must.contain' />:</strong>
-						<ul style="line-height: 1.2">
-							<li><span class="fa fa-check"></span> <fmt:message
-									key='label.password.min.length'>
-									<fmt:param value='${minNumChars}' />
-								</fmt:message></li>
-							<c:if test="${mustHaveUppercase}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.ucase' /></li>
-							</c:if>
-							<c:if test="${mustHaveLowercase}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.lcase' /></li>
-							</c:if>
-							<c:if test="${mustHaveNumerics}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.number' /></li>
-							</c:if>
-							<c:if test="${mustHaveSymbols}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.symbol' /></li>
-							</c:if>
-						</ul>
-					</lams:Alert>
-				</div>
-				<p>
-					<fmt:message key="msg.import.conclusion" />
-				</p>
-				
-				<form:form action="importexcelsave.do" modelAttribute="ImportExcelForm" method="post"
-					enctype="multipart/form-data" onsubmit="return goToStatus();">
-					<form:hidden path="orgId" />
-				
-					<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.excel.spreadsheet" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/> 
-					<lams:WaitingSpinner id="fileUpload_Busy"/> 
-				
-					<div class="pull-right">
-						<html:cancel styleId="cancelButton" styleClass="btn btn-default">
-							<fmt:message key="admin.cancel" />
-						</html:cancel>
-						<input type="submit" id="importButton" class="btn btn-primary loffset5"> value="<fmt:message key="label.import" />" />
-						&nbsp;
-					</div>
-				
-				</form:form>
-			</lams:Page>
-		</c:otherwise>
+
 	</c:choose>
 
 

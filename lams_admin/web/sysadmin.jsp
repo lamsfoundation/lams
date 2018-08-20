@@ -4,8 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><tiles:getAsString name="title"/></c:set>
-	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><fmt:message key="sysadmin.maintain"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -16,16 +15,8 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<c:set var="title"><fmt:message key="sysadmin.maintain"/></c:set>
+	<lams:Page type="admin" title="${title}">
 			<c:forEach items="${groupedLinks}" var="links">
 				<div class="panel panel-default">
 					<div class="panel-heading">
@@ -43,32 +34,8 @@
 			 		</div>
 				</div>		
 			</c:forEach>
-			</lams:Page>
-		</c:when>
-		<c:otherwise>
-			<lams:Page type="admin" title="${title}" >
-				<c:forEach items="${groupedLinks}" var="links">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="panel-title"><fmt:message key="${links[0]}"/></div>
-					</div>
-					<div class="list-group">
-						<c:set var="linkBeans" value="${links[1]}"/>
-			 			<c:forEach items="${linkBeans}" var="linkBean">
-							<span class="list-group-item">
-							<a href="<c:out value="${linkBean.link}"/>">
-									<fmt:message><c:out value="${linkBean.name}"/></fmt:message>
-							</a>
-							</span>
-						</c:forEach>
-			 		</div>
-				</div>		
-			</c:forEach>
-			</lams:Page>
-		</c:otherwise>
-	</c:choose>
-
-
+	</lams:Page>
+		
 </body>
 </lams:html>
 

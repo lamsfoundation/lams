@@ -57,7 +57,7 @@ public class LtiConsumerManagementController {
     /**
      * Shows all available LTI tool consumers
      */
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String unspecified(HttpServletRequest request) {
 	initServices();
 
@@ -71,7 +71,7 @@ public class LtiConsumerManagementController {
     /**
      * Edits specified LTI tool consumer
      */
-    @RequestMapping("/edit")
+    @RequestMapping(path = "/edit", method = RequestMethod.POST)
     public String edit(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -96,7 +96,7 @@ public class LtiConsumerManagementController {
     /**
      * Disables or enables (depending on "disable" parameter) specified LTI tool consumer
      */
-    @RequestMapping("/disable")
+    @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -139,30 +139,29 @@ public class LtiConsumerManagementController {
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
+	String[] requiredFields = extServerForm.getRequiredFields();
 	for (String requiredField : requiredFields) {
-	    if (StringUtils.trimToNull(extServerForm.getString(requiredField)) == null) {
-		errorMap.add(requiredField,
-			new ActionMessage("error.required", messageService.getMessage("sysadmin." + requiredField)));
+	    if (StringUtils.trimToNull(requiredField) == null) {
+		errorMap.add("error.required", messageService.getMessage("sysadmin." + requiredField));
 	    }
 	}
 
 	Integer sid = extServerForm.getSid();
 	//check duplication
 	if (errorMap.isEmpty()) {
-	    String[] uniqueFields = { "serverid", "prefix" };
+	    String[] uniqueFields = extServerForm.getUniqueFields();
 	    for (String uniqueField : uniqueFields) {
-		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, uniqueField,
-			extServerForm.get(uniqueField));
+		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, "uniqueField",
+			uniqueField);
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(0)) {//new map
-			errorMap.add(uniqueField, new ActionMessage("error.not.unique",
-				messageService.getMessage("sysadmin." + uniqueField)));
+			errorMap.add("error.not.unique",
+				messageService.getMessage("sysadmin." + uniqueField));
 		    } else {
 			ExtServer ltiConsumer = list.get(0);
 			if (!ltiConsumer.getSid().equals(sid)) {
-			    errorMap.add(uniqueField, new ActionMessage("error.not.unique",
-				    messageService.getMessage("sysadmin." + uniqueField)));
+			    errorMap.add("error.not.unique",
+				    messageService.getMessage("sysadmin." + uniqueField));
 			}
 		    }
 

@@ -6,8 +6,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><tiles:getAsString name="title"/></c:set>
-	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><fmt:message key="sysadmin.maintain.server.edit"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -26,7 +25,7 @@
 			});
 	
 			// validate signup form on keyup and submit
-			var validator = $("#ext-server-form").validate({
+			var validator = $("#extServerForm").validate({
 				rules: {
 					serverid: "required", 
 					serverkey: "required",
@@ -56,16 +55,11 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
 	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<c:set var="title"><fmt:message key="sysadmin.maintain.server.edit"/></c:set>
+	<c:set var="help"><fmt:message key="Integrations"/></c:set>
+	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 				<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 				<%-- Error Messages --%>
@@ -78,7 +72,7 @@
 				            </lams:Alert>
 				        </c:if>
 				
-				<form:form action="serversave.do" id="ext-server-form" modelAttribute="extServerForm" method="post">
+				<form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 					<form:hidden path="sid" />
 					
 				<table class="table table-no-border">
@@ -116,7 +110,7 @@
 						</td>
 					</tr>
 					
-					<tr id="ttl-login-request-wrap" <c:if test="${!formBean.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
+					<tr id="ttl-login-request-wrap" <c:if test="${!extServerForm.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
 						<td><fmt:message key="sysadmin.login.request.ttl" /></td>
 						<td><input type="text" name="timeToLiveLoginRequest" size="10" id="ttl-login-request" class="form-control"/></td>
 					</tr>
@@ -136,98 +130,13 @@
 				</table>
 				<div class="pull-right">
 					<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-					<html:cancel styleClass="btn btn-default"><fmt:message key="admin.cancel" /></html:cancel>
+					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
 					<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</div>
 				</form:form>
 				
 				<a href="sysadminstart.do" class="btn btn-default pull-left"><fmt:message key="sysadmin.maintain" /></a>
 			</lams:Page>
-			
-		</c:when>
-		<c:otherwise>
-		
-			<lams:Page type="admin" title="${title}" >
-			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
-				<%-- Error Messages --%>
-				<c:set var="errorKey" value="GLOBAL" />
-				        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-				            <lams:Alert id="error" type="danger" close="false">
-				                <c:forEach var="error" items="${errorMap[errorKey]}">
-				                    <c:out value="${error}" />
-				                </c:forEach>
-				            </lams:Alert>
-				        </c:if>
-				
-				<form:form action="serversave.do" id="ext-server-form" modelAttribute="extServerForm" method="post">
-					<form:hidden path="sid" />
-					
-				<table class="table table-no-border">
-					<tr>
-						<td width="25%"><fmt:message key="sysadmin.serverid" />&nbsp;*</td>
-						<td><input type="text" name="serverid" size="20" class="form-control"/></td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.serverkey" />&nbsp;*</td>
-						<td><input type="text" name="serverkey" size="30" class="form-control"/></td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.servername" />&nbsp;*</td>
-						<td><input type="text" name="servername" size="30" class="form-control"/></td>
-					</tr>
-					<tr>
-						<td valign="top"><fmt:message key="sysadmin.serverdesc" /></td>
-						<td><input type="text" name="serverdesc" cols="40" rows="3" class="form-control"/> </td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.prefix" />&nbsp;*</td>
-						<td><input type="text" name="prefix" size="10" class="form-control"/></td>
-					</tr>
-					
-					<tr>
-						<td><fmt:message key="sysadmin.disabled" /></td>
-						<td><form:checkbox path="disabled" /></td>
-					</tr>
-					
-					<tr>
-						<td><fmt:message key="sysadmin.login.request.ttl.enable" /></td>
-						<td>
-							<form:checkbox path="timeToLiveLoginRequestEnabled" id="ttl-login-request-enabled"/>
-							<input type="hidden" name="timeToLiveLoginRequestEnabled" value="false">
-						</td>
-					</tr>
-					
-					<tr id="ttl-login-request-wrap" <c:if test="${!formBean.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
-						<td><fmt:message key="sysadmin.login.request.ttl" /></td>
-						<td><input type="text" name="timeToLiveLoginRequest" size="10" id="ttl-login-request" class="form-control"/></td>
-					</tr>
-				
-					<tr>
-						<td><fmt:message key="sysadmin.userinfoUrl" />&nbsp;*</td>
-						<td><input type="text" name="userinfoUrl" size="70" class="form-control"/></td>
-					</tr>
-					<tr>
-						<td><fmt:message key="sysadmin.lessonFinishUrl" /></td>
-						<td><input type="text" name="lessonFinishUrl" size="70" class="form-control"/></td>
-					</tr>
-						<tr>
-						<td><fmt:message key="sysadmin.extGroupsUrl" /></td>
-						<td><input type="text" name="extGroupsUrl" size="70" class="form-control"/></td>
-					</tr>
-				</table>
-				<div class="pull-right">
-					<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-					<html:cancel styleClass="btn btn-default"><fmt:message key="admin.cancel" /></html:cancel>
-					<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
-				</div>
-				</form:form>
-				
-				<a href="sysadminstart.do" class="btn btn-default pull-left"><fmt:message key="sysadmin.maintain" /></a>
-			</lams:Page>
-		</c:otherwise>
-	</c:choose>
-
 
 </body>
 </lams:html>

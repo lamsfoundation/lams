@@ -40,6 +40,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -64,8 +65,7 @@ public class ScheduledJobListController {
      * Get all waitting queue jobs scheduled in Quartz table and display job name, job start time and description. The
      * description will be in format "Lesson Name":"the lesson creator", or "The gate name":"The relatived lesson name".
      */
-    @SuppressWarnings("unchecked")
-    @RequestMapping("/joblist")
+    @RequestMapping(path = "/joblist", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 
 	WebApplicationContext ctx = WebApplicationContextUtils

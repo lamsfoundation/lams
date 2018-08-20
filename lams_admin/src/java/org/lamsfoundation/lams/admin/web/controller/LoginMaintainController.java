@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * <p>
@@ -60,7 +61,7 @@ public class LoginMaintainController {
     private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar + "lams-www.war" + File.separatorChar
 	    + "news.html";
 
-    @RequestMapping("/loginmaintain")
+    @RequestMapping(path = "/loginmaintain", method = RequestMethod.POST)
     public String execute(@ModelAttribute LoginMaintainForm loginMaintainForm, HttpServletRequest request)
 	    throws Exception {
 

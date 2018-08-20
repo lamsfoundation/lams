@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -67,7 +68,7 @@ public class LogEventController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// check permission

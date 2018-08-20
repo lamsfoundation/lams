@@ -4,8 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title" value="${label.edit.tool.consumer}"/>
-	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><fmt:message key="label.edit.tool.consumer"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -45,16 +44,9 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
 	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<c:set var="title"><fmt:message key="label.edit.tool.consumer"/></c:set>
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 				<p>
 					<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default">
 						<fmt:message key="sysadmin.maintain" />
@@ -118,95 +110,12 @@
 					</table>
 					
 					<div class="pull-right">
-						<html:cancel styleClass="btn btn-default">
-							<fmt:message key="admin.cancel" />
-						</html:cancel>
-						<input type="submit" name="submitbutton" class="btn btn-primary loffset5" 
-							value="<fmt:message key="admin.save" />" />
+						<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+						<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 					</div>
 				</form:form>
 			</lams:Page>
 		
-		</c:when>
-		<c:otherwise>
-		
-			<lams:Page type="admin" title="${title}" >
-				<p>
-					<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default">
-						<fmt:message key="sysadmin.maintain" />
-					</a>
-					
-					<a href="<lams:LAMSURL/>/admin/ltiConsumerManagement/start.do" class="btn btn-default">
-						<fmt:message key="label.manage.tool.consumers" />
-					</a>
-				</p>
-					
-				<%-- Error Messages --%>
-				 	 <c:set var="errorKey" value="GLOBAL" />
-					 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-						 <lams:Alert id="error" type="danger" close="false">
-						 <c:forEach var="error" items="${errorMap[errorKey]}">
-							 <c:out value="${error}" />
-						 </c:forEach>
-						 </lams:Alert>
-					 </c:if>
-				<br />
-				
-				<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
-					<form:hidden path="sid" />
-					<input type="hidden" name="serverTypeId" value="2">
-					<input type="hidden" name="timeToLiveLoginRequestEnabled" value="false">
-						
-					<table class="table table-no-border">
-						<tr>
-							<td><fmt:message key="sysadmin.serverkey" />&nbsp;*</td>
-							<td><input type="text" name="serverid" size="20" class="form-control"/></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="sysadmin.serversecret" />&nbsp;*</td>
-							<td><input type="text" name="serverkey" size="30" class="form-control"/></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="sysadmin.servername" />&nbsp;*</td>
-							<td><input type="text" name="servername" size="30" class="form-control"/></td>
-						</tr>
-						<tr>
-							<td valign="top"><fmt:message key="sysadmin.serverdesc" />:</td>
-							<td><input type="text" name="serverdesc" cols="40" rows="3" class="form-control"/></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="sysadmin.prefix" />&nbsp;*</td>
-							<td><input type="text" name="prefix" size="10" class="form-control"/></td>
-						</tr>
-						
-						<tr>
-							<td><fmt:message key="sysadmin.disabled" />:</td>
-							<td><form:checkbox path="disabled" /></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
-							<td>${lessonFinishUrl}</td>
-						</tr>
-						<tr>
-							<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
-							<td><input type="text" name="ltiToolConsumerMonitorRoles" size="30"/></td>
-						</tr>
-					</table>
-					
-					<div class="pull-right">
-						<html:cancel styleClass="btn btn-default">
-							<fmt:message key="admin.cancel" />
-						</html:cancel>
-						<input type="submit" name="submitbutton" class="btn btn-primary loffset5" 
-							value="<fmt:message key="admin.save" />" />
-					</div>
-				</form:form>
-
-			</lams:Page>
-		</c:otherwise>
-	</c:choose>
-
-
 </body>
 </lams:html>
 

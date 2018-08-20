@@ -172,7 +172,7 @@ public class OrganisationController {
 	return null;
     }
 
-    @RequestMapping("/deleteAllLessonsInit")
+    @RequestMapping(path = "/deleteAllLessonsInit", method = RequestMethod.POST)
     public String deleteAllLessonsInit(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	if (!AdminServiceProxy.getSecurityService(applicationContext.getServletContext()).isSysadmin(getUserID(),
 		"display cleanup preview lessons", false)) {

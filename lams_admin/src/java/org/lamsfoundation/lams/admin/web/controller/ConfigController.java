@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -69,7 +70,7 @@ public class ConfigController {
 	return configurationService;
     }
 
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
@@ -77,7 +78,7 @@ public class ConfigController {
 	return "config/editconfig";
     }
 
-    @RequestMapping("/save")
+    @RequestMapping(path = "/save", method = RequestMethod.POST)
     public String save(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
@@ -87,7 +88,7 @@ public class ConfigController {
 	String[] keys = configForm.getKey();
 	String[] values = configForm.getValue();
 
-	String errorForward = "config";
+	String errorForward = "config/editconfig";
 
 	for (int i = 0; i < keys.length; i++) {
 	    ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
@@ -102,7 +103,7 @@ public class ConfigController {
 		    if (!(values[i] != null && values[i].length() > 0)) {
 			request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
 			request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
-			return mapping.findForward(errorForward);
+			return errorForward;
 		    }
 		}
 		String format = item.getFormat();
@@ -112,7 +113,7 @@ public class ConfigController {
 		    } catch (NumberFormatException e) {
 			request.setAttribute("error", getNumericError(item.getDescriptionKey()));
 			request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
-			return mapping.findForward(errorForward);
+			return errorForward;
 		    }
 		}
 		Configuration.updateItem(keys[i], values[i]);

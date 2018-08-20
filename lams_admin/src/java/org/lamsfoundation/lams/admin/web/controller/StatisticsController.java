@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -51,7 +52,7 @@ public class StatisticsController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// check permission
@@ -75,7 +76,7 @@ public class StatisticsController {
 	return "statistics";
     }
 
-    @RequestMapping("/groupStats")
+    @RequestMapping(path = "/groupStats", method = RequestMethod.POST)
     public String groupStats(HttpServletRequest request) throws Exception {
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId");

@@ -51,6 +51,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -89,7 +90,7 @@ public class OrgSaveController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/orgsave")
+    @RequestMapping(path = "/orgsave", method = RequestMethod.POST)
     public String execute(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -108,12 +109,12 @@ public class OrgSaveController {
 		request.setAttribute("org", orgId);
 		org = (Organisation) service.findById(Organisation.class, orgId);
 		if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-		    return "forward:/usermanage.do";
+		    return "redirect:/usermanage.do";
 		}
 	    } else {
 		request.setAttribute("org", organisationForm.getParentId());
 	    }
-	    return "forward:/orgmanage.do";
+	    return "redirect:/orgmanage.do";
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -166,10 +167,10 @@ public class OrgSaveController {
 	    org = service.saveOrganisation(org, user.getUserID());
 
 	    request.setAttribute("org", organisationForm.getParentId());
-	    return "forward:/orgmanage.do";
+	    return "redirect:/orgmanage.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
-	    return "forward:/organisation/edit.do";
+	    return "redirect:/organisation/edit.do";
 	}
     }
 

@@ -4,8 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><tiles:getAsString name="title"/></c:set>
-	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><fmt:message key="sysadmin.lesson.delete.title"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -74,16 +73,8 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
-	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
-	<c:choose>
-		<c:when test="${not empty help}">
-			<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<c:set var="title"><fmt:message key="sysadmin.lesson.delete.title"/></c:set>
+	<lams:Page type="admin" title="${title}">
 				<p>
 					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 					:  <a href="orgmanage.do?org=${param.orgId}" class="btn btn-default"><c:out value="${courseName}" /></a>
@@ -107,39 +98,7 @@
 				<div class="pull-right">
 					<button id="deleteButton" class="btn btn-primary loffset5"><fmt:message key="admin.delete"/></button>
 				</div>
-			</lams:Page>
-			
-		</c:when>
-		<c:otherwise>
-		
-			<lams:Page type="admin" title="${title}" >
-				<p>
-					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-					:  <a href="orgmanage.do?org=${param.orgId}" class="btn btn-default"><c:out value="${courseName}" /></a>
-				</p>
-				
-				<%-- Error Messages --%>
-				 <c:set var="errorKey" value="GLOBAL" />
-				        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-				            <lams:Alert id="error" type="danger" close="false">
-				                <c:forEach var="error" items="${errorMap[errorKey]}">
-				                    <c:out value="${error}" />
-				                </c:forEach>
-				            </lams:Alert>
-				        </c:if>
-				
-				<fmt:message key="label.delete.all.lesson.count" />&nbsp;<span id="lessonCount">${lessonCount}</span>&nbsp;/&nbsp;<span>${lessonCount}</span>
-				<div id="deletingBox" style="display: none">
-					<fmt:message key="label.delete.all.lesson.progress" />
-				</div>
-				
-				<div class="pull-right">
-					<button id="deleteButton" class="btn btn-primary loffset5"><fmt:message key="admin.delete"/></button>
-				</div>
-			</lams:Page>
-		</c:otherwise>
-	</c:choose>
-
+	</lams:Page>
 
 </body>
 </lams:html>

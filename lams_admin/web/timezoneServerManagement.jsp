@@ -1,11 +1,18 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="admin.servertimezone.server.timezone"/></title>
+	<c:set var="title"><fmt:message key="admin.servertimezone.title"/></c:set>
+	<title>${title}</title>
+
+	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
+	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	
 	<lams:css />
 	<style media="screen,projection" type="text/css">
@@ -25,40 +32,43 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function changeServerTimezone() {
-			parent.document.location.href ='<c:url value="/timezonemanagement.do?method=changeServerTimezone&timeZoneId="/>' + $("#timeZoneId").val();
+			parent.document.location.href ='<c:url value="/timezonemanagement/changeServerTimezone.do?timeZoneId="/>' + $("#timeZoneId").val();
 		}
-	</script>	
+	</script>
+
 </lams:head>
+    
+<body class="stripes">
+			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+				<h4 class="loffset10"><fmt:message key="admin.servertimezone.select.server.timezone" /></h4>
+				<div style="padding: 13px 20px 20px;">
+			
+					<form:select id="timeZoneId" path="timeZoneId" value="${serverTimezone}" style="margin-bottom:40px;">
+						<c:forEach items="${timezoneDtos}" var="timezoneDto">
+							<form:option value="${timezoneDto.timeZoneId}" cssClass="form-control">
+								${timezoneDto.timeZoneId}
+								&nbsp;&nbsp;-&nbsp;&nbsp;
+								<fmt:message key="admin.servertimezone.raw.offset" ><fmt:param><fmt:formatDate value="${timezoneDto.rawOffset}" pattern="H:mm" timeZone="GMT" /></fmt:param></fmt:message>
+								&nbsp;&nbsp;-&nbsp;&nbsp;
+								<fmt:message key="admin.servertimezone.dst.offset"><fmt:param>${timezoneDto.dstOffset}</fmt:param></fmt:message>
+								&nbsp;&nbsp;-&nbsp;&nbsp;
+								<fmt:message key="admin.servertimezone.name"><fmt:param>${timezoneDto.displayName}</fmt:param></fmt:message>
+							</form:option>
+						</c:forEach>
+					</form:select>
+					
+					<div class="pull-right">
+						<a href="#" onclick="self.parent.tb_remove();" class="btn btn-default btn-sm">
+							<fmt:message key="admin.cancel" /> 
+						</a>
+						<a href="#" onclick="changeServerTimezone();" class="btn btn-primary btn-sm">
+							<fmt:message key="admin.servertimezone.select" /> 
+						</a>
+					</div>
+				</div>
+			</lams:Page>
 
-<body>
-
-<h4 class="loffset10"><fmt:message key="admin.servertimezone.select.server.timezone" /></h4>
-	<div style="padding: 13px 20px 20px;">
-
-		<html:select styleId="timeZoneId" property="timeZoneId" value="${serverTimezone}" style="margin-bottom:40px;">
-			<logic:iterate name="timezoneDtos" id="timezoneDto">
-				<html:option value="${timezoneDto.timeZoneId}" styleClass="form-control">
-					${timezoneDto.timeZoneId}
-					&nbsp;&nbsp;-&nbsp;&nbsp;
-					<fmt:message key="admin.servertimezone.raw.offset" ><fmt:param><fmt:formatDate value="${timezoneDto.rawOffset}" pattern="H:mm" timeZone="GMT" /></fmt:param></fmt:message>
-					&nbsp;&nbsp;-&nbsp;&nbsp;
-					<fmt:message key="admin.servertimezone.dst.offset"><fmt:param>${timezoneDto.dstOffset}</fmt:param></fmt:message>
-					&nbsp;&nbsp;-&nbsp;&nbsp;
-					<fmt:message key="admin.servertimezone.name"><fmt:param>${timezoneDto.displayName}</fmt:param></fmt:message>
-				</html:option>
-			</logic:iterate>
-		</html:select>
-		
-		<div class="pull-right">
-			<a href="#" onclick="self.parent.tb_remove();" class="btn btn-default btn-sm">
-				<fmt:message key="admin.cancel" /> 
-			</a>
-			<a href="#" onclick="changeServerTimezone();" class="btn btn-primary btn-sm">
-				<fmt:message key="admin.servertimezone.select" /> 
-			</a>
-		</div>
-	</div>
-	
 </body>
 </lams:html>
+
 

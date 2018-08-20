@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,7 +54,7 @@ public class ImportUserResultController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/importuserresult")
+    @RequestMapping(path = "/importuserresult", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 
 	MessageService messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());

@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -73,7 +74,7 @@ public class CloneLessonsController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String execute(HttpServletRequest request, HttpServletResponse response) throws UserAccessDeniedException {
 
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
@@ -160,7 +161,7 @@ public class CloneLessonsController {
     }
 
     // ajax
-    @RequestMapping("/availableLessons")
+    @RequestMapping(path = "/availableLessons", method = RequestMethod.POST)
     public String availableLessons(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	Integer sourceGroupId = WebUtil.readIntParam(request, "sourceGroupId", true);
@@ -192,7 +193,7 @@ public class CloneLessonsController {
     }
 
     // ajax
-    @RequestMapping("/selectLearners")
+    @RequestMapping(path = "/selectLearners", method = RequestMethod.POST)
     public String selectLearners(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
@@ -205,7 +206,7 @@ public class CloneLessonsController {
 	return "organisation/parts/selectLearners";
     }
 
-    @RequestMapping("/clone")
+    @RequestMapping(path = "/clone", method = RequestMethod.POST)
     public String clone(HttpServletRequest request) throws Exception {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
