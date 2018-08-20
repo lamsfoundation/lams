@@ -137,7 +137,7 @@
 				
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
-					window.location.href = LEARNING_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
+					window.location.href = LEARNING_URL + 'learner/restartLesson.do?lessonID=' + lessonId;
 				}
 			}
 

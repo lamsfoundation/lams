@@ -101,11 +101,11 @@
 						 iconSet: 'fontAwesome',
 						 autoencode:false,
 					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebook/getUserGridData.do?view=monCourse&lessonID=" + lessonID,
+					     url: "<lams:LAMSURL />gradebook/gradebook/getUserGridData.do?view=monCourse&lessonID=" + lessonID,
 					     height: "100%",
 					     autowidth:true,
 					     cellEdit:true,
-					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID,
+					     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID,
 					     sortorder: "asc", 
 						 sortname: "rowName", 
 						 pager: subgrid_table_id + "_pager",
@@ -156,7 +156,7 @@
 					     	// update the lesson average mark
 					     	if (cellname == "mark") {
 					     		// Update the average activity mark
-						     	$.get("<lams:LAMSURL/>/gradebook/gradebook/getAverageMarkForLesson.do", {lessonID:lessonID}, function(xml) {
+						     	$.get("<lams:LAMSURL/>gradebook/gradebook/getAverageMarkForLesson.do", {lessonID:lessonID}, function(xml) {
 							    	if (xml!=null) {
 							    		jQuery("#organisationGrid").setCell(row_id, "avgMark", xml, "", "");
 							    	} 
@@ -310,7 +310,7 @@
 					    	 	
 					    	 	//modify cellurl setting to include lessonid
 					    	 	var lessonID = jQuery("#"+subgrid_table_id).getRowData(rowid)["id"];
-					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID + "&id=" + userID});
+					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID + "&id=" + userID});
 					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 						     	

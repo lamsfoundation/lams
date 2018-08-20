@@ -44,7 +44,7 @@
 			if ( ! graphLoaded ) {
 				$("#markChartBusy").css("display", "block");
 				drawHistogram('markChartDiv',
-						'<lams:LAMSURL/>/gradebook/gradebookMonitoring/getMarkChartData.do?lessonID=${lessonDetails.lessonID}',
+						'<lams:LAMSURL/>gradebook/gradebookMonitoring/getMarkChartData.do?lessonID=${lessonDetails.lessonID}',
 						'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
 				graphLoaded = true;
 				$("#markChartBusy").css("display", "none");
@@ -83,7 +83,7 @@
 			}
 			
 			if (conf) {
-				$.get("<lams:LAMSURL/>/gradebook/gradebookMonitoring/toggleReleaseMarks.do", {lessonID:"${lessonDetails.lessonID}"}, function(xml) {
+				$.get("<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", {lessonID:"${lessonDetails.lessonID}"}, function(xml) {
 					var str = new String(xml)
 			    	if (str.indexOf("success") != -1) {
 			    		
@@ -150,7 +150,7 @@
 				autoencode:false,
 				caption: "<fmt:message key="gradebook.gridtitle.usergrid"/>",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook/getUserGridData.do?view=monUserView&lessonID=${lessonDetails.lessonID}",
+			    url: "<lams:LAMSURL />gradebook/gradebook/getUserGridData.do?view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
 			    width: jqgridWidth,
 				shrinkToFit: false,
@@ -161,7 +161,7 @@
 			    pager: 'userViewPager',
 			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
-				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=${lessonDetails.lessonID}",
+				cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=${lessonDetails.lessonID}",
 			    colNames:["", 
 			    	"<fmt:message key="gradebook.columntitle.name"/>", 
 			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
@@ -198,14 +198,14 @@
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook/getActivityGridData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
+						     url: "<lams:LAMSURL />gradebook/gradebook/getActivityGridData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     height: "100%",
 						     autowidth:true,
 						     cellEdit:true,
 						     pager: subgrid_table_id + "_pager",
 						     rowList:[10,20,30,40,50,100],
 							 rowNum:10,
-						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
+						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     colNames: [
 						     	'',
 						     	'',
@@ -323,7 +323,7 @@
 					autoencode:false,
 					caption: "<fmt:message key="gradebook.gridtitle.activitygrid"/>",
 				    datatype: "xml",
-				    url: "<lams:LAMSURL />/gradebook/gradebook/getActivityGridData.do?view=monActivityView&lessonID=${lessonDetails.lessonID}",
+				    url: "<lams:LAMSURL />gradebook/gradebook/getActivityGridData.do?view=monActivityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
 				    width: jqgridWidth,
 				    shrinkToFit: false,
@@ -366,11 +366,11 @@
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook/getUserGridData.do?view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
+						     url: "<lams:LAMSURL />gradebook/gradebook/getUserGridData.do?view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
 						     height: "100%",
 						     autowidth:true,
 						     cellEdit:true,
-						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
+						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
 						     sortorder: "asc", 
 							 sortname: "fullName", 
 							 pager: subgrid_table_id + "_pager",
@@ -486,7 +486,7 @@
 				
 				$("#export-grades-button").click(function() {
 					var areaToBlock = "export-link-area";
-					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring/exportExcelLessonGradebook.do?lessonID=${lessonDetails.lessonID}";
+					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelLessonGradebook.do?lessonID=${lessonDetails.lessonID}";
 					var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
 					// if exportSpan is hidden then icon only mode, use small font.
 					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait, $("#exportSpan:hidden").length > 0);

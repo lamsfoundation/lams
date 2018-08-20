@@ -270,7 +270,7 @@ public class GradebookController {
      * @return
      * @throws Exception
      */
-    @RequestMapping
+    @RequestMapping("/getUserGridData")
     @ResponseBody
     public String getUserGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 

@@ -244,11 +244,7 @@ public class ActivityMapping implements Serializable {
      * @return
      */
     protected String actionToForward(String action, Activity activity, boolean redirect) {
-	if (redirect) {
-	    String activityURL = ActivityMapping.actionToURL(action, activity, false);
-	    return "redirect:" + WebUtil.getStrutsForwardNameFromPath(activityURL);
-	}
-	return "forward:" + WebUtil.getStrutsForwardNameFromPath(action);
+	return redirect ? "redirect:" + ActivityMapping.actionToURL(action, activity, false) : "forward:" + action;
     }
 
     /**

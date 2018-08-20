@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -213,7 +214,7 @@ public class NotebookController {
     /**
      *
      */
-    @RequestMapping("/processNewEntry")
+    @RequestMapping("/add")
     public String processNewEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
@@ -232,7 +233,7 @@ public class NotebookController {
     /**
      *
      */
-    @RequestMapping("/updateEntry")
+    @RequestMapping(path="/updateEntry", method=RequestMethod.POST)
     public String updateEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 

@@ -36,9 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
@@ -451,8 +448,9 @@ public class LearnerController {
     /**
      * Gets the lesson details based on lesson id or the current tool session
      */
-    public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/getLessonDetails")
+    @ResponseBody
+    public String getLessonDetails(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	Lesson lesson = null;
@@ -475,8 +473,7 @@ public class LearnerController {
 	responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON.toString());
 
-	return null;
+	return responseJSON.toString();
     }
 }

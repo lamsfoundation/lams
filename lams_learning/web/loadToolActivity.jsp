@@ -39,7 +39,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		src="${lams}includes/javascript/common.js"></script>
 </lams:head>
 
-<c:choose>
 			<body class="stripes">
 			<c:set var="learnerAppUrl">
 				<lams:WebAppURL />
@@ -98,6 +97,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			</c:if>
 		</body>
-</c:choose>
 
 </lams:html>
