@@ -9,6 +9,8 @@ import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 
 public interface IOutcomeService {
+    static final long DEFAULT_SCALE_ID = 1;
+
     String getContentFolderId(Integer organisationId);
 
     List<Outcome> getOutcomes(Integer organisationId);
@@ -22,6 +24,10 @@ public interface IOutcomeService {
     List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId);
 
     OutcomeResult getOutcomeResult(Integer userId, Long mappingId);
+
+    OutcomeScale getDefaultScale();
+
+    boolean isDefaultScale(Long scaleId);
 
     void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId, Long targetLessonId,
 	    Long targetToolContentId, Long targetItemId);

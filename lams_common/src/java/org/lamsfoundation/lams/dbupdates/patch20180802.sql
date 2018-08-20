@@ -73,6 +73,10 @@ CREATE TABLE lams_outcome_result (
 	CONSTRAINT FK_lams_outcome_result_2 FOREIGN KEY (user_id) REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT FK_lams_outcome_result_3 FOREIGN KEY (create_by) REFERENCES lams_user (user_id) ON DELETE SET NULL ON UPDATE CASCADE
 	);
+
+-- create default scale
+INSERT INTO lams_outcome_scale VALUES (1, NULL, 'Default attainment scale', 'default', 'Default global scale', NULL, 1, NOW());
+INSERT INTO lams_outcome_scale_item VALUES (1, 1, 0, 'Not yet attained'), (2, 1, 1, 'Attained');
 	
 ----------------------Put all sql statements above here-------------------------
 

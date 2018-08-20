@@ -68,7 +68,7 @@
 				</div>
 				<div class="col-xs-1">
 					<c:choose>
-						<c:when test="${not empty scale.organisation or canManageGlobal}">
+						<c:when test="${scale.scaleId != 1 and (not empty scale.organisation or canManageGlobal)}">
 							<i class="manageButton fa fa-pencil" title="<fmt:message key='scale.manage.edit' />"
 						   	   onClick="javascript:openEditScaleDialog(${scale.scaleId})" >
 							</i>
@@ -81,7 +81,7 @@
 					</c:choose>
 				</div>
 				<div class="col-xs-1">
-					<c:if test="${not empty scale.organisation or canManageGlobal}">
+					<c:if test="${scale.scaleId != 1 and (not empty scale.organisation or canManageGlobal)}">
 						<i class="manageButton fa fa-remove" title="<fmt:message key='scale.manage.remove' />"
 					   	   onClick="javascript:removeScale(${scale.scaleId})" >
 						</i>

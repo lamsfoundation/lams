@@ -97,9 +97,6 @@
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.scale" />:
 								<html:select property="scaleId"  styleClass="form-control" disabled="${formDisabled}">
-									<html:option value="0">
-										<fmt:message key="outcome.manage.add.scale.none" />
-									</html:option>
 									<c:forEach items="${scales}" var="scale">
 										<html:option value="${scale.scaleId}">
 											<c:out value="${scale.name}" /> (<c:out value="${scale.code}" />)

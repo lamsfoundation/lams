@@ -122,7 +122,9 @@ public class OutcomeAction extends DispatchAction {
 	OutcomeForm outcomeForm = (OutcomeForm) form;
 	outcomeForm.setOrganisationId(organisationId);
 	outcomeForm.setContentFolderId(getOutcomeService().getContentFolderId(organisationId));
-	if (outcome != null) {
+	if (outcome == null) {
+	    outcomeForm.setScaleId(IOutcomeService.DEFAULT_SCALE_ID);
+	} else {
 	    outcomeForm.setOutcomeId(outcome.getOutcomeId());
 	    outcomeForm.setName(outcome.getName());
 	    outcomeForm.setCode(outcome.getCode());
@@ -540,6 +542,7 @@ public class OutcomeAction extends DispatchAction {
 	}
 
 	request.setAttribute("canManageGlobal", getUserManagementService().isUserSysAdmin());
+	request.setAttribute("isDefaultScale", getOutcomeService().isDefaultScale(scaleForm.getScaleId()));
 	return mapping.findForward("scaleEdit");
     }
 
@@ -554,6 +557,10 @@ public class OutcomeAction extends DispatchAction {
 	    organisationId = scaleForm.getOrganisationId();
 	} else {
 	    scale = (OutcomeScale) getUserManagementService().findById(OutcomeScale.class, scaleId);
+	    if (getOutcomeService().isDefaultScale(scale.getScaleId())) {
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The default scale can not be altered");
+		return null;
+	    }
 	    if (scale.getOrganisation() != null) {
 		// get organisation ID from the outcome - the safest way
 		organisationId = scale.getOrganisation().getOrganisationId();
