@@ -130,8 +130,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    ret.add(outcomes != null ? outcomes : CELL_EMPTY);
+	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 

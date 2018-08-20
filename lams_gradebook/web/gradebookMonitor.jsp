@@ -180,11 +180,15 @@
 			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, formatter:userNameFormatter},
-			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
-			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
-			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:false, search:false, width:85, align:"left"},
-			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:false, search:false, width:85, align:"left"},
+			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, width: 150, formatter:userNameFormatter},
+			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
+				  {name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, align:"center",
+						cellattr: function(rowID, val, rawObject, cm, rdata) {
+				    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+				    	}
+			      },
+				  {name:'startDate',index:'startDate', width:0, hidden: true},
+				  {name:'finishDate',index:'finishDate', width:0, hidden: true},
 			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
 			      {name:'portraitId', index:'portraitId', width:0, hidden: true},
@@ -224,20 +228,28 @@
 						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
-						     	"<fmt:message key="gradebook.columntitle.mark"/>",
-						     	"<fmt:message key="gradebook.columntitle.outcome"/>"
+						     	"<fmt:message key="gradebook.columntitle.outcome"/>",
+						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 						       	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-								{name:'rowName',  index:'rowName', sortable:false, editable: false},
-								{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
-							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+								{name:'rowName',  index:'rowName', sortable:false, editable: false, width: 150},
+								{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
+									cellattr: function(rowID, val, rawObject, cm, rdata) {
+							    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate;
+							    	}
+						    	},
+							    {name:'startDate',index:'startDate', width:0, hidden: true},
+							    {name:'finishDate',index:'finishDate', width:0, hidden: true},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
-								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" },
-								{name:'outcome', index:'outcome', sortable:false, editable: false, width:100, align:"left" }
+								{name:'outcome', index:'outcome', sortable:false, editable: false,
+									cellattr: function(rowID, val, rawObject, cm, rdata) {
+							    	    return 'style="text-align:' + (rdata.outcome.startsWith('[') ? 'left"' : 'center"');
+							    	}
+						    	},
+								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:49, align:"center" }
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -289,7 +301,6 @@
 					    	 	}
 					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
-						     	
 						     	var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     	if (cellname == "mark") {
 							     	
@@ -324,7 +335,7 @@
 								 	if (id) {
 									 	// content is JSON code sent from server
 								 		var content = $(subgrid).jqGrid('getCell', id, 'outcome');
-										if (content) {
+										if (content && content.startsWith('[')) {
 											var outcomes = JSON.parse(content),
 												outcomeValues = {},
 												result = '';
@@ -344,7 +355,7 @@
 												});
 												outcomeValues[this.mappingId] = editablePossibleValues;
 												// build HTML code for x-editable
-												result += '<span title="' + this.name + '">' + this.code + 
+												result += '<span title="' + this.code + '">' + this.name + 
 														': <a href="#" class="outcome" mappingId="' + this.mappingId + '"></a></span><br />';
 											});
 											// set HTML to the cell
@@ -376,7 +387,6 @@
 										}
 							 		}
 								 });
-							 	
 							 },
 							 subGrid : hasArchivedMarks,
 							 subGridRowExpanded: function(subgrid_id, row_id) {
@@ -411,9 +421,13 @@
 									       	{name:'restart',index:'restart', sortable:false, editable: false, width:60,align:"left"},
 											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:50, align:"center" },
 											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-											{name:'timeTaken',index:'timeTaken', sortable:false, editable: false, width:80, align:"center"},
-										    {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
-										    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
+												cellattr: function(rowID, val, rawObject, cm, rdata) {
+										    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate;
+										    	}
+									    	},
+										    {name:'startDate',index:'startDate', width:0, hidden: true},
+										    {name:'finishDate',index:'finishDate', width:0, hidden: true},
 											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
 											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
 									     ],
@@ -535,7 +549,7 @@
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 						     	"<fmt:message key="gradebook.columntitle.mark"/>",
-							    	'portraitId',
+							    'portraitId',
 						     	'activityURL'
 						     ],
 						     colModel:[
@@ -543,9 +557,13 @@
 						     	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false, formatter:userNameFormatterActivity},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
-						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, search:false, width:80, align:"center"},
-							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
+									cellattr: function(rowID, val, rawObject, cm, rdata) {
+							    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+							    	}
+						    	},
+							    {name:'startDate',index:'startDate', width:0, hidden: true},
+							    {name:'finishDate',index:'finishDate', width:0, hidden: true},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
 						     	{name:'portraitId', index:'portraitId', width:0, hidden: true},
