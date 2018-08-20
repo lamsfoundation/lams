@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -354,9 +355,22 @@ public class GateAction extends LamsDispatchAction {
 	    learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	    Lesson lesson = learnerService.getLessonByActivity(scheduleGate);
 	    Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
-	    startingTime.setTime(lesson.getStartDateTime());
-	    startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
-	    gateForm.set("startingTime", startingTime.getTime());
+	    Date lessonStartTime = lesson.getStartDateTime();
+	    if (lessonStartTime == null && Lesson.NOT_STARTED_STATE.equals(lesson.getLessonStateId())) {
+		// Assume the lesson will start at the scheduled time
+		lessonStartTime = lesson.getScheduleStartDate();
+	    }
+	    if (lessonStartTime != null) {
+		startingTime.setTime(lessonStartTime);
+		startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		gateForm.set("startingTime", startingTime.getTime());
+	    } else {
+		log.error(new StringBuilder(
+			"Unable to calculate schedule gate opening time as we are missing the lesson starting time. Schedule gate ")
+				.append(scheduleGate).append(" lesson ").append(lesson.getLessonId()).append(" status ")
+				.append(lesson.getLessonStateId()).toString());
+		gateForm.set("startingTime", null);
+	    }
 	}
 
 	return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);

@@ -848,6 +848,11 @@ public class MonitoringService implements IMonitoringService {
 		// work out new offset in minutes from lesson start time to the given date
 		Lesson lesson = learnerService.getLessonByActivity(gate);
 		Date lessonStartingTime = lesson.getStartDateTime();
+		if (lessonStartingTime == null && Lesson.NOT_STARTED_STATE.equals(lesson.getLessonStateId())) {
+		    // Assume the lesson will start at the scheduled time
+		    lessonStartingTime = lesson.getScheduleStartDate();
+		}
+
 		if (lessonStartingTime != null) {
 		    // Should never be null, so just skip that case. If it was null how did the initial trigger get set up?
 		    long offset = (tzSchedulingDatetime.getTime() - lessonStartingTime.getTime()) / 60000;
@@ -892,6 +897,11 @@ public class MonitoringService implements IMonitoringService {
 			gate.setGateStartTimeOffset(offset);
 			activityDAO.update(gate);
 		    }
+		} else {
+		    log.error(new StringBuilder(
+			    "Unable to reschedule gate opening time as we are missing the lesson starting time. Schedule gate ")
+				    .append(gate).append(" lesson ").append(lesson.getLessonId()).append(" status ")
+				    .append(lesson.getLessonStateId()).toString());
 		}
 	    }
 	}
