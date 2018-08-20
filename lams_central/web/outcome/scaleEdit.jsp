@@ -37,7 +37,7 @@
 
 <html:form action="/outcomeScale.do" method="post" styleId="scaleForm">
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="formDisabled" value="${not empty formBean.scaleId and empty formBean.organisationId and not canManageGlobal}" />
+	<c:set var="formDisabled" value="${isDefaultScale or (not empty formBean.scaleId and empty formBean.organisationId and not canManageGlobal)}" />
 
 	<input type="hidden" name="method" value="scaleSave" />
 	<html:hidden property="scaleId" />

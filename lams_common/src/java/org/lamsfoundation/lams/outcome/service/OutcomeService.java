@@ -52,6 +52,14 @@ public class OutcomeService implements IOutcomeService {
 	return outcomeDAO.getOutcomeResult(userId, mappingId);
     }
 
+    public OutcomeScale getDefaultScale() {
+	return (OutcomeScale) outcomeDAO.find(OutcomeScale.class, DEFAULT_SCALE_ID);
+    }
+
+    public boolean isDefaultScale(Long scaleId) {
+	return scaleId != null && DEFAULT_SCALE_ID == scaleId;
+    }
+
     public void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId,
 	    Long targetLessonId, Long targetToolContentId, Long targetItemId) {
 	List<OutcomeMapping> sourceMappings = getOutcomeMappings(sourceLessonId, sourceToolContentId, sourceItemId);
