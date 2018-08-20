@@ -120,6 +120,7 @@
 		} else {
 			tour.restart();
 		}
+		tour.goTo(0);
 	}
 	
 	function revealCourses(tour) { 
