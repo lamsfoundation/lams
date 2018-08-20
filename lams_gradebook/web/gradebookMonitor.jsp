@@ -234,7 +234,7 @@
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 						       	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-								{name:'rowName',  index:'rowName', sortable:false, editable: false, width: 150},
+								{name:'rowName',  index:'rowName', sortable:false, editable: false, width: 140},
 								{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
 									cellattr: function(rowID, val, rawObject, cm, rdata) {
@@ -373,6 +373,7 @@
 												    name : userID,
 												    url : '<lams:LAMSURL/>outcome.do?method=outcomeSetResult',
 												    mode : 'inline',
+												    showbuttons : false,
 												    source : outcomeValues[mappingId],
 												    // sending -1 removes the result
 												    value : typeof this.value == 'undefined' ? -1 : this.value,
@@ -398,36 +399,36 @@
 										 guiStyle: "bootstrap",
 										 iconSet: 'fontAwesome',
 										 autoencode:false,
+										 autowidth: true,
 									     datatype: "xml",
 									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
 										      + activityID + "&view=monUserView&userID=" + userID,
 									     height: "100%",
-									     autowidth:true,
 									     cellEdit:false,
 									     pager: false,
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
-									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.progress"/>",
 									     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 									    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 									    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.mark"/>"
 									     ],
 									     colModel: [
-									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
-											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
-											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
+									       	{name:'id', index:'id',  sortable:false, editable: false ,width:140, align:"right"},
+											{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
+											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, align:"center",
 												cellattr: function(rowID, val, rawObject, cm, rdata) {
 										    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate;
 										    	}
 									    	},
 										    {name:'startDate',index:'startDate', width:0, hidden: true},
 										    {name:'finishDate',index:'finishDate', width:0, hidden: true},
-											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
-											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
+											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:0, hidden:true},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, align:"center" },
+											{name:'mark', index:'mark', sortable:false, editable: false, width:49, align:"center" }
 									     ],
 									     loadError: function(xhr,st,err) {
 									    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -458,10 +459,7 @@
 								    	 		return string;
 								    	 		
 								    	 	}
-								    	 },
-										 gridComplete: function(){
-										 	toolTip($(".jqgrow"), "jqgridTooltip");
-										 }
+								    	 }
 								  	});
 							}
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
@@ -667,7 +665,7 @@
 		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		        })
 
-		        	function userNameFormatter (cellvalue, options, rowObject) {
+		        function userNameFormatter (cellvalue, options, rowObject) {
 					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
 				}
 

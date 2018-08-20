@@ -40,12 +40,12 @@ public class GBActivityArchiveGridRowDTO extends GradebookGridRowDTO {
     public ArrayList<String> toStringArray(GBGridView view) {
 	ArrayList<String> ret = new ArrayList<String>();
 	ret.add(id);
-	ret.add(lessonMark.toString());
 	ret.add(status);
 	ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	ret.add(feedback);
+	ret.add(lessonMark.toString());
 	ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
 	return ret;
