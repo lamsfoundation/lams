@@ -622,11 +622,6 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
-	<!--  Gradebook related beans -->
-	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
 	<!--  Data flow related beans -->
 	<bean id="dataFlowDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.DataFlowDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
