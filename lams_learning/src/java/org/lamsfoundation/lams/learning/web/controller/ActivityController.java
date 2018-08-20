@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.learning.web.controller;
 
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -36,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/activity")
-public abstract class ActivityController{
+public abstract class ActivityController {
 
     public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 

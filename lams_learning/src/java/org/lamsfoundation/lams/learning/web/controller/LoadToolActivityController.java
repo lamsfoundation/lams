@@ -60,9 +60,10 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-public class LoadToolActivityController extends ActivityController {
+public class LoadToolActivityController {
 
     private static Logger log = Logger.getLogger(LoadToolActivityController.class);
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
     @Qualifier("learnerService")

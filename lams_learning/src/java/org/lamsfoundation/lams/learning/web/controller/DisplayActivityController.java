@@ -64,12 +64,14 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-public class DisplayActivityController extends ActivityController {
+public class DisplayActivityController {
 
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(DisplayActivityController.class);
+
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     public static final String PARAM_INITIAL_DISPLAY = "initialDisplay";
 

@@ -53,9 +53,10 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-public class SequenceActivityController extends ActivityController {
+public class SequenceActivityController {
 
     private static Logger log = Logger.getLogger(SequenceActivityController.class);
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
     @Qualifier("learnerService")

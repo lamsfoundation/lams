@@ -57,7 +57,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
@@ -106,7 +106,8 @@ public class LearnerController {
     private ICoreLearnerService learnerService;
 
     @Autowired
-    private UserManagementService userManagementService;
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
 
     @Autowired
     @Qualifier("gradebookService")

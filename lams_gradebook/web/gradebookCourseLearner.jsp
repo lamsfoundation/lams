@@ -25,7 +25,7 @@
 				autoencode:false,
 				caption: "${organisationName}",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />gradebook/gradebook/getCourseGridData.do?view='lrnCourse'&organisationID='${organisationID}'",
+			    url: "<lams:LAMSURL />gradebook/gradebook/getCourseGridData.do?view=lrnCourse&organisationID=${organisationID}",
 				height: 'auto',
 				width: $(window).width() - 100,
 				shrinkToFit: false,

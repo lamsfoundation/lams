@@ -54,12 +54,12 @@ public class GradebookLearningController {
     private static Logger logger = Logger.getLogger(GradebookLearningController.class);
 
     @Autowired
-    @Qualifier("userService")
-    private static IUserManagementService userService;
+    @Qualifier("userManagementService")
+    private IUserManagementService userService;
 
     @Autowired
     @Qualifier("securityService")
-    private static ISecurityService securityService;
+    private ISecurityService securityService;
 
     @RequestMapping("")
     public String unspecified() throws Exception {

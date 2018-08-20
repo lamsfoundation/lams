@@ -45,7 +45,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Action class run when the learner finishes a lesson.
  */
 @Controller
-public class LessonCompleteActivityController extends ActivityController {
+public class LessonCompleteActivityController {
+
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
     @Qualifier("learnerService")

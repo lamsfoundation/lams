@@ -63,9 +63,11 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-public class DisplayOptionsActivityController extends ActivityController {
+public class DisplayOptionsActivityController {
 
     private static Logger log = Logger.getLogger(DisplayOptionsActivityController.class);
+
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
     @Qualifier("learnerService")

@@ -80,19 +80,19 @@ public class GradebookMonitoringController {
 
     @Autowired
     @Qualifier("gradebookService")
-    private static IGradebookService gradebookService;
+    private IGradebookService gradebookService;
 
     @Autowired
-    @Qualifier("userService")
-    private static IUserManagementService userService;
+    @Qualifier("userManagementService")
+    private IUserManagementService userService;
 
     @Autowired
     @Qualifier("lessonService")
-    private static ILessonService lessonService;
+    private ILessonService lessonService;
 
     @Autowired
     @Qualifier("securityService")
-    private static ISecurityService securityService;
+    private ISecurityService securityService;
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {

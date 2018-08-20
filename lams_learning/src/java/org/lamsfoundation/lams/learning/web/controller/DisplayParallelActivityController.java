@@ -59,9 +59,11 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-public class DisplayParallelActivityController extends ActivityController {
+public class DisplayParallelActivityController {
 
     private static Logger log = Logger.getLogger(DisplayParallelActivityController.class);
+
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
     @Qualifier("learnerService")

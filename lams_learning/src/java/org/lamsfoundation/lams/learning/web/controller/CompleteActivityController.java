@@ -57,12 +57,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  */
 @Controller
-public class CompleteActivityController extends ActivityController {
+public class CompleteActivityController {
 
     private static Logger log = Logger.getLogger(CompleteActivityController.class);
 
     protected static String className = "CompleteActivity";
     private static IntegrationService integrationService = null;
+
+    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
     @Qualifier("learnerService")
@@ -81,8 +83,8 @@ public class CompleteActivityController extends ActivityController {
      * @throws ServletException
      */
     @RequestMapping("/CompleteActivity")
-    public String execute(@ModelAttribute("messageForm") ActivityForm messageForm, HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String execute(@ModelAttribute("messageForm") ActivityForm messageForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
 	ActivityMapping actionMappings = LearningWebUtil
 		.getActivityMapping(this.applicationContext.getServletContext());
 
