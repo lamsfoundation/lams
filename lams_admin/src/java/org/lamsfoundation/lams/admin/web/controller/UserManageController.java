@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -71,7 +72,7 @@ public class UserManageController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/usermanage")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
@@ -130,7 +131,7 @@ public class UserManageController {
 	List<UserManageBean> userManageBeans = service.getUserManageBeans(orgId);
 	Collections.sort(userManageBeans);
 	userManageForm.setUserManageBeans(userManageBeans);
-	request.setAttribute("UserManageForm", userManageForm);
+	request.setAttribute("userManageForm", userManageForm);
 
 	// heading
 	String[] args = { orgName };
@@ -162,7 +163,7 @@ public class UserManageController {
 	return "userlist";
     }
 
-    @RequestMapping("/forwardError")
+    @RequestMapping(path = "/forwardError", method = RequestMethod.POST)
     private String forwardError(HttpServletRequest request, String key) {
 	request.setAttribute("errorName", "UserManageAction");
 	request.setAttribute("errorMessage", messageService.getMessage(key));

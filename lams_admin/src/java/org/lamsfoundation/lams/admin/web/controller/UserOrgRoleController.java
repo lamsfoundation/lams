@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -71,7 +72,7 @@ public class UserOrgRoleController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/userorgrole")
+    @RequestMapping(path = "/userorgrole", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, HttpServletRequest request)
 	    throws Exception {
 

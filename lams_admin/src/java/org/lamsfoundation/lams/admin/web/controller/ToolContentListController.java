@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -81,7 +82,7 @@ public class ToolContentListController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/start")
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 	// check permission
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
@@ -217,7 +218,7 @@ public class ToolContentListController {
     /**
      * Loads groups and libraries and displays the management dialog.
      */
-    @RequestMapping("/openLearningLibraryGroups")
+    @RequestMapping(path = "/openLearningLibraryGroups", method = RequestMethod.POST)
     public String openLearningLibraryGroups(HttpServletRequest request) throws IOException {
 	// build full list of available learning libraries
 	List<LearningLibraryDTO> learningLibraries = getLearningDesignService()

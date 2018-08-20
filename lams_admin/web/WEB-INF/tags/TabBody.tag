@@ -34,7 +34,6 @@
 <%@ attribute name="titleKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="page" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
 
 <c:set var="class" value=""/>
 <c:if test="${id == 1}">

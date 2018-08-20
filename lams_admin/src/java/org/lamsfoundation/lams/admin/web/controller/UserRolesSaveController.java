@@ -43,6 +43,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -69,7 +70,7 @@ public class UserRolesSaveController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/userrolessave")
+    @RequestMapping(path = "/userrolessave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserRolesForm userRolesForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -88,7 +89,7 @@ public class UserRolesSaveController {
 	request.setAttribute("org", orgId);
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "forward:/usermanage.do";
+	    return "redirect:/usermanage.do";
 	}
 
 	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
@@ -107,7 +108,7 @@ public class UserRolesSaveController {
 
 	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	return "forward:/usermanage.do";
+	return "redirect:/usermanage.do";
     }
 
 }

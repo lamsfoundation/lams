@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -58,7 +59,7 @@ public class UserSearchSingleTermController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/user/searchsingle")
+    @RequestMapping(path = "/user/searchsingle", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 
 	UserSearchSingleTermController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
