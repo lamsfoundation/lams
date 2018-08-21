@@ -64,7 +64,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -144,11 +143,17 @@ public class LessonManagerServlet extends HttpServlet {
 	String lastNames = request.getParameter("lastNames");
 	String emails = request.getParameter("emails");
 
-	boolean presenceEnable = WebUtil.readBooleanParam(request, CentralConstants.PARAM_LEARNER_PRESENCE_ENABLE,
-		false);
-	boolean imEnable = WebUtil.readBooleanParam(request, CentralConstants.PARAM_LEARNER_IM_ENABLE, false);
-	boolean enableNotifications = WebUtil.readBooleanParam(request, CentralConstants.PARAM_ENABLE_NOTIFICATIONS,
-		false);
+	String presenceEnableString = WebUtil.readStrParam(request, CentralConstants.PARAM_LEARNER_PRESENCE_ENABLE,
+		true);
+	Boolean presenceEnable = presenceEnableString == null ? null : Boolean.valueOf(presenceEnableString);
+
+	String imEnableString = WebUtil.readStrParam(request, CentralConstants.PARAM_LEARNER_IM_ENABLE, true);
+	Boolean imEnable = imEnableString == null ? null : Boolean.valueOf(imEnableString);
+
+	String enableNotificationString = WebUtil.readStrParam(request, CentralConstants.PARAM_ENABLE_NOTIFICATIONS,
+		true);
+	Boolean enableNotifications = enableNotificationString == null ? null
+		: Boolean.valueOf(enableNotificationString);
 
 	Long ldId = null;
 	Long lsId = null;
@@ -186,8 +191,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_SCHEDULE)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			startDate, country, locale, customCSV, presenceEnable, imEnable,
-			enableNotifications);
+			startDate, country, locale, customCSV, presenceEnable, imEnable, enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -301,8 +305,8 @@ public class LessonManagerServlet extends HttpServlet {
 		return;
 
 	    } else if (method.equals(CentralConstants.METHOD_LIST_MONITOR)) {
-		element = getLessonMonitorList(document, serverId, datetime, hashValue, username, courseId,
-			country, locale);
+		element = getLessonMonitorList(document, serverId, datetime, hashValue, username, courseId, country,
+			locale);
 	    } else {
 		String msg = "Method :" + method + " is not recognised";
 		log.error(msg);
@@ -370,7 +374,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     private static Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
-	    boolean presenceEnable, boolean imEnable, boolean enableNotifications) throws RemoteException {
+	    Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications) throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -382,8 +386,12 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, organisation.getOrganisationId(),
-		    user.getUserId(), customCSV, false, false, presenceEnable, imEnable, true, enableNotifications,
-		    false, false, true, null, null);
+		    user.getUserId(), customCSV, false, false,
+		    presenceEnable == null ? extServer.getLearnerPresenceAvailable() : presenceEnable,
+		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled(),
+		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
+		    extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
+		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
@@ -399,7 +407,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
-	    String customCSV, boolean presenceEnable, boolean imEnable, boolean enableNotifications)
+	    String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
 	    throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
@@ -410,7 +418,11 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, presenceEnable, imEnable, true, enableNotifications, false, false, true, null, null);
+		    false, presenceEnable == null ? extServer.getLearnerPresenceAvailable() : presenceEnable,
+		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled(),
+		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
+		    extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
+		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
@@ -706,7 +718,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     private Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
 	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
-	    boolean presenceEnable, boolean imEnable) throws RemoteException {
+	    Boolean presenceEnable, Boolean imEnable) throws RemoteException {
 
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
@@ -718,7 +730,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLessonForPreview(title, desc, ldId, userId, customCSV,
-		    presenceEnable, imEnable, false);
+		    presenceEnable == null ? extServer.getLearnerPresenceAvailable() : presenceEnable,
+		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled());
 	    // 2. create lessonClass for lesson
 	    monitoringService.createPreviewClassForLesson(userId, lesson.getLessonId());
 
