@@ -79,12 +79,12 @@ public class QuestionParser {
 	List<Question> result = new ArrayList<Question>();
 
 	// unique folder name
-	String tempPackageName = QuestionParser.TEMP_PACKAGE_NAME_PREFIX + System.currentTimeMillis();
+	String tempPackageName = TEMP_PACKAGE_NAME_PREFIX + System.currentTimeMillis();
 	String tempPackageDirPath = ZipFileUtil.expandZip(packageFileStream, tempPackageName);
 	try {
-	    List<File> resourceFiles = QuestionParser.getQTIResourceFiles(tempPackageDirPath);
+	    List<File> resourceFiles = getQTIResourceFiles(tempPackageDirPath);
 	    if (resourceFiles.isEmpty()) {
-		QuestionParser.log.warn("No resource files found in QTI package");
+		log.warn("No resource files found in QTI package");
 	    } else {
 		// extract from every XML file; usually there is just one
 		for (File resourceFile : resourceFiles) {
@@ -473,18 +473,23 @@ public class QuestionParser {
 	String result = forcePlainText ? WebUtil.removeHTMLtags(fieldText) : fieldText;
 
 	if (!StringUtils.isBlank(result)) {
-	    Matcher imageMatcher = QuestionParser.IMAGE_PATTERN.matcher(result);
+	    Matcher imageMatcher = IMAGE_PATTERN.matcher(result);
 	    StringBuffer resultBuilder = new StringBuffer();
 
 	    // find image placeholders
 	    while (imageMatcher.find()) {
-		String fileName = imageMatcher.group(1);
+		String imageAttributesStr = imageMatcher.group(1);
+		
+		List<String> imageAttributes = new ArrayList<>(); 
+		Collections.addAll(imageAttributes, imageAttributesStr.split("\\|"));
+		String fileName = imageAttributes.get(0);
+		imageAttributes.remove(0);
+		
 		// if it is plain text or something goes wrong, the placeholder simply gets removed
 		String replacement = "";
 		if (!forcePlainText) {
 		    if (resourcesFolderPath == null) {
-			QuestionParser.log
-				.warn("Image " + fileName + " declaration found but its location is unknown.");
+			log.warn("Image " + fileName + " declaration found but its location is unknown.");
 		    } else {
 			File sourceFile = new File(resourcesFolderPath, fileName);
 			if (sourceFile.canRead()) {
@@ -496,12 +501,13 @@ public class QuestionParser {
 				    + fileName;
 			    try {
 				FileUtils.copyFile(sourceFile, destinationFile);
-				replacement = "<img src=\"" + uploadWebPath + "\" />";
+				replacement = "<img src=\"" + uploadWebPath + "\" " + String.join("", imageAttributes)
+					+ " />";
 			    } catch (IOException e) {
-				QuestionParser.log.error("Could not store image " + fileName);
+				log.error("Could not store image " + fileName);
 			    }
 			} else {
-			    QuestionParser.log.warn("Image " + fileName + " declaration found but it can not be read.");
+			    log.warn("Image " + fileName + " declaration found but it can not be read.");
 			}
 		    }
 		}
@@ -534,8 +540,7 @@ public class QuestionParser {
 		if (resourceFileName.endsWith(".xml")) {
 		    File resourceFile = new File(packageDirPath, resourceFileName);
 		    if (!resourceFile.isFile() || !resourceFile.canRead()) {
-			QuestionParser.log.warn(
-				"XML resource file specified in IMS manifest can not be read: " + resourceFileName);
+			log.warn("XML resource file specified in IMS manifest can not be read: " + resourceFileName);
 		    } else {
 			resourceFiles.add(resourceFile);
 		    }
@@ -576,14 +581,30 @@ public class QuestionParser {
 		    result.append(((Text) questionTextChildNode).getData());
 		}
 	    } else if ("matimage".equalsIgnoreCase(elementName)) {
+		String width = ((Element) questionElement).getAttribute("width");
+		String height = ((Element) questionElement).getAttribute("height");
+		String classAttr = ((Element) questionElement).getAttribute("entityref");
+		
 		String fileName = ((Element) questionElement).getAttribute("uri");
 		if (resourcesFolderPath == null) {
-		    QuestionParser.log.warn("Image " + fileName + " declaration found but its location is unknown");
+		    log.warn("Image " + fileName + " declaration found but its location is unknown");
 		} else {
 		    if (question.getResourcesFolderPath() == null) {
 			question.setResourcesFolderPath(resourcesFolderPath);
 		    }
-		    result.append("[IMAGE: ").append(fileName).append("]");
+		    
+		    //add filename and other attributes, separated by ":" character
+		    result.append("[IMAGE: ").append(fileName);
+		    if (StringUtils.isNotBlank(width)) {
+			result.append("| width=\"" + width + "\"");
+		    }
+		    if (StringUtils.isNotBlank(height)) {
+			result.append("| height=\"" + height + "\"");
+		    }
+		    if (StringUtils.isNotBlank(classAttr)) {
+			result.append("| class=\"" + classAttr + "\"");
+		    }
+		    result.append("]");
 		}
 	    }
 	}
