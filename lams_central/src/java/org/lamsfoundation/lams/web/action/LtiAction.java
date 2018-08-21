@@ -62,7 +62,7 @@ import net.oauth.OAuth;
 
 /**
  * Shows either addLesson.jsp or learnerMonitor.jsp pages.
- * 
+ *
  * @author Andrey Balan
  */
 public class LtiAction extends LamsDispatchAction {
@@ -80,6 +80,7 @@ public class LtiAction extends LamsDispatchAction {
      * Single entry point to LAMS LTI processing mechanism. It determines here whether to show author or learnerMonitor
      * pages
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, UserAccessDeniedException, JSONException,
 	    RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
@@ -88,7 +89,7 @@ public class LtiAction extends LamsDispatchAction {
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String tcGradebookId = request.getParameter(BasicLTIConstants.LIS_RESULT_SOURCEDID);
 	String extUserId = request.getParameter(BasicLTIConstants.USER_ID);
-	
+
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 	//support for ContentItemSelectionRequest. If lesson was created during such request, update its ExtServerLesson's resourceLinkId for the first time
 	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_isContentItemSelection", false);
@@ -98,7 +99,7 @@ public class LtiAction extends LamsDispatchAction {
 	    lesson.setResourceLinkId(resourceLinkId);
 	    userManagementService.save(lesson);
 	}
-	
+
 	//update lessonFinishCallbackUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
 	String lessonFinishCallbackUrl = request.getParameter(BasicLTIConstants.LIS_OUTCOME_SERVICE_URL);
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
@@ -118,13 +119,13 @@ public class LtiAction extends LamsDispatchAction {
 	    return mapping.findForward("error");
 	}
 
-	//determine whether to show author or learnerMonitor pages	
+	//determine whether to show author or learnerMonitor pages
 	if (lesson == null) {
 	    return addLesson(mapping, form, request, response);
-	    
+
 	} else {
 
-	    //as per LTI spec we need to update tool consumer's gradebook id on every LTI call 
+	    //as per LTI spec we need to update tool consumer's gradebook id on every LTI call
 	    ExtUserUseridMap extUserMap = integrationService.getExistingExtUserUseridMap(extServer, extUserId);
 	    extUserMap.setTcGradebookId(tcGradebookId);
 	    userManagementService.save(extUserMap);
@@ -167,7 +168,7 @@ public class LtiAction extends LamsDispatchAction {
 	request.setAttribute(BasicLTIConstants.CONTEXT_ID, contextId);
 	request.setAttribute(CentralConstants.PARAM_TITLE, resourceLinkTitle);
 	request.setAttribute(CentralConstants.PARAM_DESC, resourceLinkDescription);
-	
+
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
 	if (LtiUtils.LTI_MESSAGE_TYPE_CONTENTITEMSELECTIONREQUEST.equals(ltiMessageType)) {
@@ -177,11 +178,11 @@ public class LtiAction extends LamsDispatchAction {
 			"ContentItemSelectionRequest is missing content_item_return_url parameter");
 		return null;
 	    }
-	    
+
 	    request.setAttribute(BasicLTIConstants.LTI_MESSAGE_TYPE, ltiMessageType);
 	    request.setAttribute(LtiUtils.CONTENT_ITEM_RETURN_URL, contentItemReturnUrl);
 	    request.setAttribute("title", request.getParameter("title"));
-	    request.setAttribute("desc", request.getParameter("text").replaceAll("\\<[^>]*>",""));
+	    request.setAttribute("desc", request.getParameter("text").replaceAll("\\<[^>]*>", ""));
 	    request.setAttribute("data", request.getParameter("data"));
 	}
 
@@ -206,7 +207,7 @@ public class LtiAction extends LamsDispatchAction {
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	Integer organisationId = new Integer(WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID));
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
-	
+
 	//only monitors are allowed to create lesson
 	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
@@ -218,8 +219,11 @@ public class LtiAction extends LamsDispatchAction {
 
 	// 1. init lesson
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
-		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro, false, false,
-		true, true, false, false, true, null, null);
+		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro,
+		extServer.getLearnerPresenceAvailable(), extServer.getLearnerImAvailable(),
+		extServer.getLiveEditEnabled(), extServer.getEnableLessonNotifications(),
+		extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
+		extServer.getGradebookOnComplete(), null, null);
 	// 2. create lessonClass for lesson
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(user);
@@ -234,13 +238,13 @@ public class LtiAction extends LamsDispatchAction {
 	monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
 	// store information which extServer has started the lesson
 	integrationService.createExtServerLessonMap(lesson.getLessonId(), resourceLinkId, extServer);
-	
+
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
 	String contentItemReturnUrl = request.getParameter(LtiUtils.CONTENT_ITEM_RETURN_URL);
 	if (LtiUtils.LTI_MESSAGE_TYPE_CONTENTITEMSELECTIONREQUEST.equals(ltiMessageType)) {
 	    String opaqueTCData = request.getParameter("data");
-	    
+
 	    // Get the post data for the placement
 	    String returnValues = postLaunchHTML(extServer, lesson, contentItemReturnUrl, opaqueTCData);
 
@@ -262,8 +266,8 @@ public class LtiAction extends LamsDispatchAction {
 	    out.println("</body>\n</html>");
 
 	    return null;
-	    
-	//regular BasicLTI request 
+
+	    //regular BasicLTI request
 	} else {
 	    //set roles to contain monitor so that the user can see monitor link
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learnerMonitorRedirect"));
@@ -273,18 +277,19 @@ public class LtiAction extends LamsDispatchAction {
 	    return redirect;
 	}
     }
-    
+
     /**
-     * Return HTML form to be posted to TC 
+     * Return HTML form to be posted to TC
      */
-    private String postLaunchHTML(ExtServer extServer, Lesson lesson, String contentItemReturnUrl, String opaqueTCData) throws JSONException, UnsupportedEncodingException {
+    private String postLaunchHTML(ExtServer extServer, Lesson lesson, String contentItemReturnUrl, String opaqueTCData)
+	    throws JSONException, UnsupportedEncodingException {
 	String key = extServer.getServerid();
 	String secret = extServer.getServerkey();
-	
+
 	//required parameters
 //	  <input type="hidden" name="lti_message_type" value="ContentItemSelection" />
 //	  <input type="hidden" name="lti_version" value="LTI-1p0" />
-//	  <input type="hidden" name="content_items" value="{ &quot;@context&quot;: &quot;http://purl.imsglobal.org/ctx/lti/v1/ContentItem&quot;, &quot;@graph&quot;: [ { &quot;@type&quot;: &quot;FileItem&quot;, &quot;url&quot;: &quot;https://www.imsglobal.org/sites/default/files/IMSconformancelogosm.png&quot;, &quot;mediaType&quot;: &quot;image/png&quot;, &quot;text&quot;: &quot;IMS logo for certified products&quot;, &quot;title&quot;: &quot;The logo used to identify IMS certified products&quot;, &quot;placementAdvice&quot;: { &quot;displayWidth&quot;: 147, &quot;displayHeight&quot;: 184, &quot;presentationDocumentTarget&quot;: &quot;embed&quot; } } ] }" /> 
+//	  <input type="hidden" name="content_items" value="{ &quot;@context&quot;: &quot;http://purl.imsglobal.org/ctx/lti/v1/ContentItem&quot;, &quot;@graph&quot;: [ { &quot;@type&quot;: &quot;FileItem&quot;, &quot;url&quot;: &quot;https://www.imsglobal.org/sites/default/files/IMSconformancelogosm.png&quot;, &quot;mediaType&quot;: &quot;image/png&quot;, &quot;text&quot;: &quot;IMS logo for certified products&quot;, &quot;title&quot;: &quot;The logo used to identify IMS certified products&quot;, &quot;placementAdvice&quot;: { &quot;displayWidth&quot;: 147, &quot;displayHeight&quot;: 184, &quot;presentationDocumentTarget&quot;: &quot;embed&quot; } } ] }" />
 //	  <input type="hidden" name="data" value="Some opaque TC data" />
 //	  <input type="hidden" name="oauth_version" value="1.0" />
 //	  <input type="hidden" name="oauth_nonce" value="..." />
@@ -300,16 +305,16 @@ public class LtiAction extends LamsDispatchAction {
 	if (StringUtils.isNotBlank(opaqueTCData)) {
 	    properties.put("data", opaqueTCData);
 	}
-	
+
 	properties.put("lti_msg", "Information about LAMS lesson has been imported successfully.");
 	properties.put(OAuth.OAUTH_VERSION, OAuth.VERSION_1_0);
 	properties.put("oauth_callback", "about:blank");
 	properties.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
-	
+
 	//contentItem Json
 //	{
-//	    "@context" : "http://purl.imsglobal.org/ctx/lti/v1/ContentItem", 
-//	    "@graph" : [ 
+//	    "@context" : "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+//	    "@graph" : [
 //	{
 //	    "@type" : "LtiLinkItem",
 //	    "mediaType" : "application/vnd.ims.lti.v1.ltilink",
@@ -356,14 +361,14 @@ public class LtiAction extends LamsDispatchAction {
     /**
      * Once lesson was created, start showing learnerMonitor page to everybody regardless of his role.
      */
-     public ActionForward learnerMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward learnerMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, UserAccessDeniedException, JSONException,
 	    RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
 	initServices();
 	Integer userId = getUser().getUserID();
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
-	
+
 	//get orgId
 //	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 //	ExtServer extServer = integrationService.getExtServer(consumerKey);
@@ -390,7 +395,7 @@ public class LtiAction extends LamsDispatchAction {
 	    LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();
 	    request.setAttribute("learnerProgressDto", learnerProgress);
 	}
-	
+
 	// check if we need to create svg, png files on the server
 //	if (lesson.isDisplayDesignImage() && lesson.getLearnerProgresses().isEmpty()) {
 //	    Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
@@ -426,7 +431,7 @@ public class LtiAction extends LamsDispatchAction {
 		    .getRequiredWebApplicationContext(getServlet().getServletContext())
 		    .getBean("userManagementService");
 	}
-	
+
 	if (learningDesignService == null) {
 	    learningDesignService = (ILearningDesignService) WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext())

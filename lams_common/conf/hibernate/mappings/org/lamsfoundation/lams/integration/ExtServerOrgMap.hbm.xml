@@ -151,7 +151,29 @@
 			length="65535"
 			not-null="false"
         />
-
+        
+		<property name="learnerPresenceAvailable" type="java.lang.Boolean"
+        	column="learner_presence_avail" length="1">
+        </property>
+		<property name="learnerImAvailable" type="java.lang.Boolean"
+        	column="learner_im_avail" length="1">
+    	</property>
+    	<property name="liveEditEnabled" type="java.lang.Boolean"
+        	column="live_edit_enabled" length="1">
+    	</property>
+    	<property name="enableLessonNotifications" type="java.lang.Boolean"
+    		column="enable_lesson_notifications" length="1">
+    	</property>
+    	<property name="forceLearnerRestart" type="java.lang.Boolean"
+        	column="force_restart" length="1">
+    	</property>
+    	<property name="allowLearnerRestart" type="java.lang.Boolean"
+        	column="allow_restart" length="1">
+    	</property>
+    	<property name="gradebookOnComplete" type="java.lang.Boolean"
+        	column="gradebook_on_complete" length="1">
+    	</property>
+    	
         <set
             name="extCourseClassMaps"
             lazy="true"

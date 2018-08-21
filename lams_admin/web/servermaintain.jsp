@@ -63,6 +63,39 @@
 		<td><fmt:message key="sysadmin.extGroupsUrl" /></td>
 		<td><html:text property="extGroupsUrl" size="70" styleClass="form-control"/></td>
 	</tr>
+	
+	
+	<tr>
+		<td colspan="2"><h3><fmt:message key="sysadmin.lesson.default" /></h3></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.gradebook.complete" /></td>
+		<td><html:checkbox property="gradebookOnComplete" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.force.restart" /></td>
+		<td><html:checkbox property="forceLearnerRestart" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.allow.restart" /></td>
+		<td><html:checkbox property="allowLearnerRestart" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.liveedit" /></td>
+		<td><html:checkbox property="liveEditEnabled" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.notification" /></td>
+		<td><html:checkbox property="enableLessonNotifications" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.presence" /></td>
+		<td><html:checkbox property="learnerPresenceAvailable" styleId="learnerPresenceAvailable" /></td>
+	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lesson.im" /></td>
+		<td><html:checkbox property="learnerImAvailable" styleId="learnerImAvailable" /></td>
+	</tr>
 </table>
 <div class="pull-right">
 	<html:reset styleClass="btn btn-default"><fmt:message key="admin.reset" /></html:reset>
@@ -81,6 +114,10 @@
 				$('#ttl-login-request').prop("value", 80);
 			}
 		});
+
+		$('#learnerPresenceAvailable').change(function(){
+			$('#learnerImAvailable').prop('disabled', !$(this).is(':checked'));
+		}).change();
 
 		// validate signup form on keyup and submit
 		var validator = $("#ext-server-form").validate({
