@@ -97,7 +97,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:when>
 								<c:otherwise>
 									<form:form
-										action="/grouping/learnerChooseGroup.do?userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
+										action="grouping/learnerChooseGroup.do?userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
 										modelAttribute="form${user.userID}${activityID}${group.groupID}" id="form${user.userID}${activityID}${group.groupID}" target="_self">
 									</form:form>							
 									<button type="button" class="btn btn-sm btn-primary" 

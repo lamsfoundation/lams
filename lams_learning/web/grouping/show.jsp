@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:Page type="learner" title="${title}">
 	
 		<form:form
-			action="/grouping/completeActivity.do?userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
+			action="/completeActivity.do?userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
 			target="_self" modelAttribute="messageForm" id="messageForm">
 	
 			<c:set var="userId" value="${user.userID}" />
@@ -66,7 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 					<div class="table-responsive">
 						<table class="table table-condensed table-hover" cellspacing="0">
-							<logic:iterate id="group" name="groups">
+							<c:forEach var="group" items="${groups}">
 								<tr>
 									<td width="15%"><strong><c:out value="${group.groupName}" /></strong></td>
 									<td><c:forEach items="${group.userList}" var="user">
@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</div>
 										</c:forEach></td>
 								</tr>
-							</logic:iterate>
+							</c:forEach>
 						</table>
 					</div>
 	

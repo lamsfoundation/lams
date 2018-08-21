@@ -53,7 +53,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<lams:Page type="learner" title="${title}" hideProgressBar="true">
 		<c:set var="addnote">
-			<c:url value="/notebook/add.do?lessonID=" />
+			<c:url value="/notebook/addnew.jsp?lessonID=" />
 			<c:out value="${lessonID}" />
 		</c:set>
 		<div class="pull-right">
@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:set>
 	
 					<c:set var="addnote">
-						<c:url value="/notebook/add.do?currentLessonID=${lessonID}&lessonID=" />
+						<c:url value="/notebook/addnew.jsp?currentLessonID=${lessonID}&lessonID=" />
 						<c:out value="${entry.externalID}" />
 					</c:set>
 	

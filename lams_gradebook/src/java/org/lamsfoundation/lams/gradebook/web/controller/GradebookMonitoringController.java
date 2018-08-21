@@ -291,7 +291,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/toggleReleaseMarks")
     @ResponseBody
-    public void toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -299,8 +299,7 @@ public class GradebookMonitoringController {
 
 	gradebookService.toggleMarksReleased(lessonID);
 	response.setContentType("text/plain; charset=utf-8");
-	PrintWriter writer = response.getWriter();
-	writer.print("succes");
+	return "success";
 	
     }
 

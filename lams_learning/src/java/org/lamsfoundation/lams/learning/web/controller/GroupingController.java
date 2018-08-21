@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -143,7 +144,7 @@ public class GroupingController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {
 	    request.setAttribute(GroupingController.FINISHED_BUTTON, Boolean.TRUE);
-	    return "redirect: grouping/viewGroup.do";
+	    return viewGrouping(request, learnerProgress) ;
 	}
 	// forward to group choosing page
 	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
@@ -173,13 +174,13 @@ public class GroupingController {
      * @throws IOException
      * @throws ServletException
      */
-    @RequestMapping("/viewGroup")
-    public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
-	return viewGrouping(request, null);
-    }
+//    @RequestMapping("/viewGroup")
+//    public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
+//	return viewGrouping(request, null);
+//    }
 
     @RequestMapping("/viewGroup")
-    public String viewGrouping(HttpServletRequest request, LearnerProgress learnerProgress)
+    public String viewGrouping(HttpServletRequest request,@RequestParam (required = false)LearnerProgress learnerProgress)
 	    throws IOException, ServletException {
 	prepareGroupData(request);
 	request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);

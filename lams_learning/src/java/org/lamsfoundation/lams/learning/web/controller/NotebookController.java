@@ -214,7 +214,7 @@ public class NotebookController {
     /**
      *
      */
-    @RequestMapping("/add")
+    @RequestMapping("/processNewEntry")
     public String processNewEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
