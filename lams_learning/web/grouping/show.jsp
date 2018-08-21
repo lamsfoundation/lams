@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:Page type="learner" title="${title}">
 	
 		<form:form
-			action="/completeActivity.do?userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
+			action="/lams/learning/CompleteActivity.do?userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
 			target="_self" modelAttribute="messageForm" id="messageForm">
 	
 			<c:set var="userId" value="${user.userID}" />

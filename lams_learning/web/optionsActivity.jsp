@@ -175,7 +175,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				//-->
 				</script>
 		
-				<form:form action="CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
+				<form:form action="/lams/learning/CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
 					<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
 					<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">
 					<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />">

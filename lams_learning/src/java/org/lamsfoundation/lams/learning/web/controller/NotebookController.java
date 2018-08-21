@@ -215,7 +215,7 @@ public class NotebookController {
      *
      */
     @RequestMapping("/processNewEntry")
-    public String processNewEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+    public String processNewEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
 	Long id = notebookForm.getLessonID();
@@ -234,7 +234,7 @@ public class NotebookController {
      *
      */
     @RequestMapping(path="/updateEntry")
-    public String updateEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
+    public String updateEntry(@ModelAttribute ("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
 	Long uid = notebookForm.getUid();
