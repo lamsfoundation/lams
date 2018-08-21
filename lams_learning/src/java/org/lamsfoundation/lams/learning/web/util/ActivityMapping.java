@@ -164,7 +164,7 @@ public class ActivityMapping implements Serializable {
 
 	String forward = null;
 
-	String action = "requestDisplay.do?url=" + encodedURL;
+	String action = "requestURL.jsp?url=" + encodedURL;
 	action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId);
 
 	forward = actionToForward(action, null, false);

@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,6 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -172,7 +174,7 @@ public class GradebookMonitoringController {
      * @return
      * @throws Exception
      */
-    @RequestMapping("/updateUserLessonGradebookData")
+    @RequestMapping(path = "/updateUserLessonGradebookData", method = RequestMethod.POST)
     @ResponseBody
     public void updateUserLessonGradebookData(HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
@@ -212,7 +214,7 @@ public class GradebookMonitoringController {
      * @return
      * @throws Exception
      */
-    @RequestMapping("/updateUserActivityGradebookData")
+    @RequestMapping(path = "/updateUserActivityGradebookData", method = RequestMethod.POST)
     @ResponseBody
     public void updateUserActivityGradebookData(HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
@@ -288,16 +290,18 @@ public class GradebookMonitoringController {
      * @throws Exception
      */
     @RequestMapping("/toggleReleaseMarks")
-    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @ResponseBody
+    public void toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
 	}
 
 	gradebookService.toggleMarksReleased(lessonID);
 	response.setContentType("text/plain; charset=utf-8");
-	return "success";
+	PrintWriter writer = response.getWriter();
+	writer.print("succes");
+	
     }
 
     /**

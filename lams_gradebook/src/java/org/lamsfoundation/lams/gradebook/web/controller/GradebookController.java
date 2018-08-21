@@ -246,7 +246,6 @@ public class GradebookController {
 		: GradebookUtil.niceFormatting(averageLessonMark, isWeighted));
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(resultJSON.toString());
 	return resultJSON.toString();
     }
 

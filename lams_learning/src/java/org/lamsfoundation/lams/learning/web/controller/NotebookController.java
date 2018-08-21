@@ -233,7 +233,7 @@ public class NotebookController {
     /**
      *
      */
-    @RequestMapping(path="/updateEntry", method=RequestMethod.POST)
+    @RequestMapping(path="/updateEntry")
     public String updateEntry(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
