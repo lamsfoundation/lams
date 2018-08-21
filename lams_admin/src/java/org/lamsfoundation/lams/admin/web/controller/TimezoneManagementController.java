@@ -66,7 +66,7 @@ public class TimezoneManagementController {
      * Displays list of all JRE available timezones.
      */
     @RequestMapping("/start")
-    public String unspecified(HttpServletRequest request) throws Exception {
+    public String unspecified(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request) throws Exception {
 
 	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());
 	List<Timezone> defaultTimezones = timezoneService.getDefaultTimezones();
@@ -111,7 +111,8 @@ public class TimezoneManagementController {
      * Shows page where admin can choose server timezone.
      */
     @RequestMapping(path = "/serverTimezoneManagement", method = RequestMethod.POST)
-    public String serverTimezoneManagement(HttpServletRequest request) throws Exception {
+    public String serverTimezoneManagement(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
+	    throws Exception {
 
 	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());
 
@@ -132,13 +133,14 @@ public class TimezoneManagementController {
      * Changes server timezone with the one selected by user.
      */
     @RequestMapping(path = "/changeServerTimezone", method = RequestMethod.POST)
-    public String changeServerTimezone(HttpServletRequest request) throws Exception {
+    public String changeServerTimezone(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
+	    throws Exception {
 	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());
 
 	String timeZoneId = WebUtil.readStrParam(request, "timeZoneId");
 	timezoneService.setServerTimezone(timeZoneId);
 
-	return unspecified(request);
+	return unspecified(timezoneForm, request);
     }
 
 }

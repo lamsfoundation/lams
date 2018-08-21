@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -91,7 +92,7 @@ public class OrgSaveController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/orgsave", method = RequestMethod.POST)
-    public String execute(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request,
+    public String execute(@ModelAttribute OrganisationForm organisationForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	if (service == null) {
@@ -114,20 +115,19 @@ public class OrgSaveController {
 	    } else {
 		request.setAttribute("org", organisationForm.getParentId());
 	    }
-	    return "redirect:/orgmanage.do";
+	    return "redirect:../orgmanage.do";
 	}
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	//organisation name validation
 	String orgName = (organisationForm.getName() == null) ? null : organisationForm.getName();
 	if (StringUtils.isBlank(orgName)) {
-	    errorMap.add("name", messageService.getMessage("error.name.required"));
+	    errors.reject("name", messageService.getMessage("error.name.required"));
 	} else if (!ValidationUtil.isOrgNameValid(orgName)) {
-	    errorMap.add("name", messageService.getMessage("error.name.invalid.characters"));
+	    errors.reject("name", messageService.getMessage("error.name.invalid.characters"));
 	}
 
-	if (errorMap.isEmpty()) {
+	if (!errors.hasErrors()) {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    SupportedLocale locale = (SupportedLocale) service.findById(SupportedLocale.class,
@@ -169,7 +169,6 @@ public class OrgSaveController {
 	    request.setAttribute("org", organisationForm.getParentId());
 	    return "redirect:/orgmanage.do";
 	} else {
-	    request.setAttribute("errorMap", errorMap);
 	    return "redirect:/organisation/edit.do";
 	}
     }

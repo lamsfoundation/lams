@@ -73,7 +73,7 @@ public class OrganisationController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/edit", method = RequestMethod.POST)
+    @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request) throws Exception {
 
 	OrganisationController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
@@ -94,7 +94,7 @@ public class OrganisationController {
 			BeanUtils.copyProperties(organisationForm, org);
 			organisationForm.setParentId(org.getParentOrganisation().getOrganisationId());
 			organisationForm.setParentName(org.getParentOrganisation().getName());
-			organisationForm.setOrgId(org.getOrganisationType().getOrganisationTypeId());
+			organisationForm.setTypeId(org.getOrganisationType().getOrganisationTypeId());
 			organisationForm.setStateId(org.getOrganisationState().getOrganisationStateId());
 			SupportedLocale locale = org.getLocale();
 			organisationForm.setLocaleId(locale != null ? locale.getLocaleId() : null);
@@ -127,7 +127,7 @@ public class OrganisationController {
 	return error(request);
     }
 
-    @RequestMapping(path = "/create", method = RequestMethod.POST)
+    @RequestMapping(path = "/create")
     public String create(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	OrganisationController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
@@ -135,9 +135,9 @@ public class OrganisationController {
 
 	if (!(request.isUserInRole(Role.SYSADMIN) || OrganisationController.service.isUserGlobalGroupAdmin())) {
 	    // only sysadmins and global group admins can create groups
-	    if (((organisationForm.getOrgId() != null)
-		    && organisationForm.getOrgId().equals(OrganisationType.COURSE_TYPE))
-		    || (organisationForm.getOrgId() == null)) {
+	    if (((organisationForm.getTypeId() != null)
+		    && organisationForm.getTypeId().equals(OrganisationType.COURSE_TYPE))
+		    || (organisationForm.getTypeId() == null)) {
 		return error(request);
 	    }
 	}

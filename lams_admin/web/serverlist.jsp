@@ -15,7 +15,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="sysadmin.maintain.external.servers"/></c:set>
 	<lams:Page type="admin" title="${title}">
 			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
@@ -65,7 +64,7 @@
 			</table>
 			<p>${fn:length(servers)}&nbsp;<fmt:message key="sysadmin.integrated.servers" /></p>
 			
-			<input class="btn btn-default pull-right" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" />
+			<input class="btn btn-default pull-right" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain/edit.do'" />
 
 
 	</lams:Page>

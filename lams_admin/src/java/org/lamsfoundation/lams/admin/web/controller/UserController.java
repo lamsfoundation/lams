@@ -101,7 +101,7 @@ public class UserController {
 	}
     }
 
-    @RequestMapping(path = "/edit", method = RequestMethod.POST)
+    @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -290,7 +290,7 @@ public class UserController {
     }
 
     // determine whether to disable or delete user based on their lams data
-    @RequestMapping(path = "/remove", method = RequestMethod.POST)
+    @RequestMapping(path = "/remove")
     public String remove(HttpServletRequest request) throws Exception {
 
 	initServices();

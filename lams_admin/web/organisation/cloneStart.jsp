@@ -134,7 +134,6 @@
     
 <body class="stripes">
 
-	<c:set var="title"><fmt:message key="title.clone.lessons"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="cloneForm">
 			
 			<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
@@ -192,7 +191,7 @@
 			</div>
 			
 			
-			<form name="cloneForm" id="cloneForm" action="clone.do" method="post">
+			<form name="cloneForm" id="cloneForm" action="start.do" method="post">
 				<input type="hidden" name="groupId" value="<c:out value="${org.organisationId}" />">
 				<input type="hidden" name="lessons">
 				<input type="hidden" name="staff">

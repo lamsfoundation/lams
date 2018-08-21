@@ -18,7 +18,6 @@
     
 <body class="stripes">
 	
-	<c:set var="title"><fmt:message key="sysadmin.batch.temp.file.delete"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="cleanupForm">
 	
 	<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>

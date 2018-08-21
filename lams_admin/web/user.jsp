@@ -3,7 +3,11 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ page import="org.apache.struts.action.ActionMessages"%>
+<c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
+<c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
+<c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
+<c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
+<c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
 <lams:html>
 <lams:head>
@@ -15,12 +19,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
-	<c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
-	<c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
-	<c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
-	<c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
-	<c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 	
 	<lams:css/>
 	
@@ -153,37 +151,36 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><fmt:message key="admin.user.edit"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
+
+	<c:set var="title">${title}: <fmt:message key="admin.user.edit"/></c:set>
 	
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
-				<form:form id="userForm" action="saveUserDetails.do" modelAttribute="userForm" method="post">
+	<lams:Page type="admin" title="${title}" formID="userForm">
+	
+				<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
 				<form:hidden path="userId" />
 				<form:hidden path="orgId" />
 			
 				<c:if test="${not empty userForm.orgId}">
-					<a href="orgmanage.do?org=1" class="btn btn-default">
+					<a href="../orgmanage.do?org=1" class="btn btn-default">
 						<fmt:message key="admin.course.manage" />
 					</a>
 					<c:if test="${not empty pOrgId}">
-						: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default">
+						: <a href="../orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default">
 							<c:out value="${parentName}" />
 						  </a>
-						: <a href="usermanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
+						: <a href="../usermanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
 							<c:out value="${orgName}" />
 						  </a>
 					</c:if>
 					<c:if test="${empty pOrgId}">
-						: <a href="orgmanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
+						: <a href="../orgmanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
 							<c:out value="${orgName}" />
 						  </a>
 					</c:if>
 				</c:if>
 			
 				<c:if test="${empty userForm.orgId}">
-					<a href="orgmanage.do?org=1" class="btn btn-default">
+					<a href="../orgmanage.do?org=1" class="btn btn-default">
 						<fmt:message key="admin.course.manage" />
 					</a>
 				</c:if>
@@ -196,11 +193,11 @@
 			                    <c:out value="${error}" />
 			                </c:forEach>
 			            </lams:Alert>
-			        </c:if
+			        </c:if>
 			
 				<div class="panel panel-default voffset5">
 					<div class="panel-heading">
-						<span class="panel-title"> <c:if test="${not empty userForm.userId}>
+						<span class="panel-title"> <c:if test="${not empty userForm.userId}">
 								<fmt:message key="admin.user.edit" />
 							</c:if> <c:if test="${empty userForm.userId}">
 								<fmt:message key="admin.user.create" />
@@ -268,7 +265,7 @@
 								<td class="align-right"><fmt:message key="admin.user.login" />
 									*:</td>
 								<td><input type="text" id="login" name="login"  maxlength="50"
-										class="form-control" /></td>
+										class="form-control" value="${userForm.login}"/></td>
 							</tr>
 							<c:if test="${empty userForm.userId}">
 							<tr>
@@ -299,55 +296,55 @@
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.title" />:</td>
 								<td><input type="text" name="title" size="32" maxlength="32"
-										id="title" class="form-control" /></td>
+										id="title" class="form-control" value="${userForm.title}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.first_name" /> *:</td>
 								<td><input type="text" name="firstName" 
-										id="firstName" maxlength="128" class="form-control" /></td>
+										id="firstName" maxlength="128" class="form-control" value="${userForm.firstName}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.last_name" /> *:</td>
 								<td><input type="text" name="lastName" 
-										id="lastName" maxlength="128" class="form-control" /></td>
+										id="lastName" maxlength="128" class="form-control" value="${userForm.lastName}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.email" />
 									*:</td>
 								<td><input type="text" name="email" maxlength="128"
-										class="form-control" /></td>
+										class="form-control" value="${userForm.email}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.address_line_1" />:</td>
 								<td><input type="text" name="addressLine1" 
-										maxlength="64" class="form-control" /></td>
+										maxlength="64" class="form-control" value="${userForm.addressLine1}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.address_line_2" />:</td>
 								<td><input type="text" name="addressLine2" 
-										maxlength="64" class="form-control" /></td>
+										maxlength="64" class="form-control" value="${userForm.addressLine2}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.address_line_3" />:</td>
 								<td><input type="text" name="addressLine3" 
-										maxlength="64" class="form-control" /></td>
+										maxlength="64" class="form-control" value="${userForm.addressLine3}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.city" />:</td>
 								<td><input type="text" name="city"  maxlength="64"
-										class="form-control" /></td>
+										class="form-control" value="${userForm.city}"/></td>
 							</tr>
 							<tr>
 								<td class="align-right">
 									<fmt:message key="admin.user.postcode" />:
 								</td>
 								<td>
-									<input type="text" name="postcode" size="10" maxlength="10" class="form-control" />
+									<input type="text" name="postcode" size="10" maxlength="10" class="form-control" value="${userForm.postcode}"/>
 								</td>
 							</tr>
 							<tr>
@@ -355,7 +352,7 @@
 									<fmt:message key="admin.user.state" />:
 								</td>
 								<td><input type="text" name="state"  maxlength="64"
-										class="form-control" />
+										class="form-control" value="${userForm.state}" />
 								</td>
 							</tr>
 							<tr>
@@ -363,7 +360,7 @@
 									<fmt:message key="admin.user.country" />:
 								</td>
 								<td><input type="text" name="country"  maxlength="64"
-										class="form-control" />
+										class="form-control" value="${userForm.country}"/>
 								</td>
 							</tr>
 							<tr>
@@ -371,7 +368,7 @@
 									<fmt:message key="admin.user.day_phone" />:
 								</td>
 								<td>
-									<input type="text" name="dayPhone"  maxlength="64" class="form-control" />
+									<input type="text" name="dayPhone"  maxlength="64" class="form-control" value="${userForm.dayPhone}"/>
 								</td>
 							</tr>
 							<tr>
@@ -379,7 +376,7 @@
 									<fmt:message key="admin.user.evening_phone" />:
 								</td>
 								<td>
-									<input type="text" name="eveningPhone" maxlength="64" class="form-control" />		
+									<input type="text" name="eveningPhone" maxlength="64" class="form-control" value="${userForm.eveningPhone}" />		
 								</td>
 							</tr>
 							<tr>
@@ -387,14 +384,14 @@
 									<fmt:message key="admin.user.mobile_phone" />:
 								</td>
 								<td>
-									<input type="text" name="mobilePhone" maxlength="64" class="form-control" />
+									<input type="text" name="mobilePhone" maxlength="64" class="form-control" value="${userForm.mobilePhone}" />
 								</td>
 							</tr>
 							<tr>
 								<td class="align-right">
 									<fmt:message key="admin.user.fax" />:</td>
 								<td>
-									<input type="text" name="fax"  maxlength="64" class="form-control" />
+									<input type="text" name="fax"  maxlength="64" class="form-control" value="${userForm.fax}"/>
 								</td>
 							</tr>
 			
@@ -418,7 +415,7 @@
 									<fmt:message key="admin.user.time.zone" />:
 								</td>
 								<td>
-									<form:select property="timeZone" cssClass="form-control">
+									<form:select path="timeZone" cssClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
 											<form:option value="${timezoneDto.timeZoneId}">
 												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
@@ -467,9 +464,9 @@
 					
 					<div class="row">
 					<div class="col-md-12">
-						<c:if test="${not empty userForm.userId}>
+						<c:if test="${not empty userForm.userId}">
 							<div class="pull-left">
-							<a href="userChangePass.jsp?userId=<c:out value="${userForm.userId}" />&login=<c:out value="${userForm.login}" />" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+							<a href="userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
 							</div>
 						</c:if>
 						<div class="pull-right">

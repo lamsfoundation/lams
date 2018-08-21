@@ -39,7 +39,7 @@
 </lams:head>
     
 <body class="stripes">
-			<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+			<lams:Page type="admin" title="${title}">
 				<h4 class="loffset10"><fmt:message key="admin.servertimezone.select.server.timezone" /></h4>
 				<div style="padding: 13px 20px 20px;">
 			

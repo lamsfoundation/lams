@@ -75,7 +75,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.themes.title"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="themeForm">
 			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 

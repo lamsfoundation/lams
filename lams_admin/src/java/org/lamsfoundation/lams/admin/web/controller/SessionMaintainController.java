@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/sessionmaintain")
 public class SessionMaintainController {
 
-    @RequestMapping(path = "/list", method = RequestMethod.POST)
+    @RequestMapping(path = "/list")
     public String list(HttpServletRequest request) {
 	request.setAttribute("sessions", SessionManager.getLoginToSessionIDMappings());
 	return "sessionmaintain";

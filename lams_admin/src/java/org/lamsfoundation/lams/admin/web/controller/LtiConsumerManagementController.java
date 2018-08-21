@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
 import org.lamsfoundation.lams.admin.web.form.LtiConsumerForm;
@@ -20,8 +19,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,7 +55,7 @@ public class LtiConsumerManagementController {
     /**
      * Shows all available LTI tool consumers
      */
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request) {
 	initServices();
 
@@ -128,7 +126,7 @@ public class LtiConsumerManagementController {
      * Stores in the DB a new or edited LTI tool consumer
      */
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public String save(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request,
+    public String save(@ModelAttribute ExtServerForm extServerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	initServices();
@@ -138,37 +136,34 @@ public class LtiConsumerManagementController {
 	    return unspecified(request);
 	}
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String[] requiredFields = extServerForm.getRequiredFields();
 	for (String requiredField : requiredFields) {
 	    if (StringUtils.trimToNull(requiredField) == null) {
-		errorMap.add("error.required", messageService.getMessage("sysadmin." + requiredField));
+		errors.reject("error.required", messageService.getMessage("sysadmin." + requiredField));
 	    }
 	}
 
 	Integer sid = extServerForm.getSid();
 	//check duplication
-	if (errorMap.isEmpty()) {
+	if (!errors.hasErrors()) {
 	    String[] uniqueFields = extServerForm.getUniqueFields();
 	    for (String uniqueField : uniqueFields) {
 		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, "uniqueField",
 			uniqueField);
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(0)) {//new map
-			errorMap.add("error.not.unique",
-				messageService.getMessage("sysadmin." + uniqueField));
+			errors.reject("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
 		    } else {
 			ExtServer ltiConsumer = list.get(0);
 			if (!ltiConsumer.getSid().equals(sid)) {
-			    errorMap.add("error.not.unique",
-				    messageService.getMessage("sysadmin." + uniqueField));
+			    errors.reject("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
 			}
 		    }
 
 		}
 	    }
 	}
-	if (errorMap.isEmpty()) {
+	if (!errors.hasErrors()) {
 	    ExtServer ltiConsumer = null;
 	    if (sid.equals(0)) {
 		ltiConsumer = new ExtServer();
@@ -184,7 +179,6 @@ public class LtiConsumerManagementController {
 	    return unspecified(request);
 
 	} else {
-	    request.setAttribute("errorMap", errorMap);
 	    return "lti/ltiConsumer";
 	}
     }

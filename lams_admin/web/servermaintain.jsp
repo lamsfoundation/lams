@@ -56,7 +56,6 @@
     
 <body class="stripes">
 	
-	<c:set var="title"><fmt:message key="sysadmin.maintain.server.edit"/></c:set>
 	<c:set var="help"><fmt:message key="Integrations"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
@@ -72,7 +71,7 @@
 				            </lams:Alert>
 				        </c:if>
 				
-				<form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
+				<form:form action="../serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 					<form:hidden path="sid" />
 					
 				<table class="table table-no-border">
@@ -109,8 +108,7 @@
 							<input type="hidden" name="timeToLiveLoginRequestEnabled" value="false">
 						</td>
 					</tr>
-					
-					<tr id="ttl-login-request-wrap" <c:if test="${!extServerForm.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
+					<tr id="ttl-login-request-wrap" <c:if test="${!extServerForm.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
 						<td><fmt:message key="sysadmin.login.request.ttl" /></td>
 						<td><input type="text" name="timeToLiveLoginRequest" size="10" id="ttl-login-request" class="form-control"/></td>
 					</tr>
@@ -135,7 +133,7 @@
 				</div>
 				</form:form>
 				
-				<a href="sysadminstart.do" class="btn btn-default pull-left"><fmt:message key="sysadmin.maintain" /></a>
+				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default pull-left"><fmt:message key="sysadmin.maintain" /></a>
 			</lams:Page>
 
 </body>

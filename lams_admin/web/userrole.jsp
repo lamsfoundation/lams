@@ -15,73 +15,63 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><fmt:message key="admin.user.assign.roles"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
-
+	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
+	<lams:Page type="admin" title="${title}">
+		<form:form action="./userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
+		<form:hidden path="userId" />
+		<form:hidden path="orgId" />
+		<p>
+			<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+			<c:if test="${not empty pOrgId}">
+				: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${parentName}" /></a>
+				: <a href="usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
+			</c:if>
+			<c:if test="${empty pOrgId}">
+				<c:if test="${userRolesForm.orgId != 1}">
+					: <a href="orgmanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
+				</c:if>
+				<c:if test="${userRolesForm.orgId == 1}">
+					: <a href="usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
+				</c:if>
+			</c:if>
+		</p>
+		
+		<p><fmt:message key="msg.roles.mandatory"/></p>
+		
+		<div align="center"><html-el:errors/><html-el:messages id="roles" message="true"><c:out value="${roles}" /></html-el:messages></div>
+		
+		<div class="container-fluid">
+		<div class="row">
+		  <div class="col-xs-2"><fmt:message key="admin.user.login"/>:</div>
+		  <div class="col-xs-10"><c:out value="${login}" /></div>
+		</div>
+		
+		<div class="row">
+		  <div class="col-xs-2"><fmt:message key="admin.user.name"/>:</div>
+		  <div class="col-xs-10"><c:out value="${fullName}" /></div>
+		</div>
+		
+		<div class="row">
+		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
+		  <div class="col-xs-10">            
+		  	<c:forEach items="${rolelist}" var="role">
+		    	<form:select path="roles" multiple="true" items="${userRolesForm.roles}" itemValue="${role.roleId}"/>
+		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
+		    </c:forEach>
+		  </div>
+		</div>
+		</div>
+		
+		<div class="pull-right">
+			<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+			<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
+			<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+		</div>
+		
+		</form:form>
 	</lams:Page>
 
 
 </body>
 </lams:html>
 
-
-
-
-<%@ include file="/taglibs.jsp"%>
-
-<form:form action="./userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
-<form:hidden path="userId" />
-<form:hidden path="orgId" />
-<p>
-	<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-	<c:if test="${not empty pOrgId}">
-		: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${parentName}" /></a>
-		: <a href="usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
-	</c:if>
-	<c:if test="${empty pOrgId}">
-		<c:if test=${userRolesForm.orgId != 1}">
-			: <a href="orgmanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
-		</c:if>
-		<c:if test=${userRolesForm.orgId == 1}">
-			: <a href="usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
-		</c:if>
-	</c:if>
-</p>
-
-<p><fmt:message key="msg.roles.mandatory"/></p>
-
-<div align="center"><html-el:errors/><html-el:messages id="roles" message="true"><c:out value="${roles}" /></html-el:messages></div>
-
-<div class="container-fluid">
-<div class="row">
-  <div class="col-xs-2"><fmt:message key="admin.user.login"/>:</div>
-  <div class="col-xs-10"><c:out value="${login}" /></div>
-</div>
-
-<div class="row">
-  <div class="col-xs-2"><fmt:message key="admin.user.name"/>:</div>
-  <div class="col-xs-10"><c:out value="${fullName}" /></div>
-</div>
-
-<div class="row">
-  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
-  <div class="col-xs-10">            
-  	<c:forEach items="${rolelist}" var="role">
-    	<form:multibox path="${userRolesForm.roles}" value="${role.roleId}"/>
-        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
-    </c:forEach>
-  </div>
-</div>
-</div>
-
-<div class="pull-right">
-	<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
-	<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-	<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
-</div>
-
-</form:form>

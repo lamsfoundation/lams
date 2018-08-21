@@ -49,7 +49,7 @@ public class SysAdminStartController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/sysadminstart", method = RequestMethod.POST)
+    @RequestMapping(path = "/sysadminstart")
     public String execute(HttpServletRequest request) throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
@@ -59,21 +59,21 @@ public class SysAdminStartController {
 	if (request.isUserInRole(Role.SYSADMIN)) {
 	    ArrayList<LinkBean> links = new ArrayList<>();
 	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
-	    links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
+	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
 	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
-	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
+	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
 	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
-	    links.add(new LinkBean("ltiConsumerManagement.do", "label.manage.tool.consumers"));
-	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
-	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
-	    links.add(new LinkBean("sessionmaintain.do?method=list", "sysadmin.maintain.session"));
+	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
+	    links.add(new LinkBean("toolcontentlist/start.do", "sysadmin.tool.management"));
+	    links.add(new LinkBean("themeManagement/start.do", "admin.themes.title"));
+	    links.add(new LinkBean("sessionmaintain/list.do", "sysadmin.maintain.session"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_CONFIG_LINKS, links });
 
 	    links = new ArrayList<>();
-	    links.add(new LinkBean("logevent.do", "label.event.log"));
-	    links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
-	    links.add(new LinkBean("cleanupPreviewLessons.do", "sysadmin.batch.preview.lesson.delete"));
-	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));
+	    links.add(new LinkBean("logevent/start.do", "label.event.log"));
+	    links.add(new LinkBean("cleanup/start.do", "sysadmin.batch.temp.file.delete"));
+	    links.add(new LinkBean("cleanupPreviewLessons/start.do", "sysadmin.batch.preview.lesson.delete"));
+	    links.add(new LinkBean("statistics/start.do", "admin.statistics.title"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_MONITOR_LINKS, links });
 
 	    links = new ArrayList<>();
@@ -81,7 +81,7 @@ public class SysAdminStartController {
 	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
-	    links.add(new LinkBean("ldap.do", "sysadmin.ldap.configuration"));
+	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_COURSE_LINKS, links });
 
 	} else if (service.isUserGlobalGroupAdmin()) {

@@ -2,6 +2,7 @@
 
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
+<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
 
 <lams:html>
 <lams:head>
@@ -17,11 +18,9 @@
     
 <body class="stripes">
 
-	<c:set var="title"><fmt:message key="title.clone.lessons"/></c:set>
 	<lams:Page type="admin" title="${title}">
 	
 		<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
-			<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
 			<c:if test="${org.organisationType.organisationTypeId eq classTypeId}">
 				<a href="orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />" class="btn btn-default">
 				<c:out value="${org.parentOrganisation.name}" />

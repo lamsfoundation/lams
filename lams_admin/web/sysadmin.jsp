@@ -15,7 +15,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="sysadmin.maintain"/></c:set>
 	<lams:Page type="admin" title="${title}">
 			<c:forEach items="${groupedLinks}" var="links">
 				<div class="panel panel-default">

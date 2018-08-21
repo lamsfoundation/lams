@@ -16,7 +16,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.signup.title"/></c:set>
 	<c:set var="help"><fmt:message key="LAMS+Signup"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
@@ -63,15 +62,15 @@
 						<c:out value="${signupOrganisation.context}" />
 					</td>
 					<td>
-						<a href="/signupManagement/edit.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.edit"/></a>
+						<a href="../signupManagement/edit.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.edit"/></a>
 						&nbsp;&nbsp;
-						<a href="/signupManagement/delete.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.delete"/></a>
+						<a href="../signupManagement/delete.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.delete"/></a>
 					</td>
 				</tr>
 			</c:forEach>
 		</table>
 		
-		<a href="/signupManagement/add.do" class="btn btn-primary pull-right"><fmt:message key="admin.add.new.signup.page"/></a>
+		<a href="../signupManagement/add.do" class="btn btn-primary pull-right"><fmt:message key="admin.add.new.signup.page"/></a>
 
 	</lams:Page>
 

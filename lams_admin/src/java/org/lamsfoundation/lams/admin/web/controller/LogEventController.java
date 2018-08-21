@@ -68,7 +68,7 @@ public class LogEventController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request) throws Exception {
 
 	// check permission

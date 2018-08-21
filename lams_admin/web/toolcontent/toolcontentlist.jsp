@@ -24,7 +24,7 @@
 				'height'   : 700,
 				'title'	   : '<fmt:message key="tool.groups.dialog.title" />',
 				'open' 	   : function(){
-					$('#toolGroupsFrame', this).attr('src', 'toolcontentlist/openLearningLibraryGroups.do');
+					$('#toolGroupsFrame', this).attr('src', './openLearningLibraryGroups.do');
 				},
 				'beforeClose'	   : function(){
 					$('#toolGroupsFrame', this).attr('src', null);
@@ -50,7 +50,6 @@
     
 <body class="stripes">
 	
-	<c:set var="title"><fmt:message key="sysadmin.tool.management"/></c:set>
 	<lams:Page type="admin" title="${title}">
 				<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
@@ -110,10 +109,10 @@
 							<td>
 								<c:choose>
 									<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
-										[<a id="disable${dto.activityTitle}" href="<c:url value='toolcontentlist/disable.do?libraryID=${dto.learningLibraryID}' />"><fmt:message key="admin.disable" /></a>] 
+										[<a id="disable${dto.activityTitle}" href="<c:url value='../toolcontentlist/disable.do?libraryID=${dto.learningLibraryID}' />"><fmt:message key="admin.disable" /></a>] 
 									</c:when>
 									<c:otherwise>
-										[<a id="enable${dto.activityTitle}" href="<c:url value='toolcontentlist/enable.do?libraryID=${dto.learningLibraryID}'/>"><fmt:message key="admin.enable" /></a>]
+										[<a id="enable${dto.activityTitle}" href="<c:url value='../toolcontentlist/enable.do?libraryID=${dto.learningLibraryID}'/>"><fmt:message key="admin.enable" /></a>]
 									</c:otherwise>
 								</c:choose>
 								<c:if test="${not empty dto.toolContentID}">

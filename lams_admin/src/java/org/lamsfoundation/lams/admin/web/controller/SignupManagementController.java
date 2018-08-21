@@ -17,6 +17,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  *
  */
+@Controller
 @RequestMapping("/signupManagement")
 public class SignupManagementController {
 
@@ -116,7 +118,7 @@ public class SignupManagementController {
 	return null;
     }
 
-    @RequestMapping(path = "/add", method = RequestMethod.POST)
+    @RequestMapping(path = "/add")
     public String add(@ModelAttribute SignupManagementForm signupForm, HttpServletRequest request) throws Exception {
 
 	// check if form submitted

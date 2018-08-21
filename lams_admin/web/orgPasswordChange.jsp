@@ -3,7 +3,12 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-
+<c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
+<c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
+<c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
+<c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
+<c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+	
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.org.password.change.title"/></c:set>
@@ -14,12 +19,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
-	<c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
-	<c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
-	<c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
-	<c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
-	<c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 	
 	<lams:css />
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
@@ -135,7 +134,7 @@
 			
 			
 			// Setup form validation 
-			$("#OrgPasswordChangeForm").validate({
+			$("#orgPasswordChangeForm").validate({
 				errorLabelContainer : '#formValidationErrors',
 				errorClass : 'errorMessage',
 				rules : {
@@ -339,8 +338,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.org.password.change.title"/></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page type="admin" title="${title}">
 				<p>
 					<a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value='${orgPasswordChangeForm.organisationID}' />" class="btn btn-default">
 					<fmt:message key="admin.user.manage" /></a>
@@ -417,7 +415,7 @@
 									<td class="changeContainer">
 										<div class="checkbox">
 											<label>
-												<form:checkbox path="isStaffChange" od="isStaffChange"/>
+												<form:checkbox path="isStaffChange" id="isStaffChange" />
 													<fmt:message key="admin.org.password.change.is.staff" />
 											</label>
 										</div>
@@ -428,7 +426,7 @@
 									<td class="changeContainer">
 										<div class="checkbox">
 											<label>
-												<form:checkbox path="isLearnerChange" id="isLearnerChange">
+												<form:checkbox path="isLearnerChange" id="isLearnerChange" />
 													<fmt:message key="admin.org.password.change.is.learner" />
 											</label>
 										</div>

@@ -27,6 +27,8 @@ public class OrganisationForm {
     private Integer orgId;
 
     private Integer parentId;
+    
+    private Integer typeId;
 
     private String parentName;
 
@@ -70,6 +72,14 @@ public class OrganisationForm {
 
     public void setParentId(Integer parentId) {
 	this.parentId = parentId;
+    }
+   
+    public Integer getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(Integer typeId) {
+        this.typeId = typeId;
     }
 
     public String getParentName() {

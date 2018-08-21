@@ -64,7 +64,7 @@ public class UserOrgController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/userorg", method = RequestMethod.POST)
+    @RequestMapping(path = "/userorg")
     public String execute(@ModelAttribute UserOrgForm userOrgForm, HttpServletRequest request) throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());

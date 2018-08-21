@@ -235,7 +235,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="label.event.log"/></c:set>
 	<lams:Page type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 

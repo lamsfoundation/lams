@@ -42,6 +42,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -77,7 +78,7 @@ public class UserOrgRoleSaveController {
     @Qualifier("adminMessageService")
     private MessageService adminMessageService;
 
-    @RequestMapping("/userorgrolesave")
+    @RequestMapping(path = "/userorgrolesave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, HttpServletRequest request)
 	    throws Exception {
 

@@ -73,7 +73,6 @@
     
 <body class="stripes">
 
-	<c:set var="title"><fmt:message key="sysadmin.batch.preview.lesson.delete" /></c:set>
 	<lams:Page type="admin" title="${title}">
 		
 		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
@@ -81,7 +80,7 @@
 		<c:set var="errorKey" value="GLOBAL" />
 			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
 				<lams:Alert id="error" type="danger" close="false">
-				<c:forEach var="error" items="${errorMap[errorKey]}"
+				<c:forEach var="error" items="${errorMap[errorKey]}">
 					<c:out value="${error}" />
 				</c:forEach>
 				</lams:Alert>

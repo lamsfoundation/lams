@@ -72,7 +72,7 @@ public class UserOrgRoleController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/userorgrole", method = RequestMethod.POST)
+    @RequestMapping(path = "/userorgrole")
     public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, HttpServletRequest request)
 	    throws Exception {
 

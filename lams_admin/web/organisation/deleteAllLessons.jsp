@@ -73,7 +73,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="sysadmin.lesson.delete.title"/></c:set>
+
 	<lams:Page type="admin" title="${title}">
 				<p>
 					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>

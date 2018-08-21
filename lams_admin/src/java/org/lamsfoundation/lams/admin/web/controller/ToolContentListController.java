@@ -82,7 +82,7 @@ public class ToolContentListController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request) throws Exception {
 	// check permission
 	if (!(request.isUserInRole(Role.SYSADMIN))) {

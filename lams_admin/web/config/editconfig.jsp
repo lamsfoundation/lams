@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 
+<%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem"%>
-<%@ include file="/taglibs.jsp"%>
+<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
 
 <lams:html>
 <lams:head>
@@ -18,7 +19,6 @@
     
 <body class="stripes">
 
-	<c:set var="title"><fmt:message key="sysadmin.config.settings.edit"/></c:set>
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="configForm">
@@ -31,7 +31,7 @@
 			</lams:Alert>
 		</c:if>
 				
-		<form:form action="save.do" modelAttribute="configForm" id="configForm" method="post">
+		<form:form action="config/save.do" modelAttribute="configForm" id="configForm" method="post">
 				
 			<c:forEach items="${config}" var="group">
 				<div class="panel panel-default">
@@ -40,24 +40,23 @@
 					</div>
 									
 					<table class="table table-striped table-condensed" >
-						<c:forEach items="${group}" path="value" var="row">
+						<c:forEach items="${group.value}" var="row">
 							<tr>
 								<td>
 									<fmt:message key="${row.descriptionKey}"/>
 									<c:if test="${row.required}">&nbsp;&nbsp;*</c:if>
 								</td>
 								<td>
-									<form:hidden path="key" name="key" value="${row.key}"/>
-									<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
+									<input type="hidden" name="key" value="${row.key}"/>
 									<c:choose>
 									<c:when test="${row.format==BOOLEAN}">
 										<form:select id="${row.key}" name="row" path="value" cssClass="form-control form-control-sm">
-										<form:option value="true">true</form:option>
-										<form:option value="false">false&nbsp;&nbsp;</form:option>
+										<form:option value="true" label="true"/>
+										<form:option value="false" label="false"/>&nbsp;&nbsp;
 										</form:select>
 									</c:when>
 									<c:otherwise>
-										<form:input id="${row.key}" path="value" name="row" value="${row.value}" size="50" maxlength="255" cssClass="form-control"/>
+										<input type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control"/>
 									</c:otherwise>
 									</c:choose>
 								</td>
@@ -68,7 +67,7 @@
 			</c:forEach>
 				
 			<div class="pull-right">
-				<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+				<input type="button" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
 				<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 			</div>
 		</form:form>

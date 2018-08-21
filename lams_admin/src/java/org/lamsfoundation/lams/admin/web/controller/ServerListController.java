@@ -45,7 +45,7 @@ public class ServerListController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/serverlist", method = RequestMethod.POST)
+    @RequestMapping(path = "/serverlist")
     public String execute(HttpServletRequest request) throws Exception {
 	List<ExtServer> extServers = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext())
 		.getAllExtServers();

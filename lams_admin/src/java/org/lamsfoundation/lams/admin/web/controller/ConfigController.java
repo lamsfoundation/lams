@@ -51,7 +51,6 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-@RequestMapping("/config")
 public class ConfigController {
 
     private static Configuration configurationService;
@@ -70,15 +69,15 @@ public class ConfigController {
 	return configurationService;
     }
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
-    public String unspecified(HttpServletRequest request) throws Exception {
+    @RequestMapping(path = "/config")
+    public String unspecified(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
 	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
 
 	return "config/editconfig";
     }
 
-    @RequestMapping(path = "/save", method = RequestMethod.POST)
+    @RequestMapping(path = "/config/save", method = RequestMethod.POST)
     public String save(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {

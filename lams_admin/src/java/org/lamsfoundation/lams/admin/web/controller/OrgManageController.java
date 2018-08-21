@@ -66,7 +66,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @Controller
-@RequestMapping("/orgmanage")
 public class OrgManageController {
 
     private static IUserManagementService userManagementService;
@@ -74,7 +73,7 @@ public class OrgManageController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/orgmanage")
     public String unspecified(@ModelAttribute OrgManageForm orgManageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	initServices();
@@ -162,7 +161,7 @@ public class OrgManageController {
     /**
      * Returns list of organisations for .
      */
-    @RequestMapping("/getOrgs")
+    @RequestMapping("/orgmanage/getOrgs")
     @ResponseBody
     public String getOrgs(HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
 	initServices();

@@ -15,7 +15,7 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 		<table class="table table-striped">

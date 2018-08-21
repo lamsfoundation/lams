@@ -15,10 +15,10 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.organisation.entry"/></c:set>
+
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
 	
-		<form:form action="orgsave.do" modelAttribute="organisationForm" id="organisationForm" method="post">
+		<form:form action="../orgsave.do" modelAttribute="organisationForm" id="organisationForm" method="post">
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
 				<form:hidden path="typeId" />
@@ -43,15 +43,15 @@
 				<table  class="table table-no-border">
 					<tr>
 						<td><fmt:message key="admin.organisation.name"/>:</td>
-						<td><input type="text" name="name" size="40" class="form-control"/> *</td>
+						<td><input type="text" name="name" size="40" class="form-control" value="${organisationForm.name}" /> *</td>
 					</tr>
 					<tr>
 					<td><fmt:message key="admin.organisation.code"/>:</td>
-						<td><input type="text" name="code" size="20"  class="form-control"/></td>
+						<td><input type="text" name="code" size="20"  class="form-control" value="${organisationForm.code}" /></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.description"/>:</td>
-						<td><form:textarea path="description" cols="50" rows="3"  cssClass="form-control"/></td>
+						<td><textarea name="description" cols="50" rows="3"  class="form-control">${organisationForm.description}</textarea></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.locale"/>:</td>

@@ -94,7 +94,7 @@ public class LdapConfigController {
 	return configurationService;
     }
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request) throws Exception {
 
 	String action = WebUtil.readStrParam(request, "action", true);

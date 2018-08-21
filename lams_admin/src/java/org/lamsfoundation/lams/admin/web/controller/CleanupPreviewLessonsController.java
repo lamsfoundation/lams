@@ -69,7 +69,7 @@ public class CleanupPreviewLessonsController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	if (!getSecurityService().isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");

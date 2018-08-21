@@ -3,6 +3,9 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 <%@ page import=" org.lamsfoundation.lams.util.FileUtil" %>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="datePattern"><%= FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.toPattern() %></c:set>
+	
 
 <lams:html>
 <lams:head>
@@ -14,9 +17,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
-	<c:set var="lams"><lams:LAMSURL /></c:set>
-	<c:set var="datePattern"><%= FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.toPattern() %></c:set>
 	
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
@@ -122,7 +122,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.course.manage"/></c:set>
+
 	<lams:Page type="admin" title="${title}" formID="orgManageForm">
 		<c:if test="${orgManageForm.type == 1}">
 				<form>
@@ -145,7 +145,7 @@
 				<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 				</form>
 			
-				<form:form cssClass="indentPad" action="start.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
+				<form:form cssClass="indentPad" action="orgmanage.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
 					<input type="hidden" name="org" value="<c:out value="${orgManageForm.parentId}"/>" />
 					<fmt:message key="label.show"/>&nbsp;
 					<form:select path="stateId" id="org-state-id" cssClass="form-control form-control-inline input-sm">
@@ -158,7 +158,7 @@
 		</c:if>
 			
 		<c:if test="${orgManageForm.type == 2}">
-				<p><a href="orgmanage/start.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a></p>
+				<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a></p>
 			
 				<div class="panel panel-default voffset5" >
 					<div class="panel-heading">
@@ -171,10 +171,10 @@
 								</c:if>
 								<a href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>" id="manageUsers" class="btn btn-default"><i class="fa fa-users"></i> <span class="hidden-xs"><fmt:message key="admin.user.manage" /></span></a>
 								
-								<% if (request.isUserInRole(Role.SYSADMIN)) { %>
+								<c:if test="${request.isUserInRole(Role.SYSADMIN)}">
 									<a href="clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
 									<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
-								<% } %>
+								</c:if>
 							</div>
 						</div>
 					</div>
@@ -242,25 +242,25 @@
 				</form:form>
 		</c:if>
 			
-		<c:if test=${orgManageForm.type == 3}>
+		<c:if test="${orgManageForm.type == 3}">
 				<p>
-					<a href="orgmanage/start.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-					: <a href="orgmanage/start.do?org=<c:out value="${parentGroupId}"/>" class="btn btn-default"><c:out value="${parentGroupName}"/></a>
+					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+					: <a href="orgmanage.do?org=<c:out value="${parentGroupId}"/>" class="btn btn-default"><c:out value="${parentGroupName}"/></a>
 				</p>
 				
 				<div class="panel panel-default voffset5" >
 					<div class="panel-heading">
 						<div class="panel-title">
-							<span><c:out value="${OrgManageForm.parentName}"/></span>
+							<span><c:out value="${orgManageForm.parentName}"/></span>
 							<div class="btn-group btn-group-sm  pull-right">
 								<c:if test="${editGroup == true}">
 									<input class="btn btn-default" type="button" value="<fmt:message key="admin.edit" />&nbsp;<c:out value="${orgManageForm.parentName}"/>" onclick=javascript:document.location='organisation/edit.do?orgId=<c:out value="${orgManageForm.parentId}"/>' />
 								</c:if>
 								<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>' />
-								<% if (request.isUserInRole(Role.SYSADMIN)) { %>
+								<c:if test="${request.isUserInRole(Role.SYSADMIN)}">
 										<input class="btn btn-default" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>';">
 										<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
-								<% } %>
+								</c:if>
 						</div>
 						</div>
 					</div>

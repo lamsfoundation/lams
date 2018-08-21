@@ -15,7 +15,7 @@
 	
 	<script language="javascript" type="text/JavaScript">
 	function toggleCheckboxes(roleIndex, object){
-		<c:forEach var="userBean" items="${UserOrgRoleForm.userBeans}" indexId="beanIndex" >
+		<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" indexId="beanIndex" >
 		document.forms.UserOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}" />*(<c:out value="${beanIndex}" />+1)].checked=object.checked;
 		</c:forEach>
 	}
@@ -23,11 +23,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle" value="<fmt:message key="admin.user.assign.roles"/>">	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
+	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userOrgRoleForm">
 				<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 			    <c:if test=${not empty pOrgId}>

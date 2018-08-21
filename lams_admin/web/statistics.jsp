@@ -36,8 +36,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.statistics.title"/></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page type="admin" title="${title}">
 			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 			
 			<div class="panel panel-default">

@@ -38,20 +38,20 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.organisation.entry"/></c:set>
+
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
-		<form:form action="orgsave.do" method="post" modelAttribute="organisationForm" onsubmit="return warnIfRemoved()">
+		<form:form action="../orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
 				<form:hidden path="typeId" />
 				
-				<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+				<p><a href="../orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 					<c:if test="${organisationForm.typeId == 3}">
-						: <a href="orgmanage.do?org=<c:out value="${organisationForm.parentId}" />" class="btn btn-default"><c:out value="${organisationForm.parentName}"/></a>
+						: <a href="../orgmanage.do?org=<c:out value="${organisationForm.parentId}" />" class="btn btn-default"><c:out value="${organisationForm.parentName}"/></a>
 					</c:if>
 					
 					<c:if test="${not empty organisationForm.orgId}">
-						: <a href="orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default"><c:out value="${organisationForm.name}"/></a>
+						: <a href="../orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default"><c:out value="${organisationForm.name}"/></a>
 					</c:if>
 				</p>
 				
@@ -59,7 +59,7 @@
 					<c:if test="${not empty organisationForm.orgId}">
 						<fmt:message key="admin.edit"/>&nbsp;<c:out value="${organisationForm.name}"/>&nbsp;
 					</c:if>
-					<<c:if test="${empty organisationForm.orgId}">
+					<c:if test="${empty organisationForm.orgId}">
 						<c:if test="${organisationForm.typeId == 2}">
 							<fmt:message key="admin.course.add"/>
 						</c:if>
@@ -70,14 +70,7 @@
 				</h4>
 				
 				<div align="center">
-					 <c:set var="errorKey" value="GLOBAL" />
-					   <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-					      <lams:Alert id="error" type="danger" close="false">
-					        <c:forEach var="error" items="${errorMap[errorKey]}">
-					           <c:out value="${error}" />
-					        </c:forEach>
-					      </lams:Alert>
-					  </c:if>
+					<form:errors path="*"/>
 				</div>
 				
 				<div id="deleteAllLessonsBox" class="alert alert-info" style="display: none">
@@ -89,15 +82,15 @@
 				<table class="table table-condensed table-no-border">
 					<tr>
 						<td width="15%"><fmt:message key="admin.organisation.name"/> *</td>
-						<td><input type="text" name="name" size="40" class="form-control" maxlength="240"/></td>
+						<td><input type="text" name="name" size="40" class="form-control" maxlength="240" value="${organisationForm.name}"/></td>
 					</tr>
 					<tr>
 					<td><fmt:message key="admin.organisation.code"/></td>
-						<td><input type="text" name="code" size="20" class="form-control" maxlength="20"/></td>
+						<td><input type="text" name="code" size="20" class="form-control" maxlength="20" value="${organisationForm.code}"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.description"/></td>
-						<td><input type="text" name="description" cols="50" rows="3" class="form-control" id="description" /></td>
+						<td><input type="text" name="description" cols="50" rows="3" class="form-control" id="description" value="${organisationForm.description}"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.locale"/></td>

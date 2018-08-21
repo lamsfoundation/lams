@@ -56,7 +56,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  */
 @Controller
-@RequestMapping("/usersearch")
 public class UserSearchController {
 
     private static Logger log = Logger.getLogger(UserSearchController.class);
@@ -66,7 +65,7 @@ public class UserSearchController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/start")
+    @RequestMapping("/usersearch")
     public String unspecified(HttpServletRequest request) throws Exception {
 	initServices();
 
@@ -84,7 +83,7 @@ public class UserSearchController {
     /**
      * Returns list of paged users.
      */
-    @RequestMapping("/getPagedUsers")
+    @RequestMapping("/usersearch/getPagedUsers")
     @ResponseBody
     public String getPagedUsers(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {

@@ -62,7 +62,6 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-@RequestMapping("/usermanage")
 public class UserManageController {
 
     private static final Logger log = Logger.getLogger(UserManageController.class);
@@ -72,7 +71,7 @@ public class UserManageController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/usermanage")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
@@ -163,7 +162,7 @@ public class UserManageController {
 	return "userlist";
     }
 
-    @RequestMapping(path = "/forwardError", method = RequestMethod.POST)
+    @RequestMapping(path = "/usermanage/forwardError", method = RequestMethod.POST)
     private String forwardError(HttpServletRequest request, String key) {
 	request.setAttribute("errorName", "UserManageAction");
 	request.setAttribute("errorMessage", messageService.getMessage(key));

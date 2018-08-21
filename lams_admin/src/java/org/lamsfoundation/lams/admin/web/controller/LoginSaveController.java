@@ -74,7 +74,7 @@ public class LoginSaveController {
 	    }
 	}
 
-	return "redirect:/sysadminstart.do";
+	return bWriter.toString();
     }
 
 }

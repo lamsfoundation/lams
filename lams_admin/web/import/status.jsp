@@ -40,7 +40,6 @@
 	</c:set>	
 
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.user.import" /></c:set>
 	<lams:Page type="admin" title="${title}">
 	
 		<div align="center">	

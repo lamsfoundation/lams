@@ -16,7 +16,6 @@
     
 <body class="stripes">
 	
-	<c:set var="title"><fmt:message key="label.manage.tool.consumers"/></c:set>
 	<lams:Page type="admin" title="${title}">
 				<p>
 					<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default">
@@ -54,24 +53,24 @@
 								</c:choose>
 							</td>
 							<td>
-								<a href="ltiConsumerManagement/edit.do?sid=<c:out value='${ltiConsumer.sid}' />">
+								<a href="../ltiConsumerManagement/edit.do?sid=<c:out value='${ltiConsumer.sid}' />">
 									<fmt:message key="admin.edit" />
 								</a>
 								&nbsp;
 								<c:choose>
 									<c:when test="${ltiConsumer.disabled}">
-										<a href="ltiConsumerManagement/disable.do?disable=false&sid=<c:out value='${ltiConsumer.sid}' />">
+										<a href="../ltiConsumerManagement/disable.do?disable=false&sid=<c:out value='${ltiConsumer.sid}' />">
 											<fmt:message key="admin.enable" />
 										</a>
 									</c:when>
 									<c:otherwise>
-										<a href="ltiConsumerManagement/disable.do?disable=true&sid=<c:out value='${ltiConsumer.sid}' />">
+										<a href="../ltiConsumerManagement/disable.do?disable=true&sid=<c:out value='${ltiConsumer.sid}' />">
 											<fmt:message key="admin.disable" />
 										</a>
 									</c:otherwise>
 								</c:choose>
 								&nbsp;
-								<a href="ltiConsumerManagement/delete.do?sid=<c:out value='${ltiConsumer.sid}' />">
+								<a href="../ltiConsumerManagement/delete.do?sid=<c:out value='${ltiConsumer.sid}' />">
 									<fmt:message key="admin.delete" />
 								</a>
 							</td>
@@ -82,7 +81,7 @@
 				<p>${fn:length(ltiConsumers)}&nbsp;<fmt:message key="label.tool.consumers.count" /></p>
 				
 				<input class="btn btn-default pull-right" name="addNewLtiConsumer" type="button" value="<fmt:message key='label.add.tool.consumer' />" 
-						onClick="javascript:document.location='ltiConsumerManagement/edit.do'" />
+						onClick="javascript:document.location='../ltiConsumerManagement/edit.do'" />
 				
 			</lams:Page>
 			

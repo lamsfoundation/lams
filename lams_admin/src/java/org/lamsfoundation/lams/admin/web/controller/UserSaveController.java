@@ -72,7 +72,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 
 @Controller
-@RequestMapping
+@RequestMapping("/usersave")
 public class UserSaveController {
 
     private static Logger log = Logger.getLogger(UserSaveController.class);

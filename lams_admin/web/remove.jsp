@@ -15,8 +15,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page type="admin" title="${title}">
 		<form>
 
 				<c:if test="${empty orgId}">

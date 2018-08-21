@@ -56,7 +56,7 @@ public class ImportGroupsController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/importgroups", method = RequestMethod.POST)
+    @RequestMapping(path = "/importgroups")
     public String execute(@ModelAttribute ImportExcelForm importForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {

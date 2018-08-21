@@ -15,7 +15,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="sysadmin.maintain.loginpage"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="loginMaintainForm">
 		
 		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
@@ -29,12 +28,12 @@
 	      </lams:Alert>
 		  </c:if>
 		
-		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" enctype="multipart/form-data" method="post">
+		<form:form action="../loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" enctype="multipart/form-data" method="post">
 		<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 		<p class="help-block"><fmt:message key="sysadmin.login.text"/></p>
 		
-		<c:set var="existingContent"><c:out value="${loginMaintainForm.news}" filter='false' /></c:set>
-		
+		<c:set var="existingContent"><c:out value="${loginMaintainForm.news}"/></c:set>
+		..
 		<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="../public" height="600px"></lams:CKEditor>
 		
 		<div class="pull-right voffset5">

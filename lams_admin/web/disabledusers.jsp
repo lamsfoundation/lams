@@ -15,11 +15,8 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><fmt:message key="admin.list.disabled.users"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
 	
+	<c:set var="title">${title}: <fmt:message key="admin.list.disabled.users"/></c:set>
 	<lams:Page type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 

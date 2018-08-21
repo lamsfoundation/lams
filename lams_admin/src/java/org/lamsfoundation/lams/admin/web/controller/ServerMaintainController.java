@@ -51,7 +51,7 @@ public class ServerMaintainController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/edit", method = RequestMethod.POST)
+    @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
@@ -62,7 +62,7 @@ public class ServerMaintainController {
 	return "servermaintain";
     }
 
-    @RequestMapping(path = "/disable", method = RequestMethod.POST)
+    @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
 	IIntegrationService service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
@@ -72,7 +72,7 @@ public class ServerMaintainController {
 	return "redirect:/serverlist.do";
     }
 
-    @RequestMapping(path = "/enable", method = RequestMethod.POST)
+    @RequestMapping(path = "/enable")
     public String enable(HttpServletRequest request) throws Exception {
 	IIntegrationService service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
@@ -82,7 +82,7 @@ public class ServerMaintainController {
 	return "redirect:/serverlist.do";
     }
 
-    @RequestMapping(path = "/delete", method = RequestMethod.POST)
+    @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	AdminServiceProxy.getService(applicationContext.getServletContext()).deleteById(ExtServer.class, sid);

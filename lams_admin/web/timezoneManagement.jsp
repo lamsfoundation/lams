@@ -36,7 +36,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="admin.timezone.title"/></c:set>
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 		<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
@@ -62,7 +61,7 @@
 					<tr>
 						<th width="10%" align="center"><fmt:message key="admin.timezone.select" />
 						<!-- added this check box for the user to enable all available time zones -->
-						  <html:checkbox property="selected" styleId="currentSelectAllTZ"> </html:checkbox>
+						  <form:checkbox path="${selected}" id="currentSelectAllTZ"/>
 						</th>
 						<th width="22%"><fmt:message key="admin.timezone.time.zone.id" /></th>
 						<th width="24%" align="center"><fmt:message key="admin.timezone.raw.offset" /></th>

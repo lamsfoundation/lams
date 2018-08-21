@@ -29,10 +29,9 @@
     
 <body class="stripes">
 	
-	<c:set var="title"><fmt:message key="sysadmin.ldap.configuration"/></c:set>
 	<c:set var="help"><fmt:message key="LDAP+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="">
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 		
 		<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 

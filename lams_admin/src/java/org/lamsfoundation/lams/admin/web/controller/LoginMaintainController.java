@@ -61,7 +61,7 @@ public class LoginMaintainController {
     private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar + "lams-www.war" + File.separatorChar
 	    + "news.html";
 
-    @RequestMapping(path = "/loginmaintain", method = RequestMethod.POST)
+    @RequestMapping(path = "/loginmaintain")
     public String execute(@ModelAttribute LoginMaintainForm loginMaintainForm, HttpServletRequest request)
 	    throws Exception {
 

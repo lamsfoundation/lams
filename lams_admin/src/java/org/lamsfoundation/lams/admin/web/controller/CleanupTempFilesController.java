@@ -65,7 +65,7 @@ public class CleanupTempFilesController {
     @Qualifier("adminMessageService")
     private MessageService adminMessageService;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String execute(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
 
 	// check user is sysadmin

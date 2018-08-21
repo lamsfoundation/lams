@@ -149,19 +149,15 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle"><fmt:message key="admin.user.add"/></c:set>	
-	<c:if test="${not empty subtitle}">
-		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
-	</c:if>
-	
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<c:set var="title">${title}: <fmt:message key="admin.user.add"/></c:set>
+	<lams:Page type="admin" title="${title}">
 				<p>
 					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 				    <c:if test="${not empty pOrgId}">
-				        : <a href="orgmanage.do?org=<c:out value="pOrgId" />" class="btn btn-default"><bean:write name="pOrgName"/></a>
+				        : <a href="orgmanage.do?org=<c:out value="pOrgId" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
 				    </c:if>
 				    <c:if test="${userOrgForm.orgId != 1}">
-						: <a href="<c:if test="${userOrgForm.orgType == 3}">user</c:if><c:if test="${userOrgForm.orgType != 3}"/>org</c:if>manage.do?org=<c:out value="${userOrgForm.orgId}" />" class="btn btn-default">
+						: <a href="<c:if test="${userOrgForm.orgType == 3}">user</c:if><c:if test="${userOrgForm.orgType != 3}">org</c:if>manage.do?org=<c:out value="${userOrgForm.orgId}" />" class="btn btn-default">
 						<c:out value="${userOrgForm.orgName}"/></a>
 					</c:if>
 					<c:if test="${userOrgForm.orgId == 1}">
@@ -220,7 +216,7 @@
 				
 				<div id="form" class="pull-right">
 					<form:form action="userorgsave.do" modelAttribute="userOrgForm" id="userOrgForm" method="post">
-						<form:hidden property="orgId" />
+						<form:hidden path="orgId" />
 						<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
 						<input type="submit" id="nextButton" class="btn btn-primary loffset5" onclick="return populateForm();" value="<fmt:message key="label.next"/>" />
 					</form:form>

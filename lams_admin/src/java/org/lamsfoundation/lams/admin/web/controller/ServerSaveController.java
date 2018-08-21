@@ -41,6 +41,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -60,7 +61,7 @@ public class ServerSaveController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping("/serversave")
+    @RequestMapping(path = "/serversave")
     public String execute(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
