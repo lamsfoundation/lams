@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.util;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -35,7 +34,7 @@ public class ParallelActivityMappingStrategy extends ActivityMappingStrategy {
 
     /**
      * Returns the struts action used to display the specified activity.
-     * 
+     *
      * @param activity,
      *            Activity to be displayed
      * @param progress,

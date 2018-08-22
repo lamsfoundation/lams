@@ -392,7 +392,7 @@ public class LearnerController {
 	if ((url != null) && (monitorId != null)) {
 	    // URL in monitor mode
 	    url = Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + "monitoring/monitoring.do?method=getLearnerActivityURL&lessonID=" + lessonId + "&activityID="
+		    + "monitoring/monitoring/getLearnerActivityURL.do?lessonID=" + lessonId + "&activityID="
 		    + activity.getActivityId() + "&userID=" + learnerId;
 	}
 

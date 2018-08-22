@@ -47,7 +47,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -210,7 +209,7 @@ public class NotebookController {
 
 	return "notebook/view";
     }
-    
+
     @RequestMapping("/add")
     public String addNewEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm) {
 	return "notebook/addnew";
@@ -238,8 +237,8 @@ public class NotebookController {
     /**
      *
      */
-    @RequestMapping(path="/updateEntry")
-    public String updateEntry(@ModelAttribute ("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
+    @RequestMapping(path = "/updateEntry")
+    public String updateEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
 	Long uid = notebookForm.getUid();

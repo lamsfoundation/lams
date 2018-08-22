@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.Serializable;
@@ -41,7 +40,7 @@ public class ActivityMappingStrategy implements Serializable {
 
     /**
      * Returns the struts action used to display the specified activity.
-     * 
+     *
      * @param activity,
      *            Activity to be displayed
      * @param progress,
@@ -84,7 +83,7 @@ public class ActivityMappingStrategy implements Serializable {
      * Returns the struts action for triggering the window to close.
      */
     protected String getCloseWindowAction() {
-	return "/close.do";
+	return "../close.jsp";
     }
 
     /**

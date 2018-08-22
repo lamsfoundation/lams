@@ -144,7 +144,7 @@ public class GroupingController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {
 	    request.setAttribute(GroupingController.FINISHED_BUTTON, Boolean.TRUE);
-	    return viewGrouping(request, learnerProgress) ;
+	    return viewGrouping(request, learnerProgress);
 	}
 	// forward to group choosing page
 	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
@@ -180,8 +180,8 @@ public class GroupingController {
 //    }
 
     @RequestMapping("/viewGroup")
-    public String viewGrouping(HttpServletRequest request,@RequestParam (required = false)LearnerProgress learnerProgress)
-	    throws IOException, ServletException {
+    public String viewGrouping(HttpServletRequest request,
+	    @RequestParam(required = false) LearnerProgress learnerProgress) throws IOException, ServletException {
 	prepareGroupData(request);
 	request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
@@ -270,8 +270,7 @@ public class GroupingController {
 	Long lessonId = learnerProgress.getLesson().getLessonId();
 	learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId, LearningWebUtil.getUserId());
 
-	String redirectURL = "/grouping.do";
-	redirectURL = WebUtil.appendParameterToURL(redirectURL, "method", "performGrouping");
+	String redirectURL = "/grouping/performGrouping.do";
 	redirectURL = WebUtil.appendParameterToURL(redirectURL, "activityID", activity.getActivityId().toString());
 
 	return redirectURL;

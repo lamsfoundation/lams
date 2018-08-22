@@ -146,7 +146,8 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 	    msg = new StringBuilder(header).append("Successful run, no errors\n").append(auditLogBuilder.toString())
 		    .toString();
 	}
-	logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, userDTO != null ? userDTO.getUserID() : null, null, lessonId, null, msg);
+	logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, userDTO != null ? userDTO.getUserID() : null, null,
+		lessonId, null, msg);
 	out.println(msg);
 	return;
     }
@@ -182,7 +183,7 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
 	public ActivitiesToCheckProcessor(LearningDesign design, IActivityDAO activityDAO) {
 	    super(design, activityDAO);
-	    activityList = new ArrayList<Activity>();
+	    activityList = new ArrayList<>();
 	}
 
 	@Override

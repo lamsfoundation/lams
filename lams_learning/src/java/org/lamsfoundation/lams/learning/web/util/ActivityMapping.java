@@ -87,14 +87,7 @@ public class ActivityMapping implements Serializable {
 		    activity.getActivityId().toString());
 	}
 
-	if ((activity != null) && activity.isToolActivity()) {
-	    // always use redirect false for a ToolActivity as ToolDisplayActivity
-	    // does it's own redirect
-	    forward = actionToForward(action, activity, false);
-	} else {
-	    forward = actionToForward(action, activity, redirect);
-	}
-
+	forward = actionToForward(action, activity, redirect);
 	return forward;
     }
 
@@ -243,8 +236,12 @@ public class ActivityMapping implements Serializable {
      *            should the action be a client redirect
      * @return
      */
-    protected String actionToForward(String action, Activity activity, boolean redirect) {
-	return redirect ? "redirect:" + ActivityMapping.actionToURL(action, activity, false) : "forward:" + action;
+//    protected String actionToForward(String action, Activity activity, boolean redirect) {
+//	return redirect ? "redirect:" + ActivityMapping.actionToURL(action, activity, false) : "forward:" + action;
+//    }
+
+    protected String actionToForward(String action, Activity activity, boolean addParams) {
+	return "redirect:" + (addParams ? ActivityMapping.actionToURL(action, activity, false) : action);
     }
 
     /**
@@ -353,4 +350,5 @@ public class ActivityMapping implements Serializable {
 	    return "DisplayActivity.do";
 	}
     }
+
 }
