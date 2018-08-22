@@ -83,7 +83,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<td class="align-left" width="28%">
 					<c:set var="viewnote">
 						<c:url value="/notebook/viewEntry.do?mode=teacher&uid=${entry.uid}&currentLessonID=${lessonID}" />
-					</c:set> <a href="${viewnote}">
+					</c:set> 
+					<a href="${viewnote}">
 						<c:choose>
 							<c:when test="${empty entry.title}">
 								<fmt:message key="mynotes.entry.no.title.label" />
@@ -92,7 +93,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:out value="${entry.title}" escapeXml="false" />
 							</c:otherwise>
 						</c:choose>
-					</a></td>
+					</a>
+				</td>
 				<td>&nbsp;</td>
 				<td><lams:Date value="${entry.createDate}" /></td>
 				<td><lams:Date value="${entry.lastModified}" /></td>

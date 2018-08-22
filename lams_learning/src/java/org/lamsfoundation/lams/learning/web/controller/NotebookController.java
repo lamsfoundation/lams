@@ -210,6 +210,11 @@ public class NotebookController {
 
 	return "notebook/view";
     }
+    
+    @RequestMapping("/add")
+    public String addNewEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm) {
+	return "notebook/addnew";
+    }
 
     /**
      *

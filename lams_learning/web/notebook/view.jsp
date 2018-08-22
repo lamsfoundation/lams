@@ -22,6 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants"%>
 
 <lams:html>
 

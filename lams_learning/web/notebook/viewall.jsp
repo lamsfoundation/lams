@@ -53,7 +53,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<lams:Page type="learner" title="${title}" hideProgressBar="true">
 		<c:set var="addnote">
-			<c:url value="/notebook/addnew.jsp?lessonID=" />
+			<c:url value="/notebook/add.do?lessonID=" />
 			<c:out value="${lessonID}" />
 		</c:set>
 		<div class="pull-right">
@@ -67,7 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<c:forEach var="entryList" items="${entries}" varStatus="list_status">
 			<c:forEach var="entry" items="${entryList}" varStatus="entry_status">
-				<a href="#" linkName="lesson${entry.externalID}" />
+				<a href="#" linkName="lesson${entry.externalID}" ></a>
 	
 				<!-- set sig check flag -->
 				<c:if test="${entry_status.first}">
@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:set>
 	
 					<c:set var="addnote">
-						<c:url value="/notebook/addnew.jsp?currentLessonID=${lessonID}&lessonID=" />
+						<c:url value="/notebook/add.do?currentLessonID=${lessonID}&lessonID=" />
 						<c:out value="${entry.externalID}" />
 					</c:set>
 	
@@ -134,10 +134,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:if>
 	
 								<tr>
-									<td class="align-left" width="28%"><c:set var="viewnote">
+									<td class="align-left" width="28%">
+										<c:set var="viewnote">
 											<c:url value="/notebook/viewEntry.do?currentLessonID=${lessonID}&uid=" />
 											<c:out value="${entry.uid}" />
-										</c:set> <a href="${viewnote}">
+										</c:set>
+										 <a href="${viewnote}">
 											<c:choose>
 												<c:when test="${empty entry.title}">
 													<fmt:message key="mynotes.entry.no.title.label" />
@@ -146,7 +148,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:out value="${entry.title}" escapeXml="false" />
 												</c:otherwise>
 											</c:choose>
-										</a></td>
+										</a>
+									</td>
 									<td>&nbsp;</td>
 									<td><lams:Date value="${entry.createDate}" timeago="true"/></td>
 									<td><lams:Date value="${entry.lastModified}" timeago="true"/></td>
