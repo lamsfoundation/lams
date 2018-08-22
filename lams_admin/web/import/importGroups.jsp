@@ -10,6 +10,9 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set> 
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set> 
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set> 
+<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
+<c:set var="courseTypeId"><%= OrganisationType.COURSE_TYPE %></c:set>
+
 
 <lams:html>
 <lams:head>
@@ -64,29 +67,29 @@
 		<h4><fmt:message key="heading.import.results"/></h4>
 		<table cellspacing="5" cellpadding="5">
 			<tr><th width="115" align="right"><fmt:message key="table.heading.organisation.id"/></th><th><fmt:message key="admin.organisation.name"/></th></tr>
-			<%
-				List results = (List)request.getAttribute("results");
-				for (int i=0; i<results.size(); i++) {
-					out.print("<tr>");
-					List rowResult = (List)results.get(i);
-					if (rowResult != null && rowResult.size() >= 4) {
-						if (rowResult.get(3).equals(OrganisationType.COURSE_TYPE.toString())) {
-							out.print("<th>"+rowResult.get(0)+"</th>");
-							out.print("<th>"+rowResult.get(1)+"</th>");
-						} else if (rowResult.get(3).equals(OrganisationType.CLASS_TYPE.toString())) {
-							out.print("<td>"+rowResult.get(0)+"</td>");
-							out.print("<td>"+rowResult.get(1)+"</td>");
-						}
-					} else { // it's an error message
-						out.print("<td colspan=\"2\">");
-						for (int j=0; j<rowResult.size(); j++) {
-							out.println(rowResult.get(j)+"<br/>");
-						}
-						out.print("</td>");
-					}
-					out.println("</tr>");
-				}
-			%>
+			<c:set var="results" value="${results}" />
+			<c:forEach var="i" begin="0" step="1" end="${results.size()}">
+				<tr>
+				<c:set var="rowResult" value="${i}"/>
+				<c:when test="${rowResult != null || rowResult >= 4}">
+					<c:if test="${courseTypeId == 3}">
+						<th> <c:out value="0" /> </th>
+						<th> <c:out value="1" /> </th>
+					</c:if>
+					<c:if test="${classTypeId == 3}">
+						<td> <c:out value="0" /> </td>
+						<td> <c:out value="1" /> </td>
+					</c:if>
+				</c:when>
+				<c:otherwise>
+					<td colspan="2">
+					<c:forEach var="j" begin="0" step="1" end="${results.size()}">
+						<c:out value="${j}"/> <br />
+					</c:forEach>
+					</td>
+				</c:otherwise>
+				</tr>
+			</c:forEach>
 		</table>
 		<hr />
 	</c:if>

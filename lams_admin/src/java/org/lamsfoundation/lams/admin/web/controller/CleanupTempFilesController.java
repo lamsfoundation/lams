@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.admin.web.controller;
 import java.io.File;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -40,9 +39,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author jliew
@@ -66,7 +65,8 @@ public class CleanupTempFilesController {
     private MessageService adminMessageService;
 
     @RequestMapping(path = "/start")
-    public String execute(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
+    public String execute(@ModelAttribute CleanupForm cleanupForm, Errors errors, HttpServletRequest request)
+	    throws Exception {
 
 	// check user is sysadmin
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
@@ -96,8 +96,7 @@ public class CleanupTempFilesController {
 		args[0] = new Integer(filesDeleted).toString();
 		request.setAttribute("filesDeleted", adminMessageService.getMessage("msg.cleanup.files.deleted", args));
 	    } else {
-		errorMap.add("numDays", adminMessageService.getMessage("error.non.negative.number.required"));
-		request.setAttribute("errorMap", errorMap);
+		errors.reject("numDays", adminMessageService.getMessage("error.non.negative.number.required"));
 	    }
 	} else {
 	    // recommended number of days to leave temp files

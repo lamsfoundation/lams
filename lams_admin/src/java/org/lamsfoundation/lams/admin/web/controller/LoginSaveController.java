@@ -52,7 +52,6 @@ public class LoginSaveController {
 	    + "news.html";
 
     @RequestMapping("/loginsave")
-    @ResponseBody
     public String save(@ModelAttribute LoginMaintainForm loginMaintainForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -74,7 +73,7 @@ public class LoginSaveController {
 	    }
 	}
 
-	return bWriter.toString();
+	return "redirect:/sysadminstart.do";
     }
 
 }

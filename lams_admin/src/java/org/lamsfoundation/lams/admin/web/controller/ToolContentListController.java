@@ -218,7 +218,7 @@ public class ToolContentListController {
     /**
      * Loads groups and libraries and displays the management dialog.
      */
-    @RequestMapping(path = "/openLearningLibraryGroups", method = RequestMethod.POST)
+    @RequestMapping(path = "/openLearningLibraryGroups")
     public String openLearningLibraryGroups(HttpServletRequest request) throws IOException {
 	// build full list of available learning libraries
 	List<LearningLibraryDTO> learningLibraries = getLearningDesignService()

@@ -20,10 +20,10 @@
 	<lams:Page type="admin" title="${title}" formID="signupForm">
 		<div>
 			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
-			<a href="signupManagement.do" class="btn btn-default loffset5"><fmt:message key="admin.signup.title" /></a>
+			<a href="../signupManagement/start.do" class="btn btn-default loffset5"><fmt:message key="admin.signup.title" /></a>
 			</div>
 			
-			<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
+			<form:form action="../signupManagement/add.do" modelAttribute="signupForm" id="signupForm" method="post">
 				<input type="hidden" name="signupOrganisationId" />
 				
 				<table class="table table-condensed table-no-border">
@@ -50,14 +50,7 @@
 					</tr>
 					<tr>
 						<td colspan="2">
-						 <c:set var="errorKey" value="courseKey" />
-							   <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-							      <lams:Alert id="error" type="danger" close="false">
-							        <c:forEach var="error" items="${errorMap[errorKey]}">
-							           <c:out value="${error}" />
-							        </c:forEach>
-							      </lams:Alert>
-							  </c:if>
+						 <form:errors path="courseKey" />
 						</td>
 					</tr>
 					<tr>
@@ -72,7 +65,7 @@
 						<td><fmt:message key="admin.description.txt" />:</td>
 						<td>
 						  <lams:CKEditor id="blurb" 
-						     value="${signupForm.map.blurb}" 
+						     value="${signupForm.blurb}" 
 						     contentFolderID="../public/signups">
 						  </lams:CKEditor>
 						</td>
@@ -90,14 +83,7 @@
 					</tr>		
 					<tr>
 						<td colspan="2">
-						<c:set var="errorKey" value="context" />
-							   <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-							      <lams:Alert id="error" type="danger" close="false">
-							        <c:forEach var="error" items="${errorMap[errorKey]}">
-							           <c:out value="${error}" />
-							        </c:forEach>
-							      </lams:Alert>
-							  </c:if>
+						<form:errors path="context" />
 						</td>
 					</tr>
 					<tr>
@@ -108,7 +94,7 @@
 				
 				<div class="pull-right">
 					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
-					<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.delete"/>" />
+					<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</div>
 			
 			</form:form>

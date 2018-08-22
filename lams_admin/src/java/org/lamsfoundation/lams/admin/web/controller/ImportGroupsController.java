@@ -57,7 +57,7 @@ public class ImportGroupsController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/importgroups")
-    public String execute(@ModelAttribute ImportExcelForm importForm, HttpServletRequest request) throws Exception {
+    public String execute(@ModelAttribute("importForm") ImportExcelForm importForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
 	    return "redirect:/sysadminstart.do";

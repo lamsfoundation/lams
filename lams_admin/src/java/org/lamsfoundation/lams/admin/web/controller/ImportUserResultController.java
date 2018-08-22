@@ -54,7 +54,7 @@ public class ImportUserResultController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/importuserresult", method = RequestMethod.POST)
+    @RequestMapping(path = "/importuserresult")
     public String execute(HttpServletRequest request) throws Exception {
 
 	MessageService messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());

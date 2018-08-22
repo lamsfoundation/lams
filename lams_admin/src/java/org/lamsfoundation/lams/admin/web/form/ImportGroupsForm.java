@@ -22,6 +22,26 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class ImportGroupsForm {
 
+    private Integer orgId;
+    private MultipartFile file;
+
+    public Integer getOrgId() {
+	return orgId;
+    }
+
+    public void setOrgId(Integer orgId) {
+	this.orgId = orgId;
+    }
+
+    public MultipartFile getFile() {
+	return file;
+    }
+
+    public void setFile(MultipartFile file) {
+	this.file = file;
+    }
 }

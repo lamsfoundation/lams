@@ -40,13 +40,12 @@
 	<c:if test="${not empty filesDeleted}">
 		<p><c:out value="${filesDeleted}" /></p>
 	</c:if>
-	
 		<input class="btn btn-default" type="submit" value="Calculate" onClick="javascript:document.location='cleanup/refresh.do'" />
 		<span class="loffset10"><c:out value="<%= FileUtil.getTempDir() %>" /></span>
 		
 		<ul class="list-group voffset5">
-			<li class="list-group-item"><%= TempDirectoryFilter.zip_prefix %>* : <c:out value="${zipTotal}" /><c:if test="${empty zipTotal}"><i><fmt:message key="label.unknown"/></i></c:if> KB
-			<li class="list-group-item"><%= TempDirectoryFilter.tmp_prefix %>* : <c:out value="${tmpTotal}" /><c:if test="${empty tmpTotal}"><i><fmt:message key="label.unknown"/></i></c:if> KB
+			<li class="list-group-item"><c:out value="<%= TempDirectoryFilter.zip_prefix %>" />* : <c:out value="${zipTotal}" /><c:if test="${empty zipTotal}"><i><fmt:message key="label.unknown"/></i></c:if> KB
+			<li class="list-group-item"><c:out value="<%= TempDirectoryFilter.tmp_prefix %>" />* : <c:out value="${tmpTotal}" /><c:if test="${empty tmpTotal}"><i><fmt:message key="label.unknown"/></i></c:if> KB
 		</ul>
 		<fmt:message key="msg.cleanup.actual.space" />
 	</p>

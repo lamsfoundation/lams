@@ -61,15 +61,7 @@
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 				<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-				<%-- Error Messages --%>
-				<c:set var="errorKey" value="GLOBAL" />
-				        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-				            <lams:Alert id="error" type="danger" close="false">
-				                <c:forEach var="error" items="${errorMap[errorKey]}">
-				                    <c:out value="${error}" />
-				                </c:forEach>
-				            </lams:Alert>
-				        </c:if>
+				<form:errors path="*" />
 				
 				<form:form action="../serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 					<form:hidden path="sid" />

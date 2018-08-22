@@ -4,6 +4,7 @@
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem" %>
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.service.ILdapService" %>
+<c:set var="syncResult"><%= ILdapService.SYNC_RESULTS %></c:set>
 
 <lams:html>
 <lams:head>
@@ -17,9 +18,9 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
 	<script language="javascript" type="text/JavaScript">
-	<% if (SessionManager.getSession().getAttribute(ILdapService.SYNC_RESULTS) != null) { %>
-		document.location = 'ldap/results.do';
-	<% } %>
+	<c:if test="${syncResult != null}">
+		document.location = '../ldap/results.do';
+	</c:if>
 	function startSync(){
 		document.location='ldap/sync.do';
 	}
@@ -50,24 +51,24 @@
 								</div>
 												
 								<table class="table table-striped table-condensed" >
-									<c:forEach items="${group}" path="value" var="row">
+									<c:forEach items="${group.value}" var="row">
 										<tr>
 											<td>
 												<fmt:message key="${row.descriptionKey}"/>
 												<c:if test="${row.required}">&nbsp;&nbsp;*</c:if>
 											</td>
 											<td>
-												<form:hidden path="key" name="key" value="${row.key}"/>
-												<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
+												<input type="hidden" name="key" value="${row.key}"/>
+												<c:set var="BOOLEAN"><c:out value="<%= ConfigurationItem.BOOLEAN_FORMAT %>" /></c:set>
 												<c:choose>
 												<c:when test="${row.format==BOOLEAN}">
-													<form:select id="${row.key}" name="row" path="value" cssClass="form-control form-control-sm">
+													<form:select id="${row.key}" path="value" cssClass="form-control form-control-sm">
 													<form:option value="true">true</form:option>
 													<form:option value="false">false&nbsp;&nbsp;</form:option>
 													</form:select>
 												</c:when>
 												<c:otherwise>
-													<form:input id="${row.key}" path="value" name="row" value="${row.value}" size="50" maxlength="255" cssClass="form-control"/>
+													<input type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control"/>
 												</c:otherwise>
 												</c:choose>
 											</td>

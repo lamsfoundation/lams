@@ -43,7 +43,7 @@
 			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 			<fmt:message key="admin.timezone.select.timezones.you.want.users.choose" >
 			<fmt:param>
-				<a class="thickbox" href="timezonemanagement/serverTimezoneManagement.do?KeepThis=true&TB_iframe=true&height=188&width=820" title="<fmt:message key='admin.servertimezone.server.timezone.management'/>">
+				<a class="thickbox" href="../timezonemanagement/serverTimezoneManagement.do?KeepThis=true&TB_iframe=true&height=188&width=820" title="<fmt:message key='admin.servertimezone.server.timezone.management'/>">
 					${serverTimezone}
 				</a>
 			</fmt:param>
@@ -61,7 +61,7 @@
 					<tr>
 						<th width="10%" align="center"><fmt:message key="admin.timezone.select" />
 						<!-- added this check box for the user to enable all available time zones -->
-						  <form:checkbox path="${selected}" id="currentSelectAllTZ"/>
+						  <form:checkbox path="selected" value="currentSelectAllTZ" id="currentSelectAllTZ"/>
 						</th>
 						<th width="22%"><fmt:message key="admin.timezone.time.zone.id" /></th>
 						<th width="24%" align="center"><fmt:message key="admin.timezone.raw.offset" /></th>
@@ -72,7 +72,7 @@
 					<c:forEach items="${timezoneDtos}" var="timezoneDto">
 						<tr>
 							<td align="center">
-								<form:checkbox name="timezoneDto" cssClass="timezoneCheckBox" path="selected" value="${timezoneDto.timeZoneId}"/>
+								<form:checkbox cssClass="timezoneCheckBox" path="selected" value="${timezoneDto.timeZoneId}"/>
 							</td>
 							<td>
 								${timezoneDto.timeZoneId}
@@ -96,7 +96,7 @@
 				
 				<div class="pull-right">
 					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
-					<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.delete"/>" />
+					<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</p>
 			</form:form>
 		</lams:Page>

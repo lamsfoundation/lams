@@ -69,7 +69,7 @@ public class LtiConsumerManagementController {
     /**
      * Edits specified LTI tool consumer
      */
-    @RequestMapping(path = "/edit", method = RequestMethod.POST)
+    @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -136,7 +136,7 @@ public class LtiConsumerManagementController {
 	    return unspecified(request);
 	}
 
-	String[] requiredFields = extServerForm.getRequiredFields();
+	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
 	for (String requiredField : requiredFields) {
 	    if (StringUtils.trimToNull(requiredField) == null) {
 		errors.reject("error.required", messageService.getMessage("sysadmin." + requiredField));
@@ -146,7 +146,7 @@ public class LtiConsumerManagementController {
 	Integer sid = extServerForm.getSid();
 	//check duplication
 	if (!errors.hasErrors()) {
-	    String[] uniqueFields = extServerForm.getUniqueFields();
+	    String[] uniqueFields = { "serverid", "prefix" };
 	    for (String uniqueField : uniqueFields) {
 		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, "uniqueField",
 			uniqueField);

@@ -50,10 +50,10 @@
 									<input type="hidden" name="key" value="${row.key}"/>
 									<c:choose>
 									<c:when test="${row.format==BOOLEAN}">
-										<form:select id="${row.key}" name="row" path="value" cssClass="form-control form-control-sm">
-										<form:option value="true" label="true"/>
-										<form:option value="false" label="false"/>&nbsp;&nbsp;
-										</form:select>
+										<select name="value" id="AllowDirectAccessIntgrtnLrnr" class="form-control form-control-sm">
+											<option value="true">true</option>
+											<option value="false" selected="selected">false&nbsp;&nbsp;</option>
+										</select>
 									</c:when>
 									<c:otherwise>
 										<input type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control"/>
@@ -67,7 +67,7 @@
 			</c:forEach>
 				
 			<div class="pull-right">
-				<input type="button" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+				<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
 				<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 			</div>
 		</form:form>

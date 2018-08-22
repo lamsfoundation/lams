@@ -20,7 +20,7 @@
 
 		<p><c:out value="${successful}" /></p>
 		<p>
-		<c:forEach items="${results}" var="messages" indexId="index">
+		<c:forEach items="${results}" var="messages">
 			<c:if test="${not empty messages}">
 				Row <c:out value="${index+2}" />:
 				<c:forEach items="${messages}" var="message">

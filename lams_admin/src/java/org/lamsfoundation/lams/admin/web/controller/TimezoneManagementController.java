@@ -110,7 +110,7 @@ public class TimezoneManagementController {
     /**
      * Shows page where admin can choose server timezone.
      */
-    @RequestMapping(path = "/serverTimezoneManagement", method = RequestMethod.POST)
+    @RequestMapping(path = "/serverTimezoneManagement")
     public String serverTimezoneManagement(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
 	    throws Exception {
 
@@ -132,7 +132,7 @@ public class TimezoneManagementController {
     /**
      * Changes server timezone with the one selected by user.
      */
-    @RequestMapping(path = "/changeServerTimezone", method = RequestMethod.POST)
+    @RequestMapping(path = "/changeServerTimezone")
     public String changeServerTimezone(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
 	    throws Exception {
 	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());

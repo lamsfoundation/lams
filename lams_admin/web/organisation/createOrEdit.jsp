@@ -180,7 +180,7 @@
 					</c:if>
 					
 					<div class="pull-right">
-						<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+						<input type="submit" name="CANCEL" onclick="bCancel=true;" class="btn btn-default" value="<fmt:message key="admin.cancel"/>" />
 						<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 					</div>
 				

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
 import org.lamsfoundation.lams.usermanagement.service.ILdapService;
@@ -41,6 +42,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
@@ -95,7 +97,7 @@ public class LdapConfigController {
     }
 
     @RequestMapping(path = "/start")
-    public String execute(HttpServletRequest request) throws Exception {
+    public String execute(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
 	String action = WebUtil.readStrParam(request, "action", true);
 	if (action != null) {
@@ -138,7 +140,7 @@ public class LdapConfigController {
 	return "ldap";
     }
 
-    @RequestMapping(path = "/results", method = RequestMethod.POST)
+    @RequestMapping(path = "/results")
     public String results(HttpServletRequest request) throws Exception {
 
 	HttpSession ss = SessionManager.getSession();

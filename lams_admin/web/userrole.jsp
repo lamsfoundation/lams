@@ -55,7 +55,7 @@
 		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
 		  <div class="col-xs-10">            
 		  	<c:forEach items="${rolelist}" var="role">
-		    	<form:select path="roles" multiple="true" items="${userRolesForm.roles}" itemValue="${role.roleId}"/>
+		    	<form:select path="roles" multiple="true" items="${userRolesForm.roles}"/>
 		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
 		    </c:forEach>
 		  </div>

@@ -18,8 +18,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,7 +49,7 @@ public class SignupManagementController {
     private MessageService adminMessageService;
 
     @RequestMapping("/start")
-    public String execute(@ModelAttribute SignupManagementForm signupForm, HttpServletRequest request,
+    public String execute(@ModelAttribute("signupForm") SignupManagementForm signupForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	try {
@@ -72,7 +71,7 @@ public class SignupManagementController {
 	    } else if (StringUtils.equals(action, "edit")) {
 		return edit(signupForm, request);
 	    } else if (StringUtils.equals(action, "add")) {
-		return add(signupForm, request);
+		return add(signupForm, errors, request);
 	    } else if (StringUtils.equals(action, "delete")) {
 		return delete(request);
 	    }
@@ -87,8 +86,8 @@ public class SignupManagementController {
 	return "signupmanagement/list";
     }
 
-    @RequestMapping(path = "/edit", method = RequestMethod.POST)
-    public String edit(@ModelAttribute SignupManagementForm signupForm, HttpServletRequest request) throws Exception {
+    @RequestMapping(path = "/edit")
+    public String edit(@ModelAttribute("signupForm") SignupManagementForm signupForm, HttpServletRequest request) throws Exception {
 
 	Integer soid = WebUtil.readIntParam(request, "soid", false);
 
@@ -119,23 +118,21 @@ public class SignupManagementController {
     }
 
     @RequestMapping(path = "/add")
-    public String add(@ModelAttribute SignupManagementForm signupForm, HttpServletRequest request) throws Exception {
+    public String add(@ModelAttribute("signupForm") SignupManagementForm signupForm, Errors errors, HttpServletRequest request)
+	    throws Exception {
 
 	// check if form submitted
 	if (signupForm.getOrganisationId() != null && signupForm.getOrganisationId() > 0) {
-	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	    // validate
 	    if (!StringUtils.equals(signupForm.getCourseKey(), signupForm.getConfirmCourseKey())) {
-		errorMap.add("courseKey", adminMessageService.getMessage("error.course.keys.unequal"));
+		errors.reject("courseKey", adminMessageService.getMessage("error.course.keys.unequal"));
 	    }
 	    if (signupService.contextExists(signupForm.getSignupOrganisationId(), signupForm.getContext())) {
-		errorMap.add("context", adminMessageService.getMessage("error.context.exists"));
+		errors.reject("context", adminMessageService.getMessage("error.context.exists"));
 	    }
 
-	    if (!errorMap.isEmpty()) {
-		request.setAttribute("errorMap", errorMap);
-	    } else {
+	    if (!errors.hasErrors()) {
 		// proceed
 		SignupOrganisation signup;
 		if (signupForm.getSignupOrganisationId() != null && signupForm.getSignupOrganisationId() > 0) {
@@ -159,7 +156,7 @@ public class SignupManagementController {
 		signup.setContext(signupForm.getContext());
 		userManagementService.save(signup);
 
-		return "forward:signupManagement/list.do";
+		return "redirect:../signupManagement/start.do";
 	    }
 	} else {
 	    // form not submitted, default values
@@ -172,7 +169,7 @@ public class SignupManagementController {
 	return "signupmanagement/add";
     }
 
-    @RequestMapping(path = "/delete", method = RequestMethod.POST)
+    @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
 
 	Integer soid = WebUtil.readIntParam(request, "soid");
@@ -181,6 +178,6 @@ public class SignupManagementController {
 	    userManagementService.deleteById(SignupOrganisation.class, soid);
 	}
 
-	return "redirect:signupManagement/list.do";
+	return "redirect:../signupManagement/start.do";
     }
 }

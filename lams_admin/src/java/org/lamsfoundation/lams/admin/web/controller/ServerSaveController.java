@@ -39,9 +39,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -62,44 +62,43 @@ public class ServerSaveController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/serversave")
-    public String execute(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request,
+    public String execute(@ModelAttribute ExtServerForm extServerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "servermaintain";
+	    return "redirect:/serverlist.do";
 	}
 
 	service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	userService = AdminServiceProxy.getService(applicationContext.getServletContext());
 	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl" };
 	for (String requiredField : requiredFields) {
 	    if (StringUtils.trimToNull(requiredField) == null) {
-		errorMap.add("error.required", messageService.getMessage("sysadmin." + requiredField));
+		errors.reject("error.required", messageService.getMessage("sysadmin." + requiredField));
 	    }
 	}
 
 	Integer sid = extServerForm.getSid();
-	if (errorMap.isEmpty()) {//check duplication
-	    String[] uniqueFields = extServerForm.getUniqueFields();
+	if (!errors.hasErrors()) {//check duplication
+	    String[] uniqueFields = { "serverid", "prefix" };
 	    for (String uniqueField : uniqueFields) {
 		List list = userService.findByProperty(ExtServer.class, "uniqueField", uniqueField);
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(-1)) {//new map
-			errorMap.add("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
+			errors.reject("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
 		    } else {
 			ExtServer map = (ExtServer) list.get(0);
 			if (!map.getSid().equals(sid)) {
-			    errorMap.add("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
+			    errors.reject("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
 			}
 		    }
 
 		}
 	    }
 	}
-	if (errorMap.isEmpty()) {
+	if (!errors.hasErrors()) {
 	    ExtServer map = null;
 	    if (sid.equals(-1)) {
 		map = new ExtServer();
@@ -111,9 +110,8 @@ public class ServerSaveController {
 		BeanUtils.copyProperties(map, extServerForm);
 	    }
 	    service.saveExtServer(map);
-	    return "forward:/serverlist.do";
+	    return "redirect:/serverlist.do";
 	} else {
-	    request.setAttribute("errorMap", errorMap);
 	    return "servermaintain";
 	}
     }

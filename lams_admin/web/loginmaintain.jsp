@@ -28,13 +28,12 @@
 	      </lams:Alert>
 		  </c:if>
 		
-		<form:form action="../loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" enctype="multipart/form-data" method="post">
+		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" enctype="multipart/form-data" method="post">
+		
 		<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 		<p class="help-block"><fmt:message key="sysadmin.login.text"/></p>
 		
-		<c:set var="existingContent"><c:out value="${loginMaintainForm.news}"/></c:set>
-		..
-		<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="../public" height="600px"></lams:CKEditor>
+		<lams:CKEditor id="news" value="${loginMaintainForm.news}" contentFolderID="../public" height="600px"></lams:CKEditor>
 		
 		<div class="pull-right voffset5">
 			<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">

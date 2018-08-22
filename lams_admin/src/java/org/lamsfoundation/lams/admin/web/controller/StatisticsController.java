@@ -76,7 +76,7 @@ public class StatisticsController {
 	return "statistics";
     }
 
-    @RequestMapping(path = "/groupStats", method = RequestMethod.POST)
+    @RequestMapping(path = "/groupStats")
     public String groupStats(HttpServletRequest request) throws Exception {
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId");

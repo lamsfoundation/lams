@@ -42,13 +42,13 @@
 			if (answer) {
 				document.getElementById("name").value = name;
 				document.getElementById("id").value = id;
-				submitForm("removeTheme");
+				submitForm('removeTheme');
 			}
 		}
 	
 		function setAsDefault(name) {
 			document.getElementById("name").value = name;
-			submitForm("setAsDefault");
+			submitForm('setAsDefault');
 		} 
 	
 		function checkAndSubmit() {
@@ -69,7 +69,8 @@
 		}
 
 		function submitForm(methodName) {
-			document.getElementById("themeForm").submit();
+			var f = document.getElementById("themeForm").submit();
+			f.submit();
 		}
 	</script>
 </lams:head>

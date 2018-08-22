@@ -43,7 +43,7 @@
 				<h4 class="loffset10"><fmt:message key="admin.servertimezone.select.server.timezone" /></h4>
 				<div style="padding: 13px 20px 20px;">
 			
-					<form:select id="timeZoneId" path="timeZoneId" value="${serverTimezone}" style="margin-bottom:40px;">
+					<form:select id="timeZoneId" path="serverTimezone" style="margin-bottom:40px;">
 						<c:forEach items="${timezoneDtos}" var="timezoneDto">
 							<form:option value="${timezoneDto.timeZoneId}" cssClass="form-control">
 								${timezoneDto.timeZoneId}
