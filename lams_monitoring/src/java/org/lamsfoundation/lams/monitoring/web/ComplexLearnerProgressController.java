@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -37,10 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
@@ -48,11 +43,14 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author jliew
@@ -61,20 +59,23 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  *
  */
-public class ComplexLearnerProgressAction extends Action {
+@Controller
+public class ComplexLearnerProgressController {
 
-    private static Logger log = Logger.getLogger(ComplexLearnerProgressAction.class);
+    private static Logger log = Logger.getLogger(ComplexLearnerProgressController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+
+    @RequestMapping("/complexProgress")
+    public String execute(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, false);
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, false);
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	Activity activity = monitoringService.getActivityById(activityID);
 
 	HttpSession ss = SessionManager.getSession();
@@ -82,7 +83,7 @@ public class ComplexLearnerProgressAction extends Action {
 
 	if (activity.isParallelActivity()) {
 
-	    ArrayList<String> urls = new ArrayList<String>();
+	    ArrayList<String> urls = new ArrayList<>();
 	    ParallelActivity parallelActivity = (ParallelActivity) activity;
 	    Set parallels = parallelActivity.getActivities();
 	    Iterator i = parallels.iterator();
@@ -99,16 +100,16 @@ public class ComplexLearnerProgressAction extends Action {
 	    }
 
 	    request.setAttribute("parallelUrls", urls);
-	    return mapping.findForward("parallelProgress");
+	    return "parallelProgress";
 	}
 
 	else {
 
-	    HashMap<Long, Byte> statusMap = new HashMap<Long, Byte>();
-	    HashMap<Long, String> urlMap = new HashMap<Long, String>();
+	    HashMap<Long, Byte> statusMap = new HashMap<>();
+	    HashMap<Long, String> urlMap = new HashMap<>();
 	    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(userID, lessonID);
 	    request.setAttribute("hasSequenceActivity", false);
-	    List<ContributeActivityDTO> subActivities = new ArrayList<ContributeActivityDTO>();
+	    List<ContributeActivityDTO> subActivities = new ArrayList<>();
 
 	    if (activity.isOptionsActivity() || activity.isBranchingActivity()) {
 
@@ -155,8 +156,8 @@ public class ComplexLearnerProgressAction extends Action {
 		}
 
 	    } else {
-		ComplexLearnerProgressAction.log
-			.error("ComplexLearnerProgress trying to deal with a activity type it doesn't expect. Activity is "
+		ComplexLearnerProgressController.log.error(
+			"ComplexLearnerProgress trying to deal with a activity type it doesn't expect. Activity is "
 				+ activity);
 		return null;
 	    }
@@ -170,7 +171,7 @@ public class ComplexLearnerProgressAction extends Action {
 	    // main activity title
 	    request.setAttribute("activityTitle", activity.getTitle());
 
-	    return mapping.findForward("complexProgress");
+	    return "complexProgress";
 	}
 
     }
@@ -184,18 +185,6 @@ public class ComplexLearnerProgressAction extends Action {
      *
      * If the page is for a Branching or Optional Sequence activity then subActivities will be null (as the sequence
      * activities go in the subactivities list) but parentContributeActivityDTO should not be null.
-     *
-     * @param lessonID
-     * @param userID
-     * @param monitoringService
-     * @param user
-     * @param statusMap
-     * @param urlMap
-     * @param learnerProgress
-     * @param sequenceActivity
-     * @param subActivities
-     * @param parentContributeActivityDTO
-     * @throws IOException
      */
     private void processSequenceChildren(Long lessonID, Integer userID, IMonitoringService monitoringService,
 	    UserDTO user, HashMap<Long, Byte> statusMap, HashMap<Long, String> urlMap, LearnerProgress learnerProgress,

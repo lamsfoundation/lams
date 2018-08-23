@@ -35,9 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailProgressMessageJob;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -45,7 +43,6 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -57,6 +54,11 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -67,7 +69,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * Responsible for "Email Progress" functionality.
  */
-public class EmailProgressAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/emailProgress")
+public class EmailProgressController {
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+
+    private static Logger log = Logger.getLogger(EmailNotificationsController.class);
 
     // ---------------------------------------------------------------------
     // Class level constants
@@ -77,7 +90,6 @@ public class EmailProgressAction extends LamsDispatchAction {
     private static final String JOB_PREFIX_NAME = "emailProgressMessageJob:";
 
     private static IEventNotificationService eventNotificationService;
-    private static IMonitoringService monitoringService;
     private static ISecurityService securityService;
 
     // ---------------------------------------------------------------------
@@ -89,8 +101,10 @@ public class EmailProgressAction extends LamsDispatchAction {
      *
      * @throws SchedulerException
      */
-    public ActionForward getEmailProgressDates(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, SchedulerException {
+    @RequestMapping("/getEmailProgressDates")
+    @ResponseBody
+    public String getEmailProgressDates(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, SchedulerException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -133,8 +147,7 @@ public class EmailProgressAction extends LamsDispatchAction {
 	responseJSON.set("dates", datesJSON);
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
     private ObjectNode createDateJSON(Locale locale, UserDTO user, Date date, String result) {
@@ -151,24 +164,25 @@ public class EmailProgressAction extends LamsDispatchAction {
     }
 
     private String getTriggerPrefix(Long lessonId) {
-	return new StringBuilder(EmailProgressAction.TRIGGER_PREFIX_NAME).append(lessonId).append(":").toString();
+	return new StringBuilder(EmailProgressController.TRIGGER_PREFIX_NAME).append(lessonId).append(":").toString();
     }
 
     private String getTriggerName(Long lessonId, Date date) {
-	return new StringBuilder(EmailProgressAction.TRIGGER_PREFIX_NAME).append(lessonId).append(":")
+	return new StringBuilder(EmailProgressController.TRIGGER_PREFIX_NAME).append(lessonId).append(":")
 		.append(date.getTime()).toString();
     }
 
     private String getJobName(Long lessonId, Date date) {
-	return new StringBuilder(EmailProgressAction.JOB_PREFIX_NAME).append(lessonId).append(":")
+	return new StringBuilder(EmailProgressController.JOB_PREFIX_NAME).append(lessonId).append(":")
 		.append(date.getTime()).toString();
     }
 
     /**
      * Add or remove a date for the email progress
      */
-    public ActionForward updateEmailProgressDate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/updateEmailProgressDate")
+    @ResponseBody
+    public String updateEmailProgressDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -232,18 +246,20 @@ public class EmailProgressAction extends LamsDispatchAction {
 		}
 	    }
 	} catch (SchedulerException e) {
-	    LamsDispatchAction.log.error("Error occurred at " + "[EmailProgressAction]- fail to email scheduling", e);
+	    EmailProgressController.log.error("Error occurred at " + "[EmailProgressAction]- fail to email scheduling",
+		    e);
 	}
 
 	if (dateJSON != null) {
 	    response.setContentType("application/json;charset=utf-8");
-	    response.getWriter().write(dateJSON.toString());
 	}
-	return null;
+	return dateJSON.toString();
     }
 
-    public ActionForward sendLessonProgressEmail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/sendLessonProgressEmail")
+    @ResponseBody
+    public String sendLessonProgressEmail(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer monitorUserId = getCurrentUser().getUserID();
@@ -252,7 +268,7 @@ public class EmailProgressAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	String parts[] = getMonitoringService().generateLessonProgressEmail(lessonId, monitorUserId);
+	String parts[] = monitoringService.generateLessonProgressEmail(lessonId, monitorUserId);
 	String error = null;
 	int sent = 0;
 
@@ -275,8 +291,7 @@ public class EmailProgressAction extends LamsDispatchAction {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
     private UserDTO getCurrentUser() {
@@ -287,25 +302,16 @@ public class EmailProgressAction extends LamsDispatchAction {
     private IEventNotificationService getEventNotificationService() {
 	if (eventNotificationService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    eventNotificationService = (IEventNotificationService) ctx.getBean("eventNotificationService");
 	}
 	return eventNotificationService;
     }
 
-    private IMonitoringService getMonitoringService() {
-	if (EmailProgressAction.monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailProgressAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-	return EmailProgressAction.monitoringService;
-    }
-
     private ISecurityService getSecurityService() {
 	if (securityService == null) {
 	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    securityService = (ISecurityService) webContext.getBean("securityService");
 	}
 
@@ -318,7 +324,7 @@ public class EmailProgressAction extends LamsDispatchAction {
      */
     private Scheduler getScheduler() {
 	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
+		.getRequiredWebApplicationContext(applicationContext.getServletContext());
 	return (Scheduler) ctx.getBean("scheduler");
     }
 }

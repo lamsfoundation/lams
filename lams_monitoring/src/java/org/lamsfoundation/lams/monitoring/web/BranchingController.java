@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -37,9 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -48,12 +45,13 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.monitoring.dto.BranchDTO;
 import org.lamsfoundation.lams.monitoring.dto.BranchingDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
 
 /**
  * The action servlet that provides the support for the
@@ -67,9 +65,16 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  * @author Fiona Malikoff
  */
-public class BranchingAction extends LamsDispatchAction {
+@Controller
+public class BranchingController {
 
     //---------------------------------------------------------------------
+
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+
+    public static Logger log = Logger.getLogger(BranchingController.class);
 
     protected static final String VIEW_BRANCHES_SCREEN = "viewBranches";
     protected static final String CHOSEN_SELECTION_SCREEN = "chosenSelection";
@@ -83,21 +88,18 @@ public class BranchingAction extends LamsDispatchAction {
     /**
      * Display the view screen, irrespective of the branching type.
      */
-    public ActionForward viewBranching(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    public String viewBranching(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityId,
 		BranchingActivity.class);
-	return viewBranching(activity, lessonId, false, mapping, request, monitoringService);
+	return viewBranching(activity, lessonId, false, request, monitoringService);
     }
 
-    protected ActionForward viewBranching(BranchingActivity activity, Long lessonId, boolean useLocalFiles,
-	    ActionMapping mapping, HttpServletRequest request, IMonitoringService monitoringService)
-	    throws IOException, ServletException {
+    protected String viewBranching(BranchingActivity activity, Long lessonId, boolean useLocalFiles,
+	    HttpServletRequest request, IMonitoringService monitoringService) throws IOException, ServletException {
 
 	// in general the progress engine expects the activity and lesson id to be in the request,
 	// so follow that standard.
@@ -117,7 +119,7 @@ public class BranchingAction extends LamsDispatchAction {
 	if (log.isDebugEnabled()) {
 	    log.debug("viewBranching: Branching activity " + dto);
 	}
-	return mapping.findForward(CHOSEN_SELECTION_SCREEN);
+	return "chosenSelection";
     }
 
     // Can't do this in BranchingDTO (although that's where it should be) as we have
@@ -129,7 +131,7 @@ public class BranchingAction extends LamsDispatchAction {
 	dto.setBranchActivityId(activity.getActivityId());
 	dto.setBranchActivityName(activity.getTitle());
 
-	TreeSet<BranchDTO> branches = new TreeSet<BranchDTO>();
+	TreeSet<BranchDTO> branches = new TreeSet<>();
 	Iterator<Activity> iter = activity.getActivities().iterator();
 	while (iter.hasNext()) {
 	    Activity childActivity = iter.next();
@@ -140,7 +142,7 @@ public class BranchingAction extends LamsDispatchAction {
 	    // If it is a grouped based or teacher chosen branching, the users will be in groups.
 	    // If not get the user based on the progress engine and create a dummy group.
 	    // Can't use tool session as sequence activities don't have a tool session!
-	    SortedSet<Group> groups = new TreeSet<Group>();
+	    SortedSet<Group> groups = new TreeSet<>();
 	    if (activity.isChosenBranchingActivity() || activity.isGroupBranchingActivity()) {
 		for (BranchActivityEntry entry : mappingEntries) {
 		    Group group = entry.getGroup();
@@ -165,10 +167,8 @@ public class BranchingAction extends LamsDispatchAction {
      * @return String of xml with all needed language elements
      */
     protected String getLanguageXML() {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	MessageService messageService = monitoringService.getMessageService();
-	ArrayList<String> languageCollection = new ArrayList<String>();
+	ArrayList<String> languageCollection = new ArrayList<>();
 	languageCollection.add(new String("button.finished"));
 	languageCollection.add(new String("label.branching.non.allocated.users.heading"));
 	languageCollection.add(new String("label.grouping.status"));

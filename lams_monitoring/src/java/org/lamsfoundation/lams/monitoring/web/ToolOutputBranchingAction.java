@@ -36,6 +36,6 @@ package org.lamsfoundation.lams.monitoring.web;
  * 
  *
  */
-public class ToolOutputBranchingAction extends BranchingAction {
+public class ToolOutputBranchingAction extends BranchingController {
 
 }
