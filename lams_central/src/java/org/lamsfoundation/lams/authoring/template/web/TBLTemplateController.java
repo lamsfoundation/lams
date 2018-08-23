@@ -31,13 +31,9 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
 import org.lamsfoundation.lams.authoring.template.Assessment;
 import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
@@ -48,6 +44,8 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -56,19 +54,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A Team Based Learning template.
  */
-public class TBLTemplateAction extends LdTemplateAction {
+@Controller
+@RequestMapping("/tbl")
+public class TBLTemplateController extends LdTemplateController {
 
-    private static Logger log = Logger.getLogger(TBLTemplateAction.class);
+    private static Logger log = Logger.getLogger(TBLTemplateController.class);
     private static String templateCode = "TBL";
 
     /**
      * Sets up the CKEditor stuff
      */
     @Override
-    public ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/init")
+    public String init(HttpServletRequest request) throws Exception {
 	request.setAttribute("questionNumber", "1");
-	return super.init(mapping, form, request, response);
+	return super.init(request);
     }
 
     @Override
@@ -239,11 +239,11 @@ public class TBLTemplateAction extends LdTemplateAction {
 	    numLearners = WebUtil.readIntParam(request, "numLearners", true);
 	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
 
-	    testQuestions = new TreeMap<Integer, ObjectNode>();
-	    applicationExercises = new TreeMap<Integer, Assessment>();
-	    peerReviewCriteria = new TreeMap<Integer, PeerReviewCriteria>();
+	    testQuestions = new TreeMap<>();
+	    applicationExercises = new TreeMap<>();
+	    peerReviewCriteria = new TreeMap<>();
 
-	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
+	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<>();
 	    Enumeration parameterNames = request.getParameterNames();
 	    while (parameterNames.hasMoreElements()) {
 		String name = (String) parameterNames.nextElement();

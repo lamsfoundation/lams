@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.authoring.web;
 
 import java.io.File;
@@ -32,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.DiskFileUpload;
@@ -40,9 +38,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -50,18 +45,20 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Import tool content servlet. It needs an uploaded learning design zip file.
  *
  * @author Steve.Ni
  */
-public class ImportToolContentAction extends LamsAction {
+@Controller
+public class ImportToolContentController {
 
     public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
     public static final String USER_SERVICE_BEAN_NAME = "userManagementService";
@@ -75,11 +72,20 @@ public class ImportToolContentAction extends LamsAction {
     private static final String KEY_MSG_IMPORT_FILE_NOT_FOUND = "msg.import.file.not.found";
     private static final String KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON = "msg.import.failed.unknown.reason";
 
-    private Logger log = Logger.getLogger(ImportToolContentAction.class);
+    private Logger log = Logger.getLogger(ImportToolContentController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("userManagementService")
+    IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("exportToolContentService")
+    IExportToolContentService exportToolContentService;
+    @Autowired
+    @Qualifier("authoringMessageService")
+    MessageService authoringMessageService;
+
+    @RequestMapping("/authoring/importToolContent")
+    public String execute(HttpServletRequest request) throws Exception {
 	String param = request.getParameter("method");
 	String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
 	//-----------------------Resource Author function ---------------------------
@@ -88,10 +94,10 @@ public class ImportToolContentAction extends LamsAction {
 		request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
 	    }
 	    //display initial page for upload
-	    return mapping.findForward("upload");
+	    return "toolcontent/import";
 	} else {
 	    importLD(request);
-	    return mapping.findForward("success");
+	    return "toolcontent/importresult";
 	}
     }
 
@@ -100,8 +106,8 @@ public class ImportToolContentAction extends LamsAction {
      */
     private void importLD(HttpServletRequest request) {
 
-	List<String> ldErrorMsgs = new ArrayList<String>();
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+	List<String> ldErrorMsgs = new ArrayList<>();
+	List<String> toolsErrorMsgs = new ArrayList<>();
 	Long ldId = null;
 
 	try {
@@ -111,10 +117,10 @@ public class ImportToolContentAction extends LamsAction {
 	    HttpSession ss = SessionManager.getSession();
 	    //get back login user DTO
 	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    User user = (User) getUserService().findById(User.class, userDto.getUserID());
+	    User user = (User) userManagementService.findById(User.class, userDto.getUserID());
 
 	    File designFile = null;
-	    Map<String, String> params = new HashMap<String, String>();
+	    Map<String, String> params = new HashMap<>();
 	    String filename = null;
 
 	    String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign");
@@ -146,16 +152,15 @@ public class ImportToolContentAction extends LamsAction {
 	    String customCSV = params.get(AttributeNames.PARAM_CUSTOM_CSV);
 
 	    if (designFile == null) {
-		MessageService msgService = getMessageService();
+		MessageService msgService = authoringMessageService;
 		log.error("Upload file missing. Filename was " + filename);
 		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_NOT_FOUND);
 		ldErrorMsgs.add(msg != null ? msg : "Upload file missing");
 
 	    } else {
 
-		IExportToolContentService service = getExportService();
-		Object[] ldResults = service.importLearningDesign(designFile, user, workspaceFolderUid, toolsErrorMsgs,
-			customCSV);
+		Object[] ldResults = exportToolContentService.importLearningDesign(designFile, user, workspaceFolderUid,
+			toolsErrorMsgs, customCSV);
 		ldId = (Long) ldResults[0];
 		ldErrorMsgs = (List<String>) ldResults[1];
 		toolsErrorMsgs = (List<String>) ldResults[2];
@@ -169,7 +174,7 @@ public class ImportToolContentAction extends LamsAction {
 
 	request.setAttribute(ATTR_LD_ID, ldId);
 	if ((ldId == null || ldId.longValue() == -1) && ldErrorMsgs.size() == 0) {
-	    MessageService msgService = getMessageService();
+	    MessageService msgService = authoringMessageService;
 	    ldErrorMsgs.add(msgService.getMessage(KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON));
 	}
 	if (ldErrorMsgs.size() > 0) {
@@ -180,26 +185,4 @@ public class ImportToolContentAction extends LamsAction {
 	}
 
     }
-
-    //***************************************************************************************
-    // Private method
-    //***************************************************************************************
-    private IUserManagementService getUserService() {
-	WebApplicationContext webContext = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (IUserManagementService) webContext.getBean(USER_SERVICE_BEAN_NAME);
-    }
-
-    private IExportToolContentService getExportService() {
-	WebApplicationContext webContext = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
-    }
-
-    private MessageService getMessageService() {
-	WebApplicationContext webContext = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (MessageService) webContext.getBean(MESSAGE_SERVICE_BEAN_NAME);
-    }
-
 }

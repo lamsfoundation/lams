@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.authoring.web;
 
 import java.io.BufferedInputStream;
@@ -36,60 +35,58 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsAction;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Export tool content action. It needs learingDesignID as input parameter.
  *
  * @author Steve.Ni
  */
-public class ExportToolContentAction extends LamsAction {
+@Controller
+public class ExportToolContentController {
+
+    @Autowired
+    IExportToolContentService exportToolContentService;
 
     public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
     public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
     public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
 
-    private Logger log = Logger.getLogger(ExportToolContentAction.class);
+    private Logger log = Logger.getLogger(ExportToolContentController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/authoring/exportToolContent")
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	String param = request.getParameter("method");
 	// -----------------------Resource Author function ---------------------------
 	if (StringUtils.equals(param, "loading")) {
-	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
-	    request.setAttribute(ExportToolContentAction.PARAM_LEARING_DESIGN_ID, learningDesignId);
+	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);
+	    request.setAttribute(ExportToolContentController.PARAM_LEARING_DESIGN_ID, learningDesignId);
 	    // display initial page for automatically loading download pgm
-	    return mapping.findForward("loading");
+	    return "toolcontent/exportloading";
 	} else if (StringUtils.equals(param, "export")) {
 	    // the export LD pgm
-	    return exportLD(mapping, request, response);
+	    return exportLD(request, response);
 	} else { // choice format
-	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
-	    request.setAttribute(ExportToolContentAction.PARAM_LEARING_DESIGN_ID, learningDesignId);
+	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);
+	    request.setAttribute(ExportToolContentController.PARAM_LEARING_DESIGN_ID, learningDesignId);
 	    // display choose IMS or LAMS format page
-	    return mapping.findForward("choice");
+	    return "toolcontent/exportchoice";
 	}
     }
 
-    private ActionForward exportLD(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response) {
-	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
-	IExportToolContentService service = getExportService();
-	List<String> ldErrorMsgs = new ArrayList<String>();
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+    private String exportLD(HttpServletRequest request, HttpServletResponse response) {
+	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);
+	List<String> ldErrorMsgs = new ArrayList<>();
+	List<String> toolsErrorMsgs = new ArrayList<>();
 
 	try {
-	    String zipFilename = service.exportLearningDesign(learningDesignId, toolsErrorMsgs);
+	    String zipFilename = exportToolContentService.exportLearningDesign(learningDesignId, toolsErrorMsgs);
 
 	    // get only filename
 	    String zipfile = FileUtil.getFileName(zipFilename);
@@ -142,19 +139,10 @@ public class ExportToolContentAction extends LamsAction {
 	} catch (Exception e1) {
 	    log.error("Unable to export tool content: " + e1.toString());
 	    ldErrorMsgs.add(0, e1.getClass().getName());
-	    request.setAttribute(ExportToolContentAction.ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
-	    request.setAttribute(ExportToolContentAction.ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
+	    request.setAttribute(ExportToolContentController.ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
+	    request.setAttribute(ExportToolContentController.ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
 	}
 	// display initial page for upload
-	return mapping.findForward("result");
-    }
-
-    // ***************************************************************************************
-    // Private method
-    // ***************************************************************************************
-    private IExportToolContentService getExportService() {
-	WebApplicationContext webContext = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (IExportToolContentService) webContext.getBean(CentralConstants.EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
+	return "toolcontent/exportresult";
     }
 }

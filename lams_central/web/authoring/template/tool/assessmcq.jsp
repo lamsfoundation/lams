@@ -1,8 +1,8 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateAction"%>
-<c:set var="maxOptionCount" value="<%= LdTemplateAction.MAX_OPTION_COUNT %>"/>
+<%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateController"%>
+<c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
 
 <c:set var="required">${questionNumber eq 1 ? "class=\"input required\"" : "class=\"input\""}</c:set>
 

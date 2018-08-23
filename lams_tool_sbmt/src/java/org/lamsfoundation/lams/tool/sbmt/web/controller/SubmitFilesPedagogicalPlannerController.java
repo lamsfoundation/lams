@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.web.form.SubmitFilesPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerController;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/pedagogicalPlanner")
 public class SubmitFilesPedagogicalPlannerController {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
+    private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
     @Qualifier("submitFilesService")

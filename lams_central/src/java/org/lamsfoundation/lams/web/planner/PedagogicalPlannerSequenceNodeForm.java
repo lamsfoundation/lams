@@ -20,14 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web.planner;
 
-import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
-public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
+public class PedagogicalPlannerSequenceNodeForm {
     public final static String NODE_TYPE_SUBNODES = "subnodes";
     public final static String NODE_TYPE_TEMPLATE = "template";
 
@@ -87,25 +85,35 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     public int getPermissions() {
 	int permissions = 0;
 	permissions += Boolean.TRUE.equals(permitEditorViewTemplate)
-		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW
+		: 0;
 	permissions += Boolean.TRUE.equals(permitEditorModifyTemplate)
-		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY
+		: 0;
 	permissions += Boolean.TRUE.equals(permitEditorReplaceTemplate)
-		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE
+		: 0;
 	permissions += Boolean.TRUE.equals(permitEditorRemoveNode)
-		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE
+		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherViewTemplate)
-		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW
+		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherEditCopy)
-		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY
+		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherPreview)
-		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW
+		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherViewCopyInFullAuthor)
-		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR
+		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherExportCopy)
-		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT
+		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherSaveCopy)
-		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE : 0;
+		? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE
+		: 0;
 	return permissions;
     }
 

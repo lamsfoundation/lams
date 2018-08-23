@@ -60,6 +60,10 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -74,9 +78,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Marcin Cieslak, Fiona Malikoff
  */
-public abstract class LdTemplateAction extends DispatchAction {
+@Controller
+public abstract class LdTemplateController {
+    
+    @Autowired
+    WebApplicationContext applictionContext;
 
-    private static Logger log = Logger.getLogger(LdTemplateAction.class);
+    private static Logger log = Logger.getLogger(LdTemplateController.class);
     public static final int MAX_OPTION_COUNT = 6;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
 
@@ -134,8 +142,9 @@ public abstract class LdTemplateAction extends DispatchAction {
     protected static final String TOOL_CONTENT_SERVLET_URL_SUFFIX = "/lams/rest/ToolContent";
     protected static final String LEARNING_DESIGN_SERVLET_URL_SUFFIX = "/lams/rest/LearningDesign";
 
-    @Override
-    public final ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("")
+    @ResponseBody
+    public final String unspecified( HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	ObjectNode responseJSON = null;
 	try {
@@ -158,8 +167,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -172,11 +180,11 @@ public abstract class LdTemplateAction extends DispatchAction {
      * If you wish to set up other values in the initialisation that are form specific, override this method
      * in your servlet, remembering to call this method.
      */
-    public ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/init")
+    public String init(HttpServletRequest request) throws Exception {
 	String contentFolderID = FileUtil.generateUniqueContentFolderID();
 	request.setAttribute(RestTags.CONTENT_FOLDER_ID, contentFolderID);
-	return mapping.findForward("init");
+	return "authoring/template/tbl/tbl";
     }
 
     protected abstract ObjectNode createLearningDesign(HttpServletRequest request) throws Exception;
@@ -344,7 +352,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	try {
 	    learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
 	} catch (Exception e) {
-	    LdTemplateAction.log.error("Unable to learning design with details " + ldJSON, e);
+	    LdTemplateController.log.error("Unable to learning design with details " + ldJSON, e);
 	    throw new HttpException("Unable to learning design with details " + ldJSON);
 
 	}
@@ -625,7 +633,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	    return toolContentID;
 	} catch (Exception e) {
-	    LdTemplateAction.log.error("Unable to create tool content for " + toolSignature + " with details "
+	    LdTemplateController.log.error("Unable to create tool content for " + toolSignature + " with details "
 		    + toolContentJSON
 		    + ". \nThe tool probably threw an exception - check the server logs for more details.\n"
 		    + "If the exception is \"Servlet.service() for servlet ToolContentRestServlet threw exception java.lang.ClassCastException: com.sun.proxy.$ProxyXXX cannot be cast to org.lamsfoundation.lams.rest.ToolRestManager)\""
@@ -741,7 +749,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	}
 	toolContentJSON.set("references", references);
 
-	return createToolContent(user, LdTemplateAction.ASSESSMENT_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -751,8 +759,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.ASSESSMENT_TOOL_SIGNATURE,
-		LdTemplateAction.ASSESSMENT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE,
+		LdTemplateController.ASSESSMENT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT);
     }
 
@@ -767,7 +775,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
 		lockWhenFinished, null, null);
 	toolContentJSON.put("filterKeywords", filterKeywords);
-	return createToolContent(user, LdTemplateAction.CHAT_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.CHAT_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -777,8 +785,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.CHAT_TOOL_SIGNATURE,
-		LdTemplateAction.CHAT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.CHAT_TOOL_SIGNATURE,
+		LdTemplateController.CHAT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Chat", Activity.CATEGORY_COLLABORATION);
     }
 
@@ -813,7 +821,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	if (limitedMaxCharacters && maxCharacters != null) {
 	    toolContentJSON.put("maxCharacters", maxCharacters);
 	}
-	return createToolContent(user, LdTemplateAction.FORUM_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.FORUM_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -823,8 +831,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.FORUM_TOOL_SIGNATURE,
-		LdTemplateAction.FORUM_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.FORUM_TOOL_SIGNATURE,
+		LdTemplateController.FORUM_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Forum", Activity.CATEGORY_COLLABORATION);
     }
 
@@ -836,7 +844,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    throws HttpException, IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
-	return createToolContent(user, LdTemplateAction.LEADER_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.LEADER_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -846,8 +854,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.LEADER_TOOL_SIGNATURE,
-		LdTemplateAction.LEADER_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.LEADER_TOOL_SIGNATURE,
+		LdTemplateController.LEADER_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Leader Selection",
 		Activity.CATEGORY_RESPONSE);
     }
@@ -861,7 +869,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
 		allowRichTextEditor, null);
-	return createToolContent(user, LdTemplateAction.NOTEBOOK_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.NOTEBOOK_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -871,8 +879,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.NOTEBOOK_TOOL_SIGNATURE,
-		LdTemplateAction.NOTEBOOK_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.NOTEBOOK_TOOL_SIGNATURE,
+		LdTemplateController.NOTEBOOK_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Notebook", Activity.CATEGORY_RESPONSE);
     }
 
@@ -885,7 +893,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, null, reflectionInstructions, null, null, null);
 	toolContentJSON.put("content", content != null ? content : "");
-	return createToolContent(user, LdTemplateAction.NOTICEBOARD_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.NOTICEBOARD_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -895,8 +903,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.NOTICEBOARD_TOOL_SIGNATURE,
-		LdTemplateAction.NOTICEBOARD_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.NOTICEBOARD_TOOL_SIGNATURE,
+		LdTemplateController.NOTICEBOARD_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Noticeboard", Activity.CATEGORY_CONTENT);
     }
 
@@ -914,7 +922,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	toolContentJSON.put("questionsSequenced", oneQuestionPerPage);
 	toolContentJSON.put("showOtherAnswers", showOtherLearnersAnswers);
 	toolContentJSON.put("usernameVisible", showOtherLearnersNames);
-	return createToolContent(user, LdTemplateAction.QA_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.QA_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -924,8 +932,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.QA_TOOL_SIGNATURE,
-		LdTemplateAction.QA_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID, parentActivityType,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.QA_TOOL_SIGNATURE,
+		LdTemplateController.QA_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID, parentActivityType,
 		activityTitle != null ? activityTitle : "Q&A", Activity.CATEGORY_RESPONSE);
     }
 
@@ -939,7 +947,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
-	return createToolContent(user, LdTemplateAction.MCQ_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.MCQ_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -949,8 +957,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.MCQ_TOOL_SIGNATURE,
-		LdTemplateAction.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID, parentActivityType,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
+		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID, parentActivityType,
 		activityTitle != null ? activityTitle : "Multiple Choice", Activity.CATEGORY_ASSESSMENT);
     }
 
@@ -962,7 +970,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, null);
 	toolContentJSON.put("multiUserMode", multiUserMode);
-	return createToolContent(user, LdTemplateAction.MINDMAP_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.MINDMAP_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -972,8 +980,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.MINDMAP_TOOL_SIGNATURE,
-		LdTemplateAction.MINDMAP_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MINDMAP_TOOL_SIGNATURE,
+		LdTemplateController.MINDMAP_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "MindMap", Activity.CATEGORY_RESPONSE);
     }
 
@@ -999,7 +1007,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    toolContentJSON.put("minViewResourceNumber", minResourcesToView);
 	}
 	toolContentJSON.set("resources", resources);
-	return createToolContent(user, LdTemplateAction.SHARE_RESOURCES_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.SHARE_RESOURCES_TOOL_SIGNATURE, toolContentJSON);
     }
 
     // resource type - copied from ResourceConstants
@@ -1022,8 +1030,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	}
 
 	// TODO files - need to save it somehow, validate the file size, etc
-	if (type != LdTemplateAction.RESOURCE_TYPE_URL) {
-	    LdTemplateAction.log
+	if (type != LdTemplateController.RESOURCE_TYPE_URL) {
+	    LdTemplateController.log
 		    .warn("LD Templates not handling files yet - file, website & LO resources won't work. Filename "
 			    + file.getAbsoluteFile());
 	}
@@ -1032,7 +1040,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     protected ObjectNode createResourceURL(String title, String[] instructions, String URL, boolean openInNewWindow,
 	    int displayOrder) throws IOException {
-	ObjectNode obj = createResourceItem(title, LdTemplateAction.RESOURCE_TYPE_URL, instructions, null,
+	ObjectNode obj = createResourceItem(title, LdTemplateController.RESOURCE_TYPE_URL, instructions, null,
 		displayOrder);
 	obj.put("url", URL);
 	obj.put("openUrlNewWindow", openInNewWindow);
@@ -1041,7 +1049,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     protected ObjectNode createResourceFile(String title, String description, String[] instructions, File file,
 	    int displayOrder) throws IOException {
-	ObjectNode obj = createResourceItem(title, LdTemplateAction.RESOURCE_TYPE_FILE, instructions, file,
+	ObjectNode obj = createResourceItem(title, LdTemplateController.RESOURCE_TYPE_FILE, instructions, file,
 		displayOrder);
 	obj.put("description", description);
 	return obj;
@@ -1049,7 +1057,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     protected ObjectNode createResourceWebsite(String title, String description, String[] instructions, File file,
 	    int displayOrder) throws IOException {
-	ObjectNode obj = createResourceItem(title, LdTemplateAction.RESOURCE_TYPE_WEBSITE, instructions, file,
+	ObjectNode obj = createResourceItem(title, LdTemplateController.RESOURCE_TYPE_WEBSITE, instructions, file,
 		displayOrder);
 	obj.put("description", description);
 	return obj;
@@ -1057,7 +1065,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     protected ObjectNode createResourceLearningObject(String title, String description, String[] instructions,
 	    File file, int displayOrder) throws IOException {
-	ObjectNode obj = createResourceItem(title, LdTemplateAction.RESOURCE_TYPE_LEARNING_OBJECT, instructions, file,
+	ObjectNode obj = createResourceItem(title, LdTemplateController.RESOURCE_TYPE_LEARNING_OBJECT, instructions, file,
 		displayOrder);
 	obj.put("description", description);
 	return obj;
@@ -1070,8 +1078,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.SHARE_RESOURCES_TOOL_SIGNATURE,
-		LdTemplateAction.SHARE_RESOURCES_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SHARE_RESOURCES_TOOL_SIGNATURE,
+		LdTemplateController.SHARE_RESOURCES_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Share Resources",
 		Activity.CATEGORY_CONTENT);
     }
@@ -1085,7 +1093,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
-	return createToolContent(user, LdTemplateAction.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1095,8 +1103,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.SCRATCHIE_TOOL_SIGNATURE,
-		LdTemplateAction.SCRATCHIE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE,
+		LdTemplateController.SCRATCHIE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT);
     }
 
@@ -1113,7 +1121,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 	toolContentJSON.put("autoSelectScribe", autoSelectScribe);
 	toolContentJSON.put("showAggregatedReports", showAggregatedReports);
-	return createToolContent(user, LdTemplateAction.SCRIBE_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.SCRIBE_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1123,8 +1131,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.SCRIBE_TOOL_SIGNATURE,
-		LdTemplateAction.SCRIBE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRIBE_TOOL_SIGNATURE,
+		LdTemplateController.SCRIBE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Scribe", Activity.CATEGORY_COLLABORATION);
     }
 
@@ -1143,7 +1151,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    toolContentJSON.put("limitUpload", limitUpload != null ? limitUpload : true);
 	    toolContentJSON.put("limitUploadNumber", limitUploadNumber);
 	}
-	return createToolContent(user, LdTemplateAction.SUBMIT_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.SUBMIT_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1153,8 +1161,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.SUBMIT_TOOL_SIGNATURE,
-		LdTemplateAction.SUBMIT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SUBMIT_TOOL_SIGNATURE,
+		LdTemplateController.SUBMIT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Submit File",
 		Activity.CATEGORY_ASSESSMENT);
     }
@@ -1168,7 +1176,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, user);
 	toolContentJSON.set("questions", questions);
-	return createToolContent(user, LdTemplateAction.SURVEY_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.SURVEY_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1178,8 +1186,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.SURVEY_TOOL_SIGNATURE,
-		LdTemplateAction.SURVEY_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SURVEY_TOOL_SIGNATURE,
+		LdTemplateController.SURVEY_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Survey", Activity.CATEGORY_RESPONSE);
     }
 
@@ -1193,7 +1201,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.set(RestTags.ANSWERS, answers);
 	toolContentJSON.put("showResults", showResults);
-	return createToolContent(user, LdTemplateAction.VOTE_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.VOTE_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1203,8 +1211,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.VOTE_TOOL_SIGNATURE,
-		LdTemplateAction.VOTE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.VOTE_TOOL_SIGNATURE,
+		LdTemplateController.VOTE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Voting", Activity.CATEGORY_RESPONSE);
     }
 
@@ -1216,7 +1224,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, null);
 	toolContentJSON.set("pages", pages);
-	return createToolContent(user, LdTemplateAction.WIKI_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.WIKI_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1226,8 +1234,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
 	    String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.WIKI_TOOL_SIGNATURE,
-		LdTemplateAction.WIKI_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.WIKI_TOOL_SIGNATURE,
+		LdTemplateController.WIKI_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Wiki", Activity.CATEGORY_COLLABORATION);
     }
 
@@ -1244,7 +1252,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
 	toolContentJSON.set("criterias", criterias);
-	return createToolContent(user, LdTemplateAction.PEER_REVIEW_TOOL_SIGNATURE, toolContentJSON);
+	return createToolContent(user, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE, toolContentJSON);
     }
 
     /**
@@ -1254,8 +1262,8 @@ public abstract class LdTemplateAction extends DispatchAction {
 	    Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle) {
 
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateAction.PEER_REVIEW_TOOL_SIGNATURE,
-		LdTemplateAction.PEER_REVIEW_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE,
+		LdTemplateController.PEER_REVIEW_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Peer Review", Activity.CATEGORY_CONTENT);
     }
 
@@ -1266,39 +1274,39 @@ public abstract class LdTemplateAction extends DispatchAction {
     /* ************************************** I18N related methods ************************************************* */
 
     protected final IAuthoringService getAuthoringService() {
-	if (LdTemplateAction.authoringService == null) {
+	if (LdTemplateController.authoringService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LdTemplateAction.authoringService = (IAuthoringService) ctx.getBean("authoringService");
+		    .getRequiredWebApplicationContext(applictionContext.getServletContext());
+	    LdTemplateController.authoringService = (IAuthoringService) ctx.getBean("authoringService");
 	}
-	return LdTemplateAction.authoringService;
+	return LdTemplateController.authoringService;
     }
 
     protected final Tool getTool(String toolSignature) {
-	if (LdTemplateAction.toolDAO == null) {
+	if (LdTemplateController.toolDAO == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LdTemplateAction.toolDAO = (IToolDAO) ctx.getBean("toolDAO");
+		    .getRequiredWebApplicationContext(applictionContext.getServletContext());
+	    LdTemplateController.toolDAO = (IToolDAO) ctx.getBean("toolDAO");
 	}
-	return LdTemplateAction.toolDAO.getToolBySignature(toolSignature);
+	return LdTemplateController.toolDAO.getToolBySignature(toolSignature);
     }
 
     protected final IWorkspaceManagementService getWorkspaceManagementService() {
-	if (LdTemplateAction.workspaceManagementService == null) {
+	if (LdTemplateController.workspaceManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LdTemplateAction.workspaceManagementService = (IWorkspaceManagementService) ctx
+		    .getRequiredWebApplicationContext(applictionContext.getServletContext());
+	    LdTemplateController.workspaceManagementService = (IWorkspaceManagementService) ctx
 		    .getBean("workspaceManagementService");
 	}
-	return LdTemplateAction.workspaceManagementService;
+	return LdTemplateController.workspaceManagementService;
     }
 
     private ILamsCoreToolService getLamsCoreToolService() {
-	if (LdTemplateAction.lamsCoreToolService == null) {
-	    LdTemplateAction.lamsCoreToolService = (ILamsCoreToolService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("lamsCoreToolService");
+	if (LdTemplateController.lamsCoreToolService == null) {
+	    LdTemplateController.lamsCoreToolService = (ILamsCoreToolService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(applictionContext.getServletContext()).getBean("lamsCoreToolService");
 	}
-	return LdTemplateAction.lamsCoreToolService;
+	return LdTemplateController.lamsCoreToolService;
     }
 
     class ToolDetails {
@@ -1320,15 +1328,15 @@ public abstract class LdTemplateAction extends DispatchAction {
      * Specialised call to create a new question for the Assessment fields. Returns a fragment of HTML
      * which sets up a new CKEditor. Defaults to essay. If questionType = "mcq" then it will do a multiple choice
      */
-    public ActionForward createAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/createAssessment")
+    public String createAssessment(HttpServletRequest request) {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 
 	String questionType = WebUtil.readStrParam(request, "questionType");
 	if (questionType == null || !questionType.equalsIgnoreCase("mcq")) {
-	    return mapping.findForward("assess");
+	    return "/authoring/template/tool/assessment";
 	} else {
-	    return mapping.findForward("assessmcq");
+	    return "authoring/template/tool/assessmcq";
 	}
 
     }
@@ -1338,23 +1346,46 @@ public abstract class LdTemplateAction extends DispatchAction {
      * which sets up a new CKEditor. Works with both mcquestion.jsp & surveyquestion.jsp. The template's
      * struts action determines which jsp is used (see TBL and Inquiry uses).
      */
-    public ActionForward createQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/createQuestion")
+    public String createQuestion(HttpServletRequest request) {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 	String topicNumber = request.getParameter("topicNumber");
 	if (topicNumber != null) {
 	    request.setAttribute("topicNumber", topicNumber);
 	}
 	String forward = request.getParameter("forward");
-	return mapping.findForward(forward != null && forward.length() > 0 ? forward : "question");
+	String path;
+	switch (forward) {
+	    case ("init") : path = "authoring/template/tbl/tbl";
+	    	break;
+	    case ("question") : path = "authoring/template/tool/mcquestion";
+	    	break;
+	    case ("questionoption") : path = "authoring/template/tool/mcoption";
+	    	break;
+	    case ("redooption") : path = "authoring/template/tool/mcredooption";
+	    	break;
+	    case ("assess") : path = "authoring/template/tool/assessment";
+	    	break;
+	    case ("assessmcq") : path = "authoring/template/tool/assessmcq";
+	    	break;
+	    case ("assessredooption") : path = "authoring/template/tool/assessredooption";
+	    	break;
+	    case ("assessoption") : path = "authoring/template/tool/assessoption";
+	    	break;
+	    case ("peerreviewstar") : path = "authoring/template/tool/peerreviewstar";
+	    	break;
+	    default : path = null;
+	    	break;
+	}
+	return (path != null && path.length() > 0 ? path : "authoring/template/tool/mcquestion");
     }
 
     /**
      * Specialised call to create a new forum entry. Returns a fragment of HTML
      * which sets up two new fields - subject and body. Works with both forum.jsp.
      */
-    public ActionForward createForum(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping
+    public String createForum(HttpServletRequest request) {
 	request.setAttribute("topicNumber", request.getParameter("topicNumber"));
 	return mapping.findForward("forum");
     }
@@ -1365,16 +1396,16 @@ public abstract class LdTemplateAction extends DispatchAction {
      * Returns a fragment of HTML which sets up the editing field. The template's
      * struts action determines which jsp is used (see TBL and Inquiry uses).
      */
-    public ActionForward createOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/createOption")
+    public String createOption(HttpServletRequest request) {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 	request.setAttribute("optionNumber", WebUtil.readIntParam(request, "optionNumber"));
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
-	return mapping.findForward(useAssessmentVersion ? "assessoption" : "questionoption");
+	return (useAssessmentVersion ? "authoring/template/tool/assessoption" : "authoring/template/tool/mcoption");
     }
 
-    public ActionForward deleteOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/deleteOption")
+    public String deleteOption(HttpServletRequest request) {
 
 	Integer questionNumber = WebUtil.readIntParam(request, "questionNumber", true);
 	Integer delete = WebUtil.readIntParam(request, "optionNumber");
@@ -1392,11 +1423,11 @@ public abstract class LdTemplateAction extends DispatchAction {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
-	return mapping.findForward(useAssessmentVersion ? "assessredooption" : "redooption");
+	return (useAssessmentVersion ? "authoring/template/tool/assessredooption" : "authoring/template/tool/mcredooption");
     }
 
-    public ActionForward swapOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/swapOption")
+    public String swapOption(HttpServletRequest request) {
 
 	Integer questionNumber = WebUtil.readIntParam(request, "questionNumber", true);
 
@@ -1435,7 +1466,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
-	return mapping.findForward(useAssessmentVersion ? "assessredooption" : "redooption");
+	return (useAssessmentVersion ? "authoring/template/tool/assessredooption" : "authoring/template/tool/mcredooption");
     }
 
     // if mcq paramPrefix = "question". if assessment multiple choice paramPrefix = assmcq
@@ -1467,8 +1498,8 @@ public abstract class LdTemplateAction extends DispatchAction {
     /**
      * Specialised call to create a new URL field & title.
      */
-    public ActionForward createResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/createResource")
+    public ActionForward createResource(HttpServletRequest request) {
 	request.setAttribute("urlNumber", request.getParameter("urlNumber"));
 	if (request.getParameter("branchNumberUnderscore") != null) {
 	    request.setAttribute("branchNumberUnderscore", request.getParameter("branchNumberUnderscore"));
@@ -1479,8 +1510,8 @@ public abstract class LdTemplateAction extends DispatchAction {
     /**
      * Specialised call to create a new set of fields for a branch.
      */
-    public ActionForward createBranch(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/createBranch")
+    public String createBranch(HttpServletRequest request) {
 	request.setAttribute("branchNumber", request.getParameter("branchNumber"));
 	return mapping.findForward("branch");
     }
@@ -1489,10 +1520,10 @@ public abstract class LdTemplateAction extends DispatchAction {
      * Specialised call to create a new rating criteria for the Peer Review fields. Returns a fragment of HTML
      * which sets up the new fields.
      */
-    public ActionForward createRatingCriteria(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/createRatingCriteria")
+    public String createRatingCriteria(HttpServletRequest request) {
 	request.setAttribute("criteriaNumber", WebUtil.readIntParam(request, "criteriaNumber"));
-	return mapping.findForward("peerreviewstar");
+	return "authoring/template/tool/peerreviewstar";
     }
 
 }

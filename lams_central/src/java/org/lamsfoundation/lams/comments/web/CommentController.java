@@ -32,10 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.comments.Comment;
 import org.lamsfoundation.lams.comments.CommentConstants;
 import org.lamsfoundation.lams.comments.CommentLike;
@@ -53,8 +49,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -62,62 +62,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Fiona Malikoff
  */
-public class CommentAction extends Action {
+@Controller
+@RequestMapping("/comments")
+public class CommentController {
 
-    private static Logger log = Logger.getLogger(CommentAction.class);
+    private static Logger log = Logger.getLogger(CommentController.class);
 
-    private static IUserManagementService userService;
-    private static ICommentService commentService;
-    private static ILamsCoreToolService coreToolService;
-    private static ISecurityService securityService;
-
-    @Override
-    public final ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	String param = mapping.getParameter();
-	if (param.equals("init")) {
-	    return init(mapping, form, request, response);
-	}
-	if (param.equals("viewTopic")) {
-	    return viewTopic(mapping, form, request, response);
-	}
-	if (param.equals("viewTopicThread")) {
-	    return viewTopicThread(mapping, form, request, response);
-	}
-
-	if (param.equals("newComment")) {
-	    return newComment(mapping, form, request, response);
-	}
-
-	if (param.equals("newReplyTopic")) {
-	    return newReplyTopic(mapping, form, request, response);
-	}
-	if (param.equals("replyTopicInline")) {
-	    return replyTopicInline(mapping, form, request, response);
-	}
-
-	if (param.equals("editTopic")) {
-	    return editTopic(mapping, form, request, response);
-	}
-	if (param.equals("updateTopicInline")) {
-	    return updateTopicInline(mapping, form, request, response);
-	}
-
-	if (param.equals("like")) {
-	    return updateLikeCount(mapping, form, request, response, true);
-	}
-	if (param.equals("dislike")) {
-	    return updateLikeCount(mapping, form, request, response, false);
-	}
-	if (param.equals("hide")) {
-	    return hideComment(mapping, form, request, response, false);
-	}
-	if (param.equals("makeSticky")) {
-	    return makeSticky(mapping, form, request, response);
-	}
-
-	return mapping.findForward("error");
-    }
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userService;
+    @Autowired
+    @Qualifier("commentService")
+    private ICommentService commentService;
+    @Autowired
+    @Qualifier("lamsCoreToolService")
+    private ILamsCoreToolService coreToolService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
 
     /**
      * Display the comments for a given external id (usually tool session id). The session comments will be
@@ -131,8 +93,8 @@ public class CommentAction extends Action {
      * @throws ServletException
      */
     @SuppressWarnings("unchecked")
-    private ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    private String init(HttpServletRequest request) throws ServletException {
 
 	// initial Session Map
 	String sessionMapID = request.getParameter(CommentConstants.ATTR_SESSION_MAP_ID);
@@ -201,10 +163,10 @@ public class CommentAction extends Action {
 	    throwException("Unknown comment type ", user.getLogin(), externalId, externalType, externalSignature);
 	}
 
-	Comment rootComment = getCommentService().createOrGetRoot(externalId, externalSecondaryId, externalType,
+	Comment rootComment = commentService.createOrGetRoot(externalId, externalSecondaryId, externalType,
 		externalSignature, user);
 	sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
-	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy, true);
+	return viewTopicImpl(request, sessionMap, pageSize, sortBy, true);
     }
 
     private void throwException(String msg, String loginName, Long externalId, Integer externalType,
@@ -221,7 +183,7 @@ public class CommentAction extends Action {
     }
 
     private boolean learnerInToolSession(Long toolSessionId, User user) {
-	GroupedToolSession toolSession = (GroupedToolSession) getCoreToolService().getToolSessionById(toolSessionId);
+	GroupedToolSession toolSession = (GroupedToolSession) coreToolService.getToolSessionById(toolSessionId);
 	return toolSession.getSessionGroup().getUsers().contains(user);
     }
 
@@ -229,9 +191,8 @@ public class CommentAction extends Action {
 
 	if (ToolAccessMode.TEACHER
 		.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)))) {
-	    GroupedToolSession toolSession = (GroupedToolSession) getCoreToolService()
-		    .getToolSessionById(toolSessionId);
-	    return getSecurityService().isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(),
+	    GroupedToolSession toolSession = (GroupedToolSession) coreToolService.getToolSessionById(toolSessionId);
+	    return securityService.isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(),
 		    "Comment Monitoring Tasks", false);
 	} else {
 	    return false;
@@ -250,8 +211,8 @@ public class CommentAction extends Action {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/viewTopic")
+    private String viewTopic(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, CommentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -262,20 +223,18 @@ public class CommentAction extends Action {
 	if (sortBy != null) {
 	    sessionMap.put(CommentConstants.ATTR_SORT_BY, sortBy);
 	}
-	return viewTopicImpl(mapping, form, request, response, sessionMap, pageSize, sortBy, sticky);
+	return viewTopicImpl(request, sessionMap, pageSize, sortBy, sticky);
 
     }
 
-    private ActionForward viewTopicImpl(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, SessionMap<String, Object> sessionMap, Integer pageSize, Integer sortBy,
-	    boolean includeSticky) {
+    @RequestMapping("/viewTopicImpl")
+    private String viewTopicImpl(HttpServletRequest request, SessionMap<String, Object> sessionMap, Integer pageSize,
+	    Integer sortBy, boolean includeSticky) {
 
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
 	Long externalSecondaryId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SECONDARY_ID);
 	Integer externalType = (Integer) sessionMap.get(CommentConstants.ATTR_EXTERNAL_TYPE);
 	String externalSignature = (String) sessionMap.get(CommentConstants.ATTR_EXTERNAL_SIG);
-
-	commentService = getCommentService();
 
 	// get user and check they are in the tool session....
 	HttpSession ss = SessionManager.getSession();
@@ -306,7 +265,7 @@ public class CommentAction extends Action {
 	// transfer SessionMapID as well
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	return mapping.findForward(includeSticky ? "successAll" : "success");
+	return (includeSticky ? "comments/allviewwrapper" : "comments/topicviewwrapper");
     }
 
     @SuppressWarnings("unchecked")
@@ -325,10 +284,8 @@ public class CommentAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward viewTopicThread(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	commentService = getCommentService();
+    @RequestMapping("/viewTopicThread")
+    private String viewTopicThread(HttpServletRequest request) {
 
 	Long highlightMessageUid = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID, true);
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -354,7 +311,7 @@ public class CommentAction extends Action {
 	// don't want to try to scroll as this is a single thread, completely displayed.
 	request.setAttribute(CommentConstants.ATTR_NO_MORE_PAGES, true);
 
-	return mapping.findForward("success");
+	return "comments/topicviewwrapper";
     }
 
     /**
@@ -378,8 +335,10 @@ public class CommentAction extends Action {
     /**
      * Create a new comment (not a reply)
      */
-    private ActionForward newComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException, IOException, ServletException {
+    @RequestMapping("/newComment")
+    @ResponseBody
+    private String newComment(HttpServletRequest request, HttpServletResponse response)
+	    throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
@@ -400,8 +359,6 @@ public class CommentAction extends Action {
 	if (!validateText(commentText)) {
 	    responseJSON = getFailedValidationJSON();
 	} else {
-
-	    commentService = getCommentService();
 
 	    User user = getCurrentUser(request);
 	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
@@ -425,8 +382,7 @@ public class CommentAction extends Action {
 
 	}
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -438,21 +394,23 @@ public class CommentAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newReplyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newReplyTopic")
+    private String newReplyTopic(HttpServletRequest request) {
 
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID,
 		request.getParameter(CommentConstants.ATTR_SESSION_MAP_ID));
 	request.setAttribute(CommentConstants.ATTR_PARENT_COMMENT_ID,
 		request.getParameter(CommentConstants.ATTR_PARENT_COMMENT_ID));
-	return mapping.findForward("success");
+	return "comments/reply";
     }
 
     /**
      * Create a reply to a parent topic.
      */
-    private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException, IOException, ServletException {
+    @RequestMapping("/replyTopicInline")
+    @ResponseBody
+    private String replyTopicInline(HttpServletRequest request, HttpServletResponse response)
+	    throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
@@ -497,7 +455,6 @@ public class CommentAction extends Action {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
 	return null;
     }
 
@@ -507,7 +464,7 @@ public class CommentAction extends Action {
     }
 
     private ObjectNode getFailedValidationJSON() {
-	MessageService msgService = getCommentService().getMessageService();
+	MessageService msgService = commentService.getMessageService();
 	ObjectNode resultJSON = JsonNodeFactory.instance.objectNode();
 	resultJSON.put(CommentConstants.ATTR_ERR_MESSAGE, msgService.getMessage(CommentConstants.KEY_BODY_VALIDATION));
 	return resultJSON;
@@ -523,18 +480,18 @@ public class CommentAction extends Action {
      * @return
      * @throws PersistenceException
      */
-    public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editTopic")
+    public String editTopic(HttpServletRequest request) {
 
 	Long commentId = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
-	CommentDTO comment = getCommentService().getComment(commentId);
+	CommentDTO comment = commentService.getComment(commentId);
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	sessionMap.put(CommentConstants.ATTR_COMMENT_ID, commentId);
 	request.setAttribute(CommentConstants.ATTR_COMMENT_ID, commentId);
 	request.setAttribute(CommentConstants.ATTR_COMMENT, comment);
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	return mapping.findForward("success");
+	return "comments/edit";
     }
 
     /**
@@ -542,10 +499,11 @@ public class CommentAction extends Action {
      *
      * @throws ServletException
      */
-    public ActionForward updateTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @ResponseBody
+    @RequestMapping("/updateTopicInline")
+    public String updateTopicInline(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
-	commentService = getCommentService();
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long commentId = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
 
@@ -593,21 +551,19 @@ public class CommentAction extends Action {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	return ObjectNode.toString();
     }
 
     /**
      * Update the likes/dislikes
      */
-    private ActionForward updateLikeCount(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, boolean isLike) throws InterruptedException, IOException, ServletException {
+    @RequestMapping(path = ("/updateLikeCount"), method = RequestMethod.POST)
+    private String updateLikeCount(HttpServletRequest request, HttpServletResponse response, boolean isLike)
+	    throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long messageUid = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
-
-	commentService = getCommentService();
 
 	User user = getCurrentUser(request);
 	if (!learnerInToolSession(externalId, user)) {
@@ -623,22 +579,21 @@ public class CommentAction extends Action {
 	responseJSON.put(CommentConstants.ATTR_COMMENT_ID, messageUid);
 	responseJSON.put(CommentConstants.ATTR_STATUS, added);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
-	return null;
+	return responseJSON.toString();
     }
 
     /**
      * Update hide flag
      */
-    private ActionForward hideComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, boolean isLike) throws InterruptedException, IOException, ServletException {
+    @ResponseBody
+    @RequestMapping("/hideComment")
+    private String hideComment(HttpServletRequest request, HttpServletResponse response, boolean isLike)
+	    throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long commentId = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
 	boolean status = WebUtil.readBooleanParam(request, CommentConstants.ATTR_HIDE_FLAG);
-
-	commentService = getCommentService();
 
 	User user = getCurrentUser(request);
 	if (!monitorInToolSession(externalId, user, sessionMap)) {
@@ -656,8 +611,7 @@ public class CommentAction extends Action {
 	responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -665,10 +619,11 @@ public class CommentAction extends Action {
      *
      * @throws ServletException
      */
-    public ActionForward makeSticky(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @ResponseBody
+    @RequestMapping("/makeSticky")
+    public String makeSticky(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
-	commentService = getCommentService();
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long commentId = WebUtil.readLongParam(request, CommentConstants.ATTR_COMMENT_ID);
 	Boolean sticky = WebUtil.readBooleanParam(request, CommentConstants.ATTR_STICKY);
@@ -697,8 +652,7 @@ public class CommentAction extends Action {
 	responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -706,43 +660,7 @@ public class CommentAction extends Action {
      */
     private User getCurrentUser(HttpServletRequest request) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	return getUserService().getUserByLogin(user.getLogin());
-    }
-
-    private IUserManagementService getUserService() {
-	if (CommentAction.userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    CommentAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return CommentAction.userService;
-    }
-
-    private ICommentService getCommentService() {
-	if (CommentAction.commentService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    CommentAction.commentService = (ICommentService) ctx.getBean("commentService");
-	}
-	return CommentAction.commentService;
-    }
-
-    private ILamsCoreToolService getCoreToolService() {
-	if (CommentAction.coreToolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    CommentAction.coreToolService = (ILamsCoreToolService) ctx.getBean("lamsCoreToolService");
-	}
-	return CommentAction.coreToolService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (CommentAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    CommentAction.securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return CommentAction.securityService;
+	return userService.getUserByLogin(user.getLogin());
     }
 
 }

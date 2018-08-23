@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerController;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/pedagogicalPlanner")
 public class PedagogicalPlannerController {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
+    private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
     @Qualifier("wikiService")

@@ -1,8 +1,8 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateAction"%>
-<c:set var="maxOptionCount" value="<%= LdTemplateAction.MAX_OPTION_COUNT %>"/>
+<%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateController"%>
+<c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
 <%-- Generic Q&A question page. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options --%>
 
 <div class="panel panel-default">

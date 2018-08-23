@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.web.action;
+package org.lamsfoundation.lams.web.controller;
 
 import static org.imsglobal.lti.BasicLTIConstants.LTI_MESSAGE_TYPE;
 import static org.imsglobal.lti.BasicLTIConstants.LTI_VERSION;
@@ -18,10 +18,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionRedirect;
 import org.imsglobal.lti.BasicLTIConstants;
 import org.imsglobal.lti.BasicLTIUtil;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
@@ -32,7 +28,6 @@ import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -53,8 +48,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -66,26 +62,34 @@ import net.oauth.OAuth;
  *
  * @author Andrey Balan
  */
-public class LtiAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/lti")
+public class LtiController {
 
-    private static Logger log = Logger.getLogger(LtiAction.class);
-    private static IIntegrationService integrationService = null;
-    private static IMonitoringService monitoringService = null;
-    private static IUserManagementService userManagementService = null;
-    private static ILearningDesignService learningDesignService;
-    private static ILessonService lessonService = null;
-    private static IWorkspaceManagementService workspaceManagementService;
-    private static ISecurityService securityService;
+    private static Logger log = Logger.getLogger(LtiController.class);
+
+    @Autowired
+    private IIntegrationService integrationService;
+    @Autowired
+    private IMonitoringService monitoringService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    private ILearningDesignService learningDesignService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private IWorkspaceManagementService workspaceManagementService;
+    @Autowired
+    private ISecurityService securityService;
 
     /**
      * Single entry point to LAMS LTI processing mechanism. It determines here whether to show author or learnerMonitor
      * pages
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, RepositoryCheckedException,
-	    UserInfoFetchException, UserInfoValidationException {
-	initServices();
+    @RequestMapping("")
+    public String unspecified(HttpServletRequest request, HttpServletResponse respnse) throws IOException,
+	    UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String tcGradebookId = request.getParameter(BasicLTIConstants.LIS_RESULT_SOURCEDID);
@@ -117,12 +121,12 @@ public class LtiAction extends LamsDispatchAction {
 	    log.debug(errorMsg);
 	    request.setAttribute("error", errorMsg);
 	    request.setAttribute("javax.servlet.error.exception", new UserAccessDeniedException(errorMsg));
-	    return mapping.findForward("error");
+	    return "error";
 	}
 
 	//determine whether to show author or learnerMonitor pages
 	if (lesson == null) {
-	    return addLesson(mapping, form, request, response);
+	    return addLesson(request, respnse);
 
 	} else {
 
@@ -131,7 +135,7 @@ public class LtiAction extends LamsDispatchAction {
 	    extUserMap.setTcGradebookId(tcGradebookId);
 	    userManagementService.save(extUserMap);
 
-	    return learnerMonitor(mapping, form, request, response);
+	    return learnerMonitor(request, respnse);
 	}
 
     }
@@ -140,10 +144,9 @@ public class LtiAction extends LamsDispatchAction {
      * When teacher accesses link for the very first time, we show him addLesson page where he can choose learning
      * design and start a lesson.
      */
-    private ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, RepositoryCheckedException,
-	    UserInfoFetchException, UserInfoValidationException {
-	initServices();
+    @RequestMapping("/addLesson")
+    private String addLesson(HttpServletRequest request, HttpServletResponse response) throws IOException,
+	    UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
 	Integer userId = getUser().getUserID();
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
@@ -187,16 +190,15 @@ public class LtiAction extends LamsDispatchAction {
 	    request.setAttribute("data", request.getParameter("data"));
 	}
 
-	return mapping.findForward("addLesson");
+	return "lti/addLesson";
     }
 
     /**
      * Starts a lesson. Then prompts to learnerMonitor page or autosubmitForm (in case of ContentItemSelectionRequest).
      */
-    public ActionForward startLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, RepositoryCheckedException,
-	    UserInfoValidationException, UserInfoFetchException {
-	initServices();
+    @RequestMapping("/startLesson")
+    public String startLesson(HttpServletRequest request, HttpServletResponse response) throws IOException,
+	    UserAccessDeniedException, RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
 	Integer userId = getUser().getUserID();
 	User user = getRealUser(getUser());
 
@@ -223,9 +225,9 @@ public class LtiAction extends LamsDispatchAction {
 		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro, false, false, true,
 		true, false, false, true, null, null);
 	// 2. create lessonClass for lesson
-	List<User> staffList = new LinkedList<User>();
+	List<User> staffList = new LinkedList<>();
 	staffList.add(user);
-	List<User> learnerList = new LinkedList<User>();
+	List<User> learnerList = new LinkedList<>();
 	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
@@ -268,11 +270,11 @@ public class LtiAction extends LamsDispatchAction {
 	    //regular BasicLTI request
 	} else {
 	    //set roles to contain monitor so that the user can see monitor link
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learnerMonitorRedirect"));
-	    redirect.addParameter(LtiUtils.OAUTH_CONSUMER_KEY, consumerKey);
-	    redirect.addParameter(BasicLTIConstants.RESOURCE_LINK_ID, resourceLinkId);
-	    redirect.addParameter(BasicLTIConstants.CONTEXT_ID, contextId);
-	    return redirect;
+	    String redirectURL = "redirect:/lti/learnerMonitor.do";
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, LtiUtils.OAUTH_CONSUMER_KEY, consumerKey);
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.RESOURCE_LINK_ID, resourceLinkId);
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.CONTEXT_ID, contextId);
+	    return redirectURL;
 	}
     }
 
@@ -359,10 +361,9 @@ public class LtiAction extends LamsDispatchAction {
     /**
      * Once lesson was created, start showing learnerMonitor page to everybody regardless of his role.
      */
-    public ActionForward learnerMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, UserAccessDeniedException, RepositoryCheckedException,
-	    UserInfoValidationException, UserInfoFetchException {
-	initServices();
+    @RequestMapping("/learnerMonitor")
+    public String learnerMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException,
+	    UserAccessDeniedException, RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
 	Integer userId = getUser().getUserID();
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
@@ -401,7 +402,7 @@ public class LtiAction extends LamsDispatchAction {
 //	    learningDesignService.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_PNG);
 //	}
 
-	return mapping.findForward("learnerMonitor");
+	return "lti/learnerMonitor";
     }
 
     private UserDTO getUser() {
@@ -412,46 +413,4 @@ public class LtiAction extends LamsDispatchAction {
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
     }
-
-    private void initServices() {
-	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
-	}
-
-	if (monitoringService == null) {
-	    monitoringService = (IMonitoringService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("monitoringService");
-	}
-
-	if (userManagementService == null) {
-	    userManagementService = (IUserManagementService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext())
-		    .getBean("userManagementService");
-	}
-
-	if (learningDesignService == null) {
-	    learningDesignService = (ILearningDesignService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext())
-		    .getBean("learningDesignService");
-	}
-
-	if (lessonService == null) {
-	    lessonService = (ILessonService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("lessonService");
-	}
-
-	if (workspaceManagementService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    workspaceManagementService = (IWorkspaceManagementService) webContext.getBean("workspaceManagementService");
-	}
-
-	if (securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    securityService = (ISecurityService) webContext.getBean("securityService");
-	}
-    }
-
 }

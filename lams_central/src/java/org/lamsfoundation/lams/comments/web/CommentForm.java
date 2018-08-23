@@ -21,21 +21,21 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.comments.web;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.comments.Comment;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Comment Form.
  */
-public class CommentForm extends ValidatorForm {
+public class CommentForm {
     private static final long serialVersionUID = -9054365604649146734L;
     private static Logger logger = Logger.getLogger(CommentForm.class.getName());
 
@@ -48,22 +48,24 @@ public class CommentForm extends ValidatorForm {
 	comment = new Comment();
     }
 
+    @Autowired
+    MessageService messageservice;
+
     /**
      * MessageForm validation method from STRUCT interface.
      *
      */
-    @Override
-    public ActionErrors validate(ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
-	ActionErrors errors = new ActionErrors();
+    public MultiValueMap<String, String> validate(javax.servlet.http.HttpServletRequest request) {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
 	    if (StringUtils.isBlank(comment.getBody())) {
 		ActionMessage error = new ActionMessage("error.body.required");
-		errors.add("message.body", error);
+		errorMap.add("message.body", messageservice.getMessage("error.body.required"));
 	    }
 	} catch (Exception e) {
 	    CommentForm.logger.error("", e);
 	}
-	return errors;
+	return errorMap;
     }
 
     // -------------------------get/set methods----------------

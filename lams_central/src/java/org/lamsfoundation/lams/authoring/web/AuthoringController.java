@@ -41,9 +41,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
@@ -76,14 +73,18 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -94,17 +95,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Manpreet Minhas
  */
-public class AuthoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    private static IMonitoringService monitoringService;
-    private static IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
     private static ILamsToolService toolService;
+    @Autowired
+    @Qualifier("authoringService")
     private static IAuthoringService authoringService;
+    @Autowired
+    @Qualifier("learningDesignService")
     private static ILearningDesignService learningDesignService;
+    @Autowired
+    @Qualifier("securityService")
     private static ISecurityService securityService;
+    @Autowired
+    @Qualifier("integrationService")
     private static IIntegrationService integrationService;
+    @Autowired
+    WebApplicationContext applicationContext;
 
     private static int LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT = 7;
 
@@ -120,13 +137,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	return user != null ? user.getLocaleLanguage() : "";
     }
 
-    public ActionForward openAuthoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/openAuthoring")
+    public String openAuthoring(HttpServletRequest request) throws IOException {
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
 
-	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, true, request.getRemoteUser()));
+	request.setAttribute("tools", learningDesignService.getToolDTOs(true, true, request.getRemoteUser()));
 	// build list of existing learning library groups
-	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
+	List<LearningLibraryGroup> groups = learningDesignService.getLearningLibraryGroups();
 	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	for (LearningLibraryGroup group : groups) {
 	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
@@ -138,25 +155,26 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	request.setAttribute("learningLibraryGroups", groupsJSON.toString());
 
-	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(getUserId());
+	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(getUserId());
 	accessList = accessList.subList(0,
-		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
+		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	request.setAttribute("access", JsonUtil.toString(accessList));
-	request.setAttribute("licenses", getAuthoringService().getAvailableLicenses());
+	request.setAttribute("licenses", authoringService.getAvailableLicenses());
 
-	return mapping.findForward("openAutoring");
+	return "authoring/authoring";
     }
 
-    public ActionForward generateSVG(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, true, request.getRemoteUser()));
+    @RequestMapping("/generateSVG")
+    public String generateSVG(HttpServletRequest request) throws IOException {
+	request.setAttribute("tools", learningDesignService.getToolDTOs(true, true, request.getRemoteUser()));
 
-	return mapping.findForward("svgGenerator");
+	return "authoring/svgGenerator";
     }
 
-    public ActionForward getToolOutputDefinitions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
-	IAuthoringService authoringService = getAuthoringService();
+    @RequestMapping("/getToolOutputDefinitions")
+    @ResponseBody
+    public String getToolOutputDefinitions(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	Long toolContentID = WebUtil.readLongParam(request, "toolContentID");
 	Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION;
 
@@ -164,35 +182,36 @@ public class AuthoringAction extends LamsDispatchAction {
 		definitionType);
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(JsonUtil.toString(defnDTOList));
-	return null;
+	return JsonUtil.toString(defnDTOList);
     }
 
     @SuppressWarnings("unchecked")
-    public ActionForward openLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
+    @RequestMapping("/openLearningDesign")
+    @ResponseBody
+    public String openLearningDesign(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-	LearningDesignDTO learningDesignDTO = getLearningDesignService().getLearningDesignDTO(learningDesignID,
+	LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID,
 		getUserLanguage());
 
 	// some old LDs may not have learning library IDs filled in, try to find them
 	for (AuthoringActivityDTO activity : (List<AuthoringActivityDTO>) learningDesignDTO.getActivities()) {
 	    if (activity.getLearningLibraryID() == null) {
-		getLearningDesignService().fillLearningLibraryID(activity);
+		learningDesignService.fillLearningLibraryID(activity);
 	    }
 	}
 
 	Integer userId = getUserId();
 	if (learningDesignDTO.getWorkspaceFolderID() != null) {
-	    getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
+	    authoringService.storeLearningDesignAccess(learningDesignID, userId);
 	}
 
 	response.setContentType("application/json;charset=utf-8");
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	ObjectNode ldJSON = JsonUtil.readObject(learningDesignDTO);
 	// get all parent folders of the LD
-	List<Integer> folderPath = new LinkedList<Integer>();
-	WorkspaceFolder folder = (WorkspaceFolder) getUserManagementService().findById(WorkspaceFolder.class,
+	List<Integer> folderPath = new LinkedList<>();
+	WorkspaceFolder folder = (WorkspaceFolder) userManagementService.findById(WorkspaceFolder.class,
 		learningDesignDTO.getWorkspaceFolderID());
 	while (folder != null) {
 	    Integer folderID = folder.getWorkspaceFolderId();
@@ -209,18 +228,18 @@ public class AuthoringAction extends LamsDispatchAction {
 	ldJSON.set("folderPath", JsonUtil.readArray(folderPath));
 	responseJSON.set("ld", ldJSON);
 
-	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
+	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(userId);
 	accessList = accessList.subList(0,
-		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
+		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	responseJSON.set("access", JsonUtil.readArray(accessList));
 
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
-    public ActionForward finishLearningDesignEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
-	IAuthoringService authoringService = getAuthoringService();
+    @RequestMapping("/finishLearningDesignEdit")
+    @ResponseBody
+    public void finishLearningDesignEdit(HttpServletRequest request) throws ServletException, IOException {
 	Long learningDesignID = WebUtil.readLongParam(request, "learningDesignID", false);
 	boolean cancelled = WebUtil.readBooleanParam(request, "cancelled", false);
 
@@ -233,22 +252,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	    throw new IOException(e);
 	}
 
-	return null;
     }
 
     /**
      * Copy some existing content. Used when the user copies an activity in authoring. Expects one parameters -
      * toolContentId (the content to be copied)
      */
-    public ActionForward copyToolContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	IAuthoringService authoringService = getAuthoringService();
+    @RequestMapping("/copyToolContent")
+    @ResponseBody
+    public String copyToolContent(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	try {
 	    String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
 	    long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
 	    Long newToolContentID = authoringService.copyToolContent(toolContentID, customCSV);
 	    response.setContentType("text/plain;charset=utf-8");
-	    response.getWriter().write(newToolContentID.toString());
+	    return newToolContentID.toString();
 	} catch (Exception e) {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
@@ -259,9 +278,10 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Creates a copy of default tool content.
      */
-    public ActionForward createToolContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	IAuthoringService authoringService = getAuthoringService();
+    @RequestMapping("/createToolContent")
+    @ResponseBody
+    public String createToolContent(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
 	if (toolContentID == null) {
@@ -283,7 +303,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		responseJSON.put(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
 		responseJSON.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 		response.setContentType("application/json;charset=utf-8");
-		response.getWriter().write(responseJSON.toString());
+		return responseJSON.toString();
 	    }
 	}
 	return null;
@@ -292,10 +312,11 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Creates a LD with the given activity and starts a lesson with default class and settings.
      */
+    @ResponseBody
+    @RequestMapping("/createSingleActivityLesson")
     @SuppressWarnings("unchecked")
-    public ActionForward createSingleActivityLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IAuthoringService authoringService = getAuthoringService();
+    public String createSingleActivityLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID, true);
@@ -305,59 +326,59 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // if organisation ID is not set explicitly, derived it from external course
 	    String serverID = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
 	    String courseID = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
-	    ExtServer extServer = getIntegrationService().getExtServer(serverID);
-	    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(extServer.getSid(), courseID);
+	    ExtServer extServer = integrationService.getExtServer(serverID);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), courseID);
 	    organisationID = orgMap.getOrganisation().getOrganisationId();
 	}
 	Integer userID = getUserId();
 
-	if (!getSecurityService().isGroupMonitor(organisationID, userID, "create single activity lesson", false)) {
+	if (!securityService.isGroupMonitor(organisationID, userID, "create single activity lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
 
 	// get title from tool content
-	IToolVO tool = getToolService().getToolByID(toolID);
+	IToolVO tool = toolService.getToolByID(toolID);
 	if (learningLibraryID == null) {
 	    // if learning library ID is not set explicitly, derive it from tool
 	    learningLibraryID = tool.getLearningLibraryId();
 	}
 	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
+		.getRequiredWebApplicationContext(applicationContext.getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
 	if (title == null || title.trim().length() == 0) {
-	    title = getLearningDesignService().internationaliseActivityTitle(learningLibraryID);
+	    title = learningDesignService.internationaliseActivityTitle(learningLibraryID);
 	}
 	// create the LD and put it in Run Sequences folder in the given organisation
 	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
 		learningLibraryID, contentFolderID, organisationID);
 	if (learningDesignID != null) {
-	    User user = (User) getUserManagementService().findById(User.class, userID);
-	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
-		    null, false, false, false, false, true, true, false, false, true, null, null);
-	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
+	    User user = (User) userManagementService.findById(User.class, userID);
+	    Lesson lesson = monitoringService.initializeLessonWithoutLDcopy(title, "", learningDesignID, user, null,
+		    false, false, false, false, true, true, false, false, true, null, null);
+	    Organisation organisation = monitoringService.getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<>();
 	    staffList.add(user);
 
 	    // add organisation's learners as lesson participants
 	    List<User> learnerList = new LinkedList<>();
-	    Vector<User> learnerVector = getUserManagementService().getUsersFromOrganisationByRole(organisationID,
+	    Vector<User> learnerVector = userManagementService.getUsersFromOrganisationByRole(organisationID,
 		    Role.LEARNER, true);
 	    learnerList.addAll(learnerVector);
-	    getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
+	    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		    organisation.getName() + " learners", learnerList, organisation.getName() + " staff", staffList,
 		    userID);
 
-	    getMonitoringService().startLesson(lesson.getLessonId(), userID);
+	    monitoringService.startLesson(lesson.getLessonId(), userID);
 
-	    if (AuthoringAction.log.isDebugEnabled()) {
-		AuthoringAction.log.debug("Created a single activity lesson with ID: " + lesson.getLessonId());
+	    if (AuthoringController.log.isDebugEnabled()) {
+		AuthoringController.log.debug("Created a single activity lesson with ID: " + lesson.getLessonId());
 	    }
 
 	    response.setContentType("text/plain;charset=utf-8");
-	    response.getWriter().write(learningDesignID.toString());
+	    return learningDesignID.toString();
 	}
 
 	return null;
@@ -366,12 +387,13 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Stores Learning Desing created in Authoring.
      */
-    public ActionForward saveLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @ResponseBody
+    @RequestMapping(path = "/saveLearningDesign", method = RequestMethod.POST)
+    public String saveLearningDesign(HttpServletRequest request, HttpServletResponse response)
 	    throws UserException, WorkspaceFolderException, IOException, ObjectExtractorException, ParseException {
 	ObjectNode ldJSON = JsonUtil.readObject(request.getParameter("ld"));
 
-	LearningDesign learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
+	LearningDesign learningDesign = authoringService.saveLearningDesignDetails(ldJSON);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	if (learningDesign != null) {
@@ -379,31 +401,29 @@ public class AuthoringAction extends LamsDispatchAction {
 	    if (learningDesignID != null) {
 		responseJSON.put("learningDesignID", learningDesignID);
 
-		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService()
-			.validateLearningDesign(learningDesignID);
+		Vector<ValidationErrorDTO> validationDTOs = authoringService.validateLearningDesign(learningDesignID);
 		responseJSON.set("validation", JsonUtil.readArray(validationDTOs));
 	    }
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
     /**
      * Gets a list of recently used Learning Designs for currently logged in user.
      */
-    public ActionForward getLearningDesignAccess(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @ResponseBody
+    @RequestMapping("/")
+    public String getLearningDesignAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userId = getUserId();
 
-	List<LearningDesignAccess> accessList = getAuthoringService().updateLearningDesignAccessByUser(userId);
+	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(userId);
 	accessList = accessList.subList(0,
-		Math.min(accessList.size(), AuthoringAction.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
+		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(JsonUtil.toString(accessList));
-	return null;
+	return JsonUtil.toString(accessList);
     }
 
     /**
@@ -411,15 +431,15 @@ public class AuthoringAction extends LamsDispatchAction {
      *
      * @throws IOException
      */
-    public ActionForward saveLearningDesignImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @ResponseBody
+    @RequestMapping(path = "/saveLearningDesignImage", method = RequestMethod.POST)
+    public void saveLearningDesignImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	String image = request.getParameter("image");
-	boolean saveSuccesful = AuthoringAction.saveLearningDesignImage(learningDesignID, image);
+	boolean saveSuccesful = AuthoringController.saveLearningDesignImage(learningDesignID, image);
 	if (!saveSuccesful) {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
-	return null;
     }
 
     /**
@@ -427,11 +447,12 @@ public class AuthoringAction extends LamsDispatchAction {
      * It is run when SVG gets recreated in Monitoring or Add Lesson dialog
      * and activities need to be rearranged as one of them is a branching designed in the old Flash Authoring.
      */
-    public ActionForward saveActivityCoordinates(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @ResponseBody
+    @RequestMapping(path = "/saveActivityCoordinates", method = RequestMethod.POST)
+    public void saveActivityCoordinates(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
 	    ObjectNode activityJSON = JsonUtil.readObject(request.getParameter("activity"));
-	    Activity activity = getMonitoringService().getActivityById(JsonUtil.optLong(activityJSON, "activityID"));
+	    Activity activity = monitoringService.getActivityById(JsonUtil.optLong(activityJSON, "activityID"));
 	    activity.setXcoord(JsonUtil.optInt(activityJSON, "xCoord"));
 	    activity.setYcoord(JsonUtil.optInt(activityJSON, "yCoord"));
 	    if (activity.isBranchingActivity()) {
@@ -441,12 +462,11 @@ public class AuthoringAction extends LamsDispatchAction {
 		branchingActivity.setStartYcoord(JsonUtil.optInt(activityJSON, "startYCoord"));
 		branchingActivity.setEndYcoord(JsonUtil.optInt(activityJSON, "endYCoord"));
 	    }
-	    getUserManagementService().save(activity);
+	    userManagementService.save(activity);
 	} catch (Exception e) {
 	    log.error("Exception while saving activity coordinates", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
-	return null;
     }
 
     /**
@@ -454,7 +474,7 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     private static boolean saveLearningDesignImage(long learningDesignID, String image) {
 	if (StringUtils.isBlank(image)) {
-	    AuthoringAction.log.error("No SVG code to save for LD: " + learningDesignID);
+	    AuthoringController.log.error("No SVG code to save for LD: " + learningDesignID);
 	    return false;
 	}
 
@@ -478,74 +498,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // encoding is important, especially for Raphael-generated SVGs
 	    writer.write(image);
 	} catch (IOException e) {
-	    AuthoringAction.log.error("Error while writing SVG thumbnail of LD " + learningDesignID + ".", e);
+	    AuthoringController.log.error("Error while writing SVG thumbnail of LD " + learningDesignID + ".", e);
 	    return false;
 	}
 	return true;
     }
 
-    private IMonitoringService getMonitoringService() {
-	if (AuthoringAction.monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-	return AuthoringAction.monitoringService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (AuthoringAction.userManagementService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.userManagementService = (IUserManagementService) wac
-		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
-	}
-	return AuthoringAction.userManagementService;
-    }
-
-    public IAuthoringService getAuthoringService() {
-	if (AuthoringAction.authoringService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.authoringService = (IAuthoringService) wac
-		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
-	}
-	return AuthoringAction.authoringService;
-    }
-
-    public ILamsToolService getToolService() {
-	if (AuthoringAction.toolService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.toolService = (ILamsToolService) wac.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
-	}
-	return AuthoringAction.toolService;
-    }
-
-    private ILearningDesignService getLearningDesignService() {
-	if (AuthoringAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
-	}
-	return AuthoringAction.learningDesignService;
-    }
-
-    private IIntegrationService getIntegrationService() {
-	if (AuthoringAction.integrationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.integrationService = (IIntegrationService) ctx.getBean("integrationService");
-	}
-	return AuthoringAction.integrationService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (AuthoringAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return AuthoringAction.securityService;
-    }
 }

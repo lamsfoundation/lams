@@ -20,55 +20,55 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.web.action;
+package org.lamsfoundation.lams.web.controller;
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Edit lesson intro page.
  */
-public class EditLessonIntroAction extends DispatchAction {
+@Controller
+@RequestMapping("/editLessonIntro")
+public class EditLessonIntroController {
 
-    private static ILessonService lessonService;
+    @Autowired
+    private ILessonService lessonService;
 
     /**
      * Edit lesson intro page.
      */
-    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
-	    throws IOException, ServletException {
+    @RequestMapping("/edit")
+    public String edit(HttpServletRequest req) throws IOException, ServletException {
 
 	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	req.setAttribute("lesson", lesson);
 	req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
 	req.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, lesson.getLearningDesign().getContentFolderID());
 
-	return mapping.findForward("editLessonIntro");
+	return "editLessonIntro";
     }
 
     /**
      * Save lesson intro page.
      */
-    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
-	    throws IOException, ServletException {
+    @RequestMapping(path = "/save", method = RequestMethod.POST)
+    public String save(HttpServletRequest req) throws IOException, ServletException {
 
 	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	String lessonName = WebUtil.readStrParam(req, "lessonName");
 	String lessonDescription = WebUtil.readStrParam(req, "lessonDescription");
 	boolean displayDesignImage = WebUtil.readBooleanParam(req, "displayDesignImage", false);
@@ -77,17 +77,8 @@ public class EditLessonIntroAction extends DispatchAction {
 	lesson.setLessonName(lessonName);
 	lesson.setLessonDescription(lessonDescription);
 	lesson.setDisplayDesignImage(displayDesignImage);
-	getLessonService().saveLesson(lesson);
+	lessonService.saveLesson(lesson);
 
 	return null;
-    }
-
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return lessonService;
     }
 }

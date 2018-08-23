@@ -21,17 +21,15 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.web.action;
+package org.lamsfoundation.lams.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -42,32 +40,37 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 /**
  * @author Andrey Balan
  */
-public class TwoFactorAuthenticationAction extends Action {
+@Controller
+public class TwoFactorAuthenticationController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    WebApplicationContext applicationContext;
+
+    @RequestMapping("/twoFactorAuthentication")
+    public String execute(HttpServletRequest request) throws Exception {
 
 	WebApplicationContext ctx = WebApplicationContextUtils
-		.getWebApplicationContext(getServlet().getServletContext());
+		.getWebApplicationContext(applicationContext.getServletContext());
 	UserManagementService userManagementService = (UserManagementService) ctx.getBean("userManagementService");
-	
+
 	// check if user needs to get his shared two-factor authorization secret
 	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
-	if (loggedInUser.isTwoFactorAuthenticationEnabled() && loggedInUser.getTwoFactorAuthenticationSecret() == null) {
-	    
+	if (loggedInUser.isTwoFactorAuthenticationEnabled()
+		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
+
 	    GoogleAuthenticator gAuth = new GoogleAuthenticator();
 	    final GoogleAuthenticatorKey key = gAuth.createCredentials();
 	    String sharedSecret = key.getKey();
-	    
+
 	    loggedInUser.setTwoFactorAuthenticationSecret(sharedSecret);
 	    userManagementService.saveUser(loggedInUser);
-	    
+
 	    request.setAttribute("sharedSecret", sharedSecret);
-	    String QRCode = GoogleAuthenticatorQRGenerator.getOtpAuthURL(null, "LAMS account: " + loggedInUser.getLogin(), key);
+	    String QRCode = GoogleAuthenticatorQRGenerator.getOtpAuthURL(null,
+		    "LAMS account: " + loggedInUser.getLogin(), key);
 	    request.setAttribute("QRCode", QRCode);
 	}
 
-	return mapping.findForward("secret");
+	return "twoFactorAuthSecret";
     }
 }

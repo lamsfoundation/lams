@@ -20,15 +20,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web.planner;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Form for grouping activities in Pedagogical Planner.
@@ -36,12 +37,15 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
  * @author Marcin Cieslak
  *
  */
-public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityForm {
+public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivitySpringForm {
     private Integer groupingTypeId;
     private String numberOfGroups;
     private String learnersPerGroup;
     private Boolean equalGroupSizes;
     private Boolean viewStudentsBeforeSelection;
+
+    @Autowired
+    MessageService messageService;
 
     public Integer getGroupingTypeId() {
 	return groupingTypeId;
@@ -100,9 +104,9 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
     /**
      * Checks if the provided group/learner number is a nonnegative integer.
      */
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+
+    public MultiValueMap<String, String> validate() {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean valid = true;
 	boolean numberValid = true;
 
@@ -116,11 +120,11 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
 	    numberValid = false;
 	}
 	if (!numberValid) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.planner.grouping.number.integer"));
+	    errorMap.add("Global", messageService.getMessage("error.planner.grouping.number.integer"));
 	    valid = false;
 	}
 	setValid(valid);
-	return errors;
+	return errorMap;
     }
 
     public String getLearnersPerGroup() {
