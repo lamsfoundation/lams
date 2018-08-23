@@ -547,7 +547,7 @@ function showKumaliveRubricsDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getRubrics&organisationID=' + orgID);
+			$('iframe', this).attr('src', LAMS_URL	+ 'learning/kumalive/getRubrics.do?organisationID=' + orgID);
 		}
 	}, false);
 }
@@ -564,7 +564,7 @@ function showKumaliveReportDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getReport&organisationID=' + orgID);
+			$('iframe', this).attr('src', LAMS_URL	+ 'learning/kumalive/getReport.do?organisationID=' + orgID);
 		}
 	}, false);
 }

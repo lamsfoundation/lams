@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.controller.DisplayActivityController;
@@ -248,9 +247,6 @@ public class ActivityMapping implements Serializable {
      * Takes a Struts forward containing the path such as /DisplayRequest.do and turns it into a full URL including
      * servername
      */
-    protected String strutsForwardToURL(ActionForward forward) {
-	return Configuration.get(ConfigurationKeys.SERVER_URL) + ActivityMapping.LEARNING + forward.getPath();
-    }
 
     /**
      * Calculate the activity url for progress view at learner side.
