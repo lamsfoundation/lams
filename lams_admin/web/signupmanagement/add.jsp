@@ -23,7 +23,7 @@
 			<a href="../signupManagement/start.do" class="btn btn-default loffset5"><fmt:message key="admin.signup.title" /></a>
 			</div>
 			
-			<form:form action="../signupManagement/add.do" modelAttribute="signupForm" id="signupForm" method="post">
+			<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
 				<input type="hidden" name="signupOrganisationId" />
 				
 				<table class="table table-condensed table-no-border">
@@ -55,10 +55,10 @@
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.course.key" />:</td>
-						<td><input type="text" name="courseKey" size="40" maxlength="255"  class="form-control"/></td>
+						<td><form:input path="courseKey" size="40" maxlength="255" cssClass="form-control"/></td>
 					<tr>
 						<td><fmt:message key="admin.confirm.course.key" />:</td>
-						<td><input type="text" name="confirmCourseKey" size="40" maxlength="255"  class="form-control"/></td>
+						<td><form:input path="confirmCourseKey" size="40" maxlength="255" cssClass="form-control"/></td>
 						<td></td>
 					</tr>
 					<tr>
@@ -93,7 +93,7 @@
 				</table>
 				
 				<div class="pull-right">
-					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+					<a href="../signupManagement/start.do" class="btn btn-default loffset5"><fmt:message key="admin.cancel" /></a>
 					<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</div>
 			

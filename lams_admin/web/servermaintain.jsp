@@ -59,7 +59,7 @@
 	<c:set var="help"><fmt:message key="Integrations"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
-				<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+				<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 				<form:errors path="*" />
 				
@@ -102,7 +102,7 @@
 					</tr>
 					<tr id="ttl-login-request-wrap" <c:if test="${!extServerForm.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
 						<td><fmt:message key="sysadmin.login.request.ttl" /></td>
-						<td><input type="text" name="timeToLiveLoginRequest" size="10" id="ttl-login-request" class="form-control"/></td>
+						<td><form:input path="timeToLiveLoginRequest" size="10" id="ttl-login-request" cssClass="form-control"/></td>
 					</tr>
 				
 					<tr>
@@ -120,7 +120,7 @@
 				</table>
 				<div class="pull-right">
 					<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/serverlist.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 					<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</div>
 				</form:form>

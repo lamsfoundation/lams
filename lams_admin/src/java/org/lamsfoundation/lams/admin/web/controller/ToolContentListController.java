@@ -201,18 +201,17 @@ public class ToolContentListController {
     }
 
     @RequestMapping("/disableLibrary")
-    private void disableLibrary(HttpServletRequest request) {
+    public void disableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, false);
     }
 
     @RequestMapping("/enableLibrary")
-    private void enableLibrary(HttpServletRequest request) {
+    public void enableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, true);
-
     }
 
     /**

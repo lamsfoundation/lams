@@ -10,7 +10,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
 import org.lamsfoundation.lams.admin.web.form.LtiConsumerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -126,15 +125,10 @@ public class LtiConsumerManagementController {
      * Stores in the DB a new or edited LTI tool consumer
      */
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public String save(@ModelAttribute ExtServerForm extServerForm, Errors errors, HttpServletRequest request,
+    public String save(@ModelAttribute LtiConsumerForm ltiConsumerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	initServices();
-
-	if (request.getAttribute("CANCEL") != null) {
-	    //show LTI consumer list page
-	    return unspecified(request);
-	}
 
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
 	for (String requiredField : requiredFields) {
@@ -143,7 +137,7 @@ public class LtiConsumerManagementController {
 	    }
 	}
 
-	Integer sid = extServerForm.getSid();
+	Integer sid = ltiConsumerForm.getSid();
 	//check duplication
 	if (!errors.hasErrors()) {
 	    String[] uniqueFields = { "serverid", "prefix" };
@@ -167,13 +161,13 @@ public class LtiConsumerManagementController {
 	    ExtServer ltiConsumer = null;
 	    if (sid.equals(0)) {
 		ltiConsumer = new ExtServer();
-		BeanUtils.copyProperties(ltiConsumer, extServerForm);
+		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
 		ltiConsumer.setSid(null);
 		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
 		ltiConsumer.setUserinfoUrl("blank");
 	    } else {
 		ltiConsumer = integrationService.getExtServer(sid);
-		BeanUtils.copyProperties(ltiConsumer, extServerForm);
+		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
 	    }
 	    integrationService.saveExtServer(ltiConsumer);
 	    return unspecified(request);

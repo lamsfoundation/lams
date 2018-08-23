@@ -313,7 +313,7 @@ public class UserController {
 	return "remove";
     }
 
-    @RequestMapping(path = "/disable", method = RequestMethod.POST)
+    @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -335,10 +335,10 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "forward:/usersearch.do";
+	    return "redirect:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "forward:/usermanage.do";
+	    return "redirect:../usermanage.do";
 	}
     }
 
@@ -370,15 +370,15 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "forward:/usersearch.do";
+	    return "redirect:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "forward:/usermanage.do";
+	    return "redirect:../usermanage.do";
 	}
     }
 
     // called from disabled users screen
-    @RequestMapping(path = "/enable", method = RequestMethod.POST)
+    @RequestMapping(path = "/enable")
     public String enable(HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -396,7 +396,7 @@ public class UserController {
 	user.setDisabledFlag(false);
 	service.saveUser(user);
 
-	return "forward:/disabledmanage.do";
+	return "redirect:../disabledmanage.do";
     }
 
 }

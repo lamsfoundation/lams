@@ -66,28 +66,33 @@
 	<c:if test="${not empty results}">
 		<h4><fmt:message key="heading.import.results"/></h4>
 		<table cellspacing="5" cellpadding="5">
-			<tr><th width="115" align="right"><fmt:message key="table.heading.organisation.id"/></th><th><fmt:message key="admin.organisation.name"/></th></tr>
+			<tr>
+				<th width="115" align="right"><fmt:message key="table.heading.organisation.id"/></th>
+				<th><fmt:message key="admin.organisation.name"/></th>
+			</tr>
 			<c:set var="results" value="${results}" />
 			<c:forEach var="i" begin="0" step="1" end="${results.size()}">
 				<tr>
 				<c:set var="rowResult" value="${i}"/>
-				<c:when test="${rowResult != null || rowResult >= 4}">
-					<c:if test="${courseTypeId == 3}">
-						<th> <c:out value="0" /> </th>
-						<th> <c:out value="1" /> </th>
-					</c:if>
-					<c:if test="${classTypeId == 3}">
-						<td> <c:out value="0" /> </td>
-						<td> <c:out value="1" /> </td>
-					</c:if>
-				</c:when>
-				<c:otherwise>
-					<td colspan="2">
-					<c:forEach var="j" begin="0" step="1" end="${results.size()}">
-						<c:out value="${j}"/> <br />
-					</c:forEach>
-					</td>
-				</c:otherwise>
+				<c:choose>
+					<c:when test="${(rowResult != null) && (rowResult >= 4)}">
+						<c:if test="${courseTypeId == 3}">
+							<th> <c:out value="${rowResult.orgId}" /> </th>
+							<th> <c:out value="${rowResult.name}" /> </th>
+						</c:if>
+						<c:if test="${classTypeId == 3}">
+							<td> <c:out value="${rowResult.orgId}" /> </td>
+							<td> <c:out value="${rowResult.name}" /> </td>
+						</c:if>
+					</c:when>
+					<c:otherwise>
+						<td colspan="2">
+						<c:forEach var="j" begin="0" step="1" end="${results.size()}">
+							<c:out value="${j}"/> <br />
+						</c:forEach>
+						</td>
+					</c:otherwise>
+				</c:choose>
 				</tr>
 			</c:forEach>
 		</table>
@@ -118,7 +123,7 @@
 			<lams:WaitingSpinner id="fileUpload_Busy"/> 
 		
 		<div class="pull-right">
-		<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+		<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 		<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import"/>" /> &nbsp; 	
 		</div>
 	

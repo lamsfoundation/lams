@@ -145,6 +145,7 @@ public class LdapConfigController {
 
 	HttpSession ss = SessionManager.getSession();
 	Object o = ss.getAttribute(ILdapService.SYNC_RESULTS);
+	request.setAttribute("syncResults", o);
 	if (o instanceof BulkUpdateResultDTO) {
 	    BulkUpdateResultDTO dto = (BulkUpdateResultDTO) o;
 

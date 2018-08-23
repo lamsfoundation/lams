@@ -19,10 +19,10 @@
 	
 	<script language="javascript" type="text/JavaScript">
 	<c:if test="${syncResult != null}">
-		document.location = '../ldap/results.do';
+		document.location = '/ldap/results.do';
 	</c:if>
 	function startSync(){
-		document.location='ldap/sync.do';
+		document.location='/ldap/sync.do';
 	}
 </script>
 	

@@ -37,8 +37,6 @@ import org.lamsfoundation.lams.admin.web.dto.UserBean;
  */
 
 /**
- * struts doclet
- *
  *
  */
 public class UserOrgRoleForm {

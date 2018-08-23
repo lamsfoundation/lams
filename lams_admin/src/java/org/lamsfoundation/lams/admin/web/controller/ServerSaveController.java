@@ -65,10 +65,6 @@ public class ServerSaveController {
     public String execute(@ModelAttribute ExtServerForm extServerForm, Errors errors, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/serverlist.do";
-	}
-
 	service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	userService = AdminServiceProxy.getService(applicationContext.getServletContext());
 	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());

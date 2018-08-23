@@ -65,13 +65,14 @@
 					return;
 				}
 			</c:forEach>
-			submitForm();
+			submitForm('addOrEditTheme');
 		}
 
 		function submitForm(methodName) {
-			var f = document.getElementById("themeForm").submit();
+			var f = document.getElementById("themeForm") += methodName + ".do";
 			f.submit();
 		}
+		
 	</script>
 </lams:head>
     

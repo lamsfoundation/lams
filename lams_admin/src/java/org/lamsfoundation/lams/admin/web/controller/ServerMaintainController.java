@@ -54,10 +54,6 @@ public class ServerMaintainController {
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
 	
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/serverlist.do";
-	}
-	
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
 	    ExtServer map = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext())

@@ -38,7 +38,7 @@
 <body class="stripes">
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-		<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="timezoneForm">
 		
 			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 			<fmt:message key="admin.timezone.select.timezones.you.want.users.choose" >
@@ -72,7 +72,7 @@
 					<c:forEach items="${timezoneDtos}" var="timezoneDto">
 						<tr>
 							<td align="center">
-								<form:checkbox cssClass="timezoneCheckBox" path="selected" value="${timezoneDto.timeZoneId}"/>
+								<input type="checkbox" class="timezoneCheckBox" name="selected" ${timezoneDto.selected ? 'checked="checked"' : ''} value="${timezoneDto.timeZoneId}"/>
 							</td>
 							<td>
 								${timezoneDto.timeZoneId}

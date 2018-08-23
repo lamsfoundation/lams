@@ -157,8 +157,8 @@
 	<lams:Page type="admin" title="${title}" formID="userForm">
 	
 				<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
-				<form:hidden path="userId" />
-				<form:hidden path="orgId" />
+				<input type="hidden" name="userId" />
+				<input type="hidden" name="orgId" />
 			
 				<c:if test="${not empty userForm.orgId}">
 					<a href="../orgmanage.do?org=1" class="btn btn-default">
@@ -466,12 +466,11 @@
 					<div class="col-md-12">
 						<c:if test="${not empty userForm.userId}">
 							<div class="pull-left">
-							<a href="userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+							<a href="../usersave/changePass.do?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
 							</div>
 						</c:if>
 						<div class="pull-right">
-							<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel" />" 
-									formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-default"/>
+							<input type="button" name="CANCEL" class="btn btn-default" value="<fmt:message key="admin.cancel" />" />
 							<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
 					</div>

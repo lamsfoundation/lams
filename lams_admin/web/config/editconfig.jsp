@@ -3,7 +3,6 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem"%>
-<c:set var="BOOLEAN"><%= ConfigurationItem.BOOLEAN_FORMAT %></c:set>
 
 <lams:html>
 <lams:head>
@@ -48,11 +47,12 @@
 								</td>
 								<td>
 									<input type="hidden" name="key" value="${row.key}"/>
+									<c:set var="BOOLEAN"><c:out value="<%= ConfigurationItem.BOOLEAN_FORMAT %>" /></c:set>
 									<c:choose>
 									<c:when test="${row.format==BOOLEAN}">
-										<select name="value" id="AllowDirectAccessIntgrtnLrnr" class="form-control form-control-sm">
-											<option value="true">true</option>
-											<option value="false" selected="selected">false&nbsp;&nbsp;</option>
+										<select name="value" class="form-control form-control-sm">
+											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
+											<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
 										</select>
 									</c:when>
 									<c:otherwise>

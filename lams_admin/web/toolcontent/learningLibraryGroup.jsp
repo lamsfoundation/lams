@@ -34,31 +34,31 @@
 </lams:head>
 <body>
 
-<div id="titleDiv">
-	<fmt:message key="tool.groups.dialog.instructions" />
-</div>
-
-<table id="groupsTable">
-	<tr>
-		<td id="learningLibraryCell">
-			<div class="learningLibraryContainer"></div>
-		</td>
-		<td id="groupsCell">
-			<div id="newGroupPlaceholder" class="groupContainer">
-				<div><fmt:message key="tool.groups.add.group.button" /></div>
-			</div>
-		</td>
-	</tr>
-</table>
-
-<!-- A template which gets cloned when a group is added -->
-<div id="groupTemplate" class="groupContainer">
-	<div class="learningLibraryContainerTitle">
-		<i class="removeGroupButton fa fa-times" src="<lams:LAMSURL/>images/css/delete.png"
-			 title="<fmt:message key='tool.groups.remove.group.button.tooltip' />"></i>
-		<input type="text" />
+	<div id="titleDiv">
+		<fmt:message key="tool.groups.dialog.instructions" />
 	</div>
-	<div class="learningLibraryContainer"></div>
-</div>
+	
+	<table id="groupsTable">
+		<tr>
+			<td id="learningLibraryCell">
+				<div class="learningLibraryContainer"></div>
+			</td>
+			<td id="groupsCell">
+				<div id="newGroupPlaceholder" class="groupContainer">
+					<div><fmt:message key="tool.groups.add.group.button" /></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	
+	<!-- A template which gets cloned when a group is added -->
+	<div id="groupTemplate" class="groupContainer">
+		<div class="learningLibraryContainerTitle">
+			<i class="removeGroupButton fa fa-times" src="<lams:LAMSURL/>images/css/delete.png"
+				 title="<fmt:message key='tool.groups.remove.group.button.tooltip' />"></i>
+			<input type="text" />
+		</div>
+		<div class="learningLibraryContainer"></div>
+	</div>
 </body>
 </lams:html>

@@ -158,7 +158,6 @@
 						<div class="checkbox">
 							<label for="enable-live-edit">
 							<form:checkbox path="enableLiveEdit" id="enable-live-edit"/>
-							<!-- to overcome nasty DynaActionForm bug (http://www.coderanch.com/t/46408/Struts/DynaValidatorActionForm-checkboxes) -->
 							<input type="hidden" name="enableLiveEdit" value="false">
 								<fmt:message key="config.live.edit"/>
 							</label>

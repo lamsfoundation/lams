@@ -24,7 +24,7 @@
 				'height'   : 700,
 				'title'	   : '<fmt:message key="tool.groups.dialog.title" />',
 				'open' 	   : function(){
-					$('#toolGroupsFrame', this).attr('src', '../toolcontentlist/openLearningLibraryGroups.do');
+					$('#toolGroupsFrame', this).attr('src', './openLearningLibraryGroups.do');
 				},
 				'beforeClose'	   : function(){
 					$('#toolGroupsFrame', this).attr('src', null);
@@ -109,15 +109,16 @@
 							<td>
 								<c:choose>
 									<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
-										[<a id="disable${dto.activityTitle}" href="<c:url value='../toolcontentlist/disableLibrary.do?libraryID=${dto.learningLibraryID}' />"><fmt:message key="admin.disable" /></a>] 
+										[<a id="disable${dto.activityTitle}" href="../toolcontentlist/disableLibrary.do?libraryID=${dto.learningLibraryID}" ><fmt:message key="admin.disable" /></a>] 
 									</c:when>
 									<c:otherwise>
-										[<a id="enable${dto.activityTitle}" href="<c:url value='../toolcontentlist/enableLibrary.do?libraryID=${dto.learningLibraryID}'/>"><fmt:message key="admin.enable" /></a>]
+										[<a id="enable${dto.activityTitle}" href="../toolcontentlist/enableLibrary.do?libraryID=${dto.learningLibraryID}" ><fmt:message key="admin.enable" /></a>]
+										
 									</c:otherwise>
 								</c:choose>
 								<c:if test="${not empty dto.toolContentID}">
 									<c:set var="editDefaultContentUrl">
-										<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1"
+										<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=${dto.toolContentID}&contentFolderID=-1"
 									</c:set>
 									[<a id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>]
 									<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">

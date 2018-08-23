@@ -59,10 +59,6 @@ public class ImportGroupsController {
     @RequestMapping(path = "/importgroups")
     public String execute(@ModelAttribute("importForm") ImportExcelForm importForm, HttpServletRequest request) throws Exception {
 
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
-	}
-
 	IImportService importService = AdminServiceProxy.getImportService(applicationContext.getServletContext());
 	importForm.setOrgId(0);
 	MultipartFile file = importForm.getFile();

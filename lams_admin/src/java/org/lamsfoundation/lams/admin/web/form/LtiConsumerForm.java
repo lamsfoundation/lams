@@ -43,6 +43,10 @@ public class LtiConsumerForm {
     private boolean timeToLiveLoginRequestEnabled = false;
 
     private String ltiToolConsumerMonitorRoles;
+    
+    private String[] requiredFields;
+
+    private String[] uniqueFields;
 
     public Integer getSid() {
 	return sid;
@@ -124,4 +128,19 @@ public class LtiConsumerForm {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
     }
 
+    public String[] getRequiredFields() {
+        return requiredFields;
+    }
+
+    public void setRequiredFields(String[] requiredFields) {
+        this.requiredFields = requiredFields;
+    }
+
+    public String[] getUniqueFields() {
+        return uniqueFields;
+    }
+
+    public void setUniqueFields(String[] uniqueFields) {
+        this.uniqueFields = uniqueFields;
+    }
 }

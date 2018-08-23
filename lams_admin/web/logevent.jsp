@@ -96,7 +96,7 @@
 			        cssPageDisplay: '.pagedisplay',
 			        cssPageSize: '.pagesize',
 			        cssDisabled: 'disabled',
-					ajaxUrl : "<c:url value='logevent/getEventLog.do?sessionMapID=${sessionMapID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&s",
+					ajaxUrl : "<c:url value='../logevent/getEventLog.do?sessionMapID=${sessionMapID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&s'/>",
 					ajaxProcessing: function (data, table) {
 				    	if (data && data.hasOwnProperty('rows')) {
 				    		var rows = [],

@@ -48,9 +48,9 @@ public class ExtServerForm {
 
     private Integer timeToLiveLoginRequest = 80;
 
-    private String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
+    private String[] requiredFields;
 
-    private String[] uniqueFields = { "serverid", "prefix" };
+    private String[] uniqueFields;
 
     public Integer getSid() {
 	return sid;

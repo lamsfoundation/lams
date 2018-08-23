@@ -40,7 +40,7 @@
 	<c:if test="${not empty filesDeleted}">
 		<p><c:out value="${filesDeleted}" /></p>
 	</c:if>
-		<input class="btn btn-default" type="submit" value="Calculate" onClick="javascript:document.location='cleanup/refresh.do'" />
+		<input class="btn btn-default" type="submit" value="Calculate" onClick="javascript:document.location='../cleanup/refresh.do'" />
 		<span class="loffset10"><c:out value="<%= FileUtil.getTempDir() %>" /></span>
 		
 		<ul class="list-group voffset5">
@@ -60,7 +60,7 @@
 		<form:input type="text" path="numDays" maxlength="4" size="4" cssClass="form-control form-control-inline" /></p>
 		
 		<div class="pull-right">
-			<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel" /></a>
 			<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.delete"/>" />
 		</div>
 		

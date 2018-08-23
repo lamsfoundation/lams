@@ -63,10 +63,6 @@ public class ImportExcelSaveController {
     public String execute(@ModelAttribute ImportExcelForm importExcelForm, HttpServletRequest request)
 	    throws Exception {
 
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
-	}
-
 	IImportService importService = AdminServiceProxy.getImportService(applicationContext.getServletContext());
 	MultipartFile file = importExcelForm.getFile();
 

@@ -25,7 +25,7 @@
 		$(document).ready(function(){
 	
 			// validate signup form on keyup and submit
-			var validator = $("#ext-server-form").validate({
+			var validator = $("#ltiConsumerForm").validate({
 				rules: {
 					serverid: "required", 
 					serverkey: "required",
@@ -102,7 +102,7 @@
 					</table>
 					
 					<div class="pull-right">
-						<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+						<a href="<lams:LAMSURL/>/admin/ltiConsumerManagement/start.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 					</div>
 				</form:form>
