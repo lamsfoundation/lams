@@ -380,6 +380,10 @@ public class GradebookService implements IGradebookService {
 		    gUserDTO.setMark(gradebookUserActivity.getMark());
 
 		}
+		
+		boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
+		gUserDTO.setHasArchivedMarks(hasArchivedMarks);
+		
 		gradebookUserDTOs.add(gUserDTO);
 	    }
 	}
