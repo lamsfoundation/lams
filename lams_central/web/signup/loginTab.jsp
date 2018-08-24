@@ -1,10 +1,10 @@
 <body>
-	<form id="SignupForm" name="SignupForm" action="/lams/signup/signup.do" method="post" autocomplete="off" >
+	<form:form id="SignupForm" modelAttribute="SignupForm" action="/lams/signup/signup.do" method="post" autocomplete="off" >
  		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
- 		<html:hidden property="method" value="login" />
-		<html:hidden property="submitted" value="1" />
-		<html:hidden property="context" value="${signupOrganisation.context}" />
-		<html:hidden property="selectedTab" value="1" />
+ 		<form:hidden path="method" value="login" />
+		<form:hidden path="submitted" value="1" />
+		<form:hidden path="context" value="${signupOrganisation.context}" />
+		<form:hidden path="selectedTab" value="1" />
 		<div class="container">
 			<div class="row vertical-center-row">
 				<div
@@ -13,33 +13,48 @@
 						<div class="panel-body">
 							<div class="form-group">
 								<label for="usernameTab2"><fmt:message key="login.username" /></label>:
-								<html:text property="usernameTab2" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="usernameTab2" />
+								<form:input path="usernameTab2" size="40" maxlength="255"
+									cssClass="form-control" />
+								<c:set var="errorKey" value="usernameTab2" /> 
+								<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+									<lams:Alert id="error" type="danger" close="false"> 
+										<c:forEach var="error" items="${errorMap[errorKey]}"> 
+											<c:out value="${error}" /><br /> 
+										</c:forEach> 
+								    </lams:Alert> 
+								</c:if>
 							</div>
 							<div class="form-group">
 								<label for="passwordTab2"><fmt:message key="login.password" /></label>: <input
 									name="passwordTab2" type="password" size="40" maxlength="255"
 									class="form-control" autocomplete="off" />
-								<html:errors property="passwordTab2" />
+								<c:set var="errorKey" value="passwordTab2" /> 
+								<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+									<lams:Alert id="error" type="danger" close="false"> 
+										<c:forEach var="error" items="${errorMap[errorKey]}"> 
+											<c:out value="${error}" /><br /> 
+										</c:forEach> 
+								    </lams:Alert> 
+								</c:if>
+								
 							</div>
 							<div class="form-group">
 								 <label for="courseKeyTab2"><fmt:message key="login.course.key" /></label>:
-								<html:text property="courseKeyTab2" size="40" maxlength="255"
-									styleClass="form-control" />
+								<form:input path="courseKeyTab2" size="40" maxlength="255"
+									cssClass="form-control" />
 								<html:errors property="courseKeyTab2" />
 							</div>
 							<div class="form-group" align="right">
-								<html:submit styleClass="btn btn-sm btn-default voffset5">
+								<button class="btn btn-sm btn-default voffset5">
 									<fmt:message key="login.submit" />
-								</html:submit>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</form>
+	</form:form>
 </body>
 
 

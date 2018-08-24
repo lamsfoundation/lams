@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
@@ -31,28 +30,31 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Manages tutorial videos - the ones displayed on top of pages, explaining how to use certain features of LAMS.
  *
  *
  */
-public class TutorialAction extends DispatchAction {
-    private static Logger log = Logger.getLogger(TutorialAction.class);
+@Controller
+@RequestMapping("/tutorial")
+public class TutorialController {
+    private static Logger log = Logger.getLogger(TutorialController.class);
 
-    private static IUserManagementService service;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService service;
 
     /**
      * Invoked when an user chose not to show a certain video again.
@@ -63,21 +65,21 @@ public class TutorialAction extends DispatchAction {
      * @param res
      * @return
      */
-    public ActionForward disableSingleTutorialVideo(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) {
+    @ResponseBody
+    @RequestMapping("/disableSingleTutorialVideo")
+    public void disableSingleTutorialVideo(HttpServletRequest req) {
 
 	String pageString = WebUtil.readStrParam(req, AttributeNames.ATTR_PAGE_STR);
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	User user = getService().getUserByLogin(userDTO.getLogin());
+	User user = service.getUserByLogin(userDTO.getLogin());
 
 	user.getPagesWithDisabledTutorials().add(pageString);
-	getService().saveUser(user);
+	service.saveUser(user);
 
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
-	return null;
     }
 
     /**
@@ -89,21 +91,20 @@ public class TutorialAction extends DispatchAction {
      * @param res
      * @return
      */
-    public ActionForward enableSingleTutorialVideo(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) {
+    @ResponseBody
+    @RequestMapping("/enableSingleTutorialVideo")
+    public void enableSingleTutorialVideo(HttpServletRequest req) {
 
 	String pageString = WebUtil.readStrParam(req, AttributeNames.ATTR_PAGE_STR);
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	User user = getService().getUserByLogin(userDTO.getLogin());
+	User user = service.getUserByLogin(userDTO.getLogin());
 
 	user.getPagesWithDisabledTutorials().remove(pageString);
-	getService().saveUser(user);
+	service.saveUser(user);
 
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
-
-	return null;
     }
 
     /**
@@ -116,8 +117,9 @@ public class TutorialAction extends DispatchAction {
      * @return
      * @throws IOException
      */
-    public ActionForward getDoNotShowAgainValue(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException {
+    @ResponseBody
+    @RequestMapping("/getDoNotShowAgainValue")
+    public void getDoNotShowAgainValue(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
 	String pageString = WebUtil.readStrParam(req, AttributeNames.ATTR_PAGE_STR);
 
@@ -129,8 +131,6 @@ public class TutorialAction extends DispatchAction {
 	res.setContentType("text/plain");
 	PrintWriter writer = res.getWriter();
 	writer.println(doNotShowAgain.toString());
-
-	return null;
     }
 
     /**
@@ -144,27 +144,17 @@ public class TutorialAction extends DispatchAction {
      * @return
      * @throws IOException
      */
-    public ActionForward disableAllTutorialVideos(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException {
+    @ResponseBody
+    @RequestMapping("/disableAllTutorialVideos")
+    public void disableAllTutorialVideos(HttpServletRequest req) throws IOException {
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	User user = getService().getUserByLogin(userDTO.getLogin());
+	User user = service.getUserByLogin(userDTO.getLogin());
 
 	user.setTutorialsDisabled(true);
-	getService().saveUser(user);
+	service.saveUser(user);
 
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
-
-	return null;
-    }
-
-    private IUserManagementService getService() {
-	if (TutorialAction.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    TutorialAction.service = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return TutorialAction.service;
     }
 }

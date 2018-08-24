@@ -24,24 +24,22 @@
 package org.lamsfoundation.lams.web;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author jliew
  */
-public class PasswordAction extends Action {
+@Controller
+public class PasswordController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/password")
+    public String execute(@ModelAttribute PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
+	    throws Exception {
 
-	PasswordChangeActionForm passwordChangeForm = (PasswordChangeActionForm) form;
 	passwordChangeForm.setLogin(request.getRemoteUser());
-	return mapping.findForward("passwordChange");
+	return "passwordChangeContent";
     }
 }

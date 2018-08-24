@@ -33,13 +33,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
@@ -59,66 +53,32 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author jliew
  */
-public class DisplayGroupAction extends Action {
-    private static IUserManagementService service;
-    private static LessonService lessonService;
-    private static ILearningDesignService learningDesignService;
-    private static ISecurityService securityService;
-    private static IKumaliveService kumaliveService;
-
-    @Override
-    @SuppressWarnings({ "unchecked" })
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
-
-	Organisation org = null;
-	if (orgId != null) {
-	    org = (Organisation) getUserManagementService().findById(Organisation.class, orgId);
-	}
-
-	if (org != null) {
-	    User user = getUser(request.getRemoteUser());
-	    if (!getSecurityService().hasOrgRole(orgId, user.getUserId(),
-		    new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR }, "display group",
-		    false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a part of the organisation");
-		return null;
-	    }
-
-	    List<Integer> roles = new ArrayList<Integer>();
-	    List<UserOrganisationRole> userOrganisationRoles = getUserManagementService()
-		    .getUserOrganisationRoles(orgId, request.getRemoteUser());
-	    for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
-		Integer roleId = userOrganisationRole.getRole().getRoleId();
-		roles.add(roleId);
-	    }
-
-	    IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN));
-
-	    request.setAttribute("orgBean", iob);
-	    if (org.getEnableSingleActivityLessons()
-		    && (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
-		// if single activity lessons are enabled, put sorted list of tools
-		request.setAttribute("tools",
-			getLearningDesignService().getToolDTOs(false, false, request.getRemoteUser()));
-	    }
-
-	    //set whether organisation is favorite
-	    boolean isFavorite = service.isOrganisationFavorite(orgId, user.getUserId());
-	    iob.setFavorite(isFavorite);
-	}
-
-	return mapping.findForward("group");
-    }
+@Controller
+@RequestMapping("/displayGroup")
+public class DisplayGroupController {
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userService;
+    @Autowired
+    @Qualifier("lessonService")
+    private LessonService lessonService;
+    @Autowired
+    @Qualifier("learningDesignService")
+    private ILearningDesignService learningDesignService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
+    @Autowired
+    @Qualifier("kumaliveService")
+    private IKumaliveService kumaliveService;
 
     private IndexOrgBean createOrgBean(Organisation org, List<Integer> roles, String username, boolean isSysAdmin)
 	    throws SQLException, NamingException {
@@ -130,8 +90,8 @@ public class DisplayGroupAction extends Action {
 	orgBean = populateContentsOrgBean(orgBean, org, roles, username, isSysAdmin);
 
 	// First, populate header part
-	List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
-	List<IndexLinkBean> moreLinks = new ArrayList<IndexLinkBean>();
+	List<IndexLinkBean> links = new ArrayList<>();
+	List<IndexLinkBean> moreLinks = new ArrayList<>();
 	if (isSysAdmin) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		moreLinks.add(new IndexLinkBean("index.classman",
@@ -218,7 +178,7 @@ public class DisplayGroupAction extends Action {
 	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()
 		&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
 			|| roles.contains(Role.ROLE_LEARNER))) {
-	    Kumalive kumalive = getKumaliveService().getKumaliveByOrganisation(organisationId);
+	    Kumalive kumalive = kumaliveService.getKumaliveByOrganisation(organisationId);
 	    boolean isMonitor = roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR);
 	    boolean disabled = !isMonitor && (kumalive == null || kumalive.getFinished());
 	    links.add(new IndexLinkBean(isMonitor ? "index.kumalive.teacher" : "index.kumalive",
@@ -245,11 +205,11 @@ public class DisplayGroupAction extends Action {
 	if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 	    Set<Organisation> children = org.getChildOrganisations();
 
-	    List<IndexOrgBean> childOrgBeans = new ArrayList<IndexOrgBean>();
+	    List<IndexOrgBean> childOrgBeans = new ArrayList<>();
 	    for (Organisation organisation : children) {
 		if (OrganisationState.ACTIVE.equals(organisation.getOrganisationState().getOrganisationStateId())) {
-		    List<Integer> classRoles = new ArrayList<Integer>();
-		    List<UserOrganisationRole> userOrganisationRoles = getUserManagementService()
+		    List<Integer> classRoles = new ArrayList<>();
+		    List<UserOrganisationRole> userOrganisationRoles = userService
 			    .getUserOrganisationRoles(organisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
 		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isSysAdmin
@@ -278,20 +238,19 @@ public class DisplayGroupAction extends Action {
 	    throws SQLException, NamingException {
 
 	// iterate through user's lessons where they are learner
-	Map<Long, IndexLessonBean> map = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
+	Map<Long, IndexLessonBean> map = lessonService.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
 		Role.ROLE_LEARNER);
 	// remove lessons which do not have preceding lessons completed
 	Iterator<Entry<Long, IndexLessonBean>> lessonIter = map.entrySet().iterator();
 	while (lessonIter.hasNext()) {
 	    Entry<Long, IndexLessonBean> entry = lessonIter.next();
-	    if (entry.getValue().isDependent()
-		    && !DisplayGroupAction.lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
+	    if (entry.getValue().isDependent() && !lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
 		lessonIter.remove();
 	    }
 	}
 
 	for (IndexLessonBean bean : map.values()) {
-	    LinkedList<IndexLinkBean> lessonLinks = new LinkedList<IndexLinkBean>();
+	    LinkedList<IndexLinkBean> lessonLinks = new LinkedList<>();
 	    String url = null;
 	    Integer lessonStateId = bean.getState();
 	    if (roles.contains(Role.ROLE_LEARNER)
@@ -308,7 +267,7 @@ public class DisplayGroupAction extends Action {
 	// iterate through user's lessons where they are staff (or simply through all lessons in case of Group_Manager),
 	// and add staff links to the beans in the map.
 	Integer userRole = (roles.contains(Role.ROLE_GROUP_MANAGER)) ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
-	Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
+	Map<Long, IndexLessonBean> staffMap = lessonService.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
 		userRole);
 	boolean isGroupManagerOrMonitor = roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR);
 	for (IndexLessonBean bean : staffMap.values()) {
@@ -317,7 +276,7 @@ public class DisplayGroupAction extends Action {
 	    }
 	    LinkedList<IndexLinkBean> lessonLinks = (LinkedList<IndexLinkBean>) bean.getLinks();
 	    if (lessonLinks == null) {
-		lessonLinks = new LinkedList<IndexLinkBean>();
+		lessonLinks = new LinkedList<>();
 	    }
 
 	    if (isGroupManagerOrMonitor) {
@@ -356,51 +315,6 @@ public class DisplayGroupAction extends Action {
     }
 
     private User getUser(String login) {
-	return (User) getUserManagementService().findByProperty(User.class, "login", login).get(0);
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (DisplayGroupAction.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.service = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return DisplayGroupAction.service;
-    }
-
-    private LessonService getLessonService() {
-	if (DisplayGroupAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.lessonService = (LessonService) ctx.getBean("lessonService");
-	}
-	return DisplayGroupAction.lessonService;
-    }
-
-    private ILearningDesignService getLearningDesignService() {
-	if (DisplayGroupAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
-	}
-	return DisplayGroupAction.learningDesignService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (DisplayGroupAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return DisplayGroupAction.securityService;
-    }
-
-    private IKumaliveService getKumaliveService() {
-	if (DisplayGroupAction.kumaliveService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.kumaliveService = (IKumaliveService) ctx.getBean("kumaliveService");
-	}
-	return DisplayGroupAction.kumaliveService;
+	return (User) userService.findByProperty(User.class, "login", login).get(0);
     }
 }

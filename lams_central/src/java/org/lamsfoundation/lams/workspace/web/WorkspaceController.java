@@ -31,31 +31,36 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Manpreet Minhas
  *
  *
  */
-public class WorkspaceAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/workspace")
+public class WorkspaceController {
 
-    protected Logger log = Logger.getLogger(WorkspaceAction.class.getName());
+    protected Logger log = Logger.getLogger(WorkspaceController.class.getName());
+
+    @Autowired
+    @Qualifier("IWorkspaceManagementService")
+    private IWorkspaceManagementService workspaceManagementService;
 
     public static final String RESOURCE_ID = "resourceID";
     public static final String RESOURCE_TYPE = "resourceType";
@@ -81,19 +86,13 @@ public class WorkspaceAction extends LamsDispatchAction {
 	return user != null ? user.getUserID() : null;
     }
 
-    public IWorkspaceManagementService getWorkspaceManagementService() {
-	WebApplicationContext webContext = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (IWorkspaceManagementService) webContext.getBean("workspaceManagementService");
-    }
-
     /**
      * Is the folder id one of our special dummy ids? If so, we can't process the normal create, copy, paste, move
      * functions on this folder.
      */
     private boolean checkResourceDummyValue(Long folderID, String resourceType) throws IOException {
-	return FolderContentDTO.FOLDER.equals(resourceType) && (WorkspaceAction.BOOTSTRAP_FOLDER_ID.equals(folderID)
-		|| WorkspaceAction.ORG_FOLDER_ID.equals(folderID));
+	return FolderContentDTO.FOLDER.equals(resourceType) && (WorkspaceController.BOOTSTRAP_FOLDER_ID.equals(folderID)
+		|| WorkspaceController.ORG_FOLDER_ID.equals(folderID));
     }
 
     /**
@@ -109,16 +108,16 @@ public class WorkspaceAction extends LamsDispatchAction {
      * @throws WorkspaceFolderException
      * @throws UserException
      */
-    public ActionForward createFolder(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @ResponseBody
+    @RequestMapping("/createFolder")
+    public void createFolder(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException, UserException, WorkspaceFolderException {
 	Integer parentFolderID = WebUtil.readIntParam(request, "parentFolderID", false);
 	String folderName = WebUtil.readStrParam(request, "name", false);
 	Integer userID = getUserId();
-	WorkspaceFolder newFolder = getWorkspaceManagementService().createFolder(parentFolderID, folderName, userID);
+	WorkspaceFolder newFolder = workspaceManagementService.createFolder(parentFolderID, folderName, userID);
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().write(newFolder.getWorkspaceFolderId().toString());
-	return null;
     }
 
     /**
@@ -132,19 +131,18 @@ public class WorkspaceAction extends LamsDispatchAction {
      * @throws ServletException
      * @throws IOException
      */
-    public ActionForward deleteResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException {
-	Long resourceID = new Long(WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID));
-	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE);
+    @ResponseBody
+    @RequestMapping("/deleteResource")
+    public void deleteResource(HttpServletRequest request) throws ServletException, IOException {
+	Long resourceID = new Long(WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID));
+	String resourceType = WebUtil.readStrParam(request, WorkspaceController.RESOURCE_TYPE);
 
 	boolean isDummyValue = checkResourceDummyValue(resourceID, FolderContentDTO.FOLDER);
 	if (isDummyValue) {
 	    throw new IOException("Can not remove this resource.");
 	}
 
-	getWorkspaceManagementService().deleteResource(resourceID, resourceType, getUserId());
-	return null;
-
+	workspaceManagementService.deleteResource(resourceID, resourceType, getUserId());
     }
 
     /**
@@ -161,61 +159,58 @@ public class WorkspaceAction extends LamsDispatchAction {
      * @throws UserException
      * @throws LearningDesignException
      */
-    public ActionForward copyResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @ResponseBody
+    @RequestMapping("/copyResource")
+    public void copyResource(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException, LearningDesignException, UserException, WorkspaceFolderException {
-	Long resourceID = WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID, false);
-	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE, false);
+	Long resourceID = WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID, false);
+	String resourceType = WebUtil.readStrParam(request, WorkspaceController.RESOURCE_TYPE, false);
 	Integer targetFolderID = WebUtil.readIntParam(request, "targetFolderID", false);
 
 	if (targetFolderID == null) {
 	    log.error("Can not copy resource, missing target folder ID");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing target folder ID");
-	    return null;
 	}
 
 	Integer copyType = WebUtil.readIntParam(request, "copyType", true);
 	Integer userID = getUserId();
-	getWorkspaceManagementService().copyResource(resourceID, resourceType, copyType, targetFolderID, userID);
-	return null;
+	workspaceManagementService.copyResource(resourceID, resourceType, copyType, targetFolderID, userID);
     }
 
-    public ActionForward moveResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	Long resourceID = WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID, false);
-	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE, false);
+    @ResponseBody
+    @RequestMapping("/moveResource")
+    public void moveResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Long resourceID = WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID, false);
+	String resourceType = WebUtil.readStrParam(request, WorkspaceController.RESOURCE_TYPE, false);
 	Integer targetFolderID = WebUtil.readIntParam(request, "targetFolderID", false);
 
 	if (targetFolderID == null) {
 	    log.error("Can not move resource, missing target folder ID");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing target folder ID");
-	    return null;
 	}
 
 	try {
-	    getWorkspaceManagementService().moveResource(resourceID, resourceType, targetFolderID);
+	    workspaceManagementService.moveResource(resourceID, resourceType, targetFolderID);
 	} catch (WorkspaceFolderException e) {
 	    log.error("Error while moving a resource", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error while moving a resource");
-	    return null;
 	}
-	return null;
     }
 
-    public ActionForward renameResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @ResponseBody
+    @RequestMapping("/renameResource")
+    public void renameResource(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, UserException, WorkspaceFolderException {
 	Integer userID = getUserId();
-	Long resourceID = new Long(WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID));
-	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE);
+	Long resourceID = new Long(WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID));
+	String resourceType = WebUtil.readStrParam(request, WorkspaceController.RESOURCE_TYPE);
 
 	boolean isDummyValue = checkResourceDummyValue(resourceID, FolderContentDTO.FOLDER);
 	if (isDummyValue) {
 	    throw new IOException("Can not rename this resource");
 	}
 	String name = WebUtil.readStrParam(request, "name");
-	getWorkspaceManagementService().renameResource(resourceID, resourceType, name, userID);
+	workspaceManagementService.renameResource(resourceID, resourceType, name, userID);
 
-	return null;
     }
 }

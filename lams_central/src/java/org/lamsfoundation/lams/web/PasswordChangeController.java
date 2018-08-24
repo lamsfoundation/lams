@@ -24,15 +24,9 @@
 package org.lamsfoundation.lams.web;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.apache.struts.Globals;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -40,15 +34,27 @@ import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang
  */
-public class PasswordChangeAction extends Action {
+@Controller
+public class PasswordChangeController {
 
-    private static Logger log = Logger.getLogger(PasswordChangeAction.class);
+    private static Logger log = Logger.getLogger(PasswordChangeController.class);
+
+    @Autowired
+    MessageService messageService;
+    @Autowired
+    WebApplicationContext applicationContext;
 
     /**
      * @param mapping
@@ -61,20 +67,18 @@ public class PasswordChangeAction extends Action {
      *            The HTTP response we are creating
      *
      */
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/passwordChanged")
+    public String execute(@ModelAttribute PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
+	    throws Exception {
 	// -- isCancelled?
-	if (isCancelled(request)) {
+	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
 	    request.getSession().removeAttribute(PasswordChangeActionForm.formName);
-	    return mapping.findForward("cancelled");
+	    return "redirect:/index/profile.do";
 	}
 
-	ActionMessages errors = new ActionMessages();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	PasswordChangeActionForm passwordChangeForm = (PasswordChangeActionForm) form;
-
-	if (errors.isEmpty()) {
+	if (errorMap.isEmpty()) {
 	    try {
 
 		String loggedInUser = request.getRemoteUser();
@@ -84,36 +88,37 @@ public class PasswordChangeAction extends Action {
 		String passwordConfirm = passwordChangeForm.getPasswordConfirm();
 
 		if ((loggedInUser == null) || !loggedInUser.equals(login)) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.authorisation"));
+		    errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
 		} else {
 		    // WebApplicationContext ctx =
 		    // WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
 		    WebApplicationContext ctx = WebApplicationContextUtils
-			    .getWebApplicationContext(getServlet().getServletContext());
+			    .getWebApplicationContext(applicationContext.getServletContext());
 		    UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 
 		    User user = service.getUserByLogin(login);
 		    String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH
-			    ? HashUtil.sha1(oldPassword) : HashUtil.sha256(oldPassword, user.getSalt());
+			    ? HashUtil.sha1(oldPassword)
+			    : HashUtil.sha256(oldPassword, user.getSalt());
 
 		    if (!user.getPassword().equals(passwordHash)) {
-			errors.add("oldPassword", new ActionMessage("error.oldpassword.mismatch"));
-			PasswordChangeAction.log.debug("old pass wrong");
+			errorMap.add("oldPassword", messageService.getMessage("error.oldpassword.mismatch"));
+			PasswordChangeController.log.debug("old pass wrong");
 		    }
 		    if (!password.equals(passwordConfirm)) {
-			errors.add("password", new ActionMessage("error.newpassword.mismatch"));
-			PasswordChangeAction.log.debug("new pass wrong");
+			errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
+			PasswordChangeController.log.debug("new pass wrong");
 		    }
 		    if ((password == null) || (password.length() == 0)) {
-			errors.add("password", new ActionMessage("error.password.empty"));
-			PasswordChangeAction.log.debug("new password cannot be empty");
+			errorMap.add("password", messageService.getMessage("error.password.empty"));
+			PasswordChangeController.log.debug("new password cannot be empty");
 		    }
 		    if (!ValidationUtil.isPasswordValueValid(password, passwordConfirm)) {
-			errors.add("password", new ActionMessage("label.password.restrictions"));
-			PasswordChangeAction.log.debug("Password must follow the restrictions");
+			errorMap.add("password", messageService.getMessage("label.password.restrictions"));
+			PasswordChangeController.log.debug("Password must follow the restrictions");
 		    }
 
-		    if (errors.isEmpty()) {
+		    if (errorMap.isEmpty()) {
 			String salt = HashUtil.salt();
 			user.setSalt(salt);
 			user.setPassword(HashUtil.sha256(password, salt));
@@ -126,30 +131,26 @@ public class PasswordChangeAction extends Action {
 			String[] args = new String[1];
 			args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 			String message = messageService.getMessage("audit.user.password.change", args);
-			logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, user.getUserId(), user.getUserId(), null, null, message);
+			logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, user.getUserId(), user.getUserId(), null, null,
+				message);
 		    }
 		}
 
 	    } catch (Exception e) {
-		PasswordChangeAction.log.error("Exception occured ", e);
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(e.getMessage()));
+		PasswordChangeController.log.error("Exception occured ", e);
+		errorMap.add("GLOBAL", messageService.getMessage(e.getMessage()));
 	    }
 
 	} // end if no errors
 
 	// -- Report any errors
-	if (!errors.isEmpty()) {
-	    saveMessages(request, errors);
-	    if (mapping.getInput() != null) {
-		passwordChangeForm.reset(mapping, request);
-		// return (new ActionForward(mapping.getInput()));
-		return (mapping.findForward("errors"));
-	    }
-	    // If no input page, use error forwarding
-	    return (mapping.findForward("error.system"));
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    passwordChangeForm.reset(request);
+	    return "redirect:/index/password.do";
 	}
 	request.setAttribute("redirectURL", passwordChangeForm.getRedirectURL());
-	return mapping.findForward("okay");
+	return "/passwordChangeOkContent";
 
     }
 }

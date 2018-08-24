@@ -58,14 +58,16 @@ div#errorArea {
 		<fmt:message key="label.questions.file.title" />
 	</c:set>
 	<lams:Page type="admin" title="${title}">
-
-			<logic:messagesPresent>
-				<lams:Alert id="errorMessages" type="danger" close="false">
-				        <html:messages id="error">
-				            <c:out value="${error}" escapeXml="false"/><br/>
-				        </html:messages>
-				</lams:Alert>
-			</logic:messagesPresent>
+			
+			 <c:set var="errorKey" value="GLOBAL" /> 
+			 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+			     <lams:Alert id="error" type="danger" close="false"> 
+			         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+			             <c:out value="${error}" /><br /> 
+			         </c:forEach> 
+			     </lams:Alert> 
+			</c:if>
+			
 
 			<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post" onsubmit="return verifyAndSubmit();">
 				<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 

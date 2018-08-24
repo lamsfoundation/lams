@@ -20,19 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -48,6 +42,9 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -57,14 +54,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  *
  */
-public class LoginAsAction extends Action {
+@Controller
+public class LoginAsController {
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    WebApplicationContext applicationContext;
+
+    @RequestMapping("/loginas")
+    public String execute(HttpServletRequest request) throws Exception {
 
 	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
+		.getRequiredWebApplicationContext(applicationContext.getServletContext());
 	IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementService");
 	MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
 	IntegrationService integrationService = (IntegrationService) ctx.getBean("integrationService");
@@ -75,25 +75,28 @@ public class LoginAsAction extends Action {
 	    if ((login != null) && (login.trim().length() > 0)) {
 		User user = service.getUserByLogin(login);
 		if (user != null) {
-		    
+
 		    // If the user is an integration learner and ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS if off do not let syadmin log in
 		    // as they will not be able to access the index page. This test should be the same test as found in IndexAction.
-		    Boolean allowDirectAccessIntegrationLearner = Configuration.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+		    Boolean allowDirectAccessIntegrationLearner = Configuration
+			    .getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
 		    if (!allowDirectAccessIntegrationLearner) {
 			boolean isIntegrationUser = integrationService.isIntegrationUser(user.getUserId());
 			if (isIntegrationUser && isOnlyLearner(service, user.getUserId())) {
 			    request.setAttribute("errorName", "Login As");
-			    request.setAttribute("errorMessage", messageService.getMessage("error.cannot.login.as.with.not.allow.direct.access"));
-			    return mapping.findForward("error");
+			    request.setAttribute("errorMessage",
+				    messageService.getMessage("error.cannot.login.as.with.not.allow.direct.access"));
+			    return "errorpages/errorWithMessage";
 			}
 		    }
-		    
+
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		    ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
 		    String[] args = new String[] { sysadmin.getLogin() + " (" + sysadmin.getUserID() + ")", login };
 		    String message = messageService.getMessage("audit.admin.loginas", args);
-		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null, message);
+		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null,
+			    message);
 
 		    // login.jsp knows what to do with these
 		    request.setAttribute("login", login);
@@ -102,16 +105,16 @@ public class LoginAsAction extends Action {
 		    // notify the login module that the user has been authenticated correctly
 		    UniversalLoginModule.setAuthenticationToken(token);
 		    // redirect to login page
-		    return (new ActionForward("/login.jsp?redirectURL=/lams/index.jsp"));
+		    return "login.jsp?redirectURL=/lams/index";
 		}
 	    }
 	} else {
 	    request.setAttribute("errorName", "Login As");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
-	    return mapping.findForward("error");
+	    return "errorpages/errorWithMessage";
 	}
 
-	return mapping.findForward("usersearch");
+	return "redirect:/admin/usersearch.do";
     }
 
     private boolean isOnlyLearner(IUserManagementService service, Integer userId) {
@@ -120,11 +123,12 @@ public class LoginAsAction extends Action {
 	    for (Integer role : orgRoleSet) {
 		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR)
 			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_GROUP_ADMIN)
-			|| role.equals(Role.ROLE_SYSADMIN))
+			|| role.equals(Role.ROLE_SYSADMIN)) {
 		    return false;
+		}
 	    }
 	}
 	return true;
-    }    
+    }
 
 }

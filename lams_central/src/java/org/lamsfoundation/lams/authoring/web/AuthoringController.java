@@ -78,7 +78,7 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+import org.lamsfoundation.lams.workspace.web.WorkspaceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -215,7 +215,7 @@ public class AuthoringController {
 		learningDesignDTO.getWorkspaceFolderID());
 	while (folder != null) {
 	    Integer folderID = folder.getWorkspaceFolderId();
-	    if (folderID.equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
+	    if (folderID.equals(WorkspaceController.ROOT_ORG_FOLDER_ID)) {
 		// we reached the top folder, finish
 		folder = null;
 	    } else {

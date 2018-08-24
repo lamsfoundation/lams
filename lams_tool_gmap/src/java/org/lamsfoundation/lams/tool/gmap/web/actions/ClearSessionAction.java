@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.gmap.web.actions;
 
 import javax.servlet.http.HttpSession;
@@ -31,12 +30,12 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
- * 
+ *
  * @author lfoxton
  *
  *
  *
- * 
+ *
  * @version $Revision$
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {

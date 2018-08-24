@@ -1384,11 +1384,11 @@ public abstract class LdTemplateController {
      * Specialised call to create a new forum entry. Returns a fragment of HTML
      * which sets up two new fields - subject and body. Works with both forum.jsp.
      */
-    @RequestMapping
-    public String createForum(HttpServletRequest request) {
-	request.setAttribute("topicNumber", request.getParameter("topicNumber"));
-	return mapping.findForward("forum");
-    }
+//    @RequestMapping
+//    public String createForum(HttpServletRequest request) {
+//	request.setAttribute("topicNumber", request.getParameter("topicNumber"));
+//	return mapping.findForward("forum");
+//    }
 
     /**
      * Specialised call to create a new option for a multiple choice question (mcoption.jsp), Survey question
@@ -1494,27 +1494,27 @@ public abstract class LdTemplateController {
 
 	return optionDtos;
     }
-
-    /**
-     * Specialised call to create a new URL field & title.
-     */
-    @RequestMapping("/createResource")
-    public ActionForward createResource(HttpServletRequest request) {
-	request.setAttribute("urlNumber", request.getParameter("urlNumber"));
-	if (request.getParameter("branchNumberUnderscore") != null) {
-	    request.setAttribute("branchNumberUnderscore", request.getParameter("branchNumberUnderscore"));
-	}
-	return mapping.findForward("resource");
-    }
-
-    /**
-     * Specialised call to create a new set of fields for a branch.
-     */
-    @RequestMapping("/createBranch")
-    public String createBranch(HttpServletRequest request) {
-	request.setAttribute("branchNumber", request.getParameter("branchNumber"));
-	return mapping.findForward("branch");
-    }
+//
+//    /**
+//     * Specialised call to create a new URL field & title.
+//     */
+//    @RequestMapping("/createResource")
+//    public ActionForward createResource(HttpServletRequest request) {
+//	request.setAttribute("urlNumber", request.getParameter("urlNumber"));
+//	if (request.getParameter("branchNumberUnderscore") != null) {
+//	    request.setAttribute("branchNumberUnderscore", request.getParameter("branchNumberUnderscore"));
+//	}
+//	return mapping.findForward("resource");
+//    }
+//
+//    /**
+//     * Specialised call to create a new set of fields for a branch.
+//     */
+//    @RequestMapping("/createBranch")
+//    public String createBranch(HttpServletRequest request) {
+//	request.setAttribute("branchNumber", request.getParameter("branchNumber"));
+//	return mapping.findForward("branch");
+//    }
 
     /**
      * Specialised call to create a new rating criteria for the Peer Review fields. Returns a fragment of HTML

@@ -30,18 +30,10 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
@@ -51,7 +43,6 @@ import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
 import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -62,31 +53,45 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.LanguageUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class ProfileAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/profile")
+public class ProfileController {
 
-    private static Logger log = Logger.getLogger(ProfileAction.class);
+    private static Logger log = Logger.getLogger(ProfileController.class);
 
-    private static IUserManagementService service;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService service;
 
     private static List<SupportedLocale> locales;
+    @Autowired
+    @Qualifier("learnerService")
+    private ICoreLearnerService learnerService;
+    @Autowired
+    @Qualifier("themeService")
+    private IThemeService themeService;
+    @Autowired
+    @Qualifier("timezoneService")
+    private ITimezoneService timezoneService;
+    @Autowired
+    private MessageService messageService;
 
-    private static ICoreLearnerService learnerService;
+    @RequestMapping("/view")
+    public String view(HttpServletRequest request) throws Exception {
 
-    private static IThemeService themeService;
-
-    private static ITimezoneService timezoneService;
-
-    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	User requestor = getService().getUserByLogin(request.getRemoteUser());
+	User requestor = service.getUserByLogin(request.getRemoteUser());
 	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFirstName()
 		+ " " + requestor.getLastName();
 	String email = requestor.getEmail();
@@ -95,21 +100,21 @@ public class ProfileAction extends LamsDispatchAction {
 	request.setAttribute("email", (email != null ? email : ""));
 	request.setAttribute("portraitUuid", requestor.getPortraitUuid());
 
-	return mapping.findForward("view");
+	return "profile";
     }
 
-    public ActionForward lessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/lessons")
+    public String lessons(HttpServletRequest request) throws Exception {
 
 	// list all active lessons for this learner (single sql query)
-	User requestor = getService().getUserByLogin(request.getRemoteUser());
-	LessonDTO[] lessons = getLearnerService().getActiveLessonsFor(requestor.getUserId());
+	User requestor = service.getUserByLogin(request.getRemoteUser());
+	LessonDTO[] lessons = learnerService.getActiveLessonsFor(requestor.getUserId());
 
 	// make org-sorted beans out of the lessons
-	HashMap<Integer, IndexOrgBean> orgBeansMap = new HashMap<Integer, IndexOrgBean>();
+	HashMap<Integer, IndexOrgBean> orgBeansMap = new HashMap<>();
 	for (LessonDTO lesson : lessons) {
 	    Integer orgId = lesson.getOrganisationID();
-	    Organisation org = (Organisation) getService().findById(Organisation.class, orgId);
+	    Organisation org = (Organisation) service.findById(Organisation.class, orgId);
 	    Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
 	    IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(),
 		    "javascript:openLearner(" + lesson.getLessonID() + ")");
@@ -119,7 +124,8 @@ public class ProfileAction extends LamsDispatchAction {
 	    // insert or update bean if it is a course
 	    if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
 		IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId))
-			? new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId) : orgBeansMap.get(orgId);
+			? new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId)
+			: orgBeansMap.get(orgId);
 		orgBean.addLesson(lessonBean);
 		orgBeansMap.put(orgId, orgBean);
 	    } else if (orgTypeId.equals(OrganisationType.CLASS_TYPE)) {
@@ -127,9 +133,8 @@ public class ProfileAction extends LamsDispatchAction {
 		// if it is a class, find existing or create new parent bean
 		Organisation parentOrg = org.getParentOrganisation();
 		Integer parentOrgId = parentOrg.getOrganisationId();
-		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId))
-			? new IndexOrgBean(parentOrg.getOrganisationId(), parentOrg.getName(),
-				OrganisationType.COURSE_TYPE)
+		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId)) ? new IndexOrgBean(
+			parentOrg.getOrganisationId(), parentOrg.getName(), OrganisationType.COURSE_TYPE)
 			: orgBeansMap.get(parentOrgId);
 		// create new bean for class, or use existing bean
 		IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);
@@ -151,7 +156,7 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 
 	// sort group and subgroup names
-	ArrayList<IndexOrgBean> beans = new ArrayList<IndexOrgBean>(orgBeansMap.values());
+	ArrayList<IndexOrgBean> beans = new ArrayList<>(orgBeansMap.values());
 	Collections.sort(beans);
 	for (IndexOrgBean b : beans) {
 	    Collections.sort(b.getChildIndexOrgBeans());
@@ -163,7 +168,7 @@ public class ProfileAction extends LamsDispatchAction {
 	    Organisation org = (Organisation) service.findById(Organisation.class, bean.getId());
 
 	    // put lesson beans into id-indexed map
-	    HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+	    HashMap<Long, IndexLessonBean> map = new HashMap<>();
 	    for (IndexLessonBean lbean : bean.getLessons()) {
 		map.put(lbean.getId(), lbean);
 	    }
@@ -173,7 +178,7 @@ public class ProfileAction extends LamsDispatchAction {
 
 	request.setAttribute("beans", beans);
 
-	return mapping.findForward("lessons");
+	return "lessons";
     }
 
     private IndexOrgBean getOrgBean(String name, List<IndexOrgBean> list) {
@@ -185,35 +190,33 @@ public class ProfileAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/edit")
+    public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
 
 	//some errors may have already been set in ProfileSaveAction
-	ActionMessages errors = (ActionMessages) request.getAttribute(Globals.ERROR_KEY);
-	if (errors == null) {
-	    errors = new ActionMessages();
+	MultiValueMap<String, String> errorMap = (MultiValueMap<String, String>) request.getAttribute("errorMap");
+	if (errorMap == null) {
+	    errorMap = new LinkedMultiValueMap<>();
 	}
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
 	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.edit.disabled"));
+		errorMap.add("GLOBAL", messageService.getMessage("error.edit.disabled"));
 	    } else {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.partial.edit.only"));
+		errorMap.add("GLOBAL", messageService.getMessage("message.partial.edit.only"));
 	    }
-	    saveErrors(request, errors);
+	    request.setAttribute("errorMap", errorMap);
+	    ;
 	}
 
-	User requestor = getService().getUserByLogin(request.getRemoteUser());
-	DynaActionForm userForm = (DynaActionForm) form;
+	User requestor = service.getUserByLogin(request.getRemoteUser());
 	BeanUtils.copyProperties(userForm, requestor);
 	SupportedLocale locale = requestor.getLocale();
 	if (locale == null) {
 	    locale = LanguageUtil.getDefaultLocale();
 	}
-	userForm.set("localeId", locale.getLocaleId());
+	userForm.setLocaleId(locale.getLocaleId());
 	request.setAttribute("locales", locales);
-
-	themeService = getThemeService();
 
 	// Get all the css themes
 	List<Theme> themes = themeService.getAllThemes();
@@ -233,12 +236,12 @@ public class ProfileAction extends LamsDispatchAction {
 	if (userSelectedTheme == null) {
 	    userSelectedTheme = themeService.getDefaultTheme().getThemeId();
 	}
-	userForm.set("userTheme", userSelectedTheme);
+	userForm.setUserTheme(userSelectedTheme);
 
-	List<Timezone> availableTimeZones = getTimezoneService().getDefaultTimezones();
+	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
 	//TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
-	// Comparator to sort timezones by timezone id 
-	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneIDComparator());
+	// Comparator to sort timezones by timezone id
+	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
 
 	for (Timezone availableTimeZone : availableTimeZones) {
 	    String timezoneId = availableTimeZone.getTimezoneId();
@@ -249,44 +252,7 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	request.setAttribute("timezoneDtos", timezoneDtos);
 
-	return mapping.findForward("edit");
+	return "editprofile";
     }
 
-    private IUserManagementService getService() {
-	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
-	    locales = getService().findAll(SupportedLocale.class);
-	    Collections.sort(locales);
-	}
-	return service;
-    }
-
-    private ICoreLearnerService getLearnerService() {
-	if (learnerService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
-	}
-	return learnerService;
-    }
-
-    private IThemeService getThemeService() {
-	if (themeService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    themeService = (IThemeService) ctx.getBean("themeService");
-	}
-	return themeService;
-    }
-
-    private ITimezoneService getTimezoneService() {
-	if (timezoneService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
-	}
-	return timezoneService;
-    }
 }

@@ -32,12 +32,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
@@ -49,59 +46,74 @@ import org.lamsfoundation.lams.util.CentralToolContentHandler;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
  * @author Andrey Balan
  */
-public class PortraitSaveAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/saveportrait")
+public class PortraitSaveController {
 
-    private static Logger log = Logger.getLogger(PortraitSaveAction.class);
-    private static IUserManagementService service;
-    private static ILogEventService logEventService;
-    private static MessageService messageService;
+    private static Logger log = Logger.getLogger(PortraitSaveController.class);
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService service;
+    @Autowired
+    @Qualifier("logEventService")
+    private ILogEventService logEventService;
+    @Autowired
+    private MessageService messageService;
+    @Autowired
+    WebApplicationContext applicationContext;
     private static CentralToolContentHandler centralToolContentHandler;
     private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
 
     /**
      * Upload portrait image.
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("")
+    public String unspecified(@ModelAttribute PortraitActionForm portraitForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	if (isCancelled(request)) {
-	    return mapping.findForward("profile");
+	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
+	    return "redirect:/index/profile.do";
 	}
 
-	ActionMessages errors = new ActionMessages();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	PortraitActionForm portraitForm = (PortraitActionForm) form;
-	FormFile file = portraitForm.getFile();
-	String fileName = file.getFileName();
-	log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getFileSize());
+	MultipartFile file = portraitForm.getFile();
+	String fileName = file.getName();
+	log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getSize());
 
-	User user = getService().getUserByLogin(request.getRemoteUser());
+	User user = service.getUserByLogin(request.getRemoteUser());
 
 	// check if file is an image using the MIME content type
 	String mediaType = file.getContentType().split("/", 2)[0];
 	if (!mediaType.equals("image")) {
-	    errors.add("file", new ActionMessage("error.portrait.not.image"));
-	    saveErrors(request, errors);
-	    return mapping.findForward("errors");
+	    errorMap.add("file", messageService.getMessage("error.portrait.not.image"));
+	    request.setAttribute("errorMap", errorMap);
+	    return "redirect:/index/portrait.do";
 	}
 
 	// check file exists
 	InputStream is = file.getInputStream();
 	if (is == null) {
-	    errors.add("file", new ActionMessage("error.general.1"));
-	    saveErrors(request, errors);
-	    return mapping.findForward("errors");
+	    errorMap.add("file", messageService.getMessage("error.general.1"));
+	    request.setAttribute("errorMap", errorMap);
+	    return "redirect:/index/portrait.do";
 	}
 
 	// write to content repository
@@ -157,13 +169,14 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
 	}
 	user.setPortraitUuid(originalFileNode.getUuid());
-	getService().saveUser(user);
+	service.saveUser(user);
 
-	return mapping.findForward("profile");
+	return "redirect:/index/profile.do";
     }
 
     /** Called from sysadmin to delete an inappropriate portrait */
-    public ActionForward deletePortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/deletePortrait")
+    public String deletePortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
@@ -176,19 +189,20 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	}
 
 	String responseValue = "deleted";
-	User userToModify = (User) getService().findById(User.class, userId);
+	User userToModify = (User) service.findById(User.class, userId);
 	if (userToModify != null && userToModify.getPortraitUuid() != null) {
 
 	    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	    Object[] args = new Object[] { userToModify.getFullName(), userToModify.getLogin(),
 		    userToModify.getUserId(), userToModify.getPortraitUuid() };
-	    String auditMessage = getMessageService().getMessage(PORTRAIT_DELETE_AUDIT_KEY, args);
-	    getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin.getUserID(), userId, null, null, auditMessage);
+	    String auditMessage = messageService.getMessage(PORTRAIT_DELETE_AUDIT_KEY, args);
+	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin.getUserID(), userId, null, null,
+		    auditMessage);
 
 	    try {
 		getCentralToolContentHandler().deleteFile(userToModify.getPortraitUuid());
 		userToModify.setPortraitUuid(null);
-		getService().saveUser(userToModify);
+		service.saveUser(userToModify);
 	    } catch (Exception e) {
 		log.error("Unable to delete a portrait for user " + userId + ".", e);
 		return deleteResponse(response, "error");
@@ -197,7 +211,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	return deleteResponse(response, responseValue);
     }
 
-    private ActionForward deleteResponse(HttpServletResponse response, String data) throws IOException {
+    private String deleteResponse(HttpServletResponse response, String data) throws IOException {
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().write(data);
 	return null;
@@ -206,37 +220,10 @@ public class PortraitSaveAction extends LamsDispatchAction {
     private CentralToolContentHandler getCentralToolContentHandler() {
 	if (centralToolContentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    centralToolContentHandler = (CentralToolContentHandler) wac.getBean("centralToolContentHandler");
 	}
 	return centralToolContentHandler;
-    }
-
-    private IUserManagementService getService() {
-	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return service;
-    }
-
-    private ILogEventService getLogEventService() {
-	if (PortraitSaveAction.logEventService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PortraitSaveAction.logEventService = (ILogEventService) ctx.getBean("logEventService");
-	}
-	return PortraitSaveAction.logEventService;
-    }
-
-    private MessageService getMessageService() {
-	if (PortraitSaveAction.messageService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    PortraitSaveAction.messageService = (MessageService) ctx.getBean("centralMessageService");
-	}
-	return PortraitSaveAction.messageService;
     }
 
 }

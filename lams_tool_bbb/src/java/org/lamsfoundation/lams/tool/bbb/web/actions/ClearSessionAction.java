@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.bbb.web.actions;
 
 import javax.servlet.http.HttpSession;

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,27 +28,26 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.EmailValidator;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Andrey Balan, Marcin Cieslak
@@ -58,109 +56,86 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  *
  */
-public class EmailUserAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/emailUser")
+public class EmailUserController {
 
-    private static Logger log = Logger.getLogger(EmailUserAction.class);
+    private static Logger log = Logger.getLogger(EmailUserController.class);
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
-    private static IUserManagementService userManagementService;
-    private static IEventNotificationService eventNotificationService;
-    private static MessageService messageService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("eventNotificationService")
+    private IEventNotificationService eventNotificationService;
+    @Autowired
+    private MessageService messageService;
 
-    public ActionForward composeMail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/composeMail")
+    public String composeMail(HttpServletRequest request) throws Exception {
 	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	if (canSend(request, currentUser)) {
 	    Integer userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
-	    User user = (User) getUserManagementService().findById(User.class, userId);
+	    User user = (User) userManagementService.findById(User.class, userId);
 	    request.setAttribute(AttributeNames.USER, user);
-	    if (!EmailUserAction.emailValidator.isValid(user.getEmail())) {
-		EmailUserAction.log.error("Recipient " + user.getLogin() + " does not have a valid email");
+	    if (!EmailUserController.emailValidator.isValid(user.getEmail())) {
+		EmailUserController.log.error("Recipient " + user.getLogin() + " does not have a valid email");
 		saveError(request, "error.valid.email.required", true);
 	    }
 	} else {
-	    EmailUserAction.log.error("User " + currentUser.getLogin() + " is not allowed to send email");
+	    EmailUserController.log.error("User " + currentUser.getLogin() + " is not allowed to send email");
 	    saveError(request, "error.authorisation", true);
 	}
 
-	return mapping.findForward("emailuser");
+	return "emailuser";
     }
 
-    public ActionForward send(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @ResponseBody
+    @RequestMapping("/send")
+    public void send(@ModelAttribute EmailForm emailForm, HttpServletRequest request, HttpServletResponse response)
+	    throws Exception {
 	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	if (!canSend(request, currentUser)) {
-	    EmailUserAction.log.error("User " + currentUser.getLogin() + " is not allowed to send email");
+	    EmailUserController.log.error("User " + currentUser.getLogin() + " is not allowed to send email");
 	    response.setContentType("text/plain;charset=utf-8");
-	    response.getWriter().write(getMessageService().getMessage("error.authorisation"));
-	    return null;
+	    response.getWriter().write(messageService.getMessage("error.authorisation"));
 	}
 
-	EmailForm emailForm = (EmailForm) form;
 	Long userId = emailForm.getUserId();
 
 	String subject = emailForm.getSubject();
 	String body = WebUtil.removeHTMLtags(emailForm.getBody());
 
-	if (EmailUserAction.log.isDebugEnabled()) {
-	    EmailUserAction.log.debug("User " + currentUser.getLogin() + " (" + currentUser.getEmail() + ") "
+	if (EmailUserController.log.isDebugEnabled()) {
+	    EmailUserController.log.debug("User " + currentUser.getLogin() + " (" + currentUser.getEmail() + ") "
 		    + " sent email to user ID " + userId + ": \n[subject] " + subject + "\n[message] " + body);
 	}
 
 	boolean IS_HTML_FORMAT = false;
-	getEventNotificationService().sendMessage(currentUser.getUserID(), userId.intValue(),
+	eventNotificationService.sendMessage(currentUser.getUserID(), userId.intValue(),
 		IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, IS_HTML_FORMAT);
 
 	String ccEmail = emailForm.getCcEmail();
 	if (StringUtils.isNotBlank(ccEmail) && ValidationUtil.isEmailValid(ccEmail, false)) {
 	    Emailer.sendFromSupportEmail(subject, ccEmail, body, IS_HTML_FORMAT);
 
-	    if (EmailUserAction.log.isDebugEnabled()) {
-		EmailUserAction.log.debug("User " + currentUser.getLogin() + " (" + currentUser.getEmail() + ") "
+	    if (EmailUserController.log.isDebugEnabled()) {
+		EmailUserController.log.debug("User " + currentUser.getLogin() + " (" + currentUser.getEmail() + ") "
 			+ " sent email to user ID " + userId + ": \n[subject] " + subject + "\n[message] " + body);
 	    }
 	}
 
-	return null;
     }
 
     private void saveError(HttpServletRequest request, String error, boolean sendDisabled) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(error));
-	saveErrors(request, errors);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	errorMap.add("GLOBAL", messageService.getMessage(error));
+	request.setAttribute("errorMap", errorMap);
+	;
 	request.setAttribute("errorsPresent", true);
 	request.setAttribute("sendDisabled", sendDisabled);
-    }
-
-    private IEventNotificationService getEventNotificationService() {
-	if (EmailUserAction.eventNotificationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailUserAction.eventNotificationService = (IEventNotificationService) ctx
-		    .getBean("eventNotificationService");
-	}
-	return EmailUserAction.eventNotificationService;
-    }
-
-    private MessageService getMessageService() {
-	if (EmailUserAction.messageService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailUserAction.messageService = (MessageService) ctx
-		    .getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
-
-	}
-	return EmailUserAction.messageService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (EmailUserAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailUserAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return EmailUserAction.userManagementService;
     }
 
     private boolean canSend(HttpServletRequest request, UserDTO currentUser) {
@@ -168,22 +143,21 @@ public class EmailUserAction extends LamsDispatchAction {
 	    currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	}
 
-	boolean result = request.isUserInRole(Role.SYSADMIN) || getUserManagementService().isUserGlobalGroupAdmin();
+	boolean result = request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin();
 	if (!result) {
 	    String orgId = request.getParameter(AttributeNames.PARAM_ORGANISATION_ID);
 	    if (StringUtils.isBlank(orgId)) {
 		String lessonId = request.getParameter(AttributeNames.PARAM_LESSON_ID);
 		if (!StringUtils.isBlank(lessonId)) {
-		    Lesson lesson = (Lesson) getUserManagementService().findById(Lesson.class, new Long(lessonId));
+		    Lesson lesson = (Lesson) userManagementService.findById(Lesson.class, new Long(lessonId));
 		    if (lesson != null) {
 			orgId = lesson.getOrganisation().getOrganisationId().toString();
 		    }
 		}
 	    }
 	    if (!StringUtils.isBlank(orgId)) {
-		result = getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
-			Role.MONITOR)
-			|| getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
+		result = userManagementService.isUserInRole(currentUser.getUserID(), new Integer(orgId), Role.MONITOR)
+			|| userManagementService.isUserInRole(currentUser.getUserID(), new Integer(orgId),
 				Role.GROUP_MANAGER);
 	    }
 	}

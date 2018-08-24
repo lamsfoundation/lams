@@ -21,19 +21,17 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
  */
-public class PortraitActionForm extends ActionForm {
+public class PortraitActionForm {
 
     private Long portraitUuid;
-    private FormFile file;
+    private MultipartFile file;
 
     public Long getPortraitUuid() {
 	return portraitUuid;
@@ -43,11 +41,11 @@ public class PortraitActionForm extends ActionForm {
 	this.portraitUuid = uuid;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 

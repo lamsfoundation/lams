@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.webservice;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -31,12 +32,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.util.Base64StringToImageUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Paul Georges
@@ -53,16 +54,20 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *         with the Paint FCKEditor plugin.
  *
  */
-public class PaintAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/Paint")
+public class PaintController {
 
-    private static Logger logger = Logger.getLogger(PaintAction.class);
+    private static Logger logger = Logger.getLogger(PaintController.class);
 
     /**
      * @deprecated
      */
     @Deprecated
-    public ActionForward saveImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @ResponseBody
+    @RequestMapping(path = "/saveImage", method = RequestMethod.POST)
+    public void saveImage(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	try {
 	    String toolContentId = WebUtil.readStrParam(request, "toolContentId");
 	    String userId = WebUtil.readStrParam(request, "userId");
@@ -84,14 +89,26 @@ public class PaintAction extends LamsDispatchAction {
 	    boolean success = Base64StringToImageUtil.create(dir, filename, "png", data);
 
 	    if (success) {
-		writeAJAXResponse(response, absoluteFilePath);
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter writer = response.getWriter();
+
+		if (absoluteFilePath.length() > 0) {
+		    writer.println(absoluteFilePath);
+		}
 	    } else {
-		writeAJAXResponse(response, "");
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter writer = response.getWriter();
+		;
 	    }
+
 	} catch (Exception e) {
-	    writeAJAXResponse(response, e.getMessage());
+	    response.setContentType("text/html;charset=utf-8");
+	    PrintWriter writer = response.getWriter();
+
+	    if (e.getMessage().length() > 0) {
+		writer.println(e.getMessage());
+	    }
 	}
 
-	return null;
     }
 }

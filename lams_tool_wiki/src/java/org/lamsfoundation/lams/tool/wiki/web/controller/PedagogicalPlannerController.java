@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerController;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

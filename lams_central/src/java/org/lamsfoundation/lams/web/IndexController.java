@@ -34,12 +34,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -49,11 +45,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -64,21 +62,26 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class IndexAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/index")
+public class IndexController {
 
     private static final String PATH_PEDAGOGICAL_PLANNER = "pedagogical_planner";
     private static final String PATH_LAMS_CENTRAL = "lams-central.war";
 
-    private static Logger log = Logger.getLogger(IndexAction.class);
+    private static Logger log = Logger.getLogger(IndexController.class);
+    @Autowired
+    @Qualifier("userManagementService")
     private static IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("integrationService")
     private static IIntegrationService integrationService;
 
-    @Override
+    @RequestMapping("")
     @SuppressWarnings("unchecked")
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-	IndexAction.setHeaderLinks(request);
+	IndexController.setHeaderLinks(request);
 	setAdminLinks(request);
 
 	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
@@ -87,46 +90,45 @@ public class IndexAction extends LamsDispatchAction {
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if (userDTO.isFirstLogin()) {
 	    request.setAttribute("firstLogin", true);
-	    User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
+	    User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	    user.setFirstLogin(false);
-	    getUserManagementService().saveUser(user);
+	    userManagementService.saveUser(user);
 	    userDTO.setFirstLogin(false);
 	}
 
 	// check if user is flagged as needing to change their password
-	User loggedInUser = getUserManagementService().getUserByLogin(request.getRemoteUser());
+	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
 	if (loggedInUser.getChangePassword() != null && loggedInUser.getChangePassword()) {
-	    return mapping.findForward("password");
+	    return "redirect:/password.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
 	if (loggedInUser.isTwoFactorAuthenticationEnabled()
 		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
-	    return mapping.findForward("twoFactorAuthentication");
+	    return "redirect:/twoFactorAuthentication.do";
 	}
 
-	User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
+	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
 
 	String method = WebUtil.readStrParam(request, "method", true);
 	if (StringUtils.equals(method, "profile")) {
-	    return mapping.findForward("profile");
+	    return "redirect:/profile/view.do";
 	} else if (StringUtils.equals(method, "editprofile")) {
-	    return mapping.findForward("editprofile");
+	    return "redirect:/profile/edit.do";
 	} else if (StringUtils.equals(method, "password")) {
-	    return mapping.findForward("password");
+	    return "redirect:/password.do";
 	} else if (StringUtils.equals(method, "portrait")) {
-	    return mapping.findForward("portrait");
+	    return "/portrait.do";
 	} else if (StringUtils.equals(method, "lessons")) {
-	    return mapping.findForward("lessons");
+	    return "/profile/lessons.do";
 	}
 
-	
 	// This test also appears in LoginAsAction
 	Boolean allowDirectAccessIntegrationLearner = Configuration
 		.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
 	if (!allowDirectAccessIntegrationLearner) {
-	    boolean isIntegrationUser = getIntegrationService().isIntegrationUser(userDTO.getUserID());
+	    boolean isIntegrationUser = integrationService.isIntegrationUser(userDTO.getUserID());
 	    //prevent integration users with mere learner rights from accessing index.do
 	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
 		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.GROUP_ADMIN)
@@ -158,13 +160,13 @@ public class IndexAction extends LamsDispatchAction {
 	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isSysadmin, null);
 	request.setAttribute("isCourseSearchOn", userCoursesCount > 10);
 
-	return mapping.findForward("main");
+	return "main";
     }
 
     private static void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<>();
 	if (request.isUserInRole(Role.AUTHOR)) {
-	    if (IndexAction.isPedagogicalPlannerAvailable()) {
+	    if (IndexController.isPedagogicalPlannerAvailable()) {
 		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
 	    }
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:showAuthoringDialog()"));
@@ -184,9 +186,9 @@ public class IndexAction extends LamsDispatchAction {
 	if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN)
 		|| request.isUserInRole(Role.GROUP_MANAGER)) {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
-		    + getUserManagementService().getRootOrganisation().getOrganisationId() + ')'));
+		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
 	}
-	if (request.isUserInRole(Role.SYSADMIN) || getUserManagementService().isUserGlobalGroupAdmin()) {
+	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin()) {
 	    adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 	}
 	request.setAttribute("adminLinks", adminLinks);
@@ -195,10 +197,10 @@ public class IndexAction extends LamsDispatchAction {
     /**
      * Returns list of organisations for user. Used by offcanvas tablesorter on main.jsp.
      */
-    public ActionForward getOrgs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-	getUserManagementService();
-	User loggedInUser = getUserManagementService().getUserByLogin(request.getRemoteUser());
+    @ResponseBody
+    @RequestMapping("/getOrgs")
+    public void getOrgs(HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
+	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
 
 	Integer userId = loggedInUser.getUserId();
 	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
@@ -239,15 +241,13 @@ public class IndexAction extends LamsDispatchAction {
 	responcedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
-	return null;
     }
 
     /**
      * Toggles whether organisation is marked as favorite.
      */
-    public ActionForward toggleFavoriteOrganisation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-	getUserManagementService();
+    @RequestMapping("/toggleFavoriteOrganisation")
+    public String toggleFavoriteOrganisation(HttpServletRequest request) throws IOException, ServletException {
 	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 	Integer userId = getUserId();
 
@@ -261,15 +261,15 @@ public class IndexAction extends LamsDispatchAction {
 	String activeOrgId = request.getParameter("activeOrgId");
 	request.setAttribute("activeOrgId", activeOrgId);
 
-	return mapping.findForward("favoriteOrganisations");
+	return "favoriteOrganisations";
     }
 
     /**
      * Saves to DB last visited organisation. It's required for displaying some org on main.jsp next time user logs in.
      */
-    public ActionForward storeLastVisitedOrganisation(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
-	getUserManagementService();
+    @ResponseBody
+    @RequestMapping("/storeLastVisitedOrganisation")
+    public void storeLastVisitedOrganisation(HttpServletRequest request) throws IOException, ServletException {
 	Integer lastVisitedOrganisationId = WebUtil.readIntParam(request, "orgId", false);
 
 	//saves to DB last visited organisation
@@ -279,30 +279,12 @@ public class IndexAction extends LamsDispatchAction {
 	    userManagementService.saveUser(user);
 	}
 
-	return null;
     }
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null ? learner.getUserID() : null;
-    }
-
-    private IIntegrationService getIntegrationService() {
-	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
-	}
-	return integrationService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return userManagementService;
     }
 
     private static boolean isPedagogicalPlannerAvailable() {

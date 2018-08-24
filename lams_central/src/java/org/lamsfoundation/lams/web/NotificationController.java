@@ -30,10 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.events.Event;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.events.Subscription;
@@ -41,8 +37,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -53,15 +52,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  *
  */
-public class NotificationAction extends DispatchAction {
+@Controller
+@RequestMapping("//notification")
+public class NotificationController {
 
-    private static IEventNotificationService eventNotificationService;
+    @Autowired
+    @Qualifier("eventNotificationService")
+    private IEventNotificationService eventNotificationService;
 
-    public ActionForward getNotificationSubscriptions(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException {
+    @ResponseBody
+    @RequestMapping("/getNotificationSubscriptions")
+    public void getNotificationSubscriptions(HttpServletRequest req, HttpServletResponse res) throws IOException {
 	Integer limit = WebUtil.readIntParam(req, "limit", true);
 	Integer offset = WebUtil.readIntParam(req, "offset", true);
-	List<Subscription> subscriptions = getEventNotificationService().getNotificationSubscriptions(null,
+	List<Subscription> subscriptions = eventNotificationService.getNotificationSubscriptions(null,
 		getUser().getUserID(), false, limit, offset);
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (Subscription subscription : subscriptions) {
@@ -77,33 +81,22 @@ public class NotificationAction extends DispatchAction {
 	    res.setContentType("application/json;charset=UTF-8");
 	    res.getWriter().print(responseJSON.toString());
 	}
-	return null;
     }
 
-    public ActionForward markNotificationAsRead(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) {
+    @ResponseBody
+    @RequestMapping("/markNotificationAsRead")
+    public void markNotificationAsRead(HttpServletRequest req) {
 	long subscriptionUid = WebUtil.readLongParam(req, "subscriptionUid");
 	// trigger means send, i.e. mark as "seen"
-	getEventNotificationService().triggerForSingleUser(subscriptionUid, null, null);
-	return null;
+	eventNotificationService.triggerForSingleUser(subscriptionUid, null, null);
     }
 
-    public ActionForward getPendingNotificationCount(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException {
-	long count = getEventNotificationService().getNotificationPendingCount(null, getUser().getUserID());
+    @ResponseBody
+    @RequestMapping("/getPendingNotificationCount")
+    public void getPendingNotificationCount(HttpServletRequest req, HttpServletResponse res) throws IOException {
+	long count = eventNotificationService.getNotificationPendingCount(null, getUser().getUserID());
 	res.setContentType("text/plain;charset=UTF-8");
 	res.getWriter().print(count);
-	return null;
-    }
-
-    private IEventNotificationService getEventNotificationService() {
-	if (NotificationAction.eventNotificationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    NotificationAction.eventNotificationService = (IEventNotificationService) ctx
-		    .getBean("eventNotificationService");
-	}
-	return NotificationAction.eventNotificationService;
     }
 
     private UserDTO getUser() {

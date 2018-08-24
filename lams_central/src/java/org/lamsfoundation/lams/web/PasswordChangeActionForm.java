@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 
 /**
  * @author fmalikoff
@@ -37,10 +35,10 @@ import org.apache.struts.action.ActionMapping;
  *
  *
  */
-public class PasswordChangeActionForm extends ActionForm {
+public class PasswordChangeActionForm {
 
     public static final String formName = "PasswordChangeActionForm"; // must match name in @struts:action section above
-    
+
     private String redirectURL;
 
     private String oldPassword;
@@ -125,13 +123,13 @@ public class PasswordChangeActionForm extends ActionForm {
     public void setOldPassword(String oldPassword) {
 	this.oldPassword = StringUtils.trimToEmpty(oldPassword);
     }
-    
+
     public String getRedirectURL() {
-        return redirectURL;
+	return redirectURL;
     }
 
     public void setRedirectURL(String redirectURL) {
-        this.redirectURL = redirectURL;
+	this.redirectURL = redirectURL;
     }
 
     /**
@@ -142,8 +140,8 @@ public class PasswordChangeActionForm extends ActionForm {
      * @param request
      *            The servlet request we are processing
      */
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+
+    public void reset(HttpServletRequest request) {
 	setOldPassword(null);
 	setPassword(null);
 	setPasswordConfirm(null);

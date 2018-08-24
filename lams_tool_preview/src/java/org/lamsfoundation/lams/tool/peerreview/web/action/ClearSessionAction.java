@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.peerreview.web.action;
 
 import javax.servlet.http.HttpSession;

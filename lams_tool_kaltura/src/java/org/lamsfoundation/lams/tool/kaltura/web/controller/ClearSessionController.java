@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.kaltura.web.controller;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishController;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.springframework.beans.factory.annotation.Autowired;

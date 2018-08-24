@@ -124,12 +124,12 @@
                 <c:when test="${hidden}">
                   <!--  display a show link  -->
                   <c:set var="hideURL"><lams:LAMSURL />comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=false</c:set>
-                  <html:link href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" styleClass="comment"><fmt:message key="label.show" /></html:link>
+                  <a href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" class="comment"><fmt:message key="label.show" /></a>
                 </c:when>
                 <c:otherwise>
                   <!--  display a hide link -->
                   <c:set var="hideURL"><lams:LAMSURL />comments/hide.do?sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&hideFlag=true</c:set>
-                  <html:link href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" styleClass="comment"><fmt:message key="label.hide" /></html:link>
+                  <a href="javascript:hideEntry(${commentDto.comment.uid}, '${hideURL}');" class="comment"><fmt:message key="label.hide" /></a>
                 </c:otherwise>
               </c:choose>
               &middot; 

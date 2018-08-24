@@ -39,10 +39,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
@@ -67,8 +63,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -77,86 +77,102 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * This is an action where all lams client environments launch. initial configuration of the individual environment
  * setting is done here.
  */
-public class HomeAction extends DispatchAction {
+@Controller
+@RequestMapping("/home")
+public class HomeController {
 
-    private static Logger log = Logger.getLogger(HomeAction.class);
+    private static Logger log = Logger.getLogger(HomeController.class);
 
+    @Autowired
+    @Qualifier("userManagementService")
     private static IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("lessonService")
     private static ILessonService lessonService;
+    @Autowired
+    @Qualifier("learningDesignService")
     private static ILearningDesignService learningDesignService;
+    @Autowired
+    @Qualifier("learningDesignService")
     private static IGroupUserDAO groupUserDAO;
+    @Autowired
+    @Qualifier("workspaceManagementService")
     private static IWorkspaceManagementService workspaceManagementService;
+    @Autowired
+    @Qualifier("securityService")
     private static ISecurityService securityService;
+    @Autowired
+    WebApplicationContext applicationcontext;
 
     /**
      * request for sysadmin environment
      */
-    public ActionForward sysadmin(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, ServletException {
+    @RequestMapping("/sysadmin")
+    public String sysadmin(HttpServletRequest req) throws IOException, ServletException {
 
 	try {
-	    HomeAction.log.debug("request sysadmin");
+	    HomeController.log.debug("request sysadmin");
 	    int orgId = new Integer(req.getParameter("orgId")).intValue();
 	    UserDTO user = getUser();
 	    if (user == null) {
-		HomeAction.log.error("admin: User missing from session. ");
-		return mapping.findForward("error");
-	    } else if (getUserManagementService().isUserInRole(user.getUserID(), orgId, Role.SYSADMIN)) {
-		HomeAction.log.debug("user is sysadmin");
-		return mapping.findForward("sysadmin");
+		HomeController.log.error("admin: User missing from session. ");
+		return "errorContent";
+	    } else if (userManagementService.isUserInRole(user.getUserID(), orgId, Role.SYSADMIN)) {
+		HomeController.log.debug("user is sysadmin");
+		return "sysadmin";
 	    } else {
-		HomeAction.log.error("User " + user.getLogin()
+		HomeController.log.error("User " + user.getLogin()
 			+ " tried to get sysadmin screen but isn't sysadmin in organisation: " + orgId);
-		return displayMessage(mapping, req, "error.authorisation");
+		return displayMessage(req, "error.authorisation");
 	    }
 
 	} catch (Exception e) {
-	    HomeAction.log.error("Failed to load sysadmin", e);
-	    return mapping.findForward("error");
+	    HomeController.log.error("Failed to load sysadmin", e);
+	    return "errorContent";
 	}
     }
 
     /**
      * request for learner environment
      */
-    public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, ServletException {
+    @RequestMapping("/learner")
+    public String learner(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 	try {
 	    Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	    UserDTO user = getUser();
 	    if (user == null) {
-		HomeAction.log.error("learner: User missing from session. ");
-		return mapping.findForward("error");
+		HomeController.log.error("learner: User missing from session. ");
+		return "errorContent";
 	    }
 
-	    if (!getSecurityService().isLessonLearner(lessonId, user.getUserID(), "access lesson", false)) {
+	    if (!securityService.isLessonLearner(lessonId, user.getUserID(), "access lesson", false)) {
 		res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
 		return null;
 	    }
 
 	    String mode = WebUtil.readStrParam(req, AttributeNames.PARAM_MODE, true);
-	    Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
+	    Lesson lesson = lessonId != null ? lessonService.getLesson(lessonId) : null;
 	    if (!lesson.isLessonStarted()) {
-		return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
+		return displayMessage(req, "message.lesson.not.started.cannot.participate");
 	    }
-	    if (!getLessonService().checkLessonReleaseConditions(lessonId, user.getUserID())) {
-		return displayMessage(mapping, req, "message.preceding.lessons.not.finished.cannot.participate");
+	    if (!lessonService.checkLessonReleaseConditions(lessonId, user.getUserID())) {
+		return displayMessage(req, "message.preceding.lessons.not.finished.cannot.participate");
 	    }
 
 	    // check if the lesson is scheduled to be finished to individual users
 	    if (lesson.isScheduledToCloseForIndividuals()) {
-		GroupUser groupUser = getGroupUserDAO().getGroupUser(lesson, user.getUserID());
+		GroupUser groupUser = groupUserDAO.getGroupUser(lesson, user.getUserID());
 		if ((groupUser != null) && (groupUser.getScheduledLessonEndDate() != null)
 			&& groupUser.getScheduledLessonEndDate().before(new Date())) {
-		    HomeAction.log.error("learner: User " + user.getLogin()
+		    HomeController.log.error("learner: User " + user.getLogin()
 			    + " cannot access the lesson due to lesson end date has passed.");
-		    return displayMessage(mapping, req, "error.finish.date.passed");
+		    return displayMessage(req, "error.finish.date.passed");
 		}
 	    }
 
 	    // check lesson's state if its suitable for learner's access
 	    if (!lesson.isLessonAccessibleForLearner()) {
-		return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
+		return displayMessage(req, "error.lesson.not.accessible.for.learners");
 	    }
 
 	    // show lesson intro page if required and it's not been shown already
@@ -171,7 +187,7 @@ public class HomeAction extends DispatchAction {
 		    Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
 		    req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
 		}
-		return mapping.findForward("lessonIntro");
+		return "lessonIntro";
 	    }
 
 	    if (mode != null) {
@@ -183,13 +199,13 @@ public class HomeAction extends DispatchAction {
 	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
+	    applicationcontext.getServletContext().getContext(serverURLContextPath + "learning")
 		    .getRequestDispatcher("/welcome.jsp?lessonID=" + lessonId).forward(req, res);
 	    return null;
 
 	} catch (Exception e) {
-	    HomeAction.log.error("Failed to load learner", e);
-	    return mapping.findForward("error");
+	    HomeController.log.error("Failed to load learner", e);
+	    return "errorContent";
 	}
     }
 
@@ -198,8 +214,8 @@ public class HomeAction extends DispatchAction {
      *
      * @throws IOException
      */
-    public ActionForward author(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
-	    throws IOException {
+    @RequestMapping("/author")
+    public String author(HttpServletRequest req, HttpServletResponse res) throws IOException {
 	String url = Configuration.get(ConfigurationKeys.SERVER_URL) + "authoring/author.do?method=openAuthoring";
 	Long learningDesignID = WebUtil.readLongParam(req, "learningDesignID", true);
 
@@ -214,19 +230,19 @@ public class HomeAction extends DispatchAction {
     /**
      * Request for Monitor environment.
      */
-    public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, ServletException {
+    @RequestMapping("/monitorLesson")
+    public String monitorLesson(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	UserDTO user = getUser();
 	if (user == null) {
-	    HomeAction.log.error("User missing from session. Can not open Lesson Monitor.");
-	    return mapping.findForward("error");
+	    HomeController.log.error("User missing from session. Can not open Lesson Monitor.");
+	    return "errorContent";
 	}
 
-	Lesson lesson = lessonId == null ? null : getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonId == null ? null : lessonService.getLesson(lessonId);
 	if (lesson == null) {
-	    HomeAction.log.error("Lesson " + lessonId + " does not exist. Can not open Lesson Monitor.");
-	    return mapping.findForward("error");
+	    HomeController.log.error("Lesson " + lessonId + " does not exist. Can not open Lesson Monitor.");
+	    return "errorContent";
 	}
 
 	// security check will be done there
@@ -236,26 +252,24 @@ public class HomeAction extends DispatchAction {
 	return null;
     }
 
+    @RequestMapping("/addLesson")
     @SuppressWarnings("unchecked")
-    public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, UserAccessDeniedException, RepositoryCheckedException {
-	UserDTO userDTO = getUser();
+    public String addLesson(HttpServletRequest req, HttpServletResponse res)
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
-
-	if (!getSecurityService().isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson", false)) {
+	UserDTO userDTO = getUser();
+	if (!securityService.isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson", false)) {
 	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
 
 	// get all user accessible folders and LD descriptions as JSON
-	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(null, userDTO.getUserID(),
-		false);
+	String folderContentsJSON = workspaceManagementService.getFolderContentsJSON(null, userDTO.getUserID(), false);
 	req.setAttribute("folderContents", folderContentsJSON);
 	ObjectNode users = JsonNodeFactory.instance.objectNode();
 
 	// get learners available for newly created lesson
-	Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(organisationID, "LEARNER",
-		true);
+	Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(organisationID, "LEARNER", true);
 	for (User user : learners) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("userID", user.getUserId());
@@ -266,8 +280,7 @@ public class HomeAction extends DispatchAction {
 	    users.withArray("selectedLearners").add(userJSON);
 	}
 
-	Vector<User> monitors = getUserManagementService().getUsersFromOrganisationByRole(organisationID, "MONITOR",
-		true);
+	Vector<User> monitors = userManagementService.getUsersFromOrganisationByRole(organisationID, "MONITOR", true);
 	for (User user : monitors) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("userID", user.getUserId());
@@ -286,8 +299,7 @@ public class HomeAction extends DispatchAction {
 	req.setAttribute("users", users.toString());
 
 	// find lessons which can be set as preceding ones for newly created lesson
-	Organisation organisation = (Organisation) getUserManagementService().findById(Organisation.class,
-		organisationID);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	Set<LessonDTO> availableLessons = new TreeSet<>(new LessonDTOComparator());
 	for (Lesson availableLesson : (Set<Lesson>) organisation.getLessons()) {
 	    Integer availableLessonState = availableLesson.getLessonStateId();
@@ -298,39 +310,40 @@ public class HomeAction extends DispatchAction {
 	}
 	req.setAttribute("availablePrecedingLessons", availableLessons);
 
-	return mapping.findForward("addLesson");
+	return "addLesson";
     }
 
     /**
      * Gets subfolder contents in Add Lesson screen.
      */
-    public ActionForward getFolderContents(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws UserAccessDeniedException, IOException, RepositoryCheckedException {
+    @ResponseBody
+    @RequestMapping("/getFolderContents")
+    public void getFolderContents(HttpServletRequest req, HttpServletResponse res)
+	    throws UserAccessDeniedException, IOException, RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
-	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID,
-		getUser().getUserID(), allowInvalidDesigns);
+	String folderContentsJSON = workspaceManagementService.getFolderContentsJSON(folderID, getUser().getUserID(),
+		allowInvalidDesigns);
 
 	res.setContentType("application/json;charset=UTF-8");
 	res.getWriter().print(folderContentsJSON);
-	return null;
     }
 
-    public ActionForward getLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException {
+    @ResponseBody
+    @RequestMapping("/getLearningDesignThumbnail")
+    public void getLearningDesignThumbnail(HttpServletRequest req, HttpServletResponse res) throws IOException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	String imagePath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
 	File imageFile = new File(imagePath);
 	if (!imageFile.canRead()) {
 	    res.sendError(HttpServletResponse.SC_NOT_FOUND);
-	    return null;
 	}
 
 	boolean download = WebUtil.readBooleanParam(req, "download", false);
 	// should the image be downloaded or a part of page?
 	if (download) {
-	    String name = getLearningDesignService()
-		    .getLearningDesignDTO(learningDesignId, getUser().getLocaleLanguage()).getTitle();
+	    String name = learningDesignService.getLearningDesignDTO(learningDesignId, getUser().getLocaleLanguage())
+		    .getTitle();
 	    name += "." + "svg";
 	    name = FileUtil.encodeFilenameForDownload(req, name);
 	    res.setContentType("application/x-download");
@@ -345,76 +358,18 @@ public class HomeAction extends DispatchAction {
 	IOUtils.closeQuietly(input);
 	IOUtils.closeQuietly(output);
 
-	return null;
     }
 
-    public ActionForward logout(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
-	    throws IOException, ServletException {
+    @RequestMapping("/logout")
+    public String logout(HttpServletRequest req) throws IOException, ServletException {
 
 	req.getSession().invalidate();
-	return mapping.findForward("index");
+	return "index";
     }
 
-    private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
+    private String displayMessage(HttpServletRequest req, String messageKey) {
 	req.setAttribute("messageKey", messageKey);
-	return mapping.findForward("message");
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (HomeAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return HomeAction.userManagementService;
-    }
-
-    private ILessonService getLessonService() {
-	if (HomeAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return HomeAction.lessonService;
-    }
-
-    private ILearningDesignService getLearningDesignService() {
-	if (HomeAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
-	}
-	return HomeAction.learningDesignService;
-    }
-
-    private IGroupUserDAO getGroupUserDAO() {
-	if (HomeAction.groupUserDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
-	}
-	return HomeAction.groupUserDAO;
-    }
-
-    private IWorkspaceManagementService getWorkspaceManagementService() {
-	if (HomeAction.workspaceManagementService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.workspaceManagementService = (IWorkspaceManagementService) webContext
-		    .getBean("workspaceManagementService");
-	}
-
-	return HomeAction.workspaceManagementService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (HomeAction.securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    HomeAction.securityService = (ISecurityService) webContext.getBean("securityService");
-	}
-
-	return HomeAction.securityService;
+	return "msgContent";
     }
 
     private UserDTO getUser() {
@@ -423,6 +378,6 @@ public class HomeAction extends DispatchAction {
     }
 
     private User getRealUser(UserDTO dto) {
-	return getUserManagementService().getUserByLogin(dto.getLogin());
+	return userManagementService.getUserByLogin(dto.getLogin());
     }
 }

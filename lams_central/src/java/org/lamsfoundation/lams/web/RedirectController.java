@@ -29,9 +29,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -41,11 +38,12 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author lfoxton
@@ -74,24 +72,28 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  *
  */
-public class RedirectAction extends LamsAction {
+@Controller
+public class RedirectController {
 
-    private static Logger log = Logger.getLogger(RedirectAction.class);
+    private static Logger log = Logger.getLogger(RedirectController.class);
 
     public static final String PARAM_HASH = "h";
 
     public static final String ACCESS_MODE_TEACHER = "t";
     public static final String ACCESS_MODE_LEARNER = "l";
 
-    private static ILamsToolService lamsToolService;
-    private static IUserManagementService userService;
+    @Autowired
+    @Qualifier("lamsToolService")
+    private ILamsToolService lamsToolService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws Exception {
+    @RequestMapping("/r")
+    public String execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
 	try {
-	    String hash = WebUtil.readStrParam(req, RedirectAction.PARAM_HASH);
+	    String hash = WebUtil.readStrParam(req, RedirectController.PARAM_HASH);
 
 	    // Un-hash the string to gain all the paramters
 	    String fullParams = new String(Base64.decodeBase64(hash.getBytes()));
@@ -111,41 +113,41 @@ public class RedirectAction extends LamsAction {
 	    // Get the user
 	    UserDTO user = getUser();
 	    if (user == null) {
-		RedirectAction.log.error("admin: User missing from session. ");
-		return mapping.findForward("error");
+		RedirectController.log.error("admin: User missing from session. ");
+		return "errorContent";
 	    }
 
 	    // Get the tool session
 	    ToolSession toolSession = getToolSession(toolSessionID);
 
 	    if (toolSession == null) {
-		RedirectAction.log.error("No ToolSession with ID " + toolSessionID + " found.");
-		return mapping.findForward("error");
+		RedirectController.log.error("No ToolSession with ID " + toolSessionID + " found.");
+		return "errorContent";
 	    }
 
 	    // Get the lesson
 	    Lesson lesson = toolSession.getLesson();
 
 	    // Check the user's permissions, either learner or monitor
-	    if (accessMode.equals(RedirectAction.ACCESS_MODE_LEARNER)) {
+	    if (accessMode.equals(RedirectController.ACCESS_MODE_LEARNER)) {
 		if ((lesson == null) || !lesson.isLessonStarted()) {
-		    return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
+		    return displayMessage(req, "message.lesson.not.started.cannot.participate");
 		}
 
 		// Check the learner is part of the group in question
 		if (!toolSession.getLearners().contains(getRealUser(user))) {
-		    RedirectAction.log.error("learner: User " + user.getLogin()
+		    RedirectController.log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested group. Cannot access the lesson.");
-		    return displayMessage(mapping, req, "error.authorisation");
+		    return displayMessage(req, "error.authorisation");
 		}
 
-	    } else if (accessMode.equals(RedirectAction.ACCESS_MODE_TEACHER)) {
+	    } else if (accessMode.equals(RedirectController.ACCESS_MODE_TEACHER)) {
 
 		// Check this is a monitor for the lesson in question
 		if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
-		    RedirectAction.log.error("learner: User " + user.getLogin()
+		    RedirectController.log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
-		    return displayMessage(mapping, req, "error.authorisation");
+		    return displayMessage(req, "error.authorisation");
 		}
 
 	    } else {
@@ -157,14 +159,14 @@ public class RedirectAction extends LamsAction {
 
 	    return null;
 	} catch (Exception e) {
-	    RedirectAction.log.error("Failed redirect to url", e);
-	    return mapping.findForward("error");
+	    RedirectController.log.error("Failed redirect to url", e);
+	    return "errorContent";
 	}
     }
 
-    private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
+    private String displayMessage(HttpServletRequest req, String messageKey) {
 	req.setAttribute("messageKey", messageKey);
-	return mapping.findForward("message");
+	return "msgContent";
     }
 
     private UserDTO getUser() {
@@ -173,36 +175,11 @@ public class RedirectAction extends LamsAction {
     }
 
     private User getRealUser(UserDTO dto) {
-	return getUserService().getUserByLogin(dto.getLogin());
+	return userService.getUserByLogin(dto.getLogin());
     }
 
     private ToolSession getToolSession(Long toolSessionID) {
-	return getLamsToolService().getToolSession(toolSessionID);
+	return lamsToolService.getToolSession(toolSessionID);
     }
 
-    private IUserManagementService getUserService() {
-	if (RedirectAction.userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    RedirectAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return RedirectAction.userService;
-    }
-
-    public static void setUserService(IUserManagementService userService) {
-	RedirectAction.userService = userService;
-    }
-
-    private ILamsToolService getLamsToolService() {
-	if (RedirectAction.lamsToolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    RedirectAction.lamsToolService = (ILamsToolService) ctx.getBean("lamsToolService");
-	}
-	return RedirectAction.lamsToolService;
-    }
-
-    public static void setLamsToolService(ILamsToolService lamsToolService) {
-	RedirectAction.lamsToolService = lamsToolService;
-    }
 }

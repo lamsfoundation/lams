@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.apache.struts.action.ActionMessages"
@@ -97,7 +95,7 @@
 </lams:head>
 
 <body>
-<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
+<form:form modelAttribute="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
 	<div style="clear: both"></div>
 	<div class="container">
 		<div class="row vertical-center-row">
@@ -109,11 +107,14 @@
 								<bean:write name="errMsg" />
 								<br>
 							</html:messages>
+							
+							
 						</p>
-					</logic:messagesPresent>
+						</logic:messagesPresent>
+
 					<div class="panel-body">
 					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
-							<html:hidden name="<%=PasswordChangeActionForm.formName%>"
+							<form:hidden name="<%=PasswordChangeActionForm.formName%>"
 								property="login" />
 							<div class="form-group">
 								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
@@ -155,9 +156,9 @@
 							<div class="form-group" align="right">
 							<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="button.cancel"/>" formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-sm btn-default voffset5"/>
 								&nbsp;&nbsp;
-								<html:submit styleClass="btn btn-sm btn-primary voffset5">
+								<button class="btn btn-sm btn-primary voffset5">
 									<fmt:message key="button.save" />
-								</html:submit>
+								</button>
 
 							</div>
 					</div>
@@ -166,6 +167,6 @@
 			</div>
 		</div>
 	</div>
-</form>
+</form:form>
 </body>
 </lams:html>

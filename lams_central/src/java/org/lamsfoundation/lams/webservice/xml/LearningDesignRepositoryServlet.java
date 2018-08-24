@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+import org.lamsfoundation.lams.workspace.web.WorkspaceController;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -171,7 +171,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	FolderContentDTO rootFolder = new FolderContentDTO(
 		LearningDesignRepositoryServlet.msgService.getMessage("label.workspace.root_folder"),
 		LearningDesignRepositoryServlet.msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
-		WorkspaceAction.BOOTSTRAP_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
+		WorkspaceController.BOOTSTRAP_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
 	ContentTreeNode root = new ContentTreeNode(rootFolder);
 	FolderContentDTO userFolder = LearningDesignRepositoryServlet.service.getUserWorkspaceFolder(userId);
 	root.addChild(buildContentTreeNode(userFolder, userId, mode));
@@ -179,7 +179,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	FolderContentDTO dummyOrgFolder = new FolderContentDTO(
 		LearningDesignRepositoryServlet.msgService.getMessage("organisations"),
 		LearningDesignRepositoryServlet.msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
-		new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS, null);
+		new Long(WorkspaceController.ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS, null);
 	ContentTreeNode dummyOrgNode = new ContentTreeNode(dummyOrgFolder);
 	// tried using service.getAccessibleOrganisationWorkspaceFolders(userId)
 	// api,

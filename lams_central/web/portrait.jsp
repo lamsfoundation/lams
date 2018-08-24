@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 
 <lams:html>
 <lams:head>
@@ -126,8 +124,8 @@
 </lams:head>
 
 <body>
-<html:form action="/saveportrait.do" method="post" styleId="PortraitActionForm"	enctype="multipart/form-data">
-	<html:hidden name="PortraitActionForm" property="portraitUuid" />
+<form:form action="/saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" enctype="multipart/form-data">
+	<form:hidden name="PortraitActionForm" path="portraitUuid" />
 	<div style="clear: both"></div>
 	
 	<div class="container">
@@ -231,6 +229,6 @@
 	</div>
 	</div>
 	</div>	
-</html:form>
+</form:form>
 </body>
 </lams:html>
