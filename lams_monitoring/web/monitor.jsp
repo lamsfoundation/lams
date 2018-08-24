@@ -1,9 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn" %>
+<%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <c:set var="ALLOW_DIRECT_LESSON_LAUNCH"><%=Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
 <c:set var="serverURL"><%=Configuration.get(ConfigurationKeys.SERVER_URL)%></c:set>

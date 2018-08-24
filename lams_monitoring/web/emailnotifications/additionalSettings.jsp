@@ -1,9 +1,4 @@
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<%@ include file="/taglibs.jsp"%>
 
 <div id="accordion">
 	<h4 id="nowHeader">

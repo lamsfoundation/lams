@@ -12,15 +12,15 @@
 			
 			<hr />
 			<p><fmt:message key="label.gate.open.single.learner"/></p>
-			<html:form action="/gate?method=openGateForSingleUser" target="_self">
-			<input type="hidden" id="activityId" name="activityId" value="${GateForm.map.activityId}" />
+			<form:form action="openGateForSingleUser.do" id="gateForm" modelAttribute="gateForm" target="_self">
+			<input type="hidden" id="activityId" name="activityId" value="${gateForm.activityId}" />
 			<input type="hidden" id="userId" name="userId" />
 			
 			<div class="row">
 				<div class="col-sm-4">
 					  <p class="text-danger text-center"><strong><fmt:message key="label.gate.list.all.learners"/></strong></p>
 						<div class="panel panel-default gateLearners" id="forbidden">
-							<c:forEach var="learner" items="${GateForm.map.forbiddenLearnerList}">
+							<c:forEach var="learner" items="${gateForm.forbiddenLearnerList}">
 								<input id="forbidden-${learner.userId}" type="checkbox" value="${learner.userId}" />
 								<label for="forbidden-${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></label>
 								<br />
@@ -33,7 +33,7 @@
 				<div class="col-sm-4">
 						<p class="text-center"><strong><fmt:message key="label.gate.list.waiting.learners"/></strong></p>
 						<div class="panel panel-default gateLearners" id="waiting">
-							<c:forEach var="learner" items="${GateForm.map.waitingLearnerList}">
+							<c:forEach var="learner" items="${gateForm.waitingLearnerList}">
 								<input id="waiting-${learner.userId}" type="checkbox" value="${learner.userId}" />
 								<label for="waiting-${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></label>
 								<br />
@@ -46,7 +46,7 @@
 				<div class="col-sm-4">
 							<p class="text-success text-center"><strong><fmt:message key="label.gate.list.allowed.learners"/></strong></p>
 							<div class="panel panel-default gateLearners">
-								<c:forEach var="learner" items="${GateForm.map.allowedToPassLearnerList}">
+								<c:forEach var="learner" items="${gateForm.allowedToPassLearnerList}">
 									<span><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></span>
 									<br />
 								</c:forEach>
@@ -54,4 +54,4 @@
 				</div>
 			</div>
 
-			</html:form>		
+			</form:form>		

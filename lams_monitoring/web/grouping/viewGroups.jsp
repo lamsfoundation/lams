@@ -19,13 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-function" prefix="fn" %>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ include file="/taglibs.jsp"%>
 <lams:css webapp="monitoring" suffix="monitorLesson"/>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <lams:Page type="monitor" title="${title}">

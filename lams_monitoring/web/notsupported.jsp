@@ -18,8 +18,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<%@ include file="/taglibs.jsp"%>
+<!DOCTYPE html>
+<lams:html>
+    <lams:head>
+		<lams:css/>
+		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
+    </lams:head>
+    
+    <body class="stripes">
+		<H1><fmt:message key="not.supported"/></H1>
+		
+		<div id="footer">
+		</div><!--closes footer-->
 
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
+    </body>
+</lams:html>
 
-	<H1><fmt:message key="not.supported"/></H1>

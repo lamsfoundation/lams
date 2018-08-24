@@ -1,10 +1,4 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
@@ -57,12 +51,12 @@
 
 	<c:choose>
 		<c:when test="${lessonID != null}">
-			<c:set var="returnUrlParams">?method=getLessonView&lessonID=${lessonID}</c:set>
-			<c:set var="deleteUrlParams">method=deleteNotification&lessonID=${lessonID}</c:set>
+			<c:set var="returnUrlParams">getLessonView.do?lessonID=${lessonID}</c:set>
+			<c:set var="deleteUrlParams">deleteNotification.do?lessonID=${lessonID}</c:set>
 		</c:when>
 		<c:otherwise>
-			<c:set var="returnUrlParams">?method=getCourseView&organisationID=${organisationID}</c:set>
-			<c:set var="deleteUrlParams">method=deleteNotification&organisationID=${organisationID}</c:set>
+			<c:set var="returnUrlParams">getCourseView.do?organisationID=${organisationID}</c:set>
+			<c:set var="deleteUrlParams">deleteNotification.do?organisationID=${organisationID}</c:set>
 		</c:otherwise>
 	</c:choose>
 
@@ -113,7 +107,7 @@
 		</c:forEach>
 	</table>
 	
-	<a href="<c:url value='/emailNotifications.do'/>${returnUrlParams}" class="btn btn-primary pull-right">
+	<a href="<c:url value='/emailNotifications/'/>${returnUrlParams}" class="btn btn-primary pull-right">
 		<fmt:message key="email.notifications.scheduled.messages.list.back" />
 	</a>
 	</lams:Page>

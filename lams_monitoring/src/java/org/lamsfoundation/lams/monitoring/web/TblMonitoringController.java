@@ -11,12 +11,8 @@ import java.util.TreeSet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -46,8 +42,10 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -56,9 +54,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author Andrey Balan
  */
-public class TblMonitoringAction extends LamsDispatchAction {
+@Controller
+@RequestMapping("/tblmonitor")
+public class TblMonitoringController {
 
-    private static Logger log = Logger.getLogger(TblMonitoringAction.class);
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    private static Logger log = Logger.getLogger(TblMonitoringController.class);
 
     private static ILessonService lessonService;
     private static IMonitoringService monitoringService;
@@ -70,9 +73,8 @@ public class TblMonitoringAction extends LamsDispatchAction {
     /**
      * Displays addStudent page.
      */
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/start")
+    public String unspecified(HttpServletRequest request) throws Exception {
 	initServices();
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -82,14 +84,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	List<Activity> lessonActivities = getLessonActivities(lesson);
 	setupAvailableActivityTypes(request, lessonActivities);
-	return mapping.findForward("tblmonitor");
+	return "tblmonitor/tblmonitor";
     }
 
     /**
      * Shows Teams page
      */
-    public ActionForward teams(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/teams")
+    public String teams(HttpServletRequest request) throws IOException, ServletException {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
@@ -119,14 +121,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	    traGradebookUserActivities = gradebookService.getGradebookUserActivities(traToolActivityId);
 	}
 
-	Set<Long> leaderUserIds = leaderselectionToolActivityId == null ? new HashSet<Long>()
+	Set<Long> leaderUserIds = leaderselectionToolActivityId == null ? new HashSet<>()
 		: toolService.getLeaderUserId(leaderselectionToolActivityId);
 
 	GroupingActivity groupingActivity = getGroupingActivity(lesson);
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();
 	Set<Group> groups = grouping == null ? null : grouping.getGroups();
 
-	Set<TblGroupDTO> groupDtos = new TreeSet<TblGroupDTO>();
+	Set<TblGroupDTO> groupDtos = new TreeSet<>();
 	if (groups != null) {
 	    for (Group group : groups) {
 		TblGroupDTO groupDto = new TblGroupDTO(group);
@@ -169,17 +171,17 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	}
 	request.setAttribute("groupDtos", groupDtos);
 
-	return mapping.findForward("teams");
+	return "tblmonitor/teams";
     }
 
     /**
      * Shows Gates page
      */
-    public ActionForward gates(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/gates")
+    public String gates(HttpServletRequest request) throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	List<PermissionGateDTO> permissionGates = new ArrayList<PermissionGateDTO>();
+	List<PermissionGateDTO> permissionGates = new ArrayList<>();
 
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
 	if (contributeActivities != null) {
@@ -211,14 +213,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("permissionGates", permissionGates);
-	return mapping.findForward("gates");
+	return "tblmonitor/gates";
     }
 
     /**
      * Shows forum page
      */
-    public ActionForward forum(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/forum")
+    public String forum(HttpServletRequest request) throws IOException, ServletException {
 
 	long forumActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity forumActivity = (ToolActivity) monitoringService.getActivityById(forumActivityId);
@@ -229,14 +231,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	Set<ToolSession> toolSessions = forumActivity.getToolSessions();
 	request.setAttribute("toolSessions", toolSessions);
 
-	return mapping.findForward("forum");
+	return "tblmonitor/forum";
     }
 
     /**
      * Shows peerreview page
      */
-    public ActionForward peerreview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/peerreview")
+    public String peerreview(HttpServletRequest request) throws IOException, ServletException {
 
 	long peerreviewActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity peerreviewActivity = (ToolActivity) monitoringService.getActivityById(peerreviewActivityId);
@@ -247,18 +249,18 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	Set<ToolSession> toolSessions = peerreviewActivity.getToolSessions();
 	request.setAttribute("toolSessions", toolSessions);
 
-	return mapping.findForward("peerreview");
+	return "tblmonitor/peerreview";
     }
 
     /**
      * Shows sequence diagram page
      */
-    public ActionForward sequence(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/sequence")
+    public String sequence(HttpServletRequest request) throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 	request.setAttribute("lesson", lesson);
-	return mapping.findForward("sequence");
+	return "tblmonitor/sequence";
     }
 
     /**
@@ -276,7 +278,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	 */
 	Activity firstActivity = activityDAO
 		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
-	List<Activity> activities = new ArrayList<Activity>();
+	List<Activity> activities = new ArrayList<>();
 	sortActivitiesByLearningDesignOrder(firstActivity, activities);
 
 	return activities;
@@ -334,7 +336,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
     }
 
     private GroupingActivity getGroupingActivity(Lesson lesson) {
-	Set<Activity> activities = new TreeSet<Activity>();
+	Set<Activity> activities = new TreeSet<>();
 
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
@@ -358,7 +360,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
     }
 
     private void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
-	
+
 	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
 	boolean isScratchieAvailable = false;
 	for (Activity activity : activities) {
@@ -401,7 +403,8 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		}
 
 		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
-		if ((scratchiePassed || !isScratchieAvailable) && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+		if ((scratchiePassed || !isScratchieAvailable)
+			&& CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    request.setAttribute("isAeAvailable", true);
 		    //prepare assessment details to be passed to Assessment tool
 		    assessmentToolContentIds += toolContentId + ",";
@@ -439,7 +442,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
     }
 
     private void initServices() {
-	ServletContext servletContext = this.getServlet().getServletContext();
+	ServletContext servletContext = this.applicationContext.getServletContext();
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
 	if (lessonService == null) {
 	    lessonService = (ILessonService) ctx.getBean("lessonService");
