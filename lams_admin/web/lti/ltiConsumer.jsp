@@ -8,7 +8,7 @@
 	<title>${title}</title>
 
 	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -48,11 +48,11 @@
 	<c:set var="title"><fmt:message key="label.edit.tool.consumer"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="ltiConsumerForm">
 				<p>
-					<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
 						<fmt:message key="sysadmin.maintain" />
 					</a>
 					
-					<a href="<lams:LAMSURL/>/admin/ltiConsumerManagement/start.do" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default">
 						<fmt:message key="label.manage.tool.consumers" />
 					</a>
 				</p>
@@ -102,7 +102,7 @@
 					</table>
 					
 					<div class="pull-right">
-						<a href="<lams:LAMSURL/>/admin/ltiConsumerManagement/start.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+						<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 					</div>
 				</form:form>

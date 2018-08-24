@@ -60,7 +60,7 @@
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 			<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importExcelForm">
 				<p>
-					<a href="<lams:LAMSURL/>/admin/sysadminstart.do"
+					<a href="<lams:LAMSURL/>admin/sysadminstart.do"
 						class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
 				</p>
 				
@@ -123,7 +123,7 @@
 					<lams:WaitingSpinner id="fileUpload_Busy"/> 
 				
 					<div class="pull-right">
-						<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+						<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import" />" />
 						&nbsp;
 					</div>

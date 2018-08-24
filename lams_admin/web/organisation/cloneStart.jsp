@@ -9,7 +9,7 @@
 	<title>${title}</title>
 
 	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -38,7 +38,7 @@
 					$("#sourceGroupId").change(function() {
 						loadSubgroups($("#sourceGroupId").val());
 					});
-					$("#sourceGroupId").load("<lams:LAMSURL/>/admin/clone/getGroups.do", function() {
+					$("#sourceGroupId").load("<lams:LAMSURL/>admin/clone/getGroups.do", function() {
 						loadSubgroups($("#sourceGroupId").val());
 					});
 					$("a.lessonNameLink").on("click", function() {
@@ -47,7 +47,7 @@
 				});
 			
 				function loadSubgroups(groupId) {
-					$("#sourceSubgroupId").load("<lams:LAMSURL/>/admin/clone/getSubgroups.do", { groupId: groupId });
+					$("#sourceSubgroupId").load("<lams:LAMSURL/>admin/clone/getSubgroups.do", { groupId: groupId });
 				}
 			
 				function chosenGroup() {
@@ -60,7 +60,7 @@
 			
 				function loadGroupAttributes(sourceGroupId) {
 					$("#cloneOptionsDiv").show();
-					$("#availableLessons").load("<lams:LAMSURL/>/admin/clone/availableLessons.do", { sourceGroupId: sourceGroupId });
+					$("#availableLessons").load("<lams:LAMSURL/>admin/clone/availableLessons.do", { sourceGroupId: sourceGroupId });
 				}
 			
 				function lessonDialog(lessonId) {
@@ -90,7 +90,7 @@
 			
 				function staffDialog() {
 					if (!staffLoaded) {
-						$("#staffDialog").load("<lams:LAMSURL/>/admin/clone/selectStaff.do", { groupId: <c:out value="${org.organisationId}" /> });
+						$("#staffDialog").load("<lams:LAMSURL/>admin/clone/selectStaff.do", { groupId: <c:out value="${org.organisationId}" /> });
 						initUserDialog("#staffDialog");
 						staffLoaded = true;
 					}
@@ -100,7 +100,7 @@
 			
 				function learnerDialog() {
 					if (!learnersLoaded) {
-						$("#learnerDialog").load("<lams:LAMSURL/>/admin/clone/selectLearners.do", { groupId: <c:out value="${org.organisationId}" /> });
+						$("#learnerDialog").load("<lams:LAMSURL/>admin/clone/selectLearners.do", { groupId: <c:out value="${org.organisationId}" /> });
 						initUserDialog("#learnerDialog");
 						learnersLoaded = true;
 					}

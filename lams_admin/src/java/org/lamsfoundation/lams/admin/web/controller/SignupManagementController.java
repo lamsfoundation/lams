@@ -18,10 +18,10 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -49,7 +49,7 @@ public class SignupManagementController {
     private MessageService adminMessageService;
 
     @RequestMapping("/start")
-    public String execute(@ModelAttribute("signupForm") SignupManagementForm signupForm, Errors errors, HttpServletRequest request,
+    public String execute(@ModelAttribute("signupForm") SignupManagementForm signupForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	try {
@@ -71,7 +71,7 @@ public class SignupManagementController {
 	    } else if (StringUtils.equals(action, "edit")) {
 		return edit(signupForm, request);
 	    } else if (StringUtils.equals(action, "add")) {
-		return add(signupForm, errors, request);
+		return add(signupForm, request);
 	    } else if (StringUtils.equals(action, "delete")) {
 		return delete(request);
 	    }
@@ -87,7 +87,8 @@ public class SignupManagementController {
     }
 
     @RequestMapping(path = "/edit")
-    public String edit(@ModelAttribute("signupForm") SignupManagementForm signupForm, HttpServletRequest request) throws Exception {
+    public String edit(@ModelAttribute("signupForm") SignupManagementForm signupForm, HttpServletRequest request)
+	    throws Exception {
 
 	Integer soid = WebUtil.readIntParam(request, "soid", false);
 
@@ -118,21 +119,25 @@ public class SignupManagementController {
     }
 
     @RequestMapping(path = "/add")
-    public String add(@ModelAttribute("signupForm") SignupManagementForm signupForm, Errors errors, HttpServletRequest request)
+    public String add(@ModelAttribute("signupForm") SignupManagementForm signupForm, HttpServletRequest request)
 	    throws Exception {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// check if form submitted
 	if (signupForm.getOrganisationId() != null && signupForm.getOrganisationId() > 0) {
 
 	    // validate
 	    if (!StringUtils.equals(signupForm.getCourseKey(), signupForm.getConfirmCourseKey())) {
-		errors.reject("courseKey", adminMessageService.getMessage("error.course.keys.unequal"));
+		errorMap.add("courseKey", adminMessageService.getMessage("error.course.keys.unequal"));
 	    }
 	    if (signupService.contextExists(signupForm.getSignupOrganisationId(), signupForm.getContext())) {
-		errors.reject("context", adminMessageService.getMessage("error.context.exists"));
+		errorMap.add("context", adminMessageService.getMessage("error.context.exists"));
 	    }
 
-	    if (!errors.hasErrors()) {
+	    if (!errorMap.isEmpty()) {
+		request.setAttribute("errorMap", errorMap);
+	    } else {
 		// proceed
 		SignupOrganisation signup;
 		if (signupForm.getSignupOrganisationId() != null && signupForm.getSignupOrganisationId() > 0) {
@@ -156,7 +161,7 @@ public class SignupManagementController {
 		signup.setContext(signupForm.getContext());
 		userManagementService.save(signup);
 
-		return "forward:../signupManagement/start.do";
+		return "forward:/signupManagement/start.do";
 	    }
 	} else {
 	    // form not submitted, default values
@@ -178,6 +183,6 @@ public class SignupManagementController {
 	    userManagementService.deleteById(SignupOrganisation.class, soid);
 	}
 
-	return "forward:../signupManagement/start.do";
+	return "forward:/signupManagement/start.do";
     }
 }

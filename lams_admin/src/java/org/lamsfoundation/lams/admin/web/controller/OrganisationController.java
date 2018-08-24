@@ -144,7 +144,6 @@ public class OrganisationController {
 
 	// creating new organisation
 	organisationForm.setOrgId(null);
-	;
 	Integer parentId = WebUtil.readIntParam(request, "parentId", true);
 	if (parentId != null) {
 	    Organisation parentOrg = (Organisation) OrganisationController.service.findById(Organisation.class,

@@ -48,10 +48,10 @@ public class ExtServerForm {
 
     private Integer timeToLiveLoginRequest = 80;
 
-    private String[] requiredFields;
-
-    private String[] uniqueFields;
-
+    private String requiredField;
+    
+    private String uniqueField;
+    
     public Integer getSid() {
 	return sid;
     }
@@ -148,20 +148,20 @@ public class ExtServerForm {
 	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
     }
 
-    public String[] getRequiredFields() {
-	return requiredFields;
+    public String getRequiredField() {
+        return requiredField;
     }
 
-    public void setRequiredFields(String[] requiredFields) {
-	this.requiredFields = requiredFields;
+    public void setRequiredField(String requiredField) {
+        this.requiredField = requiredField;
     }
 
-    public String[] getUniqueFields() {
-	return uniqueFields;
+    public String getUniqueField() {
+        return uniqueField;
     }
 
-    public void setUniqueFields(String[] uniqueFields) {
-	this.uniqueFields = uniqueFields;
+    public void setUniqueField(String uniqueField) {
+        this.uniqueField = uniqueField;
     }
 
 }

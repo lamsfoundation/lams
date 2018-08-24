@@ -144,7 +144,7 @@ public class OrgManageController {
 	    request.setAttribute("parentGroupName", pOrg.getName());
 	    request.setAttribute("parentGroupId", pOrg.getOrganisationId());
 	} else {
-	    request.setAttribute("OrgManageForm", orgManageForm);
+	    request.setAttribute("orgManageForm", orgManageForm);
 
 	    // display org info
 	    request.setAttribute("org", org);

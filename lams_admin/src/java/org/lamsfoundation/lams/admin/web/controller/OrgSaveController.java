@@ -49,10 +49,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.Errors;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -92,8 +91,8 @@ public class OrgSaveController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/orgsave")
-    public String execute(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String execute(@ModelAttribute OrganisationForm organisationForm, BindingResult bindingResult,
+	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	if (service == null) {
 	    service = AdminServiceProxy.getService(applicationContext.getServletContext());

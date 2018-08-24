@@ -10,7 +10,7 @@
 	<title>${title}</title>
 
 	<lams:css/>
-	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -61,31 +61,50 @@
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 				<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-				<form:errors path="*" />
 				
+				<c:set var="errorKey" value="${serverid || serverkey || servername || prefix || userinfoUrl}" /> 
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						             <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
+				
+						
+				<c:set var="errorKey" value="${serverid || prefix}" /> 
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						             <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
+						
+								
 				<form:form action="../serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 					<form:hidden path="sid" />
 					
 				<table class="table table-no-border">
 					<tr>
 						<td width="25%"><fmt:message key="sysadmin.serverid" />&nbsp;*</td>
-						<td><input type="text" name="serverid" size="20" class="form-control"/></td>
+						<td><form:input path="serverid" size="20" cssClass="form-control"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="sysadmin.serverkey" />&nbsp;*</td>
-						<td><input type="text" name="serverkey" size="30" class="form-control"/></td>
+						<td><form:input path="serverkey" size="30" cssClass="form-control"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="sysadmin.servername" />&nbsp;*</td>
-						<td><input type="text" name="servername" size="30" class="form-control"/></td>
+						<td><form:input path="servername" size="30" cssClass="form-control"/></td>
 					</tr>
 					<tr>
 						<td valign="top"><fmt:message key="sysadmin.serverdesc" /></td>
-						<td><input type="text" name="serverdesc" cols="40" rows="3" class="form-control"/> </td>
+						<td><form:input path="serverdesc" cols="40" rows="3" cssClass="form-control"/> </td>
 					</tr>
 					<tr>
 						<td><fmt:message key="sysadmin.prefix" />&nbsp;*</td>
-						<td><input type="text" name="prefix" size="10" class="form-control"/></td>
+						<td><form:input path="prefix" size="10" cssClass="form-control"/></td>
 					</tr>
 					
 					<tr>
@@ -97,7 +116,7 @@
 						<td><fmt:message key="sysadmin.login.request.ttl.enable" /></td>
 						<td>
 							<form:checkbox path="timeToLiveLoginRequestEnabled" id="ttl-login-request-enabled"/>
-							<input type="hidden" name="timeToLiveLoginRequestEnabled" value="false">
+							<form:hidden path="timeToLiveLoginRequestEnabled" value="false"/>
 						</td>
 					</tr>
 					<tr id="ttl-login-request-wrap" <c:if test="${!extServerForm.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if>>
@@ -107,15 +126,15 @@
 				
 					<tr>
 						<td><fmt:message key="sysadmin.userinfoUrl" />&nbsp;*</td>
-						<td><input type="text" name="userinfoUrl" size="70" class="form-control"/></td>
+						<td><form:input path="userinfoUrl" size="70" cssClass="form-control"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="sysadmin.lessonFinishUrl" /></td>
-						<td><input type="text" name="lessonFinishUrl" size="70" class="form-control"/></td>
+						<td><form:input path="lessonFinishUrl" size="70" cssClass="form-control"/></td>
 					</tr>
 						<tr>
 						<td><fmt:message key="sysadmin.extGroupsUrl" /></td>
-						<td><input type="text" name="extGroupsUrl" size="70" class="form-control"/></td>
+						<td><form:input path="extGroupsUrl" size="70" cssClass="form-control"/></td>
 					</tr>
 				</table>
 				<div class="pull-right">
