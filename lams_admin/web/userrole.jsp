@@ -16,7 +16,8 @@
     
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
-	<lams:Page type="admin" title="${title}">
+	<lams:Page type="admin" title="${title}" formID="userRolesForm">
+	
 		<form:form action="./userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
 		<form:hidden path="userId" />
 		<form:hidden path="orgId" />
@@ -38,7 +39,9 @@
 		
 		<p><fmt:message key="msg.roles.mandatory"/></p>
 		
-		<div align="center"><html-el:errors/><html-el:messages id="roles" message="true"><c:out value="${roles}" /></html-el:messages></div>
+		<div align="center">
+		<form:errors path="roles"/>
+		</div>
 		
 		<div class="container-fluid">
 		<div class="row">
@@ -55,7 +58,7 @@
 		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
 		  <div class="col-xs-10">            
 		  	<c:forEach items="${rolelist}" var="role">
-		    	<form:select path="roles" multiple="true" items="${userRolesForm.roles}"/>
+		    	<form:checkbox path="roles" value="${role.roleId}"/>
 		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
 		    </c:forEach>
 		  </div>
@@ -63,7 +66,7 @@
 		</div>
 		
 		<div class="pull-right">
-			<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+			<a href="usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 			<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
 			<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 		</div>

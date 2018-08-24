@@ -85,8 +85,8 @@
 
 
 <body class="stripes">
-	<form id="userForm" modelAttribute="userForm" action="changePass.do" method="post">
-		<input type='hidden' value="${param.userId}" name="userId" />
+	<form id="userForm" modelAttribute="userForm" action="../usersave/changePass.do" method="post">
+		<form:hidden path="userId" />
 		<div class="panel panel-default">
 			<div
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
@@ -130,7 +130,16 @@
 								</c:if>
 							</ul>
 						</lams:Alert>
-					    <form:errors value="password" />
+						
+					    <c:set var="errorKey" value="password" /> 
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						             <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
+						
 						<div>
 							<label for="login"><fmt:message key="admin.user.login" />:</label>
 							<span>${param.login}</span>

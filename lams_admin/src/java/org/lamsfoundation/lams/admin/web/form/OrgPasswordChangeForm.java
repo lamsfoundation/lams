@@ -64,7 +64,7 @@ public class OrgPasswordChangeForm {
 	this.orgName = orgName;
     }
 
-    public boolean isStaffChange() {
+    public boolean getIsStaffChange() {
 	return isStaffChange;
     }
 
@@ -72,7 +72,7 @@ public class OrgPasswordChangeForm {
 	this.isStaffChange = isStaffChange;
     }
 
-    public boolean isLearnerChange() {
+    public boolean getIsLearnerChange() {
 	return isLearnerChange;
     }
 

@@ -93,7 +93,7 @@ public class TimezoneManagementController {
 	    HttpServletResponse response) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
+	    return "forward:/sysadminstart.do";
 	}
 
 	String[] selectedTimezoneIds = timezoneForm.getSelected();
@@ -104,7 +104,7 @@ public class TimezoneManagementController {
 	}
 	timezoneService.updateTimezones(selectedTimezones);
 
-	return "redirect:/sysadminstart.do";
+	return "forward:/sysadminstart.do";
     }
 
     /**

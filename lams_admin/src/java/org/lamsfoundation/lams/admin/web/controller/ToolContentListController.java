@@ -248,7 +248,7 @@ public class ToolContentListController {
 	}
 	request.setAttribute("groups", groupsJSON.toString());
 
-	return "toolcontent/learningLibraryGroup";
+	return "forward:/toolcontent/learningLibraryGroup";
     }
 
     @RequestMapping("/saveLearningLibraryGroups")

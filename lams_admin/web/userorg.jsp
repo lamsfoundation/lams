@@ -215,9 +215,9 @@
 				<p>&nbsp;</p>
 				
 				<div id="form" class="pull-right">
-					<form:form action="userorgsave.do" modelAttribute="userOrgForm" id="userOrgForm" method="post">
+					<form:form action="./userorgsave.do" modelAttribute="userOrgForm" id="userOrgForm" method="post">
 						<form:hidden path="orgId" />
-						<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+						<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" id="nextButton" class="btn btn-primary loffset5" onclick="return populateForm();" value="<fmt:message key="label.next"/>" />
 					</form:form>
 				</div>

@@ -15,8 +15,8 @@
 	
 	<script language="javascript" type="text/JavaScript">
 	function toggleCheckboxes(roleIndex, object){
-		<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" indexId="beanIndex" >
-		document.forms.UserOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}" />*(<c:out value="${beanIndex}" />+1)].checked=object.checked;
+		<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" varStatus="beanIndex" >
+		document.forms.userOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}" />*(<c:out value="${beanIndex.index}" />+1)].checked=object.checked;
 		</c:forEach>
 	}
 	</script>
@@ -25,8 +25,9 @@
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userOrgRoleForm">
+				
 				<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-			    <c:if test=${not empty pOrgId}>
+			    <c:if test="${not empty pOrgId}">
 			        : <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
 			    </c:if>
 			    <c:if test="${UserOrgRoleForm.orgId != 1}">
@@ -48,22 +49,20 @@
 			<table class="table table-condensed table-no-border">
 			<tr>
 				<th><fmt:message key="admin.user.login"/></th>
-				<c:forEach var="role" items="${roles}" indexId="roleIndex">
-					<th><input type="checkbox" 
-								name="<c:out value="${roleIndex}" />" 
-								onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
-								onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />&nbsp;
+				<c:forEach var="role" items="${roles}" varStatus="roleIndex">
+					<th><input type="checkbox" name="${roleIndex.index}" onclick="toggleCheckboxes(${roleIndex.index}, this);" 
+						onkeyup="toggleCheckboxes(${roleIndex.index}, this);" />&nbsp;
 						<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
 				</c:forEach>
 			</tr>
-			<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" indexId="beanIndex">
+			<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" varStatus="beanIndex">
 				<tr>
 					<td>
 						<c:out value="${userBean.login}" /><c:if test="${!userBean.memberOfParent}"> *<c:set var="parentFlag" value="true" /></c:if>
 					</td>
 					<c:forEach var="role" items="${roles}">
 						<td>
-							<form:checkbox id="${userBean.login}Role${role.roleId}" path="userBeans[${beanIndex}].roleIds" value="${role.roleId}" />&nbsp;
+							<form:checkbox id="${userBean.login}Role${role.roleId}" path="userBeans[${beanIndex.index}].roleIds" value="${role.roleId}" />&nbsp;
 						</td>
 					</c:forEach>
 				</tr>
@@ -74,8 +73,8 @@
 			</c:if>
 			
 			<div class="pull-right">
-				<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
-				<input typye="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
+				<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+				<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 			</div>
 		</form:form>
 	</lams:Page>

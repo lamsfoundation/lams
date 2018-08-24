@@ -76,7 +76,7 @@ public class CleanupTempFilesController {
 	}
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
+	    return "forward:/sysadminstart.do";
 	}
 
 	// check if url contains request for refresh folder sizes only

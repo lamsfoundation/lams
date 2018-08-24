@@ -106,7 +106,7 @@ public class ServerSaveController {
 		BeanUtils.copyProperties(map, extServerForm);
 	    }
 	    service.saveExtServer(map);
-	    return "redirect:/serverlist.do";
+	    return "forward:/serverlist.do";
 	} else {
 	    return "servermaintain";
 	}

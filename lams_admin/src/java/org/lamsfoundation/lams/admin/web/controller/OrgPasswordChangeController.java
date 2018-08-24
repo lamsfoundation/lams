@@ -185,8 +185,8 @@ public class OrgPasswordChangeController {
 	Boolean email = orgPasswordChangeForm.isEmail();
 	Boolean force = orgPasswordChangeForm.isForce();
 
-	Boolean isStaffChange = orgPasswordChangeForm.isStaffChange();
-	Boolean isLearnerChange = orgPasswordChangeForm.isLearnerChange();
+	Boolean isStaffChange = orgPasswordChangeForm.getIsStaffChange();
+	Boolean isLearnerChange = orgPasswordChangeForm.getIsLearnerChange();
 	// get data needed for each group
 	if (isStaffChange) {
 	    String staffString = orgPasswordChangeForm.getExcludedStaff();

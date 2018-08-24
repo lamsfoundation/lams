@@ -23,7 +23,7 @@
 				if (${not empty courseToDeleteLessons}) {
 					// confirm redirect to "delete all lessons" page
 					if (confirm('<fmt:message key="msg.delete.organisation.delete.lessons.confirm"/>')) {
-						document.location.href = 'organisation/deleteAllLessonsInit.do?orgId=${courseToDeleteLessons}';
+						document.location.href = '../organisation/deleteAllLessonsInit.do?orgId=${courseToDeleteLessons}';
 					}
 					return false;
 				}
@@ -40,7 +40,7 @@
 <body class="stripes">
 
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
-		<form:form action="../orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
+		<form:form action="./orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
 				<form:hidden path="typeId" />
@@ -70,7 +70,15 @@
 				</h4>
 				
 				<div align="center">
-					<form:errors path="*"/>
+					 <c:set var="errorKey" value="name" /> 
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						             <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
+						
 				</div>
 				
 				<div id="deleteAllLessonsBox" class="alert alert-info" style="display: none">
@@ -82,15 +90,15 @@
 				<table class="table table-condensed table-no-border">
 					<tr>
 						<td width="15%"><fmt:message key="admin.organisation.name"/> *</td>
-						<td><input type="text" name="name" size="40" class="form-control" maxlength="240" value="${organisationForm.name}"/></td>
+						<td><form:input path="name" size="40" cssClass="form-control" maxlength="240"/></td>
 					</tr>
 					<tr>
 					<td><fmt:message key="admin.organisation.code"/></td>
-						<td><input type="text" name="code" size="20" class="form-control" maxlength="20" value="${organisationForm.code}"/></td>
+						<td><form:input path="code" size="20" cssClass="form-control" maxlength="20"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.description"/></td>
-						<td><input type="text" name="description" cols="50" rows="3" class="form-control" id="description" value="${organisationForm.description}"/></td>
+						<td><form:input path="description" cols="50" rows="3" cssClass="form-control" id="description"/></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.locale"/></td>
@@ -179,7 +187,7 @@
 					</c:if>
 					
 					<div class="pull-right">
-						<input type="submit" name="CANCEL" onclick="bCancel=true;" class="btn btn-default" value="<fmt:message key="admin.cancel"/>" />
+						<a href="javascript:history.back();" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 					</div>
 				

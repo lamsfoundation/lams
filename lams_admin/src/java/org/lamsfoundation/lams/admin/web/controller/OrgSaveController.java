@@ -91,8 +91,8 @@ public class OrgSaveController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/orgsave", method = RequestMethod.POST)
-    public String execute(@ModelAttribute OrganisationForm organisationForm, Errors errors, HttpServletRequest request,
+    @RequestMapping(path = "/orgsave")
+    public String execute(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	if (service == null) {
@@ -105,29 +105,16 @@ public class OrgSaveController {
 	Integer orgId = organisationForm.getOrgId();
 	Organisation org;
 
-	if (request.getAttribute("CANCEL") != null) {
-	    if (orgId != 0) {
-		request.setAttribute("org", orgId);
-		org = (Organisation) service.findById(Organisation.class, orgId);
-		if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-		    return "redirect:/usermanage.do";
-		}
-	    } else {
-		request.setAttribute("org", organisationForm.getParentId());
-	    }
-	    return "redirect:../orgmanage.do";
-	}
-
-
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	//organisation name validation
 	String orgName = (organisationForm.getName() == null) ? null : organisationForm.getName();
 	if (StringUtils.isBlank(orgName)) {
-	    errors.reject("name", messageService.getMessage("error.name.required"));
+	    errorMap.add("name", messageService.getMessage("error.name.required"));
 	} else if (!ValidationUtil.isOrgNameValid(orgName)) {
-	    errors.reject("name", messageService.getMessage("error.name.invalid.characters"));
+	    errorMap.add("name", messageService.getMessage("error.name.invalid.characters"));
 	}
 
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    SupportedLocale locale = (SupportedLocale) service.findById(SupportedLocale.class,
@@ -167,9 +154,9 @@ public class OrgSaveController {
 	    org = service.saveOrganisation(org, user.getUserID());
 
 	    request.setAttribute("org", organisationForm.getParentId());
-	    return "redirect:/orgmanage.do";
+	    return "forward:/orgmanage.do";
 	} else {
-	    return "redirect:/organisation/edit.do";
+	    return "forward:/organisation/edit.do";
 	}
     }
 

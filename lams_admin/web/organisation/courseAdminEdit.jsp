@@ -43,15 +43,15 @@
 				<table  class="table table-no-border">
 					<tr>
 						<td><fmt:message key="admin.organisation.name"/>:</td>
-						<td><input type="text" name="name" size="40" class="form-control" value="${organisationForm.name}" /> *</td>
+						<td><form:input path="name" size="40" cssClass="form-control" /> *</td>
 					</tr>
 					<tr>
 					<td><fmt:message key="admin.organisation.code"/>:</td>
-						<td><input type="text" name="code" size="20"  class="form-control" value="${organisationForm.code}" /></td>
+						<td><form:input path="code" size="20"  cssClass="form-control" /></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.description"/>:</td>
-						<td><textarea name="description" cols="50" rows="3"  class="form-control">${organisationForm.description}</textarea></td>
+						<td><form:textarea path="description" cols="50" rows="3"  cssClass="form-control"></form:textarea></td>
 					</tr>
 					<tr>
 						<td><fmt:message key="admin.organisation.locale"/>:</td>
@@ -92,7 +92,7 @@
 				</table>
 				
 				<div class="pull-right">
-					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+					<a href="javascript:history.back();" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 					<input type="reset" class="btn btn-default loffset5" value="<fmt:message key="admin.reset"/>" />
 					<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 				</div>

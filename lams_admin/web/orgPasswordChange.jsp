@@ -124,8 +124,7 @@
 					return;
 				}
 				$.ajax({
-					'url' : 'orgPasswordChange/generatePassword.do'
-					}
+					'url' : '../orgPasswordChange/generatePassword.do'
 				}).done(function(password){
 					container.find('.pass').val(password);
 				});
@@ -190,7 +189,7 @@
 				}
 			});
 	
-			var jqGridURL = "orgPasswordChange/getGridUsers.do?organisationID=<c:out value='${orgPasswordChangeForm.organisationID}' />&role=",
+			var jqGridURL = "../orgPasswordChange/getGridUsers.do?organisationID=<c:out value='${orgPasswordChangeForm.organisationID}' />&role=",
 				jqGridSettings = {
 					datatype		   : "json",
 				    height			   : "100%",
@@ -378,7 +377,7 @@
 						
 					</lams:Alert>
 					
-					<form:form action="changePassword.do" modelAttribute="orgPasswordChangeForm" id="orgPasswordChangeForm">
+					<form:form action="changePassword.do" modelAttribute="orgPasswordChangeForm" id="orgPasswordChangeForm" method="post">
 						<form:hidden path="organisationID" />
 						<form:hidden path="orgName" />
 						<form:hidden path="includedLearners" id="includedLearners" />
@@ -419,7 +418,7 @@
 													<fmt:message key="admin.org.password.change.is.staff" />
 											</label>
 										</div>
-										<input type="text" name="staffPass" id="staffPass" value="${staffPass}" class="pass form-control" maxlength="25"
+										<form:input path="staffPass" id="staffPass" cssClass="pass form-control" maxlength="25"
 												   title="<fmt:message key='admin.org.password.change.custom' />" />
 										<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 									</td>
@@ -430,7 +429,7 @@
 													<fmt:message key="admin.org.password.change.is.learner" />
 											</label>
 										</div>
-										<input type="text" name="learnerPass" id="learnersPass" value="${learnerPass}" class="pass form-control" maxlength="25"
+										<form:input path="learnerPass" id="learnersPass" cssClass="pass form-control" maxlength="25"
 											   title="<fmt:message key='admin.org.password.change.custom' />" />
 										<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 									</td>

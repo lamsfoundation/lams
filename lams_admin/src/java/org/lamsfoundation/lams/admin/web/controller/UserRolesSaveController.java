@@ -89,7 +89,7 @@ public class UserRolesSaveController {
 	request.setAttribute("org", orgId);
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/usermanage.do";
+	    return "forward:/usermanage.do";
 	}
 
 	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
@@ -108,7 +108,7 @@ public class UserRolesSaveController {
 
 	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	return "redirect:/usermanage.do";
+	return "forward:/usermanage.do";
     }
 
 }

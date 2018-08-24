@@ -84,7 +84,7 @@
 					<div class="pull-right btn-group btn-group-sm">
 						<input id="addRemoveUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.add"/>" onclick="javascript:document.location='userorg.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
 						<c:if test="${userManageForm.canResetOrgPassword == true}">
-							<a class="btn btn-default" href="orgPasswordChange/start.do?organisationID=<c:out value="${userManageForm.orgId}"/>"><fmt:message key='admin.org.password.change.button'/></a>
+							<a class="btn btn-default" href="orgPasswordChange/start.do?organisationID=${userManageForm.orgId}"><fmt:message key='admin.org.password.change.button'/></a>
 						</c:if>
 						<c:if test="${userManageForm.courseAdminCanAddNewUsers == true}">
 							<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />

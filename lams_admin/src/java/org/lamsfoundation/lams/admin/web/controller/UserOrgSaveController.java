@@ -77,10 +77,6 @@ public class UserOrgSaveController {
 	Integer orgId = userOrgForm.getOrgId();
 	request.setAttribute("org", orgId);
 
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/usermanage.do";
-	}
-
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	if (rolelist == null) {
 	    rolelist = service.findAll(Role.class);
@@ -135,13 +131,13 @@ public class UserOrgSaveController {
 	// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
 	if (newUserOrganisations.isEmpty()) {
 	    log.debug("no new users to add to orgId=" + orgId);
-	    return "redirect:/usermanage.do";
+	    return "forward:/usermanage.do";
 	} else {
 	    request.setAttribute("roles", service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
 		    organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);
-	    return "redirect:/userorgrole.do";
+	    return "forward:/userorgrole.do";
 	}
     }
 

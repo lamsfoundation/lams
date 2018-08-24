@@ -157,9 +157,9 @@
 	<lams:Page type="admin" title="${title}" formID="userForm">
 	
 				<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
-				<input type="hidden" name="userId" />
-				<input type="hidden" name="orgId" />
-			
+				<form:hidden path="orgId" />
+				<form:hidden path="userId" />
+
 				<c:if test="${not empty userForm.orgId}">
 					<a href="../orgmanage.do?org=1" class="btn btn-default">
 						<fmt:message key="admin.course.manage" />
@@ -185,15 +185,50 @@
 					</a>
 				</c:if>
 			
-				<%-- Error Messages --%>
-				<c:set var="errorKey" value="GLOBAL" />
-			        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-			            <lams:Alert id="error" type="danger" close="false">
-			                <c:forEach var="error" items="${errorMap[errorKey]}">
-			                    <c:out value="${error}" />
-			                </c:forEach>
-			            </lams:Alert>
-			        </c:if>
+				 <c:set var="errorKey" value="login" /> 
+				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+				     <lams:Alert id="error" type="danger" close="false"> 
+				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+				             <c:out value="${error}" /><br /> 
+				         </c:forEach> 
+				     </lams:Alert> 
+				</c:if>
+				
+				 <c:set var="errorKey" value="firstName" /> 
+				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+				     <lams:Alert id="error" type="danger" close="false"> 
+				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+				             <c:out value="${error}" /><br /> 
+				         </c:forEach> 
+				     </lams:Alert> 
+				</c:if>
+				
+				 <c:set var="errorKey" value="lastName" /> 
+				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+				     <lams:Alert id="error" type="danger" close="false"> 
+				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+				             <c:out value="${error}" /><br /> 
+				         </c:forEach> 
+				     </lams:Alert> 
+				</c:if>
+				
+				 <c:set var="errorKey" value="email" /> 
+				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+				     <lams:Alert id="error" type="danger" close="false"> 
+				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+				             <c:out value="${error}" /><br /> 
+				         </c:forEach> 
+				     </lams:Alert> 
+				</c:if>
+				
+				<c:set var="errorKey" value="password" /> 
+				<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+				     <lams:Alert id="error" type="danger" close="false"> 
+				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+				             <c:out value="${error}" /><br /> 
+				         </c:forEach> 
+				     </lams:Alert> 
+				</c:if>
 			
 				<div class="panel panel-default voffset5">
 					<div class="panel-heading">
@@ -264,21 +299,21 @@
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.login" />
 									*:</td>
-								<td><input type="text" id="login" name="login"  maxlength="50"
-										class="form-control" value="${userForm.login}"/></td>
+								<td><form:input id="login" path="login"  maxlength="50"
+										cssClass="form-control"/></td>
 							</tr>
 							<c:if test="${empty userForm.userId}">
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.password" />
 									*:</td>
-								<td><input type="password" name="password" 
-										maxlength="25" id="password" class="form-control" /></td>
+								<td><form:input type="password" path="password" 
+										maxlength="25" id="password" cssClass="form-control" /></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.password.confirm" /> *:</td>
-								<td><input type="password" name="password2" 
-										maxlength="25" id="password2" class="form-control" /></td>
+								<td><form:input type="password" path="password2" 
+										maxlength="25" id="password2" cssClass="form-control" /></td>
 							</tr>
 							</c:if>
 							<tr>
@@ -295,72 +330,72 @@
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.title" />:</td>
-								<td><input type="text" name="title" size="32" maxlength="32"
-										id="title" class="form-control" value="${userForm.title}"/></td>
+								<td><form:input type="text" path="title" size="32" maxlength="32"
+										id="title" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.first_name" /> *:</td>
-								<td><input type="text" name="firstName" 
-										id="firstName" maxlength="128" class="form-control" value="${userForm.firstName}"/></td>
+								<td><form:input path="firstName" 
+										id="firstName" maxlength="128" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.last_name" /> *:</td>
-								<td><input type="text" name="lastName" 
-										id="lastName" maxlength="128" class="form-control" value="${userForm.lastName}"/></td>
+								<td><form:input path="lastName" 
+										id="lastName" maxlength="128" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.email" />
 									*:</td>
-								<td><input type="text" name="email" maxlength="128"
-										class="form-control" value="${userForm.email}"/></td>
+								<td><form:input path="email" maxlength="128"
+										cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.address_line_1" />:</td>
-								<td><input type="text" name="addressLine1" 
-										maxlength="64" class="form-control" value="${userForm.addressLine1}"/></td>
+								<td><form:input path="addressLine1" 
+										maxlength="64" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.address_line_2" />:</td>
-								<td><input type="text" name="addressLine2" 
-										maxlength="64" class="form-control" value="${userForm.addressLine2}"/></td>
+								<td><form:input path="addressLine2" 
+										maxlength="64" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.address_line_3" />:</td>
-								<td><input type="text" name="addressLine3" 
-										maxlength="64" class="form-control" value="${userForm.addressLine3}"/></td>
+								<td><form:input path="addressLine3" 
+										maxlength="64" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.city" />:</td>
-								<td><input type="text" name="city"  maxlength="64"
-										class="form-control" value="${userForm.city}"/></td>
+								<td><form:input path="city"  maxlength="64"
+										cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right">
 									<fmt:message key="admin.user.postcode" />:
 								</td>
 								<td>
-									<input type="text" name="postcode" size="10" maxlength="10" class="form-control" value="${userForm.postcode}"/>
+									<form:input path="postcode" size="10" maxlength="10" cssClass="form-control"/>
 								</td>
 							</tr>
 							<tr>
 								<td class="align-right">	
 									<fmt:message key="admin.user.state" />:
 								</td>
-								<td><input type="text" name="state"  maxlength="64"
-										class="form-control" value="${userForm.state}" />
+								<td><form:input path="state"  maxlength="64"
+										cssClass="form-control" />
 								</td>
 							</tr>
 							<tr>
 								<td class="align-right">
 									<fmt:message key="admin.user.country" />:
 								</td>
-								<td><input type="text" name="country"  maxlength="64"
-										class="form-control" value="${userForm.country}"/>
+								<td><form:input path="country"  maxlength="64"
+										cssClass="form-control" />
 								</td>
 							</tr>
 							<tr>
@@ -368,7 +403,7 @@
 									<fmt:message key="admin.user.day_phone" />:
 								</td>
 								<td>
-									<input type="text" name="dayPhone"  maxlength="64" class="form-control" value="${userForm.dayPhone}"/>
+									<form:input path="dayPhone"  maxlength="64" cssClass="form-control"/>
 								</td>
 							</tr>
 							<tr>
@@ -376,7 +411,7 @@
 									<fmt:message key="admin.user.evening_phone" />:
 								</td>
 								<td>
-									<input type="text" name="eveningPhone" maxlength="64" class="form-control" value="${userForm.eveningPhone}" />		
+									<form:input path="eveningPhone" maxlength="64" cssClass="form-control"/>		
 								</td>
 							</tr>
 							<tr>
@@ -384,14 +419,14 @@
 									<fmt:message key="admin.user.mobile_phone" />:
 								</td>
 								<td>
-									<input type="text" name="mobilePhone" maxlength="64" class="form-control" value="${userForm.mobilePhone}" />
+									<form:input path="mobilePhone" maxlength="64" cssClass="form-control"/>
 								</td>
 							</tr>
 							<tr>
 								<td class="align-right">
 									<fmt:message key="admin.user.fax" />:</td>
 								<td>
-									<input type="text" name="fax"  maxlength="64" class="form-control" value="${userForm.fax}"/>
+									<form:input path="fax"  maxlength="64" cssClass="form-control"/>
 								</td>
 							</tr>
 			
@@ -466,11 +501,12 @@
 					<div class="col-md-12">
 						<c:if test="${not empty userForm.userId}">
 							<div class="pull-left">
-							<a href="../usersave/changePass.do?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+							<a href="./userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
 							</div>
 						</c:if>
+						
 						<div class="pull-right">
-							<input type="button" name="CANCEL" class="btn btn-default" value="<fmt:message key="admin.cancel" />" />
+							<a href="javascript:history.back();" class="btn btn-default"> <fmt:message key="admin.cancel" /> </a>
 							<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
 					</div>

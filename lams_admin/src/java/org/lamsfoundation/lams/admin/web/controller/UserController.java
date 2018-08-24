@@ -149,7 +149,7 @@ public class UserController {
 	}
 
 	if (!(canEdit || request.isUserInRole(Role.SYSADMIN))) {
-	    request.setAttribute("errorName", "UserAction");
+	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
@@ -319,7 +319,7 @@ public class UserController {
 	initServices();
 
 	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
-	    request.setAttribute("errorName", "UserAction");
+	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
@@ -335,10 +335,10 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "redirect:../usersearch.do";
+	    return "forward:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "redirect:../usermanage.do";
+	    return "forward:../usermanage.do";
 	}
     }
 
@@ -359,7 +359,7 @@ public class UserController {
 	try {
 	    service.removeUser(userId);
 	} catch (Exception e) {
-	    request.setAttribute("errorName", "UserAction");
+	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", e.getMessage());
 	    return "error";
 	}
@@ -370,10 +370,10 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "redirect:../usersearch.do";
+	    return "forward:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "redirect:../usermanage.do";
+	    return "forward:../usermanage.do";
 	}
     }
 
@@ -384,7 +384,7 @@ public class UserController {
 	initServices();
 
 	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
-	    request.setAttribute("errorName", "UserAction");
+	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
@@ -396,7 +396,7 @@ public class UserController {
 	user.setDisabledFlag(false);
 	service.saveUser(user);
 
-	return "redirect:../disabledmanage.do";
+	return "forward:../disabledmanage.do";
     }
 
 }

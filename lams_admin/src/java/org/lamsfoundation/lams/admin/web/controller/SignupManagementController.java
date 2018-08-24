@@ -156,7 +156,7 @@ public class SignupManagementController {
 		signup.setContext(signupForm.getContext());
 		userManagementService.save(signup);
 
-		return "redirect:../signupManagement/start.do";
+		return "forward:../signupManagement/start.do";
 	    }
 	} else {
 	    // form not submitted, default values
@@ -178,6 +178,6 @@ public class SignupManagementController {
 	    userManagementService.deleteById(SignupOrganisation.class, soid);
 	}
 
-	return "redirect:../signupManagement/start.do";
+	return "forward:../signupManagement/start.do";
     }
 }

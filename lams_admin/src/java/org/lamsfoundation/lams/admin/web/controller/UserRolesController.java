@@ -124,7 +124,7 @@ public class UserRolesController {
 		|| (service.isUserGlobalGroupAdmin() && !rootOrgId.equals(orgId));
 
 	if (!(requestorHasRole || isSysadmin)) {
-	    request.setAttribute("errorName", "UserRolesAction");
+	    request.setAttribute("errorName", "UserRolesController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}

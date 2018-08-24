@@ -50,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -84,7 +83,7 @@ public class UserSaveController {
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/saveUserDetails", method = RequestMethod.POST)
-    public String saveUserDetails(@ModelAttribute UserForm userForm, Errors errors, HttpServletRequest request,
+    public String saveUserDetails(@ModelAttribute UserForm userForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
@@ -113,10 +112,10 @@ public class UserSaveController {
 
 	if (request.getAttribute("CANCEL") != null) {
 	    if ((orgId == null) || (orgId == 0)) {
-		return "redirect:/usersearch.do";
+		return "forward:../usersearch.do";
 	    }
 	    request.setAttribute("org", orgId);
-	    return "redirect:/usermanage.do";
+	    return "forward:../usermanage.do";
 	}
 
 	User user = null;
@@ -125,12 +124,13 @@ public class UserSaveController {
 	    user = (User) UserSaveController.service.findById(User.class, userId);
 	}
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	// login validation
 	String login = userForm.getLogin() == null ? null : userForm.getLogin().trim();
 	if (StringUtils.isBlank(login)) {
-	    errors.reject("login", messageService.getMessage("error.login.required"));
+	    errorMap.add("login", messageService.getMessage("error.login.required"));
 	} else if (!ValidationUtil.isUserNameValid(login)) {
-	    errors.reject("login", messageService.getMessage("error.username.invalid.characters"));
+	    errorMap.add("login", messageService.getMessage("error.username.invalid.characters"));
 	} else {
 	    userForm.setLogin(login);
 	    User existingUser = UserSaveController.service.getUserByLogin(login);
@@ -138,7 +138,7 @@ public class UserSaveController {
 		if ((user != null) && StringUtils.equals(user.getLogin(), login)) {
 		    // login exists - it's the user's current login
 		} else {
-		    errors.reject("login", messageService.getMessage("error.login.unique",
+		    errorMap.add("login", messageService.getMessage("error.login.unique",
 			    "(" + login + ", ID: " + existingUser.getUserId() + ")"));
 		}
 	    }
@@ -147,28 +147,28 @@ public class UserSaveController {
 	//first name validation
 	String firstName = (userForm.getFirstName() == null) ? null : userForm.getFirstName();
 	if (StringUtils.isBlank(firstName)) {
-	    errors.reject("firstName", messageService.getMessage("error.firstname.required"));
+	    errorMap.add("firstName", messageService.getMessage("error.firstname.required"));
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
-	    errors.reject("firstName", messageService.getMessage("error.firstname.invalid.characters"));
+	    errorMap.add("firstName", messageService.getMessage("error.firstname.invalid.characters"));
 	}
 
 	//last name validation
 	String lastName = (userForm.getLastName() == null) ? null : userForm.getLastName();
 	if (StringUtils.isBlank(lastName)) {
-	    errors.reject("lastName", messageService.getMessage("error.lastname.required"));
+	    errorMap.add("lastName", messageService.getMessage("error.lastname.required"));
 	} else if (!ValidationUtil.isFirstLastNameValid(lastName)) {
-	    errors.reject("lastName", messageService.getMessage("error.lastname.invalid.characters"));
+	    errorMap.add("lastName", messageService.getMessage("error.lastname.invalid.characters"));
 	}
 
 	//user email validation
 	String userEmail = (userForm.getEmail() == null) ? null : userForm.getEmail();
 	if (StringUtils.isBlank(userEmail)) {
-	    errors.reject("email", messageService.getMessage("error.email.required"));
+	    errorMap.add("email", messageService.getMessage("error.email.required"));
 	} else if (!ValidationUtil.isEmailValid(userEmail)) {
-	    errors.reject("email", messageService.getMessage("error.valid.email.required"));
+	    errorMap.add("email", messageService.getMessage("error.valid.email.required"));
 	}
 
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    if (edit) { // edit user
 		UserSaveController.log.debug("editing userId: " + userId);
 		// hash the new password if necessary, and audit the fact
@@ -187,16 +187,16 @@ public class UserSaveController {
 		String password2 = userForm.getPassword2();
 		String password = (userForm.getPassword() == null) ? null : userForm.getPassword();
 		if (StringUtils.isBlank(password)) {
-		    errors.reject("password", messageService.getMessage("error.password.required"));
+		    errorMap.add("password", messageService.getMessage("error.password.required"));
 		}
 		if (!StringUtils.equals(password, (userForm.getPassword2()))) {
-		    errors.reject("password", messageService.getMessage("error.newpassword.mismatch"));
+		    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
 		}
 		if (!ValidationUtil.isPasswordValueValid(password, password2)) {
-		    errors.reject("password", messageService.getMessage("error.newpassword.mismatch"));
+		    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
 		}
 
-		if (!errors.hasErrors()) {
+		if (errorMap.isEmpty()) {
 		    user = new User();
 		    String salt = HashUtil.salt();
 		    String passwordHash = HashUtil.sha256(userForm.getPassword(), salt);
@@ -204,7 +204,7 @@ public class UserSaveController {
 		    user.setSalt(salt);
 		    user.setPassword(passwordHash);
 		    UserSaveController.log.debug("creating user... new login: " + user.getLogin());
-		    if (!errors.hasErrors()) {
+		    if (errorMap.isEmpty()) {
 			// TODO set theme according to user input
 			// instead of server default.
 			user.setTheme(UserSaveController.service.getDefaultTheme());
@@ -230,26 +230,28 @@ public class UserSaveController {
 	    }
 	}
 
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    if ((orgId == null) || (orgId == 0)) {
-		return "redirect:/usersearch.do";
+		return "forward:../usersearch.do";
 	    }
 	    if (edit) {
 		request.setAttribute("org", orgId);
-		return "redirect:/usermanage.do";
+		return "forward:../usermanage.do";
 	    } else {
 		request.setAttribute("orgId", orgId);
 		request.setAttribute("userId", user.getUserId());
-		return "redirect:/userroles.do";
+		return "forward:../userroles.do";
 	    }
 	} else {
 	    request.setAttribute("orgId", orgId);
-	    return "redirect:/user/edit.do";
+	    request.setAttribute("errorMap", errorMap);
+	    return "forward:../user/edit.do";
 	}
     }
 
     @RequestMapping(path = "/changePass")
-    public String changePass(HttpServletRequest request, Errors errors, HttpServletResponse response) throws Exception {
+    public String changePass(@ModelAttribute UserForm userForm, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	UserSaveController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
@@ -265,27 +267,29 @@ public class UserSaveController {
 	String password = WebUtil.readStrParam(request, "password");
 	String password2 = WebUtil.readStrParam(request, "password2");
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	//password validation
 	if (StringUtils.isBlank(password)) {
-	    errors.reject("password", messageService.getMessage("error.password.required"));
+	    errorMap.add("password", messageService.getMessage("error.password.required"));
 	}
 
 	if (!StringUtils.equals(password, password2)) {
-	    errors.reject("password", messageService.getMessage("error.newpassword.mismatch"));
+	    errorMap.add("password", messageService.getMessage("error.newpassword.mismatch"));
 	}
 	if (!ValidationUtil.isPasswordValueValid(password, password2)) {
-	    errors.reject("password", messageService.getMessage("label.password.restrictions"));
+	    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
 	}
 
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    User user = (User) UserSaveController.service.findById(User.class, userId);
 	    String salt = HashUtil.salt();
 	    String passwordHash = HashUtil.sha256(password, salt);
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
 	    UserSaveController.service.saveUser(user);
-	    return "redirect:/user/edit.do";
+	    return "forward:../user/edit.do";
 	}
+	request.setAttribute("errorMap", errorMap);
 	return "userChangePass";
 
     }
