@@ -155,6 +155,7 @@
 			    height: "100%",
 			    width: jqgridWidth,
 				shrinkToFit: false,
+				cmTemplate: { title: false },
 			    cellEdit: true,
 			    viewrecords: true,
 			    sortorder: "asc", 
@@ -205,6 +206,7 @@
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     height: "100%",
 						     autowidth:true,
+						     cmTemplate: { title: false },
 						     cellEdit:true,
 						     pager: subgrid_table_id + "_pager",
 						     rowList:[10,20,30,40,50,100],
@@ -305,7 +307,6 @@
 						     	alert("<fmt:message key="error.cellsave"/>");
 						     },
 							 gridComplete: function(){
-							 	toolTip($(".jqgrow"), "jqgridTooltip");
 							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
 							 },
 							 subGrid : hasArchivedMarks,
@@ -327,22 +328,22 @@
 									     pager: false,
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
-									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.progress"/>",
 									     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 									    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 									    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.mark"/>"
 									     ],
 									     colModel: [
 									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
-											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
 											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
 											{name:'timeTaken',index:'timeTaken', sortable:false, editable: false, width:80, align:"center"},
 										    {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 										    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
 											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
 									     ],
 									     loadError: function(xhr,st,err) {
@@ -374,9 +375,6 @@
 								    	 		return string;
 								    	 		
 								    	 	}
-								    	 },
-										 gridComplete: function(){
-										 	toolTip($(".jqgrow"), "jqgridTooltip");
 										 }
 								  	});
 							}
@@ -384,7 +382,6 @@
 					  
 					},
 					gridComplete: function(){
-						toolTip($(".jqgrow"), "jqgridTooltip");  // Allow tooltips for this grid	
 				   	 	initializePortraitPopover('<lams:LAMSURL/>');
 						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
 						processLessonDateFields( lessonDatesHidden );
@@ -403,6 +400,7 @@
 				    height: "100%",
 				    width: jqgridWidth,
 				    shrinkToFit: false,
+				    cmTemplate: { title: false },
 				    cellEdit: true,
 				    pager: "activityViewPager",
 				    rowList:[10,20,30,40,50,100],
@@ -445,6 +443,7 @@
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
 						     height: "100%",
 						     autowidth:true,
+						     cmTemplate: { title: false },
 						     cellEdit:true,
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradebookData&lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
 						     sortorder: "asc", 
@@ -546,7 +545,6 @@
 						     	alert("<fmt:message key="error.cellsave"/>");
 						     },
 							 gridComplete: function(){
-							 	toolTip($(".jqgrow"), "jqgridTooltip");	// applying tooltips for this grid
 						   	 	initializePortraitPopover('<lams:LAMSURL/>');
 						   	 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
 							 }
@@ -555,7 +553,6 @@
 
 					},
 					 gridComplete: function(){
-					 	toolTip($(".jqgrow"), "jqgridTooltip");	// enable tooltips for grid
 					 	fixPagerInCenter('activityViewPager', 0);
 					 }	 
 				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
@@ -808,9 +805,6 @@
 				
 				<table id="activityView" class="scroll" ></table>
 				<div id="activityViewPager" class="scroll" ></div>	
-				
-				<%-- not #tooltip as it conflicts with the learner progress tooltip --%>
-				<div class="tooltip-lg" id="jqgridTooltip"></div> 
 			</div>
 	 
 	<c:if test="not isInTabs">
