@@ -215,7 +215,6 @@ public class GateController {
      * Dispatch view the according to the gate type.
      *
      */
-    @RequestMapping("/findViewByGateType")
     private String findViewByGateType(@ModelAttribute GateForm gateForm, GateActivity gate) {
 
 	lessonService = MonitoringServiceProxy.getLessonService(applicationContext.getServletContext());

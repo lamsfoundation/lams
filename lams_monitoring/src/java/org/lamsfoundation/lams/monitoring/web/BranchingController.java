@@ -119,7 +119,7 @@ public class BranchingController {
 	if (log.isDebugEnabled()) {
 	    log.debug("viewBranching: Branching activity " + dto);
 	}
-	return "chosenSelection";
+	return "viewBranches";
     }
 
     // Can't do this in BranchingDTO (although that's where it should be) as we have

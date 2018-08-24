@@ -18,8 +18,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ include file="/taglibs.jsp"%>
 <!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
+
 <lams:html>
     <lams:head>
 		<lams:css/>
@@ -27,6 +29,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     </lams:head>
     
     <body class="stripes">
+    
+    <div id="content">
+    
 		<h1><c:out value="${title}"/></h1>
 		
 			<table class="alternative-color" cellspacing="0">
@@ -50,5 +55,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     </body>
 </lams:html>
 
-<div id="content">
 

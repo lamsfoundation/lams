@@ -18,8 +18,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ include file="/taglibs.jsp"%>
 <!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
+
 <lams:html>
     <lams:head>
 		<lams:css/>

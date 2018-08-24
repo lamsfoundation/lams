@@ -49,8 +49,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -122,15 +120,8 @@ public class MonitoringController {
     private static Logger log = Logger.getLogger(MonitoringController.class);
 
     // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
-
-    // ---------------------------------------------------------------------
     // Class level constants - Struts forward
     // ---------------------------------------------------------------------
-    private static final String NOT_SUPPORTED_SCREEN = "notsupported";
-    private static final String TIME_CHART_SCREEN = "timeChart";
-    private static final String ERROR = "error";
     private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
 
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
@@ -176,8 +167,9 @@ public class MonitoringController {
      * Currently used only in TestHarness and Authoring Preview.
      */
     @RequestMapping("/initializeLesson")
-    public String initializeLesson(HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @ResponseBody
+    public String initializeLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	String title = WebUtil.readStrParam(request, "lessonName");
 	if (title == null) {
@@ -213,7 +205,9 @@ public class MonitoringController {
 	    }
 	}
 
-	return (newLesson.getLessonId()).toString();
+	PrintWriter writer = response.getWriter();
+	writer.println(newLesson.getLessonId());
+	return null;
     }
 
     /**
@@ -225,8 +219,9 @@ public class MonitoringController {
      * @throws ServletException
      */
     @RequestMapping("/startLesson")
-    public String startLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @ResponseBody
+    public String startLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    getMonitoringService().startLesson(lessonId, getUserId());
@@ -240,9 +235,9 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/")
-    public String createLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/createLessonClass")
+    public String createLessonClass(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -268,9 +263,9 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/")
-    public String addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ParseException {
+    @RequestMapping("/addLesson")
+    public String addLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, ParseException {
 	String lessonName = request.getParameter("lessonName");
 	if (!ValidationUtil.isOrgNameValid(lessonName)) {
 	    throw new IOException("Lesson name contains invalid characters");
@@ -415,9 +410,9 @@ public class MonitoringController {
     /**
      * Adds all course learners to the given lesson.
      */
-    @RequestMapping("/")
-    public String addAllOrganisationLearnersToLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("/addAllOrganisationLearnersToLesson")
+    public String addAllOrganisationLearnersToLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "add all lesson learners to lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -430,9 +425,9 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/")
-    public String startOnScheduleLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ParseException, IOException {
+    @RequestMapping("/startOnScheduleLesson")
+    public String startOnScheduleLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws ParseException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
 	Date startDate = MonitoringController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr);
@@ -451,9 +446,9 @@ public class MonitoringController {
      * @throws IOException
      * @throws ServletException
      */
-    @RequestMapping("/")
-    public String archiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/archiveLesson")
+    public String archiveLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
@@ -471,9 +466,9 @@ public class MonitoringController {
      * @throws IOException
      * @throws ServletException
      */
-    @RequestMapping("/")
-    public String unarchiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/unarchiveLesson")
+    public String unarchiveLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    getMonitoringService().unarchiveLesson(lessonId, getUserId());
@@ -488,9 +483,9 @@ public class MonitoringController {
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
      */
-    @RequestMapping("/")
-    public String suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ParseException {
+    @RequestMapping("/suspendLesson")
+    public String suspendLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, ParseException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
 	try {
@@ -518,9 +513,9 @@ public class MonitoringController {
      * @throws IOException
      * @throws ServletException
      */
-    @RequestMapping("/")
-    public String unsuspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/unsuspendLesson")
+    public String unsuspendLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    getMonitoringService().unsuspendLesson(lessonId, getUserId());
@@ -542,9 +537,10 @@ public class MonitoringController {
      * @throws IOException
      * @throws ServletException
      */
-    @RequestMapping("/")
-    public String removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/removeLesson")
+    @ResponseBody
+    public String removeLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer userId = getUserId();
 	boolean permanently = WebUtil.readBooleanParam(request, "permanently", false);
@@ -571,8 +567,7 @@ public class MonitoringController {
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(jsonObject);
-	return null;
+	return jsonObject.toString();
     }
 
     /**
@@ -589,9 +584,10 @@ public class MonitoringController {
      * @throws ServletException
      * @throws JSONException
      */
-    @RequestMapping("/")
-    public String forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/forceComplete")
+    @ResponseBody
+    public String forceComplete(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	// get parameters
 	Long activityId = null;
@@ -668,8 +664,9 @@ public class MonitoringController {
      * Get learners who are part of the lesson class.
      */
     @RequestMapping("/getLessonLearners")
+    @ResponseBody
     public String getLessonLearners(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	
+
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -760,8 +757,7 @@ public class MonitoringController {
      */
     @RequestMapping("/getCurrentLearners")
     @ResponseBody
-    public String getCurrentLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String getCurrentLearners(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
 	Integer learnerCount = null;
 
@@ -902,8 +898,9 @@ public class MonitoringController {
 
 	response.setContentType("text/xml");
 	response.setCharacterEncoding("UTF-8");
+	response.getWriter().print(languageOutput);
 
-	return languageOutput;
+	return null;
     }
 
     /**
@@ -911,9 +908,9 @@ public class MonitoringController {
      * comes from UI is the user id of the learner for which we are calculating the url. This is different to all the
      * other calls.
      */
-    @RequestMapping("/")
-    public String getLearnerActivityURL(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, LamsToolServiceException {
+    @RequestMapping("/getLearnerActivityURL")
+    public String getLearnerActivityURL(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, LamsToolServiceException {
 
 	Integer learnerUserID = new Integer(WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID));
 	Long activityID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID));
@@ -929,7 +926,6 @@ public class MonitoringController {
 
     /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
     @RequestMapping("/getActivityMonitorURL")
-    @ResponseBody
     public String getActivityMonitorURL(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, LamsToolServiceException {
 	Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
@@ -1084,8 +1080,7 @@ public class MonitoringController {
      */
     @RequestMapping("/getLearnerProgressPage")
     @ResponseBody
-    public String getLearnerProgressPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String getLearnerProgressPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get learner progress page", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -1707,7 +1702,7 @@ public class MonitoringController {
 	    return "systemErrorContent";
 	}
 
-	return "timeChart";
+	return "timer";
     }
 
     /**

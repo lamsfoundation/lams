@@ -21,10 +21,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -32,9 +32,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityTitleComparator;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -42,29 +40,41 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * The action servlet that provides the support for the
  * <UL>
  * <LI>AJAX based Groups Based Branching screen</LI>
  * </UL>
- * 
+ *
  * @author Fiona Malikoff
  *
- * 
  *
  *
  *
  *
  *
- * 
  *
- * 
+ *
+ *
+ *
  */
-public class GroupBasedBranchingAJAXAction extends BranchingAction {
+@Controller
+@RequestMapping("/groupedBranching")
+public class GroupBasedBranchingAJAXController extends BranchingController {
+
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+
+    private static Logger log = Logger.getLogger(BranchingController.class);
 
     //---------------------------------------------------------------------
 
@@ -78,14 +88,12 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
      *
      * Input parameters: activityID
      */
-    public ActionForward assignBranch(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/assignBranch")
+    public String assignBranch(HttpServletRequest request) throws IOException, ServletException {
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID,
 		BranchingActivity.class);
 
@@ -101,11 +109,11 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	    boolean usersStartedBranching = monitoringService.isActivityAttempted(activity);
 	    request.setAttribute(PARAM_MAY_DELETE, !usersStartedBranching);
 
-	    return mapping.findForward(GROUPED_SELECTION_SCREEN);
+	    return "branching/groupedSelection";
 
 	} else {
 	    // something gone wrong - shouldn't be here so revert to standard screen for viewing branching.
-	    return viewBranching(activity, lessonId, false, mapping, request, monitoringService);
+	    return viewBranching(activity, lessonId, false, request, monitoringService);
 	}
 
     }
@@ -115,16 +123,16 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
      * respond to an AJAX call.
      *
      * Input parameters: activityID (which is the branching activity id)
-     * 
+     *
      * Output format: "branchid,name,num groups;branchid,groupid,name,num groups"
      */
-    public ActionForward getBranches(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/getBranches")
+    @ResponseBody
+    public String getBranches(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	// get the branching data and sort it.
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID);
 
 	TreeSet<Activity> sortedBranches = new TreeSet<Activity>(new ActivityTitleComparator());
@@ -159,7 +167,11 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	    log.debug("getBranches activity id " + activityID + " returning " + branchesOutput);
 	}
 
-	writeAJAXResponse(response, branchesOutput);
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter writer = response.getWriter();
+	if (branchesOutput.length() > 0) {
+	    writer.println(branchesOutput);
+	}
 	return null;
     }
 
@@ -167,19 +179,25 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
      * Get a list of all the class members who aren't grouped yet. Designed to respond to an AJAX call.
      *
      * Input parameters: activityID (which is the branching activity id)
-     * 
+     *
      * Output format: "groupid,groupname;groupid,groupname"
      */
-    public ActionForward getGroupsNotAssignedToBranch(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/getGroupsNotAssignedToBranch")
+    @ResponseBody
+    public String getGroupsNotAssignedToBranch(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	// get the grouping data and sort it.
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	SortedSet<Group> groups = monitoringService.getGroupsNotAssignedToBranch(activityID);
 	String groupOutput = buildGroupString(groups);
-	writeAJAXResponse(response, groupOutput);
+
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter writer = response.getWriter();
+
+	if (groupOutput.length() > 0) {
+	    writer.println(groupOutput);
+	}
 	return null;
 
     }
@@ -188,15 +206,15 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
      * Get a list of groups associated with this branch. Designed to respond to an AJAX call.
      *
      * Input parameters: branchID which is sequence activity id
-     * 
+     *
      * Output format: "groupid,groupname;"
      */
-    public ActionForward getBranchGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    @RequestMapping("/getBranchGroups")
+    @ResponseBody
+    public String getBranchGroups(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 
 	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
 	SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(branchID);
 
 	SortedSet<Group> groups = branch.getGroupsForBranch();
@@ -206,7 +224,12 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	    log.debug("getBranchGroups branch id " + branchID + " returning " + groupOutput);
 	}
 
-	writeAJAXResponse(response, groupOutput);
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter writer = response.getWriter();
+
+	if (groupOutput.length() > 0) {
+	    writer.println(groupOutput);
+	}
 	return null;
     }
 
@@ -233,24 +256,26 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
      * Add groups to a branch. Designed to respond to an AJAX call.
      *
      * Input parameters: branchID, groups: comma separated list of group ids
-     * 
+     *
      * Output format: no data returned - just the header
      */
-    public ActionForward addGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
+    @RequestMapping("/addGroups")
+    @ResponseBody
+    public String addGroups(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, LessonServiceException {
 
 	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
 
 	String groups = WebUtil.readStrParam(request, PARAM_GROUPS, true);
 	if (groups != null) {
 	    String[] groupsSplit = groups.split(",");
-
-	    IMonitoringService monitoringService = MonitoringServiceProxy
-		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.addGroupToBranch(branchID, groupsSplit);
 	}
 
-	writeAJAXOKResponse(response);
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter writer = response.getWriter();
+	writer.println("OK");
+
 	return null;
     }
 
@@ -258,11 +283,13 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
      * Remove a list of users from a group. Designed to respond to an AJAX call.
      *
      * Input parameters: branchID, groups: comma separated list of group ids
-     * 
+     *
      * Output format: no data returned - just the header
      */
-    public ActionForward removeGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
+    @RequestMapping("/removeGroups")
+    @ResponseBody
+    public String removeGroups(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, LessonServiceException {
 
 	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
 
@@ -270,12 +297,13 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	if (groups != null) {
 	    String[] groupsSplit = groups.split(",");
 
-	    IMonitoringService monitoringService = MonitoringServiceProxy
-		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.removeGroupFromBranch(branchID, groupsSplit);
 	}
 
-	writeAJAXOKResponse(response);
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter writer = response.getWriter();
+	writer.println("OK");
+
 	return null;
     }
 

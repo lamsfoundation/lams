@@ -93,7 +93,7 @@ public class EmailProgressController {
     private static ISecurityService securityService;
 
     // ---------------------------------------------------------------------
-    // Struts Dispatch Method
+    // Dispatch Method
     // ---------------------------------------------------------------------
 
     /**

@@ -1,12 +1,14 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
 <c:set var="ALLOW_DIRECT_LESSON_LAUNCH"><%=Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
 <c:set var="serverURL"><%=Configuration.get(ConfigurationKeys.SERVER_URL)%></c:set>
 <c:if test="${fn:substring(serverURL, fn:length(serverURL)-1, fn:length(serverURL)) != '/'}">
 	<c:set var="serverURL">${serverURL}/</c:set>
 </c:if>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 
@@ -252,7 +254,7 @@
 
         function switchToTblMonitor() {
 			$("#content").load(
-				"<c:url value='tblmonitor.do'/>",
+				"<c:url value='tblmonitor/start.do'/>",
 				{
 					lessonID: ${lesson.lessonID}
 				}

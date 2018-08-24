@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 
 <c:set var="title"><fmt:message key="label.countdown.timer"></fmt:message></c:set>

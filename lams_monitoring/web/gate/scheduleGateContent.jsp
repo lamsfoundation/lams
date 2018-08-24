@@ -18,9 +18,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 
-<!DOCTYPE html>
 <lams:html>
     <lams:head>
 		<lams:css/>
@@ -78,7 +79,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     
     <body class="stripes">
 		<c:set var="title"><fmt:message key="label.schedule.gate.title"/></c:set>
-		<lams:Page title="${title}" type="monitoring">
+		<lams:Page title="${title}" type="monitoring" formID="gateForm">
 	
 			<%@ include file="gateInfo.jsp" %>
 			<c:choose>

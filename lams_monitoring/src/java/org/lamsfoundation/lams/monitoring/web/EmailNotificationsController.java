@@ -128,7 +128,7 @@ public class EmailNotificationsController {
     private static ILessonService lessonService;
 
     // ---------------------------------------------------------------------
-    // Struts Dispatch Method
+    // Method
     // ---------------------------------------------------------------------
 
     /**

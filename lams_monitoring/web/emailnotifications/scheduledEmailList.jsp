@@ -1,8 +1,9 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<c:if test="${not empty param.sessionMapID}">

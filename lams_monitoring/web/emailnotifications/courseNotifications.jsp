@@ -1,7 +1,8 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\n"); %>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<html:base/>
@@ -43,7 +44,7 @@
 			jQuery("#list3").jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
-			   	url: "<c:url value='/emailNotifications/getUsers/getUsers.do'/>" + getSearchParams(),
+			   	url: "<c:url value='/emailNotifications/getUsers.do'/>" + getSearchParams(),
 				datatype: "json",
 			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
 			   	colModel:[
@@ -213,7 +214,7 @@
     
 <body class="stripes">
 
-	<lams:Page title="${title}" type="admin">
+	<lams:Page title="${title}" type="admin" formID="emailNotificationsForm">
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="btn-group pull-right">

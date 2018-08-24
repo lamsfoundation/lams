@@ -52,11 +52,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
@@ -65,7 +60,6 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
@@ -82,8 +76,15 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -93,9 +94,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Fiona Malikoff
  */
-public class GroupingUploadAJAXAction extends DispatchAction {
+@Controller
+@RequestMapping("/")
+public class GroupingUploadAJAXController {
 
-    private static Logger log = Logger.getLogger(GroupingUploadAJAXAction.class);
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringService monitoringService;
+
+    private static Logger log = Logger.getLogger(GroupingUploadAJAXController.class);
 
     private static IUserManagementService userManagementService;
     private static ILessonService lessonService;
@@ -109,8 +119,8 @@ public class GroupingUploadAJAXAction extends DispatchAction {
      *
      * @throws Exception
      */
-    public ActionForward getGroupTemplateFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/getGroupTemplateFile")
+    public String getGroupTemplateFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -153,8 +163,6 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    Set<User> learners = lesson.getLessonClass().getLearners();
 	    // check for any groups already exist in this grouping
 	    Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    IMonitoringService monitoringService = MonitoringServiceProxy
-		    .getMonitoringService(getServlet().getServletContext());
 	    Activity activity = monitoringService.getActivityById(activityId);
 	    Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
 		    : ((GroupingActivity) activity).getCreateGrouping();
@@ -191,7 +199,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     private LinkedHashMap<String, ExcelCell[][]> exportLearnersForGrouping(Collection<User> learners, Set<Group> groups,
 	    Set<OrganisationGroup> orgGroups) {
 
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 	int numberOfColumns = 4;
 
 	ExcelCell[] title = new ExcelCell[numberOfColumns];
@@ -230,7 +238,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	}
 
 	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 	dataToExport.put(getCentralMessageService().getMessage("label.course.groups.prefix"), summaryData);
 	return dataToExport;
     }
@@ -247,7 +255,9 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     /**
      * Saves a course grouping.
      */
-    public ActionForward importLearnersForGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/importLearnersForGrouping")
+    @ResponseBody
+    public String importLearnersForGrouping(@ModelAttribute FileUploadForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InvalidParameterException, IOException {
 
 	Integer userId = getUserDTO().getUserID();
@@ -289,11 +299,11 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    return null;
 	}
 
-	@SuppressWarnings("rawtypes")
-	Hashtable fileElements = form.getMultipartRequestHandler().getFileElements();
-	if (fileElements.size() == 0) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "No file provided");
-	}
+	Hashtable fileElements = null; // null because there are commented lines
+//		form.getMultipartRequestHandler().getFileElements();
+//	if (fileElements.size() == 0) {
+//	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "No file provided");
+//	}
 	if (log.isDebugEnabled()) {
 	    log.debug("Saving course groups from spreadsheet for user " + userId + " and organisation " + organisationId
 		    + " filename " + fileElements);
@@ -302,8 +312,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	ObjectNode responseJSON = isLessonMode ? saveLessonGrouping(lessonId, activityId, fileElements)
 		: saveCourseGrouping(organisation, groupingId, name, fileElements);
 
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
     /** Create the new course grouping */
@@ -321,16 +330,16 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    orgGrouping.setName(name);
 	}
 
-	Map<String, Long> existingGroupNameToId = new HashMap<String, Long>();
+	Map<String, Long> existingGroupNameToId = new HashMap<>();
 	if (orgGrouping.getGroups() != null) {
 	    for (OrganisationGroup group : orgGrouping.getGroups()) {
 		existingGroupNameToId.put(group.getName(), group.getGroupId());
 	    }
 	}
 
-	Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
-	int totalUsersSkipped = parseGroupSpreadsheet((FormFile) fileElements.elements().nextElement(), orgGroupingId,
-		groups);
+	Map<String, Set<String>> groups = new HashMap<>();
+	int totalUsersSkipped = parseGroupSpreadsheet((MultipartFile) fileElements.elements().nextElement(),
+		orgGroupingId, groups);
 	int totalUsersAdded = 0;
 
 	List<OrganisationGroup> orgGroups = new LinkedList<>();
@@ -376,9 +385,6 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     /** Clean out and reuse any existing groups */
     private ObjectNode saveLessonGrouping(Long lessonId, Long activityId, Hashtable fileElements) throws IOException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-
 	int totalUsersSkipped = 0;
 	int totalUsersAdded = 0;
 
@@ -387,7 +393,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
 		: ((GroupingActivity) activity).getCreateGrouping();
 
-	Set<String> existingGroupNames = new HashSet<String>();
+	Set<String> existingGroupNames = new HashSet<>();
 	// check for any users starting to use the groups since the page was loaded.
 	for (Group group : grouping.getGroups()) {
 	    existingGroupNames.add(group.getGroupName());
@@ -397,8 +403,8 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    }
 	}
 
-	Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
-	totalUsersSkipped = parseGroupSpreadsheet((FormFile) fileElements.elements().nextElement(),
+	Map<String, Set<String>> groups = new HashMap<>();
+	totalUsersSkipped = parseGroupSpreadsheet((MultipartFile) fileElements.elements().nextElement(),
 		grouping.getGroupingId(), groups);
 
 	// if branching must use the already specified groups or cannot match to a branch!
@@ -480,7 +486,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	return null;
     }
 
-    public int parseGroupSpreadsheet(FormFile fileItem, Long groupingID, Map<String, Set<String>> groups)
+    public int parseGroupSpreadsheet(MultipartFile fileItem, Long groupingID, Map<String, Set<String>> groups)
 	    throws IOException {
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 	HSSFWorkbook wb = new HSSFWorkbook(fs);
@@ -500,12 +506,12 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 		    groupName = groupName != null ? groupName.trim() : null;
 		    if (groupName == null || groupName.length() == 0) {
 			skipped++;
-			GroupingUploadAJAXAction.log.warn("Unable to add learner " + login
+			GroupingUploadAJAXController.log.warn("Unable to add learner " + login
 				+ " for group in related to grouping " + groupingID + " as group name is missing.");
 		    } else {
 			Set<String> users = groups.get(groupName);
 			if (users == null) {
-			    users = new HashSet<String>();
+			    users = new HashSet<>();
 			    groups.put(groupName, users);
 			}
 			users.add(login);
@@ -516,7 +522,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	return skipped;
     }
 
-    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
+    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<>() {
 	@Override
 	public int compare(OrganisationGroup o1, OrganisationGroup o2) {
 	    String grp1Name = o1 != null ? o1.getName() : "";
@@ -535,7 +541,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     private IUserManagementService getUserManagementService() {
 	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return userManagementService;
@@ -544,7 +550,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     private ILessonService getLessonService() {
 	if (lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return lessonService;
@@ -553,7 +559,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     private ISecurityService getSecurityService() {
 	if (securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return securityService;
@@ -562,7 +568,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     private MessageService getCentralMessageService() {
 	if (centralMessageService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    centralMessageService = (MessageService) ctx.getBean("centralMessageService");
 	}
 	return centralMessageService;

@@ -47,10 +47,9 @@ function initLessonTab(){
 	$('#presenceButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/presenceAvailable.do',
 			cache : false,
 			data : {
-				'method'    : 'presenceAvailable',
 				'presenceAvailable' : checked,
 				'lessonID'      : lessonId
 			},
@@ -72,10 +71,9 @@ function initLessonTab(){
 	$('#imButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/presenceImAvailable.do',
 			cache : false,
 			data : {
-				'method'    : 'presenceImAvailable',
 				'presenceImAvailable' : checked,
 				'lessonID'      : lessonId
 			},
@@ -122,7 +120,7 @@ function initLessonTab(){
 	
 	// search for users in the organisation with the term the Monitor entered
 	$('.dialogSearchPhrase', classDialog).autocomplete({
-			'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=organisation&lessonID=" + lessonId,
+			'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=organisation&lessonID=" + lessonId,
 			'delay'  : 700,
 			'select' : function(event, ui){
 				var phraseField = $(this),
@@ -174,10 +172,9 @@ function initLessonTab(){
 	$('#gradebookOnCompleteButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/gradebookOnComplete.do',
 			cache : false,
 			data : {
-				'method'    : 'gradebookOnComplete',
 				'gradebookOnComplete' : checked,
 				'lessonID'      : lessonId
 			},
@@ -199,9 +196,8 @@ function initLessonTab(){
  */
 function showLessonLearnersDialog() {
 	var ajaxProperties = {
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/getLessonLearners.do',
 		data : {
-			'method'    : 'getLessonLearners',
 			'lessonID'  : lessonId
 		}
 	};
@@ -460,7 +456,7 @@ function updateLessonTab(){
 	});
 	
 	drawChart('pie', 'chartDiv',
-			  LAMS_URL + 'monitoring/monitoring.do?method=getLessonChartData&lessonID=' + lessonId,
+			  LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
 			  true);
 	
 	updatePresenceAvailableCount();
@@ -478,10 +474,9 @@ function scheduleLesson(){
 	if (date) {
 		if ( checkScheduleDate (date, lessonEndDate) ) {
 			$.ajax({
-				url : LAMS_URL + 'monitoring/monitoring.do',
+				url : LAMS_URL + 'monitoring/monitoring/startOnScheduleLesson.do',
 				cache : false,
 				data : {
-					'method'          : 'startOnScheduleLesson',
 					'lessonID'        : lessonId,
 					'lessonStartDate' : date
 				},
@@ -502,10 +497,9 @@ function scheduleLesson(){
 function startLesson(){
 	$.ajax({
 		dataType : 'text',
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/startLesson.do',
 		cache : false,
 		data : {
-			'method'          : 'startLesson',
 			'lessonID'        : lessonId
 		},
 		success : function() {
@@ -559,7 +553,7 @@ function showEmailDialog(userId){
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog).attr('src',
-					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
+					LAMS_URL + 'emailUser/composeMail.do?lessonID=' + lessonId
 					+ '&userID=' + userId);
 		},
 		'close' : function(){
@@ -576,10 +570,9 @@ function updatePresenceAvailableCount(){
 	if (checked) {
 		$.ajax({
 			dataType : 'text',
-			url : LAMS_URL + 'learning/learner.do',
+			url : LAMS_URL + 'learning/learner/getPresenceChatActiveUserCount.do',
 			cache : false,
 			data : {
-				'method'    : 'getPresenceChatActiveUserCount',
 				'lessonID'      : lessonId
 			},
 			success : function(result) {
@@ -640,11 +633,10 @@ function editEmailProgressDate(dateCheckbox){
 		add = dateCheckbox.is(':checked');
 		
 	$.ajax({
-		url : LAMS_URL + 'monitoring/emailProgress.do',
+		url : LAMS_URL + 'monitoring/emailProgress/updateEmailProgressDate.do',
 		type : 'POST',
 		cache : false,
 		data : {
-			'method'   : 'updateEmailProgressDate',
 			'lessonID' : lessonId,
 			'id'   : dateid,
 			'add' 	   : add
@@ -672,11 +664,10 @@ function fillEmailProgress() {
 		// initialise ajax config
 		ajaxProperties = {
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/emailProgress.do',
+		url : LAMS_URL + 'monitoring/emailProgress/getEmailProgressDates.do',
 		cache : false,
 		async : false,
 		data : {
-			'method'    : 'getEmailProgressDates',
 			'lessonID'  : lessonId
 		}};
 		dialog.data('ajaxProperties', ajaxProperties);
@@ -734,10 +725,9 @@ function sendProgressEmail() {
 	if ( confirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION) ) {
 		$.ajax({
 			dataType : 'json',
-			url : LAMS_URL + 'monitoring/emailProgress.do',
+			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
 			cache : false,
 			data : {
-				'method'    : 'sendLessonProgressEmail',
 				'lessonID'  : lessonId
 				},		
 			success : function(response) {
@@ -894,7 +884,7 @@ function initSequenceTab(){
 	
 	// search for users with the term the Monitor entered
 	$('.dialogSearchPhrase', learnerGroupDialog).autocomplete({
-			'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
+			'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
 			'delay'  : 700,
 			'select' : function(event, ui){
 				var phraseField = $(this),
@@ -926,7 +916,7 @@ function initSequenceTab(){
 	
 	// search for users with the term the Monitor entered
 	$("#sequenceSearchPhrase").autocomplete( {
-		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
+		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
 		'delay'  : 700,
 		'select' : function(event, ui){
 			// put the learner first name, last name and login into the box
@@ -1014,7 +1004,7 @@ function showIntroductionDialog(lessonId) {
 		'resizable' : false,
 		'title'		: LABELS.LESSON_INTRODUCTION,
 		'open'      : function(){
-			$('iframe', this).attr('src', LAMS_URL + 'editLessonIntro.do?method=edit&lessonID='+lessonId);
+			$('iframe', this).attr('src', LAMS_URL + 'editLessonIntro/edit.do?lessonID='+lessonId);
 			$('iframe', this).css('height', '360px'); 
 			autoRefreshBlocked = true;
 		},
@@ -1064,10 +1054,9 @@ function updateSequenceTab() {
 	
 	$.ajax({
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/getLessonProgress.do',
 		cache : false,
 		data : {
-			'method'    : 'getLessonProgress',
 			'lessonID'  : lessonId,
 			'searchedLearnerId' : sequenceSearchedLearner
 		},		
@@ -1158,11 +1147,10 @@ function loadLearningDesignSVG() {
 	// fetch SVG just once, since it is immutable
 	$.ajax({
 		dataType : 'text',
-		url : LAMS_URL + 'home.do',
+		url : LAMS_URL + 'home/getLearningDesignThumbnail.do',
 		async : false,
 		cache : false,
 		data : {
-			'method'    : 'getLearningDesignThumbnail',
 			'ldId'      : ldId
 		},
 		success : function(response) {
@@ -1187,7 +1175,7 @@ function loadLearningDesignSVG() {
 				// run the whole fetch again
 				updateSequenceTab();
 			}).attr('src', LAMS_URL 
-						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID=' + ldId).attr('width',0).attr('height',0).attr('style','border: 0px');
+						   + 'authoring/author/generateSVG.do?selectable=false&learningDesignID=' + ldId).attr('width',0).attr('height',0).attr('style','border: 0px');
 			
 		}
 	});
@@ -1269,11 +1257,10 @@ function forceComplete(currentActivityId, learners, x, y) {
 			if (currentActivityId) {
 				$.ajax({
 					dataType : 'text',
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/isActivityPreceding.do',
 					async : false,
 					cache : false,
 					data : {
-						'method'     	 : 'isActivityPreceding',
 						'activityA' 	 :  targetActivityId,
 						'activityB'		 :  currentActivityId
 					},
@@ -1322,10 +1309,9 @@ function forceCompleteExecute(learners, activityId, removeContent) {
 	
 	$.ajax({
 		dataType : 'text',
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/forceComplete.do',
 		cache : false,
 		data : {
-			'method'     		 : 'forceComplete',
 			'lessonID'   		 : lessonId,
 			'learnerID'  		 : learnerIds.slice(0, -1),
 			'activityID' 		 : activityId,
@@ -1476,7 +1462,7 @@ function addActivityIconsHandlers(activity) {
 				dblTap(learnerIcon, function(event){
 					 // double click on learner icon to see activity from his perspective
 					event.stopPropagation();
-					var url = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
+					var url = LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
 						               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
 					openPopUp(url, "LearnActivity", popupHeight, popupWidth, true);
 				});
@@ -1497,9 +1483,8 @@ function addActivityIconsHandlers(activity) {
 			 // double click on learner group icon to see list of learners
 			event.stopPropagation();
 			var ajaxProperties = {
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
 					data : {
-						'method'     : 'getCurrentLearners',
 						'activityID' : activity.id
 					}
 				};
@@ -1584,9 +1569,8 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 		
 		dblTap(groupIcon, function(){
 			var ajaxProperties = {
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
 					data : {
-						'method'     : 'getCurrentLearners',
 						'lessonID'   : lessonId
 					}
 				};
@@ -1727,11 +1711,10 @@ function fillClassList(role, disableCreator) {
 		// initialise ajax config
 		ajaxProperties = {
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/getClassMembers.do',
 		cache : false,
 		async : false,
 		data : {
-			'method'    : 'getClassMembers',
 			'lessonID'  : lessonId,
 					'role'      	 : role.toUpperCase(),
 					'pageNumber'	 : 1,
@@ -1804,11 +1787,10 @@ function editClassMember(userCheckbox){
 		add = userCheckbox.is(':checked');
 		
 	$.ajax({
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/updateLessonClass.do',
 		type : 'POST',
 		cache : false,
 		data : {
-			'method'   : 'updateLessonClass',
 			'lessonID' : lessonId,
 			'userID'   : userID,
 			'role'     : role,
@@ -1823,11 +1805,10 @@ function editClassMember(userCheckbox){
 function addAllLearners(){
 	if (confirm(LABELS.CLASS_ADD_ALL_CONFIRM)) {
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/addAllOrganisationLearnersToLesson.do',
 			type : 'POST',
 			cache : false,
 			data : {
-				'method'   : 'addAllOrganisationLearnersToLesson',
 				'lessonID' : lessonId
 			},
 			success : function(){
@@ -1845,11 +1826,10 @@ function openLiveEdit(){
 	if (confirm(LABELS.LIVE_EDIT_CONFIRM)) {
 		$.ajax({
 			dataType : 'text',
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/startLiveEdit.do',
 			cache : false,
 			async : false,
 			data : {
-				'method'    : 'startLiveEdit',
 				'ldId'      : ldId
 			},
 			success : function(response) {
@@ -1892,7 +1872,7 @@ function resizeSequenceCanvas(width, height){
 function initLearnersTab() {
 	// search for users with the term the Monitor entered
 	$("#learnersSearchPhrase").autocomplete( {
-		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
+		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
 		'delay'  : 700,
 		'select' : function(event, ui){
 		    // learner's ID in ui.item.value is not used here
@@ -2035,10 +2015,9 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 	
 	$.ajax({
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
 		cache : false,
 		data : {
-			'method'           : 'getLearnerProgressPage',
 			'lessonID'         : lessonId,
 			'searchPhrase'     : learnersSearchPhrase,
 			'pageNumber'       : pageNumber,
@@ -2265,7 +2244,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	togglePagingCells(learnerGroupDialog, pageNumber, maxPageNumber);
 
 	$.each(learners, function(learnerIndex, learner) {
-		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
+		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
         				       	  + learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
         				        : null,
 				learnerDiv = $('<div />').attr({

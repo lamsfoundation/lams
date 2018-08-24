@@ -1,7 +1,8 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\n"); %>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<html:base/>
@@ -182,15 +183,15 @@
     
 <body class="stripes">
 
-	<lams:Page title="${title}" type="admin">
+	<lams:Page title="${title}" type="admin" formID="emailNotificationsForm">
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="btn-group pull-right">
-					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&lessonID=${lesson.lessonId}"
+					<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?lessonID=${lesson.lessonId}"
 					   id="listEmailsHref" class="btn btn-default btn-sm">
 						<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
 					</a>
-					<a href="<c:url value='/emailNotifications.do'/>?method=showArchivedEmails&lessonID=${lesson.lessonId}"
+					<a href="<c:url value='/emailNotifications/showArchivedEmails.do'/>?lessonID=${lesson.lessonId}"
 					   id="archiveHref" class="btn btn-default btn-sm">
 						<i class="fa fa-archive"></i> <fmt:message key="email.notifications.archived.messages.button" />
 					</a>		
