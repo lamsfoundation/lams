@@ -63,8 +63,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -1299,9 +1299,9 @@ public class LessonManagerServlet extends HttpServlet {
 	boolean hasNumericToolOutput = false;
 	for (ToolActivity activity : activities) {
 	    String toolSignature = activity.getTool().getToolSignature();
-	    hasNumericToolOutput |= CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-		    || CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature);
+	    hasNumericToolOutput |= CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+		    || CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
+		    || CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature);
 	}
 
 	// Create the root node of the xml document

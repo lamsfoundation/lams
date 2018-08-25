@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
@@ -67,7 +67,7 @@ public abstract class RestServlet extends HttpServlet {
     private static IToolDAO toolDAO;
     private static ILamsCoreToolService lamsCoreToolService;
     private static IIntegrationService integrationService;
-    private static IAuthoringService authoringService;
+    private static IAuthoringFullService authoringFullService;
     private static IUserManagementService userManagementService;
 
     /**
@@ -165,13 +165,13 @@ public abstract class RestServlet extends HttpServlet {
     protected abstract void doPostInternal(JSONObject requestJSON, UserDTO userDTO, HttpServletResponse response)
 	    throws Exception;
 
-    protected final IAuthoringService getAuthoringService() {
-	if (RestServlet.authoringService == null) {
+    protected final IAuthoringFullService getAuthoringService() {
+	if (RestServlet.authoringFullService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServletContext());
-	    RestServlet.authoringService = (IAuthoringService) ctx.getBean("authoringService");
+	    RestServlet.authoringFullService = (IAuthoringFullService) ctx.getBean("authoringFullService");
 	}
-	return RestServlet.authoringService;
+	return RestServlet.authoringFullService;
     }
 
     protected ILamsCoreToolService getLamsCoreToolService() {

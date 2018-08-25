@@ -48,7 +48,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -94,10 +94,6 @@ import com.google.gson.GsonBuilder;
 
 /**
  * @author Manpreet Minhas
- *
- *
- *
- *
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -106,7 +102,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private static IMonitoringService monitoringService;
     private static IUserManagementService userManagementService;
     private static ILamsToolService toolService;
-    private static IAuthoringService authoringService;
+    private static IAuthoringFullService authoringFullService;
     private static ILearningDesignService learningDesignService;
     private static ISecurityService securityService;
     private static IIntegrationService integrationService;
@@ -167,11 +163,11 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public ActionForward getToolOutputDefinitions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException, JSONException {
-	IAuthoringService authoringService = getAuthoringService();
+	IAuthoringFullService authoringFullService = getAuthoringService();
 	Long toolContentID = WebUtil.readLongParam(request, "toolContentID");
 	Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION;
 
-	List<ToolOutputDefinitionDTO> defnDTOList = authoringService.getToolOutputDefinitions(toolContentID,
+	List<ToolOutputDefinitionDTO> defnDTOList = authoringFullService.getToolOutputDefinitions(toolContentID,
 		definitionType);
 
 	Gson gson = new GsonBuilder().create();
@@ -236,12 +232,12 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public ActionForward finishLearningDesignEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException {
-	IAuthoringService authoringService = getAuthoringService();
+	IAuthoringFullService authoringFullService = getAuthoringService();
 	Long learningDesignID = WebUtil.readLongParam(request, "learningDesignID", false);
 	boolean cancelled = WebUtil.readBooleanParam(request, "cancelled", false);
 
 	try {
-	    authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
+	    authoringFullService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
 	} catch (Exception e) {
 	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage() + " learning design id "
 		    + learningDesignID;
@@ -258,11 +254,11 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     public ActionForward copyToolContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	IAuthoringService authoringService = getAuthoringService();
+	IAuthoringFullService authoringFullService = getAuthoringService();
 	try {
 	    String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
 	    long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
-	    Long newToolContentID = authoringService.copyToolContent(toolContentID, customCSV);
+	    Long newToolContentID = authoringFullService.copyToolContent(toolContentID, customCSV);
 	    response.setContentType("text/plain;charset=utf-8");
 	    response.getWriter().write(newToolContentID.toString());
 	} catch (Exception e) {
@@ -277,12 +273,12 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     public ActionForward createToolContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
-	IAuthoringService authoringService = getAuthoringService();
+	IAuthoringFullService authoringFullService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
 	if (toolContentID == null) {
 	    // if the tool content ID was not provided, generate the next unique content ID for the tool
-	    toolContentID = authoringService.insertToolContentID(toolID);
+	    toolContentID = authoringFullService.insertToolContentID(toolID);
 	}
 
 	if (toolContentID != null) {
@@ -291,7 +287,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		contentFolderID = FileUtil.generateUniqueContentFolderID();
 	    }
 
-	    String authorUrl = authoringService.getToolAuthorUrl(toolID, toolContentID, contentFolderID);
+	    String authorUrl = authoringFullService.getToolAuthorUrl(toolID, toolContentID, contentFolderID);
 	    if (authorUrl != null) {
 		JSONObject responseJSON = new JSONObject();
 		responseJSON.put("authorURL", authorUrl);
@@ -311,7 +307,7 @@ public class AuthoringAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     public ActionForward createSingleActivityLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IAuthoringService authoringService = getAuthoringService();
+	IAuthoringFullService authoringFullService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID, true);
@@ -346,7 +342,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    title = getLearningDesignService().internationaliseActivityTitle(learningLibraryID);
 	}
 	// create the LD and put it in Run Sequences folder in the given organisation
-	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
+	Long learningDesignID = authoringFullService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
 		learningLibraryID, contentFolderID, organisationID);
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);
@@ -522,14 +518,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	return AuthoringAction.userManagementService;
     }
 
-    public IAuthoringService getAuthoringService() {
-	if (AuthoringAction.authoringService == null) {
+    public IAuthoringFullService getAuthoringService() {
+	if (AuthoringAction.authoringFullService == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    AuthoringAction.authoringService = (IAuthoringService) wac
+	    AuthoringAction.authoringFullService = (IAuthoringFullService) wac
 		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
 	}
-	return AuthoringAction.authoringService;
+	return AuthoringAction.authoringFullService;
     }
 
     public ILamsToolService getToolService() {

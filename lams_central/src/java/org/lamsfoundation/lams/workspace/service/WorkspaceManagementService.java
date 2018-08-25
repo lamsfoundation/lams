@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -73,7 +73,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     protected IBaseDAO baseDAO;
     protected ILearningDesignDAO learningDesignDAO;
 
-    protected IAuthoringService authoringService;
+    protected IAuthoringFullService authoringFullService;
     protected IRepositoryService repositoryService;
     protected IUserManagementService userMgmtService;
     protected MessageService messageService;
@@ -113,11 +113,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     }
 
     /**
-     * @param authoringService
-     *            The authoringService to set.
+     * @param authoringFullService
+     *            The authoringFullService to set.
      */
-    public void setAuthoringService(IAuthoringService authoringService) {
-	this.authoringService = authoringService;
+    public void setAuthoringService(IAuthoringFullService authoringFullService) {
+	this.authoringFullService = authoringFullService;
     }
 
     /**
@@ -571,7 +571,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     public void copyResource(Long resourceID, String resourceType, Integer copyType, Integer targetFolderID,
 	    Integer userID) throws LearningDesignException, UserException, WorkspaceFolderException, IOException {
 	if (FolderContentDTO.DESIGN.equals(resourceType)) {
-	    authoringService.copyLearningDesign(resourceID,
+	    authoringFullService.copyLearningDesign(resourceID,
 		    copyType != null ? copyType : new Integer(LearningDesign.COPY_TYPE_NONE), userID, targetFolderID,
 		    false);
 	} else if (FolderContentDTO.FOLDER.equals(resourceType)) {
@@ -691,7 +691,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    Iterator iterator = designs.iterator();
 	    while (iterator.hasNext()) {
 		LearningDesign design = (LearningDesign) iterator.next();
-		authoringService.copyLearningDesign(design, new Integer(LearningDesign.COPY_TYPE_NONE), user,
+		authoringFullService.copyLearningDesign(design, new Integer(LearningDesign.COPY_TYPE_NONE), user,
 			targetWorkspaceFolder, false, null, null);
 	    }
 	}

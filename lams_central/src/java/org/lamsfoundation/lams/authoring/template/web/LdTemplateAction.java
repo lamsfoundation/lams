@@ -45,7 +45,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -85,7 +85,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
     private static ILamsCoreToolService lamsCoreToolService;
     private static IWorkspaceManagementService workspaceManagementService;
-    private static IAuthoringService authoringService;
+    private static IAuthoringFullService authoringFullService;
     private static IToolDAO toolDAO;
 
     protected static final String CONTENT_TYPE_JSON = "application/json;charset=utf-8";
@@ -343,7 +343,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	try {
 	    learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
 	} catch ( Exception e )  {
-	    LdTemplateAction.log.error("Unable to learning design with details " + ldJSON, e);
+	    log.error("Unable to learning design with details " + ldJSON, e);
 	    throw new HttpException("Unable to learning design with details " + ldJSON);
 
 	}
@@ -627,7 +627,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 
 	    return toolContentID;
 	} catch (Exception e) {
-	    LdTemplateAction.log.error("Unable to create tool content for " + toolSignature + " with details "
+	    log.error("Unable to create tool content for " + toolSignature + " with details "
 		    + toolContentJSON
 		    + ". \nThe tool probably threw an exception - check the server logs for more details.\n"
 		    + "If the exception is \"Servlet.service() for servlet ToolContentRestServlet threw exception java.lang.ClassCastException: com.sun.proxy.$ProxyXXX cannot be cast to org.lamsfoundation.lams.rest.ToolRestManager)\""
@@ -1277,40 +1277,40 @@ public abstract class LdTemplateAction extends DispatchAction {
     /* ************************************** Service related methods ********************************************** */
     /* ************************************** I18N related methods ************************************************* */
 
-    protected final IAuthoringService getAuthoringService() {
-	if (LdTemplateAction.authoringService == null) {
+    protected final IAuthoringFullService getAuthoringService() {
+	if (authoringFullService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LdTemplateAction.authoringService = (IAuthoringService) ctx.getBean("authoringService");
+	    authoringFullService = (IAuthoringFullService) ctx.getBean("authoringFullService");
 	}
-	return LdTemplateAction.authoringService;
+	return authoringFullService;
     }
 
     protected final Tool getTool(String toolSignature) {
-	if (LdTemplateAction.toolDAO == null) {
+	if (toolDAO == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LdTemplateAction.toolDAO = (IToolDAO) ctx.getBean("toolDAO");
+	    toolDAO = (IToolDAO) ctx.getBean("toolDAO");
 	}
-	return LdTemplateAction.toolDAO.getToolBySignature(toolSignature);
+	return toolDAO.getToolBySignature(toolSignature);
     }
 
     protected final IWorkspaceManagementService getWorkspaceManagementService() {
-	if (LdTemplateAction.workspaceManagementService == null) {
+	if (workspaceManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    LdTemplateAction.workspaceManagementService = (IWorkspaceManagementService) ctx
+	    workspaceManagementService = (IWorkspaceManagementService) ctx
 		    .getBean("workspaceManagementService");
 	}
-	return LdTemplateAction.workspaceManagementService;
+	return workspaceManagementService;
     }
 
     private ILamsCoreToolService getLamsCoreToolService() {
-	if (LdTemplateAction.lamsCoreToolService == null) {
-	    LdTemplateAction.lamsCoreToolService = (ILamsCoreToolService) WebApplicationContextUtils
+	if (lamsCoreToolService == null) {
+	    lamsCoreToolService = (ILamsCoreToolService) WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("lamsCoreToolService");
 	}
-	return LdTemplateAction.lamsCoreToolService;
+	return lamsCoreToolService;
     }
 
     class ToolDetails {

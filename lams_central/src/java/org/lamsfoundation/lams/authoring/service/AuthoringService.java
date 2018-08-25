@@ -112,6 +112,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -119,7 +120,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 /**
  * @author Manpreet Minhas
  */
-public class AuthoringService implements IAuthoringService, BeanFactoryAware {
+public class AuthoringService implements IAuthoringFullService, BeanFactoryAware {
 
     protected Logger log = Logger.getLogger(AuthoringService.class);
 
@@ -354,19 +355,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesign(java.lang.Long)
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getLearningDesign(java.lang.Long)
      */
     @Override
     public LearningDesign getLearningDesign(Long learningDesignID) {
 	return learningDesignDAO.getLearningDesignById(learningDesignID);
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#saveLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign)
-     */
-    @Override
-    public void saveLearningDesign(LearningDesign learningDesign) {
-	learningDesignDAO.insertOrUpdate(learningDesign);
     }
 
     public BeanFactory getBeanFactory() {
@@ -394,7 +387,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long, int)
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getToolOutputDefinitions(java.lang.Long, int)
      */
     @Override
     public List<ToolOutputDefinitionDTO> getToolOutputDefinitions(Long toolContentID, int definitionType) {
@@ -411,7 +404,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyLock(LearningDesign,
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#setupEditOnFlyLock(LearningDesign,
      *      java.lang.Integer)
      */
     @SuppressWarnings("unchecked")
@@ -463,7 +456,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#setupEditOnFlyGate(java.lang.Long,
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#setupEditOnFlyGate(java.lang.Long,
      *      java.lang.Integer)
      */
 
@@ -839,7 +832,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign,
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign,
      *      java.lang.Integer, org.lamsfoundation.lams.usermanagement.User,
      *      org.lamsfoundation.lams.usermanagement.WorkspaceFolder, java.lang.Boolean, java.lang.String)
      */
@@ -893,7 +886,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @throws UserException
      * @throws WorkspaceFolderException
      * @throws IOException
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#insertLearningDesign(java.lang.Long,
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#insertLearningDesign(java.lang.Long,
      *      java.lang.Long, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.Integer)
      */
     @Override
@@ -968,7 +961,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign,
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign,
      *      org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
      */
     private LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign,
@@ -1594,7 +1587,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAvailableLicenses()
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getAvailableLicenses()
      */
     @Override
     public Vector getAvailableLicenses() {
@@ -1820,5 +1813,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	access.setUserId(userId);
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
+    }
+    
+    @Override
+    public FolderContentDTO getUserWorkspaceFolder(Integer userID) throws IOException {
+	return workspaceManagementService.getUserWorkspaceFolder(userID);
     }
 }

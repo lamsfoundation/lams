@@ -15,7 +15,7 @@
 
     <form-bean
       name="TextSearchActionForm"
-      type="org.lamsfoundation.lams.web.TextSearchActionForm"
+      type="org.lamsfoundation.lams.web.form.TextSearchActionForm"
     />
     <form-bean
       name="PasswordChangeActionForm"
