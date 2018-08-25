@@ -201,34 +201,10 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	this.branchActivityEntryDAO = branchActivityEntryDAO;
     }
 
-    /**
-     *
-     * @return
-     */
-    public ICompetenceDAO getCompetenceDAO() {
-	return competenceDAO;
-    }
-
-    /**
-     *
-     * @param competenceDAO
-     */
     public void setCompetenceDAO(ICompetenceDAO competenceDAO) {
 	this.competenceDAO = competenceDAO;
     }
 
-    /**
-     *
-     * @return
-     */
-    public ICompetenceMappingDAO getCompetenceMappingDAO() {
-	return competenceMappingDAO;
-    }
-
-    /**
-     *
-     * @param competenceMappingDAO
-     */
     public void setCompetenceMappingDAO(ICompetenceMappingDAO competenceMappingDAO) {
 	this.competenceMappingDAO = competenceMappingDAO;
     }
@@ -297,16 +273,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	this.licenseDAO = licenseDAO;
     }
 
-    public ILamsCoreToolService getLamsCoreToolService() {
-	return lamsCoreToolService;
-    }
-
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
-    }
-
-    public ILearningDesignService getLearningDesignService() {
-	return learningDesignService;
     }
 
     /**
@@ -315,15 +283,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      */
     public void setLearningDesignService(ILearningDesignService learningDesignService) {
 	this.learningDesignService = learningDesignService;
-    }
-
-    @Override
-    public MessageService getMessageService() {
-	return messageService;
-    }
-
-    public ILessonService getLessonService() {
-	return lessonService;
     }
 
     public void setLessonService(ILessonService lessonService) {
@@ -354,18 +313,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	this.contentIDGenerator = contentIDGenerator;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getLearningDesign(java.lang.Long)
-     */
-    @Override
-    public LearningDesign getLearningDesign(Long learningDesignID) {
-	return learningDesignDAO.getLearningDesignById(learningDesignID);
-    }
-
-    public BeanFactory getBeanFactory() {
-	return beanFactory;
-    }
-
     @Override
     public void setBeanFactory(BeanFactory beanFactory) {
 	this.beanFactory = beanFactory;
@@ -376,11 +323,22 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      **************************************************************************/
 
     /**
+     * Returns a populated LearningDesign object corresponding to the given learningDesignID
+     *
+     * @param learningDesignID
+     *            The learning_design_id of the design which has to be fetched
+     * @return LearningDesign The populated LearningDesign object corresponding to the given learningDesignID
+     */
+    private LearningDesign getLearningDesign(Long learningDesignID) {
+	return learningDesignDAO.getLearningDesignById(learningDesignID);
+    }
+
+    /**
      * Helper method to retrieve the user data. Gets the id from the user details in the shared session
      *
      * @return the user id
      */
-    public static Integer getUserId() {
+    private static Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null ? learner.getUserID() : null;
@@ -883,84 +841,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     }
 
     /**
-     * @throws UserException
-     * @throws WorkspaceFolderException
-     * @throws IOException
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#insertLearningDesign(java.lang.Long,
-     *      java.lang.Long, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.Integer)
-     */
-    @Override
-    public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID,
-	    boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV)
-	    throws UserException, WorkspaceFolderException, IOException {
-
-	User user = (User) baseDAO.find(User.class, userID);
-	if (user == null) {
-	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
-	}
-
-	LearningDesign mainDesign = learningDesignDAO.getLearningDesignById(originalDesignID);
-	if (mainDesign == null) {
-	    throw new LearningDesignException(
-		    messageService.getMessage("no.such.learningdesign.exist", new Object[] { originalDesignID }));
-	}
-
-	LearningDesign designToImport = learningDesignDAO.getLearningDesignById(designToImportID);
-	if (designToImport == null) {
-	    throw new LearningDesignException(
-		    messageService.getMessage("no.such.learningdesign.exist", new Object[] { designToImportID }));
-	}
-
-	if (createNewLearningDesign) {
-	    WorkspaceFolder workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
-	    if (workspaceFolder == null) {
-		throw new WorkspaceFolderException(
-			messageService.getMessage("no.such.workspace.exist", new Object[] { workspaceFolderID }));
-	    }
-	    if (!workspaceManagementService
-		    .isUserAuthorizedToModifyFolderContents(workspaceFolder.getWorkspaceFolderId(), user.getUserId())) {
-		throw new UserAccessDeniedException("User with user_id of " + user.getUserId()
-			+ " is not authorized to store a copy a learning design into the workspace folder "
-			+ workspaceFolder);
-	    }
-
-	    mainDesign = copyLearningDesign(mainDesign, LearningDesign.COPY_TYPE_NONE, user, workspaceFolder, false,
-		    newDesignName, customCSV);
-	} else {
-	    // updating the existing design so check the rights to the folder
-	    // containing the design. If this is in live edit mode
-	    boolean authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(
-		    mainDesign.getWorkspaceFolder().getWorkspaceFolderId(), user.getUserId());
-	    if (!authorised) {
-		authorised = (mainDesign.getEditOverrideLock() != null)
-			&& mainDesign.getEditOverrideLock().booleanValue()
-			&& userID.equals(mainDesign.getEditOverrideUser().getUserId());
-	    }
-	    if (!authorised) {
-		throw new UserAccessDeniedException("User with user_id of " + user.getUserId()
-			+ " is not authorized to update a learning design into the workspace folder "
-			+ mainDesign.getWorkspaceFolder());
-	    }
-	}
-
-	// now dump the import design into our main sequence. Leave the first
-	// activity ui id for the design as it is.
-	int uiidOffset = mainDesign.getMaxID().intValue();
-	updateDesignCompetences(designToImport, mainDesign, true);
-	HashMap<Integer, Activity> newActivities = updateDesignActivities(designToImport, mainDesign, uiidOffset,
-		customCSV);
-	updateDesignTransitions(designToImport, mainDesign, newActivities, uiidOffset);
-	mainDesign.setMaxID(LearningDesign.addOffset(designToImport.getMaxID(), uiidOffset));
-	mainDesign.setValidDesign(Boolean.FALSE);
-	mainDesign.setLastModifiedDateTime(new Date());
-	learningDesignDAO.update(mainDesign);
-
-	insertCompetenceMappings(mainDesign.getCompetences(), designToImport.getCompetences(), newActivities);
-
-	return mainDesign;
-    }
-
-    /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign,
      *      org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
      */
@@ -1235,7 +1115,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * @param newLearningDesign
      *            The copy of the originalLearningDesign
      */
-    public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
+    private void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    HashMap<Integer, Activity> newActivities, int uiidOffset) {
 	HashSet newTransitions = new HashSet();
 	Set oldTransitions = originalLearningDesign.getTransitions();
@@ -1291,7 +1171,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * @param newLearningDesign
      *            The copy of the originalLearningDesign
      */
-    public void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
+    private void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    boolean insert) {
 	HashSet<Competence> newCompeteces = new HashSet<>();
 
@@ -1334,58 +1214,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     }
 
-    public void insertCompetenceMappings(Set<Competence> oldCompetences, Set<Competence> newCompetences,
-	    HashMap<Integer, Activity> newActivities) {
-
-	for (Integer activityKey : newActivities.keySet()) {
-	    Activity activity = newActivities.get(activityKey);
-	    if (activity.isToolActivity()) {
-		Set<CompetenceMapping> newCompetenceMappings = new HashSet<>();
-		ToolActivity newToolActivity = (ToolActivity) activity;
-		if (newToolActivity.getCompetenceMappings() != null) {
-		    for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
-			CompetenceMapping newMapping = new CompetenceMapping();
-			newMapping.setToolActivity(newToolActivity);
-
-			// Check if competence mapping title already exists as a
-			// competence in the original sequence
-			// If so, simply use the existing competence to map to.
-			if ((oldCompetences != null) && (oldCompetences.size() > 0)
-				&& (getCompetenceFromSet(oldCompetences,
-					competenceMapping.getCompetence().getTitle()) != null)) {
-			    newMapping.setCompetence(
-				    getCompetenceFromSet(oldCompetences, competenceMapping.getCompetence().getTitle()));
-			    competenceMappingDAO.insert(newMapping);
-			    newCompetenceMappings.add(newMapping);
-			}
-			// If competence was not already existing in the ld, add
-			// a new mappping
-			else if ((newCompetences != null) && (newCompetences.size() > 0)
-				&& (getCompetenceFromSet(newCompetences,
-					competenceMapping.getCompetence().getTitle()) != null)) {
-			    newMapping.setCompetence(
-				    getCompetenceFromSet(newCompetences, competenceMapping.getCompetence().getTitle()));
-			    competenceMappingDAO.insert(newMapping);
-			    newCompetenceMappings.add(newMapping);
-			}
-		    }
-		}
-		newToolActivity.getCompetenceMappings().addAll(newCompetenceMappings);
-	    }
-	}
-    }
-
-    public Competence getCompetenceFromSet(Set<Competence> competences, String title) {
-	Competence ret = null;
-	for (Competence competence : competences) {
-	    if (competence.getTitle().equals(title)) {
-		ret = competence;
-		break;
-	    }
-	}
-	return ret;
-    }
-
     /**
      * Updates the competence information in the newLearningDesign based on the originalLearningDesign
      *
@@ -1394,7 +1222,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * @param newLearningDesign
      *            The copy of the originalLearningDesign
      */
-    public void updateCompetenceMappings(Set<Competence> newCompetences, HashMap<Integer, Activity> newActivities) {
+    private void updateCompetenceMappings(Set<Competence> newCompetences, HashMap<Integer, Activity> newActivities) {
 	for (Integer activityKey : newActivities.keySet()) {
 	    Activity activity = newActivities.get(activityKey);
 	    if (activity.isToolActivity()) {
@@ -1541,35 +1369,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     }
 
     @Override
-    public Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode) {
-	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
-	Vector<AuthoringActivityDTO> listOfAuthoringActivityDTOs = new Vector<>();
-
-	for (Iterator i = learningDesign.getActivities().iterator(); i.hasNext();) {
-	    Activity currentActivity = (Activity) i.next();
-	    if (currentActivity.isToolActivity()) {
-		try {
-		    // Normally we pass in an array for the branch mappings as
-		    // the second parameter to new AuthoringActivityDTO()
-		    // but we don't need to in this case as it is only doing it
-		    // for tool activities, and the extra parameter is only
-		    // used for branching activities
-		    ToolActivity toolActivity = (ToolActivity) activityDAO
-			    .getActivityByActivityId(currentActivity.getActivityId());
-		    AuthoringActivityDTO activityDTO = new AuthoringActivityDTO(toolActivity, null, languageCode);
-		    listOfAuthoringActivityDTOs.add(activityDTO);
-		} catch (ToolException e) {
-		    String error = "" + e.getMessage();
-		    log.error(error, e);
-		    throw new LearningDesignException(error, e);
-		}
-	    }
-	}
-
-	return listOfAuthoringActivityDTOs;
-    }
-
-    @Override
     public Long insertToolContentID(Long toolID) {
 	Tool tool = toolDAO.getToolByID(toolID);
 	if (tool == null) {
@@ -1599,39 +1398,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    licenseDTOList.add(element.getLicenseDTO(Configuration.get(ConfigurationKeys.SERVER_URL)));
 	}
 	return licenseDTOList;
-    }
-
-    /**
-     * Delete a learning design from the database. Does not remove any content stored in tools - that is done by the
-     * LamsCoreToolService
-     */
-    @Override
-    public void deleteLearningDesign(LearningDesign design) {
-	if (design == null) {
-	    log.error("deleteLearningDesign: unable to delete learning design as design is null.");
-	    return;
-	}
-
-	// remove all the tool content for the learning design
-	Set acts = design.getActivities();
-	Iterator iter = acts.iterator();
-	while (iter.hasNext()) {
-	    Activity activity = (Activity) iter.next();
-	    if (activity.isToolActivity()) {
-		try {
-		    ToolActivity toolActivity = (ToolActivity) activityDAO
-			    .getActivityByActivityId(activity.getActivityId());
-		    lamsCoreToolService.notifyToolToDeleteContent(toolActivity);
-		} catch (ToolException e) {
-		    log.error(
-			    "Unable to delete tool content for activity" + activity + " as activity threw an exception",
-			    e);
-		}
-	    }
-	}
-
-	// remove the learning design
-	learningDesignDAO.delete(design);
     }
 
     /**

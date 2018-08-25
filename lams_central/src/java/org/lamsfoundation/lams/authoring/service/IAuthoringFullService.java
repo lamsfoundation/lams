@@ -51,24 +51,6 @@ import org.lamsfoundation.lams.util.MessageService;
  */
 public interface IAuthoringFullService extends IAuthoringService {
 
-    /** Message key returned by the storeLearningDesignDetails() method */
-    public static final String STORE_LD_MESSAGE_KEY = "storeLearningDesignDetails";
-
-    public static final String INSERT_LD_MESSAGE_KEY = "insertLearningDesign";
-
-    public static final String START_EDIT_ON_FLY_MESSAGE_KEY = "startEditOnFly";
-
-    public static final String COPY_TOOL_CONTENT_MESSAGE_KEY = "copyMultipleToolContent";
-
-    /**
-     * Returns a populated LearningDesign object corresponding to the given learningDesignID
-     *
-     * @param learningDesignID
-     *            The learning_design_id of the design which has to be fetched
-     * @return LearningDesign The populated LearningDesign object corresponding to the given learningDesignID
-     */
-    LearningDesign getLearningDesign(Long learningDesignID);
-
     /**
      * Create a copy of learning design as per the requested learning design and saves it in the given workspacefolder.
      * Designed to be called when user tries to copy a learning design using the Authoring interface. Does not set the
@@ -95,34 +77,6 @@ public interface IAuthoringFullService extends IAuthoringService {
 	    Integer workspaceFolder, boolean setOriginalDesign)
 	    throws UserException, LearningDesignException, WorkspaceFolderException, IOException;
 
-    /**
-     * Insert a learning design into another learning design. This is a copy and paste type of copy - it just dumps the
-     * contents (with modified activity ui ids) in the main learning design. It doesn't wrap up the contents in a
-     * sequence activity. Always sets the type to COPY_TYPE_NONE.
-     *
-     * @param originalDesignID
-     *            The design to be "modified". Required.
-     * @param designToImportID
-     *            The design to be imported into originalLearningDesign. Required.
-     * @param userId
-     *            Current User. Required.
-     * @param customCSV
-     *            The custom CSV required to insert tool adapter tools, so their content can be copied in the external
-     *            server
-     * @param createNewLearningDesign
-     *            If true, then a copy of the originalLearningDesign is made and the copy modified. If it is false, then
-     *            the originalLearningDesign is modified. Required.
-     * @param newDesignName
-     *            New name for the design if a new design is being create. Optional.
-     * @param workspaceFolderID
-     *            The folder in which to put the new learning design if createNewLearningDesign = true. May be null if
-     *            createNewLearningDesign = false
-     * @return New / updated learning design
-     */
-    LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID,
-	    boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV)
-	    throws UserException, LearningDesignException, WorkspaceFolderException, IOException;
-
     LearningDesign saveLearningDesignDetails(JSONObject ldJSON)
 	    throws UserException, JSONException, WorkspaceFolderException, ObjectExtractorException, ParseException;
 
@@ -136,13 +90,6 @@ public interface IAuthoringFullService extends IAuthoringService {
      * @throws Exception
      */
     Vector<ValidationErrorDTO> validateLearningDesign(Long learningDesignId);
-
-    /**
-     *
-     * @param learningDesignId
-     * @return
-     */
-    Vector<AuthoringActivityDTO> getToolActivities(Long learningDesignId, String languageCode);
 
     /**
      * This method returns a output definitions of the Tool.
@@ -176,12 +123,6 @@ public interface IAuthoringFullService extends IAuthoringService {
     Vector<License> getAvailableLicenses();
 
     /**
-     * Delete a learning design from the database. Does not remove any content stored in tools - that is done by the
-     * LamsCoreToolService
-     */
-    void deleteLearningDesign(LearningDesign design);
-
-    /**
      *
      *
      * @param learningDesignID
@@ -194,9 +135,6 @@ public interface IAuthoringFullService extends IAuthoringService {
      * @throws Exception
      */
     void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws Exception;
-
-    /** Get the message service, which gives access to the I18N text */
-    MessageService getMessageService();
 
     String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
 

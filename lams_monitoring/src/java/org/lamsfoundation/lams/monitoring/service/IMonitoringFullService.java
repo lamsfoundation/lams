@@ -55,18 +55,6 @@ public interface IMonitoringFullService extends IMonitoringService {
      */
     Boolean togglePresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
 
-    /**
-     * Set whether or not the live edit is available in monitor. Checks that the user is a staff member of this lesson
-     * before updating.
-     *
-     * @param lessonId
-     * @param userId
-     * @param liveEditEnabled
-     * @return new value for liveEditEnabled. Normally will be same as input parameter, will only be different if the
-     *         value cannot be updated for some reason.
-     */
-    Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
-
     /** Set whether or not to display the gradebook activity scores at the end of a lesson */
     Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete);
     
@@ -271,17 +259,6 @@ public interface IMonitoringFullService extends IMonitoringService {
     void createChosenBranchingGroups(Long branchingActivityID);
 
     /**
-     * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
-     * Branching. Don't use for Group Based Branching as there could be more than one group for the branch.
-     *
-     * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
-     * @param learnerIDs
-     *            the IDS of the learners to be added.
-     */
-    void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException;
-
-    /**
      * Has anyone started this branch / branching activity ? Irrespective of the groups. Used to determine if a branch
      * mapping can be removed.
      */
@@ -359,18 +336,5 @@ public interface IMonitoringFullService extends IMonitoringService {
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
     
     List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
-
-    /**
-     * Finish a lesson.A Finished lesson can be viewed on the monitoring interface. It should be an "inactive" lesson. A
-     * Finished lesson is listed on the learner interface but all the learner can do is view the progress - they cannot
-     * access any of the tool screens.
-     *
-     * @param lessonId
-     * @param userId
-     *            checks that the user is a staff member for this lesson
-     * @param endDate
-     *            teh lesson end date and time.
-     */
-    void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
 }

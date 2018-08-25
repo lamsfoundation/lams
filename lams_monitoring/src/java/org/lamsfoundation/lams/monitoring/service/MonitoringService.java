@@ -916,13 +916,6 @@ public class MonitoringService implements IMonitoringFullService {
     }
 
     @Override
-    public void finishLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	setLessonState(requestedLesson, Lesson.FINISHED_STATE, userId);
-    }
-
-    @Override
     public void archiveLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "archive lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -1194,15 +1187,6 @@ public class MonitoringService implements IMonitoringFullService {
 	requestedLesson.setLearnerImAvailable(presenceImAvailable != null ? presenceImAvailable : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
 	return requestedLesson.getLearnerImAvailable();
-    }
-
-    @Override
-    public Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
-	securityService.isLessonMonitor(lessonId, userId, "set live edit available", true);
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	requestedLesson.setLiveEditEnabled(liveEditEnabled != null ? liveEditEnabled : Boolean.FALSE);
-	lessonDAO.updateLesson(requestedLesson);
-	return requestedLesson.getLiveEditEnabled();
     }
 
     @Override
@@ -2377,8 +2361,16 @@ public class MonitoringService implements IMonitoringFullService {
 	lessonService.removeLearnersFromGroup(grouping, groupId, learners);
     }
 
-    @Override
-    public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
+    /**
+     * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
+     * Branching. Don't use for Group Based Branching as there could be more than one group for the branch.
+     *
+     * @param sequenceActivityID
+     *            Activity id of the sequenceActivity representing this branch
+     * @param learnerIDs
+     *            the IDS of the learners to be added.
+     */
+    private void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
 
 	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
 	if (branch == null) {
