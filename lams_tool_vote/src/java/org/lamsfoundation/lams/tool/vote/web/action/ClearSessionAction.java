@@ -26,22 +26,22 @@ package org.lamsfoundation.lams.tool.vote.web.action;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
+import org.lamsfoundation.lams.web.action.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
  *
  * @author Steve.Ni, Ozgur Demirtas
  */
-public class ClearSessionAction extends LamsAuthoringFinishAction implements VoteAppConstants {
+public class ClearSessionAction extends LamsAuthoringFinishAction {
     private static Logger logger = Logger.getLogger(ClearSessionAction.class.getName());
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
-	session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
+	session.removeAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 	if (mode.isAuthor()) {
 	    ClearSessionAction.logger.debug("In Author mode");
 	    session.removeAttribute(customiseSessionID);

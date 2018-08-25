@@ -55,8 +55,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.authoring.ObjectExtractor;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -91,7 +90,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -1044,9 +1043,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    case "MCQ or Assessment":
 		//the second activity shall be a MCQ or Assessment
-		if (activity.isToolActivity() && (CentralConstants.TOOL_SIGNATURE_ASSESSMENT
+		if (activity.isToolActivity() && (CommonConstants.TOOL_SIGNATURE_ASSESSMENT
 			.equals(((ToolActivity) activity).getTool().getToolSignature())
-			|| CentralConstants.TOOL_SIGNATURE_MCQ
+			|| CommonConstants.TOOL_SIGNATURE_MCQ
 				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
 		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
 		    
@@ -1056,7 +1055,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    case "Leaderselection":
 		//the third activity shall be a Leader Selection
-		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
+		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_LEADERSELECTION
 			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
 		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
 		    
@@ -1066,7 +1065,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 	    case "Scratchie":
 		//the fourth activity shall be Scratchie
-		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
+		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_SCRATCHIE
 			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
 		    return true;
 		    
@@ -1517,7 +1516,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward startLiveEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws LearningDesignException, UserException, IOException {
-	long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	long learningDesignId = WebUtil.readLongParam(request, CommonConstants.PARAM_LEARNING_DESIGN_ID);
 	LearningDesign learningDesign = (LearningDesign) getUserManagementService().findById(LearningDesign.class,
 		learningDesignId);
 	if (learningDesign.getLessons().isEmpty()) {
@@ -1769,7 +1768,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     private static int getActivityCoordinate(Integer coord) {
-	return (coord == null) || (coord < 0) ? ObjectExtractor.DEFAULT_COORD : coord;
+	return (coord == null) || (coord < 0) ? CommonConstants.DEFAULT_COORD : coord;
     }
 
     /**

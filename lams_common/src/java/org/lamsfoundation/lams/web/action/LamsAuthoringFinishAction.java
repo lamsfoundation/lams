@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.authoring.web;
+package org.lamsfoundation.lams.web.action;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -162,7 +162,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
     public ILamsToolService getToolService() {
 	WebApplicationContext webContext = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-	return (ILamsToolService) webContext.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+	return (ILamsToolService) webContext.getBean("lamsToolService");
     }
     
     /**

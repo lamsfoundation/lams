@@ -33,7 +33,6 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.CircularByteBuffer;
 import org.lamsfoundation.lams.util.imgscalr.Scalr.Method;
 
 /**

@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import javax.servlet.ServletContext;
 
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;

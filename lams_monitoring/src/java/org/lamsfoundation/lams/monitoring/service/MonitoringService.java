@@ -49,7 +49,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.dao.EventDAO;
@@ -365,7 +365,7 @@ public class MonitoringService implements IMonitoringFullService {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 
-	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
+	LearningDesign originalLearningDesign = learningDesignDAO.getLearningDesignById(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignId + " is missing. Unable to initialize lesson.");
@@ -403,7 +403,7 @@ public class MonitoringService implements IMonitoringFullService {
     public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled) {
-	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
+	LearningDesign originalLearningDesign = learningDesignDAO.getLearningDesignById(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignId + " is missing. Unable to initialize lesson.");
@@ -421,7 +421,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
 	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
-	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
+	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
 	if (learningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignID + " is missing. Unable to initialize lesson.");
@@ -445,7 +445,7 @@ public class MonitoringService implements IMonitoringFullService {
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
 		new Integer(copyType), user, workspaceFolder, true, null, customCSV);
-	authoringService.saveLearningDesign(copiedLearningDesign);
+	learningDesignDAO.insertOrUpdate(copiedLearningDesign);
 
 	// Make all efforts to make sure it has a title
 	String title = lessonName != null ? lessonName : copiedLearningDesign.getTitle();

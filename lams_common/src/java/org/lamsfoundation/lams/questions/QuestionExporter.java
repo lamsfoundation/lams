@@ -41,7 +41,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -99,9 +99,9 @@ public class QuestionExporter {
 	try {
 	    String fileName = FileUtil.getFileName(packagePath);
 	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
-	    response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
-	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION,
-		    CentralConstants.HEADER_CONTENT_ATTACHMENT + fileName);
+	    response.setContentType(CommonConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	    response.setHeader(CommonConstants.HEADER_CONTENT_DISPOSITION,
+		    CommonConstants.HEADER_CONTENT_ATTACHMENT + fileName);
 
 	    // write out the ZIP to respose error
 	    FileUtils.copyFile(packageFile, response.getOutputStream());

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.web;
+package org.lamsfoundation.lams.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;

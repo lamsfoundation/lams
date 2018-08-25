@@ -59,7 +59,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeServ
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeItemComparator;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -229,7 +229,7 @@ public class LearningAction extends Action {
 	    redirect.addParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(CommonCartridgeConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	    redirect.addParameter(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_UID, runAutoItemUid);
-	    redirect.addParameter(CentralConstants.PARAM_MODE, mode.toString());
+	    redirect.addParameter(CommonConstants.PARAM_MODE, mode.toString());
 	    return redirect;
 	    
 	} else {

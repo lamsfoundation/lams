@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.imgscalr;
 
 /*
  * Circular Byte Buffer
@@ -44,6 +44,8 @@ package org.lamsfoundation.lams.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.apache.commons.collections.BufferOverflowException;
 
 /**
  * Implements the Circular Buffer producer/consumer model for bytes.

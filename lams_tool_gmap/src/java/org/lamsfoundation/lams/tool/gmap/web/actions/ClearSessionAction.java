@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.gmap.web.actions;
 
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
+import org.lamsfoundation.lams.web.action.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 
 /**
