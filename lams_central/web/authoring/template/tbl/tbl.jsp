@@ -29,7 +29,10 @@
 			// validate signup form on keyup and submit
 			var validator = $("#templateForm").validate({
 			rules: {
-				sequenceTitle: "required",
+				sequenceTitle: {
+					required: true,
+					validateNoSpecialCharacters: true
+				},
          		question1correct: "required",
  				question1: {
  					required: validateCK
@@ -40,7 +43,10 @@
 				<%@ include file="../groupingvalidation.jsp" %>
 			},
 			messages: {
-				sequenceTitle: '<fmt:message key="authoring.error.sequence.title" />',
+				sequenceTitle: {
+					required: '<fmt:message key="authoring.fla.title.validation.error" />',
+					validateNoSpecialCharacters: '<fmt:message key="authoring.fla.title.validation.error" />'
+				},
 				question1: '<fmt:message key="authoring.error.question.num"><fmt:param value="1"/></fmt:message>',
 				question1correct: '<fmt:message key="authoring.error.question.correct.num"><fmt:param value="1"/></fmt:message>',
 				assessment1: '<fmt:message key="authoring.error.application.exercise.num"><fmt:param value="1"/></fmt:message>',
@@ -54,6 +60,8 @@
  				submitForm(form);
  				},
 			});
+
+			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.fla.title.validation.error" />');
 
 			// Remove the display:none or the fields won't be validate as jquery validation is set to only valid non hidden fields. 
 			// If we allow validation of hidden fields then we cannot have validation on the Still should not be seen as visibility is hidden

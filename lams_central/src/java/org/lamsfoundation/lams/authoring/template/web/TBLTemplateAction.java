@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -415,9 +416,9 @@ public class TBLTemplateAction extends LdTemplateAction {
 	    if (contentFolderID == null) {
 		addValidationErrorMessage("authoring.error.content.id", null);
 	    }
-	    if (sequenceTitle == null) {
-		addValidationErrorMessage("authoring.error.sequence.title", null);
-	    }
+	    if (sequenceTitle == null || ! ValidationUtil.isOrgNameValid(sequenceTitle)  ) {
+		addValidationErrorMessage("authoring.fla.title.validation.error", null);
+	    } 
 	    if (applicationExercises.size() == 0) {
 		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });
 	    } else {
