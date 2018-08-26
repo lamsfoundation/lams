@@ -384,6 +384,10 @@
 														}
 													}
 												});
+												// prevent onSelectCell jqGrid event from firing and focusing out from the cell
+												editable.parent().on('click','.editable-container', function(e) {
+													e.stopPropagation();
+												});
 											});
 										}
 							 		}
