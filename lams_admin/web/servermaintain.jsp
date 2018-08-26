@@ -67,6 +67,7 @@
 <div class="checkbox">
     <label>
     <html:checkbox property="gradebookOnComplete" /><fmt:message key="sysadmin.lesson.gradebook.complete" />
+    <input type="hidden" name="gradebookOnComplete" value="false">        
     </label>
 </div>
 <div class="checkbox">
@@ -82,11 +83,13 @@
 <div class="checkbox">
     <label>
     <html:checkbox property="liveEditEnabled" /><fmt:message key="sysadmin.lesson.liveedit" />
+    <input type="hidden" name="liveEditEnabled" value="false">        
     </label>
 </div>
 <div class="checkbox">
     <label>
     <html:checkbox property="enableLessonNotifications" /><fmt:message key="sysadmin.lesson.notification" />
+    <input type="hidden" name="enableLessonNotifications" value="false">        
     </label>
 </div>
 <div class="checkbox">
