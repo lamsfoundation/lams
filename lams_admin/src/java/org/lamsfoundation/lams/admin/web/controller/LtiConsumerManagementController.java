@@ -133,34 +133,57 @@ public class LtiConsumerManagementController {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
-	for (String requiredField : requiredFields) {
-	    if (StringUtils.trimToNull(ltiConsumerForm.getRequiredField()) == null) {
-		errorMap.add(requiredField, messageService.getMessage("error.required"));
-	    }
+	if (StringUtils.trimToNull(ltiConsumerForm.getServerid()) == null) {
+	    errorMap.add("serverid", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.serverid") }));
+	}
+	if (StringUtils.trimToNull(ltiConsumerForm.getServerkey()) == null) {
+	    errorMap.add("serverkey", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.serverkey") }));
+	}
+	if (StringUtils.trimToNull(ltiConsumerForm.getServername()) == null) {
+	    errorMap.add("servername", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.servername") }));
+	}
+	if (StringUtils.trimToNull(ltiConsumerForm.getPrefix()) == null) {
+	    errorMap.add("prefix", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.prefix") }));
 	}
 
 	Integer sid = ltiConsumerForm.getSid();
 	//check duplication
 	if (errorMap.isEmpty()) {
-	    String[] uniqueFields = { "serverid", "prefix" };
-	    for (String uniqueField : uniqueFields) {
-		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, uniqueField, ltiConsumerForm.getUniqueField());
-		if (list != null && list.size() > 0) {
-		    if (sid.equals(0)) {//new map
-			errorMap.add(uniqueField,
-				messageService.getMessage("error.not.unique"));
-		    } else {
-			ExtServer ltiConsumer = list.get(0);
-			if (!ltiConsumer.getSid().equals(sid)) {
-			    errorMap.add(uniqueField,
-				    messageService.getMessage("error.not.unique"));
-			}
+	    List<ExtServer> listServer = userManagementService.findByProperty(ExtServer.class, "serverid",
+		    ltiConsumerForm.getServerid());
+	    if (listServer != null && listServer.size() > 0) {
+		if (sid.equals(0)) {//new map
+		    errorMap.add("serverid", messageService.getMessage("error.not.unique",
+			    new Object[] { messageService.getMessage("sysadmin.serverid") }));
+		} else {
+		    ExtServer ltiConsumer = listServer.get(0);
+		    if (!ltiConsumer.getSid().equals(sid)) {
+			errorMap.add("serverid", messageService.getMessage("error.not.unique",
+				new Object[] { messageService.getMessage("sysadmin.serverid") }));
 		    }
+		}
+	    }
 
+	    List<ExtServer> listPrefix = userManagementService.findByProperty(ExtServer.class, "prefix",
+		    ltiConsumerForm.getPrefix());
+	    if (listPrefix != null && listPrefix.size() > 0) {
+		if (sid.equals(0)) {//new map
+		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
+			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
+		} else {
+		    ExtServer ltiConsumer = listPrefix.get(0);
+		    if (!ltiConsumer.getSid().equals(sid)) {
+			errorMap.add("prefix", messageService.getMessage("error.not.unique",
+				new Object[] { messageService.getMessage("sysadmin.prefix") }));
+		    }
 		}
 	    }
 	}
+
 	if (errorMap.isEmpty()) {
 	    ExtServer ltiConsumer = null;
 	    if (sid.equals(0)) {

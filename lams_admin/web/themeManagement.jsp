@@ -70,6 +70,9 @@
 
 		function submitForm(methodName) {
 			var f = document.getElementById('themeForm');
+			if (methodName) {
+				f.action = methodName + ".do";
+				}
 			f.submit();
 		}
 		

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 
 <%@ include file="/taglibs.jsp"%>
+
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem" %>
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.service.ILdapService" %>
-<c:set var="syncResult"><%= ILdapService.SYNC_RESULTS %></c:set>
+
 <script language="javascript" type="text/JavaScript">
 	<% if (SessionManager.getSession().getAttribute(ILdapService.SYNC_RESULTS) != null) { %>
 		document.location = 'results.do';

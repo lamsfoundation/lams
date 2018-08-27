@@ -74,7 +74,7 @@ public class CloneLessonsController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
+    @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws UserAccessDeniedException {
 
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
@@ -88,7 +88,7 @@ public class CloneLessonsController {
 
 	    String method = WebUtil.readStrParam(request, "method", true);
 	    if (StringUtils.equals(method, "getGroups")) {
-		return getGroups(request, response);
+		return getGroups(response);
 	    } else if (StringUtils.equals(method, "getSubgroups")) {
 		return getSubgroups(request, response);
 	    } else if (StringUtils.equals(method, "availableLessons")) {
@@ -116,7 +116,7 @@ public class CloneLessonsController {
     // ajax
     @RequestMapping("/getGroups")
     @ResponseBody
-    public String getGroups(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String getGroups(HttpServletResponse response) throws Exception {
 
 	response.addHeader("Cache-Control", "no-cache");
 	response.addHeader("content-type", "text/html; charset=UTF-8");
@@ -161,7 +161,7 @@ public class CloneLessonsController {
     }
 
     // ajax
-    @RequestMapping(path = "/availableLessons", method = RequestMethod.POST)
+    @RequestMapping(path = "/availableLessons")
     public String availableLessons(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	Integer sourceGroupId = WebUtil.readIntParam(request, "sourceGroupId", true);

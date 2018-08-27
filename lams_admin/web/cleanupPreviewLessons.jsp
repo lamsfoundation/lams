@@ -77,15 +77,6 @@
 		
 		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-		<c:set var="errorKey" value="GLOBAL" />
-			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-				<lams:Alert id="error" type="danger" close="false">
-				<c:forEach var="error" items="${errorMap[errorKey]}">
-					<c:out value="${error}" />
-				</c:forEach>
-				</lams:Alert>
-			</c:if>
-		
 		<fmt:message key="label.cleanup.preview.lesson.count" />&nbsp;<span id="previewCount">${previewCount}</span> / <span id="allLessonCount">${allLessonCount}</span>
 		<div id="deletingBox" style="display: none">
 		<fmt:message key="label.cleanup.preview.lesson.progress" />

@@ -39,7 +39,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -65,18 +64,13 @@ public class CleanupTempFilesController {
     private MessageService adminMessageService;
 
     @RequestMapping(path = "/start")
-    public String execute(@ModelAttribute CleanupForm cleanupForm, Errors errors, HttpServletRequest request)
-	    throws Exception {
+    public String execute(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
 
 	// check user is sysadmin
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupTempFilesAction");
 	    request.setAttribute("errorMessage", adminMessageService.getMessage("error.need.sysadmin"));
 	    return "error";
-	}
-
-	if (request.getAttribute("CANCEL") != null) {
-	    return "forward:/sysadminstart.do";
 	}
 
 	// check if url contains request for refresh folder sizes only
@@ -96,13 +90,13 @@ public class CleanupTempFilesController {
 		args[0] = new Integer(filesDeleted).toString();
 		request.setAttribute("filesDeleted", adminMessageService.getMessage("msg.cleanup.files.deleted", args));
 	    } else {
-		errors.reject("numDays", adminMessageService.getMessage("error.non.negative.number.required"));
+		errorMap.add("numDays", adminMessageService.getMessage("error.non.negative.number.required"));
 	    }
 	} else {
 	    // recommended number of days to leave temp files
 	    cleanupForm.setNumDays(1);
 	}
-
+	request.setAttribute("errorMap", errorMap);
 	return "cleanup";
     }
 

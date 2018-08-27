@@ -335,10 +335,10 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "forward:../usersearch.do";
+	    return "redirect:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "forward:../usermanage.do";
+	    return "redirect:../usermanage.do";
 	}
     }
 
@@ -370,10 +370,10 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "forward:../usersearch.do";
+	    return "redirect:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "forward:../usermanage.do";
+	    return "redirect:../usermanage.do";
 	}
     }
 
@@ -396,7 +396,7 @@ public class UserController {
 	user.setDisabledFlag(false);
 	service.saveUser(user);
 
-	return "forward:../disabledmanage.do";
+	return "redirect:../disabledmanage.do";
     }
 
 }

@@ -112,10 +112,10 @@ public class UserSaveController {
 
 	if (request.getAttribute("CANCEL") != null) {
 	    if ((orgId == null) || (orgId == 0)) {
-		return "forward:../usersearch.do";
+		return "redirect:../usersearch.do";
 	    }
 	    request.setAttribute("org", orgId);
-	    return "forward:../usermanage.do";
+	    return "redirect:../usermanage.do";
 	}
 
 	User user = null;
@@ -232,15 +232,15 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    if ((orgId == null) || (orgId == 0)) {
-		return "forward:../usersearch.do";
+		return "redirect:../usersearch.do";
 	    }
 	    if (edit) {
 		request.setAttribute("org", orgId);
-		return "forward:../usermanage.do";
+		return "redirect:../usermanage.do";
 	    } else {
 		request.setAttribute("orgId", orgId);
 		request.setAttribute("userId", user.getUserId());
-		return "forward:../userroles.do";
+		return "redirect:../userroles.do";
 	    }
 	} else {
 	    request.setAttribute("orgId", orgId);
@@ -287,7 +287,7 @@ public class UserSaveController {
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
 	    UserSaveController.service.saveUser(user);
-	    return "forward:../user/edit.do";
+	    return "redirect:../user/edit.do";
 	}
 	request.setAttribute("errorMap", errorMap);
 	return "userChangePass";

@@ -206,7 +206,7 @@ public class ToolContentListController {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, false);
-	return "forward:/toolcontentlist/start.do";
+	return "redirect:/toolcontentlist/start.do";
     }
 
     @RequestMapping("/enable")
@@ -214,7 +214,7 @@ public class ToolContentListController {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, true);
-	return "forward:/toolcontentlist/start.do";
+	return "redirect:/toolcontentlist/start.do";
     }
 
     /**
@@ -263,12 +263,12 @@ public class ToolContentListController {
 	for (JsonNode groupJSON : groupsJSON) {
 	    LearningLibraryGroup group = new LearningLibraryGroup();
 	    groups.add(group);
-
-	    long groupId = groupJSON.get("groupId").asLong();
-	    if (groupId > 0) {
+	    
+	    Long groupId = JsonUtil.optLong(groupJSON, "groupId");
+	    if (groupId != null) {
 		group.setGroupId(groupId);
 	    }
-	    group.setName(groupJSON.get("name").asText(null));
+	    group.setName(JsonUtil.optString(groupJSON, "name"));
 
 	    group.setLearningLibraries(new HashSet<LearningLibrary>());
 	    ArrayNode learningLibrariesJSON = (ArrayNode) groupJSON.get("learningLibraries");
@@ -281,7 +281,7 @@ public class ToolContentListController {
 
 	getLearningDesignService().saveLearningLibraryGroups(groups);
 	
-	return "forward:/toolcontentlist/start.do";
+	return "redirect:/toolcontentlist/start.do";
     }
 
     private ILearningDesignService getLearningDesignService() {

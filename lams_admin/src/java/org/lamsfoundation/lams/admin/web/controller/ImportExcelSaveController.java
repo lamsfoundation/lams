@@ -68,7 +68,7 @@ public class ImportExcelSaveController {
 
 	// validation
 	if (file == null || file.getSize() <= 0) {
-	    return "forward:/importexcel.do";
+	    return "redirect:/importexcel.do";
 	}
 
 	String sessionId = SessionManager.getSession().getId();
@@ -77,7 +77,7 @@ public class ImportExcelSaveController {
 	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
 	    List results = importService.parseSpreadsheet(file, sessionId);
 	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
-	    return "forward:/importuserresult.do";
+	    return "redirect:/importuserresult.do";
 	} else {
 	    Thread t = new Thread(new ImportExcelThread(sessionId));
 	    t.start();

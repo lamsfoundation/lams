@@ -28,8 +28,6 @@ public class ConfigForm {
 
     private String[] value;
 
-    private String method;
-
     public String[] getKey() {
 	return key;
     }
@@ -44,14 +42,6 @@ public class ConfigForm {
 
     public void setValue(String[] value) {
 	this.value = value;
-    }
-
-    public String getMethod() {
-	return method;
-    }
-
-    public void setMethod(String method) {
-	this.method = method;
     }
 
 }

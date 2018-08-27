@@ -2,6 +2,7 @@
 
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
+
 <c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
 
 <lams:html>

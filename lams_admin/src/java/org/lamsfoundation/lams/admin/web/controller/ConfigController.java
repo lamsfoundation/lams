@@ -81,7 +81,7 @@ public class ConfigController {
     public String save(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "forward:/sysadminstart.do";
+	    return "redirect:/sysadminstart.do";
 	}
 
 	String[] keys = configForm.getKey();
@@ -122,7 +122,7 @@ public class ConfigController {
 
 	Configuration.refreshCache();
 
-	return "forward:/sysadminstart.do";
+	return "redirect:/sysadminstart.do";
     }
 
     private String getRequiredError(String arg) {

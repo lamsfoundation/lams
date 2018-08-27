@@ -132,7 +132,7 @@ public class OrgSaveController {
 		    writeAuditLog(user, org, organisationForm, state, locale);
 		    BeanUtils.copyProperties(org, organisationForm);
 		} else {
-		    request.setAttribute("errorName", "UserAction");
+		    request.setAttribute("errorName", "UserController");
 		    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 		    return "error";
 		}
@@ -153,9 +153,10 @@ public class OrgSaveController {
 	    org = service.saveOrganisation(org, user.getUserID());
 
 	    request.setAttribute("org", organisationForm.getParentId());
-	    return "forward:/orgmanage.do";
+	    return "redirect:/orgmanage.do";
 	} else {
-	    return "forward:/organisation/edit.do";
+	    request.setAttribute("errorMap", errorMap);
+	    return "redirect:/organisation/edit.do";
 	}
     }
 

@@ -88,10 +88,6 @@ public class UserRolesSaveController {
 
 	request.setAttribute("org", orgId);
 
-	if (request.getAttribute("CANCEL") != null) {
-	    return "forward:/usermanage.do";
-	}
-
 	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
 	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
 	User user = (User) service.findById(User.class, userId);
@@ -103,12 +99,12 @@ public class UserRolesSaveController {
 		    service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
-	    return "forward:/userroles.do";
+	    return "redirect:/userroles.do";
 	}
 
 	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	return "forward:/usermanage.do";
+	return "redirect:/usermanage.do";
     }
 
 }

@@ -46,18 +46,18 @@
 						</c:choose>
 					</td>
 					<td>
-						<a id="edit_<c:out value='${server.serverid}'/>" href="../servermaintain/edit.do?sid=${server.sid}"><fmt:message key="admin.edit" /></a>
+						<a id="edit_<c:out value='${server.serverid}'/>" href="servermaintain/edit.do?sid=${server.sid}"><fmt:message key="admin.edit" /></a>
 						&nbsp;
 						<c:choose>
 							<c:when test="${server.disabled}">
-								<a id="enable_<c:out value='${server.serverid}'/>" href="../servermaintain/enable.do?sid=${server.sid}"><fmt:message key="admin.enable" /></a>
+								<a id="enable_<c:out value='${server.serverid}'/>" href="servermaintain/enable.do?sid=${server.sid}"><fmt:message key="admin.enable" /></a>
 							</c:when>
 							<c:otherwise>
-								<a id="disable_<c:out value='${server.serverid}'/>" href="../servermaintain/disable.do?sid=${server.sid}"><fmt:message key="admin.disable" /></a>
+								<a id="disable_<c:out value='${server.serverid}'/>" href="servermaintain/disable.do?sid=${server.sid}"><fmt:message key="admin.disable" /></a>
 							</c:otherwise>
 						</c:choose>
 						&nbsp;
-						<a id="delete_<c:out value='${server.serverid}'/>" href="../servermaintain/delete.do?sid=${server.sid}"><fmt:message key="admin.delete" /></a>
+						<a id="delete_<c:out value='${server.serverid}'/>" href="servermaintain/delete.do?sid=${server.sid}"><fmt:message key="admin.delete" /></a>
 					</td>
 				</tr>
 				</c:forEach>

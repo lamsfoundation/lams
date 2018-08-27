@@ -93,7 +93,7 @@ public class UserOrgRoleSaveController {
 	request.getSession().removeAttribute("UserOrgRoleForm");
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "forward:/usermanage.do";
+	    return "redirect:/usermanage.do";
 	}
 
 	// save UserOrganisation memberships, and the associated roles;
@@ -109,7 +109,7 @@ public class UserOrgRoleSaveController {
 		errorMap.add("roles", adminMessageService.getMessage("error.roles.empty"));
 		request.setAttribute("errorMap", errorMap);
 		request.setAttribute("orgId", orgId);
-		return "forward:/userorg.do";
+		return "redirect:/userorg.do";
 	    }
 	    service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
@@ -120,7 +120,7 @@ public class UserOrgRoleSaveController {
 	    //	}
 	    //}
 	}
-	return "forward:/usermanage.do";
+	return "redirect:/usermanage.do";
     }
 
 }

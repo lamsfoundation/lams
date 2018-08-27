@@ -44,10 +44,6 @@ public class LtiConsumerForm {
 
     private String ltiToolConsumerMonitorRoles;
 
-    private String requiredField;
-
-    private String uniqueField;
-
     public Integer getSid() {
 	return sid;
     }
@@ -126,22 +122,6 @@ public class LtiConsumerForm {
 
     public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
-    }
-
-    public String getRequiredField() {
-	return requiredField;
-    }
-
-    public void setRequiredField(String requiredField) {
-	this.requiredField = requiredField;
-    }
-
-    public String getUniqueField() {
-	return uniqueField;
-    }
-
-    public void setUniqueField(String uniqueField) {
-	this.uniqueField = uniqueField;
     }
 
 }

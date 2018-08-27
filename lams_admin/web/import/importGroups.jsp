@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 
 <%@ include file="/taglibs.jsp"%>
+
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorSpringUtil" %> 
+
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set> 
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set> 
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set> 
@@ -54,7 +56,7 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title"><fmt:message key="sysadmin.import.groups.title"/></c:set>
+
 	<c:set var="help"><fmt:message key="Import+Groups"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importForm">

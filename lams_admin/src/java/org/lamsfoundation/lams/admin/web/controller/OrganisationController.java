@@ -128,8 +128,8 @@ public class OrganisationController {
     }
 
     @RequestMapping(path = "/create")
-    public String create(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String create(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request)
+	    throws Exception {
 	OrganisationController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	initLocalesAndStatus();
 

@@ -56,7 +56,7 @@ public class LoginSaveController {
 	    HttpServletResponse response) throws Exception {
 
 	if (request.getAttribute("CANCEL") != null) {
-	    return "forward:/sysadminstart.do";
+	    return "redirect:/sysadminstart.do";
 	}
 
 	BufferedWriter bWriter = null;
@@ -73,7 +73,7 @@ public class LoginSaveController {
 	    }
 	}
 
-	return "forward:/sysadminstart.do";
+	return "redirect:/sysadminstart.do";
     }
 
 }

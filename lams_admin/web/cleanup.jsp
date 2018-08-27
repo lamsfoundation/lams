@@ -23,7 +23,7 @@
 	<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 	<%-- Error Messages --%>
-	 <c:set var="errorKey" value="GLOBAL" />
+	 <c:set var="errorKey" value="numDays" />
 	   <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
 	      <lams:Alert id="error" type="danger" close="false">
 	        <c:forEach var="error" items="${errorMap[errorKey]}">

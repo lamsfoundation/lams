@@ -71,33 +71,60 @@ public class ServerSaveController {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl" };
-	for (String requiredField : requiredFields) {
-	    request.setAttribute("requiredField", requiredField);
-	    if (StringUtils.trimToNull(extServerForm.getRequiredField()) == null) {
-		errorMap.add(requiredField, messageService.getMessage("error.required"));
-	    }
+	if (StringUtils.trimToNull(extServerForm.getServerid()) == null) {
+	    errorMap.add("serverid", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.serverid") }));
 	}
-
+	if (StringUtils.trimToNull(extServerForm.getServerkey()) == null) {
+	    errorMap.add("serverkey", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.serverkey") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getServername()) == null) {
+	    errorMap.add("servername", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.servername") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getPrefix()) == null) {
+	    errorMap.add("prefix", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.prefix") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getPrefix()) == null) {
+	    errorMap.add("userinfoUrl", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.userinfoUrl") }));
+	}
+	
 	Integer sid = extServerForm.getSid();
 	if (errorMap.isEmpty()) {//check duplication
-	    String[] uniqueFields = { "serverid", "prefix" };
-	    for (String uniqueField : uniqueFields) {
-		List list = userService.findByProperty(ExtServer.class, uniqueField, extServerForm.getUniqueField());
-		if (list != null && list.size() > 0) {
-		    request.setAttribute("uniqueField", uniqueField);
-		    if (sid.equals(-1)) {//new map
-			errorMap.add(uniqueField, messageService.getMessage("error.not.unique"));
-		    } else {
-			ExtServer map = (ExtServer) list.get(0);
-			if (!map.getSid().equals(sid)) {
-			    errorMap.add(uniqueField, messageService.getMessage("error.not.unique"));
-			}
+	    List listServer = userService.findByProperty(ExtServer.class, "serverid",
+		    extServerForm.getServerid());
+	    if (listServer != null && listServer.size() > 0) {
+		if (sid.equals(-1)) {//new map
+		    errorMap.add("serverid", messageService.getMessage("error.not.unique",
+			    new Object[] { messageService.getMessage("sysadmin.serverid") }));
+		} else {
+		    ExtServer map = (ExtServer) listServer.get(0);
+		    if (!map.getSid().equals(sid)) {
+			errorMap.add("serverid", messageService.getMessage("error.not.unique",
+				new Object[] { messageService.getMessage("sysadmin.serverid") }));
 		    }
+		}
+	    }
 
+	    List<ExtServer> listPrefix = userService.findByProperty(ExtServer.class, "prefix",
+		    extServerForm.getPrefix());
+	    if (listPrefix != null && listPrefix.size() > 0) {
+		if (sid.equals(0)) {//new map
+		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
+			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
+		} else {
+		    ExtServer map = (ExtServer) listServer.get(0);
+		    if (!map.getSid().equals(sid)) {
+			errorMap.add("prefix", messageService.getMessage("error.not.unique",
+				new Object[] { messageService.getMessage("sysadmin.prefix") }));
+		    }
 		}
 	    }
 	}
+
 	if (errorMap.isEmpty()) {
 	    ExtServer map = null;
 	    if (sid.equals(-1)) {
@@ -110,7 +137,7 @@ public class ServerSaveController {
 		BeanUtils.copyProperties(map, extServerForm);
 	    }
 	    service.saveExtServer(map);
-	    return "forward:/serverlist.do";
+	    return "redirect:/serverlist.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
 	    return "servermaintain";
