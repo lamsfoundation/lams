@@ -383,11 +383,11 @@ function showNotificationsDialog(orgID, lessonID) {
 			if (lessonID) {
 				// load contents after opening the dialog
 				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
+					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
 					+ lessonID);
 			} else {
 				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
+					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
 					+ orgID);
 			}
 		}
