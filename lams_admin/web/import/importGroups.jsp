@@ -71,24 +71,24 @@
 				<th><fmt:message key="admin.organisation.name"/></th>
 			</tr>
 			<c:set var="results" value="${results}" />
-			<c:forEach var="i" begin="0" step="1" end="${results.size()}">
+			<c:forEach var="i" begin="0" step="1" end="${results.size()-1}">
 				<tr>
-				<c:set var="rowResult" value="${i}"/>
+				<c:set var="rowResult" value="${results[i]}"/>
 				<c:choose>
-					<c:when test="${(rowResult != null) && (rowResult >= 4)}">
-						<c:if test="${courseTypeId == 3}">
-							<th> <c:out value="${rowResult.orgId}" /> </th>
-							<th> <c:out value="${rowResult.name}" /> </th>
+					<c:when test="${(rowResult != null) && (rowResult.size() >= 4)}">
+						<c:if test="${courseTypeId == rowResult[3]}">
+							<th> <c:out value="${rowResult[0]}" /> </th>
+							<th> <c:out value="${rowResult[1]}" /> </th>
 						</c:if>
-						<c:if test="${classTypeId == 3}">
-							<td> <c:out value="${rowResult.orgId}" /> </td>
-							<td> <c:out value="${rowResult.name}" /> </td>
+						<c:if test="${classTypeId == rowResult[3]}">
+							<td> <c:out value="${rowResult[0]}" /> </td>
+							<td> <c:out value="${rowResult[1]}" /> </td>
 						</c:if>
 					</c:when>
 					<c:otherwise>
 						<td colspan="2">
-						<c:forEach var="j" begin="0" step="1" end="${results.size()}">
-							<c:out value="${j}"/> <br />
+						<c:forEach var="j" begin="0" step="1" end="${results.size()-1}">
+							<c:out value="${rowResult[j]}"/> <br />
 						</c:forEach>
 						</td>
 					</c:otherwise>

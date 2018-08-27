@@ -229,7 +229,7 @@ function saveGroups(){
 		$.ajax({
 			'async'   : false,
 			'cache'   : false,
-			'url'     : '../toolcontentlist/saveLearningLibraryGroups.do',
+			'url'     : 'saveLearningLibraryGroups.do',
 			'data'    : {
 				'groups' : JSON.stringify(groups)
 			},

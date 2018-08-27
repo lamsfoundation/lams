@@ -18,7 +18,8 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -125,39 +126,42 @@ public class LtiConsumerManagementController {
      * Stores in the DB a new or edited LTI tool consumer
      */
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public String save(@ModelAttribute LtiConsumerForm ltiConsumerForm, Errors errors, HttpServletRequest request,
+    public String save(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	initServices();
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
 	for (String requiredField : requiredFields) {
-	    if (StringUtils.trimToNull(requiredField) == null) {
-		errors.reject("error.required", messageService.getMessage("sysadmin." + requiredField));
+	    if (StringUtils.trimToNull(ltiConsumerForm.getRequiredField()) == null) {
+		errorMap.add(requiredField, messageService.getMessage("error.required"));
 	    }
 	}
 
 	Integer sid = ltiConsumerForm.getSid();
 	//check duplication
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    String[] uniqueFields = { "serverid", "prefix" };
 	    for (String uniqueField : uniqueFields) {
-		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, "uniqueField",
-			uniqueField);
+		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, uniqueField, ltiConsumerForm.getUniqueField());
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(0)) {//new map
-			errors.reject("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
+			errorMap.add(uniqueField,
+				messageService.getMessage("error.not.unique"));
 		    } else {
 			ExtServer ltiConsumer = list.get(0);
 			if (!ltiConsumer.getSid().equals(sid)) {
-			    errors.reject("error.not.unique", messageService.getMessage("sysadmin." + uniqueField));
+			    errorMap.add(uniqueField,
+				    messageService.getMessage("error.not.unique"));
 			}
 		    }
 
 		}
 	    }
 	}
-	if (!errors.hasErrors()) {
+	if (errorMap.isEmpty()) {
 	    ExtServer ltiConsumer = null;
 	    if (sid.equals(0)) {
 		ltiConsumer = new ExtServer();
@@ -173,6 +177,7 @@ public class LtiConsumerManagementController {
 	    return unspecified(request);
 
 	} else {
+	    request.setAttribute("errorMap", errorMap);
 	    return "lti/ltiConsumer";
 	}
     }

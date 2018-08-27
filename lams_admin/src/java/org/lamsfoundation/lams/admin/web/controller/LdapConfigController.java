@@ -120,7 +120,7 @@ public class LdapConfigController {
 	return "ldap";
     }
 
-    @RequestMapping(path = "/sync", method = RequestMethod.POST)
+    @RequestMapping(path = "/sync")
     public String sync(HttpServletRequest request) throws Exception {
 
 	String sessionId = SessionManager.getSession().getId();
@@ -132,7 +132,7 @@ public class LdapConfigController {
 	return "ldap";
     }
 
-    @RequestMapping(path = "/waiting", method = RequestMethod.POST)
+    @RequestMapping(path = "/waiting")
     public String waiting(HttpServletRequest request) throws Exception {
 
 	request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));

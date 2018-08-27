@@ -88,7 +88,7 @@ public class ThemeManagementController {
 	return "themeManagement";
     }
 
-    @RequestMapping(path = "/addOrEditTheme", method = RequestMethod.POST)
+    @RequestMapping(path = "/addOrEditTheme")
     public String addOrEditTheme(@ModelAttribute ThemeForm themeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -118,7 +118,7 @@ public class ThemeManagementController {
 	return unspecified(themeForm, request);
     }
 
-    @RequestMapping(path = "/removeTheme", method = RequestMethod.POST)
+    @RequestMapping(path = "/removeTheme")
     public String removeTheme(@ModelAttribute ThemeForm themeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -137,7 +137,7 @@ public class ThemeManagementController {
 	return unspecified(themeForm, request);
     }
 
-    @RequestMapping(path = "/setAsDefault", method = RequestMethod.POST)
+    @RequestMapping(path = "/setAsDefault")
     public String setAsDefault(@ModelAttribute ThemeForm themeForm, HttpServletRequest request) throws Exception {
 
 	if (themeForm.getName() != null) {

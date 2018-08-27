@@ -5,6 +5,14 @@
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.service.ILdapService" %>
 <c:set var="syncResult"><%= ILdapService.SYNC_RESULTS %></c:set>
+<script language="javascript" type="text/JavaScript">
+	<% if (SessionManager.getSession().getAttribute(ILdapService.SYNC_RESULTS) != null) { %>
+		document.location = 'results.do';
+	<% } %>
+	function startSync(){
+		document.location='sync.do';
+	}
+</script>
 
 <lams:html>
 <lams:head>
@@ -18,12 +26,6 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
 	<script language="javascript" type="text/JavaScript">
-	<c:if test="${syncResult != null}">
-		document.location = '/ldap/results.do';
-	</c:if>
-	function startSync(){
-		document.location='/ldap/sync.do';
-	}
 </script>
 	
 </lams:head>
@@ -43,7 +45,7 @@
 				
 			<div class="panel-body panel-default">
 				<c:if test="${not empty config}">
-					<form:form action="save.do" modelAttribute="configForm" id="configForm" method="post">
+					<form:form action="../config/save.do" modelAttribute="configForm" id="configForm" method="post">
 						<c:forEach items="${config}" var="group">
 							<div class="panel panel-default">
 								<div class="panel-heading">
@@ -58,17 +60,17 @@
 												<c:if test="${row.required}">&nbsp;&nbsp;*</c:if>
 											</td>
 											<td>
-												<input type="hidden" name="key" value="${row.key}"/>
+												<form:hidden path="key" value="${row.key}"/>
 												<c:set var="BOOLEAN"><c:out value="<%= ConfigurationItem.BOOLEAN_FORMAT %>" /></c:set>
 												<c:choose>
 												<c:when test="${row.format==BOOLEAN}">
-													<form:select id="${row.key}" path="value" cssClass="form-control form-control-sm">
-													<form:option value="true">true</form:option>
-													<form:option value="false">false&nbsp;&nbsp;</form:option>
-													</form:select>
+													<select name="value" class="form-control form-control-sm">
+														<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
+														<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
+													</select>
 												</c:when>
 												<c:otherwise>
-													<input type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control"/>
+													<form:input id="${row.key}" path="value" value="${row.value}" size="50" maxlength="255" cssClass="form-control"/>
 												</c:otherwise>
 												</c:choose>
 											</td>
@@ -80,7 +82,7 @@
 					
 						<div class="pull-right">
 							<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-							<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default loffset5">
+							<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default loffset5"><fmt:message key="admin.cancel"/></a>
 							<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
 					</form:form>
@@ -105,7 +107,7 @@
 							<p><c:out value="${wait}"/></p>
 							<script language="javascript" type="text/javascript">
 								function refresh() {
-									document.location = 'ldap/waiting.do';
+									document.location = 'waiting.do';
 								}
 								window.setInterval("refresh()",5000);
 							</script>
@@ -139,7 +141,7 @@
 					</ul>
 			</c:if>
 						
-			<input class="btn btn-primary pull-right" value="<fmt:message key="label.synchronise" />" onclick='startSync();'/>
+			<input type="button" class="btn btn-primary pull-right" value="<fmt:message key="label.synchronise" />" onclick='startSync();'/>
 						
 			</div>
 		</div>				

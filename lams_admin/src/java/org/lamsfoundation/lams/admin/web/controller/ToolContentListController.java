@@ -54,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -200,18 +201,20 @@ public class ToolContentListController {
 	return true;
     }
 
-    @RequestMapping("/disableLibrary")
-    public void disableLibrary(HttpServletRequest request) {
+    @RequestMapping("/disable")
+    public String disableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, false);
+	return "forward:/toolcontentlist/start.do";
     }
 
-    @RequestMapping("/enableLibrary")
-    public void enableLibrary(HttpServletRequest request) {
+    @RequestMapping("/enable")
+    public String enableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, true);
+	return "forward:/toolcontentlist/start.do";
     }
 
     /**
@@ -248,11 +251,11 @@ public class ToolContentListController {
 	}
 	request.setAttribute("groups", groupsJSON.toString());
 
-	return "forward:/toolcontent/learningLibraryGroup";
+	return "toolcontent/learningLibraryGroup";
     }
 
-    @RequestMapping("/saveLearningLibraryGroups")
-    private void saveLearningLibraryGroups(HttpServletRequest request) throws IOException {
+    @RequestMapping(path = "/saveLearningLibraryGroups", method = RequestMethod.POST)
+    private String saveLearningLibraryGroups(HttpServletRequest request) throws IOException {
 	// extract groups from JSON and persist them
 
 	ArrayNode groupsJSON = JsonUtil.readArray(request.getParameter("groups"));
@@ -277,6 +280,8 @@ public class ToolContentListController {
 	}
 
 	getLearningDesignService().saveLearningLibraryGroups(groups);
+	
+	return "forward:/toolcontentlist/start.do";
     }
 
     private ILearningDesignService getLearningDesignService() {

@@ -58,29 +58,26 @@
 	
 	<c:set var="help"><fmt:message key="Integrations"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="extServerForm">
 				<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
 				
-				<c:set var="errorKey" value="${serverid || serverkey || servername || prefix || userinfoUrl}" /> 
+				<c:set var="errorKey" value="${requiredField}" /> 
 						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
 						     <lams:Alert id="error" type="danger" close="false"> 
 						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
-				
-						
-				<c:set var="errorKey" value="${serverid || prefix}" /> 
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
+						             <fmt:message key="sysadmin.${requiredField}" /> <c:out value="${error}" /><br /> 
 						         </c:forEach> 
 						     </lams:Alert> 
 						</c:if>
 						
+				<c:set var="errorKey" value="${uniqueField}" /> 		
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						            <fmt:message key="sysadmin.${uniqueField}" /> <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
 								
 				<form:form action="../serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 					<form:hidden path="sid" />

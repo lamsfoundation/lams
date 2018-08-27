@@ -57,7 +57,23 @@
 					</a>
 				</p>
 					
-				<form:errors path="*"/>
+				<c:set var="errorKey" value="${requiredField}" /> 
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						             <fmt:message key="sysadmin.${requiredField}" /> <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
+						
+				<c:set var="errorKey" value="${uniqueField}" /> 		
+						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						     <lams:Alert id="error" type="danger" close="false"> 
+						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+						            <fmt:message key="sysadmin.${uniqueField}" /> <c:out value="${error}" /><br /> 
+						         </c:forEach> 
+						     </lams:Alert> 
+						</c:if>
 				<br />
 				
 				<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">

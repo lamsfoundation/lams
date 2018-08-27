@@ -9,9 +9,11 @@
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
+	
 	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
@@ -24,7 +26,7 @@
 				'height'   : 700,
 				'title'	   : '<fmt:message key="tool.groups.dialog.title" />',
 				'open' 	   : function(){
-					$('#toolGroupsFrame', this).attr('src', './openLearningLibraryGroups.do');
+					$('#toolGroupsFrame', this).attr('src', 'openLearningLibraryGroups.do');
 				},
 				'beforeClose'	   : function(){
 					$('#toolGroupsFrame', this).attr('src', null);
@@ -66,7 +68,7 @@
 					</p>
 					
 					<a href="javascript:openToolGroups()" class="btn btn-default pull-right" 
-					   title="<fmt:message key='tool.groups.open.button.tooltip' />"><fmt:message key="tool.groups.open.button" /></a>
+					   title="<fmt:message key='tool.groups.open.button.tooltip' />" ><fmt:message key="tool.groups.open.button" /></a>
 					<div id="toolGroupsDialog" style="display: none">
 						<a class="customDialogButton" href="javascript:saveToolGroups()" style="right: 50px;">
 							<fmt:message key="admin.save" />
@@ -109,10 +111,10 @@
 							<td>
 								<c:choose>
 									<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
-										[<a id="disable${dto.activityTitle}" href="../toolcontentlist/disableLibrary.do?libraryID=${dto.learningLibraryID}" ><fmt:message key="admin.disable" /></a>] 
+										[<a id="disable${dto.activityTitle}" href="<c:url value='disable.do?libraryID=${dto.learningLibraryID}' />" ><fmt:message key="admin.disable" /></a>] 
 									</c:when>
 									<c:otherwise>
-										[<a id="enable${dto.activityTitle}" href="../toolcontentlist/enableLibrary.do?libraryID=${dto.learningLibraryID}" ><fmt:message key="admin.enable" /></a>]
+										[<a id="enable${dto.activityTitle}" href="<c:url value='enable.do?libraryID=${dto.learningLibraryID}' />" ><fmt:message key="admin.enable" /></a>]
 										
 									</c:otherwise>
 								</c:choose>
@@ -123,7 +125,7 @@
 									[<a id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>]
 									<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">
 										&nbsp;&nbsp;
-										[<a id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />"><fmt:message key="msg.tool.management" /></a>]
+										[<a id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />" ><fmt:message key="msg.tool.management" /></a>]
 									</c:if>
 								</c:if>
 							</td>

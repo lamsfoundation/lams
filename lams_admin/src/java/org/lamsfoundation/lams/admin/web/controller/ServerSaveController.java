@@ -73,8 +73,9 @@ public class ServerSaveController {
 
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl" };
 	for (String requiredField : requiredFields) {
+	    request.setAttribute("requiredField", requiredField);
 	    if (StringUtils.trimToNull(extServerForm.getRequiredField()) == null) {
-		errorMap.add(requiredField, messageService.getMessage("error.required", messageService.getMessage("sysadmin." + requiredField)));
+		errorMap.add(requiredField, messageService.getMessage("error.required"));
 	    }
 	}
 
@@ -84,12 +85,13 @@ public class ServerSaveController {
 	    for (String uniqueField : uniqueFields) {
 		List list = userService.findByProperty(ExtServer.class, uniqueField, extServerForm.getUniqueField());
 		if (list != null && list.size() > 0) {
+		    request.setAttribute("uniqueField", uniqueField);
 		    if (sid.equals(-1)) {//new map
-			errorMap.add(uniqueField, messageService.getMessage("error.not.unique", messageService.getMessage("sysadmin." + uniqueField)));
+			errorMap.add(uniqueField, messageService.getMessage("error.not.unique"));
 		    } else {
 			ExtServer map = (ExtServer) list.get(0);
 			if (!map.getSid().equals(sid)) {
-			    errorMap.add(uniqueField, messageService.getMessage("error.not.unique", messageService.getMessage("sysadmin." + uniqueField)));
+			    errorMap.add(uniqueField, messageService.getMessage("error.not.unique"));
 			}
 		    }
 

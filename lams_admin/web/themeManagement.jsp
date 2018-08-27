@@ -69,7 +69,7 @@
 		}
 
 		function submitForm(methodName) {
-			var f = document.getElementById("themeForm") += methodName + ".do";
+			var f = document.getElementById('themeForm');
 			f.submit();
 		}
 		
@@ -156,7 +156,7 @@
 							* <fmt:message key="admin.themes.name" />:
 						</td>
 						<td>
-							<input type="text" name="name" id="name" size="40" />
+							<form:input path="name" id="name" size="40" />
 						</td>
 					</tr>
 					<tr>
@@ -164,7 +164,7 @@
 							<fmt:message key="admin.themes.description" />:
 						</td>
 						<td>
-							<input type="text" name="description" id="description" size="40" />
+							<form:input path="description" id="description" size="40" />
 						</td>
 					</tr>
 					<tr>
@@ -172,7 +172,7 @@
 							<fmt:message key="admin.themes.imageDir" />:
 						</td>
 						<td>
-							<input type="text" name="imageDirectory" id="imageDirectory" size="40" />
+							<form:input path="imageDirectory" id="imageDirectory" size="40" />
 						</td>
 					</tr>
 					<tr>
