@@ -126,15 +126,15 @@ function openKumalive(orgID, role) {
  */
 function openLearnerShortenedUrl( lessonId ) {
 	if (isMac) {
-		learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width 
+		learnWin = window.open('../home/learner.do&lessonID='+lessonId,'lWindow','width=' + learner_width 
 				   + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes'
 				   + getCenterParams(learner_width, learner_height));
 	} else {
 		if (learnWin && !learnWin.closed ) {
-			learnWin.location = '../home.do?method=learner&lessonID='+lessonId;		
+			learnWin.location = '../home/learner.do&lessonID='+lessonId;		
 			learnWin.focus();
 		} else {
-			learnWin = window.open('../home.do?method=learner&lessonID='+lessonId,'lWindow','width='
+			learnWin = window.open('../home/learner.do&lessonID='+lessonId,'lWindow','width='
 					   + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes'
 					   + getCenterParams(learner_width, learner_height));
 		}

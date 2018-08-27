@@ -522,7 +522,7 @@ public class GroupingUploadAJAXController {
 	return skipped;
     }
 
-    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<>() {
+    final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
 	@Override
 	public int compare(OrganisationGroup o1, OrganisationGroup o2) {
 	    String grp1Name = o1 != null ? o1.getName() : "";

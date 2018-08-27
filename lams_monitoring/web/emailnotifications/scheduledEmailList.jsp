@@ -24,7 +24,7 @@
 		if (confirm(msg+'\n\n'+deleteConfirmationMessage2)) {
  			$.ajax({
 				async : false,
-				url : '<c:url value="/emailNotifications.do"/>',
+				url : '<c:url value="/emailNotifications/"/>',
  				data : deleteUrlParams+'&triggerName=' + triggerName,
  				type : "POST",
 				success : function(json) {

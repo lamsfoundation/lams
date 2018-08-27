@@ -63,7 +63,7 @@
 	<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
 </div>
 
-<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring.do" method="POST">
+<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring/addLesson.do" method="POST">
 
 <lams:Page type="navbar">
 		<lams:Tabs>
@@ -159,7 +159,6 @@
 				</lams:TabBody>
 				<lams:TabBody id="3" titleKey="label.tab.advanced">
 					<!-- Advanced Panel -->
-					<input name="method" value="addLesson" type="hidden" />
 					<input name="organisationID" value="${param.organisationID}" type="hidden" />
 					<input id="ldIdField" name="learningDesignID" type="hidden" />
 					<input id="lessonNameField" name="lessonName" type="hidden" />

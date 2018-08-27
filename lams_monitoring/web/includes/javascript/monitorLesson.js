@@ -296,7 +296,6 @@ function disableLesson() {
 
 function applyStateChange(state, method, newLessonEndDate) {
 	var params = {
-			'method'    : method,
 			'lessonID'  : lessonId,
 		};
 	if ( newLessonEndDate ) {
@@ -304,7 +303,7 @@ function applyStateChange(state, method, newLessonEndDate) {
 	}
 	
 	$.ajax({
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
 		cache : false,
 		data : params,
 		success : function() {
@@ -327,10 +326,9 @@ function applyStateChange(state, method, newLessonEndDate) {
 function updateLessonTab(){
 	$.ajax({
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/getLessonDetails.do',
 		cache : false,
 		data : {
-			'method'    : 'getLessonDetails',
 			'lessonID'  : lessonId
 		},
 		

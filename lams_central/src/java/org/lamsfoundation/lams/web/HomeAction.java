@@ -231,7 +231,7 @@ public class HomeAction extends DispatchAction {
 
 	// security check will be done there
 	String url = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "monitoring/monitoring.do?method=monitorLesson&lessonID=" + lessonId;
+		+ "monitoring/monitoring/monitorLesson.do?&lessonID=" + lessonId;
 	res.sendRedirect(url);
 	return null;
     }

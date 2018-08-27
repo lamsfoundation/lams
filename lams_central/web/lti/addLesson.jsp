@@ -128,9 +128,8 @@
 		
 		// initialize, create and enter the preview lesson
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 			data : {
-				'method' : 'initializeLesson',
 				'learningDesignID' : ldId,
 				'copyType' : 3,
 				'lessonName' : "<fmt:message key='authoring.fla.preview.lesson.default.title' />"
@@ -144,7 +143,7 @@
 				}
 				
 				$.ajax({
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 					data : {
 						'method' : 'startPreviewLesson',
 						'lessonID' : lessonID

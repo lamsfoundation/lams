@@ -406,9 +406,8 @@ function previewLesson(){
 	var previewButton = $('#previewButton').button('loading');
 	// initialize, create and enter the preview lesson
 	$.ajax({
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 		data : {
-			'method' : 'initializeLesson',
 			'learningDesignID' : ldNode.data.learningDesignId,
 			'copyType' : 3,
 			'lessonName' : LABEL_PREVIEW_LESSON_DEFAULT_TITLE
@@ -423,10 +422,9 @@ function previewLesson(){
 			}
 			
 			$.ajax({
-				url : LAMS_URL + 'monitoring/monitoring.do',
+				url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 				data : {
-					'method' : 'startPreviewLesson',
-					'lessonID' : lessonID
+s					'lessonID' : lessonID
 				},
 				cache : false,
 				dataType : 'text',
