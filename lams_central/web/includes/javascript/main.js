@@ -30,7 +30,7 @@ $(document).ready(function () {
             cssPageDisplay: '.pagedisplay',
             cssPageSize: '.pagesize',
             cssDisabled: 'disabled',
-            ajaxUrl : LAMS_URL + "/index.do?dispatch=getOrgs&page={page}&size={size}&{sortList:column}&{filterList:fcol}",
+            ajaxUrl : LAMS_URL + "/index/getOrgs.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}",
 			ajaxProcessing: function (data, table) {
 		    	if (data && data.hasOwnProperty('rows')) {
 		    		var rows = [],
@@ -182,7 +182,7 @@ function showMyProfileDialog() {
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=profile');
+			$('iframe', dialog).attr('src', LAMS_URL + 'index/profile.do');
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

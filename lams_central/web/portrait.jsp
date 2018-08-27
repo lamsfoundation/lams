@@ -135,14 +135,14 @@
 		<div class="currentPortrait text-center" style="margin:10px">
 			<fmt:message key="label.portrait.current" />:<br/>
 	
-			<logic:notEqual name="PortraitActionForm" property="portraitUuid" value="0">
-				<img class="img-thumbnail" src="/lams/download/?uuid=<bean:write name="PortraitActionForm" 
-						property="portraitUuid" />&version=2&preferDownload=false" />
-			</logic:notEqual>
-	
-			<logic:equal name="PortraitActionForm" property="portraitUuid"	value="0">
-				<em><fmt:message key="msg.portrait.none" /></em>
-			</logic:equal>
+			<c:choose>
+				<c:when test="${PortraitActionForm.portraitUuid == 0}">
+					<em><fmt:message key="msg.portrait.none" /></em>
+				</c:when>
+				<c:otherwise>
+				<img class="img-thumbnail" src="/lams/download/?uuid="${PortraitActionForm.portraitUuid}"&version=2&preferDownload=false" />
+				</c:otherwise>
+			</c:choose>
 		</div>
 
 		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">

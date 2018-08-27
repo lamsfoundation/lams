@@ -75,9 +75,9 @@
 
 		</lams:Alert>
 
-		<html:button property="cancel" styleClass="btn btn-primary pull-right voffset10" onclick="javascript:toHome();">
+		<button type="button" name="cancel" class="btn btn-primary pull-right voffset10" onclick="javascript:toHome();">
 			<fmt:message key="label.ok" />
-		</html:button>
+		</button>
 
 
 	</lams:Page>

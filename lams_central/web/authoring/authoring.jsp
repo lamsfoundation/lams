@@ -34,7 +34,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
-			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=getLearningDesignThumbnail&ldId=',
+			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home/getLearningDesignThumbnail.do?ldId=',
 
 			decoderDiv = $('<div />'),
 			LABELS = {

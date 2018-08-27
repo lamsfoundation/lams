@@ -155,9 +155,9 @@
 					name="confirmNewPassword" maxlength="25" />
 			</div>
 			<div class="form-group" align="right">
-				<html:submit styleClass="btn btn-sm btn-primary voffset5">
+				<button class="btn btn-sm btn-primary voffset5">
 					<fmt:message key="button.save" />
-				</html:submit>
+				</button>
 			</div>
 
 		</form>

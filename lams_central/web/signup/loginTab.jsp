@@ -1,6 +1,5 @@
 <body>
 	<form:form id="SignupForm" modelAttribute="SignupForm" action="/lams/signup/signup.do" method="post" autocomplete="off" >
- 		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
  		<form:hidden path="method" value="login" />
 		<form:hidden path="submitted" value="1" />
 		<form:hidden path="context" value="${signupOrganisation.context}" />
@@ -42,7 +41,14 @@
 								 <label for="courseKeyTab2"><fmt:message key="login.course.key" /></label>:
 								<form:input path="courseKeyTab2" size="40" maxlength="255"
 									cssClass="form-control" />
-								<html:errors property="courseKeyTab2" />
+								 <c:set var="errorKey" value="courseKeyTab2" /> 
+								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+								     <lams:Alert id="error" type="danger" close="false"> 
+								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+								             <c:out value="${error}" /><br /> 
+								         </c:forEach> 
+								     </lams:Alert> 
+								</c:if>
 							</div>
 							<div class="form-group" align="right">
 								<button class="btn btn-sm btn-default voffset5">

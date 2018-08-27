@@ -1310,9 +1310,8 @@ ActivityLib = {
 			return;
 		}
 		$.ajax({
-			url : LAMS_URL + 'authoring/author.do',
+			url : LAMS_URL + 'authoring/author/getToolOutputDefinitions.do',
 			data : {
-				'method' : 'getToolOutputDefinitions',
 				'toolContentID' : activity.toolContentID 
 								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
 			},

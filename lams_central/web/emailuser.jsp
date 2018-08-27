@@ -91,12 +91,13 @@ input[type="checkbox"] {
 			<div class="panel-heading">
 				<fmt:message key="email.compose.mail" />
 			</div>
-			<c:if test="${errorsPresent}">
-				<lams:Alert id="errorArea" type="warning">
-					<html:messages id="error">
-						<c:out value="${error}" escapeXml="false" />
-					</html:messages>
-				</lams:Alert>
+			 <c:set var="errorKey" value="GLOBAL" /> 
+			 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+			    <lams:Alert id="errorArea" type="warning">
+			         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+			             <c:out value="${error}" /><br /> 
+			         </c:forEach> 
+			     </lams:Alert> 
 			</c:if>
 			<div class="panel-body">
 				<form id="emailUserForm"

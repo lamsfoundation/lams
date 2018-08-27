@@ -9,10 +9,10 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<html:base/>
+	<base href="<lams:WebAppURL />"/>
 	<title><fmt:message key="title.lams.signup" /></title>
 	<lams:css/>
-	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/changeStyle.js'/>"></script>
+	<script language="JavaScript" type="text/JavaScript" src="<lams:WebAppURL />includes/javascript/changeStyle.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />

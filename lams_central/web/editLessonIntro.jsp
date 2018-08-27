@@ -4,7 +4,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
 <lams:html>

@@ -2,7 +2,7 @@
 	contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c" %>
 
 <!DOCTYPE html>
@@ -45,14 +45,14 @@
 	<lams:Page type="admin" title="${title}">
 
 		<div class="voffset10 text-center">
-			<html:link href="javascript:;" onclick="javascript:location.href='${param.reEditUrl}'"
-				property="reedit" styleClass="btn btn-primary roffset10">
+			<a href="javascript:;" onclick="javascript:location.href='${param.reEditUrl}'"
+				name="reedit" class="btn btn-primary roffset10">
 				<fmt:message key="label.authoring.re.edit" />&nbsp;<i class="fa fa-pencil-square-o"></i>
-			</html:link>
-			<html:link href="javascript:;" onclick="javascript:closeWindow();" property="close"
-				styleClass="btn btn-primary">
+			</a>
+			<a href="javascript:;" onclick="javascript:closeWindow();" name="close"
+				class="btn btn-primary">
 				<fmt:message key="label.authoring.close" />&nbsp;<i class="fa fa-times-circle-o"></i>
-			</html:link>
+			</a>
 		</div>
 
 	<div id="footer"></div>

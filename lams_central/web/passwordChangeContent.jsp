@@ -101,16 +101,31 @@
 		<div class="row vertical-center-row">
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel voffset20">
-					<logic:messagesPresent message="true">
-						<p class="warning">
-							<html:messages message="true" id="errMsg">
-								<bean:write name="errMsg" />
-								<br>
-							</html:messages>
-							
-							
-						</p>
-						</logic:messagesPresent>
+						 <c:set var="errorKey" value="GLOBAL" /> 
+						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						 	<p class="warning">
+							         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+							             <c:out value="${error}" /><br /> 
+							         </c:forEach> 
+						     </p>
+						</c:if>
+						<c:set var="errorKey" value="password" /> 
+						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						 	<p class="warning">
+							         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+							             <c:out value="${error}" /><br /> 
+							         </c:forEach> 
+						     </p>
+						</c:if>
+						<c:set var="errorKey" value="oldPassword" /> 
+						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+						 	<p class="warning">
+							         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+							             <c:out value="${error}" /><br /> 
+							         </c:forEach> 
+						     </p>
+						</c:if>
+						
 
 					<div class="panel-body">
 					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />

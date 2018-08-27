@@ -138,13 +138,12 @@
 </script>
 <div>
 
-	<form id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
-		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
+	<form:form modelAttribute="SignupForm" id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
 	
-		<html:hidden property="method" value="register" />
-		<html:hidden property="submitted" value="1" />
-		<html:hidden property="context" value="${signupOrganisation.context}" />
-		<html:hidden property="selectedTab" value="0" />
+		<form:hidden path="method" value="register" />
+		<form:hidden path="submitted" value="1" />
+		<form:hidden path="context" value="${signupOrganisation.context}" />
+		<form:hidden path="selectedTab" value="0" />
 
 		<div class="container">
 			<div class="row vertical-center-row">
@@ -155,9 +154,16 @@
 
 							<div class="form-group">
 								<label for="username"><fmt:message key="signup.username" /></label>:
-								<html:text property="username" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="username" />
+								<form:input path="username" size="40" maxlength="255"
+									cssClass="form-control" />
+								 <c:set var="errorKey" value="username" /> 
+								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+								     <lams:Alert id="error" type="danger" close="false"> 
+								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+								             <c:out value="${error}" /><br /> 
+								         </c:forEach> 
+								     </lams:Alert> 
+								</c:if>
 								<span style="display: none;'" class="msg error"> <fmt:message
 										key="error.username.invalid.characters" /></span>
 							</div>
@@ -193,25 +199,39 @@
 							<div class="form-group">
 								<label for="password"><fmt:message key="signup.password" /></label>:
 
-								<html:password property="password" size="40"
-									styleClass="form-control" maxlength="25" />
-								<html:errors property="password" />
+								<form:password path="password" size="40"
+									cssClass="form-control" maxlength="25" />
+								 <c:set var="errorKey" value="password" /> 
+								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+								     <lams:Alert id="error" type="danger" close="false"> 
+								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+								             <c:out value="${error}" /><br /> 
+								         </c:forEach> 
+								     </lams:Alert> 
+								</c:if>
 							</div>
 
 							<div class="form-group">
 								<label for="confirmPassword"><fmt:message key="signup.confirm.password" /></label>:
 
-								<html:password property="confirmPassword" size="40"
-									maxlength="25" styleClass="form-control" />
+								<form:password path="confirmPassword" size="40"
+									maxlength="25" cssClass="form-control" />
 								<span style="display: none;'" class="confirmPassword error"><fmt:message
 										key="error.passwords.unequal" /></span>
 							</div>
 							<div class="form-group">
 								<label for="firstName"><fmt:message key="signup.first.name" /></label>:
 
-								<html:text property="firstName" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="firstName" />
+								<form:input path="firstName" size="40" maxlength="255"
+									cssClass="form-control" />
+								 <c:set var="errorKey" value="firstName" /> 
+								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+								     <lams:Alert id="error" type="danger" close="false"> 
+								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+								             <c:out value="${error}" /><br /> 
+								         </c:forEach> 
+								     </lams:Alert> 
+								</c:if>
 								<span style="display: none;'" class="first error"><fmt:message
 										key="error.firstname.invalid.characters" /></span>
 							</div>
@@ -219,18 +239,32 @@
 							<div class="form-group">
 								<label for="lastName"><fmt:message key="signup.last.name" /></label>:
 
-								<html:text property="lastName" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="lastName" />
+								<form:input path="lastName" size="40" maxlength="255"
+									cssClass="form-control" />
+								 <c:set var="errorKey" value="lastName" /> 
+									 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+									     <lams:Alert id="error" type="danger" close="false"> 
+									         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+									             <c:out value="${error}" /><br /> 
+									         </c:forEach> 
+									     </lams:Alert> 
+									</c:if>
 								<span style="display: none;'" class="last error"><fmt:message
 										key="error.lastname.invalid.characters" /></span>
 							</div>
 							<div class="form-group">
 								<label for="email"><fmt:message key="signup.email" /></label>:
 
-								<html:text property="email" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="email" />
+								<form:input path="email" size="40" maxlength="255"
+									cssClass="form-control" />
+								 <c:set var="errorKey" value="email" /> 
+								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+								     <lams:Alert id="error" type="danger" close="false"> 
+								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+								             <c:out value="${error}" /><br /> 
+								         </c:forEach> 
+								     </lams:Alert> 
+								</c:if>
 								<span style="display: none;'" class="email error"><fmt:message
 										key="error.email.invalid.format" /></span>
 							</div>
@@ -238,8 +272,8 @@
 							<div class="form-group">
 								<label for="confirmEmail"><fmt:message key="signup.confirm.email" /></label>:
 
-								<html:text property="confirmEmail" size="40" maxlength="255"
-									styleClass="form-control" />
+								<form:input path="confirmEmail" size="40" maxlength="255"
+									cssClass="form-control" />
 								<span style="display: none;'" class="confirmEmail error"><fmt:message
 										key="error.emails.unequal" /></span>
 							</div>
@@ -248,15 +282,22 @@
 							<div class="form-group">
 								<label for="courseKey"><fmt:message key="signup.course.key" /></label>:
 
-								<html:text property="courseKey" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="courseKey" />
+								<form:input path="courseKey" size="40" maxlength="255"
+									cssClass="form-control" />
+								 <c:set var="errorKey" value="courseKey" /> 
+									 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+									     <lams:Alert id="error" type="danger" close="false"> 
+									         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+									             <c:out value="${error}" /><br /> 
+									         </c:forEach> 
+									     </lams:Alert> 
+									</c:if>
 							</div>
 
 							<div class="form-group" align="right">
-								<html:submit styleClass="btn btn-sm btn-default voffset5">
+								<button styleClass="btn btn-sm btn-default voffset5">
 									<fmt:message key="login.submit" />
-								</html:submit>
+								</</button>
 							</div>
 						</div>
 					</div>

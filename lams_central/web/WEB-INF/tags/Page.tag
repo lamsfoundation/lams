@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="type" required="true" rtexprvalue="true"%>
+<%@ attribute name="formID" required="false" rtexprvalue="true"%>
 <%@ attribute name="style" required="false" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="titleHelpURL" required="false" rtexprvalue="true"%>
@@ -88,8 +89,8 @@
 					</c:if>
 				</c:if>
 			</c:if>
-			<c:if test="${empty toolSessionId}">
-				<c:set var="toolForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:if test="${empty toolSessionId and not empty formID}">
+				<c:set var="toolForm" value="${requestScope[formID]}" />
 				<c:if test="${not empty toolForm}"> 
 				    <c:set var="toolSessionId"><c:catch var="exception">${toolForm.toolSessionID}</c:catch></c:set>
 				</c:if>
@@ -137,7 +138,7 @@
 				
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
-					window.location.href = LEARNING_URL + 'learner/restartLesson.do?lessonID=' + lessonId;
+					window.location.href = LEARNING_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
 				}
 			}
 

@@ -27,15 +27,15 @@
 
 		function validateForm() {
 			if (document.forgotForm.selectType[0].checked) {
-				var login = document.forgotForm.login.value;
+				var login = document.forms.forgotForm.login.value;
 				if (login == null || login == "") {
 					alert("<fmt:message key="error.forgot.password.username" />");
 					return false;
 				} else {
-					document.forgotForm.submit();
+					document.forms.forgotForm.submit();
 				}
-			} else if (document.forgotForm.selectType[1].checked) {
-				var email = document.forgotForm.email.value;
+			} else if (document.forms.forgotForm.selectType[1].checked) {
+				var email = document.forms.forgotForm.email.value;
 				//var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 				var filter = /^(.)+\@(.)+\.(.)+/;
 
@@ -46,18 +46,18 @@
 					alert("<fmt:message key="error.valid.email.required" />");
 					return false;
 				} else {
-					document.forgotForm.submit();
+					document.forms.forgotForm.submit();
 				}
 			}
 		}
 
 		function radioSelected() {
-			if (document.forgotForm.selectType[0].checked) {
-				document.forgotForm.login.disabled = false;
-				document.forgotForm.email.disabled = true;
-			} else if (document.forgotForm.selectType[1].checked) {
-				document.forgotForm.login.disabled = true;
-				document.forgotForm.email.disabled = false;
+			if (document.forms.forgotForm.selectType[0].checked) {
+				document.forms.forgotForm.login.disabled = false;
+				document.forms.forgotForm.email.disabled = true;
+			} else if (document.forms.forgotForm.selectType[1].checked) {
+				document.forms.forgotForm.login.disabled = true;
+				document.forms.forgotForm.email.disabled = false;
 			}
 		}
 
@@ -133,15 +133,15 @@
 						</div>
 
 						<div class="form-group">
-							<html:button property="cancel"
-								styleClass="btn btn-default roffset10"
+							<button name="cancel"
+								class="btn btn-default roffset10" type="button"
 								onclick="javascript:toHome();">
 								<fmt:message key="button.cancel" />
-							</html:button>
-							<html:button property="ok" styleClass="btn btn-primary"
+							</button>
+							<button name="ok" class="btn btn-primary" type="button"
 								onclick="javascript:validateForm();">
 								<fmt:message key="label.ok" />
-							</html:button>
+							</button>
 						</div>
 
 					</div>

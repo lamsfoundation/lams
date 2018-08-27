@@ -2,7 +2,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
@@ -234,17 +234,17 @@
 				</button>
 			</div>
 			<div class="voffset5">
-				<html:form action="groupingUpload.do?method=importLearnersForGrouping" enctype="multipart/form-data" styleId="uploadForm">
-				<html:hidden property="activityID" styleId="activityID" value="${param.activityID}"/>
-				<html:hidden property="lessonID" styleId="lessonID" value="${lessonID}"/>
-				<%-- <html:hidden property="organisationID" styleId="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
-				<%-- <thml:hidden property="groupingId" styleId="groupingId" value="${groupingId}"/> Value is set in Javascript as only used for some modes  --%>
+				<form:form action="groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" modelAttribute="uploadForm" id="uploadForm">
+				<form:hidden path="activityID" id="activityID" value="${param.activityID}"/>
+				<form:hidden path="lessonID" id="lessonID" value="${lessonID}"/>
+				<%-- <form:hidden path="organisationID" id="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
+				<%-- <form:hidden path="groupingId" id="groupingId" value="${groupingId}"/> Value is set in Javascript as only used for some modes  --%>
 				<button id="import" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
 					<fmt:message key="button.import" />
 				</button>
 				<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
 					uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-				</html:form>
+				</form:form>
 			</div>
 			<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</div>

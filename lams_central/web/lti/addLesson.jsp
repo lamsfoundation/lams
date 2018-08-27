@@ -5,7 +5,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-function" prefix="fn"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
@@ -124,7 +124,7 @@
 
 	function openPreview() {
     	var ldId = document.getElementsByName("ldId")[0].value;
-        var title = document.lessonForm.title.value;
+        var title = document.forms.lessonForm.title.value;
 		
 		// initialize, create and enter the preview lesson
 		$.ajax({
@@ -172,7 +172,7 @@
      // Check that a title has been supplied
 	function confirmSubmit() {
          
-		var title = rettrim(document.lessonForm.title.value);
+		var title = rettrim(document.forms.lessonForm.title.value);
 		if ((title == "")||(title == null)) {
 			alert("<fmt:message key='authoring.fla.save.sequence.title.prompt' />");
 			return false;

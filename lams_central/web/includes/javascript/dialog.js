@@ -404,7 +404,7 @@ function showMyPortraitDialog() {
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=portrait&isReturnButtonHidden=true');
+			$('iframe', dialog).attr('src', LAMS_URL + 'index/portrait.do?isReturnButtonHidden=true');
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

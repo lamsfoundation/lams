@@ -32,11 +32,11 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$("#query").focus().autocomplete({
-				'source' : "${lams}/findUserLessons.do?courseID=${courseID}&dispatch=autocomplete",
+				'source' : "${lams}/findUserLessons/autocomplete.do?courseID=${courseID}",
 				'delay'  : 700,
 				'select' : function(event, ui){
 					// display results for an exact user ID
-					window.location.href = "${lams}/findUserLessons.do?courseID=${courseID}&dispatch=getResults&userID="
+					window.location.href = "${lams}/findUserLessons/getResults.do?courseID=${courseID}&userID="
 											+ ui.item.value; 
 			    }
 			});
@@ -55,8 +55,7 @@
 			<fmt:message key="lessonsearch.instuctions" />
 		</div>
 
-		<form action="${lams}/findUserLessons.do">
-			<input type="hidden" name="dispatch" value="getResults" />
+		<form action="${lams}/findUserLessons/getResults.do">
 			<input type="text" id="query" name="query" />
 			<input type="hidden" name="courseID" value="${courseID}" />
 			<button type="submit" class="btn btn-sm btn-primary">

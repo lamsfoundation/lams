@@ -2,9 +2,7 @@
 
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
 	import="org.lamsfoundation.lams.util.Configuration"
@@ -61,7 +59,7 @@
 					<!-- Split button -->
 					<div class="col-xs-12 text-center">
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?method=editprofile" role="button"><i
+							href="index/editprofile.do" role="button"><i
 							class="fa fa-fw fa-pencil"></i> <span class="hidden-xs"><fmt:message
 									key="title.profile.edit.screen" /></span></i>
 						</a>&nbsp;&nbsp;
@@ -73,7 +71,7 @@
 						<c:if test="${authenticationMethodId eq dbId}">
 
 							<a class="btn btn-sm btn-default offset5"
-								href="index.do?method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button">
+								href="index/password.do?redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button">
 									<i class="fa fa-fw fa-lock"></i> 
 										<span class="hidden-xs"><fmt:message
 											key="title.password.change.screen" />
@@ -82,14 +80,14 @@
 							</a>
 						</c:if>
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?method=portrait" role="button">
+							href="index/portrait.do" role="button">
 							<i class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
 									key="title.portrait.change.screen" /></span></i>
 						</a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-								href="index.do?method=lessons" role="button">
+								href="index/lessons.do" role="button">
 								<i class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
 										key="title.all.my.lessons" /></span>
 								</i>
