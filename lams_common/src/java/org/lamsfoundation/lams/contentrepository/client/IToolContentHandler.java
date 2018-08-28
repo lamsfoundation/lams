@@ -26,15 +26,12 @@ package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 
-import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 
 /**
  * IToolContentHandler defines the ContentHandler interface used by the tools.
@@ -47,33 +44,6 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
  * @author Fiona Malikoff
  */
 public interface IToolContentHandler {
-
-    /**
-     * @return Returns the repositoryWorkspaceName.
-     */
-    public abstract String getRepositoryWorkspaceName();
-
-    /**
-     * @return Returns the repositoryUser.
-     */
-    public abstract String getRepositoryUser();
-
-    /**
-     * @return Returns the repository identification string. This is the
-     *         "password" field the credential.
-     */
-    public abstract char[] getRepositoryId();
-
-    /**
-     * Get the ticket to access the repository. If the workspace/credential
-     * hasn't been set up, then it will be set up automatically.
-     *
-     * @param forceLogin
-     *            set to true if tried to do something and got access denied. This may happen
-     *            if the repository loses the ticket.
-     * @return the repository ticket
-     */
-    public abstract ITicket getTicket(boolean forceLogin) throws RepositoryCheckedException;
 
     /**
      * Save a file in the content repository.
@@ -92,7 +62,7 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public abstract NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
     /**
@@ -116,7 +86,7 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public abstract NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
+    public NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
     /**
@@ -136,7 +106,7 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public abstract NodeKey uploadPackage(String dirPath, String startFile)
+    public NodeKey uploadPackage(String dirPath, String startFile)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
     /**
@@ -149,19 +119,7 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public abstract void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException;
-
-    /**
-     * Copy an entry in the content repository.
-     *
-     * @param uuid
-     *            id of the file node. Mandatory
-     * @throws ItemNotFoundException
-     *             Node to copy cannot be found
-     * @throws RepositoryCheckedException
-     *             Some other error occured.
-     */
-    public abstract NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException;
+    public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Get the file, as an inputstream.
@@ -175,10 +133,8 @@ public interface IToolContentHandler {
      * @throws RepositoryCheckedException
      *             Some other error occured.
      */
-    public abstract InputStream getFileInputStream(Long uuid)
+    public InputStream getFileInputStream(Long uuid)
 	    throws ItemNotFoundException, FileException, RepositoryCheckedException;
-
-    public abstract IRepositoryService getRepositoryService();
 
     /**
      * Save content in repository into local file by given <code>toFileName</code>.

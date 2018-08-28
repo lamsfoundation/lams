@@ -107,31 +107,52 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  *
  * @author conradb, Fiona Malikoff
  */
-public abstract class ToolContentHandler implements IToolContentHandler {
+public class ToolContentHandler implements IToolContentFullHandler {
 
     private IRepositoryService repositoryService;
     private ITicket ticket;
+    
+    private String repositoryWorkspaceName;
+    private String repositoryUser;
+    private String repositoryId;
 
     protected Logger log = Logger.getLogger(ToolContentHandler.class.getName());
 
-    /**
-     * @return Returns the repositoryWorkspaceName.
-     */
-    @Override
-    public abstract String getRepositoryWorkspaceName();
+    private String getRepositoryWorkspaceName() {
+	if (repositoryWorkspaceName == null) {
+	    log.error(
+		    "Accessing ToolContentHandler bean, but repositoryWorkspaceName has not been defined. Please define this property in ApplicationContext.xml");
+	}
+	return repositoryWorkspaceName;
+    }
+    
+    public void setRepositoryWorkspaceName(String repositoryWorkspaceName) {
+	this.repositoryWorkspaceName = repositoryWorkspaceName;
+    }
 
-    /**
-     * @return Returns the repositoryUser.
-     */
-    @Override
-    public abstract String getRepositoryUser();
+    private String getRepositoryUser() {
+	if (repositoryUser == null) {
+	    log.error(
+		    "Accessing ToolContentHandler bean, but repositoryUser has not been defined. Please define this property in ApplicationContext.xml");
+	}
+	return repositoryUser;	
+    }
+    
+    public void setRepositoryUser(String repositoryUser) {
+	this.repositoryUser = repositoryUser;
+    }
 
-    /**
-     * @return Returns the repository identification string. This is the
-     *         "password" field the credential.
-     */
-    @Override
-    public abstract char[] getRepositoryId();
+    private char[] getRepositoryId() {
+	if (repositoryId == null) {
+	    log.error(
+		    "Accessing ToolContentHandler bean, but repositoryWorkspaceName has not been defined. Please define this property in ApplicationContext.xml");
+	}
+	return repositoryId.toCharArray();	
+    }
+    
+    public void setRepositoryId(String repositoryId) {
+	this.repositoryId = repositoryId;
+    }
 
     @Override
     public ITicket getTicket(boolean forceLogin) throws RepositoryCheckedException {
