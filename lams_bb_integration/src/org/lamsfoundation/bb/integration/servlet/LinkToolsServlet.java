@@ -471,7 +471,7 @@ public class LinkToolsServlet extends HttpServlet {
 		    FormattedText descriptionFormatted = content.getBody();
 		    String description = URLEncoder.encode(descriptionFormatted.getText(), "UTF-8");
 		    final long newLessonId = LamsSecurityUtil.startLesson(teacher, courseIdStr, newLdId, title,
-			    description, false);
+			    description, null, false);
 
 		    // update lesson id
 		    content.setLinkRef(Long.toString(newLessonId));
