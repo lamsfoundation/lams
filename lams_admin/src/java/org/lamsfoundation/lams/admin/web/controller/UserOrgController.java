@@ -70,14 +70,13 @@ public class UserOrgController {
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 
-	//ActionMessages errors = new ActionMessages();
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	log.debug("orgId: " + orgId);
 	// get org name
 	Organisation organisation = (Organisation) service.findById(Organisation.class, orgId);
 
 	if ((orgId == null) || (orgId <= 0) || organisation == null) {
-	    request.setAttribute("errorName", "UserOrgAction");
+	    request.setAttribute("errorName", "UserOrgController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.org.invalid"));
 	    return "error";
 	}

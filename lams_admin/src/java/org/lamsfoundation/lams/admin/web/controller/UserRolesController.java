@@ -155,11 +155,10 @@ public class UserRolesController {
 		i++;
 	    }
 	} else {
-	    Errors messages = null;
-	    messages.reject("roles", messageService.getMessage("msg.add.to.org", org.getName()));
+	    errorMap.add("roles", messageService.getMessage("msg.add.to.org", org.getName()));
 	}
 	userRolesForm.setRoles(roles);
-
+	request.setAttribute("errorMap", errorMap);
 	return "userrole";
     }
 

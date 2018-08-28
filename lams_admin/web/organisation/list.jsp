@@ -147,7 +147,7 @@
 				</form>
 			
 				<form:form cssClass="indentPad" action="orgmanage.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
-					<input type="hidden" name="org" value="<c:out value="${orgManageForm.parentId}"/>" />
+					<input type="hidden" name="org" value="${orgManageForm.parentId}" />
 					<fmt:message key="label.show"/>&nbsp;
 					<form:select path="stateId" id="org-state-id" cssClass="form-control form-control-inline input-sm">
 						<form:option value="1"><fmt:message key="organisation.state.ACTIVE"/></form:option>

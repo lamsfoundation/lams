@@ -80,6 +80,7 @@ public class OrgManageController {
 
 	// Get organisation whose child organisations we will populate the OrgManageForm with
 	Integer orgId = WebUtil.readIntParam(request, "org", true);
+
 	if (orgId == null) {
 	    orgId = (Integer) request.getAttribute("org");
 	}

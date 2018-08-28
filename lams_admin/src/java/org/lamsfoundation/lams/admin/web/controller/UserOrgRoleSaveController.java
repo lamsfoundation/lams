@@ -90,11 +90,7 @@ public class UserOrgRoleSaveController {
 	log.debug("orgId: " + orgId);
 
 	request.setAttribute("org", orgId);
-	request.getSession().removeAttribute("UserOrgRoleForm");
-
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/usermanage.do";
-	}
+	request.getSession().removeAttribute("userOrgRoleForm");
 
 	// save UserOrganisation memberships, and the associated roles;
 	// for subgroups, if user is not a member of the parent group then add to that as well.

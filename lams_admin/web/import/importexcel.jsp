@@ -54,6 +54,7 @@
 	 </script>
 </lams:head>
     
+<body class="stripes">
 
 	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
 	<c:set var="help"><fmt:message key="Import+Users"/></c:set>

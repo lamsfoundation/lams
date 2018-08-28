@@ -70,7 +70,7 @@ public class UserOrgSaveController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @RequestMapping(path = "/userorgsave", method = RequestMethod.POST)
+    @RequestMapping(path = "/userorgsave")
     public String execute(@ModelAttribute UserOrgForm userOrgForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -137,7 +137,7 @@ public class UserOrgSaveController {
 		    organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);
-	    return "redirect:/userorgrole.do";
+	    return "forward:/userorgrole.do";
 	}
     }
 

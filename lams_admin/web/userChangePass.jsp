@@ -85,8 +85,8 @@
 
 
 <body class="stripes">
-	<form id="userForm" modelAttribute="userForm" action="../usersave/changePass.do" method="post">
-		<form:hidden path="userId" />
+	<form id="userForm" modelAttribute="userForm" action="usersave/changePass.do" method="post">
+		<input type="hidden" name="userId" value="${param.userId}" />
 		<div class="panel panel-default">
 			<div
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">

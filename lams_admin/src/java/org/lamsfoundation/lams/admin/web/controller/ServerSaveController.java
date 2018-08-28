@@ -116,7 +116,7 @@ public class ServerSaveController {
 		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
 			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
 		} else {
-		    ExtServer map = (ExtServer) listServer.get(0);
+		    ExtServer map = (ExtServer) listPrefix.get(0);
 		    if (!map.getSid().equals(sid)) {
 			errorMap.add("prefix", messageService.getMessage("error.not.unique",
 				new Object[] { messageService.getMessage("sysadmin.prefix") }));

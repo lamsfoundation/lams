@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,8 +73,9 @@ public class UserOrgRoleController {
     @Autowired
     private WebApplicationContext applicationContext;
 
+    @SuppressWarnings("unchecked")
     @RequestMapping(path = "/userorgrole")
-    public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, HttpServletRequest request)
+    public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, BindingResult result, HttpServletRequest request)
 	    throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());

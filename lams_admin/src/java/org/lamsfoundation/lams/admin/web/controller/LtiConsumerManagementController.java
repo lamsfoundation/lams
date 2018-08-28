@@ -156,7 +156,7 @@ public class LtiConsumerManagementController {
 	    List<ExtServer> listServer = userManagementService.findByProperty(ExtServer.class, "serverid",
 		    ltiConsumerForm.getServerid());
 	    if (listServer != null && listServer.size() > 0) {
-		if (sid.equals(0)) {//new map
+		if (sid == null) {//new map
 		    errorMap.add("serverid", messageService.getMessage("error.not.unique",
 			    new Object[] { messageService.getMessage("sysadmin.serverid") }));
 		} else {
@@ -171,7 +171,7 @@ public class LtiConsumerManagementController {
 	    List<ExtServer> listPrefix = userManagementService.findByProperty(ExtServer.class, "prefix",
 		    ltiConsumerForm.getPrefix());
 	    if (listPrefix != null && listPrefix.size() > 0) {
-		if (sid.equals(0)) {//new map
+		if (sid == null) {//new map
 		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
 			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
 		} else {
@@ -186,7 +186,7 @@ public class LtiConsumerManagementController {
 
 	if (errorMap.isEmpty()) {
 	    ExtServer ltiConsumer = null;
-	    if (sid.equals(0)) {
+	    if (sid == null) {
 		ltiConsumer = new ExtServer();
 		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
 		ltiConsumer.setSid(null);

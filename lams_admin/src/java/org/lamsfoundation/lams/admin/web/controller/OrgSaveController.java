@@ -121,7 +121,7 @@ public class OrgSaveController {
 	    OrganisationState state = (OrganisationState) service.findById(OrganisationState.class,
 		    organisationForm.getStateId());
 
-	    if (orgId != 0) {
+	    if (orgId != null) {
 		if (service.canEditGroup(user.getUserID(), orgId)) {
 		    org = (Organisation) service.findById(Organisation.class, orgId);
 		    // set archived date only when it first changes to become archived
@@ -142,7 +142,7 @@ public class OrgSaveController {
 		org.setParentOrganisation(
 			(Organisation) service.findById(Organisation.class, organisationForm.getParentId()));
 		org.setOrganisationType(
-			(OrganisationType) service.findById(OrganisationType.class, organisationForm.getOrgId()));
+			(OrganisationType) service.findById(OrganisationType.class, organisationForm.getTypeId()));
 		writeAuditLog(user, org, organisationForm, org.getOrganisationState(), org.getLocale());
 	    }
 	    org.setLocale(locale);
@@ -171,7 +171,7 @@ public class OrgSaveController {
 	String message;
 
 	// audit log entries for organisation attribute changes
-	if (orgForm.getOrgId() != 0) {
+	if (orgForm.getOrgId() != null) {
 	    final String key = "audit.organisation.change";
 	    String[] args = new String[4];
 	    args[1] = org.getName() + "(" + org.getOrganisationId() + ")";

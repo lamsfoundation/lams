@@ -119,7 +119,7 @@ public class UserSaveController {
 	}
 
 	User user = null;
-	if (userId != 0) {
+	if (userId != null) {
 	    edit = true;
 	    user = (User) UserSaveController.service.findById(User.class, userId);
 	}
@@ -232,20 +232,20 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    if ((orgId == null) || (orgId == 0)) {
-		return "redirect:../usersearch.do";
+		return "redirect:/usersearch.do";
 	    }
 	    if (edit) {
 		request.setAttribute("org", orgId);
-		return "redirect:../usermanage.do";
+		return "redirect:/usermanage.do";
 	    } else {
 		request.setAttribute("orgId", orgId);
 		request.setAttribute("userId", user.getUserId());
-		return "redirect:../userroles.do";
+		return "redirect:/userroles.do";
 	    }
 	} else {
 	    request.setAttribute("orgId", orgId);
 	    request.setAttribute("errorMap", errorMap);
-	    return "forward:../user/edit.do";
+	    return "forward:/user/edit.do";
 	}
     }
 
@@ -255,6 +255,7 @@ public class UserSaveController {
 
 	UserSaveController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
+	userForm.setUserId(userId);
 	ISecurityService securityService = AdminServiceProxy.getSecurityService(applicationContext.getServletContext());
 	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
@@ -287,7 +288,7 @@ public class UserSaveController {
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
 	    UserSaveController.service.saveUser(user);
-	    return "redirect:../user/edit.do";
+	    return "forward:/user/edit.do";
 	}
 	request.setAttribute("errorMap", errorMap);
 	return "userChangePass";

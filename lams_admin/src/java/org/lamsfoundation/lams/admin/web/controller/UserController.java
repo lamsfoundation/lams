@@ -345,7 +345,7 @@ public class UserController {
 	}
     }
 
-    @RequestMapping(path = "/delete", method = RequestMethod.POST)
+    @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
 
 	initServices();
