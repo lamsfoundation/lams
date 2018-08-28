@@ -96,6 +96,7 @@ public class LessonConditionsController {
     @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
+    @Qualifier("centralMessageService")
     private MessageService messageservice;
 
     /**

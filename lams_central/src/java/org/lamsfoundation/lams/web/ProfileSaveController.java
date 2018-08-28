@@ -60,20 +60,23 @@ public class ProfileSaveController {
     @Qualifier("userManagementService")
     private IUserManagementService service;
     @Autowired
+    @Qualifier("centralMessageService")
     private MessageService messageService;
 
-    @RequestMapping(path = "/saveprofile", method = RequestMethod.POST)
-    public String execute(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
+    @RequestMapping(path = "/saveprofile")
+    public String execute(@ModelAttribute("newForm") UserForm userForm, HttpServletRequest request) throws Exception {
 
 	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
-	    return "redirect:/index/profile.do?";
+	    request.setAttribute("redirect", "profile");
+	    return "redirect:/index.do";
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
 	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
-		return "redirect:/index/editprofile.do";
+		request.setAttribute("redirect", "editprofile");
+		return "redirect:/index.do";
 	    }
 	}
 
@@ -85,8 +88,8 @@ public class ProfileSaveController {
 		    .warn(requestor.getLogin() + " tried to edit profile of user " + userForm.getLogin());
 	    errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
 	    request.setAttribute("errorMap", errorMap);
-	    ;
-	    return "redirect:/index/editprofile.do";
+	    request.setAttribute("redirect", "editprofile");
+	    return "redirect:/index.do";
 	}
 
 	// (dyna)form validation
@@ -116,8 +119,8 @@ public class ProfileSaveController {
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    ;
-	    return "redirect:/index/editprofile.do";
+	    request.setAttribute("redirect", "editprofile");
+	    return "redirect:/index.do";
 	}
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)
@@ -144,7 +147,8 @@ public class ProfileSaveController {
 	HttpSession ss = SessionManager.getSession();
 	ss.setAttribute(AttributeNames.USER, requestor.getUserDTO());
 
-	return "redirect:/index/profile.do";
+	request.setAttribute("redirect", "profile");
+	return "redirect:/index.do";
     }
 
 }

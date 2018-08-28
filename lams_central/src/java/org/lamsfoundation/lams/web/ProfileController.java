@@ -86,6 +86,7 @@ public class ProfileController {
     @Qualifier("timezoneService")
     private ITimezoneService timezoneService;
     @Autowired
+    @Qualifier("centralMessageService")
     private MessageService messageService;
 
     @RequestMapping("/view")
@@ -191,7 +192,7 @@ public class ProfileController {
     }
 
     @RequestMapping("/edit")
-    public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
+    public String edit(@ModelAttribute("newForm") UserForm userForm, HttpServletRequest request) throws Exception {
 
 	//some errors may have already been set in ProfileSaveAction
 	MultiValueMap<String, String> errorMap = (MultiValueMap<String, String>) request.getAttribute("errorMap");

@@ -107,19 +107,19 @@ public class AuthoringController {
     @Autowired
     @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
-    private static ILamsToolService toolService;
+    private  ILamsToolService toolService;
     @Autowired
     @Qualifier("authoringService")
-    private static IAuthoringService authoringService;
+    private  IAuthoringService authoringService;
     @Autowired
     @Qualifier("learningDesignService")
-    private static ILearningDesignService learningDesignService;
+    private  ILearningDesignService learningDesignService;
     @Autowired
     @Qualifier("securityService")
-    private static ISecurityService securityService;
+    private  ISecurityService securityService;
     @Autowired
     @Qualifier("integrationService")
-    private static IIntegrationService integrationService;
+    private  IIntegrationService integrationService;
     @Autowired
     WebApplicationContext applicationContext;
 

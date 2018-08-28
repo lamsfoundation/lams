@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<base href="<lams:WebAppURL />">
+	<base href="<lams:LAMSURL/>"/>
 	<title><fmt:message key="heading.general.error" /></title>
 	<lams:css/>
 	<script language="JavaScript" type="text/JavaScript" src="<lams:WebAppURL />includes/javascript/changeStyle.js"></script>

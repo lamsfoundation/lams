@@ -49,7 +49,7 @@ public class FindUserLessonsController {
     @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("securityServicesecurityService")
+    @Qualifier("securityService")
     private ISecurityService securityService;
 
     @RequestMapping("/getResults")

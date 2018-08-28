@@ -22,11 +22,10 @@
 		$(document).ready(function(){
 			$.ajax({
 				dataType : 'text',
-				url : '<lams:LAMSURL/>home.do',
+				url : '<lams:LAMSURL/>home/getLearningDesignThumbnail.do',
 				async : false,
 				cache : false,
 				data : {
-					'method'    : 'getLearningDesignThumbnail',
 					'ldId'      : '${learningDesignID}',
 					'_t'		: new Date().getTime()
 				},

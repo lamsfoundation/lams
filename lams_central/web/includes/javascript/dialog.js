@@ -330,7 +330,7 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 			}
 		},
 		'open' : function() {
-			var url = LAMS_URL + 'authoring/author.do?method=openAuthoring';
+			var url = LAMS_URL + 'authoring/openAuthoring.do';
 			
 			if (learningDesignID) {
 				url += '&learningDesignID=' + learningDesignID;
@@ -404,7 +404,7 @@ function showMyPortraitDialog() {
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', dialog).attr('src', LAMS_URL + 'index/portrait.do?isReturnButtonHidden=true');
+			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?redirect=portrait&isReturnButtonHidden=true');
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

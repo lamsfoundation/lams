@@ -8,14 +8,16 @@
 	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <c:set var="showAllMyLessonLink"><%=Configuration.get(ConfigurationKeys.SHOW_ALL_MY_LESSON_LINK)%></c:set>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <lams:html>
 <lams:head>
 	<lams:css/>
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
+	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
@@ -59,7 +61,7 @@
 					<!-- Split button -->
 					<div class="col-xs-12 text-center">
 						<a class="btn btn-sm btn-default offset5"
-							href="index/editprofile.do" role="button"><i
+							href="<lams:LAMSURL/>index.do?redirect=editprofile" role="button"><i
 							class="fa fa-fw fa-pencil"></i> <span class="hidden-xs"><fmt:message
 									key="title.profile.edit.screen" /></span></i>
 						</a>&nbsp;&nbsp;
@@ -71,7 +73,7 @@
 						<c:if test="${authenticationMethodId eq dbId}">
 
 							<a class="btn btn-sm btn-default offset5"
-								href="index/password.do?redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button">
+								href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button">
 									<i class="fa fa-fw fa-lock"></i> 
 										<span class="hidden-xs"><fmt:message
 											key="title.password.change.screen" />
@@ -80,14 +82,14 @@
 							</a>
 						</c:if>
 						<a class="btn btn-sm btn-default offset5"
-							href="index/portrait.do" role="button">
+							href="<lams:LAMSURL/>index.do?redirect=portrait" role="button">
 							<i class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
 									key="title.portrait.change.screen" /></span></i>
 						</a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-								href="index/lessons.do" role="button">
+								href="<lams:LAMSURL/>index.do?redirect=lessons" role="button">
 								<i class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
 										key="title.all.my.lessons" /></span>
 								</i>

@@ -822,9 +822,8 @@ GeneralInitLib = {
 							$.ajax({
 								cache : false,
 								async : false,
-								url : LAMS_URL + "authoring/author.do",
+								url : LAMS_URL + "authoring/copyToolContent.do",
 								data : {
-									'method'        : 'copyToolContent',
 									'toolContentID' : activity.toolContentID
 								},
 								dataType : 'text',
@@ -1504,9 +1503,8 @@ GeneralLib = {
 				type  : 'POST',
 				async : false,
 				cache : false,
-				url : LAMS_URL + 'authoring/author.do',
+				url : LAMS_URL + 'authoring/finishLearningDesignEdit.do',
 				data : {
-					'method' : 'finishLearningDesignEdit',
 					'learningDesignID' : layout.ld.learningDesignID,
 					'cancelled' : 'true'
 				},
@@ -1666,7 +1664,7 @@ GeneralLib = {
 			// do not prompt again
 			window.onbeforeunload = null;
 			// full window reload so new content ID gets generated
-			document.location.href = LAMS_URL + 'authoring/author.do?method=openAuthoring';
+			document.location.href = LAMS_URL + 'authoring/openAuthoring.do';
 		}
 	},
 	
@@ -1683,10 +1681,9 @@ GeneralLib = {
 		$.ajax({
 			async : false,
 			cache : false,
-			url : LAMS_URL + "authoring/author.do",
+			url : LAMS_URL + "authoring/openLearningDesign.do",
 			dataType : 'json',
 			data : {
-				'method'          : 'openLearningDesign',
 				'learningDesignID': learningDesignID
 			},
 			success : function(response) {
@@ -2746,10 +2743,9 @@ GeneralLib = {
 			type     : 'POST',
 			cache    : false,
 			async    : false,
-			url      : LAMS_URL + "authoring/author.do",
+			url      : LAMS_URL + "authoring/saveLearningDesign.do",
 			dataType : 'json',
 			data     : {
-				'method' : 'saveLearningDesign',
 				'ld'     : JSON.stringify(ld)
 			},
 			success : function(response) {
@@ -2798,9 +2794,8 @@ GeneralLib = {
 							type  : 'POST',
 							async : false,
 							cache : false,
-							url : LAMS_URL + 'authoring/author.do',
+							url : LAMS_URL + 'authoring/finishLearningDesignEdit.do',
 							data : {
-								'method' : 'finishLearningDesignEdit',
 								'learningDesignID' : layout.ld.learningDesignID,
 								'cancelled' : 'false'
 							},
@@ -2905,10 +2900,9 @@ GeneralLib = {
 				var activity = this;
 				$.ajax({
 					type : 'POST',
-					url : LAMS_URL + 'authoring/author.do',
+					url : LAMS_URL + 'authoring/saveActivityCoordinates.do',
 					async: false,
 					data : {
-						'method'   : 'saveActivityCoordinates',
 						'activity' : JSON.stringify({
 							'activityID'  : activity.activityID,
 							'xCoord'      : activity.xCoord,
@@ -2936,10 +2930,9 @@ GeneralLib = {
 		
 		$.ajax({
 			type : 'POST',
-			url : LAMS_URL + 'authoring/author.do',
+			url : LAMS_URL + 'authoring/saveLearningDesignImage.do',
 			async: false,
 			data : {
-				'method' : 'saveLearningDesignImage',
 				'learningDesignID' : layout.ld.learningDesignID,
 				'image' : MenuLib.exportSVG()
 			},
@@ -2982,7 +2975,7 @@ GeneralLib = {
 			if ($('#ldStoreDialogImportPartButton', layout.ldStoreDialog).is(':visible')) {
 				// get read-only Authoring of the chosen LD and prevent caching
 				$('#ldStoreDialogImportPartFrame', layout.ldStoreDialog).attr('src',
-				  LAMS_URL + 'authoring/author.do?method=generateSVG&selectable=true&learningDesignID='
+				  LAMS_URL + 'authoring/generateSVG.do?selectable=true&learningDesignID='
 				  		   + learningDesignID + '&_=' + new Date().getTime());
 			} else {
 				$('#ldScreenshotLoading', layout.ldStoreDialog).show();
@@ -3018,7 +3011,7 @@ GeneralLib = {
 								$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
 							}
 						}).attr('src', LAMS_URL 
-									   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+									   + 'authoring/generateSVG.do?selectable=false&learningDesignID='
 									   + learningDesignID);
 					}
 				});
@@ -3095,10 +3088,9 @@ GeneralLib = {
 			$.ajax({
 				cache : false,
 				async : false,
-				url : LAMS_URL + "authoring/author.do",
+				url : LAMS_URL + "authoring/getLearningDesignAccess.do",
 				dataType : 'json',
 				data : {
-					'method' : 'getLearningDesignAccess'
 				},
 				success : function(response) {
 					access = response;

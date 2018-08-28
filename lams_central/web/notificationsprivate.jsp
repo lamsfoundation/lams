@@ -32,9 +32,8 @@
 	function markPrivateNotificationAsRead(subscriptionUid){
 		$.ajax({
 			cache : false,
-			url : LAMS_URL + "notification.do",
+			url : LAMS_URL + "notification/markNotificationAsRead.do",
 			data : {
-				'method' 		  : 'markNotificationAsRead',
 				'subscriptionUid' : subscriptionUid
 			},
 			success : function() {
@@ -64,10 +63,9 @@
 													 .appendTo(headerRow);
 		$.ajax({
 			cache : false,
-			url : LAMS_URL + "notification.do",
+			url : LAMS_URL + "notification/getNotificationSubscriptions.do",
 			dataType : 'json',
 			data : {
-				'method' : 'getNotificationSubscriptions',
 				'limit'  : 30
 			},
 			success : function(notifications) {

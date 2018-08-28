@@ -38,10 +38,6 @@ import org.apache.http.HttpException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
@@ -80,7 +76,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 public abstract class LdTemplateController {
-    
+
     @Autowired
     WebApplicationContext applictionContext;
 
@@ -144,8 +140,7 @@ public abstract class LdTemplateController {
 
     @RequestMapping("")
     @ResponseBody
-    public final String unspecified( HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public final String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	ObjectNode responseJSON = null;
 	try {
 	    responseJSON = createLearningDesign(request);
@@ -322,7 +317,7 @@ public abstract class LdTemplateController {
      *
      * @throws IOException
      * @
-     *       @throws
+     * @throws
      *       HttpException
      */
     protected ObjectNode saveLearningDesign(String templateCode, String userEnteredTitleString,
@@ -933,8 +928,8 @@ public abstract class LdTemplateController {
 	    String activityTitle) {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.QA_TOOL_SIGNATURE,
-		LdTemplateController.QA_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID, parentActivityType,
-		activityTitle != null ? activityTitle : "Q&A", Activity.CATEGORY_RESPONSE);
+		LdTemplateController.QA_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+		parentActivityType, activityTitle != null ? activityTitle : "Q&A", Activity.CATEGORY_RESPONSE);
     }
 
     /**
@@ -958,8 +953,9 @@ public abstract class LdTemplateController {
 	    String activityTitle) {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
-		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID, parentActivityType,
-		activityTitle != null ? activityTitle : "Multiple Choice", Activity.CATEGORY_ASSESSMENT);
+		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
+		parentActivityType, activityTitle != null ? activityTitle : "Multiple Choice",
+		Activity.CATEGORY_ASSESSMENT);
     }
 
     /**
@@ -1065,8 +1061,8 @@ public abstract class LdTemplateController {
 
     protected ObjectNode createResourceLearningObject(String title, String description, String[] instructions,
 	    File file, int displayOrder) throws IOException {
-	ObjectNode obj = createResourceItem(title, LdTemplateController.RESOURCE_TYPE_LEARNING_OBJECT, instructions, file,
-		displayOrder);
+	ObjectNode obj = createResourceItem(title, LdTemplateController.RESOURCE_TYPE_LEARNING_OBJECT, instructions,
+		file, displayOrder);
 	obj.put("description", description);
 	return obj;
     }
@@ -1304,7 +1300,8 @@ public abstract class LdTemplateController {
     private ILamsCoreToolService getLamsCoreToolService() {
 	if (LdTemplateController.lamsCoreToolService == null) {
 	    LdTemplateController.lamsCoreToolService = (ILamsCoreToolService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applictionContext.getServletContext()).getBean("lamsCoreToolService");
+		    .getRequiredWebApplicationContext(applictionContext.getServletContext())
+		    .getBean("lamsCoreToolService");
 	}
 	return LdTemplateController.lamsCoreToolService;
     }
@@ -1356,26 +1353,36 @@ public abstract class LdTemplateController {
 	String forward = request.getParameter("forward");
 	String path;
 	switch (forward) {
-	    case ("init") : path = "authoring/template/tbl/tbl";
-	    	break;
-	    case ("question") : path = "authoring/template/tool/mcquestion";
-	    	break;
-	    case ("questionoption") : path = "authoring/template/tool/mcoption";
-	    	break;
-	    case ("redooption") : path = "authoring/template/tool/mcredooption";
-	    	break;
-	    case ("assess") : path = "authoring/template/tool/assessment";
-	    	break;
-	    case ("assessmcq") : path = "authoring/template/tool/assessmcq";
-	    	break;
-	    case ("assessredooption") : path = "authoring/template/tool/assessredooption";
-	    	break;
-	    case ("assessoption") : path = "authoring/template/tool/assessoption";
-	    	break;
-	    case ("peerreviewstar") : path = "authoring/template/tool/peerreviewstar";
-	    	break;
-	    default : path = null;
-	    	break;
+	    case ("init"):
+		path = "authoring/template/tbl/tbl";
+		break;
+	    case ("question"):
+		path = "authoring/template/tool/mcquestion";
+		break;
+	    case ("questionoption"):
+		path = "authoring/template/tool/mcoption";
+		break;
+	    case ("redooption"):
+		path = "authoring/template/tool/mcredooption";
+		break;
+	    case ("assess"):
+		path = "authoring/template/tool/assessment";
+		break;
+	    case ("assessmcq"):
+		path = "authoring/template/tool/assessmcq";
+		break;
+	    case ("assessredooption"):
+		path = "authoring/template/tool/assessredooption";
+		break;
+	    case ("assessoption"):
+		path = "authoring/template/tool/assessoption";
+		break;
+	    case ("peerreviewstar"):
+		path = "authoring/template/tool/peerreviewstar";
+		break;
+	    default:
+		path = null;
+		break;
 	}
 	return (path != null && path.length() > 0 ? path : "authoring/template/tool/mcquestion");
     }
@@ -1414,7 +1421,7 @@ public abstract class LdTemplateController {
 	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
 	optionsMap.remove(delete);
 	// reorder the displayOrder and setup the return value
-	LinkedList<Option> options = new LinkedList<Option>();
+	LinkedList<Option> options = new LinkedList<>();
 	int displayOrder = 1;
 	for (Option option : optionsMap.values()) {
 	    option.setDisplayOrder(displayOrder++);
@@ -1423,7 +1430,8 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
-	return (useAssessmentVersion ? "authoring/template/tool/assessredooption" : "authoring/template/tool/mcredooption");
+	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
+		: "authoring/template/tool/mcredooption");
     }
 
     @RequestMapping("/swapOption")
@@ -1443,7 +1451,7 @@ public abstract class LdTemplateController {
 
 	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
 	// reorder the options and setup the return value
-	LinkedList<Option> options = new LinkedList<Option>();
+	LinkedList<Option> options = new LinkedList<>();
 
 	Option swap = null;
 	for (Option option : optionsMap.values()) {
@@ -1466,7 +1474,8 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
-	return (useAssessmentVersion ? "authoring/template/tool/assessredooption" : "authoring/template/tool/mcredooption");
+	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
+		: "authoring/template/tool/mcredooption");
     }
 
     // if mcq paramPrefix = "question". if assessment multiple choice paramPrefix = assmcq
@@ -1480,7 +1489,7 @@ public abstract class LdTemplateController {
 	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, paramPrefix + questionNumber + "correct", true);
 	int correctDisplayId = correctDisplayIdInteger != null ? correctDisplayIdInteger.intValue() : 0;
 
-	TreeMap<Integer, Option> optionDtos = new TreeMap<Integer, Option>();
+	TreeMap<Integer, Option> optionDtos = new TreeMap<>();
 
 	for (int i = 1; i <= MAX_OPTION_COUNT; i++) {
 	    String optionText = request.getParameter(paramPrefix + questionNumber + "option" + i);

@@ -94,11 +94,11 @@ public class LoginRequestDispatcher {
 
     private static final String URL_DEFAULT = "/index.jsp";
 
-    private static final String URL_AUTHOR = "/home.do?method=author";
+    private static final String URL_AUTHOR = "/home/author.do";
 
     private static final String URL_LEARNER = "/home/learner.do?lessonID=";
 
-    private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
+    private static final String URL_MONITOR = "/home/monitorLesson&lessonID=.do?lessonID=";
 
     private static final String URL_GRADEBOOK = "/services/Gradebook?";
 

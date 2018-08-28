@@ -85,22 +85,22 @@ public class HomeController {
 
     @Autowired
     @Qualifier("userManagementService")
-    private static IUserManagementService userManagementService;
+    private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("lessonService")
-    private static ILessonService lessonService;
+    private ILessonService lessonService;
     @Autowired
     @Qualifier("learningDesignService")
-    private static ILearningDesignService learningDesignService;
+    private ILearningDesignService learningDesignService;
     @Autowired
     @Qualifier("learningDesignService")
     private static IGroupUserDAO groupUserDAO;
     @Autowired
     @Qualifier("workspaceManagementService")
-    private static IWorkspaceManagementService workspaceManagementService;
+    private IWorkspaceManagementService workspaceManagementService;
     @Autowired
     @Qualifier("securityService")
-    private static ISecurityService securityService;
+    private ISecurityService securityService;
     @Autowired
     WebApplicationContext applicationcontext;
 
@@ -216,7 +216,7 @@ public class HomeController {
      */
     @RequestMapping("/author")
     public String author(HttpServletRequest req, HttpServletResponse res) throws IOException {
-	String url = Configuration.get(ConfigurationKeys.SERVER_URL) + "authoring/author/openAuthoring.do";
+	String url = Configuration.get(ConfigurationKeys.SERVER_URL) + "authoring/openAuthoring.do";
 	Long learningDesignID = WebUtil.readLongParam(req, "learningDesignID", true);
 
 	if (learningDesignID != null) {

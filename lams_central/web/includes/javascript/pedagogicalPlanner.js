@@ -181,7 +181,7 @@
   	   		startPreview(startPreviewUrl);
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
-  	   		var openAuthorURL = "home.do?method=author&learningDesignID=" + learningDesignId;
+  	   		var openAuthorURL = "home/author.do?learningDesignID=" + learningDesignId;
   	   		if (requestSrc != "") {
   	   			openAuthorURL += "&requestSrc=" + requestSrc;
   	   		}

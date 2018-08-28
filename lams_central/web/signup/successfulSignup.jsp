@@ -9,7 +9,6 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<base href="<lams:WebAppURL />"/>
 	<title><fmt:message key="title.lams.signup" /></title>
 	<lams:css/>
 	<script language="JavaScript" type="text/JavaScript" src="<lams:WebAppURL />includes/javascript/changeStyle.js"></script>

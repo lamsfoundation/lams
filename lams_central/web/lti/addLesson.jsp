@@ -73,9 +73,8 @@
 		tree.setDynamicLoad(function(node, callback){
 			// load subfolder contents
 			$.ajax({
-				url : LAMS_URL + 'home.do',
+				url : LAMS_URL + 'home/getFolderContents.do',
 				data : {
-					'method' : 'getFolderContents',
 					'folderID' : node.data.folderID
 				},
 				cache : false,
@@ -128,9 +127,8 @@
 		
 		// initialize, create and enter the preview lesson
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 			data : {
-				'method' : 'initializeLesson',
 				'learningDesignID' : ldId,
 				'copyType' : 3,
 				'lessonName' : "<fmt:message key='authoring.fla.preview.lesson.default.title' />"
@@ -144,16 +142,15 @@
 				}
 				
 				$.ajax({
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 					data : {
-						'method' : 'startPreviewLesson',
 						'lessonID' : lessonID
 					},
 					cache : false,
 					dataType : 'text',
 					success : function() {
 						// open preview pop up window
-						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
+						window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID,'Preview',
 									'width=920,height=700,resizable,scrollbars=yes,status=yes');
 					}
 				});
@@ -198,7 +195,7 @@
 <lams:Page type="learner" title="${titlePage}">
 		
 	<%-- Form to Collect ID of Selected LAMS Sequence --%>
-    <form name="lessonForm" id="lesson-form" action="lti.do?method=startLesson" method="post" onSubmit="return confirmSubmit();">
+    <form name="lessonForm" id="lesson-form" action="lti/startLesson.do" method="post" onSubmit="return confirmSubmit();">
     	<input type="hidden" name="oauth_consumer_key" value="${oauth_consumer_key}">
     	<input type="hidden" name="resource_link_id" value="${resource_link_id}">
         <input type="hidden" name="courseId" value="${courseId}">

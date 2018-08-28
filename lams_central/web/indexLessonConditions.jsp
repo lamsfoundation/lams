@@ -2,8 +2,6 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-function" prefix="fn"%>
 
 <!DOCTYPE html>

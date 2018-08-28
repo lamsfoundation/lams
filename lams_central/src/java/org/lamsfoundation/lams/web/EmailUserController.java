@@ -69,6 +69,7 @@ public class EmailUserController {
     @Qualifier("eventNotificationService")
     private IEventNotificationService eventNotificationService;
     @Autowired
+    @Qualifier("centralMessageService")
     private MessageService messageService;
 
     @RequestMapping("/composeMail")

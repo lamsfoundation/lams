@@ -75,6 +75,7 @@ public class PortraitSaveController {
     @Qualifier("logEventService")
     private ILogEventService logEventService;
     @Autowired
+    @Qualifier("centralMessageService")
     private MessageService messageService;
     @Autowired
     WebApplicationContext applicationContext;
@@ -89,7 +90,8 @@ public class PortraitSaveController {
 	    HttpServletResponse response) throws Exception {
 
 	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
-	    return "redirect:/index/profile.do";
+	    request.setAttribute("redirect", "profile");
+	    return "redirect:/index.do";
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -105,7 +107,8 @@ public class PortraitSaveController {
 	if (!mediaType.equals("image")) {
 	    errorMap.add("file", messageService.getMessage("error.portrait.not.image"));
 	    request.setAttribute("errorMap", errorMap);
-	    return "redirect:/index/portrait.do";
+	    request.setAttribute("redirect", "portrait");
+	    return "redirect:/index.do";
 	}
 
 	// check file exists
@@ -113,7 +116,8 @@ public class PortraitSaveController {
 	if (is == null) {
 	    errorMap.add("file", messageService.getMessage("error.general.1"));
 	    request.setAttribute("errorMap", errorMap);
-	    return "redirect:/index/portrait.do";
+	    request.setAttribute("redirect", "portrait");
+	    return "redirect:/index.do";
 	}
 
 	// write to content repository
@@ -171,7 +175,8 @@ public class PortraitSaveController {
 	user.setPortraitUuid(originalFileNode.getUuid());
 	service.saveUser(user);
 
-	return "redirect:/index/profile.do";
+	request.setAttribute("redirect", "profile");
+	return "redirect:/index.do";
     }
 
     /** Called from sysadmin to delete an inappropriate portrait */

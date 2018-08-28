@@ -6,6 +6,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <!DOCTYPE html>
 <lams:html>
@@ -20,22 +21,22 @@
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/bootstrap-tour.min.css" type="text/css" media="screen">
 
-	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="loadVars.jsp"></script>
-	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.tablesorter.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.tablesorter-pager.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.tablesorter-widgets.js"></script> 	
-	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap-tour.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.ui.touch-punch.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.slimscroll.js"></script>
-	<script type="text/javascript" src="includes/javascript/main.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="${lams}loadVars.jsp"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.dialogextend.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tour.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.ui.touch-punch.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.slimscroll.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/main.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',	
 			decoderDiv = $('<div />'),
@@ -238,7 +239,7 @@
 					</c:forEach>
 							                  
 					<li>
-						<a href="#nogo" onclick="javascript:closeAllChildren(); document.location.href='home.do?method=logout'">
+						<a href="#nogo" onclick="javascript:closeAllChildren(); document.location.href='home/logout.do?'">
 							<i class="fa fa-sign-out"></i> <fmt:message key="index.logout" />
 						</a>
 					</li>

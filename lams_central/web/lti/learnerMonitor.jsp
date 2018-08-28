@@ -50,7 +50,7 @@
     
 		<c:if test="${isDisplayDesignImage}">
 			<div id="sequence-preview">
-				<img src="<lams:LAMSURL/>home.do?method=getLearningDesignThumbnail&ldId=${ldId}" alt="Sequence Preview" />
+				<img src="<lams:LAMSURL/>home/getLearningDesignThumbnail.do?ldId=${ldId}" alt="Sequence Preview" />
 			</div>
 		</c:if>
     

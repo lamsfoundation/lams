@@ -8,7 +8,7 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
 	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -18,9 +18,9 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript">
 		function submitMessage() {
 			var formData = new FormData(document.getElementById("newForm"));
@@ -51,7 +51,7 @@
 </lams:head>
 
 <body>
-	<form:form action="saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
+	<form:form action="/lams/saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
 		<form:hidden path="userId" />
 		<form:hidden path="login" />
 		<form:hidden path="password" />
@@ -401,8 +401,8 @@
 			</div>
 	</form:form>
 	<div class="form-group" align="right">
-		<a href="<lams:LAMSURL />profile.jsp"   class="btn btn-sm btn-default voffset5" ></a>
-			<fmt:message key="button.cancel" />
+		<a href="<lams:LAMSURL />profile.jsp"   class="btn btn-sm btn-default voffset5" >
+			<fmt:message key="button.cancel" /></a>
 		&nbsp;&nbsp;
 		<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
 			<button class="btn btn-sm btn-primary voffset5" type="button"

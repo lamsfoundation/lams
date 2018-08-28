@@ -221,7 +221,7 @@
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
-				<a class="btn btn-sm btn-file btn-default offset5" role="button" href="<c:url value='/index.do'/>?method=profile">
+				<a class="btn btn-sm btn-file btn-default offset5" role="button" href="<c:url value='/index.do?redirect=profile'/>">
 					<fmt:message key="label.return.to.myprofile" />
 				</a>
 			</div>

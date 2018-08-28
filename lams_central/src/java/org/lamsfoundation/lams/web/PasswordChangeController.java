@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -52,6 +53,7 @@ public class PasswordChangeController {
     private static Logger log = Logger.getLogger(PasswordChangeController.class);
 
     @Autowired
+    @Qualifier("centralMessageService")
     MessageService messageService;
     @Autowired
     WebApplicationContext applicationContext;
@@ -73,7 +75,8 @@ public class PasswordChangeController {
 	// -- isCancelled?
 	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
 	    request.getSession().removeAttribute(PasswordChangeActionForm.formName);
-	    return "redirect:/index/profile.do";
+	    request.setAttribute("redirect", "profile");
+	    return "redirect:/index.do";
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -147,7 +150,8 @@ public class PasswordChangeController {
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    passwordChangeForm.reset(request);
-	    return "redirect:/index/password.do";
+	    request.setAttribute("redirect", "password");
+	    return "redirect:/index.do";
 	}
 	request.setAttribute("redirectURL", passwordChangeForm.getRedirectURL());
 	return "/passwordChangeOkContent";

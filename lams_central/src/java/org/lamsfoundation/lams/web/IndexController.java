@@ -72,10 +72,10 @@ public class IndexController {
     private static Logger log = Logger.getLogger(IndexController.class);
     @Autowired
     @Qualifier("userManagementService")
-    private static IUserManagementService userManagementService;
+    private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("integrationService")
-    private static IIntegrationService integrationService;
+    private IIntegrationService integrationService;
 
     @RequestMapping("")
     @SuppressWarnings("unchecked")
@@ -111,17 +111,17 @@ public class IndexController {
 	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
 
-	String method = WebUtil.readStrParam(request, "method", true);
-	if (StringUtils.equals(method, "profile")) {
+	String redirectURL = WebUtil.readStrParam(request, "redirect", true);
+	if (StringUtils.equals(redirectURL, "profile")) {
 	    return "redirect:/profile/view.do";
-	} else if (StringUtils.equals(method, "editprofile")) {
+	} else if (StringUtils.equals(redirectURL, "editprofile")) {
 	    return "redirect:/profile/edit.do";
-	} else if (StringUtils.equals(method, "password")) {
+	} else if (StringUtils.equals(redirectURL, "password")) {
 	    return "redirect:/password.do";
-	} else if (StringUtils.equals(method, "portrait")) {
-	    return "/portrait.do";
-	} else if (StringUtils.equals(method, "lessons")) {
-	    return "/profile/lessons.do";
+	} else if (StringUtils.equals(redirectURL, "portrait")) {
+	    return "redirect:/portrait.do";
+	} else if (StringUtils.equals(redirectURL, "lessons")) {
+	    return "redirect:/profile/lessons.do";
 	}
 
 	// This test also appears in LoginAsAction

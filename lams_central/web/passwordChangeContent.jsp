@@ -14,15 +14,16 @@
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 	
 <lams:html>
 <lams:head>
 	<lams:css/>
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
 		 var mustHaveUppercase = ${mustHaveUppercase},
 	     mustHaveNumerics  = ${mustHaveNumerics},
@@ -130,7 +131,7 @@
 					<div class="panel-body">
 					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 							<form:hidden name="<%=PasswordChangeActionForm.formName%>"
-								property="login" />
+								path="login" />
 							<div class="form-group">
 								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
 								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			

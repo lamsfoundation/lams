@@ -2,35 +2,36 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/yui/treeview.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/yui/folders.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/addLesson.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/yui/treeview.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/yui/folders.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/jquery-ui.timepicker.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/addLesson.css" type="text/css" media="screen" />
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.form.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.timepicker.js"></script>
-	<script type="text/javascript" src="includes/javascript/yui/yahoo-dom-event.js" ></script>
-	<script type="text/javascript" src="includes/javascript/yui/animation-min.js"></script>
-	<script type="text/javascript" src="includes/javascript/yui/json-min.js" ></script> 
-	<script type="text/javascript" src="includes/javascript/yui/treeview-min.js" ></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.tabcontroller.js"></script>
-	<script type="text/javascript" src="includes/javascript/addLesson.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/yui/yahoo-dom-event.js" ></script>
+	<script type="text/javascript" src="${lams}includes/javascript/yui/animation-min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/yui/json-min.js" ></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/yui/treeview-min.js" ></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/addLesson.js"></script>
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>',
 			folderContents = ${folderContents},
 			users = ${users},
 			
 			LAMS_URL = '<lams:LAMSURL/>',
-			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=getLearningDesignThumbnail&ldId=',
+			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home/getLearningDesignThumbnail.do?ldId=',
 			
 			CANVAS_RESIZE_OPTION_NONE = 0,
 			CANVAS_RESIZE_OPTION_FIT = 1,
@@ -63,7 +64,7 @@
 	<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
 </div>
 
-<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring.do" method="POST">
+<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring/addLesson.do" method="POST">
 
 <lams:Page type="navbar">
 		<lams:Tabs>
@@ -159,7 +160,6 @@
 				</lams:TabBody>
 				<lams:TabBody id="3" titleKey="label.tab.advanced">
 					<!-- Advanced Panel -->
-					<input name="method" value="addLesson" type="hidden" />
 					<input name="organisationID" value="${param.organisationID}" type="hidden" />
 					<input id="ldIdField" name="learningDesignID" type="hidden" />
 					<input id="lessonNameField" name="lessonName" type="hidden" />
