@@ -66,4 +66,20 @@ function submitOutcome(){
 function submitScale(){
 	CKEDITOR.instances.description.updateElement();
 	document.getElementById("scaleForm");
-}  
+} 
+
+function exportScale(){
+	var exportButton = $('#exportButton').button('loading'),
+		token = new Date().getTime(),
+		fileDownloadCheckTimer = window.setInterval(function () {
+			var cookieValue = $.cookie('fileDownloadToken');
+			if (cookieValue == token) {
+			    //unBlock export button
+				window.clearInterval(fileDownloadCheckTimer);
+				$.cookie('fileDownloadToken', null); //clears this cookie value
+				exportButton.button('reset');
+			}
+		}, 1000);
+	document.location.href = LAMS_URL + 'outcome.do?method=scaleExport&downloadTokenValue=' + token;
+	return false;
+}

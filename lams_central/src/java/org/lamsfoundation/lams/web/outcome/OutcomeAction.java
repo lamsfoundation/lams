@@ -24,10 +24,13 @@ package org.lamsfoundation.lams.web.outcome;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -57,6 +60,10 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -70,6 +77,7 @@ public class OutcomeAction extends DispatchAction {
     private static IUserManagementService userManagementService;
     private static ISecurityService securityService;
     private static IOutcomeService outcomeService;
+    private static MessageService messageService;
 
     public ActionForward outcomeManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -652,6 +660,32 @@ public class OutcomeAction extends DispatchAction {
 	return mapping.findForward("scaleEdit");
     }
 
+    public ActionForward scaleExport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "export outcome scales", true);
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = getOutcomeService().exportScales();
+
+	String fileName = "lams_outcome_scales.xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	// Code to generate file and write file contents to response
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcel(out, dataToExport, getMessageService().getMessage("outcome.export.date"), true);
+
+	return null;
+    }
+
     private UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -707,5 +741,14 @@ public class OutcomeAction extends DispatchAction {
 	    OutcomeAction.outcomeService = (IOutcomeService) ctx.getBean("outcomeService");
 	}
 	return OutcomeAction.outcomeService;
+    }
+
+    private MessageService getMessageService() {
+	if (OutcomeAction.messageService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    OutcomeAction.messageService = (MessageService) ctx.getBean("centralMessageService");
+	}
+	return messageService;
     }
 }
