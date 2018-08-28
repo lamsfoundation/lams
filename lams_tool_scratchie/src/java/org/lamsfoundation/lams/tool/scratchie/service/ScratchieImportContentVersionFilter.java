@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.service;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
@@ -73,5 +74,15 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
      */
     public void up20140613To20150206() {
 	this.addField(Scratchie.class, "burningQuestionsEnabled", "1");
+    }
+    
+    /**
+     * Import 20140613 version content to 20150206 version tool server.
+     */
+    public void up20180425To20180828() {
+	this.removeField(ScratchieItem.class, "correctAnswer");
+	this.removeField(ScratchieItem.class, "firstChoiceAnswerLetter");
+	this.removeField(ScratchieItem.class, "userMark");
+	this.removeField(ScratchieItem.class, "userAttempts");
     }
 }
