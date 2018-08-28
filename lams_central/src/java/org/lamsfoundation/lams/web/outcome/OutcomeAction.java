@@ -460,6 +460,32 @@ public class OutcomeAction extends DispatchAction {
 	response.getWriter().print("OK");
 	return null;
     }
+    
+    public ActionForward outcomeExport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "export outcomes", true);
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = getOutcomeService().exportOutcomes();
+
+	String fileName = "lams_outcomes.xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	// Code to generate file and write file contents to response
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcel(out, dataToExport, getMessageService().getMessage("outcome.export.date"), true);
+
+	return null;
+    }
 
     public ActionForward scaleManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {

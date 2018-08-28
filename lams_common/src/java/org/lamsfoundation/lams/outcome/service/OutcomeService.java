@@ -105,6 +105,33 @@ public class OutcomeService implements IOutcomeService {
 	return dataToExport;
     }
 
+    public LinkedHashMap<String, ExcelCell[][]> exportOutcomes() {
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+
+	// The entire data list
+	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	ExcelCell[] row = new ExcelCell[4];
+	row[0] = new ExcelCell(messageService.getMessage("outcome.manage.add.name"), true);
+	row[1] = new ExcelCell(messageService.getMessage("outcome.manage.add.code"), true);
+	row[2] = new ExcelCell(messageService.getMessage("outcome.manage.add.description"), true);
+	row[3] = new ExcelCell(messageService.getMessage("outcome.manage.add.scale"), true);
+	rowList.add(row);
+
+	List<Outcome> outcomes = getOutcomes(null);
+	for (Outcome outcome : outcomes) {
+	    row = new ExcelCell[4];
+	    row[0] = new ExcelCell(outcome.getName(), false);
+	    row[1] = new ExcelCell(outcome.getCode(), false);
+	    row[2] = new ExcelCell(outcome.getDescription(), false);
+	    row[3] = new ExcelCell(outcome.getScale().getCode(), false);
+	    rowList.add(row);
+	}
+
+	ExcelCell[][] data = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(messageService.getMessage("index.outcome.manage"), data);
+	return dataToExport;
+    }
+
     private static UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);

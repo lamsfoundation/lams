@@ -90,8 +90,8 @@
 				</div>
 			</div>
 		</c:forEach>
-		<c:if test="${canManageGlobal}">
-			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportScale()"
+		<c:if test="${canManageGlobal and not empty scales}">
+			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome(true)"
 				 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
 				<i class="fa fa-download"></i>
 				<span class="hidden-xs">

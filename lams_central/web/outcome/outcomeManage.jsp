@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/outcome.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		var organisationId = '${param.organisationID}',
@@ -90,6 +91,15 @@
 				</div>
 			</div>
 		</c:forEach>
+		<c:if test="${canManageGlobal and not empty outcomes}">
+			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome()"
+				 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
+				<i class="fa fa-download"></i>
+				<span class="hidden-xs">
+					<fmt:message key="outcome.export" />
+				</span>
+			</div> 
+		</c:if>
 		<div id="addButton" class="btn btn-primary" onClick="javascript:openEditOutcomeDialog()">
 			<i class="fa fa-plus"></i>
 			<span><fmt:message key='outcome.manage.add' /></span>

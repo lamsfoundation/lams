@@ -68,7 +68,7 @@ function submitScale(){
 	document.getElementById("scaleForm");
 } 
 
-function exportScale(){
+function exportOutcome(isScaleExport){
 	var exportButton = $('#exportButton').button('loading'),
 		token = new Date().getTime(),
 		fileDownloadCheckTimer = window.setInterval(function () {
@@ -80,6 +80,6 @@ function exportScale(){
 				exportButton.button('reset');
 			}
 		}, 1000);
-	document.location.href = LAMS_URL + 'outcome.do?method=scaleExport&downloadTokenValue=' + token;
+	document.location.href = LAMS_URL + 'outcome.do?method=' + (isScaleExport ? 'scaleExport' : 'outcomeExport') + '&downloadTokenValue=' + token;
 	return false;
 }

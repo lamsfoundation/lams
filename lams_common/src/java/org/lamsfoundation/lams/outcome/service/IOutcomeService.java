@@ -35,4 +35,6 @@ public interface IOutcomeService {
 	    Long targetToolContentId, Long targetItemId);
 
     LinkedHashMap<String, ExcelCell[][]> exportScales();
+
+    LinkedHashMap<String, ExcelCell[][]> exportOutcomes();
 }
