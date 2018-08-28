@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -70,7 +71,6 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
-import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -98,7 +98,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private DokumaranConfigItemDAO dokumaranConfigItemDAO;
 
     // tool service
-    private DokumaranToolContentHandler dokumaranToolContentHandler;
+    private IToolContentHandler dokumaranToolContentHandler;
 
     private MessageService messageService;
 
@@ -1071,7 +1071,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	this.dokumaranConfigItemDAO = dokumaranConfigItemDAO;
     }
 
-    public void setDokumaranToolContentHandler(DokumaranToolContentHandler dokumaranToolContentHandler) {
+    public void setDokumaranToolContentHandler(IToolContentHandler dokumaranToolContentHandler) {
 	this.dokumaranToolContentHandler = dokumaranToolContentHandler;
     }
 

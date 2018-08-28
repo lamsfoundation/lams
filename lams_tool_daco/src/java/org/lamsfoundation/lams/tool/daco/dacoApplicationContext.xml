@@ -43,9 +43,12 @@
     </bean>
 
     <!-- Managers -->
-	<bean id="dacoToolContentHandler" class="org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="dacoToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>dacoworkspace</value></property>
+		<property name="repositoryUser"><value>daco</value></property>
+		<property name="repositoryId"><value>lams-daco</value></property>
+	</bean>
 	
 	<bean id="dacoOutputFactory" class="org.lamsfoundation.lams.tool.daco.service.DacoOutputFactory">
  		<property name="toolMessageService"><ref bean="dacoMessageService"/></property>

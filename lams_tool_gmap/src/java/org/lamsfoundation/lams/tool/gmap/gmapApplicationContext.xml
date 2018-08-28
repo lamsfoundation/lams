@@ -73,9 +73,12 @@
 	<bean id="gmapUserDAO" class="org.lamsfoundation.lams.tool.gmap.dao.hibernate.GmapUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="gmapToolContentHandler" class="org.lamsfoundation.lams.tool.gmap.util.GmapToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="gmapToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>gmapworkspace</value></property>
+		<property name="repositoryUser"><value>gmap</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

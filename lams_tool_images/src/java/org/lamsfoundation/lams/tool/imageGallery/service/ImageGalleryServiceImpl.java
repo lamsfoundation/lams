@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -90,7 +91,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -125,7 +125,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGalleryConfigItemDAO imageGalleryConfigItemDAO;
 
     // tool service
-    private ImageGalleryToolContentHandler imageGalleryToolContentHandler;
+    private IToolContentHandler imageGalleryToolContentHandler;
 
     private MessageService messageService;
 
@@ -675,7 +675,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.imageGallerySessionDao = imageGallerySessionDao;
     }
 
-    public void setImageGalleryToolContentHandler(ImageGalleryToolContentHandler imageGalleryToolContentHandler) {
+    public void setImageGalleryToolContentHandler(IToolContentHandler imageGalleryToolContentHandler) {
 	this.imageGalleryToolContentHandler = imageGalleryToolContentHandler;
     }
 

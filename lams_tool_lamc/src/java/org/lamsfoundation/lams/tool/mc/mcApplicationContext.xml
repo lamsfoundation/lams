@@ -43,10 +43,13 @@
 	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.tool.mc.util.McToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+
+	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>lamc11</value></property>
+		<property name="repositoryUser"><value>lamc11</value></property>
+		<property name="repositoryId"><value>lamc_11</value></property>
+	</bean>
 	
 	<!-- end of data access and repository access beans -->
 

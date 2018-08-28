@@ -58,9 +58,12 @@
     </bean>
     
     <!-- Managers -->
-	<bean id="laimagImageGalleryToolContentHandler" class="org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="laimagImageGalleryToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedimageGalleryworkspace</value></property>
+		<property name="repositoryUser"><value>sharedimageGallery</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
 	
     <bean id="laimagImageGalleryManagerTarget" class="org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceImpl">
         <property name="imageGalleryDao">

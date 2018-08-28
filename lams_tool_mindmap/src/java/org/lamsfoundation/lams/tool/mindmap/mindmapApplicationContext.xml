@@ -87,9 +87,12 @@
 	<bean id="mindmapRequestDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapRequestDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="mindmapToolContentHandler" class="org.lamsfoundation.lams.tool.mindmap.util.MindmapToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+
+	<bean id="mindmapToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>mindmapworkspace</value></property>
+		<property name="repositoryUser"><value>mindmap</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
 	</bean>  
 
 </beans>

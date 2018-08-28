@@ -63,9 +63,12 @@
 	</bean>
 
     <!-- Managers -->
-	<bean id="scratchieToolContentHandler" class="org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="scratchieToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedscratchieworkspace</value></property>
+		<property name="repositoryUser"><value>sharedscratchie</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
 	
     <bean id="scratchieManagerTarget" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl">
         <property name="scratchieDao">

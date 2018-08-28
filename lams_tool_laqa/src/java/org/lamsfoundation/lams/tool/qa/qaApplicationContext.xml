@@ -53,9 +53,12 @@
 	<bean id="qaWizardDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaWizardDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<bean id="qaToolContentHandler" class="org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+
+	<bean id="qaToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>qaworkspace</value></property>
+		<property name="repositoryUser"><value>qa_user</value></property>
+		<property name="repositoryId"><value>lams-qa</value></property>
 	</bean> 
 	
 

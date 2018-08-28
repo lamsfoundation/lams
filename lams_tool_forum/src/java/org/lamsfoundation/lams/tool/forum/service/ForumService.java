@@ -47,6 +47,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -98,7 +99,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
-import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -137,7 +137,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // system level handler and service
     private ILamsToolService toolService;
 
-    private ForumToolContentHandler forumToolContentHandler;
+    private IToolContentHandler forumToolContentHandler;
 
     private ILogEventService logEventService;
 
@@ -1301,11 +1301,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.forumUserDao = forumUserDao;
     }
 
-    public ForumToolContentHandler getForumToolContentHandler() {
+    public IToolContentHandler getForumToolContentHandler() {
 	return forumToolContentHandler;
     }
 
-    public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
+    public void setForumToolContentHandler(IToolContentHandler toolContentHandler) {
 	forumToolContentHandler = toolContentHandler;
     }
 

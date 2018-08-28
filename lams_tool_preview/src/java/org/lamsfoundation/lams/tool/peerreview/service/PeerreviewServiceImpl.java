@@ -45,6 +45,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -77,7 +78,6 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder;
-import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
 import org.lamsfoundation.lams.tool.peerreview.util.SpreadsheetBuilder;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -102,7 +102,7 @@ public class PeerreviewServiceImpl
     private PeerreviewSessionDAO peerreviewSessionDao;
 
     // tool service
-    private PeerreviewToolContentHandler peerreviewToolContentHandler;
+    private IToolContentHandler peerreviewToolContentHandler;
 
     private MessageService messageService;
 
@@ -910,7 +910,7 @@ public class PeerreviewServiceImpl
 	this.peerreviewSessionDao = peerreviewSessionDao;
     }
 
-    public void setPeerreviewToolContentHandler(PeerreviewToolContentHandler peerreviewToolContentHandler) {
+    public void setPeerreviewToolContentHandler(IToolContentHandler peerreviewToolContentHandler) {
 	this.peerreviewToolContentHandler = peerreviewToolContentHandler;
     }
 

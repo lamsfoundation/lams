@@ -38,7 +38,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
@@ -74,7 +73,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     protected ILearningDesignDAO learningDesignDAO;
 
     protected IAuthoringFullService authoringFullService;
-    protected IRepositoryService repositoryService;
     protected IUserManagementService userMgmtService;
     protected MessageService messageService;
 
@@ -118,14 +116,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      */
     public void setAuthoringService(IAuthoringFullService authoringFullService) {
 	this.authoringFullService = authoringFullService;
-    }
-
-    /**
-     * @param repositoryService
-     *            The repositoryService to set.
-     */
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     /**

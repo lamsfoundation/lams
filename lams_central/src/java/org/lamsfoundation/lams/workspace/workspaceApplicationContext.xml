@@ -22,7 +22,6 @@
 		<property name="authoringService"><ref bean="authoringService"/></property>
 		<property name="userMgmtService"><ref bean="userManagementService"/></property>
 		<property name="messageService"><ref bean="workspaceMessageService"/></property>
-		<property name="repositoryService"><ref bean="repositoryService" /></property>
 	</bean>
 	
 	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

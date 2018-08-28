@@ -35,6 +35,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -65,7 +66,6 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.util.ReflectDTOComparator;
-import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -84,7 +84,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao;
     private SpreadsheetMarkDAO spreadsheetMarkDao;
     // tool service
-    private SpreadsheetToolContentHandler spreadsheetToolContentHandler;
+    private IToolContentHandler spreadsheetToolContentHandler;
     private MessageService messageService;
     // system services
     private ILamsToolService toolService;
@@ -383,7 +383,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	this.spreadsheetSessionDao = spreadsheetSessionDao;
     }
 
-    public void setSpreadsheetToolContentHandler(SpreadsheetToolContentHandler spreadsheetToolContentHandler) {
+    public void setSpreadsheetToolContentHandler(IToolContentHandler spreadsheetToolContentHandler) {
 	this.spreadsheetToolContentHandler = spreadsheetToolContentHandler;
     }
 

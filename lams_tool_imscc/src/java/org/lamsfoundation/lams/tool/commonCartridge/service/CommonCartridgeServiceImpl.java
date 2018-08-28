@@ -42,6 +42,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -75,7 +76,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemVisitLog;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
-import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler;
 import org.lamsfoundation.lams.tool.commonCartridge.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -108,7 +108,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     private CommonCartridgeConfigItemDAO commonCartridgeConfigItemDao;
 
     // tool service
-    private CommonCartridgeToolContentHandler commonCartridgeToolContentHandler;
+    private IToolContentHandler commonCartridgeToolContentHandler;
 
     private MessageService messageService;
 
@@ -533,8 +533,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.commonCartridgeSessionDao = commonCartridgeSessionDao;
     }
 
-    public void setCommonCartridgeToolContentHandler(
-	    CommonCartridgeToolContentHandler commonCartridgeToolContentHandler) {
+    public void setCommonCartridgeToolContentHandler(IToolContentHandler commonCartridgeToolContentHandler) {
 	this.commonCartridgeToolContentHandler = commonCartridgeToolContentHandler;
     }
 

@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -69,7 +70,6 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
-import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -95,7 +95,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     private DacoAnswerDAO dacoAnswerDao;
 
     // tool service
-    private DacoToolContentHandler dacoToolContentHandler;
+    private IToolContentHandler dacoToolContentHandler;
 
     private MessageService messageService;
 
@@ -872,7 +872,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	this.dacoSessionDao = dacoSessionDao;
     }
 
-    public void setDacoToolContentHandler(DacoToolContentHandler dacoToolContentHandler) {
+    public void setDacoToolContentHandler(IToolContentHandler dacoToolContentHandler) {
 	this.dacoToolContentHandler = dacoToolContentHandler;
     }
 

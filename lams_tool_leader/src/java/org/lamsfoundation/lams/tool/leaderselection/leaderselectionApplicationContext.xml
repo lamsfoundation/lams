@@ -72,9 +72,12 @@
 	<bean id="leaderselectionUserDAO" class="org.lamsfoundation.lams.tool.leaderselection.dao.hibernate.LeaderselectionUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="leaderselectionToolContentHandler" class="org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="leaderselectionToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>leaderselectionworkspace</value></property>
+		<property name="repositoryUser"><value>leaderselection</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

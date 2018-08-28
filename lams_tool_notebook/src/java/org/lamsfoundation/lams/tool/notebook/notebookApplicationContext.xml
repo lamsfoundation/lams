@@ -75,9 +75,12 @@
 	<bean id="notebookUserDAO" class="org.lamsfoundation.lams.tool.notebook.dao.hibernate.NotebookUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="notebookToolContentHandler" class="org.lamsfoundation.lams.tool.notebook.util.NotebookToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="notebookToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>notebookworkspace</value></property>
+		<property name="repositoryUser"><value>notebook</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

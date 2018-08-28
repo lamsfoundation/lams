@@ -75,12 +75,15 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
- 	<bean id="pixlrToolContentHandler" class="org.lamsfoundation.lams.tool.pixlr.util.PixlrToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
-	
 	<bean id="pixlrConfigItemDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrConfigItemDAO">
  		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="pixlrToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>pixlrworkspace</value></property>
+		<property name="repositoryUser"><value>pixlr</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
 	</bean>
 
 </beans>

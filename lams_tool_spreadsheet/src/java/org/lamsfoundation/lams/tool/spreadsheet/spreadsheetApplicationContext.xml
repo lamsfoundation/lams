@@ -46,9 +46,12 @@
 
 
     <!-- Managers -->
-	<bean id="spreadsheetToolContentHandler" class="org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="spreadsheetToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedspreadsheetworkspace</value></property>
+		<property name="repositoryUser"><value>sharedspreadsheet</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
 	
     <bean id="spreadsheetManagerTarget" class="org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetServiceImpl">
         <property name="spreadsheetDao">

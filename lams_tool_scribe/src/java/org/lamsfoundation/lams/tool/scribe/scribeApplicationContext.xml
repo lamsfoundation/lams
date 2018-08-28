@@ -67,9 +67,12 @@
 	<bean id="lascrbScribeHeadingDAO" class="org.lamsfoundation.lams.tool.scribe.dao.hibernate.ScribeHeadingDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="lascrbScribeToolContentHandler" class="org.lamsfoundation.lams.tool.scribe.util.ScribeToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="lascrbScribeToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>scribeworkspace</value></property>
+		<property name="repositoryUser"><value>scribe</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

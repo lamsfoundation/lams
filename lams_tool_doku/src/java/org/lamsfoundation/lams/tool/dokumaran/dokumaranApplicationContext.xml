@@ -40,8 +40,11 @@
 
 
     <!-- Managers -->
-	<bean id="dokumaranToolContentHandler" class="org.lamsfoundation.lams.tool.dokumaran.util.DokumaranToolContentHandler">
-	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
+	<bean id="dokumaranToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>dokumaranworkspace</value></property>
+		<property name="repositoryUser"><value>dokumaran</value></property>
+		<property name="repositoryId"><value>lams-dokumaran</value></property>
 	</bean>
     <bean id="dokumaranManagerTarget" class="org.lamsfoundation.lams.tool.dokumaran.service.DokumaranService">
         <property name="dokumaranDao">

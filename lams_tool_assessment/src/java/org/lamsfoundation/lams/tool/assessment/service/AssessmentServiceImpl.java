@@ -53,6 +53,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -100,7 +101,6 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -134,7 +134,7 @@ public class AssessmentServiceImpl
     private AssessmentResultDAO assessmentResultDao;
 
     // tool service
-    private AssessmentToolContentHandler assessmentToolContentHandler;
+    private IToolContentHandler assessmentToolContentHandler;
 
     private MessageService messageService;
 
@@ -2484,7 +2484,7 @@ public class AssessmentServiceImpl
 	this.assessmentSessionDao = assessmentSessionDao;
     }
 
-    public void setAssessmentToolContentHandler(AssessmentToolContentHandler assessmentToolContentHandler) {
+    public void setAssessmentToolContentHandler(IToolContentHandler assessmentToolContentHandler) {
 	this.assessmentToolContentHandler = assessmentToolContentHandler;
     }
 

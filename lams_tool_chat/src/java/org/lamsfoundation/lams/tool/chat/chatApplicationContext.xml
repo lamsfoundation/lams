@@ -78,9 +78,12 @@
 	<bean id="chatMessageDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatMessageDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="chatToolContentHandler" class="org.lamsfoundation.lams.tool.chat.util.ChatToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="chatToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>chatworkspace</value></property>
+		<property name="repositoryUser"><value>chat</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean> 
 
 </beans>

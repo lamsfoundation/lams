@@ -40,10 +40,13 @@
 	<bean id="voteUsrAttemptDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUsrAttemptDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<bean id="voteToolContentHandler" class="org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+
+	<bean id="voteToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>vote11</value></property>
+		<property name="repositoryUser"><value>vote11</value></property>
+		<property name="repositoryId"><value>vote_11</value></property>
+	</bean>
 	
 
 	<!-- end of tool beans -->

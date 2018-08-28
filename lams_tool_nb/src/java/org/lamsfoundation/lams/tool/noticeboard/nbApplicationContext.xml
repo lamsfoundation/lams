@@ -66,9 +66,12 @@
 	<bean id="nbUserDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<bean id="nbToolContentHandler" class="org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+
+	<bean id="nbToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>nbworkspace</value></property>
+		<property name="repositoryUser"><value>noticeboard</value></property>
+		<property name="repositoryId"><value>lams-nb</value></property>
+	</bean>
 
 </beans>

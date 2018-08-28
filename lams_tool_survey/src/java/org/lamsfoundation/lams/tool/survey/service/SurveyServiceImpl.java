@@ -42,6 +42,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -78,7 +79,6 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 import org.lamsfoundation.lams.tool.survey.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveySessionComparator;
-import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -104,7 +104,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     private SurveySessionDAO surveySessionDao;
 
     // tool service
-    private SurveyToolContentHandler surveyToolContentHandler;
+    private IToolContentHandler surveyToolContentHandler;
 
     private MessageService messageService;
 
@@ -885,7 +885,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	this.surveySessionDao = surveySessionDao;
     }
 
-    public void setSurveyToolContentHandler(SurveyToolContentHandler surveyToolContentHandler) {
+    public void setSurveyToolContentHandler(IToolContentHandler surveyToolContentHandler) {
 	this.surveyToolContentHandler = surveyToolContentHandler;
     }
 

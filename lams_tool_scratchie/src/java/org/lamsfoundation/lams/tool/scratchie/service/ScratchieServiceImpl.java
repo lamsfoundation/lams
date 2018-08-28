@@ -50,6 +50,7 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -94,7 +95,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -130,7 +130,7 @@ public class ScratchieServiceImpl
     private ScratchieConfigItemDAO scratchieConfigItemDao;
 
     // tool service
-    private ScratchieToolContentHandler scratchieToolContentHandler;
+    private IToolContentHandler scratchieToolContentHandler;
 
     private MessageService messageService;
 
@@ -1827,7 +1827,7 @@ public class ScratchieServiceImpl
 	this.scratchieSessionDao = scratchieSessionDao;
     }
 
-    public void setScratchieToolContentHandler(ScratchieToolContentHandler scratchieToolContentHandler) {
+    public void setScratchieToolContentHandler(IToolContentHandler scratchieToolContentHandler) {
 	this.scratchieToolContentHandler = scratchieToolContentHandler;
     }
 

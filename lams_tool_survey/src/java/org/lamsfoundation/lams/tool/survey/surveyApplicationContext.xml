@@ -47,9 +47,12 @@
 
 
     <!-- Managers -->
-	<bean id="lasurvSurveyToolContentHandler" class="org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="lasurvSurveyToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>lasruvSurveyWorkspace</value></property>
+		<property name="repositoryUser"><value>lasruvSurveys</value></property>
+		<property name="repositoryId"><value>lams-survey</value></property>
+	</bean>
 	
     <bean id="lasurvSurveyManagerTarget" class="org.lamsfoundation.lams.tool.survey.service.SurveyServiceImpl">
         <property name="surveyDao">

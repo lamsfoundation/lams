@@ -50,6 +50,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -94,7 +95,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
-import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -123,7 +123,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     private ResourceItemVisitDAO resourceItemVisitDao;
 
     // tool service
-    private ResourceToolContentHandler resourceToolContentHandler;
+    private IToolContentHandler resourceToolContentHandler;
 
     private MessageService messageService;
 
@@ -1102,7 +1102,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	this.resourceSessionDao = resourceSessionDao;
     }
 
-    public void setResourceToolContentHandler(ResourceToolContentHandler resourceToolContentHandler) {
+    public void setResourceToolContentHandler(IToolContentHandler resourceToolContentHandler) {
 	this.resourceToolContentHandler = resourceToolContentHandler;
     }
 

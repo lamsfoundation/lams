@@ -80,10 +80,13 @@
 	<bean id="wikiUserDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="wikiToolContentHandler" class="org.lamsfoundation.lams.tool.wiki.util.WikiToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="wikiToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>wikiworkspace</value></property>
+		<property name="repositoryUser"><value>wiki</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 	
 	<bean id="wikiMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
