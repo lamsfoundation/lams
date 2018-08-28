@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -57,14 +57,14 @@ public class RecalculateTotalMarksForLessonServlet extends HttpServlet {
 
     private static ILogEventService logEventService;
     private static ILessonService lessonService;
-    private static IGradebookService gradebookService;
+    private static IGradebookFullService gradebookService;
 
     @Override
     public void init() throws ServletException {
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 	logEventService = (ILogEventService) ctx.getBean("logEventService");
 	lessonService = (ILessonService) ctx.getBean("lessonService");
-	gradebookService = (IGradebookService) ctx.getBean("gradebookService");
+	gradebookService = (IGradebookFullService) ctx.getBean("gradebookService");
     }
 
     @Override

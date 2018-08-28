@@ -32,18 +32,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.bbb.model.Bbb;
 import org.lamsfoundation.lams.tool.bbb.service.BbbServiceProxy;
 import org.lamsfoundation.lams.tool.bbb.service.IBbbService;
 import org.lamsfoundation.lams.tool.bbb.util.Constants;
 import org.lamsfoundation.lams.tool.bbb.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -146,7 +145,7 @@ public class AuthoringAction extends DispatchAction {
 
 	bbbService.saveOrUpdateBbb(bbb);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authForm.setSessionMapID(map.getSessionID());

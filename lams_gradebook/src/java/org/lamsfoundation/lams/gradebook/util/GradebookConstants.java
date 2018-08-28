@@ -34,10 +34,6 @@ public class GradebookConstants {
     public static final String MODULE_NAME = "gradebook";
 
     // Parameters
-    public static final String PARAM_PAGE = "page";
-    public static final String PARAM_ROWS = "rows";
-    public static final String PARAM_SIDX = "sidx";
-    public static final String PARAM_SORD = "sord";
     public static final String PARAM_METHOD = "method";
     public static final String PARAM_DISPATCH = "dispatch";
     public static final String PARAM_LOGIN = "login";
@@ -75,7 +71,7 @@ public class GradebookConstants {
     public static final String VIEW_LRN_COURSE = "lrnCourse";
     public static final String VIEW_LRN_ACTIVITY = "lrnActivity";
     public static final String VIEW_LIST = "listView";
-
+    
     // XML Elemetns
     public static final String ELEMENT_ROWS = "rows";
     public static final String ELEMENT_PAGE = "page";

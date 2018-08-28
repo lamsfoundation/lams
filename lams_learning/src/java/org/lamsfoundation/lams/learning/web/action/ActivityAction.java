@@ -24,7 +24,7 @@
 
 package org.lamsfoundation.lams.learning.web.action;
 
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsAction;
 
@@ -36,9 +36,9 @@ public abstract class ActivityAction extends LamsAction {
 
     public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
-    private ICoreLearnerService learnerService = null;
+    private ILearnerFullService learnerService = null;
 
-    protected ICoreLearnerService getLearnerService() {
+    protected ILearnerFullService getLearnerService() {
 	if (learnerService == null) {
 	    learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	}

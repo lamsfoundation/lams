@@ -50,9 +50,8 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -96,7 +95,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -132,7 +130,7 @@ public class ScratchieServiceImpl
     private ScratchieConfigItemDAO scratchieConfigItemDao;
 
     // tool service
-    private ScratchieToolContentHandler scratchieToolContentHandler;
+    private IToolContentHandler scratchieToolContentHandler;
 
     private MessageService messageService;
 
@@ -140,13 +138,9 @@ public class ScratchieServiceImpl
 
     private ILamsToolService toolService;
 
-    private ILearnerService learnerService;
-
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private IGradebookService gradebookService;
 
     private ILogEventService logEventService;
 
@@ -387,7 +381,7 @@ public class ScratchieServiceImpl
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 
-	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
+	    toolService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
 		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
@@ -474,7 +468,7 @@ public class ScratchieServiceImpl
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
+		toolService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
 	}
@@ -1816,9 +1810,6 @@ public class ScratchieServiceImpl
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
@@ -1836,7 +1827,7 @@ public class ScratchieServiceImpl
 	this.scratchieSessionDao = scratchieSessionDao;
     }
 
-    public void setScratchieToolContentHandler(ScratchieToolContentHandler scratchieToolContentHandler) {
+    public void setScratchieToolContentHandler(IToolContentHandler scratchieToolContentHandler) {
 	this.scratchieToolContentHandler = scratchieToolContentHandler;
     }
 
@@ -2067,8 +2058,7 @@ public class ScratchieServiceImpl
 		}
 
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
-
-		gradebookService.removeActivityMark(userId, session.getSessionId());
+		toolService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -2103,7 +2093,7 @@ public class ScratchieServiceImpl
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared scratchie session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -2176,9 +2166,6 @@ public class ScratchieServiceImpl
 	this.exportContentService = exportContentService;
     }
 
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
-    }
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;

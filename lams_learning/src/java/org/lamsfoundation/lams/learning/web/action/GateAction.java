@@ -37,15 +37,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -122,7 +122,7 @@ public class GateAction extends LamsDispatchAction {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Activity activity = learnerService.getActivity(activityId);
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
@@ -188,7 +188,7 @@ public class GateAction extends LamsDispatchAction {
 		// so it is in seconds
 		gateForm.set("startOffset", scheduleGate.getGateStartTimeOffset() * 60);
 
-		ICoreLearnerService learnerService = LearnerServiceProxy
+		ILearnerFullService learnerService = LearnerServiceProxy
 			.getLearnerService(getServlet().getServletContext());
 		User learner = LearningWebUtil.getUser(learnerService);
 		Date reachTime = ScheduleGateActivityStrategy.getPreviousActivityCompletionDate(scheduleGate, learner);

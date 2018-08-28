@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -150,7 +150,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
 	    Set<User> learners = lesson.getLessonClass().getLearners();
 	    // check for any groups already exist in this grouping
 	    Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    IMonitoringService monitoringService = MonitoringServiceProxy
+	    IMonitoringFullService monitoringService = MonitoringServiceProxy
 		    .getMonitoringService(getServlet().getServletContext());
 	    Activity activity = monitoringService.getActivityById(activityId);
 	    Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
@@ -372,7 +372,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     private JSONObject saveLessonGrouping(Long lessonId, Long activityId, Hashtable fileElements)
 	    throws JSONException, IOException {
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	int totalUsersSkipped = 0;

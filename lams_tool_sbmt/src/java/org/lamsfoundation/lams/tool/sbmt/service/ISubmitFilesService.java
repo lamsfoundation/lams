@@ -30,7 +30,6 @@ import java.util.Locale;
 import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -145,8 +144,10 @@ public interface ISubmitFilesService {
      * @param reportID
      * @param markFileUUID
      * @param markFileVersionID
+     * @throws RepositoryCheckedException 
+     * @throws InvalidParameterException 
      */
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID);
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID) throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
@@ -171,16 +172,12 @@ public interface ISubmitFilesService {
      */
     public SubmitFilesSession getSessionById(Long sessionID);
 
-    public IVersionedNode downloadFile(Long uuid, Long versionID);
-
     /**
      * Release marks and comments information to learners, for a special session.
      *
      * @param sessionID
      */
     public void releaseMarksForSession(Long sessionID);
-
-    public void deleteFromRepository(Long uuid, Long versionID);
 
     /**
      * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.

@@ -39,13 +39,13 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralToolContentHandler;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -66,7 +66,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
     private static IUserManagementService service;
     private static ILogEventService logEventService;
     private static MessageService messageService;
-    private static CentralToolContentHandler centralToolContentHandler;
+    private static IToolContentHandler centralToolContentHandler;
     private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
 
     /**
@@ -204,11 +204,11 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	return null;
     }
 
-    private CentralToolContentHandler getCentralToolContentHandler() {
+    private IToolContentHandler getCentralToolContentHandler() {
 	if (centralToolContentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    centralToolContentHandler = (CentralToolContentHandler) wac.getBean("centralToolContentHandler");
+	    centralToolContentHandler = (IToolContentHandler) wac.getBean("centralToolContentHandler");
 	}
 	return centralToolContentHandler;
     }

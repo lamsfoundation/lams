@@ -40,15 +40,15 @@ import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -75,11 +76,11 @@ public class GradebookAction extends LamsDispatchAction {
 
     private static Logger logger = Logger.getLogger(GradebookAction.class);
 
-    private static IGradebookService gradebookService;
+    private static IGradebookFullService gradebookService;
     private static IUserManagementService userService;
     private static ILessonService lessonService;
     private static ISecurityService securityService;
-    private static ICoreLearnerService learnerService;
+    private static ILearnerService learnerService;
 
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -107,10 +108,10 @@ public class GradebookAction extends LamsDispatchAction {
     public ActionForward getActivityGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
@@ -212,7 +213,7 @@ public class GradebookAction extends LamsDispatchAction {
 	List<GradebookGridRowDTO> gradebookActivityDTOs = getGradebookService().getGBLessonComplete(lessonId, userId);
 
 	JSONObject resultJSON = new JSONObject();
-	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
+	resultJSON.put(CommonConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
 
 	JSONArray rowsJSON = new JSONArray();
 	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
@@ -234,10 +235,10 @@ public class GradebookAction extends LamsDispatchAction {
 	    cellJSON.put(gradebookActivityDTO.getMark() == null ? GradebookConstants.CELL_EMPTY
 		    : GradebookUtil.niceFormatting(gradebookActivityDTO.getMark()));
 
-	    rowJSON.put(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.put(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.put(rowJSON);
 	}
-	resultJSON.put(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	resultJSON.put(CommonConstants.ELEMENT_ROWS, rowsJSON);
 
 	// make a mapping of activity ID -> URL, same as in progress bar
 	JSONObject activityURLJSON = new JSONObject();
@@ -296,10 +297,10 @@ public class GradebookAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
@@ -420,10 +421,10 @@ public class GradebookAction extends LamsDispatchAction {
     public ActionForward getCourseGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
@@ -675,11 +676,11 @@ public class GradebookAction extends LamsDispatchAction {
 	return GradebookAction.lessonService;
     }
 
-    private IGradebookService getGradebookService() {
+    private IGradebookFullService getGradebookService() {
 	if (GradebookAction.gradebookService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.gradebookService = (IGradebookService) ctx.getBean("gradebookService");
+	    GradebookAction.gradebookService = (IGradebookFullService) ctx.getBean("gradebookService");
 	}
 	return GradebookAction.gradebookService;
     }
@@ -694,11 +695,11 @@ public class GradebookAction extends LamsDispatchAction {
 	return GradebookAction.securityService;
     }
 
-    private ICoreLearnerService getLearnerService() {
+    private ILearnerService getLearnerService() {
 	if (GradebookAction.learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    GradebookAction.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	    GradebookAction.learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
 	return GradebookAction.learnerService;
     }

@@ -53,8 +53,8 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -101,7 +101,6 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -135,7 +134,7 @@ public class AssessmentServiceImpl
     private AssessmentResultDAO assessmentResultDao;
 
     // tool service
-    private AssessmentToolContentHandler assessmentToolContentHandler;
+    private IToolContentHandler assessmentToolContentHandler;
 
     private MessageService messageService;
 
@@ -152,8 +151,6 @@ public class AssessmentServiceImpl
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private IGradebookService gradebookService;
 
     private ICoreNotebookService coreNotebookService;
 
@@ -2044,8 +2041,8 @@ public class AssessmentServiceImpl
 	    result.setGrade(totalMark);
 	    assessmentResultDao.saveObject(result);
 
-	    // propagate changes to Gradebook
-	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
+	    // propagade changes to Gradebook
+	    toolService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
 	    logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
@@ -2314,7 +2311,7 @@ public class AssessmentServiceImpl
 			// if this is the last finished assessment result - propagade total mark to Gradebook
 			if (lastFinishedAssessmentResult != null
 				&& lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
-			    gradebookService.updateActivityMark(new Double(assessmentMark), null,
+			    toolService.updateActivityMark(new Double(assessmentMark), null,
 				    user.getUserId().intValue(), toolSessionId, false);
 			}
 		    }
@@ -2471,10 +2468,6 @@ public class AssessmentServiceImpl
 	this.logEventService = logEventService;
     }
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -2491,7 +2484,7 @@ public class AssessmentServiceImpl
 	this.assessmentSessionDao = assessmentSessionDao;
     }
 
-    public void setAssessmentToolContentHandler(AssessmentToolContentHandler assessmentToolContentHandler) {
+    public void setAssessmentToolContentHandler(IToolContentHandler assessmentToolContentHandler) {
 	this.assessmentToolContentHandler = assessmentToolContentHandler;
     }
 
@@ -2667,7 +2660,7 @@ public class AssessmentServiceImpl
 		}
 
 		// propagade changes to Gradebook
-		gradebookService.removeActivityMark(userId, session.getSessionId());
+		toolService.removeActivityMark(userId, session.getSessionId());
 
 		assessmentUserDao.removeObject(AssessmentUser.class, user.getUid());
 	    }
@@ -2705,7 +2698,7 @@ public class AssessmentServiceImpl
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared assessment session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -2867,10 +2860,6 @@ public class AssessmentServiceImpl
 	this.exportContentService = exportContentService;
     }
 
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
-    }
-
     public IUserManagementService getUserManagementService() {
 	return userManagementService;
     }
@@ -2885,6 +2874,10 @@ public class AssessmentServiceImpl
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
     }
 
     public IEventNotificationService getEventNotificationService() {

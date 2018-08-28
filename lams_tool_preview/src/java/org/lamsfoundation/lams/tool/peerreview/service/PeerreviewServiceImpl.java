@@ -45,8 +45,8 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -78,7 +78,6 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder;
-import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
 import org.lamsfoundation.lams.tool.peerreview.util.SpreadsheetBuilder;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -103,15 +102,13 @@ public class PeerreviewServiceImpl
     private PeerreviewSessionDAO peerreviewSessionDao;
 
     // tool service
-    private PeerreviewToolContentHandler peerreviewToolContentHandler;
+    private IToolContentHandler peerreviewToolContentHandler;
 
     private MessageService messageService;
 
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private IUserManagementService userManagementService;
 
@@ -783,7 +780,7 @@ public class PeerreviewServiceImpl
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find peerreview session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -901,10 +898,6 @@ public class PeerreviewServiceImpl
     // set methods for Spring Bean
     // *****************************************************************************
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -917,7 +910,7 @@ public class PeerreviewServiceImpl
 	this.peerreviewSessionDao = peerreviewSessionDao;
     }
 
-    public void setPeerreviewToolContentHandler(PeerreviewToolContentHandler peerreviewToolContentHandler) {
+    public void setPeerreviewToolContentHandler(IToolContentHandler peerreviewToolContentHandler) {
 	this.peerreviewToolContentHandler = peerreviewToolContentHandler;
     }
 

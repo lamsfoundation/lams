@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.monitoring.quartz.job;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -37,7 +37,6 @@ import org.quartz.JobExecutionException;
  *
  * @author Jacky Fang
  * @since 2005-4-12
- * @version 1.1
  */
 public class CloseScheduleGateJob extends MonitoringJob {
 
@@ -51,7 +50,7 @@ public class CloseScheduleGateJob extends MonitoringJob {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-	IMonitoringService monitoringService = getMonitoringService(context);
+	IMonitoringFullService monitoringService = getMonitoringService(context);
 
 	//getting gate id set from scheduler
 	Map properties = context.getJobDetail().getJobDataMap();

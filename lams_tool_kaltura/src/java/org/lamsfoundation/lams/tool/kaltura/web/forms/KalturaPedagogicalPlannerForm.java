@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.kaltura.web.forms;
 
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *

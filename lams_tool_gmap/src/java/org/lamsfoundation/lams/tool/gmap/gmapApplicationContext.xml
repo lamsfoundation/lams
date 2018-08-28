@@ -26,7 +26,6 @@
 				<property name="gmapMarkerDAO"><ref bean="gmapMarkerDAO"/></property>
 				<property name="gmapConfigItemDAO"><ref bean="gmapConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>
  				<property name="gmapToolContentHandler"><ref bean="gmapToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
@@ -74,9 +73,12 @@
 	<bean id="gmapUserDAO" class="org.lamsfoundation.lams.tool.gmap.dao.hibernate.GmapUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="gmapToolContentHandler" class="org.lamsfoundation.lams.tool.gmap.util.GmapToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="gmapToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>gmapworkspace</value></property>
+		<property name="repositoryUser"><value>gmap</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

@@ -1,7 +1,7 @@
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.form.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Chat needs.

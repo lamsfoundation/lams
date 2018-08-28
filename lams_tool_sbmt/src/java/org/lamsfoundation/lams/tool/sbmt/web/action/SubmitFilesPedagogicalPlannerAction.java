@@ -41,14 +41,13 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.web.form.SubmitFilesPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  */
 public class SubmitFilesPedagogicalPlannerAction extends LamsDispatchAction {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
+    private static Logger logger = Logger.getLogger(SubmitFilesPedagogicalPlannerAction.class);
 
     public ISubmitFilesService submitFilesService;
 

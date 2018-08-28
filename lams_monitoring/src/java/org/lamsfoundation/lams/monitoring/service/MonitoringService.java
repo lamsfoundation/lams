@@ -49,12 +49,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.dao.EventDAO;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
@@ -75,6 +74,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -141,7 +141,7 @@ import org.quartz.TriggerKey;
  * @since 2/02/2005
  * @version 1.1
  */
-public class MonitoringService implements IMonitoringService {
+public class MonitoringService implements IMonitoringFullService {
 
     // ---------------------------------------------------------------------
     // Instance variables
@@ -175,7 +175,7 @@ public class MonitoringService implements IMonitoringService {
 
     private IAuthoringService authoringService;
 
-    private ICoreLearnerService learnerService;
+    private ILearnerService learnerService;
 
     private ILessonService lessonService;
 
@@ -247,7 +247,7 @@ public class MonitoringService implements IMonitoringService {
      *
      * @param learnerService
      */
-    public void setLearnerService(ICoreLearnerService learnerService) {
+    public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
 
@@ -365,7 +365,7 @@ public class MonitoringService implements IMonitoringService {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 
-	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
+	LearningDesign originalLearningDesign = learningDesignDAO.getLearningDesignById(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignId + " is missing. Unable to initialize lesson.");
@@ -403,7 +403,7 @@ public class MonitoringService implements IMonitoringService {
     public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled) {
-	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
+	LearningDesign originalLearningDesign = learningDesignDAO.getLearningDesignById(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignId + " is missing. Unable to initialize lesson.");
@@ -421,7 +421,7 @@ public class MonitoringService implements IMonitoringService {
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
 	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
-	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
+	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
 	if (learningDesign == null) {
 	    throw new MonitoringServiceException(
 		    "Learning design for id=" + learningDesignID + " is missing. Unable to initialize lesson.");
@@ -445,7 +445,7 @@ public class MonitoringService implements IMonitoringService {
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
 		new Integer(copyType), user, workspaceFolder, true, null, customCSV);
-	authoringService.saveLearningDesign(copiedLearningDesign);
+	learningDesignDAO.insertOrUpdate(copiedLearningDesign);
 
 	// Make all efforts to make sure it has a title
 	String title = lessonName != null ? lessonName : copiedLearningDesign.getTitle();
@@ -777,8 +777,25 @@ public class MonitoringService implements IMonitoringService {
 	return newMaxId;
     }
 
-    @Override
-    public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
+    /**
+     * <p>
+     * Runs the system scheduler to start the scheduling for opening gate and closing gate. It invlovs a couple of steps
+     * to start the scheduler:
+     * </p>
+     * <li>1. Initialize the resource needed by scheduling job by setting them into the job data map.</li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li>
+     *
+     * @param scheduleGate
+     *            the gate that needs to be scheduled.
+     * @param schedulingStartTime
+     *            the time on which the gate open should be based if an offset is used. For starting a lesson, this is
+     *            the lessonStartTime. For live edit, it is now.
+     * @param lessonName
+     *            the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
+     * @returns An updated gate, that should be saved by the calling code.
+     */
+    private ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
 	    String lessonName) {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("Running scheduler for gate " + scheduleGate.getActivityId() + "...");
@@ -906,13 +923,6 @@ public class MonitoringService implements IMonitoringService {
 	    }
 	}
 	return gateActivity;
-    }
-
-    @Override
-    public void finishLesson(long lessonId, Integer userId) {
-	securityService.isLessonMonitor(lessonId, userId, "finish lesson", true);
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	setLessonState(requestedLesson, Lesson.FINISHED_STATE, userId);
     }
 
     @Override
@@ -1187,15 +1197,6 @@ public class MonitoringService implements IMonitoringService {
 	requestedLesson.setLearnerImAvailable(presenceImAvailable != null ? presenceImAvailable : Boolean.FALSE);
 	lessonDAO.updateLesson(requestedLesson);
 	return requestedLesson.getLearnerImAvailable();
-    }
-
-    @Override
-    public Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
-	securityService.isLessonMonitor(lessonId, userId, "set live edit available", true);
-	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	requestedLesson.setLiveEditEnabled(liveEditEnabled != null ? liveEditEnabled : Boolean.FALSE);
-	lessonDAO.updateLesson(requestedLesson);
-	return requestedLesson.getLiveEditEnabled();
     }
 
     @Override
@@ -1792,11 +1793,10 @@ public class MonitoringService implements IMonitoringService {
 		break;
 
 	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
-		List<User> allUSers = learnerService.getUserManagementService().getUsersFromOrganisation(orgId);
+		List<User> allUSers = userManagementService.getUsersFromOrganisation(orgId);
 		Set<User> usersStartedAtLest1Lesson = new TreeSet<User>();
 
-		Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class,
-			orgId);
+		Organisation org = getOrganisation(orgId);
 		Set<Lesson> lessons = org.getLessons();
 		for (Lesson les : lessons) {
 		    Activity firstActivity = les.getLearningDesign().getFirstActivity();
@@ -2371,8 +2371,16 @@ public class MonitoringService implements IMonitoringService {
 	lessonService.removeLearnersFromGroup(grouping, groupId, learners);
     }
 
-    @Override
-    public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
+    /**
+     * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
+     * Branching. Don't use for Group Based Branching as there could be more than one group for the branch.
+     *
+     * @param sequenceActivityID
+     *            Activity id of the sequenceActivity representing this branch
+     * @param learnerIDs
+     *            the IDS of the learners to be added.
+     */
+    private void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
 
 	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
 	if (branch == null) {

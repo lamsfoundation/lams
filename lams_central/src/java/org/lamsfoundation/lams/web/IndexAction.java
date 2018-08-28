@@ -66,8 +66,7 @@ import org.springframework.web.util.HtmlUtils;
  */
 public class IndexAction extends LamsDispatchAction {
 
-    private static final String PATH_PEDAGOGICAL_PLANNER = "pedagogical_planner";
-    private static final String PATH_LAMS_CENTRAL = "lams-central.war";
+    private static final String PATH_LAMS_PLANNER_WAR = "lams-planner.war";
 
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
@@ -319,9 +318,8 @@ public class IndexAction extends LamsDispatchAction {
 
     private static boolean isPedagogicalPlannerAvailable() {
 	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_CENTRAL + File.separator
-		+ PATH_PEDAGOGICAL_PLANNER;
+	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_PLANNER_WAR;
 	File plannerDir = new File(plannerPath);
-	return plannerDir.isDirectory();
+	return plannerDir.exists();
     }
 }

@@ -19,10 +19,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-1.7.2.jbossorg-1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/websocket"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

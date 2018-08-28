@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.survey.web.form;
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.form.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Survey needs.

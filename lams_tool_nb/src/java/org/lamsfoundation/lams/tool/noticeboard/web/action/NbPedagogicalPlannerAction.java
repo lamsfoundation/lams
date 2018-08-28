@@ -40,21 +40,14 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * @author
- * @version
- *
- *
- *
- *
- *
+ * 
  */
 public class NbPedagogicalPlannerAction extends LamsDispatchAction {
 
-    private static Logger logger = Logger.getLogger(PedagogicalPlannerAction.class);
+    private static Logger logger = Logger.getLogger(NbPedagogicalPlannerAction.class);
 
     public INoticeboardService noticeboardService;
 

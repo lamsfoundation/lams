@@ -32,8 +32,7 @@
 				<property name="notebookUserDAO"><ref bean="notebookUserDAO"/></property>
 				<property name="notebookDAO"><ref bean="notebookDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="logEventService"><ref bean="logEventService"/></property>		
+				<property name="logEventService"><ref bean="logEventService"/></property>
  				<property name="notebookToolContentHandler"><ref bean="notebookToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
@@ -76,9 +75,12 @@
 	<bean id="notebookUserDAO" class="org.lamsfoundation.lams.tool.notebook.dao.hibernate.NotebookUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="notebookToolContentHandler" class="org.lamsfoundation.lams.tool.notebook.util.NotebookToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="notebookToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>notebookworkspace</value></property>
+		<property name="repositoryUser"><value>notebook</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

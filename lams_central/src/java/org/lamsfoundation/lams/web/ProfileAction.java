@@ -44,7 +44,7 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.policies.Policy;
 import org.lamsfoundation.lams.policies.PolicyDTO;
@@ -84,7 +84,7 @@ public class ProfileAction extends LamsDispatchAction {
 
     private static List<SupportedLocale> locales;
 
-    private static ICoreLearnerService learnerService;
+    private static ILearnerService learnerService;
 
     private static IThemeService themeService;
 
@@ -294,11 +294,11 @@ public class ProfileAction extends LamsDispatchAction {
 	return service;
     }
 
-    private ICoreLearnerService getLearnerService() {
+    private ILearnerService getLearnerService() {
 	if (learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	    learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
 	return learnerService;
     }

@@ -39,7 +39,6 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -90,8 +89,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     private IScribeUserDAO scribeUserDAO = null;
 
-    private ILearnerService learnerService;
-
     private ILamsToolService toolService;
 
     private IToolContentHandler scribeToolContentHandler = null;
@@ -126,7 +123,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -572,14 +569,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     public void setScribeUserDAO(IScribeUserDAO userDAO) {
 	scribeUserDAO = userDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

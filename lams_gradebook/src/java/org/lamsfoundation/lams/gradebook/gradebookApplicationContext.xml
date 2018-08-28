@@ -46,4 +46,9 @@
 			</props>
 		</property>
 	</bean>
+	
+	<!--  Gradebook related beans -->
+	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
 </beans>

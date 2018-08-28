@@ -35,14 +35,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -53,22 +53,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  * @author daveg
  *
- *         XDoclet definition:
- *
- *
- *
- *
- *
- *
  */
 public class BranchingActivityAction extends LamsDispatchAction {
 
     /** Input parameter. Boolean value */
     public static final String PARAM_FORCE_GROUPING = "force";
 
-    private ICoreLearnerService learnerService = null;
+    private ILearnerFullService learnerService = null;
 
-    protected ICoreLearnerService getLearnerService() {
+    protected ILearnerFullService getLearnerService() {
 	if (learnerService == null) {
 	    learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	}

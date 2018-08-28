@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.forum.web.forms;
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.form.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Forum needs.

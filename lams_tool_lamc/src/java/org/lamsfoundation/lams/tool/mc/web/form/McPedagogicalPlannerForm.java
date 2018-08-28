@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private static Logger logger = Logger.getLogger(McPedagogicalPlannerForm.class);

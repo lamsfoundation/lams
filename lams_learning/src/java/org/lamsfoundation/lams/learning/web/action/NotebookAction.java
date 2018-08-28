@@ -35,7 +35,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -114,7 +114,7 @@ public class NotebookAction extends LamsDispatchAction {
 		.findById(User.class, userID);
 	
 	// lesson service
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = learnerService.getLesson(lessonID);
 	
@@ -192,7 +192,7 @@ public class NotebookAction extends LamsDispatchAction {
 
 	if ( entry.getUser() != null && ! entry.getUser().getUserId().equals(user.getUserId()) ) {
 	    // wants to look at someone else's entry - check they are a teacher
-	    ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	    ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	    Lesson lesson = learnerService.getLesson(currentLessonID);
 	    if ( ! hasStaffAccessToJournals(user, lesson) ) {
 		throw new UserAccessDeniedException(

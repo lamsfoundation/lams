@@ -4,8 +4,6 @@
 	<classpathentry kind="src" path="conf/hibernate/mappings"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar" sourcepath="/lams_central"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar" sourcepath="/lams_contentrepository"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_3.1_spec-1.0.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/servlet-api">
 		<attributes>
 			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-8.0-doc/servletapi/"/>
@@ -32,7 +30,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/beanutils/main/commons-beanutils-1.8.3.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/collections/main/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/collections/main/commons-collections-3.2.1.jar" sourcepath="/Users/Andrey/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/commons-io"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/lang/main/commons-lang-2.6.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/commons-lang">
 		<attributes>
@@ -43,7 +41,6 @@
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/codec/main/commons-codec-1.9.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/core/main/undertow-core-1.1.8.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.1.8.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-gradebook.jar" sourcepath="/lams_gradebook"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/as/controller-client/main/wildfly-controller-client-8.2.1.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/dmr/main/jboss-dmr-1.2.0.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>

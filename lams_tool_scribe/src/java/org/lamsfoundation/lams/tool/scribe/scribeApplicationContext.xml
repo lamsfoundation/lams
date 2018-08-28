@@ -24,7 +24,6 @@
 				<property name="scribeHeadingDAO"><ref bean="lascrbScribeHeadingDAO"/></property>
 				<property name="scribeDAO"><ref bean="lascrbScribeDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
 				<property name="scribeToolContentHandler"><ref bean="lascrbScribeToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
@@ -68,9 +67,12 @@
 	<bean id="lascrbScribeHeadingDAO" class="org.lamsfoundation.lams.tool.scribe.dao.hibernate.ScribeHeadingDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="lascrbScribeToolContentHandler" class="org.lamsfoundation.lams.tool.scribe.util.ScribeToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="lascrbScribeToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>scribeworkspace</value></property>
+		<property name="repositoryUser"><value>scribe</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

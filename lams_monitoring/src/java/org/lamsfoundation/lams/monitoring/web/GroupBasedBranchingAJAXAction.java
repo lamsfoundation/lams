@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -53,20 +54,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </UL>
  * 
  * @author Fiona Malikoff
- *
- * 
- *
- *
- *
- *
- *
- * 
- *
- * 
  */
 public class GroupBasedBranchingAJAXAction extends BranchingAction {
-
-    //---------------------------------------------------------------------
 
     private static final String GROUPED_SELECTION_SCREEN = "groupedSelection";
     public static final String PARAM_BRANCH_ID = "branchID";
@@ -84,7 +73,7 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID,
 		BranchingActivity.class);
@@ -123,7 +112,7 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 
 	// get the branching data and sort it.
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID);
 
@@ -175,7 +164,7 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 
 	// get the grouping data and sort it.
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	SortedSet<Group> groups = monitoringService.getGroupsNotAssignedToBranch(activityID);
 	String groupOutput = buildGroupString(groups);
@@ -195,7 +184,7 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 
 	Long branchID = WebUtil.readLongParam(request, PARAM_BRANCH_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(branchID);
 
@@ -245,7 +234,7 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	if (groups != null) {
 	    String[] groupsSplit = groups.split(",");
 
-	    IMonitoringService monitoringService = MonitoringServiceProxy
+	    IMonitoringFullService monitoringService = MonitoringServiceProxy
 		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.addGroupToBranch(branchID, groupsSplit);
 	}
@@ -270,7 +259,7 @@ public class GroupBasedBranchingAJAXAction extends BranchingAction {
 	if (groups != null) {
 	    String[] groupsSplit = groups.split(",");
 
-	    IMonitoringService monitoringService = MonitoringServiceProxy
+	    IMonitoringFullService monitoringService = MonitoringServiceProxy
 		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.removeGroupFromBranch(branchID, groupsSplit);
 	}

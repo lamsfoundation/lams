@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -45,9 +46,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * The action servlet that provides the support for the Sequence activities. At present, this is only a basic view
  * screen that lists the user's in the sequence.
- *
- *
- *
  *
  * @author Fiona Malikoff
  */
@@ -65,7 +63,7 @@ public class SequenceAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	SequenceActivity activity = (SequenceActivity) monitoringService.getActivityById(activityId,
 		SequenceActivity.class);

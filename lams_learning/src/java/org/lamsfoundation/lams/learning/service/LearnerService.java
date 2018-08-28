@@ -40,12 +40,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.command.dao.ICommandDAO;
 import org.lamsfoundation.lams.learning.command.model.Command;
+import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
+import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -54,7 +53,6 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
-import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
@@ -69,9 +67,11 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -99,7 +99,7 @@ import org.lamsfoundation.lams.util.MessageService;
  *
  * @author chris, Jacky Fang
  */
-public class LearnerService implements ICoreLearnerService {
+public class LearnerService implements ILearnerFullService {
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
@@ -111,7 +111,6 @@ public class LearnerService implements ICoreLearnerService {
     private IGroupingDAO groupingDAO;
     private IGroupUserDAO groupUserDAO;
     private ProgressEngine progressEngine;
-    private IDataFlowDAO dataFlowDAO;
     private ICommandDAO commandDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
@@ -120,6 +119,7 @@ public class LearnerService implements ICoreLearnerService {
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     private IGradebookService gradebookService;
     private ILogEventService logEventService;
+    private IKumaliveService kumaliveService;
     private MessageService messageService;
 
     // ---------------------------------------------------------------------
@@ -219,6 +219,10 @@ public class LearnerService implements ICoreLearnerService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
+    }
+    
+    public void setKumaliveService(IKumaliveService kumaliveService) {
+	this.kumaliveService = kumaliveService;
     }
 
     public void setMessageService(MessageService messageService) {
@@ -553,8 +557,7 @@ public class LearnerService implements ICoreLearnerService {
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    @Override
-    public void calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress learnerProgress) {
+    private void calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress learnerProgress) {
 	try {
 	    progressEngine.calculateProgress(learnerProgress.getUser(), completedActivity, learnerProgress);
 	    learnerProgressDAO.updateLearnerProgress(learnerProgress);
@@ -564,9 +567,6 @@ public class LearnerService implements ICoreLearnerService {
 
     }
 
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(java.lang.Long, java.lang.Long)
-     */
     @Override
     public String completeToolSession(Long toolSessionId, Long learnerId) {
 	// this method is called by tools, so it mustn't do anything that relies on all the tools' Spring beans
@@ -663,7 +663,7 @@ public class LearnerService implements ICoreLearnerService {
     public void updateGradebookMark(Activity activity, LearnerProgress progress) {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
-	gradebookService.updateUserActivityGradebookMark(lesson, activity, learner);
+	gradebookService.updateGradebookUserActivityMark(lesson, activity, learner);
     }
 
     /**
@@ -1287,37 +1287,12 @@ public class LearnerService implements ICoreLearnerService {
 	this.gradebookService = gradebookService;
     }
 
-    public IDataFlowDAO getDataFlowDAO() {
-	return dataFlowDAO;
-    }
-
-    public void setDataFlowDAO(IDataFlowDAO dataFlowDAO) {
-	this.dataFlowDAO = dataFlowDAO;
-    }
-
     public ICommandDAO getCommandDAO() {
 	return commandDAO;
     }
 
     public void setCommandDAO(ICommandDAO commandDAO) {
 	this.commandDAO = commandDAO;
-    }
-
-    /**
-     * Gets the concreted tool output (not the definition) from a tool. This method is called by target tool in order to
-     * get data from source tool.
-     */
-    @Override
-    public ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId) {
-	DataFlowObject dataFlowObject = getDataFlowDAO().getAssignedDataFlowObject(requestingToolContentId,
-		assigmentId);
-	User learner = (User) getUserManagementService().findById(User.class, learnerId);
-	Activity activity = dataFlowObject.getDataTransition().getFromActivity();
-	String outputName = dataFlowObject.getName();
-	ToolSession session = lamsCoreToolService.getToolSessionByLearner(learner, activity);
-	ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, session, learnerId);
-
-	return output;
     }
 
     /**
@@ -1398,6 +1373,9 @@ public class LearnerService implements ICoreLearnerService {
 	commandDAO.insert(command);
     }
 
+    /**
+     * Used by <code>CommandWebsocketServer</code>.
+     */
     @Override
     public void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand) {
 	// find lesson for given tool content ID
@@ -1476,7 +1454,7 @@ public class LearnerService implements ICoreLearnerService {
 			    || TOOL_SIGNATURE_MCQ.equals(tool.getToolSignature())) {
 			auditLogBuilder.append("Pushing mark to Gradebook for activity ")
 				.append(activity.getActivityId()).append(" ").append(activity.getTitle()).append("\n");
-			gradebookService.updateUserActivityGradebookMark(lesson, activity, learner);
+			gradebookService.updateGradebookUserActivityMark(lesson, activity, learner);
 		    }
 		}
 	    }
@@ -1620,6 +1598,12 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	return status;
 
+    }
+    
+    @Override
+    public boolean isKumaliveDisabledForOrganisation(Integer organisationId) {
+	Kumalive kumalive = kumaliveService.getKumaliveByOrganisation(organisationId);
+	return kumalive == null || kumalive.getFinished();
     }
 
     @Override

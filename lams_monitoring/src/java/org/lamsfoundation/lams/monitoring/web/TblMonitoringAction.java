@@ -39,12 +39,12 @@ import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.dto.PermissionGateDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblGroupDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblUserDTO;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -61,7 +61,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(TblMonitoringAction.class);
 
     private static ILessonService lessonService;
-    private static IMonitoringService monitoringService;
+    private static IMonitoringFullService monitoringService;
     private static ILamsCoreToolService coreToolService;
     private static ILamsToolService toolService;
     private static IActivityDAO activityDAO;
@@ -365,7 +365,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	    if (activity instanceof ToolActivity) {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		String toolSignature = toolActivity.getTool().getToolSignature();
-		if (CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
 		    isScratchieAvailable = true;
 		    break;
 		}
@@ -385,10 +385,10 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		String toolTitle = toolActivity.getTitle();
 
 		//count only the first MCQ or Assessmnet as iRA
-		if (!iraPassed && (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| isScratchieAvailable && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
+			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
 		    iraPassed = true;
-		    if (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 			request.setAttribute("isIraMcqAvailable", true);
 
 		    } else {
@@ -401,22 +401,22 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		}
 
 		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
-		if ((scratchiePassed || !isScratchieAvailable) && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+		if ((scratchiePassed || !isScratchieAvailable) && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    request.setAttribute("isAeAvailable", true);
 		    //prepare assessment details to be passed to Assessment tool
 		    assessmentToolContentIds += toolContentId + ",";
 		    assessmentActivityTitles += toolTitle + "\\,";
 
-		} else if (CentralConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
+		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
 		    request.setAttribute("isForumAvailable", true);
 		    request.setAttribute("forumActivityId", toolActivityId);
 
-		} else if (CentralConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
+		} else if (CommonConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
 		    request.setAttribute("isPeerreviewAvailable", true);
 		    request.setAttribute("peerreviewToolContentId", toolContentId);
 
 		    //tRA is the first scratchie activity
-		} else if (!scratchiePassed && CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		} else if (!scratchiePassed && CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
 		    scratchiePassed = true;
 
 		    request.setAttribute("isScratchieAvailable", true);
@@ -424,7 +424,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 		    request.setAttribute("traToolActivityId", toolActivityId);
 		}
 
-		if (CentralConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
+		if (CommonConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
 		    request.setAttribute("leaderselectionToolActivityId", toolActivityId);
 		    request.setAttribute("leaderselectionToolContentId", toolContentId);
 		}
@@ -446,7 +446,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	}
 
 	if (monitoringService == null) {
-	    monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	    monitoringService = (IMonitoringFullService) ctx.getBean("monitoringService");
 	}
 
 	if (coreToolService == null) {

@@ -33,9 +33,12 @@
     </bean>
 
     <!-- Managers -->
-	<bean id="peerreviewToolContentHandler" class="org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler">
-	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="peerreviewToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>peerreviewworkspace</value></property>
+		<property name="repositoryUser"><value>peerreview</value></property>
+		<property name="repositoryId"><value>lams-peerreview</value></property>
+	</bean>
 	
     <bean id="peerreviewManagerTarget" class="org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl">
         <property name="peerreviewDao">
@@ -52,9 +55,6 @@
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
-   		</property>
-   		<property name="learnerService">
-   			<ref bean="learnerService"/>
    		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>

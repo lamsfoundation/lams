@@ -52,14 +52,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class CloneLessonsAction extends Action {
 
@@ -218,13 +210,12 @@ public class CloneLessonsAction extends Action {
 	    learnerIds = learners.split(",");
 	}
 
-	CloneLessonsAction.monitoringService = AdminServiceProxy.getMonitoringService(getServlet().getServletContext());
+	monitoringService = AdminServiceProxy.getMonitoringService(getServlet().getServletContext());
 	int result = 0;
 
-	Organisation group = (Organisation) CloneLessonsAction.userManagementService.findById(Organisation.class,
-		groupId);
+	Organisation group = monitoringService.getOrganisation(groupId);
 	if (group != null) {
-	    result = CloneLessonsAction.monitoringService.cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds,
+	    result = monitoringService.cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds,
 		    learnerIds, group);
 	} else {
 	    throw new UserException("Couldn't find Organisation based on id=" + groupId);

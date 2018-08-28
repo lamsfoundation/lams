@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
@@ -44,16 +43,6 @@ import org.lamsfoundation.lams.tool.daco.model.DacoUser;
  *         Interface that defines the contract that all Data Collection service provider must follow.
  */
 public interface IDacoService {
-
-    /**
-     * Get file <code>IVersiondNode</code> by given package id and path.
-     *
-     * @param packageId
-     * @param relPathString
-     * @return
-     * @throws DacoApplicationException
-     */
-    IVersionedNode getFileNode(Long packageId, String relPathString) throws DacoApplicationException;
 
     /**
      * Get <code>Daco</code> by toolContentID.
@@ -105,11 +94,6 @@ public interface IDacoService {
      */
     DacoUser getUserByUserIdAndSessionId(Long long1, Long sessionId);
 
-    // ********** Repository methods ***********************
-    /**
-     * Delete file from repository.
-     */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws DacoApplicationException;
 
     /**
      * Save or update daco into database.

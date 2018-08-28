@@ -46,19 +46,11 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -107,7 +99,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
-import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -146,11 +137,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // system level handler and service
     private ILamsToolService toolService;
 
-    private ForumToolContentHandler forumToolContentHandler;
-
-    private IRepositoryService repositoryService;
-
-    private ILearnerService learnerService;
+    private IToolContentHandler forumToolContentHandler;
 
     private ILogEventService logEventService;
 
@@ -163,8 +150,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private ICoreNotebookService coreNotebookService;
 
     private ForumOutputFactory forumOutputFactory;
-
-    private IGradebookService gradebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -766,31 +751,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return node;
     }
 
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws ForumException {
-	ICredentials credentials = new SimpleCredentials(forumToolContentHandler.getRepositoryUser(),
-		forumToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, forumToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ForumException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ForumException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ForumException("Login failed." + e.getMessage());
-	}
-    }
-
     private Forum getDefaultForum() {
 	Long defaultForumId = new Long(toolService.getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE));
 	if (defaultForumId.equals(0L)) {
@@ -976,7 +936,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		user.setSessionFinished(false);
 		forumUserDao.save(user);
 
-		gradebookService.removeActivityMark(userId, session.getSessionId());
+		toolService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -1173,7 +1133,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find submit file session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1260,7 +1220,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	    if (totalMark != null) {
 		Double mark = new Double(totalMark);
-		gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
+		toolService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
 	    }
 	}
 
@@ -1341,28 +1301,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.forumUserDao = forumUserDao;
     }
 
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public ForumToolContentHandler getForumToolContentHandler() {
+    public IToolContentHandler getForumToolContentHandler() {
 	return forumToolContentHandler;
     }
 
-    public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
+    public void setForumToolContentHandler(IToolContentHandler toolContentHandler) {
 	forumToolContentHandler = toolContentHandler;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {
@@ -1403,10 +1347,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return messageService.getMessage(key, args);
     }
 
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
-    }
-
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
@@ -1415,9 +1355,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.activityDAO = activityDAO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String createTextSearchConditionName(Collection<ForumCondition> existingConditions) {
 	String uniqueNumber = null;

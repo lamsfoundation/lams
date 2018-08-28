@@ -37,8 +37,7 @@
 				<property name="kalturaCommentDao"><ref bean="kalturaCommentDao"/></property>
 				<property name="kalturaRatingDao"><ref bean="kalturaRatingDao"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
-				<property name="logEventService"><ref bean="logEventService"/></property>		
+				<property name="logEventService"><ref bean="logEventService"/></property>
  				<property name="kalturaToolContentHandler"><ref bean="kalturaToolContentHandler"/></property>
  				<property name="userManagementService"><ref bean="userManagementService"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -100,9 +99,12 @@
 	<bean id="kalturaUserDao" class="org.lamsfoundation.lams.tool.kaltura.dao.hibernate.KalturaUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="kalturaToolContentHandler" class="org.lamsfoundation.lams.tool.kaltura.util.KalturaToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="kalturaToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>kalturaworkspace</value></property>
+		<property name="repositoryUser"><value>kaltura</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

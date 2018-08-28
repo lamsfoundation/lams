@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -40,11 +40,6 @@ import org.lamsfoundation.lams.web.action.LamsAction;
 
 /**
  * @author daveg
- *
- *         XDoclet definition:
- *
- *
- *
  */
 public class ChooseActivityAction extends ActivityAction {
 
@@ -66,7 +61,7 @@ public class ChooseActivityAction extends ActivityAction {
 	    return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 	}
 
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 
 	// Get learner and lesson details.
 	Integer learnerId = LearningWebUtil.getUserId();

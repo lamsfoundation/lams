@@ -91,6 +91,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -112,9 +113,6 @@ import org.lamsfoundation.lams.util.JsonUtil;
  *
  */
 public class ObjectExtractor implements IObjectExtractor {
-
-    public static final Integer DEFAULT_COORD = new Integer(10); // default coordinate used if the entry came from Flash
-    // is 0 or less.
 
     protected IBaseDAO baseDAO = null;
     protected ILearningDesignDAO learningDesignDAO = null;
@@ -1077,7 +1075,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	// the coordinate can be Integer or Double in JSON, need to be ready for any
 	Number number = (Number) JsonUtil.opt(details, tag);
 	Integer coord = number == null ? null : number.intValue();
-	return (coord == null) || (coord >= 0) ? coord : ObjectExtractor.DEFAULT_COORD;
+	return (coord == null) || (coord >= 0) ? coord : CommonConstants.DEFAULT_COORD;
     }
 
     private void clearGrouping(Activity activity) {
