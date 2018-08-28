@@ -551,7 +551,7 @@ function showEmailDialog(userId){
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog).attr('src',
-					LAMS_URL + 'emailUser/composeMail.do?lessonID=' + lessonId
+					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
 					+ '&userID=' + userId);
 		},
 		'close' : function(){
@@ -568,7 +568,7 @@ function updatePresenceAvailableCount(){
 	if (checked) {
 		$.ajax({
 			dataType : 'text',
-			url : LAMS_URL + 'learning/learner/getPresenceChatActiveUserCount.do',
+			url : LAMS_URL + 'learning/learner.do?method=getPresenceChatActiveUserCount',
 			cache : false,
 			data : {
 				'lessonID'      : lessonId
@@ -1145,7 +1145,7 @@ function loadLearningDesignSVG() {
 	// fetch SVG just once, since it is immutable
 	$.ajax({
 		dataType : 'text',
-		url : LAMS_URL + 'home/getLearningDesignThumbnail.do',
+		url : LAMS_URL + 'home.do?method=getLearningDesignThumbnail',
 		async : false,
 		cache : false,
 		data : {
@@ -1173,7 +1173,7 @@ function loadLearningDesignSVG() {
 				// run the whole fetch again
 				updateSequenceTab();
 			}).attr('src', LAMS_URL 
-						   + 'authoring/author/generateSVG.do?selectable=false&learningDesignID=' + ldId).attr('width',0).attr('height',0).attr('style','border: 0px');
+						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID=' + ldId).attr('width',0).attr('height',0).attr('style','border: 0px');
 			
 		}
 	});
