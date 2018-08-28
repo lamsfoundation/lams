@@ -432,6 +432,7 @@
 					<c:forEach var="tool" items="${tools}">
 						<div class="tooltemplate">
 						<div
+                             name="tool${tool.learningLibraryTitle}"
 							 toolId="${tool.toolId}"
 							 learningLibraryId="${tool.learningLibraryId}"
 							 learningLibraryTitle="${tool.learningLibraryTitle}"

@@ -290,7 +290,7 @@
 
 	<div class="voffset10">
 	<lams:TSTable numColumns="4"> 
-		<th width="3%" clas="filter-false">
+		<th width="3%" id="idsorter" class="filter-false">
 			Id
 		</th>
 		<th width="10%" align="center"> 
