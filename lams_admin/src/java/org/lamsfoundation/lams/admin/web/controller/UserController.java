@@ -116,6 +116,9 @@ public class UserController {
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
+	userForm.setOrgId(orgId);
+	userForm.setUserId(userId);
+	
 	// Get all the css themess
 	List<Theme> themes = UserController.themeService.getAllThemes();
 	request.setAttribute("themes", themes);
