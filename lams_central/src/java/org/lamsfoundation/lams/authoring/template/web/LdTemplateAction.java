@@ -48,6 +48,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -1281,7 +1282,7 @@ public abstract class LdTemplateAction extends DispatchAction {
 	if (authoringFullService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    authoringFullService = (IAuthoringFullService) ctx.getBean("authoringFullService");
+	    authoringFullService = (IAuthoringFullService) ctx.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
 	}
 	return authoringFullService;
     }
