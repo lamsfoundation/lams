@@ -182,7 +182,7 @@ public class PortraitSaveController {
 
     /** Called from sysadmin to delete an inappropriate portrait */
     @RequestMapping("/deletePortrait")
-    public String deletePortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public String deletePortrait(HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	Integer userId = WebUtil.readIntParam(request, "userId", true);

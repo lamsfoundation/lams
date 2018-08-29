@@ -62,8 +62,8 @@ public class GradebookServlet extends HttpServlet {
     private static IUserManagementService userManagementService;
 
     private static final String GRADEBOOK_MONITOR_LESSON_URL = "gradebook/gradebookMonitoring.do?lessonID=";
-    private static final String GRADEBOOK_MONITOR_ORGANISATION_URL = "gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=";
-    private static final String GRADEBOOK_LEARNER_ORGANISATION_URL = "gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=";
+    private static final String GRADEBOOK_MONITOR_ORGANISATION_URL = "gradebook/gradebookMonitoring/courseMonitor.do?organisationID=";
+    private static final String GRADEBOOK_LEARNER_ORGANISATION_URL = "gradebook/gradebookLearning/courseLearner.do?organisationID=";
 
     /**
      * The doGet method of the servlet. <br>
