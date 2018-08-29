@@ -472,7 +472,7 @@ function showGradebookCourseDialog(orgID){
 			console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
+				+ 'gradebook/gradebookMonitoring/courseMonitor.do?organisationID=' + orgID);
 		}
 	}, true);
 }
@@ -508,7 +508,7 @@ function showConditionsDialog(lessonID){
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
+				+ 'lessonConditions/getIndexLessonConditions.do?lsId=' + lessonID);
 		}
 	}, true);
 }

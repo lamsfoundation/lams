@@ -46,15 +46,15 @@
 							</c:when>
 							<c:otherwise>
 								<img style="margin: 0 auto;" class="img-circle img-responsive"
-									title="<c:out value='fullName' />"
-									src="/lams/download/?uuid=<c:out value="portraitUuid" />&version=2&preferDownload=false" />
+									title="<c:out value='${fullName}' />"
+									src="/lams/download/?uuid=<c:out value="${portraitUuid}" />&version=2&preferDownload=false" />
 							</c:otherwise>
 						</c:choose>
 
 						<p class="text-center">
-							<c:out value="fullName" />
+							<c:out value="${fullName}" />
 								<br /> <i class="fa fa-envelope small"></i>
-							<c:out value="email" />
+							<c:out value="${email}" />
 						</p>
 					</div>
 					<hr>

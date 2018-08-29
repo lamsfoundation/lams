@@ -3,16 +3,14 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
-
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<c:url value="/lessonConditions.do" var="addLessonDependencyUrl">
-		<c:param name="method" value="addLessonDependency" />
+	<c:url value="/lessonConditions/addLessonDependency.do" var="addLessonDependencyUrl">
 		<c:param name="lsId" value="${lsId}" />
 	</c:url>
-	<c:url value="/lessonConditions.do" var="setDaysToLessonFinishUrl">
-		<c:param name="method" value="setDaysToLessonFinish" />
+	<c:url value="/lessonConditions/setDaysToLessonFinish.do" var="setDaysToLessonFinishUrl">
 		<c:param name="lsId" value="${lsId}" />
 	</c:url>
 	
@@ -27,13 +25,13 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		var lessonId="${lsId}";
 		var edit="${edit}";
 		
 		function removePrecedingLesson(precedingLessonId){
-			document.location.href="<lams:LAMSURL/>lessonConditions.do?method=removeLessonDependency&lsId=" + lessonId
+			document.location.href="<lams:LAMSURL/>lessonConditions/removeLessonDependency.do?lsId=" + lessonId
 						  + "&precedingLessonId=" + precedingLessonId;
 		}
 

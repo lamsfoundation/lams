@@ -53,7 +53,7 @@
 					<div class="form-group voffset10">
 						<div class="col-sm-12 controls">
 							<input type="submit" class="btn btn-default pull-right" value="Ok"
-								onClick="javascript:document.location='index.do';" tabindex="1"/>
+								onClick="javascript:document.location='<lams:LAMSURL/>index.do';" tabindex="1"/>
 						</div>	
 					</div>
 			</div>		

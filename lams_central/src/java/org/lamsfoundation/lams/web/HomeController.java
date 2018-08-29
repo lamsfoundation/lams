@@ -93,8 +93,7 @@ public class HomeController {
     @Qualifier("learningDesignService")
     private ILearningDesignService learningDesignService;
     @Autowired
-    @Qualifier("learningDesignService")
-    private static IGroupUserDAO groupUserDAO;
+    private IGroupUserDAO groupUserDAO;
     @Autowired
     @Qualifier("workspaceManagementService")
     private IWorkspaceManagementService workspaceManagementService;
