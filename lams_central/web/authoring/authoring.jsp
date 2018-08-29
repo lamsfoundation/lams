@@ -313,11 +313,11 @@
 		</div>
 		
 		<div class="btn-group btn-group-sm">
-			<button type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
+			<button id="openButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
 				<i class="fa fa-folder-open-o"></i>
 				<span><fmt:message key="authoring.fla.page.menu.open" /></span>
 			</button>
-			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button id="openDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
@@ -332,7 +332,7 @@
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 			</button>
-			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button id="saveDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
@@ -432,7 +432,7 @@
 					<c:forEach var="tool" items="${tools}">
 						<div class="tooltemplate">
 						<div
-                             name="tool${tool.learningLibraryTitle}"
+                             name="tool${tool.toolDisplayName}"
 							 toolId="${tool.toolId}"
 							 learningLibraryId="${tool.learningLibraryId}"
 							 learningLibraryTitle="${tool.learningLibraryTitle}"
