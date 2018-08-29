@@ -11,15 +11,15 @@
 	<html:hidden property="sid" />
 
 <div class="form-group">
-    <label for="serverid"><strong><fmt:message key="sysadmin.serverid" /></strong></label>
+    <label for="serverid"><strong><fmt:message key="sysadmin.serverid" /> *</strong></label>
     <html:text styleId="serverid" property="serverid" styleClass="form-control"/>
 </div>
 <div class="form-group">
-    <label for="serverkey"><strong><fmt:message key="sysadmin.serverkey" /></strong></label>
+    <label for="serverkey"><strong><fmt:message key="sysadmin.serverkey" /> *</strong></label>
     <html:text styleId="serverkey" property="serverkey" styleClass="form-control"/>
 </div>
 <div class="form-group">
-    <label for="servername"><strong><fmt:message key="sysadmin.servername" /></strong></label>
+    <label for="servername"><strong><fmt:message key="sysadmin.servername" /> *</strong></label>
     <html:text styleId="serverkey" property="servername"  styleClass="form-control"/>
 </div>
 <div class="form-group">
@@ -27,7 +27,7 @@
     <html:textarea styleId="serverdesc" property="serverdesc" cols="40" rows="3" styleClass="form-control"/>
 </div>
 <div class="form-group">
-    <label for="prefix"><strong><fmt:message key="sysadmin.prefix" /></strong></label>
+    <label for="prefix"><strong><fmt:message key="sysadmin.prefix" /> *</strong></label>
     <html:text styleId="prefix" property="prefix" styleClass="form-control"/>
 </div>
 <div class="checkbox">
