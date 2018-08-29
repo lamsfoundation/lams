@@ -86,6 +86,7 @@ public class UserRolesController {
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
@@ -93,6 +94,10 @@ public class UserRolesController {
 	if (orgId == null) {
 	    orgId = (Integer) request.getAttribute("orgId");
 	}
+	
+	userRolesForm.setOrgId(orgId);
+	userRolesForm.setUserId(userId);
+	
 	if (orgId == null) {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.org.invalid"));
 	    request.setAttribute("errorMap", errorMap);
@@ -158,7 +163,6 @@ public class UserRolesController {
 	    errorMap.add("roles", messageService.getMessage("msg.add.to.org", org.getName()));
 	}
 	userRolesForm.setRoles(roles);
-	request.setAttribute("errorMap", errorMap);
 	return "userrole";
     }
 

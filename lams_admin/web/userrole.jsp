@@ -19,8 +19,9 @@
 	<lams:Page type="admin" title="${title}" formID="userRolesForm">
 	
 		<form:form action="./userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
-		<form:hidden path="userId" />
 		<form:hidden path="orgId" />
+		<form:hidden path="userId" />
+		
 		<p>
 			<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 			<c:if test="${not empty pOrgId}">
@@ -40,6 +41,14 @@
 		<p><fmt:message key="msg.roles.mandatory"/></p>
 		
 		<div align="center">
+		<c:set var="errorKey" value="GLOBAL" /> 
+			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+				 <lams:Alert id="error" type="danger" close="false"> 
+				 <c:forEach var="error" items="${errorMap[errorKey]}"> 
+					 <c:out value="${error}" /><br /> 
+				 </c:forEach> 
+				</lams:Alert> 
+			</c:if>
 		<c:set var="errorKey" value="roles" /> 
 			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
 				 <lams:Alert id="error" type="danger" close="false"> 
