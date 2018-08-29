@@ -18,7 +18,7 @@
 	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userRolesForm">
 	
-		<form:form action="./userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
+		<form:form action="userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
 		<form:hidden path="orgId" />
 		<form:hidden path="userId" />
 		
@@ -73,8 +73,8 @@
 		<div class="row">
 		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
 		  <div class="col-xs-10">            
-		  	<c:forEach items="${rolelist}" var="role">
-		    	<form:checkbox path="${userRolesForm.roles}" value="${role.roleId}"/>
+		  	<c:forEach items="${rolelist}" var="role" varStatus="index">
+		    	<input type="checkbox" name="${userRolesForm.roles}" value="${role.roleId}"/>
 		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
 		    </c:forEach>
 		  </div>

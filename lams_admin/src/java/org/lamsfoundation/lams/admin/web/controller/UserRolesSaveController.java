@@ -40,7 +40,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -81,25 +82,27 @@ public class UserRolesSaveController {
 	    Collections.sort(rolelist);
 	}
 
-	Errors errors = null;
 	Integer orgId = userRolesForm.getOrgId();
 	Integer userId = userRolesForm.getUserId();
 	String[] roles = userRolesForm.getRoles();
 
 	request.setAttribute("org", orgId);
-
+	
 	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
 	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
 	User user = (User) service.findById(User.class, userId);
 
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
 	// user must have at least 1 role
 	if (roles.length < 1) {
-	    errors.reject("roles", messageService.getMessage("error.roles.empty"));
+	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
+	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("rolelist",
 		    service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
-	    return "redirect:/userroles.do";
+	    return "forward:/userroles.do";
 	}
 
 	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));

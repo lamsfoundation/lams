@@ -240,7 +240,7 @@ public class UserSaveController {
 	    } else {
 		request.setAttribute("orgId", orgId);
 		request.setAttribute("userId", user.getUserId());
-		return "redirect:/userroles.do";
+		return "forward:/userroles.do";
 	    }
 	} else {
 	    request.setAttribute("orgId", orgId);
