@@ -570,7 +570,8 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$allowLear
 
   $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
 
-  $load = array('method'	  =>	$method,
+  $load = array(
+  		'method'	  		  =>	$method,
 		'serverId'			  =>	$CFG->lamslesson_serverid,
 		'datetime'			  =>	$datetime,
 		'hashValue'			  =>	$hashvalue,
@@ -580,12 +581,9 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$allowLear
 		'title'				  =>	$title,
 		'desc'				  =>	$desc,
 		'country'			  =>	$country,
-		'lang'				  =>	$lang);
-	
-	//append 'allowLearnerRestart' param only if it's true
-	if (isset($allowLearnerRestart) && $allowLearnerRestart) {
-		$load['allowLearnerRestart'] = $allowLearnerRestart;
-	}
+		'lang'				  =>	$lang,
+		'allowLearnerRestart' =>	isset($allowLearnerRestart) && $allowLearnerRestart ? 'true' : 'false'
+	);
 
 
   // GET call to LAMS
