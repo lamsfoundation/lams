@@ -45,7 +45,7 @@
 		
 		<p><fmt:message key="msg.roles.mandatory.users"/></p>
 		
-		<form:form action="../userorgrolesave.do" modelAttribute="userOrgRoleForm" id="userOrgRoleForm" method="post">
+		<form:form action="userorgrolesave.do" modelAttribute="userOrgRoleForm" id="userOrgRoleForm" method="post">
 		<input type="hidden" name="orgId" />
 		
 		<table class="table table-condensed table-no-border">
@@ -66,7 +66,7 @@
 				</td>
 				<c:forEach var="role" items="${roles}">
 					<td>
-						<form:checkbox id="${userBean.login}Role${role.roleId}" path="userBeans[${beanIndex.index}].roleId" value="${role.roleId}" />&nbsp;
+						<input type="checkbox" id="${userBean.login}Role${role.roleId}" name="userBeans[${beanIndex.index}].roleId" value="${role.roleId}" />&nbsp;
 					</td>
 				</c:forEach>
 			</tr>
