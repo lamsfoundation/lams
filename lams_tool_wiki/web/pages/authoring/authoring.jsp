@@ -1,32 +1,36 @@
 <!DOCTYPE html>
-<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>    
-
+            
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-			<c:set var="lams">
-				<lams:LAMSURL />
-			</c:set>
-			
-			<c:set var="tool">
-				<lams:WebAppURL />
-			</c:set>
-			<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-			
-			<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-			<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
-			<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-			<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-			<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
-			<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-			<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-			
-			<script type="text/javascript">
-				$(document).ready(function() {$("time.timeago").timeago();});
-			</script>
-
+	<c:set var="lams"> <lams:LAMSURL /> </c:set>
+	<c:set var="tool"> <lams:WebAppURL /> </c:set>
 	
-	<body class="stripes" onload="init();">
+	<lams:head>
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+	
+		<lams:headItems />
+		<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+
+		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/validation.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		
+		<script type="text/javascript">
+			$(document).ready(function() {$("time.timeago").timeago();});
+		</script>
+
+		
+	</lams:head>
+
+	<body class="stripes">
 		<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
 
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
@@ -54,7 +58,7 @@
 					</lams:Alert>
 				</c:if>
 			
-			   <lams:TabBodyArea>
+			<lams:TabBodyArea>
 			    <c:set var="errorKey" value="GLOBAL" />
         			<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
            				 <lams:Alert id="error" type="danger" close="false">
@@ -63,7 +67,7 @@
              				  </c:forEach>
            				 </lams:Alert>
       			    </c:if>
-s				
+				
 					<%-- Page tabs --%>
 					<lams:TabBodys>
 						<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
@@ -80,17 +84,12 @@ s
 							contentFolderID="${sessionMap.contentFolderID}" />
 					</div>
 		
-				</lams:TabBodyArea>
+			</lams:TabBodyArea>
 					
 			<div id="footer"></div>
 		
 			</lams:Page>
 		</form:form>
-
-
 	</body>
 </lams:html>
-
-
-
 

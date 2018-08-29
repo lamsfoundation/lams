@@ -18,19 +18,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<!DOCTYPE html>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/taglibs.jsp"%>
 
-	<c:set var="title"><fmt:message key="label.synch.gate.title"/></c:set>
-	<lams:Page title="${title}" type="monitoring">
+<lams:html>
+    <lams:head>
+		<lams:css/>
+		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
+    </lams:head>
+    
+    <body class="stripes">
+		<c:set var="title"><fmt:message key="label.synch.gate.title"/></c:set>
+		<lams:Page title="${title}" type="monitoring">
+	
+			<%@ include file="gateInfo.jsp" %>
+			<%@ include file="gateStatus.jsp" %>
+	
+		</lams:Page>
 
-		<%@ include file="gateInfo.jsp" %>
-		<%@ include file="gateStatus.jsp" %>
+		<div id="footer">
+		</div><!--closes footer-->
 
-	</lams:Page>
-
+    </body>
+</lams:html>

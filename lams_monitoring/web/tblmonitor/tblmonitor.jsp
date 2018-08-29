@@ -1,6 +1,7 @@
+<!DOCTYPE html>
+
 <%@ include file="/template/taglibs.jsp"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
     <title><fmt:message key="label.tbl.monitor"/></title>
@@ -38,8 +39,8 @@
 			//hide burning-questions if it's disabled in a tool
 			if ("${traToolContentId}" != "") {
 		        $.ajax({
-		            url: '<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do',
-		            data: 'method=isBurningQuestionsEnabled&toolContentID=${traToolContentId}',
+		            url: '<lams:LAMSURL/>tool/lascrt11/tblmonitoring/isBurningQuestionsEnabled.do',
+		            data: 'toolContentID=${traToolContentId}',
 		            type: 'post',
 		            success: function (json) {
 			            if (!json.isBurningQuestionsEnabled) {
@@ -142,7 +143,7 @@
 		}
 
         function switchToRegularMonitor() {
-        	location.href = "<lams:LAMSURL/>home.do?method=monitorLesson&lessonID=${lesson.lessonId}";
+        	location.href = "<lams:LAMSURL/>home/monitorLesson.do?lessonID=${lesson.lessonId}";
     	}
 	</script>
 </lams:head>

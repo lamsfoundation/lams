@@ -74,8 +74,6 @@ public class AuthoringForm extends WikiPageForm {
 
     String currentTab;
 
-    String dispatch;
-
     String sessionMapID;
 
     Long deleteFileUuid;
@@ -111,14 +109,6 @@ public class AuthoringForm extends WikiPageForm {
 
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public boolean isLockOnFinished() {

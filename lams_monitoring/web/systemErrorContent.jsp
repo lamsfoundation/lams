@@ -18,24 +18,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<!DOCTYPE html>
 
-<!-- taglib definition-->
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ include file="/taglibs.jsp"%>
 
-<!-- end of taglib definition -->
-<tr>
-	<td>
-		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
-			<tr> 
-				<td height="138" valign="top"> 
-				 <table width="90%" border="0" cellspacing="0" cellpadding="0">
-				 	<br/>
-					<br/>
-   					<%@ include file="errorbox.jsp" %>
-				 </table>
-				</td>
-			 </tr>
-		</table>
-	</td>
-</tr>
+<lams:html>
+    <lams:head>
+		<lams:css/>
+		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
+    </lams:head>
+    
+    <body class="stripes">
+		<tr>
+			<td>
+				<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
+					<tr> 
+						<td height="138" valign="top"> 
+						 <table width="90%" border="0" cellspacing="0" cellpadding="0">
+						 	<br/>
+							<br/>
+		   					<%@ include file="errorbox.jsp" %>
+						 </table>
+						</td>
+					 </tr>
+				</table>
+			</td>
+		</tr>
+		<div id="footer">
+		</div><!--closes footer-->
+
+    </body>
+</lams:html>
+

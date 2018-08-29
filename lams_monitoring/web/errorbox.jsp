@@ -1,15 +1,11 @@
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ page import="org.apache.struts.Globals" %>
+<%@ include file="/taglibs.jsp"%>
 
-<logic:present name="<%=Globals.ERROR_KEY%>">
-<tr>
-	<td width="10%"  align="right" >
-		<i class="fa fa-fw fa-exclamation-circle text-danger" title="<fmt:message key="error.title"/>"></i>
-	</td>
-	<td width="90%" valign="center" class="body" colspan="2">
-		<html:errors/>
-	</td>
-</tr>
-</logic:present>
+<%-- Error Messages --%>
+<c:set var="errorKey" value="GLOBAL" /> 
+<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+    <lams:Alert id="error" type="danger" close="false"> 
+        <c:forEach var="error" items="${errorMap[errorKey]}"> 
+            <c:out value="${error}" /><br /> 
+        </c:forEach> 
+    </lams:Alert> 
+</c:if>

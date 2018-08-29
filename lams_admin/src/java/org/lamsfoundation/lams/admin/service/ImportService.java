@@ -37,7 +37,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
@@ -56,6 +55,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -133,20 +133,20 @@ public class ImportService implements IImportService {
     private static final short ADMIN_CHANGE_STATUS = 7;
 
     // class-wide variables
-    ArrayList<ArrayList> results = new ArrayList<ArrayList>();
-    ArrayList<String> rowResult = new ArrayList<String>();
+    ArrayList<ArrayList> results = new ArrayList<>();
+    ArrayList<String> rowResult = new ArrayList<>();
     private boolean emptyRow;
     private boolean hasError;
     private Organisation parentOrg;
 
-    private HSSFSheet getSheet(FormFile fileItem) throws IOException {
+    private HSSFSheet getSheet(MultipartFile fileItem) throws IOException {
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 	HSSFWorkbook wb = new HSSFWorkbook(fs);
 	return wb.getSheetAt(0);
     }
 
     @Override
-    public boolean isUserSpreadsheet(FormFile fileItem) throws IOException {
+    public boolean isUserSpreadsheet(MultipartFile fileItem) throws IOException {
 	HSSFSheet sheet = getSheet(fileItem);
 	HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
 	String string = parseStringCell(row.getCell(ImportService.PASSWORD));
@@ -154,7 +154,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public boolean isRolesSpreadsheet(FormFile fileItem) throws IOException {
+    public boolean isRolesSpreadsheet(MultipartFile fileItem) throws IOException {
 	HSSFSheet sheet = getSheet(fileItem);
 	HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
 	String string = parseStringCell(row.getCell(ImportService.ORGANISATION));
@@ -162,7 +162,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
+    public List parseSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
 	if (isUserSpreadsheet(fileItem)) {
 	    return parseUserSpreadsheet(fileItem, sessionId);
 	} else if (isRolesSpreadsheet(fileItem)) {
@@ -175,8 +175,8 @@ public class ImportService implements IImportService {
     // each item in the list lists the id, name, and parent's id of that org; otherwise
     // the items in the list are error messages.
     @Override
-    public List parseGroupSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
-	results = new ArrayList<ArrayList>();
+    public List parseGroupSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+	results = new ArrayList<>();
 	parentOrg = service.getRootOrganisation();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
@@ -191,7 +191,7 @@ public class ImportService implements IImportService {
 	for (int i = startRow + 1; i < (endRow + 1); i++) {
 	    emptyRow = true;
 	    hasError = false;
-	    rowResult = new ArrayList<String>();
+	    rowResult = new ArrayList<>();
 	    row = sheet.getRow(i);
 	    if (row != null) {
 		org = parseGroup(row, i);
@@ -297,7 +297,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public int getNumRows(FormFile fileItem) throws IOException {
+    public int getNumRows(MultipartFile fileItem) throws IOException {
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
@@ -305,8 +305,8 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseUserSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
-	results = new ArrayList<ArrayList>();
+    public List parseUserSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+	results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
@@ -322,7 +322,7 @@ public class ImportService implements IImportService {
 	for (int i = startRow + 1; i < (endRow + 1); i++) {
 	    emptyRow = true;
 	    hasError = false;
-	    rowResult = new ArrayList<String>();
+	    rowResult = new ArrayList<>();
 	    row = sheet.getRow(i);
 	    user = parseUser(row, i);
 
@@ -376,8 +376,8 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseRolesSpreadsheet(FormFile fileItem, String sessionId) throws IOException {
-	results = new ArrayList<ArrayList>();
+    public List parseRolesSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+	results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
@@ -393,7 +393,7 @@ public class ImportService implements IImportService {
 	for (int i = startRow + 1; i < (endRow + 1); i++) {
 	    emptyRow = true;
 	    hasError = false;
-	    rowResult = new ArrayList<String>();
+	    rowResult = new ArrayList<>();
 	    row = sheet.getRow(i);
 
 	    String login = parseStringCell(row.getCell(ImportService.LOGIN));
@@ -711,7 +711,7 @@ public class ImportService implements IImportService {
 		ImportService.log.error("Caught exception when reading roles in spreadsheet: " + e.getMessage());
 		return null;
 	    }
-	    List<String> roles = new ArrayList<String>();
+	    List<String> roles = new ArrayList<>();
 	    int fromIndex = 0;
 	    int index = roleDescription.indexOf(IImportService.SEPARATOR, fromIndex);
 	    while (index != -1) {
@@ -751,7 +751,7 @@ public class ImportService implements IImportService {
     // return false if a role shouldn't be assigned in given org type
     private boolean checkValidRoles(List<String> idList, boolean isSysadmin, OrganisationType orgType) {
 	// convert list of id's into list of Roles
-	List<Role> roleList = new ArrayList<Role>();
+	List<Role> roleList = new ArrayList<>();
 	for (String id : idList) {
 	    Role role = (Role) service.findById(Role.class, Integer.parseInt(id));
 	    if (role != null) {

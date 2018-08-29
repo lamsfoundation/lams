@@ -168,10 +168,10 @@
 
 		//Disable sequence button handler 
 		$('#disable-sequence-button').click(function () {
-	        var method = (lessonStateId == 3) ? "suspendLesson" : "unsuspendLesson";
+	        var method = (lessonStateId == 3) ? "suspendLesson.do" : "unsuspendLesson.do";
 			$.ajax({
 				dataType : 'xml',
-				url : LAMS_URL + 'monitoring/monitoring.do',
+				url : LAMS_URL + 'monitoring/monitoring/',
 				cache : false,
 				data : {
 					'method'    : method,

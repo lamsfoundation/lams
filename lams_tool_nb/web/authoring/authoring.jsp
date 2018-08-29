@@ -84,7 +84,6 @@
   				</lams:TabBodys>
 		
 				<!-- Button Row -->
-				<form:hidden path="method" value="save" />
 				<c:set var="accessMode">
 					<c:choose>
 						<c:when test="${nbAuthoringForm.defineLater == 'true'}">

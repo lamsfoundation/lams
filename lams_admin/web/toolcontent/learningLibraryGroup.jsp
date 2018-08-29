@@ -1,17 +1,18 @@
+<!DOCTYPE html>
+
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/learningLibraryGroup.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/learningLibraryGroup.css" type="text/css" media="screen" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/learningLibraryGroup.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>admin/includes/javascript/learningLibraryGroup.js"></script>
 	<script type="text/javascript">
 		var groups = ${groups},	
 			learningLibraries = ${learningLibraries},
@@ -31,33 +32,34 @@
 			};
 	</script>
 </lams:head>
+
 <body>
-
-<div id="titleDiv">
-	<fmt:message key="tool.groups.dialog.instructions" />
-</div>
-
-<table id="groupsTable">
-	<tr>
-		<td id="learningLibraryCell">
-			<div class="learningLibraryContainer"></div>
-		</td>
-		<td id="groupsCell">
-			<div id="newGroupPlaceholder" class="groupContainer">
-				<div><fmt:message key="tool.groups.add.group.button" /></div>
+	
+		<div id="titleDiv">
+			<fmt:message key="tool.groups.dialog.instructions" />
+		</div>
+		
+		<table id="groupsTable">
+			<tr>
+				<td id="learningLibraryCell">
+					<div class="learningLibraryContainer"></div>
+				</td>
+				<td id="groupsCell">
+					<div id="newGroupPlaceholder" class="groupContainer">
+						<div><fmt:message key="tool.groups.add.group.button" /></div>
+					</div>
+				</td>
+			</tr>
+		</table>
+		
+		<!-- A template which gets cloned when a group is added -->
+		<div id="groupTemplate" class="groupContainer">
+			<div class="learningLibraryContainerTitle">
+				<i class="removeGroupButton fa fa-times" src="<lams:LAMSURL/>images/css/delete.png"
+					 title="<fmt:message key='tool.groups.remove.group.button.tooltip' />"></i>
+				<input type="text" />
 			</div>
-		</td>
-	</tr>
-</table>
-
-<!-- A template which gets cloned when a group is added -->
-<div id="groupTemplate" class="groupContainer">
-	<div class="learningLibraryContainerTitle">
-		<i class="removeGroupButton fa fa-times" src="<lams:LAMSURL/>images/css/delete.png"
-			 title="<fmt:message key='tool.groups.remove.group.button.tooltip' />"></i>
-		<input type="text" />
-	</div>
-	<div class="learningLibraryContainer"></div>
-</div>
+			<div class="learningLibraryContainer"></div>
+		</div>
 </body>
 </lams:html>

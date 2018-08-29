@@ -1,83 +1,109 @@
+<!DOCTYPE html>
+
 <%@ include file="/taglibs.jsp"%>
 
-<html-el:form action="/orgsave.do" method="post">
-<html-el:hidden property="orgId" />
-<html-el:hidden property="parentId" />
-<html-el:hidden property="typeId" />
-<html:hidden property="courseAdminCanAddNewUsers" />
-<html:hidden property="courseAdminCanBrowseAllUsers" />
-<html:hidden property="courseAdminCanChangeStatusOfCourse" />
-<logic:equal name="OrganisationForm" property="courseAdminCanChangeStatusOfCourse" value="false">
-	<html:hidden property="stateId" />
-</logic:equal>
-<p>
-	<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
-	<a href="orgmanage.do?org=<bean:write name="OrganisationForm" property="orgId" />" class="btn btn-default">
-		<bean:write name="OrganisationForm" property="name"/>
-	</a>
-</p>
+<lams:html>
+<lams:head>
+	<c:set var="title"><fmt:message key="admin.organisation.entry"/></c:set>
+	<title>${title}</title>
 
-<h1>
-	<fmt:message key="admin.edit"/> <bean:write name="OrganisationForm" property="name"/>
-</h1>
+	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
+	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+</lams:head>
+    
+<body class="stripes">
 
-<div align="center"><html-el:errors/></div>
-<table  class="table table-no-border">
-	<tr>
-		<td><fmt:message key="admin.organisation.name"/>:</td>
-		<td><html-el:text property="name" size="40" styleClass="form-control"/> *</td>
-	</tr>
-	<tr>
-	<td><fmt:message key="admin.organisation.code"/>:</td>
-		<td><html-el:text property="code" size="20"  styleClass="form-control"/></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="admin.organisation.description"/>:</td>
-		<td><html-el:textarea property="description" cols="50" rows="3"  styleClass="form-control"/></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="admin.organisation.locale"/>:</td>
-		<td>
-			<html-el:select property="localeId"  styleClass="form-control">
-				<c:forEach items="${locales}" var="locale">
-					<html-el:option value="${locale.localeId}">
-						<c:out value="${locale.description}" />
-					</html-el:option>
-				</c:forEach>	
-			</html-el:select>
-		</td>
-	</tr>
-	<logic:equal name="OrganisationForm" property="courseAdminCanChangeStatusOfCourse" value="true">
-	<tr>
-		<td><fmt:message key="admin.organisation.status"/>:</td>
-		<td>
-			<html-el:select property="stateId"  styleClass="form-control">
-				<c:forEach items="${status}" var="state">
-					<html-el:option value="${state.organisationStateId}"><fmt:message key="organisation.state.${state.description}"/></html-el:option>
-				</c:forEach>
-			</html-el:select>
-		</td>
-	</tr>
-	</logic:equal>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td><logic:equal name="OrganisationForm" property="typeId" value="2"><fmt:message key="msg.group.organisation_id"/></logic:equal>
-			<logic:equal name="OrganisationForm" property="typeId" value="3"><fmt:message key="msg.subgroup.organisation_id"/></logic:equal>
-			<bean:write name="OrganisationForm" property="orgId" />.
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-</table>
+	<lams:Page type="admin" title="${title}" formID="organisationForm">
+	
+		<form:form action="../orgsave.do" modelAttribute="organisationForm" id="organisationForm" method="post">
+				<form:hidden path="orgId" />
+				<form:hidden path="parentId" />
+				<form:hidden path="typeId" />
+				<form:hidden path="courseAdminCanAddNewUsers" />
+				<form:hidden path="courseAdminCanBrowseAllUsers" />
+				<form:hidden path="courseAdminCanChangeStatusOfCourse" />
+				<c:if test="${organisationForm.courseAdminCanChangeStatusOfCourse == false}">
+					<form:hidden path="stateId" />
+				</c:if>
+				<p>
+					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
+					<a href="orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default">
+						<c:out value="${organisationForm.name}"/>
+					</a>
+				</p>
+				
+				<h1>
+					<fmt:message key="admin.edit"/> <c:out value="${organisationForm.name}"/>
+				</h1>
+				
+				<div align="center"><html-el:errors/></div>
+				<table  class="table table-no-border">
+					<tr>
+						<td><fmt:message key="admin.organisation.name"/>:</td>
+						<td><form:input path="name" size="40" cssClass="form-control" /> *</td>
+					</tr>
+					<tr>
+					<td><fmt:message key="admin.organisation.code"/>:</td>
+						<td><form:input path="code" size="20"  cssClass="form-control" /></td>
+					</tr>
+					<tr>
+						<td><fmt:message key="admin.organisation.description"/>:</td>
+						<td><form:textarea path="description" cols="50" rows="3"  cssClass="form-control"></form:textarea></td>
+					</tr>
+					<tr>
+						<td><fmt:message key="admin.organisation.locale"/>:</td>
+						<td>
+							<form:select path="localeId"  cssClass="form-control">
+								<c:forEach items="${locales}" var="locale">
+									<form:option value="${locale.localeId}">
+										<c:out value="${locale.description}" />
+									</form:option>
+								</c:forEach>	
+							</form:select>
+						</td>
+					</tr>
+					<c:if test=${organisationForm.courseAdminCanChangeStatusOfCourse == true}>
+					<tr>
+						<td><fmt:message key="admin.organisation.status"/>:</td>
+						<td>
+							<form:select path="stateId"  cssClass="form-control">
+								<c:forEach items="${status}" var="state">
+									<form:option value="${state.organisationStateId}"><fmt:message key="organisation.state.${state.description}"/></form:option>
+								</c:forEach>
+							</form:select>
+						</td>
+					</tr>
+					</c:if>
+					<tr>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+					<tr>
+						<td><c:if test="${organisationForm.typeId == 2}"><fmt:message key="msg.group.organisation_id"/></c:if>
+							<c:if test="${organisationForm.typeId == 3}"><fmt:message key="msg.subgroup.organisation_id"/></c:if>
+							<c:out value="${organisationForm.orgId}" />.
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+				</table>
+				
+				<div class="pull-right">
+					<a href="javascript:history.back();" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+					<input type="reset" class="btn btn-default loffset5" value="<fmt:message key="admin.reset"/>" />
+					<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
+				</div>
+				
+		</form:form>
+	</lams:Page>
 
-<div class="pull-right">
-	<html-el:cancel styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html-el:cancel>
-	<html-el:reset styleClass="btn btn-default loffset5"><fmt:message key="admin.reset"/></html-el:reset>
-	<html-el:submit styleClass="btn btn-primary loffset5"><fmt:message key="admin.save"/></html-el:submit>
-</div>
+</body>
+</lams:html>
 
-</html-el:form>
+
+
+
 		

@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
-import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -51,13 +50,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * This action handles all the authoring actions, which include opening author, saving, uploading instruction files and
  * all the wikipage actions
  *
- * It inherits from the WikiPageAction which inherits from the LamsDispatchAction so that common actions can be used in
- * learner, monitor and author
  *
  * @author lfoxton
  */
@@ -78,16 +76,10 @@ public class AuthoringController extends WikiPageController {
 
     private static final String KEY_MODE = "mode";
 
-    /**
-     * Default method when no dispatch parameter is specified. It is expected that the parameter
-     * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     *
-     */
     @RequestMapping("/authoring")
-    public String unspecified(@ModelAttribute WikiPageForm wikiForm, HttpServletRequest request)
+    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws Exception {
 
-	AuthoringForm authoringForm = new AuthoringForm();
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -166,39 +158,101 @@ public class AuthoringController extends WikiPageController {
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
-	request.setAttribute("authoringForm", authoringForm);
 
 	return "pages/authoring/authoring";
     }
 
-    @Override
-    public String removePage(HttpServletRequest request) throws Exception {
+    @RequestMapping(path = "/editPage", method = RequestMethod.POST)
+    public String editPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.editPage(authoringForm, request);
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return returnToWiki(authoringForm, request, currentPageUid);
+    }
 
-	WikiPageForm wikiForm = new WikiPageForm();
+    @RequestMapping(path = "/revertPage", method = RequestMethod.POST)
+    public String revertPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.revertPage(authoringForm, request);
+	return unspecified(authoringForm, request);
+    }
+
+    @RequestMapping(path = "/comparePage")
+    public String comparePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.comparePage(authoringForm, request);
+	return "pages/wiki/compare";
+    }
+
+    @RequestMapping(path = "/viewPage")
+    public String viewPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	super.viewPage(authoringForm, request);
+	return "pages/wiki/viewWiki";
+    }
+
+    @RequestMapping(path = "/changePage", method = RequestMethod.POST)
+    public String changePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	Long pageUid = super.changePage(authoringForm, request);
+	return this.returnToWiki(authoringForm, request, pageUid);
+    }
+
+    @RequestMapping(path = "/addPage", method = RequestMethod.POST)
+    public String addPage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+	Long currentWikiPageId = super.addPage(authoringForm, request);
+	return returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping(path = "/removePage", method = RequestMethod.POST)
+    public String removePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws Exception {
+
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
 	if (wiki.isDefineLater()) {
 	    // Only mark as removed if editing a live version (monitor/live edit)
-	    return super.removePage(request);
+	    super.removePage(authoringForm, request);
+	    return returnToWiki(authoringForm, request, currentPageUid);
 	}
-	// Completely delete the page
-	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
-
 	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
 	wikiService.deleteWikiPage(wikiPage);
 
 	// return to the main page, by setting the current page to null
-	return this.returnToWiki(wikiForm, request, null);
+	return this.returnToWiki(authoringForm, request, null);
+    }
+
+    @RequestMapping(path = "/restorePage", method = RequestMethod.POST)
+    public String restorePage(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.restorePage(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return this.returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @RequestMapping(path = "/toggleLearnerSubsciption", method = RequestMethod.POST)
+    public String toggleLearnerSubsciption(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws Exception {
+	super.toggleLearnerSubsciption(authoringForm, request);
+	Long currentWikiPageId = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+	return returnToWiki(authoringForm, request, currentWikiPageId);
+    }
+
+    @Override
+    @RequestMapping(path = "/notifyWikiChange", method = RequestMethod.POST)
+    public void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
+	    HttpServletRequest request) throws Exception {
+	super.notifyWikiChange(toolSessionID, subjectLangKey, bodyLangKey, wikiUser, request);
+    }
+
+    @RequestMapping("/revertJavascriptTokenReplacement")
+    public void revertJavascriptTokenReplacement(AuthoringForm authoringForm) {
+	super.revertJavascriptTokenReplacement(authoringForm);
     }
 
     /**
      * Wrapper method to make sure that the correct wiki is returned to from the WikiPageAction class
      */
-    @Override
-    protected String returnToWiki(WikiPageForm wikiForm, HttpServletRequest request, Long currentWikiPageId)
+    protected String returnToWiki(AuthoringForm authoringForm, HttpServletRequest request, Long currentWikiPageId)
 	    throws Exception {
-	wikiForm.setCurrentWikiPageId(currentWikiPageId);
-	return unspecified((AuthoringForm) wikiForm, request);
+	authoringForm.setCurrentWikiPageId(currentWikiPageId);
+	return unspecified(authoringForm, request);
     }
 
     /**
@@ -215,7 +269,7 @@ public class AuthoringController extends WikiPageController {
      *
      * The WikiPage content is not saved here as that is done in the WikiPageAction
      */
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// TODO need error checking.

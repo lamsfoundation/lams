@@ -1,16 +1,10 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\n"); %>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<html:base/>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<title><fmt:message key="${title}"/></title>
 	
@@ -49,7 +43,7 @@
 			jQuery("#list3").jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
-			   	url: "<c:url value='/emailNotifications.do'/>?method=getUsers" + getSearchParams(),
+			   	url: "<c:url value='/emailNotifications/getUsers.do'/>" + getSearchParams(),
 				datatype: "json",
 			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
 			   	colModel:[
@@ -149,8 +143,8 @@
     			scheduleDate = (scheduleDate == null) ? "" : scheduleDate.getTime();
     	        $.ajax({
     	        	async: false,
-    	            url: '<c:url value="/emailNotifications.do"/>',
-    	            data: "method=emailUsers&emailBody=" + emailBody + params,
+    	            url: '<c:url value="/emailNotifications/emailUsers.do"/>',
+    	            data: "emailBody=" + emailBody + params,
     	            dataType: 'json',
     	            type: 'post',
     	            success: function (json) {
@@ -169,7 +163,7 @@
 	
 		function getUsers(){
 			var searchParams = getSearchParams();
-			var url = "<c:url value='/emailNotifications.do'/>?method=getUsers" + searchParams;
+			var url = "<c:url value='/emailNotifications/getUsers.do'/>" + searchParams;
 			if (searchParams.length) {
 				$("#list3").setGridParam({datatype:'json', page:1, url: url}).trigger('reloadGrid');	
 			} else {
@@ -219,15 +213,15 @@
     
 <body class="stripes">
 
-	<lams:Page title="${title}" type="admin">
+	<lams:Page title="${title}" type="admin" formID="emailNotificationsForm">
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="btn-group pull-right">
-					<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&organisationID=${org.organisationId}"
+					<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?organisationID=${org.organisationId}"
 					   id="listEmailsHref" class="btn btn-default btn-sm">
 						<i class="fa fa-calendar"></i> <fmt:message key="email.notifications.scheduled.messages.button" />
 					</a>
-					<a href="<c:url value='/emailNotifications.do'/>?method=showArchivedEmails&organisationID=${org.organisationId}"
+					<a href="<c:url value='/emailNotifications/showArchivedEmails.do'/>?organisationID=${org.organisationId}"
 					   id="archiveHref" class="btn btn-default btn-sm">
 						<i class="fa fa-archive"></i> <fmt:message key="email.notifications.archived.messages.button" />
 					</a>		
@@ -238,7 +232,7 @@
 			<div class="col-sm-6">
 				<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 				
-				<form action="<c:url value="/emailNotifications.do"/>?method=emailUsers" method="post" id="emailNotificationsForm" >	
+				<form:form action="emailUsers.do" method="post" modelAttribute="emailNotificationsForm" id="emailNotificationsForm" >	
 				
 				<!-- Dropdown menu for choosing a user search type -->
 				<div>
@@ -285,7 +279,7 @@
 		
 				<%@ include file="additionalSettings.jsp"%>
 		
-				</form>
+				</form:form>
 			
 			</div>
 			<div class="col-sm-6">

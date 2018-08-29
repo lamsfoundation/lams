@@ -1,15 +1,21 @@
 <!DOCTYPE html>
             
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 
 <lams:html>
-		<c:set var="tool">
-		<lams:WebAppURL />
-		</c:set>
+
+	<c:set var="lams"> <lams:LAMSURL /> </c:set>
+	<c:set var="tool"> <lams:WebAppURL /> </c:set>
+	
+	<lams:head>
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+	
+		<lams:headItems />
 		<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-		
+
 		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.timeago.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js"></script>
@@ -22,6 +28,9 @@
 		<script type="text/javascript">
 			$(document).ready(function() {$("time.timeago").timeago();});
 		</script>
+
+		
+	</lams:head>
 	
 	<body class="stripes">
 		<script type="text/javascript">
@@ -30,13 +39,12 @@
 		});
 		</script>
 		
-		<form:form action="/monitoring" id="monitoringForm" modelAttribute="monitoringForm" method="post" enctype="multipart/form-data">
+		<form:form id="monitoringForm" modelAttribute="monitoringForm" method="post" enctype="multipart/form-data">
 		
-		<form:hidden path="dispatch" id="dispatch" />
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="contentFolderID" />
 		<!--<form:hidden path="mode"/>-->
-		<form:hidden path="currentWikiPage" value="${currentWikiPage.uid}" id="currentWikiPage" />
+		<input type="hidden" name="currentWikiPage" value="${currentWikiPage.uid}" id="currentWikiPage" />
 		<input type="hidden" id="wikiLinks" />
 		<form:hidden path="newPageName" id="newPageName" />
 		<form:hidden path="historyPageContentId" id="historyPageContentId" />
@@ -254,8 +262,8 @@
 							&nbsp;
 						<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
 						
-							<a href="javascript:doEditOrAdd('addPage');" class="class="btn btn-primary pull-right voffset5""><fmt:message key="label.wiki.savechanges"></fmt:message></a>
-							<a href="javascript:cancelAdd();changeDiv('view');" class="class="btn default pull-right voffset5""><fmt:message key="button.cancel"></fmt:message></a>
+							<a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary pull-right voffset5"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
+							<a href="javascript:cancelAdd();changeDiv('view');" class="btn default pull-right voffset5"><fmt:message key="button.cancel"></fmt:message></a>
 					</div>
 				</div>
 		
@@ -320,9 +328,9 @@
 				document.getElementById("wikiLinks").value = wikiLinkArray.toString();
 			}
 			
-			function doEditOrAdd(dispatch) {
+			function doEditOrAdd(actionMethod) {
 				var title="";
-				if(dispatch == "editPage") {
+				if(actionMethod == "editPage") {
 					title = document.getElementById("title").value;
 				}
 				else {
@@ -337,7 +345,7 @@
 				}
 				
 				for (i=0; i<wikiLinkArray.length; i++) {
-					if(dispatch == "editPage" && wikiLinkArray[i] == '${currentWikiPage.javaScriptTitle}') {
+					if(actionMethod == "editPage" && wikiLinkArray[i] == '${currentWikiPage.javaScriptTitle}') {
 						continue;
 					}
 					
@@ -349,12 +357,14 @@
 				
 				// if all validation fulfilled, we can continue
 				document.getElementById("title").value = trim(title);
-				submitWiki(dispatch);
+				submitWiki(actionMethod);
 			}
-			
-			function submitWiki(dispatch) {
-				document.getElementById("dispatch").value=dispatch;
-				replaceJavascriptTokenAndSubmit("monitoringForm");
+
+		    function submitWiki(actionMethod)
+			{
+			  		document.forms.monitoringForm.action=actionMethod+".do"; 
+			  		document.forms.monitoringForm.submit();
+			  		replaceJavascriptTokenAndSubmit("monitoringForm");
 			}
 			
 			CKEDITOR.on('instanceCreated',function (editorInstance) { 	
@@ -362,7 +372,7 @@
 			});
 			
 			function refreshPage() {
-				var url = "<lams:WebAppURL/>/monitoring/showWiki.do?toolSessionID=${sessionDTO.sessionID}&currentWikiPageId=${currentWikiPage.uid}&contentFolderID=${contentFolderID}"
+				var url = "<lams:WebAppURL/>monitoring/showWiki.do?toolSessionID=${sessionDTO.sessionID}&currentWikiPageId=${currentWikiPage.uid}&contentFolderID=${contentFolderID}"
 				window.location=url;
 			}
 			

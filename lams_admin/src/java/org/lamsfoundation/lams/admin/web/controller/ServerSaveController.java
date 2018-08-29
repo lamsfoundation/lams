@@ -1,0 +1,146 @@
+/****************************************************************
+ * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+package org.lamsfoundation.lams.admin.web.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
+import org.lamsfoundation.lams.integration.ExtServer;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
+
+/**
+ * <p>
+ * <a href="ServerSaveAction.java.html"><i>View Source</i><a>
+ * </p>
+ *
+ * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ */
+@Controller
+public class ServerSaveController {
+
+    private static IIntegrationService service;
+    private static IUserManagementService userService;
+    private static MessageService messageService;
+
+    @Autowired
+    private WebApplicationContext applicationContext;
+
+    @RequestMapping(path = "/serversave")
+    public String execute(@ModelAttribute ExtServerForm extServerForm, BindingResult bindingResult,
+	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+	service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
+	userService = AdminServiceProxy.getService(applicationContext.getServletContext());
+	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
+	if (StringUtils.trimToNull(extServerForm.getServerid()) == null) {
+	    errorMap.add("serverid", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.serverid") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getServerkey()) == null) {
+	    errorMap.add("serverkey", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.serverkey") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getServername()) == null) {
+	    errorMap.add("servername", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.servername") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getPrefix()) == null) {
+	    errorMap.add("prefix", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.prefix") }));
+	}
+	if (StringUtils.trimToNull(extServerForm.getPrefix()) == null) {
+	    errorMap.add("userinfoUrl", messageService.getMessage("error.required",
+		    new Object[] { messageService.getMessage("sysadmin.userinfoUrl") }));
+	}
+	
+	Integer sid = extServerForm.getSid();
+	if (errorMap.isEmpty()) {//check duplication
+	    List listServer = userService.findByProperty(ExtServer.class, "serverid",
+		    extServerForm.getServerid());
+	    if (listServer != null && listServer.size() > 0) {
+		if (sid.equals(-1)) {//new map
+		    errorMap.add("serverid", messageService.getMessage("error.not.unique",
+			    new Object[] { messageService.getMessage("sysadmin.serverid") }));
+		} else {
+		    ExtServer map = (ExtServer) listServer.get(0);
+		    if (!map.getSid().equals(sid)) {
+			errorMap.add("serverid", messageService.getMessage("error.not.unique",
+				new Object[] { messageService.getMessage("sysadmin.serverid") }));
+		    }
+		}
+	    }
+
+	    List<ExtServer> listPrefix = userService.findByProperty(ExtServer.class, "prefix",
+		    extServerForm.getPrefix());
+	    if (listPrefix != null && listPrefix.size() > 0) {
+		if (sid.equals(0)) {//new map
+		    errorMap.add("prefix", messageService.getMessage("error.not.unique",
+			    new Object[] { messageService.getMessage("sysadmin.prefix") }));
+		} else {
+		    ExtServer map = (ExtServer) listPrefix.get(0);
+		    if (!map.getSid().equals(sid)) {
+			errorMap.add("prefix", messageService.getMessage("error.not.unique",
+				new Object[] { messageService.getMessage("sysadmin.prefix") }));
+		    }
+		}
+	    }
+	}
+
+	if (errorMap.isEmpty()) {
+	    ExtServer map = null;
+	    if (sid.equals(-1)) {
+		map = new ExtServer();
+		BeanUtils.copyProperties(map, extServerForm);
+		map.setSid(null);
+		map.setServerTypeId(ExtServer.INTEGRATION_SERVER_TYPE);
+	    } else {
+		map = service.getExtServer(sid);
+		BeanUtils.copyProperties(map, extServerForm);
+	    }
+	    service.saveExtServer(map);
+	    return "redirect:/serverlist.do";
+	} else {
+	    request.setAttribute("errorMap", errorMap);
+	    return "servermaintain";
+	}
+    }
+}

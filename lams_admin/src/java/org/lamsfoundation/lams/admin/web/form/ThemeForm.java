@@ -22,8 +22,6 @@
  */
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  *
  * Form for theme management
@@ -32,28 +30,19 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class ThemeForm extends ActionForm {
+public class ThemeForm {
 
     private static final long serialVersionUID = -3127221000563399156L;
 
     public ThemeForm() {
     }
 
-    private String method;
     private Long id;
     private String name;
     private String description;
     private String imageDirectory;
     private Boolean currentDefaultTheme;
     private String type;
-
-    public String getMethod() {
-	return method;
-    }
-
-    public void setMethod(String method) {
-	this.method = method;
-    }
 
     public Long getId() {
 	return id;
@@ -104,7 +93,6 @@ public class ThemeForm extends ActionForm {
     }
 
     public void clear() {
-	this.method = null;
 	this.id = null;
 	this.name = null;
 	this.description = null;
