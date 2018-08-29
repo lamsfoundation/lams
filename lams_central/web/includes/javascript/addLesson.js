@@ -423,7 +423,7 @@ function previewLesson(){
 			$.ajax({
 				url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 				data : {
-s					'lessonID' : lessonID
+					'lessonID' : lessonID
 				},
 				cache : false,
 				dataType : 'text',

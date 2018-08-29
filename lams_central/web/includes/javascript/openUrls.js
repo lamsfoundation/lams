@@ -126,27 +126,15 @@ function openKumalive(orgID, role) {
  */
 function openLearnerShortenedUrl( lessonId ) {
 	if (isMac) {
-<<<<<<< HEAD
 		learnWin = window.open('../home/learner.do?lessonID='+lessonId,'lWindow','width=' + learner_width 
-=======
-		learnWin = window.open('../home/learner.do&lessonID='+lessonId,'lWindow','width=' + learner_width 
->>>>>>> refs/remotes/asia/LDEV-4440
 				   + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes'
 				   + getCenterParams(learner_width, learner_height));
 	} else {
 		if (learnWin && !learnWin.closed ) {
-<<<<<<< HEAD
 			learnWin.location = '../home/learner.do?lessonID='+lessonId;		
-=======
-			learnWin.location = '../home/learner.do&lessonID='+lessonId;		
->>>>>>> refs/remotes/asia/LDEV-4440
 			learnWin.focus();
 		} else {
-<<<<<<< HEAD
 			learnWin = window.open('../home/learner.do?lessonID='+lessonId,'lWindow','width='
-=======
-			learnWin = window.open('../home/learner.do&lessonID='+lessonId,'lWindow','width='
->>>>>>> refs/remotes/asia/LDEV-4440
 					   + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes'
 					   + getCenterParams(learner_width, learner_height));
 		}
