@@ -5,7 +5,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base/>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<title><fmt:message key="${title}"/></title>
 	

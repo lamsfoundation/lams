@@ -5,7 +5,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base/>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<title><fmt:message key="${fn:escapeXml(title)}"/></title>
 	
@@ -251,7 +250,7 @@
 					</c:set>
 					<textarea rows="8" name="emailBody" id="emailBody" width="100%" class="form-control">${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
 					<br/>
-					<input class="btn btn-primary btn-sm voffset10 pull-right" type="button" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
+					<input class="btn btn-primary btn-sm voffset10 pull-right" type="buuton" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
 				</div>		
 			</div>
 		</div>
