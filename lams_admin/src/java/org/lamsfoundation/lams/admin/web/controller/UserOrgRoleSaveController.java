@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -66,6 +67,7 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
+@Scope("session")
 public class UserOrgRoleSaveController {
 
     private static Logger log = Logger.getLogger(UserOrgRoleSaveController.class);

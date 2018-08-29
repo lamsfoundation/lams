@@ -40,11 +40,11 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -65,6 +65,7 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
+@Scope("session")
 public class UserOrgRoleController {
 
     private static Logger log = Logger.getLogger(UserOrgRoleController.class);
@@ -73,10 +74,9 @@ public class UserOrgRoleController {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(path = "/userorgrole")
-    public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, BindingResult result, HttpServletRequest request)
-	    throws Exception {
+    public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, BindingResult result,
+	    HttpServletRequest request) throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	// make sure we don't have left overs from any previous attempt

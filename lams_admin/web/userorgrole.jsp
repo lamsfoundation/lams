@@ -46,7 +46,7 @@
 		<p><fmt:message key="msg.roles.mandatory.users"/></p>
 		
 		<form:form action="userorgrolesave.do" modelAttribute="userOrgRoleForm" id="userOrgRoleForm" method="post">
-		<input type="hidden" name="orgId" />
+		<form:hidden path="orgId" />
 		
 		<table class="table table-condensed table-no-border">
 		<tr>

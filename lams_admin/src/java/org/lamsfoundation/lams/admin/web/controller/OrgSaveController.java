@@ -153,7 +153,7 @@ public class OrgSaveController {
 	    org = service.saveOrganisation(org, user.getUserID());
 
 	    request.setAttribute("org", organisationForm.getParentId());
-	    return "redirect:/orgmanage.do";
+	    return "forward:/orgmanage.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
 	    return "redirect:/organisation/edit.do";
