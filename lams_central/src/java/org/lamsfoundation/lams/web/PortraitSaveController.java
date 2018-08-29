@@ -55,6 +55,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,7 +65,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrey Balan
  */
 @Controller
-@RequestMapping("/saveportrait")
+@RequestMapping(path = "/saveportrait", method = RequestMethod.POST)
 public class PortraitSaveController {
 
     private static Logger log = Logger.getLogger(PortraitSaveController.class);
@@ -86,7 +87,7 @@ public class PortraitSaveController {
      * Upload portrait image.
      */
     @RequestMapping("")
-    public String unspecified(@ModelAttribute PortraitActionForm portraitForm, HttpServletRequest request,
+    public String unspecified(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	if (request.getAttribute(Globals.CANCEL_KEY) != null) {

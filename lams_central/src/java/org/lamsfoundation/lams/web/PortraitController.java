@@ -42,10 +42,10 @@ public class PortraitController {
     private static Logger log = Logger.getLogger(PortraitController.class);
     @Autowired
     @Qualifier("userManagementService")
-    private static IUserManagementService service;
+    private IUserManagementService service;
 
     @RequestMapping("/portrait")
-    public String execute(@ModelAttribute PortraitActionForm portraitForm, HttpServletRequest request)
+    public String execute(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request)
 	    throws Exception {
 
 	Long portraitUuid = service.getUserByLogin(request.getRemoteUser()).getPortraitUuid();

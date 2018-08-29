@@ -170,7 +170,7 @@
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
 							</div>
 							<div class="form-group" align="right">
-							<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="button.cancel"/>" formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-sm btn-default voffset5"/>
+							<a href="/lams/profile.jsp" type="submit" id="cancelButton" class="btn btn-sm btn-default voffset5"><fmt:message key="button.cancel"/></a>
 								&nbsp;&nbsp;
 								<button class="btn btn-sm btn-primary voffset5">
 									<fmt:message key="button.save" />

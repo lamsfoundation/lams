@@ -41,6 +41,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -69,8 +70,8 @@ public class PasswordChangeController {
      *            The HTTP response we are creating
      *
      */
-    @RequestMapping("/passwordChanged")
-    public String execute(@ModelAttribute PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
+    @RequestMapping(path = "/passwordChanged", method = RequestMethod.POST)
+    public String execute(@ModelAttribute("PasswordChangeActionForm") PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
 	    throws Exception {
 	// -- isCancelled?
 	if (request.getAttribute(Globals.CANCEL_KEY) != null) {

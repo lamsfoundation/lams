@@ -526,7 +526,7 @@ function showSearchLessonDialog(orgID){
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
+				+ 'findUserLessons/getResults.do?courseID=' + orgID);
 		}
 	}, true);
 }

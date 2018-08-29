@@ -5,7 +5,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -30,12 +30,12 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="includes/javascript/webrtc-capturestill.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/webrtc-capturestill.js"></script>
 	<script type="text/javascript">
 		//constant for croppie.js
 		var PORTRAIT_SIZE = 400;
@@ -124,7 +124,7 @@
 </lams:head>
 
 <body>
-<form:form action="/saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" enctype="multipart/form-data">
+<form:form action="saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" enctype="multipart/form-data">
 	<form:hidden name="PortraitActionForm" path="portraitUuid" />
 	<div style="clear: both"></div>
 	
