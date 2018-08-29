@@ -629,7 +629,7 @@
 								   <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>
 								<a class="btn btn-sm btn-default" title="<fmt:message key='button.journal.entries.tooltip'/>"
 						   		   href="#" id="journalButton"
-						           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook.do?method=viewAllJournals&lessonID=${lesson.lessonID}', 'JournalEntries', 648, 1152, true)">
+						           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook/viewAllJournals.do?lessonID=${lesson.lessonID}', 'JournalEntries', 648, 1152, true)">
 						           <i class="fa fa-book"></i> <span class="hidden-xs"><fmt:message key="button.journal.entries"/></span></a>
 							</td>
 						</tr>

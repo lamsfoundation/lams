@@ -57,18 +57,18 @@
 			
 			if (method == "tra" || method == "traStudentChoices" || method == "burningQuestions") {
 				toolContentID = "${traToolContentId}";
-				url = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/";
 				
 			} else if (method == "iraMcq" || method == "mcqStudentChoices") {
 				toolContentID = "${iraToolContentId}";
-				url = "<lams:LAMSURL/>tool/lamc11/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/lamc11/tblmonitoring/";
 				
 			} else if (method == "iraAssessment" || method == "iraAssessmentStudentChoices") {
 				toolContentID = "${iraToolContentId}";
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 	
 			} else if (method == "aes" || method == "aesStudentChoices") {
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 				options = {
 					assessmentToolContentIds: "${assessmentToolContentIds}",
 					assessmentActivityTitles: "${assessmentActivityTitles}"
@@ -81,7 +81,7 @@
 				
 			} else if (method == "peerreview") {
 				toolContentID = "${peerreviewToolContentId}";
-				url = "<lams:LAMSURL/>tool/laprev11/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/laprev11/tblmonitoring/";
 			}
 
 			// Merge additional options into existing options object

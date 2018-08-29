@@ -43,7 +43,7 @@
 			jQuery("#list3").jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
-			   	url: "<c:url value='/emailNotifications/getUsers.do'/>" + getSearchParams(),
+			   	url: "<c:url value='/emailNotifications/getUsers.do?'/>" + getSearchParams(),
 				datatype: "json",
 			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
 			   	colModel:[
@@ -163,7 +163,7 @@
 	
 		function getUsers(){
 			var searchParams = getSearchParams();
-			var url = "<c:url value='/emailNotifications/getUsers.do'/>" + searchParams;
+			var url = "<c:url value='/emailNotifications/getUsers.do?'/>" + searchParams;
 			if (searchParams.length) {
 				$("#list3").setGridParam({datatype:'json', page:1, url: url}).trigger('reloadGrid');	
 			} else {

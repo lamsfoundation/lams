@@ -95,7 +95,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Fiona Malikoff
  */
 @Controller
-@RequestMapping("/")
+@RequestMapping("/groupingUpload")
 public class GroupingUploadAJAXController {
 
     @Autowired
