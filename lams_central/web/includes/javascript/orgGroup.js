@@ -339,9 +339,8 @@ function removeGroup(container) {
 				async    : false,
 				cache    : false,
 				dataType : 'json',
-				url : LAMS_URL + 'monitoring/grouping.do',
+				url : LAMS_URL + 'monitoring/grouping/removeGroup.do',
 				data : {
-					'method'     : 'removeGroup',
 					'activityID' : groupingActivityId,
 					'groupID'    : groupId
 				},
@@ -371,9 +370,8 @@ function renameGroup(container) {
 		var groupName = nameInput.val();
 		$.ajax({
 			cache    : false,
-			url : LAMS_URL + 'monitoring/grouping.do',
+			url : LAMS_URL + 'monitoring/grouping/changeGroupName.do',
 			data : {
-				'method'     : 'changeGroupName',
 				'groupID'    : groupId,
 				'name'       : groupName
 			},
@@ -403,11 +401,10 @@ function saveGroups(){
 	var isGroupingNameUnique = false;
 	$.ajax({
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/grouping.do',
+		url : LAMS_URL + 'monitoring/grouping/checkGroupingNameUnique.do',
 		cache : false,
 		async : false,
 		data : {
-			'method'    : 'checkGroupingNameUnique',
 			'organisationID' : grouping.organisationId,
 			'name'  : groupingName
 		},		
@@ -491,9 +488,8 @@ function assignUsersToGroup(userIds, groupContainer) {
 		async    : false,
 		cache    : false,
 		dataType : 'json',
-		url : LAMS_URL + 'monitoring/grouping.do',
+		url : LAMS_URL + 'monitoring/grouping/addMembers.do',
 		data : {
-			'method'     : 'addMembers',
 			'activityID' : groupingActivityId,
 			'groupID'    : groupId,
 			'name'       : groupName,
@@ -532,7 +528,7 @@ function markGroupLocked(container) {
  * Show a printable version of the groups. Open the same size as the current window
  */
 function showPrintPage() {
-	var url = LAMS_URL + '/monitoring/grouping.do?method=printGrouping';
+	var url = LAMS_URL + '/monitoring/grouping/printGrouping.do';
 	if ( groupingActivityId )
 		url += '&activityID='+groupingActivityId;
 	if ( lessonId )
@@ -605,11 +601,10 @@ function showPrintPage() {
 				var isGroupingNameUnique = false;
 				$.ajax({
 					dataType : 'json',
-					url : LAMS_URL + 'monitoring/grouping.do',
+					url : LAMS_URL + 'monitoring/grouping/checkGroupingNameUnique.do',
 					cache : false,
 					async : false,
 					data : {
-						'method'    : 'checkGroupingNameUnique',
 						'organisationID' : grouping.organisationId,
 						'name'  : groupingName
 					},		
@@ -718,7 +713,7 @@ function showPrintPage() {
 			}
 		}, 1000);
 				
-		var url = LAMS_URL + "groupingUpload.do?method=getGroupTemplateFile&activityID="+groupingActivityId
+		var url = LAMS_URL + "monitoring/groupingUpload/getGroupTemplateFile.do?activityID="+groupingActivityId
 		+"&organisationID="+organisationId+"&lessonID="+lessonId+"&downloadTokenValue=" + token;
 		if ( grouping && grouping.groupingId) {
 			url += "&groupingId=" + grouping.groupingId;
@@ -785,11 +780,10 @@ $(document).ready(function(){
 		//name should be unique
 		$.ajax({
 			dataType : 'json',
-			url : LAMS_URL + 'monitoring/grouping.do',
+			url : LAMS_URL + 'monitoring/grouping/checkGroupingNameUnique.do',
 			cache : false,
 			async : false,
 			data : {
-				'method'    : 'checkGroupingNameUnique',
 				'organisationID' : organisationId,
 				'name'  : name
 			},		
@@ -797,11 +791,10 @@ $(document).ready(function(){
 				if (response.isGroupingNameUnique) {
 					$.ajax({
 						dataType : 'json',
-						url : LAMS_URL + 'monitoring/grouping.do',
+						url : LAMS_URL + 'monitoring/grouping/saveAsCourseGrouping.do',
 						cache : false,
 						async : false,
 						data : {
-							'method'    : 'saveAsCourseGrouping',
 							'organisationID' : organisationId,
 							'activityID' : groupingActivityId,
 							'name'  : name
