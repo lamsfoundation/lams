@@ -21,12 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -51,9 +49,10 @@ public class LAMSUploadServlet extends HttpServlet {
 
     private static final long serialVersionUID = 7839808388592495717L;
     private static final Logger log = Logger.getLogger(LAMSUploadServlet.class);
-    
+
     private static MessageService messageService;
-    
+
+    @Override
     public void init() {
 	WebApplicationContext ctx = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(this.getServletContext());
@@ -92,7 +91,7 @@ public class LAMSUploadServlet extends HttpServlet {
 	    DiskFileUpload upload = new DiskFileUpload();
 	    try {
 		List<FileItem> items = upload.parseRequest(request);
-		Map<String, Object> fields = new HashMap<String, Object>();
+		Map<String, Object> fields = new HashMap<>();
 
 		Iterator<FileItem> iter = items.iterator();
 		while (iter.hasNext()) {
@@ -118,12 +117,12 @@ public class LAMSUploadServlet extends HttpServlet {
 		boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile, true);
 		if (!maxFilesizeExceededMessage) {
 		    fileName = messageService.getMessage("errors.maxfilesize",
-				  new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
+			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
 
-		// validate file extension
-		} else if  (!FileUtil.isExtensionAllowed(fileType, fileName)) {
+		    // validate file extension
+		} else if (!FileUtil.isExtensionAllowed(fileType, fileName)) {
 		    returnMessage = "Invalid file type";
-		    
+
 		} else {
 		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
 		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);

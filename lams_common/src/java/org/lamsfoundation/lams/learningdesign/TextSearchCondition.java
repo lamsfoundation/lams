@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.TextSearchForm;
 
 /**
  * Condition that is based on text search. Several properties set what needs to be found in a tool output. Based on the
@@ -88,7 +87,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     /**
      * Property {@link #allWords} divided into words.
      */
-    protected List<String> allWordsCondition = new ArrayList<String>();
+    protected List<String> allWordsCondition = new ArrayList<>();
     /**
      * Property {@link #phrase} divided into words. Although we are looking for the whole phrase, spaces between words
      * should be divided into something more regex'y.
@@ -97,11 +96,11 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     /**
      * Property {@link #anyWords} divided into words.
      */
-    protected List<String> anyWordsCondition = new ArrayList<String>();
+    protected List<String> anyWordsCondition = new ArrayList<>();
     /**
      * Property {@link #excludedWords} divided into words.
      */
-    protected List<String> excludedWordsCondition = new ArrayList<String>();
+    protected List<String> excludedWordsCondition = new ArrayList<>();
 
     public TextSearchCondition() {
 	super();
@@ -287,7 +286,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      * @param textSearchActionForm
      *            form to parse
      */
-    public void parseConditionStrings(TextSearchActionForm textSearchActionForm) {
+    public void parseConditionStrings(TextSearchForm textSearchActionForm) {
 	parseConditionStrings(textSearchActionForm.getAllWords(), textSearchActionForm.getPhrase(),
 		textSearchActionForm.getAnyWords(), textSearchActionForm.getExcludedWords());
     }
@@ -347,7 +346,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	List<String> list = null;
 	if (!StringUtils.isEmpty(sentence)) {
 	    String[] splitted = sentence.trim().split(regex);
-	    list = new ArrayList<String>(splitted.length);
+	    list = new ArrayList<>(splitted.length);
 	    // we don't need empty words
 	    for (String word : splitted) {
 		if (!StringUtils.isEmpty(word)) {

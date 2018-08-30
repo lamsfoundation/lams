@@ -90,7 +90,7 @@ public class PortraitSaveController {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	MultipartFile file = portraitForm.getFile();
-	String fileName = file.getName();
+	String fileName = file.getOriginalFilename();
 	log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getSize());
 
 	User user = service.getUserByLogin(request.getRemoteUser());
