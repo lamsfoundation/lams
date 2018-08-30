@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -71,14 +70,8 @@ public class PasswordChangeController {
      *
      */
     @RequestMapping(path = "/passwordChanged", method = RequestMethod.POST)
-    public String execute(@ModelAttribute("PasswordChangeActionForm") PasswordChangeActionForm passwordChangeForm, HttpServletRequest request)
-	    throws Exception {
-	// -- isCancelled?
-	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
-	    request.getSession().removeAttribute(PasswordChangeActionForm.formName);
-	    request.setAttribute("redirect", "profile");
-	    return "redirect:/index.do";
-	}
+    public String execute(@ModelAttribute("PasswordChangeActionForm") PasswordChangeActionForm passwordChangeForm,
+	    HttpServletRequest request) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 

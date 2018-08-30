@@ -49,9 +49,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -104,6 +101,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -867,11 +865,11 @@ public class PedagogicalPlannerController {
 		node.setLearningDesignId(null);
 		node.setLearningDesignTitle(null);
 		node.setPermissions(PedagogicalPlannerSequenceNode.PERMISSION_DEFAULT_SETTING);
-	    } else if ((nodeForm.getFile() != null) && (nodeForm.getFile().getFileSize() > 0)) {
+	    } else if ((nodeForm.getFile() != null) && (nodeForm.getFile().getSize() > 0)) {
 		// file has been uploaded, so copy it to file system and import LD
-		FormFile file = nodeForm.getFile();
+		MultipartFile file = nodeForm.getFile();
 		InputStream inputStream = file.getInputStream();
-		File sourceFile = new File(FileUtil.getTempDir(), file.getFileName());
+		File sourceFile = new File(FileUtil.getTempDir(), file.getName());
 
 		try {
 		    FileUtils.copyInputStreamToFile(inputStream, sourceFile);
@@ -975,10 +973,10 @@ public class PedagogicalPlannerController {
      */
     private MultiValueMap<String, String> validateFormFile(PedagogicalPlannerSequenceNodeForm form) {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	if ((form.getFile() == null) || (form.getFile().getFileSize() == 0)) {
+	if ((form.getFile() == null) || (form.getFile().getSize() == 0)) {
 	    errorMap.add("GLOBAL", messageService.getMessage(PedagogicalPlannerController.ERROR_KEY_FILE_EMPTY));
 	} else {
-	    String fileName = form.getFile().getFileName();
+	    String fileName = form.getFile().getName();
 	    boolean badExtension = false;
 	    if (fileName.length() >= 4) {
 		String extension = fileName.substring(fileName.length() - 4);
@@ -1202,7 +1200,7 @@ public class PedagogicalPlannerController {
 	if (errorMap.isEmpty()) {
 	    try {
 		String uploadPath = FileUtil.createTempDirectory(PedagogicalPlannerController.DIR_UPLOADED_NODE_SUFFIX);
-		String fileName = nodeForm.getFile().getFileName();
+		String fileName = nodeForm.getFile().getName();
 		File importFile = new File(uploadPath + fileName);
 		PedagogicalPlannerController.log.debug("Importing a node from file: " + fileName);
 

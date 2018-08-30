@@ -363,7 +363,7 @@ public class HomeController {
     public String logout(HttpServletRequest req) throws IOException, ServletException {
 
 	req.getSession().invalidate();
-	return "index";
+	return "redirect:/index.do";
     }
 
     private String displayMessage(HttpServletRequest req, String messageKey) {
@@ -378,5 +378,5 @@ public class HomeController {
 
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
-    }
+    } 
 }

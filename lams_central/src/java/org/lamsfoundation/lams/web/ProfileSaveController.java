@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -47,7 +46,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author jliew
@@ -65,11 +63,6 @@ public class ProfileSaveController {
 
     @RequestMapping(path = "/saveprofile")
     public String execute(@ModelAttribute("newForm") UserForm userForm, HttpServletRequest request) throws Exception {
-
-	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
-	    request.setAttribute("redirect", "profile");
-	    return "redirect:/index.do";
-	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
