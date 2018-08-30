@@ -418,16 +418,16 @@ public class LamsSecurityUtil {
      *            the title of the lesson
      * @param desc
      *            the description of the lesson
-     * @param isAllowLearnerRestart
-     *            whether learners are allowed to restart the lesson. This parameter will be passed to LAMS only in case
-     *            it's true, otherwise LAMS will use according ExtServer's default value
+     * @param enforceAllowLearnerRestart
+     *            whether learners are allowed to restart the lesson. It has a higher priority than LAMS ExtServer's
+     *            according default setting
      * @param isPreview
      *            whether LAMS should start it as a preview or not
      * 
      * @return the learning session id
      */
     public static Long startLesson(User user, String courseId, long ldId, String title, String desc,
-	    Boolean isAllowLearnerRestart, boolean isPreview) {
+	    boolean enforceAllowLearnerRestart, boolean isPreview) {
 
 	String serverId = LamsPluginUtil.getServerId();
 	String serverAddr = LamsPluginUtil.getServerUrl();
@@ -454,7 +454,7 @@ public class LamsSecurityUtil {
 		    + new Long(ldId).toString() + "&country=" + country + "&lang=" + locale + "&method=" + method
 		    + "&title=" + URLEncoder.encode(title, "utf8").trim() + "&desc="
 		    + URLEncoder.encode(desc, "utf8").trim() + "&enableNotifications=true"
-		    + (isAllowLearnerRestart == null ? "" : "&allowLearnerRestart=true");
+		    + "&allowLearnerRestart=" + enforceAllowLearnerRestart;
 
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
 

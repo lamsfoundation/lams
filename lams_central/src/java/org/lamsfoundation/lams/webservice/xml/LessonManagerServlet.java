@@ -158,8 +158,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 	String allowLearnerRestartString = WebUtil.readStrParam(request, CentralConstants.PARAM_ALLOW_LEARNER_RESTART,
 		true);
-	Boolean allowLearnerRestart = allowLearnerRestartString == null ? null
-		: Boolean.valueOf(allowLearnerRestartString);
+	// whether this lesson was created with this option ON
+	boolean enforceAllowLearnerRestart = StringUtils.isNotBlank(allowLearnerRestartString)
+		&& Boolean.valueOf(allowLearnerRestartString);
 
 	Long ldId = null;
 	Long lsId = null;
@@ -180,7 +181,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = LessonManagerServlet.startLesson(serverId, datetime, hashValue, username, ldId,
-			courseId, title, desc, allowLearnerRestart, country, locale, customCSV, presenceEnable, imEnable,
+			courseId, title, desc, enforceAllowLearnerRestart, country, locale, customCSV, presenceEnable, imEnable,
 			enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
@@ -197,7 +198,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_SCHEDULE)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			allowLearnerRestart, startDate, country, locale, customCSV, presenceEnable, imEnable,
+			enforceAllowLearnerRestart, startDate, country, locale, customCSV, presenceEnable, imEnable,
 			enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
@@ -380,7 +381,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     private static Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
-	    String courseId, String title, String desc, Boolean allowLearnerRestart, String countryIsoCode,
+	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String countryIsoCode,
 	    String langIsoCode, String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
 	    throws RemoteException {
 	try {
@@ -399,7 +400,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled(),
 		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
 		    extServer.getForceLearnerRestart(),
-		    allowLearnerRestart == null ? extServer.getAllowLearnerRestart() : allowLearnerRestart,
+		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
 		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.createLessonClass(lesson, organisation, user);
@@ -415,7 +416,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
-	    String courseId, String title, String desc, Boolean allowLearnerRestart, String startDate, String countryIsoCode, String langIsoCode,
+	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String startDate, String countryIsoCode, String langIsoCode,
 	    String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
 	    throws RemoteException {
 	try {
@@ -431,7 +432,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled(),
 		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
 		    extServer.getForceLearnerRestart(),
-		    allowLearnerRestart == null ? extServer.getAllowLearnerRestart() : allowLearnerRestart,
+		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
 		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
 	    LessonManagerServlet.createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());

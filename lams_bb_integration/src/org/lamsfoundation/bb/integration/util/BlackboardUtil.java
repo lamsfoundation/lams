@@ -156,7 +156,7 @@ public class BlackboardUtil {
 	boolean isAvailable = (strIsAvailable == null || strIsAvailable.equals("true")) ? true : false; // default true
 	boolean isGradecenter = (strIsGradecenter != null && strIsGradecenter.equals("true")) ? true : false; // default false
 	boolean isTracked = (strIsTracked != null && strIsTracked.equals("true")) ? true : false; // default false
-	Boolean isAllowLearnerRestart = (strIsAllowLearnerRestart != null && strIsAllowLearnerRestart.equals("true")) ? true : null; // default false
+	boolean enforceAllowLearnerRestart = (strIsAllowLearnerRestart != null && strIsAllowLearnerRestart.equals("true")); // default false
 	
 	// Set Availability Dates
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -214,7 +214,7 @@ public class BlackboardUtil {
 
 	// Start the Lesson in LAMS (via Webservices) and capture the lesson ID
 	final long lamsLessonIdLong = LamsSecurityUtil.startLesson(user, courseIdStr, ldId, strTitle, strDescription,
-		isAllowLearnerRestart, false);
+		enforceAllowLearnerRestart, false);
 	// error checking
 	if (lamsLessonIdLong == -1) {
 	    response.sendRedirect("lamsServerDown.jsp");
