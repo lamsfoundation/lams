@@ -523,49 +523,6 @@
 	<jsp-config>
 
 		<!-- ======================================================== -->
-		<!-- Struts Tag Library Descriptors -->
-		<!-- ======================================================== -->
-		<taglib>
-			<taglib-uri>tags-bean</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-html</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-logic</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-tiles</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-bean-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-html-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-logic-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld
-			</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-tiles-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld
-			</taglib-location>
-		</taglib>
-		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
 		<!-- ======================================================== -->
 		<taglib>

@@ -13,7 +13,7 @@
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	<lams:css/>
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>	
 	<c:if test="${displayDesignImage}">
 		<script>
 		var originalThumbnailWidth = 0,

@@ -3,9 +3,9 @@
 	contentType="text/html;charset=utf-8"%>
 
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <title><fmt:message key="title.admin.window" /></title>
 <link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico"
 	type="image/x-icon" />
@@ -26,9 +26,9 @@ input[type="checkbox"] {
 	//constant for instantedit.js
 	var IS_AJAX_CALL_REQUIRED = false;
 </script>
-<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="includes/javascript/jquery.form.js"></script>
-<script type="text/javascript" src="includes/javascript/instantedit.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}iincludes/javascript/jquery.form.js"></script>
+<script type="text/javascript" src="${lams}iincludes/javascript/instantedit.js"></script>
 <script type="text/javascript"
 	src="/lams/includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">

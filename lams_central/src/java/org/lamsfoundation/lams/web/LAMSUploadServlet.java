@@ -21,13 +21,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Servlet to upload files.<br>
@@ -47,9 +49,10 @@ public class LAMSUploadServlet extends HttpServlet {
 
     private static final long serialVersionUID = 7839808388592495717L;
     private static final Logger log = Logger.getLogger(LAMSUploadServlet.class);
-    
+
     private static MessageService messageService;
-    
+
+    @Override
     public void init() {
 	WebApplicationContext ctx = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(this.getServletContext());
@@ -88,7 +91,7 @@ public class LAMSUploadServlet extends HttpServlet {
 	    DiskFileUpload upload = new DiskFileUpload();
 	    try {
 		List<FileItem> items = upload.parseRequest(request);
-		Map<String, Object> fields = new HashMap<String, Object>();
+		Map<String, Object> fields = new HashMap<>();
 
 		Iterator<FileItem> iter = items.iterator();
 		while (iter.hasNext()) {
@@ -99,10 +102,10 @@ public class LAMSUploadServlet extends HttpServlet {
 			fields.put(item.getFieldName(), item);
 		    }
 		}
-		FileItem uplFile = (FileItem) fields.get("NewFile");
+		MultipartFile uplFile = (MultipartFile) fields.get("NewFile");
 		if (uplFile == null) {
 		    // form field name used by CKEditor 3.x
-		    uplFile = (FileItem) fields.get("upload");
+		    uplFile = (MultipartFile) fields.get("upload");
 		}
 
 		String fileNameLong = uplFile.getName();
@@ -111,15 +114,15 @@ public class LAMSUploadServlet extends HttpServlet {
 		String fileName = pathParts[pathParts.length - 1];
 
 		// validate file size
-		ActionMessage maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile, true);
-		if (maxFilesizeExceededMessage != null) {
-		    returnMessage = messageService.getMessage(maxFilesizeExceededMessage.getKey(),
-			    maxFilesizeExceededMessage.getValues());
+		boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile, true);
+		if (!maxFilesizeExceededMessage) {
+		    fileName = messageService.getMessage("errors.maxfilesize",
+			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
 
-		// validate file extension
-		} else if  (!FileUtil.isExtensionAllowed(fileType, fileName)) {
+		    // validate file extension
+		} else if (!FileUtil.isExtensionAllowed(fileType, fileName)) {
 		    returnMessage = "Invalid file type";
-		    
+
 		} else {
 		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
 		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
@@ -129,7 +132,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
 		    fileUrl = currentWebPath + '/' + fileName;
 
-		    uplFile.write(destinationFile);
+		    uplFile.transferTo(destinationFile);
 		    if (LAMSUploadServlet.log.isDebugEnabled()) {
 			LAMSUploadServlet.log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
 		    }

@@ -217,6 +217,9 @@ public class ProfileController {
 	    locale = LanguageUtil.getDefaultLocale();
 	}
 	userForm.setLocaleId(locale.getLocaleId());
+	if (locales == null) {
+	    locales = service.findAll(SupportedLocale.class);
+	}
 	request.setAttribute("locales", locales);
 
 	// Get all the css themes

@@ -32,9 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
@@ -87,18 +84,13 @@ public class PortraitSaveController {
      * Upload portrait image.
      */
     @RequestMapping("")
-    public String unspecified(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	if (request.getAttribute(Globals.CANCEL_KEY) != null) {
-	    request.setAttribute("redirect", "profile");
-	    return "redirect:/index.do";
-	}
+    public String unspecified(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm,
+	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	MultipartFile file = portraitForm.getFile();
-	String fileName = file.getName();
+	String fileName = file.getOriginalFilename();
 	log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getSize());
 
 	User user = service.getUserByLogin(request.getRemoteUser());
@@ -182,8 +174,7 @@ public class PortraitSaveController {
 
     /** Called from sysadmin to delete an inappropriate portrait */
     @RequestMapping("/deletePortrait")
-    public String deletePortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public String deletePortrait(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 

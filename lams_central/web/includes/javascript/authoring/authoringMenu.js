@@ -537,9 +537,8 @@ var MenuLib = {
 				}
 				
 				$.ajax({
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 					data : {
-						'method' : 'startPreviewLesson',
 						'lessonID' : lessonID
 					},
 					cache : false,

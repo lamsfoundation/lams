@@ -11,14 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.Globals;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -30,6 +32,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class QuestionsController {
+
+    @Autowired
+    @Qualifier("centralMessageService")
+    MessageService messageService;
+
     @SuppressWarnings("unchecked")
     @RequestMapping("/questions")
     public String execute(HttpServletRequest request) throws Exception {
@@ -63,9 +70,10 @@ public class QuestionsController {
 
 	// user did not choose a file
 	if ((uploadedFileStream == null) || !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))) {
-	    ActionMessages errors = new ActionMessages();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("label.questions.file.missing"));
-	    request.setAttribute(Globals.ERROR_KEY, errors);
+
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
+	    request.setAttribute("errorMap", errorMap);
 	    return "questions/questionFile";
 	}
 

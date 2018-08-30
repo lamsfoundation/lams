@@ -93,8 +93,7 @@ public class HomeController {
     @Qualifier("learningDesignService")
     private ILearningDesignService learningDesignService;
     @Autowired
-    @Qualifier("learningDesignService")
-    private static IGroupUserDAO groupUserDAO;
+    private IGroupUserDAO groupUserDAO;
     @Autowired
     @Qualifier("workspaceManagementService")
     private IWorkspaceManagementService workspaceManagementService;
@@ -364,7 +363,7 @@ public class HomeController {
     public String logout(HttpServletRequest req) throws IOException, ServletException {
 
 	req.getSession().invalidate();
-	return "index";
+	return "redirect:/index.do";
     }
 
     private String displayMessage(HttpServletRequest req, String messageKey) {
@@ -379,5 +378,5 @@ public class HomeController {
 
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
-    }
+    } 
 }

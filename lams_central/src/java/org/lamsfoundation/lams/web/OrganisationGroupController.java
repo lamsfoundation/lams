@@ -40,8 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -370,7 +368,7 @@ public class OrganisationGroupController {
      */
     @ResponseBody
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public void save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    public void save(HttpServletRequest request, HttpServletResponse response)
 	    throws InvalidParameterException, IOException {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
@@ -511,8 +509,7 @@ public class OrganisationGroupController {
      */
     @ResponseBody
     @RequestMapping(path = "/save", method = RequestMethod.POST)
-    public void saveGroupMappings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public void saveGroupMappings(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	ArrayNode groupMapping = JsonUtil.readArray(request.getParameter("mapping"));
 	for (JsonNode entryNode : groupMapping) {
 	    ObjectNode entry = (ObjectNode) entryNode;

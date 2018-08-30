@@ -115,7 +115,7 @@
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_1" />:</label>
 									<form:input path="addressLine1" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" csseClass="form-control" />
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_2" />:</label>

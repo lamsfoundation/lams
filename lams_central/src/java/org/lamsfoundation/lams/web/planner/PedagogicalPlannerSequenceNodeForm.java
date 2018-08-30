@@ -22,8 +22,8 @@
 
 package org.lamsfoundation.lams.web.planner;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
+import org.springframework.web.multipart.MultipartFile;
 
 public class PedagogicalPlannerSequenceNodeForm {
     public final static String NODE_TYPE_SUBNODES = "subnodes";
@@ -35,7 +35,7 @@ public class PedagogicalPlannerSequenceNodeForm {
     private String title;
     private String briefDescription;
     private String fullDescription;
-    private FormFile file;
+    private MultipartFile file;
     private Boolean removeTemplate;
     private String nodeType = PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES;
 
@@ -157,11 +157,11 @@ public class PedagogicalPlannerSequenceNodeForm {
 	this.parentUid = parentUid;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 

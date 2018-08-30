@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.comments.web;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.comments.Comment;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class CommentForm {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
 	    if (StringUtils.isBlank(comment.getBody())) {
-		ActionMessage error = new ActionMessage("error.body.required");
+
 		errorMap.add("message.body", messageservice.getMessage("error.body.required"));
 	    }
 	} catch (Exception e) {
