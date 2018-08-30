@@ -250,7 +250,7 @@
 					</c:set>
 					<textarea rows="8" name="emailBody" id="emailBody" width="100%" class="form-control">${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
 					<br/>
-					<input class="btn btn-primary btn-sm voffset10 pull-right" type="buuton" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
+					<input class="btn btn-primary btn-sm voffset10 pull-right" type="button" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
 				</div>		
 			</div>
 		</div>
