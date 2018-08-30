@@ -34,7 +34,8 @@ import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.validation.Errors;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -73,15 +74,17 @@ public class MessageForm {
      * MessageForm validation method from STRUCT interface.
      *
      */
-    public Errors validate(HttpServletRequest request, Errors errors) {
+    public MultiValueMap<String, String> validate(HttpServletRequest request) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
 
 	try {
 	    if (StringUtils.isBlank(message.getSubject())) {
-		errors.reject("message.subject", messageService.getMessage("error.subject.required"));
+		errorMap.add("message.subject", messageService.getMessage("error.subject.required"));
 	    }
 	    boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	    if (!isTestHarness && StringUtils.isBlank(message.getBody())) {
-		errors.reject("message.body", messageService.getMessage("error.body.required"));
+		errorMap.add("message.body", messageService.getMessage("error.body.required"));
 	    }
 
 	    // validate item size
@@ -89,7 +92,7 @@ public class MessageForm {
 	    if (request.getRequestURI().indexOf("/learning/") != -1) {
 		if ((this.getAttachmentFile() != null)
 			&& FileUtil.isExecutableFile(this.getAttachmentFile().getOriginalFilename())) {
-		    errors.reject("message.attachments", messageService.getMessage("error.attachment.executable"));
+		    errorMap.add("message.attachments", messageService.getMessage("error.attachment.executable"));
 		}
 		largeFile = false;
 	    }
@@ -99,7 +102,7 @@ public class MessageForm {
 	} catch (Exception e) {
 	    MessageForm.logger.error("", e);
 	}
-	return errors;
+	return errorMap;
     }
 
     // -------------------------get/set methods----------------

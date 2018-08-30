@@ -25,7 +25,15 @@
 			<div class="form-group">
 		    <label for="message.subject"><fmt:message key="message.label.subject" /> *</label>
 		    <form:input type="text" size="30" tabindex="1" path="message.subject" value="${message.subject}" maxlength="60" cssClass="form-control"/>
-		    <form:errors path="message.subject" />
+		    
+		    <c:set var="errorKey" value="message.subject" />
+	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+	            <lams:Alert id="error" type="danger" close="false">
+	                <c:forEach var="error" items="${errorMap[errorKey]}">
+	                    <c:out value="${error}" />
+	                </c:forEach>
+	            </lams:Alert>
+	        </c:if>
 			</div>
 			
 			<div class="form-group">
@@ -35,7 +43,14 @@
 				<c:set var="body" value="${topicFormId.message.body}"/>
 			</c:if>
 			<lams:CKEditor id="message.body" value="${body}" contentFolderID="${sessionMap.contentFolderID}"/>
-			<form:errors path="message.body" />
+			<c:set var="errorKey" value="message.body" />
+	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+	            <lams:Alert id="error" type="danger" close="false">
+	                <c:forEach var="error" items="${errorMap[errorKey]}">
+	                    <c:out value="${error}" />
+	                </c:forEach>
+	            </lams:Alert>
+	        </c:if>
 			</div>
 
 			<c:set var="itemAttachment" value="${topicFormId}" />
@@ -43,6 +58,14 @@
 				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
 				<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="3" />
 				<form:errors path="message.attachments" />
+				<c:set var="errorKey" value="message.attachments" />
+		        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+		            <lams:Alert id="error" type="danger" close="false">
+		                <c:forEach var="error" items="${errorMap[errorKey]}">
+		                    <c:out value="${error}" />
+		                </c:forEach>
+		            </lams:Alert>
+		        </c:if>
 				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 			</div>
 
