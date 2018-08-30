@@ -88,6 +88,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  */
 public class MindmapService implements ToolSessionManager, ToolContentManager, IMindmapService, ToolRestManager {
 
+    private static final int NODE_TEXT_LENGTH = 100; // node_text column in the database is varchar(100)
     private static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
     private final XStream xstream = new XStream(new SunUnsafeReflectionProvider());
@@ -845,6 +846,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     public void saveOrUpdateMindmapNode(MindmapNode mindmapNode) {
+	if (mindmapNode.getText() != null && mindmapNode.getText().length() > NODE_TEXT_LENGTH) {
+	    mindmapNode.setText(mindmapNode.getText().substring(0, NODE_TEXT_LENGTH));
+	}
 	mindmapNodeDAO.saveOrUpdate(mindmapNode);
     }
 

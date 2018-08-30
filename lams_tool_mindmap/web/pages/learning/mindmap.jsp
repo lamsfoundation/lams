@@ -1,9 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
-<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
-<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
-<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
+<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"/>
+<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"/>
+<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"/>
 
 <script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
 <script src="${lams}includes/javascript/fullscreen.js"></script>

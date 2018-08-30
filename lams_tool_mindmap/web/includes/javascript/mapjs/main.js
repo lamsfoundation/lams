@@ -12339,6 +12339,13 @@ $.fn.simpleDraggableContainer = function () {
 			$(this).on('drag', drag);
 		}
 	}).on('mm:start-dragging-shadow', function (event) {
+		// LAMS Modification IE11 does not support the remove() needed at the end of the drag, so don't start the drag.
+		if ( typeof this.remove != "function" ) {
+			event.stopPropagation();
+			event.stopImmediatePropagation();
+			return;
+		}
+
 		const target = $(event.relatedTarget),
 			clone = function () {
 				const result = target.clone().addClass('drag-shadow').appendTo(container).offset(target.offset()).data(target.data()).attr('mapjs-drag-role', 'shadow'),
@@ -12358,7 +12365,10 @@ $.fn.simpleDraggableContainer = function () {
 				left: currentDragObject.css('left')
 			};
 			currentDragObject.on('mm:stop-dragging mm:cancel-dragging', function (e) {
-				this.remove();
+				// LAMS Modification IE11 does not support the remove() needed at the end of the drag, so avoid rather than throwing error
+				if ( typeof this.remove === "function" ) {
+					this.remove();
+				}
 				e.stopPropagation();
 				e.stopImmediatePropagation();
 				const evt = $.Event(e.type, {
@@ -15460,7 +15470,8 @@ module.exports = {
 /*global require, module */
 const Theme = __webpack_require__ (6),
 	_ = __webpack_require__(0),
-	lineStyles = __webpack_require__(38),
+// LAMS Modification comment out => entries so that it will work on IE11. See module 38
+//	lineStyles = __webpack_require__(38),  
 	nodeConnectionPointX = __webpack_require__(33),
 	appendUnderLine = function (connectorCurve, calculatedConnector, position) {
 		'use strict';
@@ -15689,8 +15700,9 @@ const Theme = __webpack_require__ (6),
 			lineStyle = linkAttr.lineStyle || linkTheme.line.lineStyle,
 			lineProps = {
 				color: linkAttr.color || linkTheme.line.color,
-				strokes: lineStyles.strokes(lineStyle, width),
-				linecap: lineStyles.linecap(lineStyle, width),
+// LAMS Modification comment out => entries so that it will work on IE11. See module 38
+//				strokes: lineStyles.strokes(lineStyle, width),
+//				linecap: lineStyles.linecap(lineStyle, width),
 				width: width
 			};
 
@@ -16690,35 +16702,37 @@ module.exports = {
 
 
 /***/ }),
+// LAMS Modification comment out => entries so that it will work on IE11. 
+// These features are not being used. Once we no longer support IE11 they can be uncommented.
 /* 38 */
 /***/ (function(module, exports) {
 
 /*global module*/
 
 module.exports = {
-	strokes: (name, width) => {
-		'use strict';
-		if (!name || name === 'solid') {
-			return '';
-		}
-		const multipleWidth = Math.max(width || 1, 1) * 4;
-		if (name === 'dashed') {
-			return [multipleWidth, multipleWidth].join(', ');
-		} else {
-			return [1, multipleWidth].join(', ');
-		}
-	},
-	linecap: (name) => {
-		'use strict';
-		if (!name || name === 'solid') {
-			return 'square';
-		}
-		if (name === 'dotted') {
-			return 'round';
-		}
-		return '';
-	}
-
+//	strokes: (name, width) => {
+//		'use strict';
+//		if (!name || name === 'solid') {
+//			return '';
+//		}
+//		const multipleWidth = Math.max(width || 1, 1) * 4;
+//		if (name === 'dashed') {
+//			return [multipleWidth, multipleWidth].join(', ');
+//		} else {
+//			return [1, multipleWidth].join(', ');
+//		}
+//	},
+//	linecap: (name) => {
+//		'use strict';
+//		if (!name || name === 'solid') {
+//			return 'square';
+//		}
+//		if (name === 'dotted') {
+//			return 'round';
+//		}
+//		return '';
+//	}
+//
 };
 
 
@@ -18093,8 +18107,12 @@ module.exports = function content(contentAggregate, sessionKey) {
 		if (originalTitle === title) {
 			return false;
 		}
-		idea.title = title;
-		appendChange('initialiseTitle', [ideaId, title], function () {
+		// LAMS Modification - LDEV-4656 Restrict to 100 chars if not already specified so that it fits in the database node_text field (NODE_TEXT_LENGTH)
+//		idea.title = title;
+		var trimmedTitle = ( title && title.length > 100 ) ? title.substring(0,100) : title;
+		idea.title = trimmedTitle;
+
+		appendChange('initialiseTitle', [ideaId, trimmedTitle], function () {
 			idea.title = originalTitle;
 		}, originSession);
 		return true;
@@ -18111,8 +18129,12 @@ module.exports = function content(contentAggregate, sessionKey) {
 		if (originalTitle === title) {
 			return false;
 		}
-		idea.title = title;
-		logChange('updateTitle', [ideaId, title], function () {
+		// LAMS Modification - LDEV-4656 Restrict to 100 chars if not already specified so that it fits in the database node_text field (NODE_TEXT_LENGTH)
+//		idea.title = title;
+		var trimmedTitle = ( title && title.length > 100 ) ? title.substring(0,100) : title;
+		idea.title = trimmedTitle;
+		
+		logChange('updateTitle', [ideaId, trimmedTitle], function () {
 			idea.title = originalTitle;
 		}, originSession);
 		return true;
@@ -18171,7 +18193,9 @@ module.exports = function content(contentAggregate, sessionKey) {
 				if (!oldRank) {
 					return false;
 				}
-				oldIdea.traverse((traversed)=> removedNodeIds[traversed.id] = true);
+
+// LAMS Modification comment out => entries so that it will work on IE11. These features are not being used.
+//				oldIdea.traverse((traversed)=> removedNodeIds[traversed.id] = true);
 				delete parent.ideas[oldRank];
 
 				contentAggregate.links = _.reject(contentAggregate.links, function (link) {
@@ -18612,7 +18636,13 @@ const urlHelper = __webpack_require__(14),
 	},
 	trimLines = function (nodeTitle) {
 		'use strict';
-		return nodeTitle.replace(/\r/g, '').split('\n').map(line => line.trim()).join('\n');
+// LAMS Modification comment out => entries so that it will work on IE11. This feature would be nice to have but we can live without it.
+//		return nodeTitle.replace(/\r/g, '').split('\n').map(line => line.trim()).join('\n');
+		var lc, lines = nodeTitle.replace(/\r/g, '').split('\n');
+		for (lc = 0; lc < lines.length; lc++) {
+			lines[lc] = lines[lc].trim();
+		}
+		return lines.join('\n');
 	};
 module.exports = function (nodeTitle, maxUrlLength) {
 	'use strict';
@@ -18700,9 +18730,23 @@ jQuery.fn.setThemeClassList = function (classList) {
 		},
 		toRemove = filterClasses(domElement.classList),
 		toAdd = classList && classList.length && filterClasses(classList);
-	domElement.classList.remove.apply(domElement.classList, toRemove);
+
+// LAMS Modification rewrite to avoid apply() entries so that it will work on IE11. 
+//	domElement.classList.remove.apply(domElement.classList, toRemove);
+//	if (toAdd && toAdd.length) {
+//		domElement.classList.add.apply(domElement.classList, toAdd);
+//	}
+	if ( toRemove.length ) {
+		var len = toRemove.length;
+		for (var i = 0; i < len; i++) {
+			domElement.classList.remove(toRemove[i]);
+		}
+	}
 	if (toAdd && toAdd.length) {
-		domElement.classList.add.apply(domElement.classList, toAdd);
+		var len = toAdd.length;
+		for (var i = 0; i < len; i++) {
+			domElement.classList.add(toAdd[i]);
+		}
 	}
 	return this;
 };
