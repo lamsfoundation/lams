@@ -75,6 +75,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Marcin Cieslak, Fiona Malikoff
  */
 @Controller
+@RequestMapping("authoring/template/tbl")
 public abstract class LdTemplateController {
 
     @Autowired
