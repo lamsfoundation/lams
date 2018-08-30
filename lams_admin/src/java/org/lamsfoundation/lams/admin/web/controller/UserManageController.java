@@ -164,7 +164,7 @@ public class UserManageController {
 
     @RequestMapping(path = "/usermanage/forwardError", method = RequestMethod.POST)
     private String forwardError(HttpServletRequest request, String key) {
-	request.setAttribute("errorName", "UserManageAction");
+	request.setAttribute("errorName", "UserManageController");
 	request.setAttribute("errorMessage", messageService.getMessage(key));
 	return "error";
     }

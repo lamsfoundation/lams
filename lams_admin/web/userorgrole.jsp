@@ -28,16 +28,16 @@
 	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userOrgRoleForm">
 		
-		<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+		<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 	    <c:if test="${not empty pOrgId}">
-	        : <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
+	        : <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
 	    </c:if>
 	    <c:if test="${userOrgRoleForm.orgId != 1}">
-			: <a href="<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${userOrgRoleForm.orgId}" />" class="btn btn-default">
+			: <a href="<lams:LAMSURL/>admin/<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${userOrgRoleForm.orgId}" />" class="btn btn-default">
 			<c:out value="${orgName}"/></a>
 		</c:if>
 		<c:if test="${userOrgRoleForm.orgId == 1}">
-			: <a href="usermanage.do?org=<c:out value="${userOrgRoleForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
+			: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userOrgRoleForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
 		</c:if>
 		</h4>
 		
@@ -66,7 +66,7 @@
 				</td>
 				<c:forEach var="role" items="${roles}">
 					<td>
-						<input type="checkbox" id="${userBean.login}Role${role.roleId}" name="userBeans[${beanIndex.index}].roleId" value="${role.roleId}" />&nbsp;
+						<input type="checkbox" id="${userBean.login}Role${role.roleId}" name="userBeans[${beanIndex.index}].roleIds" value="${role.roleId}" />&nbsp;
 					</td>
 				</c:forEach>
 			</tr>
@@ -77,7 +77,7 @@
 		</c:if>
 		
 		<div class="pull-right">
-			<a href="usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+			<a href="<lams:LAMSURL/>admin/usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 			<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 		</div>
 		</form:form>

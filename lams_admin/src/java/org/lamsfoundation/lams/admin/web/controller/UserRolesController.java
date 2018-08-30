@@ -161,6 +161,7 @@ public class UserRolesController {
 	    }
 	} else {
 	    errorMap.add("roles", messageService.getMessage("msg.add.to.org", org.getName()));
+	    request.setAttribute("errorMap", errorMap);
 	}
 	userRolesForm.setRoles(roles);
 	return "userrole";

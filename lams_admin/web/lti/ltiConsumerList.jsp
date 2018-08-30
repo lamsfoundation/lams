@@ -59,18 +59,18 @@
 								&nbsp;
 								<c:choose>
 									<c:when test="${ltiConsumer.disabled}">
-										<a href="../ltiConsumerManagement/disable.do?disable=false&sid=<c:out value='${ltiConsumer.sid}' />">
+										<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/disable.do?disable=false&sid=<c:out value='${ltiConsumer.sid}' />">
 											<fmt:message key="admin.enable" />
 										</a>
 									</c:when>
 									<c:otherwise>
-										<a href="../ltiConsumerManagement/disable.do?disable=true&sid=<c:out value='${ltiConsumer.sid}' />">
+										<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/disable.do?disable=true&sid=<c:out value='${ltiConsumer.sid}' />">
 											<fmt:message key="admin.disable" />
 										</a>
 									</c:otherwise>
 								</c:choose>
 								&nbsp;
-								<a href="../ltiConsumerManagement/delete.do?sid=<c:out value='${ltiConsumer.sid}' />">
+								<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/delete.do?sid=<c:out value='${ltiConsumer.sid}' />">
 									<fmt:message key="admin.delete" />
 								</a>
 							</td>

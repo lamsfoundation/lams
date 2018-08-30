@@ -23,7 +23,7 @@
 				if (${not empty courseToDeleteLessons}) {
 					// confirm redirect to "delete all lessons" page
 					if (confirm('<fmt:message key="msg.delete.organisation.delete.lessons.confirm"/>')) {
-						document.location.href = '../organisation/deleteAllLessonsInit.do?orgId=${courseToDeleteLessons}';
+						document.location.href = '<lams:LAMSURL/>admin/organisation/deleteAllLessonsInit.do?orgId=${courseToDeleteLessons}';
 					}
 					return false;
 				}
@@ -45,13 +45,13 @@
 				<form:hidden path="parentId" />
 				<form:hidden path="typeId" />
 				
-				<p><a href="../orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+				<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 					<c:if test="${organisationForm.typeId == 3}">
-						: <a href="../orgmanage.do?org=<c:out value="${organisationForm.parentId}" />" class="btn btn-default"><c:out value="${organisationForm.parentName}"/></a>
+						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${organisationForm.parentId}" />" class="btn btn-default"><c:out value="${organisationForm.parentName}"/></a>
 					</c:if>
 					
 					<c:if test="${not empty organisationForm.orgId}">
-						: <a href="../orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default"><c:out value="${organisationForm.name}"/></a>
+						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${organisationForm.orgId}" />" class="btn btn-default"><c:out value="${organisationForm.name}"/></a>
 					</c:if>
 				</p>
 				

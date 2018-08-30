@@ -57,7 +57,7 @@
 	<form:form action="start.do" modelAttribute="cleanupForm" id="cleanupForm" method="post">
 	
 		<p><fmt:message key="label.cleanup.delete" />:
-		<form:input type="text" path="numDays" maxlength="4" size="4" cssClass="form-control form-control-inline" /></p>
+		<form:input path="numDays" maxlength="4" size="4" cssClass="form-control form-control-inline" /></p>
 		
 		<div class="pull-right">
 			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel" /></a>

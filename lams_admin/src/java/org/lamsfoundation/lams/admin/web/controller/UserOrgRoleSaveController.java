@@ -37,13 +37,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -67,7 +67,7 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-@Scope("session")
+@SessionAttributes("userOrgRoleForm")
 public class UserOrgRoleSaveController {
 
     private static Logger log = Logger.getLogger(UserOrgRoleSaveController.class);
@@ -107,7 +107,7 @@ public class UserOrgRoleSaveController {
 		errorMap.add("roles", adminMessageService.getMessage("error.roles.empty"));
 		request.setAttribute("errorMap", errorMap);
 		request.setAttribute("orgId", orgId);
-		return "redirect:/userorg.do";
+		return "forward:/userorg.do";
 	    }
 	    service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
@@ -118,7 +118,7 @@ public class UserOrgRoleSaveController {
 	    //	}
 	    //}
 	}
-	return "redirect:/usermanage.do";
+	return "forward:/usermanage.do";
     }
 
 }

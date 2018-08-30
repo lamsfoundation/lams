@@ -47,7 +47,7 @@
 					<c:out value="${user.lastName}" />
 				</td>
 				<td>
-					<a href="user/enable.do?userId=<c:out value="${user.userId}"/>" class="btn btn-default btn-sm"><fmt:message key="admin.enable"/></a>
+					<a href="<lams:LAMSURL/>admin/user/enable.do?userId=<c:out value="${user.userId}"/>" class="btn btn-default btn-sm"><fmt:message key="admin.enable"/></a>
 				</td>		
 			</tr>
 		</c:forEach>

@@ -126,7 +126,7 @@
 					return;
 				}
 				$.ajax({
-					'url' : '../orgPasswordChange/generatePassword.do'
+					'url' : '<lams:LAMSURL/>admin/orgPasswordChange/generatePassword.do'
 				}).done(function(password){
 					container.find('.pass').val(password);
 				});
@@ -191,7 +191,7 @@
 				}
 			});
 	
-			var jqGridURL = "../orgPasswordChange/getGridUsers.do?organisationID=<c:out value='${orgPasswordChangeForm.organisationID}' />&role=",
+			var jqGridURL = "<lams:LAMSURL/>admin/orgPasswordChange/getGridUsers.do?organisationID=<c:out value='${orgPasswordChangeForm.organisationID}' />&role=",
 				jqGridSettings = {
 					datatype		   : "json",
 				    height			   : "100%",

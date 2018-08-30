@@ -61,13 +61,13 @@
 	<lams:Page type="admin" title="${title}">
 				
 			<p>
-				<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 				<c:if test="${orgType == 2}">
-					: <a href="orgmanage.do?org=<c:out value="${userManageForm.orgId}" />" class="btn btn-default"><c:out value="${userManageForm.orgName}" /></a>
+					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userManageForm.orgId}" />" class="btn btn-default"><c:out value="${userManageForm.orgName}" /></a>
 				</c:if>
 				<c:if test="${orgType == 3}">
-					: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
-					: <a href="orgmanage.do?org=<c:out value="${userManageForm.orgId}" />" class="btn btn-default"><c:out value="${userManageForm.orgName}"/></a>
+					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
+					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userManageForm.orgId}" />" class="btn btn-default"><c:out value="${userManageForm.orgName}"/></a>
 				</c:if>
 			</p>
 			
@@ -82,12 +82,12 @@
 						</c:if>
 					</span>
 					<div class="pull-right btn-group btn-group-sm">
-						<input id="addRemoveUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.add"/>" onclick="javascript:document.location='userorg.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
+						<input id="addRemoveUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.add"/>" onclick="javascript:document.location='<lams:LAMSURL/>admin/userorg.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
 						<c:if test="${userManageForm.canResetOrgPassword == true}">
-							<a class="btn btn-default" href="orgPasswordChange/start.do?organisationID=${userManageForm.orgId}"><fmt:message key='admin.org.password.change.button'/></a>
+							<a class="btn btn-default" href="<lams:LAMSURL/>admin/orgPasswordChange/start.do?organisationID=${userManageForm.orgId}"><fmt:message key='admin.org.password.change.button'/></a>
 						</c:if>
 						<c:if test="${userManageForm.courseAdminCanAddNewUsers == true}">
-							<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
+							<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='<lams:LAMSURL/>admin/user/edit.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
 						</c:if>
 					</div>
 				</div>
@@ -171,14 +171,14 @@
 						    </small>
 						</td>
 						<td>
-								<a href="userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.assign.roles"/></a>
+								<a href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.assign.roles"/></a>
 								&nbsp;
 								<c:if test="${userManageForm.courseAdminCanAddNewUsers == true }">
-									<a href="user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.edit" /></a>
+									<a href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.edit" /></a>
 									&nbsp;
 								</c:if>
 								<c:if test="${canDeleteUser == true}">
-									<a href="user/remove.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.delete"/></a>
+									<a href="<lams:LAMSURL/>admin/user/remove.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.delete"/></a>
 								</c:if>
 								<br/>
 						</td>		

@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
@@ -65,7 +66,6 @@ import org.springframework.web.context.WebApplicationContext;
  *
  */
 @Controller
-@Scope("session")
 public class UserOrgRoleController {
 
     private static Logger log = Logger.getLogger(UserOrgRoleController.class);
@@ -76,7 +76,7 @@ public class UserOrgRoleController {
 
     @RequestMapping(path = "/userorgrole")
     public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, BindingResult result,
-	    HttpServletRequest request) throws Exception {
+	    HttpServletRequest request, HttpSession session) throws Exception {
 
 	service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	// make sure we don't have left overs from any previous attempt
@@ -120,6 +120,8 @@ public class UserOrgRoleController {
 	}
 	log.debug("ready to assign roles for " + userOrgRoleForm.getUserBeans().size() + " new users in organisation "
 		+ organisation.getName());
+	
+	session.setAttribute("userOrgRoleForm", userOrgRoleForm);
 
 	return "userorgrole";
     }

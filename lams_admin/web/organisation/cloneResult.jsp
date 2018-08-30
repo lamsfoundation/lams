@@ -21,13 +21,13 @@
 
 	<lams:Page type="admin" title="${title}">
 	
-		<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
+		<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
 			<c:if test="${org.organisationType.organisationTypeId eq classTypeId}">
-				<a href="orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />" class="btn btn-default">
+				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />" class="btn btn-default">
 				<c:out value="${org.parentOrganisation.name}" />
 				</a> :
 				</c:if>
-				<a href="orgmanage.do?org=<c:out value="${org.organisationId}" />" class="btn btn-default">
+				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.organisationId}" />" class="btn btn-default">
 					<c:out value="${org.name}" />
 				</a>
 		</p>
@@ -47,7 +47,7 @@
 		</p>
 				
 		<input type="button" class="btn btn-default pull-right" value="<fmt:message key="label.return.to.group" />" 
-		onclick="document.location='orgmanage.do?org=<c:out value="${org.organisationId}" />';"	>
+		onclick="document.location='<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.organisationId}" />';"	>
 		
 	</lams:Page>
 	

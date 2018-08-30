@@ -19,10 +19,10 @@
 		<form>
 
 				<c:if test="${empty orgId}">
-					<c:url var="cancel" value="../usersearch.do" />
+					<c:url var="cancel" value="usersearch.do" />
 				</c:if>
 				<c:if test="${not empty orgId}">
-					<c:url var="cancel" value="../usermanage.do">
+					<c:url var="cancel" value="usermanage.do">
 						<c:param name="org" value="${orgId}" />
 					</c:url>
 				</c:if>
@@ -41,7 +41,7 @@
 								<fmt:message key="msg.disable.user.3"/><br />
 								<fmt:message key="msg.disable.user.4"/>
 							</p>
-							<c:url var="disableaction" value="../user/disable.do">
+							<c:url var="disableaction" value="user/disable.do">
 								<c:param name="userId" value="${userId}" />
 								<c:param name="orgId" value="${orgId}" />
 							</c:url>
@@ -62,7 +62,7 @@
 						</div>
 						<div class="panel-body">     
 							<p><fmt:message key="msg.delete.user.1"/>&nbsp;&nbsp;<fmt:message key="msg.delete.user.2"/></p>
-							<c:url var="deleteaction" value="../user/delete.do">
+							<c:url var="deleteaction" value="user/delete.do">
 									<c:param name="userId" value="${userId}" />
 									<c:param name="orgId" value="${orgId}" />
 								</c:url>

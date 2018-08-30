@@ -23,17 +23,17 @@
 		<form:hidden path="userId" />
 		
 		<p>
-			<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+			<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 			<c:if test="${not empty pOrgId}">
-				: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${parentName}" /></a>
-				: <a href="usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
+				: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${parentName}" /></a>
+				: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
 			</c:if>
 			<c:if test="${empty pOrgId}">
 				<c:if test="${userRolesForm.orgId != 1}">
-					: <a href="orgmanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
+					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><c:out value="${orgName}" /></a>
 				</c:if>
 				<c:if test="${userRolesForm.orgId == 1}">
-					: <a href="usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
+					: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
 				</c:if>
 			</c:if>
 		</p>
@@ -82,7 +82,7 @@
 		</div>
 		
 		<div class="pull-right">
-			<a href="usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+			<a href="<lams:LAMSURL/>admin/usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 			<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
 			<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 		</div>

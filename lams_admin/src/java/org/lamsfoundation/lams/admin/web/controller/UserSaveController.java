@@ -232,11 +232,11 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    if ((orgId == null) || (orgId == 0)) {
-		return "redirect:/usersearch.do";
+		return "forward:/usersearch.do";
 	    }
 	    if (edit) {
 		request.setAttribute("org", orgId);
-		return "redirect:/usermanage.do";
+		return "forward:/usermanage.do";
 	    } else {
 		request.setAttribute("orgId", orgId);
 		request.setAttribute("userId", user.getUserId());

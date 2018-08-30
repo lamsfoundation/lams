@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+bo<!DOCTYPE html>
 
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
@@ -161,26 +161,26 @@
 				<form:hidden path="userId" />
 
 				<c:if test="${not empty userForm.orgId}">
-					<a href="../orgmanage.do?org=1" class="btn btn-default">
+					<a href="<c:out value="<lams:LAMSURL/>"/>orgmanage.do?org=1" class="btn btn-default">
 						<fmt:message key="admin.course.manage" />
 					</a>
 					<c:if test="${not empty pOrgId}">
-						: <a href="../orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default">
+						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default">
 							<c:out value="${parentName}" />
 						  </a>
-						: <a href="../usermanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
+						: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
 							<c:out value="${orgName}" />
 						  </a>
 					</c:if>
 					<c:if test="${empty pOrgId}">
-						: <a href="../orgmanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
+						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
 							<c:out value="${orgName}" />
 						  </a>
 					</c:if>
 				</c:if>
 			
 				<c:if test="${empty userForm.orgId}">
-					<a href="../orgmanage.do?org=1" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default">
 						<fmt:message key="admin.course.manage" />
 					</a>
 				</c:if>

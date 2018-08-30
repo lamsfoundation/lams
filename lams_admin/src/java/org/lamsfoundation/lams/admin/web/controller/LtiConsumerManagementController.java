@@ -94,7 +94,7 @@ public class LtiConsumerManagementController {
     /**
      * Disables or enables (depending on "disable" parameter) specified LTI tool consumer
      */
-    @RequestMapping(path = "/disable", method = RequestMethod.POST)
+    @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
 
 	initServices();
@@ -111,7 +111,7 @@ public class LtiConsumerManagementController {
     /**
      * Removes specified LTI tool consumer
      */
-    @RequestMapping(path = "/delete", method = RequestMethod.POST)
+    @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
 
 	initServices();

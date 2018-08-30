@@ -43,7 +43,7 @@
 			<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 			<fmt:message key="admin.timezone.select.timezones.you.want.users.choose" >
 			<fmt:param>
-				<a class="thickbox" href="../timezonemanagement/serverTimezoneManagement.do?KeepThis=true&TB_iframe=true&height=188&width=820" title="<fmt:message key='admin.servertimezone.server.timezone.management'/>">
+				<a class="thickbox" href="<lams:LAMSURL/>admin/timezonemanagement/serverTimezoneManagement.do?KeepThis=true&TB_iframe=true&height=188&width=820" title="<fmt:message key='admin.servertimezone.server.timezone.management'/>">
 					${serverTimezone}
 				</a>
 			</fmt:param>

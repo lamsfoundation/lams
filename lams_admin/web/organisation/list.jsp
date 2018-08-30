@@ -159,7 +159,7 @@
 		</c:if>
 			
 		<c:if test="${orgManageForm.type == 2}">
-				<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a></p>
+				<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a></p>
 			
 				<div class="panel panel-default voffset5" >
 					<div class="panel-heading">
@@ -245,8 +245,8 @@
 			
 		<c:if test="${orgManageForm.type == 3}">
 				<p>
-					<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-					: <a href="orgmanage.do?org=<c:out value="${parentGroupId}"/>" class="btn btn-default"><c:out value="${parentGroupName}"/></a>
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${parentGroupId}"/>" class="btn btn-default"><c:out value="${parentGroupName}"/></a>
 				</p>
 				
 				<div class="panel panel-default voffset5" >

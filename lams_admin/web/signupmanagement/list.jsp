@@ -62,15 +62,15 @@
 						<c:out value="${signupOrganisation.context}" />
 					</td>
 					<td>
-						<a href="../signupManagement/edit.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.edit"/></a>
+						<a href="<lams:LAMSURL/>admin/signupManagement/edit.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.edit"/></a>
 						&nbsp;&nbsp;
-						<a href="../signupManagement/delete.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.delete"/></a>
+						<a href="<lams:LAMSURL/>admin/signupManagement/delete.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.delete"/></a>
 					</td>
 				</tr>
 			</c:forEach>
 		</table>
 		
-		<a href="../signupManagement/add.do" class="btn btn-primary pull-right"><fmt:message key="admin.add.new.signup.page"/></a>
+		<a href="<lams:LAMSURL/>admin/signupManagement/add.do" class="btn btn-primary pull-right"><fmt:message key="admin.add.new.signup.page"/></a>
 
 	</lams:Page>
 
