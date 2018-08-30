@@ -1,7 +1,6 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-<c:url var="tutorialActionUrl" value="tutorial.do" />
 
 <!DOCTYPE html>
 <html>
@@ -21,8 +20,8 @@
 			 		if (! $("#doNotShowAgain").attr("checked")){
 				 		$.ajax({		
 							type: "GET",
-							url: "${tutorialActionUrl}",
-							data: {method : "enableSingleTutorialVideo", pageString : "${param.pageString}"},
+							url: "tutorial/enableSingleTutorialVideo.do",
+							data: {pageString : "${param.pageString}"},
 							cache: false
 						});
 			 		}
@@ -33,8 +32,8 @@
 			 			
 				 		$.ajax({		
 							type: "GET",
-							url: "${tutorialActionUrl}",
-							data: {method : "disableSingleTutorialVideo", pageString : "${param.pageString}"},
+							url: "tutorial/disableSingleTutorialVideo.do",
+							data: {pageString : "${param.pageString}"},
 							cache: false
 						});
 			 		}
@@ -53,8 +52,8 @@
 				   That's why we need to check it each time we enter this thickbox.
 				*/
 	 			$.get(
-	 				"${tutorialActionUrl}",
-					{method : "getDoNotShowAgainValue", pageString : "${param.pageString}"},
+	 				"tutorial/getDoNotShowAgainValue.do",
+					{pageString : "${param.pageString}"},
 					function (data, textStatus) {
 						// Comparing with "==" did not work
 						doNotShowAgainInitialValue = data.indexOf("true")>-1;

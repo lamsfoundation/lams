@@ -201,7 +201,7 @@
   	   		}
   	   	}
   	   	else if (actionAfterCompleted==ACTION_EXPORT){
-  	   		 document.getElementById("downloadFileDummyIframe").src="pedagogicalPlanner.do?method=exportTemplate&ldId="+learningDesignId;
+  	   		 document.getElementById("downloadFileDummyIframe").src="pedagogicalPlanner/exportTemplate.do?ldId="+learningDesignId;
   	   	}
   	}
   	else {

@@ -103,7 +103,7 @@
 		}
 		
 		function getSubmissionURL() {
-			return '<lams:WebAppURL />/authoring/template/'+$('#template').val().toLowerCase()+'.do';
+			return '<lams:WebAppURL />'+$('#template').val().toLowerCase()+'.do';
 		}
 		
 		function doGotoList() {

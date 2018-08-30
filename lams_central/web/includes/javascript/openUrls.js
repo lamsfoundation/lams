@@ -86,7 +86,7 @@ function openMonitorLesson( lessonID ) {
 }
 
 function openLearner( lessonId ) {
-	var learnerUrl = '../home/learner.do?lessonID=' + lessonId;
+	var learnerUrl = '/lams/home/learner.do?lessonID=' + lessonId;
 	
 	if (isMac) {
 		learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height 

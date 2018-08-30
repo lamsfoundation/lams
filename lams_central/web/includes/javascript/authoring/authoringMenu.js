@@ -250,7 +250,7 @@ var MenuLib = {
 			'modal'	   : true,
 			'title'	   : LABELS.EXPORT_SEQUENCE_DIALOG_TITLE,
 			'open'	   : function() {
-				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&learningDesignID='
+				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent/export.do?learningDesignID='
 									  	  			   + layout.ld.learningDesignID);
 			}
 		}, false)
@@ -432,7 +432,7 @@ var MenuLib = {
 						'open' : function() {
 							var dialog = $(this);
 							// load contents after opening the dialog
-							$('iframe', dialog).attr('src', LAMS_URL + 'authoring/importToolContent.do?method=import').load(function(){
+							$('iframe', dialog).attr('src', LAMS_URL + 'authoring/importToolContent/import.do').load(function(){
 								// override the close function so it works with the dialog, not window
 								this.contentWindow.closeWin = function(){
 									dialog.modal('hide');
@@ -520,9 +520,8 @@ var MenuLib = {
 		
 		// initialize, create and enter the preview lesson
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 			data : {
-				'method' : 'initializeLesson',
 				'learningDesignID' : layout.ld.learningDesignID,
 				'copyType' : 3,
 				'lessonName' : LABELS.PREVIEW_LESSON_DEFAULT_TITLE

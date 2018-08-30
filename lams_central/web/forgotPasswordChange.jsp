@@ -103,10 +103,9 @@
 
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
-		<form action="<lams:LAMSURL/>/ForgotPasswordRequest" method="post"
+		<form action="<lams:LAMSURL/>ForgotPasswordRequest/requestPasswordChange.do" method="post"
 			name="changePass">
-			<input type="hidden" name="method" id="method"
-				value="requestPasswordChange" /> <input type="hidden" name="key"
+				<input type="hidden" name="key"
 				id="key" value="<c:out value='${param.key}' />" />
 
 			<h4>

@@ -100,8 +100,7 @@
 		$(document).ready(function(){
 			<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
 			<c:if test="${firstLogin}">
-				<c:url var="disableAllTutorialVideosUrl" value="tutorial.do">
-					<c:param name="method" value="disableAllTutorialVideos" />
+				<c:url var="disableAllTutorialVideosUrl" value="tutorial/disableAllTutorialVideos.do">
 				</c:url>
 				if (!confirm("<fmt:message key='label.tutorial.disable.all' />")){
 			 		$.get("${disableAllTutorialVideosUrl}");
