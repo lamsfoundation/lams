@@ -257,8 +257,8 @@ public class GroupingUploadAJAXController {
      */
     @RequestMapping("/importLearnersForGrouping")
     @ResponseBody
-    public String importLearnersForGrouping(@ModelAttribute FileUploadForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InvalidParameterException, IOException {
+    public String importLearnersForGrouping(@ModelAttribute("uploadForm") FileUploadForm uploadForm,
+	    HttpServletRequest request, HttpServletResponse response) throws InvalidParameterException, IOException {
 
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -299,11 +299,10 @@ public class GroupingUploadAJAXController {
 	    return null;
 	}
 
-	Hashtable fileElements = null; // null because there are commented lines
-//		form.getMultipartRequestHandler().getFileElements();
-//	if (fileElements.size() == 0) {
-//	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "No file provided");
-//	}
+	MultipartFile fileElements = uploadForm.getAttachmentFile();
+	if (fileElements.getSize() == 0) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "No file provided");
+	}
 	if (log.isDebugEnabled()) {
 	    log.debug("Saving course groups from spreadsheet for user " + userId + " and organisation " + organisationId
 		    + " filename " + fileElements);
@@ -317,7 +316,7 @@ public class GroupingUploadAJAXController {
 
     /** Create the new course grouping */
     private ObjectNode saveCourseGrouping(Organisation organisation, Long orgGroupingId, String name,
-	    Hashtable fileElements) throws IOException {
+	    MultipartFile fileElements) throws IOException {
 
 	OrganisationGrouping orgGrouping = null;
 	if (orgGroupingId != null) {
@@ -338,8 +337,7 @@ public class GroupingUploadAJAXController {
 	}
 
 	Map<String, Set<String>> groups = new HashMap<>();
-	int totalUsersSkipped = parseGroupSpreadsheet((MultipartFile) fileElements.elements().nextElement(),
-		orgGroupingId, groups);
+	int totalUsersSkipped = parseGroupSpreadsheet(fileElements, orgGroupingId, groups);
 	int totalUsersAdded = 0;
 
 	List<OrganisationGroup> orgGroups = new LinkedList<>();
@@ -383,7 +381,8 @@ public class GroupingUploadAJAXController {
     }
 
     /** Clean out and reuse any existing groups */
-    private ObjectNode saveLessonGrouping(Long lessonId, Long activityId, Hashtable fileElements) throws IOException {
+    private ObjectNode saveLessonGrouping(Long lessonId, Long activityId, MultipartFile fileElements)
+	    throws IOException {
 
 	int totalUsersSkipped = 0;
 	int totalUsersAdded = 0;
@@ -404,8 +403,7 @@ public class GroupingUploadAJAXController {
 	}
 
 	Map<String, Set<String>> groups = new HashMap<>();
-	totalUsersSkipped = parseGroupSpreadsheet((MultipartFile) fileElements.elements().nextElement(),
-		grouping.getGroupingId(), groups);
+	totalUsersSkipped = parseGroupSpreadsheet(fileElements, grouping.getGroupingId(), groups);
 
 	// if branching must use the already specified groups or cannot match to a branch!
 	if (activity.isChosenBranchingActivity()) {

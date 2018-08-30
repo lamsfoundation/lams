@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
@@ -11,7 +13,6 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -235,7 +236,7 @@
 				</button>
 			</div>
 			<div class="voffset5">
-				<form:form action="groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" modelAttribute="uploadForm" id="uploadForm">
+				<form:form action="monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" modelAttribute="uploadForm" id="uploadForm">
 				<form:hidden path="activityID" id="activityID" value="${param.activityID}"/>
 				<form:hidden path="lessonID" id="lessonID" value="${lessonID}"/>
 				<%-- <form:hidden path="organisationID" id="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
