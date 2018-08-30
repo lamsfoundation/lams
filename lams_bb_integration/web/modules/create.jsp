@@ -176,9 +176,15 @@
                 </bbNG:dataElement>
 
                 <bbNG:dataElement label="Track number of views" labelFor="isTracked">
-                    <input type="radio" name="isTracked" value="true">Yes
-                    <input type="radio" name="isTracked" value="false" checked>No
+                    <input type="Radio" name="isTracked" value="true">Yes
+                    <input type="Radio" name="isTracked" value="false" checked>No
                 </bbNG:dataElement>
+                
+				<bbNG:dataElement label="Learners can restart the lesson?" labelFor="isAllowLearnerRestart">
+                    <input type="Radio" name="isAllowLearnerRestart" value="true">Yes
+                    <input type="Radio" name="isAllowLearnerRestart" value="false" checked>No
+                </bbNG:dataElement>
+                
                 <bbNG:dataElement label="Choose date restrictions">
                     <bbNG:dateRangePicker baseFieldName="lessonAvailability" showTime="true"/>
                 </bbNG:dataElement>

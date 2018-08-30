@@ -128,21 +128,22 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $mform->setType('customCSV', PARAM_TEXT);
 
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
-	$mform->setExpanded('selectsequence', true);
+		$mform->setExpanded('selectsequence', true);
 
         $mform->addElement('static', 'sequencemessage', '', $html);
     	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
+    	$mform->addElement('checkbox', 'allowLearnerRestart', get_string('allowLearnerRestart', 'lamslesson'));
 
-//-------------------------------------------------------------------------------
-	$this->standard_grading_coursemodule_elements();
+		//-------------------------------------------------------------------------------
+		$this->standard_grading_coursemodule_elements();
 
-	// set the default grade to 'No Grade' so it doesn't record
-	// anything on gradebook unless specifically set.
-	$mform->setDefault('grade', 0);
+		// set the default grade to 'No Grade' so it doesn't record
+		// anything on gradebook unless specifically set.
+		$mform->setDefault('grade', 0);
 
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
-//-------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
     }
@@ -151,7 +152,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
       $errors = array();
       // a sequence needs to be selected                                                                                   
       if (empty($data['sequence_id']) || $data['sequence_id'] <= 0) {
-	$errors['sequencemessage'] = get_string('sequencenotselected', 'lamslesson');
+			$errors['sequencemessage'] = get_string('sequencenotselected', 'lamslesson');
       }
       return $errors;
     }

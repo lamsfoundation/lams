@@ -170,3 +170,7 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 1.2.27 Release Fixes
 ====================
 * LDEV-4494: Avoid cloning and importing the lessons created by old NTU plugin
+
+1.2.28 Release Fixes
+====================
+* LDEV-4653: Parameter to add "Learners can restart the lesson" via integrations

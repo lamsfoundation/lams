@@ -176,4 +176,6 @@ public class CentralConstants {
     public static final String PARAM_LEARNER_IM_ENABLE = "learnerInstantMessaging";
     
     public static final String PARAM_ENABLE_NOTIFICATIONS = "enableNotifications";
+    
+    public static final String PARAM_ALLOW_LEARNER_RESTART = "allowLearnerRestart";
 }
