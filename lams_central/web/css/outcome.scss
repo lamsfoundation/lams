@@ -14,7 +14,7 @@ div#titleDiv {
 	height: 16px;
 }
 
-#exportButton {
+#exportButton, #importButton {
 	float: left;
 	margin: 20px 0 10px 10px;
 }
@@ -38,4 +38,8 @@ div#titleDiv {
 
 textarea {
 	width: 100%;	
+}
+
+#importInput {
+	display: none;
 }

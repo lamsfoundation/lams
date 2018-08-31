@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.outcome.service;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -8,11 +10,19 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
+import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -130,6 +140,58 @@ public class OutcomeService implements IOutcomeService {
 	ExcelCell[][] data = rowList.toArray(new ExcelCell[][] {});
 	dataToExport.put(messageService.getMessage("index.outcome.manage"), data);
 	return dataToExport;
+    }
+
+    @SuppressWarnings("unchecked")
+    public int importScales(FormFile fileItem) throws IOException {
+	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
+	HSSFWorkbook wb = new HSSFWorkbook(fs);
+	HSSFSheet sheet = wb.getSheetAt(0);
+	int startRow = sheet.getFirstRowNum();
+	int endRow = sheet.getLastRowNum();
+	User user = null;
+	int counter = 0;
+
+	for (int i = startRow + 5; i < (endRow + 1); i++) {
+	    HSSFRow row = sheet.getRow(i);
+	    HSSFCell cell = row.getCell(1);
+	    String code = cell.getStringCellValue();
+	    List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", code);
+	    if (!foundScales.isEmpty()) {
+		continue;
+	    }
+	    cell = row.getCell(0);
+	    String name = cell.getStringCellValue();
+	    cell = row.getCell(2);
+	    String description = cell.getStringCellValue();
+	    cell = row.getCell(3);
+	    String itemsString = cell.getStringCellValue();
+
+	    OutcomeScale scale = new OutcomeScale();
+	    scale.setName(name);
+	    scale.setCode(code);
+	    scale.setDescription(description);
+	    if (user == null) {
+		UserDTO userDTO = OutcomeService.getUserDTO();
+		user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
+	    }
+	    scale.setCreateBy(user);
+	    scale.setCreateDateTime(new Date());
+	    outcomeDAO.insert(scale);
+
+	    List<String> items = OutcomeScale.parseItems(itemsString);
+	    int value = 0;
+	    for (String itemString : items) {
+		OutcomeScaleItem item = new OutcomeScaleItem();
+		item.setName(itemString);
+		item.setValue(value++);
+		item.setScale(scale);
+		outcomeDAO.insert(item);
+	    }
+
+	    counter++;
+	}
+	return counter;
     }
 
     private static UserDTO getUserDTO() {

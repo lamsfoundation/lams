@@ -1,4 +1,12 @@
-﻿function removeOutcome(outcomeId) {
+﻿$(document).ready(function(){
+	$('#importInput').change(function(){
+		if (this.files.length == 1) {
+			$('#importForm').submit();
+		} 
+	});
+});
+
+function removeOutcome(outcomeId) {
 	if (confirm(LABELS.REMOVE_OUTCOME_CONFIRM_LABEL)) {
 		document.location.href = 'outcome.do?method=outcomeRemove&organisationID=' + organisationId + '&outcomeId=' + outcomeId;
 	}
