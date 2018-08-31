@@ -161,7 +161,7 @@ bo<!DOCTYPE html>
 				<form:hidden path="userId" />
 
 				<c:if test="${not empty userForm.orgId}">
-					<a href="<c:out value="<lams:LAMSURL/>"/>orgmanage.do?org=1" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default">
 						<fmt:message key="admin.course.manage" />
 					</a>
 					<c:if test="${not empty pOrgId}">
@@ -465,7 +465,7 @@ bo<!DOCTYPE html>
 									<fmt:message key="label.theme" />:
 								</td>
 								<td>
-									<form:select path="userTheme" styleClass="form-control">
+									<form:select path="userTheme" class="form-control">
 										<c:forEach items="${themes}" var="theme">
 											<form:option value="${theme.themeId}">${theme.name}</form:option>
 										</c:forEach>

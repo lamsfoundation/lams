@@ -18,7 +18,7 @@
 	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userRolesForm">
 	
-		<form:form action="userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
+		<form:form action="/lams/admin/userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
 		<form:hidden path="orgId" />
 		<form:hidden path="userId" />
 		
@@ -74,7 +74,13 @@
 		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
 		  <div class="col-xs-10">            
 		  	<c:forEach items="${rolelist}" var="role" varStatus="index">
-		    	<input type="checkbox" name="${userRolesForm.roles}" value="${role.roleId}"/>
+		    	<input type="checkbox" name="roles" value="${role.roleId}" 
+		    	<c:forEach items="${userRolesForm.roles}" var="userRole">
+		    		<c:if test="${userRole == role.roleId}">
+		    			checked="checked"
+		    		</c:if>
+		    	</c:forEach>
+		    	/>
 		        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message><br/>
 		    </c:forEach>
 		  </div>
@@ -82,7 +88,7 @@
 		</div>
 		
 		<div class="pull-right">
-			<a href="<lams:LAMSURL/>admin/usermanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+			<a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 			<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
 			<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 		</div>

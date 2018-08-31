@@ -107,11 +107,12 @@
 						</c:if>
 
 						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm" autocomplete="off">
-						  <input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
-              <div class="input-group">
+							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" 
+						  		 escapeXml="true" />' />
+             				 <div class="input-group">
 								<span class="input-group-addon"><i class="fa fa-user"></i></span>
 								<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1">
-              </div>
+              				</div>
 
 							<div class="input-group voffset5">
 								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
@@ -169,7 +170,7 @@
 				<form style="display: none" method="POST" action="j_security_check">
 					<input type="hidden" name="j_username" value="${login}" /> <input type="hidden" name="j_password"
 						value="${password}" /> <input type="hidden" name="redirectURL"
-						value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
+						value='<c:out value="${empty param.redirectURL ? redirectURL : param.redirectURL}" escapeXml="true" />' />
 				</form>
 				<div id="footer"></div>
 			</lams:Page>

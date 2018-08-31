@@ -118,7 +118,7 @@ public class UserOrgRoleSaveController {
 	    //	}
 	    //}
 	}
-	return "forward:/usermanage.do";
+	return "redirect:/usermanage.do?org=" + orgId;
     }
 
 }

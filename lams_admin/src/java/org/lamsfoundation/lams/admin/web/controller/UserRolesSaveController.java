@@ -107,7 +107,7 @@ public class UserRolesSaveController {
 
 	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
-	return "forward:/usermanage.do";
+	return "redirect:/usermanage.do?org=" + orgId;
     }
 
 }

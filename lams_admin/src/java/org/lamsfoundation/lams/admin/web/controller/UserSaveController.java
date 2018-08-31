@@ -114,8 +114,7 @@ public class UserSaveController {
 	    if ((orgId == null) || (orgId == 0)) {
 		return "redirect:../usersearch.do";
 	    }
-	    request.setAttribute("org", orgId);
-	    return "redirect:../usermanage.do";
+	    return "redirect:../usermanage.do?org" + orgId;
 	}
 
 	User user = null;

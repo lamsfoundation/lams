@@ -131,7 +131,7 @@ public class UserOrgSaveController {
 	// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
 	if (newUserOrganisations.isEmpty()) {
 	    log.debug("no new users to add to orgId=" + orgId);
-	    return "forward:/usermanage.do";
+	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {
 	    request.setAttribute("roles", service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
 		    organisation.getOrganisationType()));

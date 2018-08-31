@@ -105,7 +105,8 @@ public class LoginAsController {
 		    // notify the login module that the user has been authenticated correctly
 		    UniversalLoginModule.setAuthenticationToken(token);
 		    // redirect to login page
-		    return "redirect:login.jsp?redirectURL=/lams/index";
+		    request.setAttribute("redirectURL", "/lams/index.jsp");
+		    return "login";
 		}
 	    }
 	} else {
