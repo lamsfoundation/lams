@@ -1352,38 +1352,40 @@ public abstract class LdTemplateController {
 	    request.setAttribute("topicNumber", topicNumber);
 	}
 	String forward = request.getParameter("forward");
-	String path;
-	switch (forward) {
-	    case ("init"):
-		path = "authoring/template/tbl/tbl";
-		break;
-	    case ("question"):
-		path = "authoring/template/tool/mcquestion";
-		break;
-	    case ("questionoption"):
-		path = "authoring/template/tool/mcoption";
-		break;
-	    case ("redooption"):
-		path = "authoring/template/tool/mcredooption";
-		break;
-	    case ("assess"):
-		path = "authoring/template/tool/assessment";
-		break;
-	    case ("assessmcq"):
-		path = "authoring/template/tool/assessmcq";
-		break;
-	    case ("assessredooption"):
-		path = "authoring/template/tool/assessredooption";
-		break;
-	    case ("assessoption"):
-		path = "authoring/template/tool/assessoption";
-		break;
-	    case ("peerreviewstar"):
-		path = "authoring/template/tool/peerreviewstar";
-		break;
-	    default:
-		path = null;
-		break;
+	String path = null;
+	if (forward != null) {
+        	switch (forward) {
+        	    case ("init"):
+        		path = "authoring/template/tbl/tbl";
+        		break;
+        	    case ("question"):
+        		path = "authoring/template/tool/mcquestion";
+        		break;
+        	    case ("questionoption"):
+        		path = "authoring/template/tool/mcoption";
+        		break;
+        	    case ("redooption"):
+        		path = "authoring/template/tool/mcredooption";
+        		break;
+        	    case ("assess"):
+        		path = "authoring/template/tool/assessment";
+        		break;
+        	    case ("assessmcq"):
+        		path = "authoring/template/tool/assessmcq";
+        		break;
+        	    case ("assessredooption"):
+        		path = "authoring/template/tool/assessredooption";
+        		break;
+        	    case ("assessoption"):
+        		path = "authoring/template/tool/assessoption";
+        		break;
+        	    case ("peerreviewstar"):
+        		path = "authoring/template/tool/peerreviewstar";
+        		break;
+        	    default:
+        		path = null;
+        		break;
+        	}
 	}
 	return (path != null && path.length() > 0 ? path : "authoring/template/tool/mcquestion");
     }

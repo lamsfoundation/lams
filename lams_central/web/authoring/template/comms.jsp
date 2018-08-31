@@ -71,7 +71,7 @@
        		
              var jqxhr = $.ajax( {
 	        		method: $(form).attr('method'),
-					url: getSubmissionURL(),
+					url: getSubmissionURL() + '.do',
                 	data: $(form).serialize()
 	            	})
 				.done(function(data) {
@@ -103,7 +103,7 @@
 		}
 		
 		function getSubmissionURL() {
-			return '<lams:WebAppURL />'+$('#template').val().toLowerCase();
+			return '<lams:WebAppURL />authoring/template/'+$('#template').val().toLowerCase();
 		}
 		
 		function doGotoList() {

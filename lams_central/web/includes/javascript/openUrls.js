@@ -61,24 +61,24 @@ function openPedagogicalPlanner() {
 }
 
 function returnToMonitorLessonIntegrated( lessonID ) {
-	window.location = '../home/monitorLesson.do?lessonID='+lessonID;
+	window.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
 }
 
 function openMonitorLesson( lessonID ) {
 	if (isMac) {
 		if(belowMinRes) {
-			monitorLessonWin = window.open('../home/monitorLesson.do?lessonID='+ lessonID,'mWindow','width=' + monitor_width 
+			monitorLessonWin = window.open('/lams/home/monitorLesson.do?lessonID='+ lessonID,'mWindow','width=' + monitor_width 
 							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
 		} else {
-			monitorLessonWin = window.open('../home/monitorLesson.do?lessonID='+lessonID,'mWindow','width=' + monitor_width
+			monitorLessonWin = window.open('/lams/home/monitorLesson.do?lessonID='+lessonID,'mWindow','width=' + monitor_width
 							   + ',height=' + monitor_height + ',resizable,scrollbars' + getCenterParams(monitor_width, monitor_height));
 		}
 	} else {
 		if (monitorLessonWin && !monitorLessonWin.closed) {
-			monitorLessonWin.location = '../home/monitorLesson.do?lessonID='+lessonID;
+			monitorLessonWin.location = '/lams/home/monitorLesson.do?lessonID='+lessonID;
 			monitorLessonWin.focus();
 		} else {
-			monitorLessonWin = window.open('../home/monitorLesson.do?lessonID='+lessonID,'mWindow','width=' + monitor_width
+			monitorLessonWin = window.open('/lams/home/monitorLesson.do?lessonID='+lessonID,'mWindow','width=' + monitor_width
 							   + ',height=' + monitor_height + ',resizable,resizable,scrollbars'
 							   + getCenterParams(monitor_width, monitor_height));
 		}
@@ -126,15 +126,15 @@ function openKumalive(orgID, role) {
  */
 function openLearnerShortenedUrl( lessonId ) {
 	if (isMac) {
-		learnWin = window.open('../home/learner.do?lessonID='+lessonId,'lWindow','width=' + learner_width 
+		learnWin = window.open('/lams/home/learner.do?lessonID='+lessonId,'lWindow','width=' + learner_width 
 				   + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes'
 				   + getCenterParams(learner_width, learner_height));
 	} else {
 		if (learnWin && !learnWin.closed ) {
-			learnWin.location = '../home/learner.do?lessonID='+lessonId;		
+			learnWin.location = '/lams/home/learner.do?lessonID='+lessonId;		
 			learnWin.focus();
 		} else {
-			learnWin = window.open('../home/learner.do?lessonID='+lessonId,'lWindow','width='
+			learnWin = window.open('/lams/home/learner.do?lessonID='+lessonId,'lWindow','width='
 					   + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes'
 					   + getCenterParams(learner_width, learner_height));
 		}
