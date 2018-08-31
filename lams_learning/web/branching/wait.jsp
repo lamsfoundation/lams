@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<body class="stripes">
 	
-		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.type}&activityID=${BranchingForm.activityID}&progressID=${BranchingForm.progressID}</c:set>
+		<c:set var="formAction">performBranching.do?type=${BranchingForm.type}&activityID=${BranchingForm.activityID}&progressID=${BranchingForm.progressID}</c:set>
 	
 		<form:form action="${formAction}" modelAttribute="BranchingForm" target="_self">
 	
