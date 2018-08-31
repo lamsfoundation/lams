@@ -29,8 +29,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="label.branching.title"/></title>
 		<lams:css/>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
-		<c:if test="${BranchingForm.map.previewLesson == true}">
+		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.type}&activityID=${BranchingForm.activityID}&progressID=${BranchingForm.progressID}</c:set>
+		<c:if test="${BranchingForm.previewLesson == true}">
 			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
 		</c:if>
 		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>${formAction}">
@@ -38,11 +38,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<body class="stripes">
 	
-		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
+		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.type}&activityID=${BranchingForm.activityID}&progressID=${BranchingForm.progressID}</c:set>
 	
 		<form:form action="${formAction}" modelAttribute="BranchingForm" target="_self">
 	
-			<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
+			<c:set var="title"><c:out value="${BranchingForm.title}" /></c:set>
 			<lams:Page type="learner" title="${title}">
 	
 				<p><fmt:message key="label.branching.wait.message"/></p>

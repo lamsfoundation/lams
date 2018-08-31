@@ -29,8 +29,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="label.branching.title"/></title>
 		<lams:css/>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.map.type}&activityID=${BranchingForm.map.activityID}&progressID=${BranchingForm.map.progressID}</c:set>
-		<c:if test="${BranchingForm.map.previewLesson == true}">
+		<c:set var="formAction">/branching/performBranching.do?type=${BranchingForm.type}&activityID=${BranchingForm.activityID}&progressID=${BranchingForm.progressID}</c:set>
+		<c:if test="${BranchingForm.previewLesson == true}">
 			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
 		</c:if>
 		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>${formAction}">
@@ -65,7 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		</script>
 		
-		<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
+		<c:set var="title"><c:out value="${BranchingForm.title}" /></c:set>
 		<lams:Page type="learner" title="${title}">
 		
 			<p>
@@ -75,11 +75,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="group-box">
 		
 				<form:form
-					action="branching/forceBranching.do?amp;type=${BranchingForm.map.type}&amp;activityID=${BranchingForm.map.activityID}&amp;progressID=${BranchingForm.map.progressID}"
+					action="forceBranching.do?amp;type=${BranchingForm.type}&amp;activityID=${BranchingForm.activityID}&amp;progressID=${BranchingForm.progressID}"
 					modelAttribute="BranchingForm" target="_self" onsubmit="return validate();">
 		
 					<table class="table table-condensed table-striped">
-						<c:forEach items="${BranchingForm.map.activityURLs}"
+						<c:forEach items="${BranchingForm.activityURLs}"
 							var="activityURL" varStatus="loop">
 							<tr>
 								<td width="2%">

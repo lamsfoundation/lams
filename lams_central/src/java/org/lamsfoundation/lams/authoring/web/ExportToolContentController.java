@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Export tool content action. It needs learingDesignID as input parameter.
@@ -60,27 +61,10 @@ public class ExportToolContentController {
 
     private Logger log = Logger.getLogger(ExportToolContentController.class);
 
-    @RequestMapping("/authoring/exportToolContent")
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	String param = request.getParameter("method");
-	// -----------------------Resource Author function ---------------------------
-	if (StringUtils.equals(param, "loading")) {
-	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);
-	    request.setAttribute(ExportToolContentController.PARAM_LEARING_DESIGN_ID, learningDesignId);
-	    // display initial page for automatically loading download pgm
-	    return "toolcontent/exportloading";
-	} else if (StringUtils.equals(param, "export")) {
-	    // the export LD pgm
-	    return exportLD(request, response);
-	} else { // choice format
-	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);
-	    request.setAttribute(ExportToolContentController.PARAM_LEARING_DESIGN_ID, learningDesignId);
-	    // display choose IMS or LAMS format page
-	    return "toolcontent/exportchoice";
-	}
-    }
 
-    private String exportLD(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping("/authoring/exportToolContent/export")
+    @ResponseBody
+    private void exportLD(HttpServletRequest request, HttpServletResponse response) {
 	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);
 	List<String> ldErrorMsgs = new ArrayList<>();
 	List<String> toolsErrorMsgs = new ArrayList<>();
@@ -135,7 +119,6 @@ public class ExportToolContentController {
 		}
 	    }
 
-	    return null;
 	} catch (Exception e1) {
 	    log.error("Unable to export tool content: " + e1.toString());
 	    ldErrorMsgs.add(0, e1.getClass().getName());
@@ -143,6 +126,5 @@ public class ExportToolContentController {
 	    request.setAttribute(ExportToolContentController.ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
 	}
 	// display initial page for upload
-	return "toolcontent/exportresult";
     }
 }
