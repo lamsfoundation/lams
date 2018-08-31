@@ -57,10 +57,14 @@ public class GroupDTO {
     private List userList;
     private Integer groupUIID;
 
+    public GroupDTO() {
+
+    }
+
     /**
      * Get the DTO for this group. Does not include the GroupBranchActivities as they will
      * be in a separate array for Authoring.
-     * 
+     *
      * @param group
      */
     @SuppressWarnings("unchecked")
