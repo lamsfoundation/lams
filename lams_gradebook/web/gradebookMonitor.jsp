@@ -31,7 +31,6 @@
 	
 		var marksReleased = ${marksReleased};
 		var graphLoaded = false;
-		var lessonDatesHidden = true;
 
 		function toggleMarkChart() {
 			// the two methods showMarkChart and hideMarkChart are used in the Monitoring tour
@@ -118,29 +117,6 @@
 				document.getElementById("padlockLocked").style.display="inline";
 			}
 		}
-		
-		// Show/hide the dates for the start and end of the lesson. 
-		function toggleLessonDates() {
-			lessonDatesHidden = !lessonDatesHidden;
-			processLessonDateFields( lessonDatesHidden ) 
-		}
-		
-		function processLessonDateFields( hide ) {
-
-            if ( hide ) {
-				jQuery("#userView").jqGrid('hideCol','startDate');
-				jQuery("#userView").jqGrid('hideCol','finishDate');
-				document.getElementById("datesShown").style.display="none";
-				document.getElementById("datesNotShown").style.display="inline";
-            } else { 
-				jQuery("#userView").jqGrid('showCol','startDate');
-				jQuery("#userView").jqGrid('showCol','finishDate');
-				document.getElementById("datesShown").style.display="inline";
-				document.getElementById("datesNotShown").style.display="none";
-            }
-
-            resizeJqgrid(jQuery("#userView"));
- 		}
 
 		jQuery(document).ready(function(){
   
@@ -158,8 +134,8 @@
 			    height: "100%",
 			    width: jqgridWidth,
 				shrinkToFit: false,
-				cmTemplate: { title: false },
 			    cellEdit: true,
+			    cmTemplate: { title: false },
 			    viewrecords: true,
 			    sortorder: "asc", 
 			    sortname: "rowName", 
@@ -182,9 +158,11 @@
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, width: 150, formatter:userNameFormatter},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
-				  {name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, align:"center",
+				  {name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, title: true, align:"center",
 						cellattr: function(rowID, val, rawObject, cm, rdata) {
-				    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+							if (rdata.startDate != "-") {
+								return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+							}
 				    	}
 			      },
 				  {name:'startDate',index:'startDate', width:0, hidden: true},
@@ -236,9 +214,11 @@
 						       	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 								{name:'rowName',  index:'rowName', sortable:false, editable: false, width: 140},
 								{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
-								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, title : true, align:"center",
 									cellattr: function(rowID, val, rawObject, cm, rdata) {
-							    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate;
+										if (rdata.startDate != "-") {
+											return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+										}
 							    	}
 						    	},
 							    {name:'startDate',index:'startDate', width:0, hidden: true},
@@ -408,6 +388,7 @@
 									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
 										      + activityID + "&view=monUserView&userID=" + userID,
 									     height: "100%",
+									     cmTemplate: { title: false },
 									     cellEdit:false,
 									     pager: false,
 									     colNames: [
@@ -423,9 +404,11 @@
 									     colModel: [
 									       	{name:'id', index:'id',  sortable:false, editable: false ,width:140, align:"right"},
 											{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
-											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, align:"center",
+											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, title : true, align:"center",
 												cellattr: function(rowID, val, rawObject, cm, rdata) {
-										    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate;
+													if (rdata.startDate != "-") {
+														return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+													}
 										    	}
 									    	},
 										    {name:'startDate',index:'startDate', width:0, hidden: true},
@@ -471,8 +454,6 @@
 					},
 					gridComplete: function(){
 				   	 	initializePortraitPopover('<lams:LAMSURL/>');
-						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
-						processLessonDateFields( lessonDatesHidden );
 					}
 				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 				jQuery("#userView").jqGrid('filterToolbar');
@@ -709,23 +690,6 @@
 	</c:otherwise>
 	</c:choose>
 		
-	<c:set var="tourDatesCode">
-		<div id="tour-dates">
- 		<div id="datesNotShown">
- 			<a class="${btnclass}" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates"/>" >
- 			<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
-			<fmt:message key="gradebook.monitor.show.dates" /></a>
-			</span>
-		</div>
-		<div id="datesShown" style="display:none">
-			<a class="${btnclass}" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates"/>" >
- 			<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
-			<fmt:message key="gradebook.monitor.hide.dates" /></a>
-			</span>
-		</div>
-		</div>
-	</c:set>
-		
 	<c:set var="lockLabelClass">${isInTabs?"lockLabel":""}</c:set>
 	<c:set var="padlockCode">
 		<div class="visible-xs-inline">
@@ -804,7 +768,6 @@
 		<div class="gbTopButtonsContainer pull-right">
 			${chartButtonCode}
 			${weightButtonCode}
-			${tourDatesCode}
 			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
 				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
 			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
@@ -855,7 +818,6 @@
 		<c:if test="${isInTabs}">
 	 		${chartButtonCode}
 	 		${weightButtonCode}
-			${tourDatesCode}
 		</c:if>
 		
 		</div> <!-- Closes buttons -->
