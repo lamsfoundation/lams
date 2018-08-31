@@ -2,6 +2,8 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 
 <!DOCTYPE html>
 <lams:html>
@@ -15,6 +17,7 @@
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/outcome.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		var organisationId = '${param.organisationID}',
@@ -33,6 +36,14 @@
 </lams:head>
 <body class="stripes">
 <lams:Page type="admin" >
+	<logic:messagesPresent>
+		<lams:Alert id="error" close="false" type="danger">
+			<html:messages id="error">
+				<c:out value="${error}" escapeXml="false" />
+			</html:messages>
+		</lams:Alert>
+	</logic:messagesPresent>
+	
 	<div class="outcomeContainer">
 		<div class="row">
 			<div class="col-xs-5">
@@ -90,6 +101,25 @@
 				</div>
 			</div>
 		</c:forEach>
+		<c:if test="${canManageGlobal}">
+			<c:if test="${not empty outcomes}">
+				<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome()"
+					 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
+					<i class="fa fa-download"></i>
+					<span class="hidden-xs">
+						<fmt:message key="outcome.export" />
+					</span>
+				</div>
+			</c:if>
+			
+			<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+				<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
+			</div>
+			<form id="importForm" action="outcome.do" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="method" value="outcomeImport" />
+				<input type="file" id="importInput" name="file"/>
+			</form>
+		</c:if>
 		<div id="addButton" class="btn btn-primary" onClick="javascript:openEditOutcomeDialog()">
 			<i class="fa fa-plus"></i>
 			<span><fmt:message key='outcome.manage.add' /></span>

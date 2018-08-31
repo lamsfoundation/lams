@@ -1,12 +1,16 @@
 package org.lamsfoundation.lams.outcome.service;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
+import org.lamsfoundation.lams.util.ExcelCell;
 
 public interface IOutcomeService {
     static final long DEFAULT_SCALE_ID = 1;
@@ -31,4 +35,12 @@ public interface IOutcomeService {
 
     void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId, Long targetLessonId,
 	    Long targetToolContentId, Long targetItemId);
+
+    LinkedHashMap<String, ExcelCell[][]> exportScales();
+
+    LinkedHashMap<String, ExcelCell[][]> exportOutcomes();
+
+    int importScales(FormFile fileItem) throws IOException;
+
+    int importOutcomes(FormFile fileItem) throws IOException;
 }

@@ -24,16 +24,21 @@ package org.lamsfoundation.lams.web.outcome;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.Globals;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -41,6 +46,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.upload.FormFile;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -57,6 +63,10 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -70,6 +80,7 @@ public class OutcomeAction extends DispatchAction {
     private static IUserManagementService userManagementService;
     private static ISecurityService securityService;
     private static IOutcomeService outcomeService;
+    private static MessageService messageService;
 
     public ActionForward outcomeManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -453,6 +464,52 @@ public class OutcomeAction extends DispatchAction {
 	return null;
     }
 
+    public ActionForward outcomeExport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "export outcomes", true);
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = getOutcomeService().exportOutcomes();
+
+	String fileName = "lams_outcomes.xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	// Code to generate file and write file contents to response
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcelXLS(out, dataToExport, getMessageService().getMessage("outcome.export.date"), true);
+
+	return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public ActionForward outcomeImport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "import outcomes", true);
+	Hashtable fileElements = form.getMultipartRequestHandler().getFileElements();
+
+	try {
+	    int importCount = getOutcomeService().importOutcomes((FormFile) fileElements.elements().nextElement());
+	    log.info("Imported " + importCount + " outcomes");
+	} catch (Exception e) {
+	    log.error("Error while importing outcomes", e);
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("outcome.import.error"));
+	    saveErrors(request, errors);
+	}
+
+	return outcomeManage(mapping, form, request, response);
+    }
+
     public ActionForward scaleManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -501,10 +558,18 @@ public class OutcomeAction extends DispatchAction {
 		return null;
 	    }
 	}
-	getUserManagementService().delete(scale);
-	if (log.isDebugEnabled()) {
-	    log.debug("Deleted outcome scale " + scaleId);
+	try {
+	    getUserManagementService().delete(scale);
+	    if (log.isDebugEnabled()) {
+		log.debug("Deleted outcome scale " + scaleId);
+	    }
+	} catch (Exception e) {
+	    log.error("Error while removing an outcome scale", e);
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("scale.manage.remove.scale"));
+	    saveErrors(request, errors);
 	}
+
 	return scaleManage(mapping, form, request, response);
     }
 
@@ -652,6 +717,52 @@ public class OutcomeAction extends DispatchAction {
 	return mapping.findForward("scaleEdit");
     }
 
+    public ActionForward scaleExport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "export outcome scales", true);
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = getOutcomeService().exportScales();
+
+	String fileName = "lams_outcome_scales.xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	// Code to generate file and write file contents to response
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcelXLS(out, dataToExport, getMessageService().getMessage("outcome.export.date"), true);
+
+	return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public ActionForward scaleImport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "import outcome scales", true);
+	Hashtable fileElements = form.getMultipartRequestHandler().getFileElements();
+
+	try {
+	    int importCount = getOutcomeService().importScales((FormFile) fileElements.elements().nextElement());
+	    log.info("Imported " + importCount + " outcome scales");
+	} catch (Exception e) {
+	    log.error("Error while importing outcome scales", e);
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("outcome.import.error"));
+	    saveErrors(request, errors);
+	}
+
+	return scaleManage(mapping, form, request, response);
+    }
+
     private UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -707,5 +818,14 @@ public class OutcomeAction extends DispatchAction {
 	    OutcomeAction.outcomeService = (IOutcomeService) ctx.getBean("outcomeService");
 	}
 	return OutcomeAction.outcomeService;
+    }
+
+    private MessageService getMessageService() {
+	if (OutcomeAction.messageService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    OutcomeAction.messageService = (MessageService) ctx.getBean("centralMessageService");
+	}
+	return messageService;
     }
 }

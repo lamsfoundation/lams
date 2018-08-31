@@ -497,6 +497,7 @@
 	<!-- Outcome service -->
 	<bean id="outcomeServiceTarget" class="org.lamsfoundation.lams.outcome.service.OutcomeService">
 		<property name="outcomeDAO"><ref bean="outcomeDAO"/></property>
+		<property name="messageService"><ref bean="authoringMessageService"/></property>
 	</bean>	
 	
 	<bean id="outcomeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
