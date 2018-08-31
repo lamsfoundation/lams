@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -33,6 +34,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class OutcomeService implements IOutcomeService {
     private IOutcomeDAO outcomeDAO;
     private MessageService messageService;
+
+    private static Logger log = Logger.getLogger(OutcomeService.class);
 
     public String getContentFolderId(Integer organisationId) {
 	String contentFolderId = outcomeDAO.getContentFolderID(organisationId);
@@ -158,6 +161,9 @@ public class OutcomeService implements IOutcomeService {
 	    String code = cell.getStringCellValue();
 	    List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", code);
 	    if (!foundScales.isEmpty()) {
+		if (log.isDebugEnabled()) {
+		    log.debug("Skipping an outcome scale with existing code: " + code);
+		}
 		continue;
 	    }
 	    cell = row.getCell(0);
@@ -188,6 +194,60 @@ public class OutcomeService implements IOutcomeService {
 		item.setScale(scale);
 		outcomeDAO.insert(item);
 	    }
+
+	    counter++;
+	}
+	return counter;
+    }
+
+    @SuppressWarnings("unchecked")
+    public int importOutcomes(FormFile fileItem) throws IOException {
+	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
+	HSSFWorkbook wb = new HSSFWorkbook(fs);
+	HSSFSheet sheet = wb.getSheetAt(0);
+	int startRow = sheet.getFirstRowNum();
+	int endRow = sheet.getLastRowNum();
+	User user = null;
+	int counter = 0;
+
+	for (int i = startRow + 5; i < (endRow + 1); i++) {
+	    HSSFRow row = sheet.getRow(i);
+	    HSSFCell cell = row.getCell(1);
+	    String code = cell.getStringCellValue();
+	    List<Outcome> foundOutcomes = outcomeDAO.findByProperty(Outcome.class, "code", code);
+	    if (!foundOutcomes.isEmpty()) {
+		if (log.isDebugEnabled()) {
+		    log.debug("Skipping an outcome with existing code: " + code);
+		}
+		continue;
+	    }
+	    cell = row.getCell(3);
+	    String scaleCode = cell.getStringCellValue();
+	    List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", scaleCode);
+	    OutcomeScale scale = foundScales.isEmpty() ? null : foundScales.get(0);
+	    if (scale == null) {
+		if (log.isDebugEnabled()) {
+		    log.debug("Skipping an outcome with missing scale with code: " + scaleCode);
+		}
+		continue;
+	    }
+	    cell = row.getCell(0);
+	    String name = cell.getStringCellValue();
+	    cell = row.getCell(2);
+	    String description = cell.getStringCellValue();
+
+	    Outcome outcome = new Outcome();
+	    outcome.setName(name);
+	    outcome.setCode(code);
+	    outcome.setDescription(description);
+	    outcome.setScale(scale);
+	    if (user == null) {
+		UserDTO userDTO = OutcomeService.getUserDTO();
+		user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
+	    }
+	    outcome.setCreateBy(user);
+	    outcome.setCreateDateTime(new Date());
+	    outcomeDAO.insert(outcome);
 
 	    counter++;
 	}

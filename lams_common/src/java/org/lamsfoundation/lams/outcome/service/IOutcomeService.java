@@ -41,4 +41,6 @@ public interface IOutcomeService {
     LinkedHashMap<String, ExcelCell[][]> exportOutcomes();
 
     int importScales(FormFile fileItem) throws IOException;
+
+    int importOutcomes(FormFile fileItem) throws IOException;
 }

@@ -485,9 +485,29 @@ public class OutcomeAction extends DispatchAction {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, getMessageService().getMessage("outcome.export.date"), true);
+	ExcelUtil.createExcelXLS(out, dataToExport, getMessageService().getMessage("outcome.export.date"), true);
 
 	return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public ActionForward outcomeImport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	getSecurityService().isSysadmin(user.getUserID(), "import outcomes", true);
+	Hashtable fileElements = form.getMultipartRequestHandler().getFileElements();
+
+	try {
+	    int importCount = getOutcomeService().importOutcomes((FormFile) fileElements.elements().nextElement());
+	    log.info("Imported " + importCount + " outcomes");
+	} catch (Exception e) {
+	    log.error("Error while importing outcomes", e);
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("outcome.import.error"));
+	    saveErrors(request, errors);
+	}
+
+	return outcomeManage(mapping, form, request, response);
     }
 
     public ActionForward scaleManage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
