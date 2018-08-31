@@ -37,7 +37,7 @@
 <body class="stripes">
 	
 	<lams:Page type="admin">		
-		<form action="editLessonIntro.do?method=save" method="post" id="lessonForm">
+		<form action="editLessonIntro/save.do" method="post" id="lessonForm">
 			<input type="hidden" name="lessonID" value="${lesson.lessonId}"/>
 	
 			<div class="field-group">

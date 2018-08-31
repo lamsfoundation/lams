@@ -55,7 +55,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * A Team Based Learning template.
  */
 @Controller
-@RequestMapping("/tbl")
+@RequestMapping("authoring/template/tbl")
 public class TBLTemplateController extends LdTemplateController {
 
     private static Logger log = Logger.getLogger(TBLTemplateController.class);

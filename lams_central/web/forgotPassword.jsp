@@ -4,7 +4,6 @@
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
@@ -85,9 +84,8 @@
 <body class="stripes" onload="radioSelected();">
 
 	<lams:Page type="admin" title="${title}">
-		<form action="<lams:LAMSURL/>/ForgotPasswordRequest" method="post"
+		<form action="<lams:LAMSURL/>ForgotPasswordRequest/requestEmail.do" method="post"
 			name="forgotForm">
-			<input type="hidden" name="method" id="method" value="requestEmail" />
 
 			<h4 class="no-tabs-below">
 				<fmt:message key="label.forgot.password" />

@@ -101,7 +101,7 @@ input[type="checkbox"] {
 			</c:if>
 			<div class="panel-body">
 				<form id="emailUserForm"
-					action="<lams:LAMSURL/>emailUser.do?method=send" method="post">
+					action="<lams:LAMSURL/>emailUser/send.do" method="post">
 					<c:if test="${not empty user}">
 						<input type="hidden" name="userId" value="${user.userId}" />
 					</c:if>

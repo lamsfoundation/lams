@@ -61,7 +61,7 @@
 			</c:otherwise>
 		</c:choose>
 		<div class="voffset10">
-			<a href="importToolContent.do?method=import" class="btn btn-default pull-left"><fmt:message
+			<a href="importToolContent/import.do" class="btn btn-default pull-left"><fmt:message
 						key="button.select.another.importfile" /></a> <a href="javascript:;" onclick="closeWin();" class="btn btn-primary pull-right"><fmt:message key="button.close" /></a>
 		</div>
 

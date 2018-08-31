@@ -713,7 +713,7 @@ function showPrintPage() {
 			}
 		}, 1000);
 				
-		var url = LAMS_URL + "monitoring/groupingUpload/getGroupTemplateFile.do?activityID="+groupingActivityId
+		var url = LAMS_URL + "groupingUpload/getGroupTemplateFile.do?activityID="+groupingActivityId
 		+"&organisationID="+organisationId+"&lessonID="+lessonId+"&downloadTokenValue=" + token;
 		if ( grouping && grouping.groupingId) {
 			url += "&groupingId=" + grouping.groupingId;

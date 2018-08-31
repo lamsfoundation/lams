@@ -1,6 +1,5 @@
 <body>
-	<form:form id="SignupForm" modelAttribute="SignupForm" action="/lams/signup/signup.do" method="post" autocomplete="off" >
- 		<form:hidden path="method" value="login" />
+	<form:form id="SignupForm" modelAttribute="SignupForm" action="/lams/signup/signup/login.do" method="post" autocomplete="off" >
 		<form:hidden path="submitted" value="1" />
 		<form:hidden path="context" value="${signupOrganisation.context}" />
 		<form:hidden path="selectedTab" value="1" />

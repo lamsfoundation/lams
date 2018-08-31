@@ -107,6 +107,7 @@ public class AuthoringController {
     @Autowired
     @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
+    @Autowired
     private  ILamsToolService toolService;
     @Autowired
     @Qualifier("authoringService")

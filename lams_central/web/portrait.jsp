@@ -40,7 +40,7 @@
 		//constant for croppie.js
 		var PORTRAIT_SIZE = 400;
 	</script>
-	<script type="text/javascript" src="includes/javascript/croppie.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/croppie.js"></script>
 	<script type="text/javascript">
 		//variable defined in croppie.js
 		var croppieWidget;
@@ -124,8 +124,8 @@
 </lams:head>
 
 <body>
-<form:form action="saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" enctype="multipart/form-data">
-	<form:hidden name="PortraitActionForm" path="portraitUuid" />
+<form:form action="saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" >
+	<form:hidden path="portraitUuid" />
 	<div style="clear: both"></div>
 	
 	<div class="container">
@@ -140,7 +140,7 @@
 					<em><fmt:message key="msg.portrait.none" /></em>
 				</c:when>
 				<c:otherwise>
-				<img class="img-thumbnail" src="/lams/download/?uuid="${PortraitActionForm.portraitUuid}"&version=2&preferDownload=false" />
+				<img class="img-thumbnail" src="/lams/download?uuid=${PortraitActionForm.portraitUuid}&version=2&preferDownload=false" />
 				</c:otherwise>
 			</c:choose>
 		</div>

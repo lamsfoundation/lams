@@ -263,14 +263,14 @@ public class GroupingController {
      * @throws ServletException
      */
     @RequestMapping("/learnerChooseGroup")
-    public String learnerChooseGroup(HttpServletRequest request) throws IOException, ServletException {
+    public String learnerChooseGroup(@ModelAttribute GroupingForm GroupingForm, HttpServletRequest request) throws IOException, ServletException {
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Long lessonId = learnerProgress.getLesson().getLessonId();
 	learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId, LearningWebUtil.getUserId());
 
-	String redirectURL = "/grouping/performGrouping.do";
+	String redirectURL = "redirect:/grouping/performGrouping.do";
 	redirectURL = WebUtil.appendParameterToURL(redirectURL, "activityID", activity.getActivityId().toString());
 
 	return redirectURL;

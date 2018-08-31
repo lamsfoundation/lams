@@ -350,10 +350,9 @@ GeneralInitLib = {
 			$.ajax({
 				cache : false,
 				async : false,
-				url : LAMS_URL + "workspace.do",
+				url : LAMS_URL + "workspace/createFolder.do",
 				dataType : 'text',
 				data : {
-					'method'         : 'createFolder',
 					'name' 		     : title,
 					'parentFolderID' : parentFolder.data.folderID
 				},
@@ -413,10 +412,9 @@ GeneralInitLib = {
 
 			$.ajax({
 				cache : false,
-				url : LAMS_URL + "workspace.do",
+				url : copiedResource.isCut ? 'LAMS_URL + "workspace/moveResource.do' : 'LAMS_URL + "workspace/copyResource.do',
 				dataType : 'text',
 				data : {
-					'method'         : copiedResource.isCut ? 'moveResource' : 'copyResource',
 					'targetFolderID' : folderNode.data.folderID,
 					'resourceID'     : copiedResource.isFolder ? copiedResource.resourceNode.data.folderID
 															   : copiedResource.resourceNode.data.learningDesignId ,
@@ -456,10 +454,9 @@ GeneralInitLib = {
 			$.ajax({
 				cache : false,
 				async : false,
-				url : LAMS_URL + "workspace.do",
+				url : LAMS_URL + "workspace/deleteResource.do",
 				dataType : 'text',
 				data : {
-					'method'       : 'deleteResource',
 					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
 					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
 				},
@@ -511,10 +508,9 @@ GeneralInitLib = {
 			$.ajax({
 				cache : false,
 				async : false,
-				url : LAMS_URL + "workspace.do",
+				url : LAMS_URL + "workspace/renameResource.do",
 				dataType : 'text',
 				data : {
-					'method'       : 'renameResource',
 					'name' 		   : title,
 					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
 					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
