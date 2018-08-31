@@ -60,7 +60,7 @@ public class ExportToolContentController {
 
     private Logger log = Logger.getLogger(ExportToolContentController.class);
 
-    @RequestMapping("/authoring/exportToolContent/export")
+    @RequestMapping("/authoring/exportToolContent")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	String param = request.getParameter("method");
 	// -----------------------Resource Author function ---------------------------
