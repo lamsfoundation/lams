@@ -30,7 +30,7 @@
 				}
 			</script>
 			
-			<lams:Page type="learner" title="${chatDTO.title}">
+			<lams:Page type="learner" title="${chatDTO.title}" formID="learningForm">
 			
 				<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
 			
@@ -42,7 +42,7 @@
 			
 					<form:hidden path="chatUserUID" />
 					<a href="#nogo" class="btn btn-primary pull-right voffset10 na" id="finishButton"
-						onclick="submitForm('finish')">
+						onclick="submitForm('finishActivity')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="button.submit" />
