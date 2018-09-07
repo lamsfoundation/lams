@@ -8,6 +8,10 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="ENABLE_PORTRAIT_EDITING"><%=Configuration.get(ConfigurationKeys.ENABLE_PORTRAIT_EDITING)%></c:set>
+
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -146,80 +150,82 @@
 				<em><fmt:message key="msg.portrait.none" /></em>
 			</logic:equal>
 		</div>
-
-		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 		
-			<!-- Webcamera -->
-			<div class="panel panel-default">
-			    <div class="panel-heading" role="tab" id="headingOne">
-			    	<div class="panel-title">
-			        	<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" 
-			        			aria-expanded="true" aria-controls="collapseOne">
-			          	<i class="fa fa-fw fa-camera text-primary"></i> 
-			          	<fmt:message key="label.portrait.take.snapshot.from.webcamera" />
-			        	</a>
-			    	</div>
-			    </div>
-			    
-			    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-			    	<div class="panel-body">
-			      			
-						<div>
-						    <video id="video">
-						    		<fmt:message key="label.video.stream.not.available" />
-						    </video>
-						</div>
-						    
-						<a id="startbutton" class="btn btn-sm btn-file btn-default voffset5" role="button" href="#nogo">
-							<fmt:message key='label.portrait.take.snapshot' />
-						</a>
-						
-						<canvas id="canvas"></canvas>
-						<div id="still-portrait">
-							<div class="output voffset10">
-								<div id="photo" ></div> 
-							</div>
-							
-							<a class="btn btn-sm btn-default voffset10" id="upload-webcam">
-								<fmt:message key='label.portrait.yes.set.it.as.portrait' />
-							</a>
-						</div>
-			    	</div>
-			    </div>
-			</div>
+		<c:if test="${ENABLE_PORTRAIT_EDITING}">
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			
-			<!-- Upload -->
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingTwo">
-					<div class="panel-title">
-			        		<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" 
-			        				aria-expanded="false" aria-controls="collapseTwo">
-			        			<i class="fa fa-fw fa-upload text-primary"></i> 
-			        			<fmt:message key="label.portrait.upload" />
-			        		</a>
-					</div>
-				</div>
-			    
-			    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-			    		<div class="panel-body">
-						<div class="form-group">
-							<label class="btn btn-default">
-								<input type="file" name="file" value="" id="upload-input" accept="image/*">
-							</label>
-							
-							<p class="help-block">
-								<fmt:message key="msg.portrait.resized" />
-							</p>	
-							<div id="upload-croppie"></div>
-							
-							<a class="btn btn-sm btn-default offset5" id="save-upload-button" role="button">
-								<fmt:message key='label.portrait.yes.set.it.as.portrait' />
+				<!-- Webcamera -->
+				<div class="panel panel-default">
+				    <div class="panel-heading" role="tab" id="headingOne">
+				    	<div class="panel-title">
+				        	<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" 
+				        			aria-expanded="true" aria-controls="collapseOne">
+				          	<i class="fa fa-fw fa-camera text-primary"></i> 
+				          	<fmt:message key="label.portrait.take.snapshot.from.webcamera" />
+				        	</a>
+				    	</div>
+				    </div>
+				    
+				    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+				    	<div class="panel-body">
+				      			
+							<div>
+							    <video id="video">
+							    		<fmt:message key="label.video.stream.not.available" />
+							    </video>
+							</div>
+							    
+							<a id="startbutton" class="btn btn-sm btn-file btn-default voffset5" role="button" href="#nogo">
+								<fmt:message key='label.portrait.take.snapshot' />
 							</a>
+							
+							<canvas id="canvas"></canvas>
+							<div id="still-portrait">
+								<div class="output voffset10">
+									<div id="photo" ></div> 
+								</div>
+								
+								<a class="btn btn-sm btn-default voffset10" id="upload-webcam">
+									<fmt:message key='label.portrait.yes.set.it.as.portrait' />
+								</a>
+							</div>
+				    	</div>
+				    </div>
+				</div>
+				
+				<!-- Upload -->
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingTwo">
+						<div class="panel-title">
+				        		<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" 
+				        				aria-expanded="false" aria-controls="collapseTwo">
+				        			<i class="fa fa-fw fa-upload text-primary"></i> 
+				        			<fmt:message key="label.portrait.upload" />
+				        		</a>
 						</div>
-			    		</div>
-			    </div>
+					</div>
+				    
+				    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+				    		<div class="panel-body">
+							<div class="form-group">
+								<label class="btn btn-default">
+									<input type="file" name="file" value="" id="upload-input" accept="image/*">
+								</label>
+								
+								<p class="help-block">
+									<fmt:message key="msg.portrait.resized" />
+								</p>	
+								<div id="upload-croppie"></div>
+								
+								<a class="btn btn-sm btn-default offset5" id="save-upload-button" role="button">
+									<fmt:message key='label.portrait.yes.set.it.as.portrait' />
+								</a>
+							</div>
+				    		</div>
+				    </div>
+				</div>
 			</div>
-		</div>
+		</c:if>
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
