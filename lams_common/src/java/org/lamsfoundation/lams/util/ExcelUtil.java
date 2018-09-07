@@ -30,15 +30,19 @@ import java.util.LinkedHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 /**
@@ -130,29 +134,29 @@ public class ExcelUtil {
 	//create bold style
 	boldStyle = workbook.createCellStyle();
 	Font boldFont = workbook.createFont();
-	boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+	boldFont.setBold(true);
 	boldFont.setFontName(DEFAULT_FONT_NAME);
 	boldStyle.setFont(boldFont);
 
 	//create color style
 	blueColor = workbook.createCellStyle();
 	blueColor.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
-	blueColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	blueColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	blueColor.setFont(defaultFont);
 	redColor = workbook.createCellStyle();
 	redColor.setFillForegroundColor(IndexedColors.RED.getIndex());
-	redColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	redColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	redColor.setFont(defaultFont);
 	greenColor = workbook.createCellStyle();
 	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
-	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	greenColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	Font whiteFont = workbook.createFont();
 	whiteFont.setColor(IndexedColors.WHITE.getIndex());
 	whiteFont.setFontName(DEFAULT_FONT_NAME);
 	greenColor.setFont(whiteFont);
 	yellowColor = workbook.createCellStyle();
 	yellowColor.setFillForegroundColor(IndexedColors.GOLD.getIndex());
-	yellowColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	yellowColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	yellowColor.setFont(defaultFont);
 
 	// create percentage style
@@ -162,44 +166,44 @@ public class ExcelUtil {
 
 	//create border style
 	borderStyleLeftThin = workbook.createCellStyle();
-	borderStyleLeftThin.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleLeftThin.setBorderLeft(BorderStyle.THIN);
 	borderStyleLeftThin.setFont(defaultFont);
 	borderStyleLeftThick = workbook.createCellStyle();
-	borderStyleLeftThick.setBorderLeft(CellStyle.BORDER_THICK);
+	borderStyleLeftThick.setBorderLeft(BorderStyle.THICK);
 	borderStyleLeftThick.setFont(defaultFont);
 	borderStyleRightThick = workbook.createCellStyle();
-	borderStyleRightThick.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleRightThick.setBorderRight(BorderStyle.THICK);
 	borderStyleRightThick.setFont(defaultFont);
 	borderStyleLeftThinBoldFont = workbook.createCellStyle();
-	borderStyleLeftThinBoldFont.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleLeftThinBoldFont.setBorderLeft(BorderStyle.THIN);
 	borderStyleLeftThinBoldFont.setFont(boldFont);
 	borderStyleLeftThickBoldFont = workbook.createCellStyle();
-	borderStyleLeftThickBoldFont.setBorderLeft(CellStyle.BORDER_THICK);
+	borderStyleLeftThickBoldFont.setBorderLeft(BorderStyle.THICK);
 	borderStyleLeftThickBoldFont.setFont(boldFont);
 	borderStyleRightThickBoldFont = workbook.createCellStyle();
-	borderStyleRightThickBoldFont.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleRightThickBoldFont.setBorderRight(BorderStyle.THICK);
 	borderStyleRightThickBoldFont.setFont(boldFont);
 	borderStyleBottomThin = workbook.createCellStyle();
-	borderStyleBottomThin.setBorderBottom(CellStyle.BORDER_THIN);
+	borderStyleBottomThin.setBorderBottom(BorderStyle.THIN);
 	borderStyleBottomThin.setFont(defaultFont);
 	borderStyleBottomThinBoldFont = workbook.createCellStyle();
-	borderStyleBottomThinBoldFont.setBorderBottom(CellStyle.BORDER_THIN);
+	borderStyleBottomThinBoldFont.setBorderBottom(BorderStyle.THIN);
 	borderStyleBottomThinBoldFont.setFont(boldFont);
 
 	borderStyleLeftThinPercentage = workbook.createCellStyle();
-	borderStyleLeftThinPercentage.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleLeftThinPercentage.setBorderLeft(BorderStyle.THIN);
 	borderStyleLeftThinPercentage.setFont(defaultFont);
 	borderStyleLeftThinPercentage.setDataFormat(percentageDataFormatId);
 	borderStyleLeftThinBoldFontPercentage = workbook.createCellStyle();
-	borderStyleLeftThinBoldFontPercentage.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleLeftThinBoldFontPercentage.setBorderLeft(BorderStyle.THIN);
 	borderStyleLeftThinBoldFontPercentage.setFont(boldFont);
 	borderStyleLeftThinBoldFontPercentage.setDataFormat(percentageDataFormatId);
 
 	borderStyleRightThickPercentage = workbook.createCellStyle();
-	borderStyleRightThickPercentage.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleRightThickPercentage.setBorderRight(BorderStyle.THICK);
 	borderStyleRightThickPercentage.setDataFormat(percentageDataFormatId);
 	borderStyleRightThickBoldFontPercentage = workbook.createCellStyle();
-	borderStyleRightThickBoldFontPercentage.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleRightThickBoldFontPercentage.setBorderRight(BorderStyle.THICK);
 	borderStyleRightThickBoldFontPercentage.setFont(boldFont);
 	borderStyleRightThickBoldFontPercentage.setDataFormat(percentageDataFormatId);
 	
@@ -227,6 +231,10 @@ public class ExcelUtil {
 	}
 
 	Sheet sheet = workbook.createSheet(sheetName);
+	//make sure columns are tracked prior to auto-sizing them
+	if (workbook instanceof SXSSFWorkbook) {
+	    ((SXSSFSheet)sheet).trackAllColumnsForAutoSizing();
+	}
 
 	// Print title in bold, if needed
 	if (!StringUtils.isBlank(sheetTitle)) {
@@ -368,16 +376,16 @@ public class ExcelUtil {
 	    if (excelCell.getAlignment() != 0) {
 		switch (excelCell.getAlignment()) {
 		    case ExcelCell.ALIGN_GENERAL:
-			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_GENERAL);
+			CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.GENERAL);
 			break;
 		    case ExcelCell.ALIGN_LEFT:
-			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_LEFT);
+			CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.LEFT);
 			break;
 		    case ExcelCell.ALIGN_CENTER:
-			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_CENTER);
+			CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.CENTER);
 			break;
 		    case ExcelCell.ALIGN_RIGHT:
-			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_RIGHT);
+			CellUtil.setCellStyleProperty(cell, CellUtil.ALIGNMENT, HorizontalAlignment.RIGHT);
 			break;
 		    default:
 			break;

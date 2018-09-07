@@ -2,9 +2,9 @@
 
 Folder            Library                               Version                License                       Vendor                           Description
 
-apache-poi        poi-3.16.jar           				3.16                   Apache License 2.0            Apache                           the Java API for Microsoft Documents
-                  poi-ooxml-3.16.jar
-                  poi-ooxml-schemas-3.16.jar
+apache-poi        poi-3.17.jar           				3.17                   Apache License 2.0            Apache                           the Java API for Microsoft Documents
+                  poi-ooxml-3.17.jar
+                  poi-ooxml-schemas-3.17.jar
                   xmlbeans-2.6.0.jar					2.6.0
 
 autopatch		  autopatch-1.4.2-lams.jar			    1.4.2-lams		       Apache License				 Tacit Knowledge				  automated Java patching system
