@@ -48,7 +48,7 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -944,7 +944,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFCellStyle greenColor = wb.createCellStyle();
 	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
-	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	greenColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	Font whiteFont = wb.createFont();
 	whiteFont.setColor(IndexedColors.WHITE.getIndex());
 	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);

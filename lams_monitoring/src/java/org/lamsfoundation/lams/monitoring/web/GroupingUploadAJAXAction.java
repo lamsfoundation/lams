@@ -51,7 +51,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -472,7 +472,7 @@ public class GroupingUploadAJAXAction extends DispatchAction {
     /* XLS Version Parse */
     private String parseStringCell(HSSFCell cell) {
 	if (cell != null) {
-	    cell.setCellType(Cell.CELL_TYPE_STRING);
+	    cell.setCellType(CellType.STRING);
 	    if (cell.getStringCellValue() != null) {
 		return cell.getStringCellValue().trim();
 	    }

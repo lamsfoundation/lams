@@ -37,6 +37,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
@@ -604,7 +605,7 @@ public class ImportService implements IImportService {
 	if (cell != null) {
 	    String value;
 	    try {
-		cell.setCellType(Cell.CELL_TYPE_STRING);
+		cell.setCellType(CellType.STRING);
 		if (cell.getStringCellValue() != null) {
 		    if (cell.getStringCellValue().trim().length() != 0) {
 			emptyRow = false;
@@ -614,7 +615,7 @@ public class ImportService implements IImportService {
 		}
 		value = cell.getStringCellValue().trim();
 	    } catch (Exception e) {
-		cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+		cell.setCellType(CellType.NUMERIC);
 		double d = cell.getNumericCellValue();
 		emptyRow = false;
 		value = new Long(new Double(d).longValue()).toString();
@@ -629,7 +630,7 @@ public class ImportService implements IImportService {
     private String parseStringCell(HSSFCell cell) {
 	if (cell != null) {
 	    try {
-		cell.setCellType(Cell.CELL_TYPE_STRING);
+		cell.setCellType(CellType.STRING);
 		if (cell.getStringCellValue() != null) {
 		    if (cell.getStringCellValue().trim().length() != 0) {
 			emptyRow = false;
@@ -640,7 +641,7 @@ public class ImportService implements IImportService {
 		// log.debug("string cell value: '"+cell.getStringCellValue().trim()+"'");
 		return cell.getStringCellValue().trim();
 	    } catch (Exception e) {
-		cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+		cell.setCellType(CellType.NUMERIC);
 		double d = cell.getNumericCellValue();
 		emptyRow = false;
 		// log.debug("numeric cell value: '"+d+"'");
@@ -669,7 +670,7 @@ public class ImportService implements IImportService {
 	String roleDescription = "";
 	if (cell != null) {
 	    try {
-		cell.setCellType(Cell.CELL_TYPE_STRING);
+		cell.setCellType(CellType.STRING);
 		if ((cell.getStringCellValue() != null) || (cell.getStringCellValue().trim().length() != 0)) {
 		    emptyRow = false;
 		} else {
