@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="sessionMapID" value="${assessmentForm.sessionMapID}" />
 <c:url var="newQuestionInitUrl" value='/authoring/newQuestionInit.do'>
 	<c:param name="sessionMapID" value="${sessionMapID}" />
 </c:url>	
@@ -116,7 +115,7 @@
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	};
 	function reinitializePassingMarkSelect(isPageFresh){
-		var oldValue = (isPageFresh) ? "${formBean.assessment.passingMark}" : $("#passingMark").val();
+		var oldValue = (isPageFresh) ? "${assessmentForm.assessment.passingMark}" : $("#passingMark").val();
 		$('#passingMark').empty();
 		$('#passingMark').append( new Option("<fmt:message key='label.authoring.advance.passing.mark.none' />",0) );
 		
@@ -162,20 +161,20 @@
     <label for="assessment.title">
     		<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <html:text property="assessment.title" styleClass="form-control" maxlength="255"/>
+    <form:input path="assessment.title" cssClass="form-control" maxlength="255"/>
 </div>
 
 <div class="form-group">
     <label for="assessment.instructions">
     		<fmt:message key="label.authoring.basic.instruction"/>
     </label>
-	<lams:CKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
-			contentFolderID="${formBean.contentFolderID}">
+	<lams:CKEditor id="assessment.instructions" value="${assessmentForm.assessment.instructions}"
+			contentFolderID="${assessmentForm.contentFolderID}">
 	</lams:CKEditor>
 </div>
 
 <div id="questionListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${assessmentForm.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/questionlist.jsp"%>
 </div>
 

@@ -23,16 +23,13 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.form;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  * Assessment Question Form.
  *
  *
  * @author Andrey Balan
  */
-public class AssessmentQuestionForm extends ActionForm {
-    private static final long serialVersionUID = 4900738305713649389L;
+public class AssessmentQuestionForm {
 
     private String questionIndex;
     private String sessionMapID;

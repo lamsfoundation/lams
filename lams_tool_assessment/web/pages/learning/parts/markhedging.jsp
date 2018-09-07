@@ -38,10 +38,9 @@
 							<fmt:message key="label.justify.hedging.marks" />
 						</div>
 					</c:if>
-					
-					<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
-						disabled="${!hasEditRight}" styleClass="mark-hedging-select"
-					/>
+					<textarea id="justification-question${questionIndex}" name="question${questionIndex}" rows="4" cols="60" class="mark-hedging-select"
+							<c:if test="${!hasEditRight}">readonly="readonly"</c:if> data-question-index="${questionIndex}"
+					>${question.answerString}</textarea>
 				</td>
 			</tr>
 		</c:if>
@@ -50,9 +49,9 @@
 
 <c:if test="${isLeadershipEnabled && isUserLeader}">
 	<div class="float-right">
-		<html:button property="submit-hedging-question${questionIndex}" onclick="return submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
-				styleClass="btn pull-right">
+		<button type="button" name="submit-hedging-question${questionIndex}" onclick="return submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
+				class="btn pull-right">
 			<fmt:message key="label.learning.submit" />
-		</html:button>
+		</button>
 	</div>
 </c:if>

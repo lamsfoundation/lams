@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script lang="javascript">
 	$(document).ready(function(){
@@ -43,10 +42,10 @@
 			}		
 		});
 		
-		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
-		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
-		<c:if test="${formBean.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
-		<c:if test="${formBean.assessment.allowDiscloseAnswers}">
+		<c:if test="${assessmentForm.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
+		<c:if test="${assessmentForm.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
+		<c:if test="${assessmentForm.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
+		<c:if test="${assessmentForm.assessment.allowDiscloseAnswers}">
 			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true)
 		;</c:if>
 	});
@@ -57,7 +56,7 @@
 <lams:SimplePanel titleKey="label.select.leader">
 <div class="checkbox">
 	<label for="useSelectLeaderToolOuput">
-		<html:checkbox property="assessment.useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput"/>
+		<form:checkbox path="assessment.useSelectLeaderToolOuput" value="1" id="useSelectLeaderToolOuput"/>
 		<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
 </div>
@@ -70,32 +69,32 @@
 <div class="form-inline">
 	<label for="assessment.questionsPerPage">
 		<fmt:message key="label.authoring.advance.questions.per.page" />&nbsp;
-	<html:select property="assessment.questionsPerPage" styleClass="form-control input-sm">
-		<html:option value="0"><fmt:message key="label.authoring.advance.all.in.one.page" /></html:option>
-		<html:option value="10">10</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="1">1</html:option>
-	</html:select>
+	<form:select path="assessment.questionsPerPage" cssClass="form-control input-sm">
+		<form:option value="0"><fmt:message key="label.authoring.advance.all.in.one.page" /></form:option>
+		<form:option value="10">10</form:option>
+		<form:option value="9">9</form:option>
+		<form:option value="8">8</form:option>
+		<form:option value="7">7</form:option>
+		<form:option value="6">6</form:option>
+		<form:option value="5">5</form:option>
+		<form:option value="4">4</form:option>
+		<form:option value="3">3</form:option>
+		<form:option value="2">2</form:option>
+		<form:option value="1">1</form:option>
+	</form:select>
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="shuffled">
-		<html:checkbox property="assessment.shuffled" styleId="shuffled"/>
+		<form:checkbox path="assessment.shuffled" id="shuffled"/>
 		<fmt:message key="label.authoring.advance.shuffle.questions" />
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="questions-numbering">
-		<html:checkbox property="assessment.numbered" styleId="questions-numbering"/>
+		<form:checkbox path="assessment.numbered" id="questions-numbering"/>
 		<fmt:message key="label.authoring.advance.numbered.questions" />
 	</label>
 </div>
@@ -107,7 +106,7 @@
 <div class="form-inline">
 	<label for="timeLimit">
 		<fmt:message key="label.authoring.advance.time.limit" />&nbsp;
-		<html:text property="assessment.timeLimit" size="3" styleId="timeLimit" styleClass="form-control input-sm"/>
+		<form:input path="assessment.timeLimit" size="3" id="timeLimit" cssClass="form-control input-sm"/>
 	</label>
 </div>
 
@@ -117,30 +116,30 @@
 	<div class="radio form-inline">
 		<label for="attemptsAllowedRadio">
 			<input type="radio" name="isAttemptsChosen" value="${true}" id="attemptsAllowedRadio"
-					<c:if test="${formBean.assessment.passingMark == 0}">checked="checked"</c:if> />
+					<c:if test="${assessmentForm.assessment.passingMark == 0}">checked="checked"</c:if> />
 					
 			<fmt:message key="label.authoring.advance.attempts.allowed" />&nbsp;
 			
-			<html:select property="assessment.attemptsAllowed" styleId="attemptsAllowed" styleClass="form-control input-sm">
-				<html:option value="0"><fmt:message key="label.authoring.advance.unlimited" /></html:option>
-				<html:option value="6">6</html:option>
-				<html:option value="5">5</html:option>
-				<html:option value="4">4</html:option>
-				<html:option value="3">3</html:option>
-				<html:option value="2">2</html:option>
-				<html:option value="1">1</html:option>
-			</html:select>
+			<form:select path="assessment.attemptsAllowed" id="attemptsAllowed" cssClass="form-control input-sm">
+				<form:option value="0"><fmt:message key="label.authoring.advance.unlimited" /></form:option>
+				<form:option value="6">6</form:option>
+				<form:option value="5">5</form:option>
+				<form:option value="4">4</form:option>
+				<form:option value="3">3</form:option>
+				<form:option value="2">2</form:option>
+				<form:option value="1">1</form:option>
+			</form:select>
 		</label>
 	</div>
 
 	<div class="radio form-inline">
 		<label for="passingMarkRadio">
 			<input type="radio" name="isAttemptsChosen" value="${false}" id="passingMarkRadio"	
-					<c:if test="${formBean.assessment.passingMark > 0}">checked="checked"</c:if> />
+					<c:if test="${assessmentForm.assessment.passingMark > 0}">checked="checked"</c:if> />
 					
 			<fmt:message key="label.authoring.advance.passing.mark" />&nbsp;
 			
-			<html:select property="assessment.passingMark" styleId="passingMark" styleClass="form-control input-sm"/>
+			<form:select path="assessment.passingMark" id="passingMark" cssClass="form-control input-sm"/>
 		</label>
 	</div>
 	
@@ -152,45 +151,45 @@
 
 <div class="checkbox">
 	<label for="display-summary">
-		<html:checkbox property="assessment.displaySummary" styleId="display-summary"/>
+		<form:checkbox path="assessment.displaySummary" id="display-summary"/>
 		<fmt:message key="label.authoring.advance.display.summary" />
 	</label>
 </div>
 
 <div id="display-summary-area" class="loffset20" 
-		<c:if test="${!formBean.assessment.displaySummary}">style="display:none;"</c:if>>
+		<c:if test="${!assessmentForm.assessment.displaySummary}">style="display:none;"</c:if>>
 
 	<div class="checkbox">
 		<label for="allowQuestionFeedback">
-			<html:checkbox property="assessment.allowQuestionFeedback" styleId="allowQuestionFeedback"/>
+			<form:checkbox path="assessment.allowQuestionFeedback" id="allowQuestionFeedback"/>
 			<fmt:message key="label.authoring.advance.allow.students.question.feedback" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="allowDiscloseAnswers">
-			<html:checkbox property="assessment.allowDiscloseAnswers" styleId="allowDiscloseAnswers"/>
+			<form:checkbox path="assessment.allowDiscloseAnswers" id="allowDiscloseAnswers"/>
 			<fmt:message key="label.authoring.advance.disclose.answers" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="allowRightAnswersAfterQuestion">
-			<html:checkbox property="assessment.allowRightAnswersAfterQuestion" styleId="allowRightAnswersAfterQuestion"/>
+			<form:checkbox path="assessment.allowRightAnswersAfterQuestion" id="allowRightAnswersAfterQuestion"/>
 			<fmt:message key="label.authoring.advance.allow.students.right.answers" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="allowWrongAnswersAfterQuestion">
-			<html:checkbox property="assessment.allowWrongAnswersAfterQuestion" styleId="allowWrongAnswersAfterQuestion"/>
+			<form:checkbox path="assessment.allowWrongAnswersAfterQuestion" id="allowWrongAnswersAfterQuestion"/>
 			<fmt:message key="label.authoring.advance.allow.students.wrong.answers" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="allowHistoryResponsesAfterAttempt">
-			<html:checkbox property="assessment.allowHistoryResponses" styleId="allowHistoryResponsesAfterAttempt"/>
+			<form:checkbox path="assessment.allowHistoryResponses" id="allowHistoryResponsesAfterAttempt"/>
 			<fmt:message key="label.authoring.advance.allow.students.history.responses" />
 		</label>
 	</div>
@@ -198,21 +197,21 @@
 
 <div class="checkbox">
 	<label for="allowOverallFeedbackAfterQuestion">
-		<html:checkbox property="assessment.allowOverallFeedbackAfterQuestion" styleId="allowOverallFeedbackAfterQuestion"/>
+		<form:checkbox path="assessment.allowOverallFeedbackAfterQuestion" id="allowOverallFeedbackAfterQuestion"/>
 		<fmt:message key="label.authoring.advance.allow.students.overall.feedback" />
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="allowGradesAfterAttempt">
-		<html:checkbox property="assessment.allowGradesAfterAttempt" styleId="allowGradesAfterAttempt"/>
+		<form:checkbox path="assessment.allowGradesAfterAttempt" id="allowGradesAfterAttempt"/>
 		<fmt:message key="label.authoring.advance.allow.students.grades" />
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="enable-confidence-levels">
-		<html:checkbox property="assessment.enableConfidenceLevels" styleId="enable-confidence-levels"/>
+		<form:checkbox path="assessment.enableConfidenceLevels" id="enable-confidence-levels"/>
 		<fmt:message key="label.enable.confidence.levels" />
 	</label>
 </div>
@@ -223,7 +222,7 @@
 <lams:SimplePanel titleKey="label.notifications">
 <div class="checkbox">
 	<label for="notifyTeachersOnAttemptCompletion">
-		<html:checkbox property="assessment.notifyTeachersOnAttemptCompletion" styleId="notifyTeachersOnAttemptCompletion"/>
+		<form:checkbox path="assessment.notifyTeachersOnAttemptCompletion" id="notifyTeachersOnAttemptCompletion"/>
 		<fmt:message key="label.authoring.advanced.notify.on.attempt.completion" />
 	</label>
 </div>
@@ -234,7 +233,7 @@
 
 <input type="hidden" name="overallFeedbackList" id="overallFeedbackList" />
 <iframe id="advancedInputArea" name="advancedInputArea" style="width:650px;height:100%;border:0px;display:block;" 
-		frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${formBean.sessionMapID}">
+		frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${assessmentForm.sessionMapID}">
 </iframe>
 </lams:SimplePanel>
 
@@ -242,13 +241,13 @@
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
-		<html:checkbox property="assessment.reflectOnActivity" styleId="reflectOnActivity"/>
+		<form:checkbox path="assessment.reflectOnActivity" id="reflectOnActivity"/>
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
 </div>
 
 <div class="form-group">
-	<html:textarea property="assessment.reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
+	<form:textarea path="assessment.reflectInstructions" rows="3" id="reflectInstructions" cssClass="form-control"/>
 </div>
 </lams:SimplePanel>
 

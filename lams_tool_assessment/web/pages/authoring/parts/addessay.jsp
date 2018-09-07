@@ -5,7 +5,7 @@
 <lams:head>
 	<link href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css">
 	<%@ include file="/common/header.jsp"%>
-	<link href="<html:rewrite page='/includes/css/addQuestion.css'/>" rel="stylesheet" type="text/css">
+	<link href="<lams:WebAppURL/>includes/css/addQuestion.css" rel="stylesheet" type="text/css">
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
@@ -119,18 +119,17 @@
 				</lams:Alert>	
 		    </div>
 			
-			<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="assessmentQuestionForm">
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<html:hidden property="sessionMapID" />
-				<html:hidden property="questionType" value="6"/>
-				<html:hidden property="questionIndex" />
+			<form:form action="/lams/tool/laasse10/authoring/saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+				<form:hidden path="sessionMapID" />
+				<form:hidden path="questionType" value="6"/>
+				<form:hidden path="questionIndex" />
 				
 				<div class="form-group">
 				    <label for="title">
 				    	<fmt:message key="label.authoring.basic.question.name"/>
 				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 				    </label>
-				    <html:text property="title" maxlength="255" styleId="title" styleClass="form-control" tabindex="1"/>
+				    <form:input path="title" maxlength="255" id="title" cssClass="form-control" tabindex="1"/>
 				</div>
 			
 				<div class="form-group">
@@ -138,12 +137,12 @@
 						<fmt:message key="label.authoring.basic.question.text" />
 					</label>
 		            	
-					<lams:CKEditor id="question" value="${formBean.question}" contentFolderID="${formBean.contentFolderID}" />
+					<lams:CKEditor id="question" value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 				</div>
 				
 				<div class="checkbox">
 					<label for="answer-required">
-						<html:checkbox property="answerRequired" styleId="answer-required"/>
+						<form:checkbox path="answerRequired" id="answer-required"/>
 						<fmt:message key="label.authoring.answer.required" />
 					</label>
 				</div>
@@ -153,12 +152,12 @@
 				    	<fmt:message key="label.authoring.basic.default.question.grade" />:
 				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 				    </label>
-				    <html:text property="defaultGrade" styleClass="form-control short-input-text input-sm"/>
+				    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
 				</div>
 				
 				<div class="checkbox">
 					<label for="allow-rich-editor">
-						<html:checkbox property="allowRichEditor" styleId="allow-rich-editor"/>
+						<form:checkbox path="allowRichEditor" id="allow-rich-editor"/>
 						<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
 					</label>
 				</div>
@@ -166,29 +165,29 @@
 				<div class="checkbox">
 				    <label for="max-words-limit-checkbox">
 						<input type="checkbox" id="max-words-limit-checkbox" name="noname"
-								<c:if test="${formBean.maxWordsLimit != 0}">checked="checked"</c:if>/>
+								<c:if test="${assessmentQuestionForm.maxWordsLimit != 0}">checked="checked"</c:if>/>
 				    	<fmt:message key="label.maximum.number.words" />
 				    </label>
-				    <html:text property="maxWordsLimit" styleId="max-words-limit"/>
+				    <form:input path="maxWordsLimit" id="max-words-limit"/>
 				</div>
 				
 				<div class="checkbox">
 				    <label for="min-words-limit-checkbox">
 						<input type="checkbox" id="min-words-limit-checkbox" name="noname"
-								<c:if test="${formBean.minWordsLimit != 0}">checked="checked"</c:if>/>
+								<c:if test="${assessmentQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
 				    	<fmt:message key="label.minimum.number.words" />
 				    </label>
-				    <html:text property="minWordsLimit" styleId="min-words-limit"/>
+				    <form:input path="minWordsLimit" id="min-words-limit"/>
 				</div>
 
 				<div class="generalFeedback">
 				  <a data-toggle="collapse" data-target="#general-feedback" href="#general-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
-					<div id="general-feedback"  class="voffset5 collapse <c:if test="${not empty formBean.generalFeedback}">in</c:if> form-group">
-						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
+					<div id="general-feedback"  class="voffset5 collapse <c:if test="${not empty assessmentQuestionForm.generalFeedback}">in</c:if> form-group">
+						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 				</div>
 					
-			</html:form>
+			</form:form>
 			
 			<div class="voffset10 pull-right">
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">

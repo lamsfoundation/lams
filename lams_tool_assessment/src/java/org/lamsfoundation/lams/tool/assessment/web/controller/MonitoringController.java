@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.assessment.web.action;
+package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,10 +41,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -72,74 +68,28 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
+    public static Logger log = Logger.getLogger(MonitoringController.class);
 
+    @Autowired
+    @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
-
-	String param = mapping.getParameter();
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("userMasterDetail")) {
-	    return userMasterDetail(mapping, form, request, response);
-	}
-	if (param.equals("questionSummary")) {
-	    return questionSummary(mapping, form, request, response);
-	}
-	if (param.equals("userSummary")) {
-	    return userSummary(mapping, form, request, response);
-	}
-	if (param.equals("saveUserGrade")) {
-	    return saveUserGrade(mapping, form, request, response);
-	}
-	if (param.equals("setSubmissionDeadline")) {
-	    return setSubmissionDeadline(mapping, form, request, response);
-	}
-	if (param.equals("setActivityEvaluation")) {
-	    return setActivityEvaluation(mapping, form, request, response);
-	}
-	if (param.equals("getUsers")) {
-	    return getUsers(mapping, form, request, response);
-	}
-	if (param.equals("getUsersByQuestion")) {
-	    return getUsersByQuestion(mapping, form, request, response);
-	}
-	if (param.equals("exportSummary")) {
-	    return exportSummary(mapping, form, request, response);
-	}
-	if (param.equals("getMarkChartData")) {
-	    return getMarkChartData(mapping, form, request, response);
-	}
-	if (param.equals("statistic")) {
-	    return statistic(mapping, form, request, response);
-	}
-	if (param.equals("discloseCorrectAnswers")) {
-	    return discloseCorrectAnswers(mapping, form, request, response);
-	}
-	if (param.equals("discloseGroupsAnswers")) {
-	    return discloseGroupsAnswers(mapping, form, request, response);
-	}
-
-	return mapping.findForward(AssessmentConstants.ERROR);
-    }
-
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/summary")
+    public String summary(HttpServletRequest request,
 	    HttpServletResponse response) {
-	initAssessmentService();
 
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -204,12 +154,11 @@ public class MonitoringAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/monitoring/monitoring";
     }
 
-    private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initAssessmentService();
+    @RequestMapping("/userMasterDetail")
+    public String userMasterDetail(HttpServletRequest request, HttpServletResponse response) {
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -217,12 +166,12 @@ public class MonitoringAction extends Action {
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return (result == null) ? null : mapping.findForward(AssessmentConstants.SUCCESS);
+	return (result == null) ? null : "pages/monitoring/parts/masterDetailLoadUp";
     }
 
-    private ActionForward questionSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/questionSummary")
+    public String questionSummary(HttpServletRequest request,
 	    HttpServletResponse response) {
-	initAssessmentService();
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -236,12 +185,11 @@ public class MonitoringAction extends Action {
 	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
 
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/monitoring/parts/questionsummary";
     }
 
-    private ActionForward userSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	initAssessmentService();
+    @RequestMapping("/userSummary")
+    public String userSummary(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -253,15 +201,14 @@ public class MonitoringAction extends Action {
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/monitoring/parts/usersummary";
     }
 
-    private ActionForward saveUserGrade(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/saveUserGrade")
+    public String saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
 
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
-	    initAssessmentService();
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
 	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));
 	    service.changeQuestionResultMark(questionResultUid, newGrade);
@@ -272,17 +219,9 @@ public class MonitoringAction extends Action {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
-    private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initAssessmentService();
+    @RequestMapping("/setSubmissionDeadline")
+    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentID);
@@ -318,9 +257,8 @@ public class MonitoringAction extends Action {
      * @throws JSONException
      * @throws IOException
      */
-    private ActionForward setActivityEvaluation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initAssessmentService();
+    @RequestMapping("/setActivityEvaluation")
+    public String setActivityEvaluation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -344,9 +282,8 @@ public class MonitoringAction extends Action {
     /**
      * Refreshes user list.
      */
-    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-	initAssessmentService();
+    @RequestMapping("/getUsers")
+    public String getUsers(HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -432,9 +369,9 @@ public class MonitoringAction extends Action {
     /**
      * Refreshes user list.
      */
-    public ActionForward getUsersByQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-	initAssessmentService();
+    @RequestMapping("/getUsersByQuestion")
+    public String getUsersByQuestion(HttpServletRequest request, HttpServletResponse res)
+	    throws IOException, ServletException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -552,10 +489,9 @@ public class MonitoringAction extends Action {
     /**
      * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
      */
-    private ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
-
-	initAssessmentService();
+    @RequestMapping("/getMarkChartData")
+    public String getMarkChartData(HttpServletRequest request, HttpServletResponse res)
+	    throws IOException, ServletException {
 
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -590,17 +526,9 @@ public class MonitoringAction extends Action {
 
     /**
      * Excel Summary Export.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
-    private ActionForward exportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initAssessmentService();
+    @RequestMapping("/exportSummary")
+    public String exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	String fileName = null;
 	boolean showUserNames = true;
@@ -651,10 +579,8 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	initAssessmentService();
+    @RequestMapping("/statistic")
+    public String statistic(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -671,18 +597,17 @@ public class MonitoringAction extends Action {
 		sessionMap.put("sessionDtos", sessionDtos);
 	    }
 	}
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/monitoring/statisticpart";
     }
 
     /**
      * Allows displaying correct answers to learners
      */
-    private ActionForward discloseCorrectAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/discloseCorrectAnswers")
+    public String discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
-	initAssessmentService();
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	question.setCorrectAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
@@ -700,12 +625,11 @@ public class MonitoringAction extends Action {
     /**
      * Allows displaying other groups' answers to learners
      */
-    private ActionForward discloseGroupsAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/discloseGroupsAnswers")
+    public String discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
-	initAssessmentService();
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	question.setGroupsAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
@@ -718,18 +642,6 @@ public class MonitoringAction extends Action {
 	}
 
 	return null;
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private IAssessmentService initAssessmentService() {
-	if (service == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    service = (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
-	}
-	return service;
     }
 
 }
