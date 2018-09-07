@@ -119,6 +119,8 @@ public class ConfigurationKeys {
     public static String ALLOW_KUMALIVE = "AllowKumalive";
     
     public static String DISPLAY_PORTRAIT = "DisplayPortrait";
+    
+    public static String ENABLE_PORTRAIT_EDITING = "EnablePortraitEditing";
 
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
 
