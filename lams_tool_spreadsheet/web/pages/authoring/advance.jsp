@@ -37,6 +37,8 @@
 
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${formBean.spreadsheet.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 	<div class="checkbox">

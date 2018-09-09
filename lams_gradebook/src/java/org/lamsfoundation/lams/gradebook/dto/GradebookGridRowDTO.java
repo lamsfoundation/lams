@@ -55,10 +55,10 @@ public abstract class GradebookGridRowDTO {
 
     // Another unit of time that represents average time taken for a corresponding task
     protected Long medianTimeTaken;
-    
+
     // Another unit of time that represents minimum time taken for a corresponding task
     protected Long minTimeTaken;
-    
+
     // Another unit of time that represents maximum time taken for a corresponding task
     protected Long maxTimeTaken;
 
@@ -73,6 +73,8 @@ public abstract class GradebookGridRowDTO {
 
     protected String status;
     protected String feedback;
+
+    protected String outcomes;
 
     protected boolean displayMarkAsPercent = false;
 
@@ -189,12 +191,11 @@ public abstract class GradebookGridRowDTO {
     public void setMedianTimeTaken(Long medianTimeTaken) {
 	this.medianTimeTaken = medianTimeTaken;
     }
-    
-    
+
     public Long getMinTimeTaken() {
-        return minTimeTaken;
+	return minTimeTaken;
     }
-    
+
     public Long getMinTimeTakenSeconds() {
 	if (minTimeTaken != null) {
 	    return minTimeTaken / 1000;
@@ -204,13 +205,13 @@ public abstract class GradebookGridRowDTO {
     }
 
     public void setMinTimeTaken(Long minTimeTaken) {
-        this.minTimeTaken = minTimeTaken;
+	this.minTimeTaken = minTimeTaken;
     }
 
     public Long getMaxTimeTaken() {
-        return maxTimeTaken;
+	return maxTimeTaken;
     }
-    
+
     public Long getMaxTimeTakenSeconds() {
 	if (maxTimeTaken != null) {
 	    return maxTimeTaken / 1000;
@@ -220,7 +221,7 @@ public abstract class GradebookGridRowDTO {
     }
 
     public void setMaxTimeTaken(Long maxTimeTaken) {
-        this.maxTimeTaken = maxTimeTaken;
+	this.maxTimeTaken = maxTimeTaken;
     }
 
     public Double getAverageMark() {
@@ -271,6 +272,14 @@ public abstract class GradebookGridRowDTO {
 	this.finishDate = finishDate;
     }
 
+    public String getOutcomes() {
+	return outcomes;
+    }
+
+    public void setOutcomes(String outcomes) {
+	this.outcomes = outcomes;
+    }
+
     public boolean getDisplayMarkAsPercent() {
 	return displayMarkAsPercent;
     }
@@ -278,5 +287,4 @@ public abstract class GradebookGridRowDTO {
     public void setDisplayMarkAsPercent(boolean displayMarkAsPercent) {
 	this.displayMarkAsPercent = displayMarkAsPercent;
     }
-
 }

@@ -75,6 +75,11 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.OutcomeResult;
+import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -98,6 +103,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -128,6 +137,7 @@ public class GradebookService implements IGradebookFullService {
     private ILogEventService logEventService;
     private static ILearnerService learnerService;
 
+    private IOutcomeService outcomeService;
 
     @Override
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone) {
@@ -189,6 +199,30 @@ public class GradebookService implements IGradebookFullService {
 		}
 	    }
 
+	    List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(null, activity.getToolContentId(),
+		    null);
+	    if (!outcomeMappings.isEmpty()) {
+		ArrayNode outcomeMappingsJSON = JsonNodeFactory.instance.arrayNode();
+		for (OutcomeMapping outcomeMapping : outcomeMappings) {
+		    ObjectNode outcomeMappingJSON = JsonNodeFactory.instance.objectNode();
+		    Outcome outcome = outcomeMapping.getOutcome();
+		    outcomeMappingJSON.put("mappingId", outcomeMapping.getMappingId());
+		    outcomeMappingJSON.put("name", outcome.getName());
+		    outcomeMappingJSON.put("code", outcome.getCode());
+		    ArrayNode possibleValues = JsonNodeFactory.instance.arrayNode();
+		    for (OutcomeScaleItem possibleValue : outcome.getScale().getItems()) {
+			possibleValues.add(possibleValue.getName());
+		    }
+		    outcomeMappingJSON.set("possibleValues", possibleValues);
+		    OutcomeResult result = outcomeService.getOutcomeResult(userId, outcomeMapping.getMappingId());
+		    if (result != null) {
+			outcomeMappingJSON.put("value", result.getValue());
+		    }
+		    outcomeMappingsJSON.add(outcomeMappingJSON);
+		}
+		activityDTO.setOutcomes(outcomeMappingsJSON.toString());
+	    }
+
 	    gradebookActivityDTOs.add(activityDTO);
 	}
 
@@ -211,9 +245,7 @@ public class GradebookService implements IGradebookFullService {
 	List<GradebookUserActivityArchive> activityArchives = gradebookDAO.getArchivedActivityMarks(activityId, userId);
 	for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
 	    Date archiveDate = lessonArchive.getArchiveDate();
-	    Date adjustedArchiveDate = userTimezone == null ? archiveDate
-		    : DateUtil.convertToTimeZoneFromDefault(userTimezone, archiveDate);
-	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder, adjustedArchiveDate,
+	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder,
 		    lessonArchive.getMark());
 	    for (GradebookUserActivityArchive activityArchive : activityArchives) {
 		if (archiveDate.equals(activityArchive.getArchiveDate())) {
@@ -704,7 +736,7 @@ public class GradebookService implements IGradebookFullService {
 	updateUserActivityGradebookMark(lesson, learner, activity, mark, markedInGradebook, isAuditLogRequired,
 		gradebookUserActivity, gradebookUserLesson);
     }
-    
+
     private void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired) {
 
@@ -744,7 +776,7 @@ public class GradebookService implements IGradebookFullService {
 	}
 	return evaluations;
     }
-    
+
     private void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
 	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
 
@@ -858,7 +890,7 @@ public class GradebookService implements IGradebookFullService {
 	gradebookUserActivity.setUpdateDate(new Date());
 	gradebookDAO.insertOrUpdate(gradebookUserActivity);
     }
-    
+
     private void updateUserActivityGradebookFeedback(Activity activity, User learner, String feedback) {
 
 	GradebookUserActivity gradebookUserActivity = gradebookDAO
@@ -1086,7 +1118,6 @@ public class GradebookService implements IGradebookFullService {
     public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
 
 	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());
-	;
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
@@ -1306,6 +1337,8 @@ public class GradebookService implements IGradebookFullService {
 	    titleRow[4] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
 	    rowList.add(titleRow);
 
+	    Map<Long, String> activityIdToName = new HashMap<Long, String>();
+
 	    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 
 		//find userDto corresponding to the user
@@ -1332,6 +1365,7 @@ public class GradebookService implements IGradebookFullService {
 		    String activityRowName = (groupName != null && groupId != null)
 			    ? activity.getTitle() + " (" + groupName + ")"
 			    : activity.getTitle();
+		    activityIdToName.put(activity.getActivityId(), activityRowName);
 
 		    String startDate = (userDto.getStartDate() == null) ? ""
 			    : FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(userDto.getStartDate());
@@ -1345,6 +1379,68 @@ public class GradebookService implements IGradebookFullService {
 		    activityDataRow[3] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
 		    activityDataRow[4] = new ExcelCell(userDto.getMark(), false);
 		    rowList.add(activityDataRow);
+		}
+	    }
+
+	    // check if learner has restarted the lesson and has archived marks
+	    boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
+	    if (hasArchivedMarks) {
+		// "Previous attempts" row
+		ExcelCell[] attemptsRow = new ExcelCell[1];
+		attemptsRow[0] = new ExcelCell(getMessage("gradebook.columntitle.attempts"), true);
+		rowList.add(attemptsRow);
+
+		List<GradebookUserLessonArchive> lessonArchives = gradebookDAO
+			.getArchivedLessonMarks(lesson.getLessonId(), learner.getUserId());
+		int attemptOrder = lessonArchives.size();
+		// go through each lesson attempt
+		for (GradebookUserLessonArchive lessonArchive : lessonArchives) {
+		    // lesson attempt header
+		    ExcelCell[] attemptRow = new ExcelCell[4];
+		    attemptRow[0] = new ExcelCell(getMessage("gradebook.columntitle.attempt"), true);
+		    attemptRow[1] = new ExcelCell(attemptOrder, true);
+		    attemptRow[1].setAlignment(ExcelCell.ALIGN_LEFT);
+		    attemptRow[2] = new ExcelCell(getMessage("gradebook.columntitle.lesson.mark"), true);
+		    attemptRow[3] = new ExcelCell(lessonArchive.getMark(), false);
+		    rowList.add(attemptRow);
+
+		    // go throuch each activity and see if there is an archived mark for it
+		    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
+			ExcelCell[] activityDataRow = null;
+			List<GradebookUserActivityArchive> activityArchives = gradebookDAO
+				.getArchivedActivityMarks(activity.getActivityId(), learner.getUserId());
+			Date archiveDate = lessonArchive.getArchiveDate();
+			for (GradebookUserActivityArchive activityArchive : activityArchives) {
+			    // if it matches, we found an archived mark for this activity and this attempt
+			    if (archiveDate.equals(activityArchive.getArchiveDate())) {
+				LearnerProgressArchive learnerProgress = learnerProgressDAO.getLearnerProgressArchive(
+					lesson.getLessonId(), learner.getUserId(), lessonArchive.getArchiveDate());
+				activityDataRow = new ExcelCell[5];
+				activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()),
+					false);
+				Date startDate = getActivityStartDate(learnerProgress, activity, null);
+				activityDataRow[1] = new ExcelCell(
+					startDate == null ? ""
+						: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(startDate),
+					false);
+				Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
+				activityDataRow[2] = new ExcelCell(
+					finishDate == null ? ""
+						: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate),
+					false);
+				activityDataRow[3] = new ExcelCell(
+					getActivityDuration(learnerProgress, activity) / 1000, false);
+				activityDataRow[4] = new ExcelCell(activityArchive.getMark(), false);
+				break;
+			    }
+			}
+			if (activityDataRow == null) {
+			    activityDataRow = new ExcelCell[1];
+			    activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()), false);
+			}
+			rowList.add(activityDataRow);
+		    }
+		    attemptOrder--;
 		}
 	    }
 
@@ -1850,7 +1946,7 @@ public class GradebookService implements IGradebookFullService {
 	    }
 	}
     }
-    
+
     @Override
     public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook) {
@@ -2569,5 +2665,9 @@ public class GradebookService implements IGradebookFullService {
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+
+    public void setOutcomeService(IOutcomeService outcomeService) {
+	this.outcomeService = outcomeService;
     }
 }

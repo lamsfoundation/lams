@@ -87,6 +87,7 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -165,6 +166,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     protected ILogEventService logEventService;
 
     protected IGradebookService gradebookService;
+
+    protected IOutcomeService outcomeService;
 
     protected ToolContentIDGenerator contentIDGenerator;
 
@@ -306,6 +309,10 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	this.logEventService = logEventService;
     }
 
+    public void setOutcomeService(IOutcomeService outcomeService) {
+	this.outcomeService = outcomeService;
+    }
+
     /**
      * @param contentIDGenerator
      *            The contentIDGenerator to set.
@@ -393,12 +400,14 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
 		lesson.setLockedForEdit(true);
 
-		if ( design.getEditOverrideUser() == null ||  design.getEditOverrideLock() == null || !design.getEditOverrideLock() ) {
+		if (design.getEditOverrideUser() == null || design.getEditOverrideLock() == null
+			|| !design.getEditOverrideLock()) {
 		    // create audit log entry only the first time - do not redo one if the monitor has restarted editing.
-		    String message = messageService.getMessage("audit.live.edit.start", new Object[] { design.getTitle(),
-			    design.getLearningDesignId(), lesson.getLessonId(), user.getLogin(), user.getUserId() });
-		    logEventService.logEvent(LogEvent.TYPE_LIVE_EDIT, user.getUserId(), null, lesson.getLessonId(), null,
-			    message);
+		    String message = messageService.getMessage("audit.live.edit.start",
+			    new Object[] { design.getTitle(), design.getLearningDesignId(), lesson.getLessonId(),
+				    user.getLogin(), user.getUserId() });
+		    logEventService.logEvent(LogEvent.TYPE_LIVE_EDIT, user.getUserId(), null, lesson.getLessonId(),
+			    null, message);
 		}
 	    }
 
@@ -869,6 +878,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    ToolActivity toolActivity = (ToolActivity) activity;
 	    // copy the content
 	    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, customCSV);
+	    outcomeService.copyOutcomeMappings(null, toolActivity.getToolContentId(), null, null, newContentId, null);
 	    toolActivity.setToolContentId(newContentId);
 
 	    // clear read only field
@@ -1381,7 +1391,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     @Override
     public Long copyToolContent(Long toolContentID, String customCSV) throws IOException {
-	return lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
+	Long newToolContentID = lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
+	outcomeService.copyOutcomeMappings(null, toolContentID, null, null, newToolContentID, null);
+	return newToolContentID;
     }
 
     /**

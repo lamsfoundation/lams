@@ -8,6 +8,8 @@
 </c:set>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
+<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
+
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>

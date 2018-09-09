@@ -155,6 +155,7 @@ public class NbAuthoringAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute(FORM, nbForm);
+	request.setAttribute("outcomes", null);
 	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
     }
 

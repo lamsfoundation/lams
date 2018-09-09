@@ -493,6 +493,28 @@
 			</props>
 		</property>
 	</bean>
+	
+	<!-- Outcome service -->
+	<bean id="outcomeServiceTarget" class="org.lamsfoundation.lams.outcome.service.OutcomeService">
+		<property name="outcomeDAO"><ref bean="outcomeDAO"/></property>
+		<property name="messageService"><ref bean="authoringMessageService"/></property>
+	</bean>	
+	
+	<bean id="outcomeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="outcomeServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
 
 	<!-- Learning Design related beans-->
 	
@@ -627,8 +649,13 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
-	<!--  Data flow related beans -->
+	<!-- Security check related beans -->
 	<bean id="securityDAO" class="org.lamsfoundation.lams.security.SecurityDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!-- Outcome related beans -->
+	<bean id="outcomeDAO" class="org.lamsfoundation.lams.outcome.dao.hibernate.OutcomeDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

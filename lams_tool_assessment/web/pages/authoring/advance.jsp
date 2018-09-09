@@ -238,6 +238,8 @@
 </iframe>
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${formBean.assessment.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">

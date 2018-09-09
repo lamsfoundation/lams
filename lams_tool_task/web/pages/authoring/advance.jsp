@@ -54,6 +54,8 @@
 	</div>
 
 </lams:SimplePanel>
+
+<lams:OutcomeAuthor toolContentId="${formBean.taskList.contentId}" />
 	
 <lams:SimplePanel titleKey="label.activity.completion">
 

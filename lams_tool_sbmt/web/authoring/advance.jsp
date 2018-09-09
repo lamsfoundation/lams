@@ -59,6 +59,8 @@
 </div>
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${formBean.toolContentID}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
 	<label for="lockOnFinished">
