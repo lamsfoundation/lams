@@ -471,7 +471,7 @@ public class OutcomeAction extends DispatchAction {
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = getOutcomeService().exportOutcomes();
 
-	String fileName = "lams_outcomes.xlsx";
+	String fileName = "lams_outcomes.xls";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
 	response.setContentType("application/x-download");
@@ -724,7 +724,7 @@ public class OutcomeAction extends DispatchAction {
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = getOutcomeService().exportScales();
 
-	String fileName = "lams_outcome_scales.xlsx";
+	String fileName = "lams_outcome_scales.xls";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
 	response.setContentType("application/x-download");
