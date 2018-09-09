@@ -52,7 +52,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
@@ -66,6 +65,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeForm
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeItemForm;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -535,7 +535,7 @@ public class AuthoringAction extends Action {
 
 	commonCartridgeForm.setCommonCartridge(commonCartridgePO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
     }
 
@@ -813,7 +813,7 @@ public class AuthoringAction extends Action {
 	CommonCartridgePedagogicalPlannerForm plannerForm = (CommonCartridgePedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	CommonCartridge taskList = getCommonCartridgeService().getCommonCartridgeByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
+	String command = WebUtil.readStrParam(request, "command", true);
 	if (command == null) {
 	    plannerForm.fillForm(taskList);
 	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);

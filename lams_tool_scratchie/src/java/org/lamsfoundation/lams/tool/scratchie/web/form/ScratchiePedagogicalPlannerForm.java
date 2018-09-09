@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *

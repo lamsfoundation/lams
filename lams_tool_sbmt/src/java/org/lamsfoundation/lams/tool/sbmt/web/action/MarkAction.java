@@ -151,7 +151,7 @@ public class MarkAction extends LamsDispatchAction {
      * Remove a mark file
      */
     public ActionForward removeMarkFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
 	MarkForm markForm = (MarkForm) form;
 
 	if (submitFilesService == null) {

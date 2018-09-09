@@ -26,12 +26,10 @@ package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
@@ -109,31 +107,52 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  *
  * @author conradb, Fiona Malikoff
  */
-public abstract class ToolContentHandler implements IToolContentHandler {
+public class ToolContentHandler implements IToolContentFullHandler {
 
     private IRepositoryService repositoryService;
     private ITicket ticket;
+    
+    private String repositoryWorkspaceName;
+    private String repositoryUser;
+    private String repositoryId;
 
     protected Logger log = Logger.getLogger(ToolContentHandler.class.getName());
 
-    /**
-     * @return Returns the repositoryWorkspaceName.
-     */
-    @Override
-    public abstract String getRepositoryWorkspaceName();
+    private String getRepositoryWorkspaceName() {
+	if (repositoryWorkspaceName == null) {
+	    log.error(
+		    "Accessing ToolContentHandler bean, but repositoryWorkspaceName has not been defined. Please define this property in ApplicationContext.xml");
+	}
+	return repositoryWorkspaceName;
+    }
+    
+    public void setRepositoryWorkspaceName(String repositoryWorkspaceName) {
+	this.repositoryWorkspaceName = repositoryWorkspaceName;
+    }
 
-    /**
-     * @return Returns the repositoryUser.
-     */
-    @Override
-    public abstract String getRepositoryUser();
+    private String getRepositoryUser() {
+	if (repositoryUser == null) {
+	    log.error(
+		    "Accessing ToolContentHandler bean, but repositoryUser has not been defined. Please define this property in ApplicationContext.xml");
+	}
+	return repositoryUser;	
+    }
+    
+    public void setRepositoryUser(String repositoryUser) {
+	this.repositoryUser = repositoryUser;
+    }
 
-    /**
-     * @return Returns the repository identification string. This is the
-     *         "password" field the credential.
-     */
-    @Override
-    public abstract char[] getRepositoryId();
+    private char[] getRepositoryId() {
+	if (repositoryId == null) {
+	    log.error(
+		    "Accessing ToolContentHandler bean, but repositoryWorkspaceName has not been defined. Please define this property in ApplicationContext.xml");
+	}
+	return repositoryId.toCharArray();	
+    }
+    
+    public void setRepositoryId(String repositoryId) {
+	this.repositoryId = repositoryId;
+    }
 
     @Override
     public ITicket getTicket(boolean forceLogin) throws RepositoryCheckedException {
@@ -142,13 +161,13 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	if (!doLogin) {
 	    // make sure workspace exists - sometimes it does not get created when creating a ticket
 	    cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
-	    doLogin = !getRepositoryService().workspaceExists(cred, getRepositoryWorkspaceName());
+	    doLogin = !repositoryService.workspaceExists(cred, getRepositoryWorkspaceName());
 		}
 	if (doLogin) {
 	    if (cred == null) {
 		cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
 	    }
-	    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
+	    ticket = repositoryService.login(cred, getRepositoryWorkspaceName());
 	}
 	return ticket;
     }
@@ -159,11 +178,11 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
+		nodeKey = repositoryService.addFileItem(getTicket(false), stream, fileName, mimeType, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
+		nodeKey = repositoryService.addFileItem(getTicket(true), stream, fileName, mimeType, null);
 	    }
 
 	} catch (RepositoryCheckedException e2) {
@@ -181,11 +200,11 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = getRepositoryService().updateFileItem(getTicket(false), uuid, fileName, stream, mimeType, null);
+		nodeKey = repositoryService.updateFileItem(getTicket(false), uuid, fileName, stream, mimeType, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = getRepositoryService().updateFileItem(getTicket(true), uuid, fileName, stream, mimeType, null);
+		nodeKey = repositoryService.updateFileItem(getTicket(true), uuid, fileName, stream, mimeType, null);
 	    }
 
 	} catch (RepositoryCheckedException e2) {
@@ -235,11 +254,11 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = getRepositoryService().addPackageItem(getTicket(false), dirPath, startFile, null);
+		nodeKey = repositoryService.addPackageItem(getTicket(false), dirPath, startFile, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add directory of files. AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = getRepositoryService().addPackageItem(getTicket(true), dirPath, startFile, null);
+		nodeKey = repositoryService.addPackageItem(getTicket(true), dirPath, startFile, null);
 	    }
 
 	} catch (RepositoryCheckedException e2) {
@@ -256,11 +275,11 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	    throws ItemNotFoundException, RepositoryCheckedException, IOException {
 	try {
 	    try {
-		getRepositoryService().saveFile(getTicket(false), uuid, null, toFileName);
+		repositoryService.saveFile(getTicket(false), uuid, null, toFileName);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add copy node " + uuid + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		getRepositoryService().saveFile(getTicket(false), uuid, null, toFileName);
+		repositoryService.saveFile(getTicket(false), uuid, null, toFileName);
 	    }
 	} catch (ItemNotFoundException e) {
 	    log.warn("Unable to to save node " + uuid + " as the node cannot be found. Repository Exception: "
@@ -297,11 +316,11 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = getRepositoryService().copyNodeVersion(getTicket(false), uuid, null);
+		nodeKey = repositoryService.copyNodeVersion(getTicket(false), uuid, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add copy node " + uuid + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = getRepositoryService().copyNodeVersion(getTicket(true), uuid, null);
+		nodeKey = repositoryService.copyNodeVersion(getTicket(true), uuid, null);
 	    }
 	} catch (ItemNotFoundException e) {
 	    log.warn("Unable to to copy node " + uuid + " as the node cannot be found. Repository Exception: "
@@ -319,11 +338,11 @@ public abstract class ToolContentHandler implements IToolContentHandler {
     public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException {
 	try {
 	    try {
-		getRepositoryService().deleteNode(getTicket(false), uuid);
+		repositoryService.deleteNode(getTicket(false), uuid);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to delete file id" + uuid + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		getRepositoryService().deleteNode(getTicket(true), uuid);
+		repositoryService.deleteNode(getTicket(true), uuid);
 	    }
 	} catch (ItemNotFoundException e1) {
 	    // didn't exist so don't need to delete. Ignore problem.
@@ -335,34 +354,15 @@ public abstract class ToolContentHandler implements IToolContentHandler {
     }
 
     @Override
-    public IVersionedNode getFileNode(Long uuid)
+    public InputStream getFileInputStream(Long uuid)
 	    throws ItemNotFoundException, FileException, RepositoryCheckedException {
 	try {
 	    try {
-		return getRepositoryService().getFileItem(getTicket(false), uuid, null);
+		return repositoryService.getFileItem(getTicket(false), uuid, null).getFile();
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to get file id" + uuid + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		return getRepositoryService().getFileItem(getTicket(true), uuid, null);
-	    }
-	} catch (RepositoryCheckedException e2) {
-	    log.warn("Unable to to get file id" + uuid + "Repository Exception: " + e2.getMessage()
-		    + " Retry not possible.");
-	    throw e2;
-	}
-    }
-
-    @Override
-    public Set getFileProperties(Long uuid) throws ItemNotFoundException, FileException, RepositoryCheckedException {
-	try {
-	    try {
-		IVersionedNode node = getRepositoryService().getFileItem(getTicket(false), uuid, null);
-		return node != null ? node.getProperties() : null;
-	    } catch (AccessDeniedException e) {
-		log.warn("Unable to access repository to get file id" + uuid + "AccessDeniedException: "
-			+ e.getMessage() + " Retrying login.");
-		IVersionedNode node = getRepositoryService().getFileItem(getTicket(true), uuid, null);
-		return node != null ? node.getProperties() : null;
+		return repositoryService.getFileItem(getTicket(true), uuid, null).getFile();
 	    }
 	} catch (RepositoryCheckedException e2) {
 	    log.warn("Unable to to get file id" + uuid + "Repository Exception: " + e2.getMessage()
@@ -411,7 +411,6 @@ public abstract class ToolContentHandler implements IToolContentHandler {
      * @param repositoryService
      *            The repositoryService to set.
      */
-    @Override
     public void setRepositoryService(IRepositoryService repositoryService) {
 	this.repositoryService = repositoryService;
     }

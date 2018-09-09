@@ -15,7 +15,6 @@
         	<include name="openUrls.js"/>
         	<include name="orgGroup.js"/>
         	<include name="orgGrouping.js"/>
-  	  	<include name="pedagogicalPlanner.js"/>
         	<include name="progressBar.js"/>
  	   	<include name="portrait.js"/>
    	 	<include name="rating.js"/>

@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -156,8 +155,7 @@ public class LearningAction extends LamsDispatchAction {
 	    mindmapService.saveOrUpdateMindmap(mindmap);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet().getServletContext());
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -651,7 +649,7 @@ public class LearningAction extends LamsDispatchAction {
 	    request.setAttribute("reflectEntry", entry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(mindmapSession.getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(mindmapSession.getSessionId(), request,
 		getServlet().getServletContext());
 
 	return mapping.findForward("reflect");

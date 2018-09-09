@@ -148,28 +148,6 @@ public class CentralConstants {
     public static final String ATTR_RESULT_CODE = "resultCode";
 
     public static final String ATTR_RESULT_TEXT = "resultText";
-    // Pedagogical Planner constants
-    public static final String ATTR_PLANNER = "planner";
-
-    public static final String PARAM_CALL_ATTEMPTED_ID = "callAttemptedID";
-
-    public static final String PARAM_SEQUENCE_TITLE = "sequenceTitle";
-
-    public static final String PARAM_ACTIVITY_METADATA = "activityMetadataField";
-
-    public static final String PARAM_FORM_MESSAGE = "formMessage";
-
-    public static final String ERROR_PLANNER_TITLE_BLANK = "error.planner.title.blank";
-
-    public static final String RESOURCE_KEY_BRANCH_EMPTY = "label.planner.branch.empty";
-
-    public static final int PLANNER_MAX_BRANCHES = 4;
-
-    public static final int PLANNER_MAX_OPTIONS = 4;
-
-    public static final int PLANNER_MAX_PARALLEL_ACTIVITIES = 4;
-
-    public static final int PLANNER_RECENT_LD_MAX_COUNT = 10;
 
     public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
 
@@ -193,22 +171,11 @@ public class CentralConstants {
 
     public static final String PARAM_FILTER_TEXT = "filterText";
 
-    public static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
-
-    public static final String RESPONSE_CONTENT_TYPE_DOWNLOAD = "application/x-download";
-
-    public static final String HEADER_CONTENT_ATTACHMENT = "attachment;filename=";
-
     public static final String PARAM_LEARNER_PRESENCE_ENABLE = "learnerSeeOnline";
 
     public static final String PARAM_LEARNER_IM_ENABLE = "learnerInstantMessaging";
     
     public static final String PARAM_ENABLE_NOTIFICATIONS = "enableNotifications";
     
-    public static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
-    public static final String TOOL_SIGNATURE_FORUM = "lafrum11";
-    public static final String TOOL_SIGNATURE_LEADERSELECTION = "lalead11";
-    public static final String TOOL_SIGNATURE_MCQ = "lamc11";
-    public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
-    public static final String TOOL_SIGNATURE_PEER_REVIEW = "laprev11";
+    public static final String PARAM_ALLOW_LEARNER_RESTART = "allowLearnerRestart";
 }

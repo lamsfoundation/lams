@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
@@ -85,7 +85,7 @@ public class RegisterAction extends HttpServlet {
 
     private static ILessonService lessonService = null;
 
-    private static ICoreLearnerService learnerService = null;
+    private static ILearnerService learnerService = null;
 
     private static IGroupUserDAO groupUserDAO = null;
 
@@ -128,7 +128,7 @@ public class RegisterAction extends HttpServlet {
 	lessonService = (ILessonService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
 
-	learnerService = (ICoreLearnerService) WebApplicationContextUtils
+	learnerService = (ILearnerService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerService");
 
 	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext())

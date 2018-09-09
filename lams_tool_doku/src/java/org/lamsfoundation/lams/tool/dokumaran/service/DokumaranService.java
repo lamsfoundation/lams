@@ -41,7 +41,7 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -69,7 +69,6 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
-import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -99,15 +98,13 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private DokumaranConfigItemDAO dokumaranConfigItemDAO;
 
     // tool service
-    private DokumaranToolContentHandler dokumaranToolContentHandler;
+    private IToolContentHandler dokumaranToolContentHandler;
 
     private MessageService messageService;
 
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private ILogEventService logEventService;
 
@@ -1001,7 +998,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared dokumaran session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1058,10 +1055,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	this.logEventService = logEventService;
     }
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -1078,7 +1071,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	this.dokumaranConfigItemDAO = dokumaranConfigItemDAO;
     }
 
-    public void setDokumaranToolContentHandler(DokumaranToolContentHandler dokumaranToolContentHandler) {
+    public void setDokumaranToolContentHandler(IToolContentHandler dokumaranToolContentHandler) {
 	this.dokumaranToolContentHandler = dokumaranToolContentHandler;
     }
 

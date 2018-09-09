@@ -3,13 +3,7 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_admin"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_build"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_monitoring"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.0.10.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
 		<attributes>
 			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/" />

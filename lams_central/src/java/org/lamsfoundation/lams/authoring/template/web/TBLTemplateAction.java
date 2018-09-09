@@ -44,7 +44,9 @@ import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
 import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -118,9 +120,11 @@ public class TBLTemplateAction extends LdTemplateAction {
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	activityTitle = data.getText("boilerplate.ira.title");
 	Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
-		data.getText("boilerplate.ira.instructions"), false, JsonUtil.readArray(data.testQuestions.values()));
-	activities.add(createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
-		data.contentFolderID, groupingUIID, null, null, activityTitle));
+		data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable,
+		JsonUtil.readArray(data.testQuestions.values()));
+	ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
+		data.contentFolderID, groupingUIID, null, null, activityTitle);
+	activities.add(iraActivityJSON);
 
 	// Stop!
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
@@ -137,8 +141,12 @@ public class TBLTemplateAction extends LdTemplateAction {
 	// tRA Test
 	currentActivityPosition = calcPositionNextRight(firstActivityInRowPosition);
 	activityTitle = data.getText("boilerplate.tra.title");
+	Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable
+		? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
+		: null;
 	Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
-		data.getText("boilerplate.tra.instructions"), false, JsonUtil.readArray(data.testQuestions.values()));
+		data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
+		JsonUtil.readArray(data.testQuestions.values()));
 	activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		data.contentFolderID, groupingUIID, null, null, activityTitle));
 
@@ -222,6 +230,7 @@ public class TBLTemplateAction extends LdTemplateAction {
 	Integer numLearners;
 	Integer numGroups;
 	SortedMap<Integer, ObjectNode> testQuestions;
+	boolean confidenceLevelEnable;
 	SortedMap<Integer, Assessment> applicationExercises;
 	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
 
@@ -270,6 +279,7 @@ public class TBLTemplateAction extends LdTemplateAction {
 		    processInputPeerReviewRequestField(name, request);
 		}
 	    }
+	    confidenceLevelEnable = WebUtil.readBooleanParam(request, "confidenceLevelEnable", false);
 	    updateCorrectAnswers(correctAnswers);
 
 	    processAssessments(request);
@@ -410,8 +420,8 @@ public class TBLTemplateAction extends LdTemplateAction {
 	    if (contentFolderID == null) {
 		addValidationErrorMessage("authoring.error.content.id", null);
 	    }
-	    if (sequenceTitle == null) {
-		addValidationErrorMessage("authoring.error.sequence.title", null);
+	    if (sequenceTitle == null || !ValidationUtil.isOrgNameValid(sequenceTitle)) {
+		addValidationErrorMessage("authoring.fla.title.validation.error", null);
 	    }
 	    if (applicationExercises.size() == 0) {
 		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });

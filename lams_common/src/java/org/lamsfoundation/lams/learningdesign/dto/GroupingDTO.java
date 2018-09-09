@@ -52,6 +52,10 @@ public class GroupingDTO extends BaseDTO {
     // list of GroupDTO
     private List groups;
 
+    public GroupingDTO() {
+
+    }
+
     public GroupingDTO(Long groupingID, Integer groupingUIID, Integer groupingType, Integer numberOfGroups,
 	    Integer learnersPerGroup, Long staffGroupID, Integer maxNumberOfGroups,
 	    Boolean equalNumberOfLearnersPerGroup, Boolean viewStudentsBeforeSelection, List groupDTOs) {

@@ -34,7 +34,6 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -87,6 +86,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
  */
 public class MindmapService implements ToolSessionManager, ToolContentManager, IMindmapService, ToolRestManager {
 
+    private static final int NODE_TEXT_LENGTH = 100; // node_text column in the database is varchar(100)
     private static Logger logger = Logger.getLogger(MindmapService.class.getName());
 
     private final XStream xstream = new XStream(new StaxDriver());
@@ -96,7 +96,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     private IMindmapUserDAO mindmapUserDAO = null;
     private IMindmapNodeDAO mindmapNodeDAO = null;
     private IMindmapRequestDAO mindmapRequestDAO = null;
-    private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mindmapToolContentHandler = null;
     private ILogEventService logEventService = null;
@@ -136,7 +135,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -801,14 +800,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	mindmapUserDAO = userDAO;
     }
 
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public IExportToolContentService getExportContentService() {
 	return exportContentService;
     }
@@ -853,6 +844,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     public void saveOrUpdateMindmapNode(MindmapNode mindmapNode) {
+	if (mindmapNode.getText() != null && mindmapNode.getText().length() > NODE_TEXT_LENGTH) {
+	    mindmapNode.setText(mindmapNode.getText().substring(0, NODE_TEXT_LENGTH));
+	}
 	mindmapNodeDAO.saveOrUpdate(mindmapNode);
     }
 

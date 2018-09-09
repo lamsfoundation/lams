@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.monitoring.dto.BranchDTO;
 import org.lamsfoundation.lams.monitoring.dto.BranchingDTO;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -88,7 +89,7 @@ public class BranchingAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityId,
 		BranchingActivity.class);
@@ -165,7 +166,7 @@ public class BranchingAction extends LamsDispatchAction {
      * @return String of xml with all needed language elements
      */
     protected String getLanguageXML() {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	MessageService messageService = monitoringService.getMessageService();
 	ArrayList<String> languageCollection = new ArrayList<String>();

@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -98,8 +97,7 @@ public class LearningAction extends LamsDispatchAction {
 	    service.saveOrUpdateLeaderselection(content);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet().getServletContext());
 
 	LeaderselectionUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {

@@ -46,8 +46,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -213,7 +212,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    return (mapping.findForward(DEFINE_LATER));
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(
 		new Long(toolSessionID), request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 

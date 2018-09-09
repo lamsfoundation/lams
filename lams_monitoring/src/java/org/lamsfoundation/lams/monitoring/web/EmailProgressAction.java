@@ -40,7 +40,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailProgressMessageJob;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -77,7 +77,7 @@ public class EmailProgressAction extends LamsDispatchAction {
     private static final String JOB_PREFIX_NAME = "emailProgressMessageJob:";
 
     private static IEventNotificationService eventNotificationService;
-    private static IMonitoringService monitoringService;
+    private static IMonitoringFullService monitoringService;
     private static ISecurityService securityService;
 
     // ---------------------------------------------------------------------
@@ -293,11 +293,11 @@ public class EmailProgressAction extends LamsDispatchAction {
 	return eventNotificationService;
     }
 
-    private IMonitoringService getMonitoringService() {
+    private IMonitoringFullService getMonitoringService() {
 	if (EmailProgressAction.monitoringService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailProgressAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	    EmailProgressAction.monitoringService = (IMonitoringFullService) ctx.getBean("monitoringService");
 	}
 	return EmailProgressAction.monitoringService;
     }

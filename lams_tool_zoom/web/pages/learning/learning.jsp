@@ -1,14 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${empty meetingURL}">
-	<script type="text/javascript">
-		// refresh in 20 seconds
-		window.setTimeout(function() {
-			window.location.reload();
-		}, 20*1000);
-	</script>
-</c:if>
-
 <lams:Page type="learner" title="${contentDTO.title}">
 	<div class="panel">
 		<c:out value="${contentDTO.instructions}" escapeXml="false" />
@@ -26,6 +17,13 @@
 	<c:if test="${not skipContent}">
 		<c:choose>
 			<c:when test="${empty meetingURL}">
+				<script type="text/javascript">
+					// refresh in 20 seconds
+					window.setTimeout(function() {
+						window.location.reload();
+					}, 20*1000);
+				</script>
+				
 				<p>
 					<fmt:message key="label.learning.conferenceNotAvailable" />
 				</p>
@@ -34,7 +32,19 @@
 				</html:link>
 			</c:when>
 			<c:otherwise>
-				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none;" src="${meetingURL}"></iframe>
+				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none; display: none" src="${meetingURL}"></iframe>
+				<a id="zoomJoinButton" href="${meetingURL}" target="_blank" style="display: none" class="btn btn-default">
+					<fmt:message key="button.enter" />
+				</a>
+				
+				<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+				<script type="text/javascript">
+					if (isMac) {
+						$('#zoomJoinButton').show();
+					} else {
+						$('#zoomJoinFrame').show();
+					}
+				</script>
 			</c:otherwise>
 		</c:choose>
 	</c:if>

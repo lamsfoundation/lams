@@ -32,7 +32,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.RedirectingActionForward;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -52,8 +52,8 @@ public class LearningAction extends LamsDispatchAction {
 
 	WebApplicationContext wac = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
-	String finishURL = learnerService.completeToolSession(toolSessionId, user.getUserID().longValue());
+	ILamsToolService toolService = (ILamsToolService) wac.getBean("toolService");
+	String finishURL = toolService.completeToolSession(toolSessionId, user.getUserID().longValue());
 	return new RedirectingActionForward(finishURL);
     }
 }

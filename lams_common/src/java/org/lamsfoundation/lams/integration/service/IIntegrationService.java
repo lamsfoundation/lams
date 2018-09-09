@@ -47,16 +47,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 public interface IIntegrationService {
 
     ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix)
-	    throws UserInfoValidationException;
+	    String prettyCourseName, String method, Boolean prefix) throws UserInfoValidationException;
 
     ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
-	    throws UserInfoValidationException;
+	    String prettyCourseName, String method) throws UserInfoValidationException;
 
     ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
-	    Boolean prefix) throws UserInfoValidationException;
+	    String extCourseName, String parentOrgId, Boolean isTeacher, Boolean prefix)
+	    throws UserInfoValidationException;
 
     ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException;
@@ -137,8 +135,8 @@ public interface IIntegrationService {
      * @param extUsername
      * @param firstName
      * @param lastName
-     * @param langIsoCode
-     * @param countryIsoCode
+     * @param locale
+     * @param country
      * @param email
      * @param prefix
      * @param isUpdateUserDetails
@@ -147,9 +145,9 @@ public interface IIntegrationService {
      * @throws UserInfoValidationException
      */
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
-	    String lastName, String langIsoCode, String countryIsoCode, String country, String email, boolean prefix, boolean isUpdateUserDetails)
+	    String lastName, String locale, String country, String email, boolean prefix, boolean isUpdateUserDetails)
 	    throws UserInfoValidationException;
-    
+
     /**
      * Checks whether user was created via integrations.
      * 
@@ -230,6 +228,5 @@ public interface IIntegrationService {
      * Creates an external org and normal org. It does not set roles for the creator.
      */
     ExtCourseClassMap createExtCourseClassMap(ExtServer extServer, Integer userId, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
-	    throws UserInfoValidationException;
+	    String extCourseName, String parentOrgId, Boolean prefix) throws UserInfoValidationException;
 }

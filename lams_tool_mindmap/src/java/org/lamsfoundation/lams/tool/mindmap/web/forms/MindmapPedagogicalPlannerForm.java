@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.mindmap.web.forms;
 
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *

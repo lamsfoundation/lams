@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.gradebook.dto.comparators.GBMedianTimeTakenCompar
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBStartDateComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.w3c.dom.Document;
@@ -118,25 +119,25 @@ public class GradebookUtil {
 	    Document document = GradebookUtil.getDocument();
 
 	    // root element
-	    Element rootElement = document.createElement(GradebookConstants.ELEMENT_ROWS);
+	    Element rootElement = document.createElement(CommonConstants.ELEMENT_ROWS);
 
-	    Element pageElement = document.createElement(GradebookConstants.ELEMENT_PAGE);
+	    Element pageElement = document.createElement(CommonConstants.ELEMENT_PAGE);
 	    pageElement.appendChild(document.createTextNode("" + page));
 	    rootElement.appendChild(pageElement);
 
-	    Element totalPageElement = document.createElement(GradebookConstants.ELEMENT_TOTAL);
+	    Element totalPageElement = document.createElement(CommonConstants.ELEMENT_TOTAL);
 	    totalPageElement.appendChild(document.createTextNode("" + totalPages));
 	    rootElement.appendChild(totalPageElement);
 
-	    Element recordsElement = document.createElement(GradebookConstants.ELEMENT_RECORDS);
+	    Element recordsElement = document.createElement(CommonConstants.ELEMENT_RECORDS);
 	    recordsElement.appendChild(document.createTextNode("" + gridRows.size()));
 	    rootElement.appendChild(recordsElement);
 
 	    Iterator iter = gridRows.iterator();
 	    while (iter.hasNext()) {
 		GradebookGridRowDTO gridRow = (GradebookGridRowDTO) iter.next();
-		Element rowElement = document.createElement(GradebookConstants.ELEMENT_ROW);
-		rowElement.setAttribute(GradebookConstants.ELEMENT_ID, gridRow.getId().toString());
+		Element rowElement = document.createElement(CommonConstants.ELEMENT_ROW);
+		rowElement.setAttribute(CommonConstants.ELEMENT_ID, gridRow.getId().toString());
 
 		// Work out which grid we want to put the data into
 		ArrayList<String> gridRowStringArray = new ArrayList<String>();
@@ -144,7 +145,7 @@ public class GradebookUtil {
 		gridRowStringArray = gridRow.toStringArray(view);
 
 		for (String gradebookItem : gridRowStringArray) {
-		    Element cellElement = document.createElement(GradebookConstants.ELEMENT_CELL);
+		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
 		    gradebookItem = (gradebookItem != null) ? gradebookItem : "";
 		    cellElement.appendChild(document.createTextNode(gradebookItem));
 		    rowElement.appendChild(cellElement);

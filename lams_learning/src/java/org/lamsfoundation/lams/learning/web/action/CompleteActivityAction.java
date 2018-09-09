@@ -33,7 +33,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -70,7 +70,7 @@ public class CompleteActivityAction extends ActivityAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-	ICoreLearnerService learnerService = getLearnerService();
+	ILearnerFullService learnerService = getLearnerService();
 
 	Integer learnerId = LearningWebUtil.getUserId();
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);

@@ -409,19 +409,25 @@ public class LamsSecurityUtil {
      * @param ctx
      *            the blackboard contect, contains session data
      * @param usernameFromParam
-     * 		  current user's username 
+     *            current user's username
      * @param courseIdStr
-     * 		  courseId 
+     *            courseId
      * @param ldId
      *            the learning design id for which you wish to start a lesson
      * @param title
      *            the title of the lesson
      * @param desc
-     *            the description of the lesson 
-     *            
+     *            the description of the lesson
+     * @param enforceAllowLearnerRestart
+     *            whether learners are allowed to restart the lesson. It has a higher priority than LAMS ExtServer's
+     *            according default setting
+     * @param isPreview
+     *            whether LAMS should start it as a preview or not
+     * 
      * @return the learning session id
      */
-    public static Long startLesson(User user, String courseId, long ldId, String title, String desc, boolean isPreview) {
+    public static Long startLesson(User user, String courseId, long ldId, String title, String desc,
+	    boolean enforceAllowLearnerRestart, boolean isPreview) {
 
 	String serverId = LamsPluginUtil.getServerId();
 	String serverAddr = LamsPluginUtil.getServerUrl();
@@ -447,7 +453,8 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + course + "&ldId="
 		    + new Long(ldId).toString() + "&country=" + country + "&lang=" + locale + "&method=" + method
 		    + "&title=" + URLEncoder.encode(title, "utf8").trim() + "&desc="
-		    + URLEncoder.encode(desc, "utf8").trim() + "&enableNotifications=true";
+		    + URLEncoder.encode(desc, "utf8").trim() + "&enableNotifications=true"
+		    + "&allowLearnerRestart=" + enforceAllowLearnerRestart;
 
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
 

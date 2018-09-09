@@ -35,8 +35,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -67,7 +66,6 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.util.ReflectDTOComparator;
-import org.lamsfoundation.lams.tool.spreadsheet.util.SpreadsheetToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -86,15 +84,13 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao;
     private SpreadsheetMarkDAO spreadsheetMarkDao;
     // tool service
-    private SpreadsheetToolContentHandler spreadsheetToolContentHandler;
+    private IToolContentHandler spreadsheetToolContentHandler;
     private MessageService messageService;
     // system services
     private ILamsToolService toolService;
-    private ILearnerService learnerService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
-    private IGradebookService gradebookService;
 
     // *******************************************************************************
     // Service method
@@ -323,7 +319,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		// send marks to gradebook where applicable
 		if (mark.getMarks() != null) {
 		    Double doubleMark = new Double(mark.getMarks());
-		    gradebookService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId,
+		    toolService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId,
 			    false);
 		}
 	    }
@@ -370,10 +366,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -391,7 +383,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	this.spreadsheetSessionDao = spreadsheetSessionDao;
     }
 
-    public void setSpreadsheetToolContentHandler(SpreadsheetToolContentHandler spreadsheetToolContentHandler) {
+    public void setSpreadsheetToolContentHandler(IToolContentHandler spreadsheetToolContentHandler) {
 	this.spreadsheetToolContentHandler = spreadsheetToolContentHandler;
     }
 
@@ -624,7 +616,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared spreadsheet session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -693,14 +685,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public IGradebookService getGradebookService() {
-	return gradebookService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     @Override

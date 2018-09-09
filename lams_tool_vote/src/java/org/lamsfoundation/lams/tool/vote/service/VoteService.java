@@ -45,7 +45,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -120,18 +119,14 @@ public class VoteService
     private IVoteSessionDAO voteSessionDAO;
     private IVoteUserDAO voteUserDAO;
     private IVoteUsrAttemptDAO voteUsrAttemptDAO;
-
     private IUserManagementService userManagementService;
-    private ILearnerService learnerService;
     private ILogEventService logEventService;
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
-
     private ICoreNotebookService coreNotebookService;
     private IToolContentHandler voteToolContentHandler = null;
     private VoteOutputFactory voteOutputFactory;
     private IDataFlowDAO dataFlowDAO;
-
     private MessageService messageService;
 
     public VoteService() {
@@ -1500,10 +1495,6 @@ public class VoteService
     @Override
     public String leaveToolSession(Long toolSessionID, Long learnerId) throws DataMissingException, ToolException {
 
-	if (learnerService == null) {
-	    return "dummyNextUrl";
-	}
-
 	if (learnerId == null) {
 	    logger.error("learnerId is null");
 	    throw new DataMissingException("learnerId is missing");
@@ -1526,7 +1517,7 @@ public class VoteService
 	voteSession.setSessionStatus(VoteAppConstants.COMPLETED);
 	voteSessionDAO.updateVoteSession(voteSession);
 
-	String nextUrl = learnerService.completeToolSession(toolSessionID, learnerId);
+	String nextUrl = toolService.completeToolSession(toolSessionID, learnerId);
 	if (nextUrl == null) {
 	    logger.error("nextUrl is null");
 	    throw new ToolException("nextUrl is null");
@@ -1782,21 +1773,6 @@ public class VoteService
     }
 
     /**
-     * @return Returns the learnerService.
-     */
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    /**
-     * @param learnerService
-     *            The learnerService to set.
-     */
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
-    /**
      * @return Returns the voteContentDAO.
      */
     public IVoteContentDAO getVoteContentDAO() {
@@ -1950,7 +1926,7 @@ public class VoteService
     @Override
     public ToolOutput getToolInput(Long requestingToolContentId, Integer learnerId) {
 	// just forwarding to learner service
-	return learnerService.getToolInput(requestingToolContentId, VoteAppConstants.DATA_FLOW_OBJECT_ASSIGMENT_ID,
+	return toolService.getToolInput(requestingToolContentId, VoteAppConstants.DATA_FLOW_OBJECT_ASSIGMENT_ID,
 		learnerId);
     }
 

@@ -50,7 +50,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
@@ -66,6 +65,7 @@ import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -373,7 +373,7 @@ public class AuthoringAction extends Action {
 	}
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }

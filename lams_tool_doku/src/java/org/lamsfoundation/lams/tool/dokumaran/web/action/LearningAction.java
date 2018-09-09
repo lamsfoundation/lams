@@ -40,8 +40,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -217,8 +216,8 @@ public class LearningAction extends Action {
 	dokumaran.setDefineLater(false);
 	service.saveOrUpdateDokumaran(dokumaran);
 
-	ActivityPositionDTO activityPosition = LearningWebUtil
-		.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet().getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId,
+		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);

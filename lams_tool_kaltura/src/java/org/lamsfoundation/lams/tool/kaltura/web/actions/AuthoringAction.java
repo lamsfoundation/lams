@@ -45,7 +45,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
@@ -57,6 +56,7 @@ import org.lamsfoundation.lams.tool.kaltura.util.KalturaException;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaItemComparator;
 import org.lamsfoundation.lams.tool.kaltura.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -211,7 +211,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	kalturaService.saveOrUpdateKaltura(kaltura);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authForm.setSessionMapID(sessionMap.getSessionID());

@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *

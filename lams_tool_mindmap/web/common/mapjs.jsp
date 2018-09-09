@@ -111,9 +111,11 @@
 			if ( idea.creator ) {
 				labelMap[idea.id] = idea.creator;
 			}
-			if ( idea.ideas ) {
-				Object.values(idea.ideas).forEach(addLabel);
-	    		}
+			if ( idea.ideas ) { 
+				Object.keys(idea.ideas).forEach(function(key) {
+				    addLabel(idea.ideas[key]);
+				});
+ 	    		}
 		};
 		addLabel(idea);
 	    	return labelMap;
@@ -225,7 +227,7 @@
 		// Cannot use the standard function as that would be picked up by the onIdeaChangedLAMS listener
 		// Return all the elements for which a truth test fails.
 		function customRemoveSubIdea(subIdeaId) {
-			parent = contentAggregate.findParent(subIdeaId) || contentAggregate,
+			const parent = contentAggregate.findParent(subIdeaId) || contentAggregate,
 				oldRank = parent && parent.findChildRankById(subIdeaId),
 				oldIdea = parent && parent.ideas[oldRank],
 				oldLinks = contentAggregate.links,
@@ -234,7 +236,8 @@
 			if (!oldRank) {
 				return false;
 			}
-			oldIdea.traverse((traversed)=> removedNodeIds[traversed.id] = true);
+			// LAMS Modification comment out => entries so that it will work on IE11. These features are not being used.
+			// oldIdea.traverse((traversed)=> removedNodeIds[traversed.id] = true);
 			delete parent.ideas[oldRank];
 	
 			contentAggregate.links = _.reject(contentAggregate.links, function (link) {

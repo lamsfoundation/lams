@@ -98,14 +98,9 @@
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 
 		$(document).ready(function(){
-			<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
+			<%-- If it's the user's first login, show tour --%>
 			<c:if test="${firstLogin}">
-				<c:url var="disableAllTutorialVideosUrl" value="tutorial.do">
-					<c:param name="method" value="disableAllTutorialVideos" />
-				</c:url>
-				if (!confirm("<fmt:message key='label.tutorial.disable.all' />")){
-			 		$.get("${disableAllTutorialVideosUrl}");
-				}
+				startTour();
 			</c:if>
 
 			<c:if test="${showTimezoneWarning}"> 
@@ -189,7 +184,7 @@
 
 		<ul class="nav navbar-nav navbar-right">
 			<li>
-				<a href="javascript:;" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
+				<a href="javascript:;" id="index-profile" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
 	           		<c:choose>
 	           			<c:when test="${not empty portraitUuid}">
 	           				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false&version=4</c:set>
@@ -231,14 +226,14 @@
 		               	</c:choose>
 									
 						<li>
-							<a href="javascript:;" onclick="<c:out value="${adminlink.url}"/>">
+							<a href="javascript:;" id="<c:out value="${adminlink.id}"/>" onclick="<c:out value="${adminlink.url}"/>">
 								<span><i class="fa ${iconClass}"></i> <fmt:message key="${adminlink.name}"/></span>
 							</a>
 						</li>
 					</c:forEach>
 							                  
 					<li>
-						<a href="#nogo" onclick="javascript:closeAllChildren(); document.location.href='home.do?method=logout'">
+						<a href="#nogo" id="logoutButton" onclick="javascript:closeAllChildren(); document.location.href='home.do?method=logout'">
 							<i class="fa fa-sign-out"></i> <fmt:message key="index.logout" />
 						</a>
 					</li>
@@ -269,7 +264,7 @@
 				</c:choose>
 						
 				<li role="presentation">
-					<a href="<c:out value='${headerlink.url}' />"  class="tour-${headerlink.id}" title="${headerLinkTitle}">
+					<a href="<c:out value='${headerlink.url}' />"  id="${headerlink.id}" class="tour-${headerlink.id}" title="${headerLinkTitle}">
 						<i class="fa ${headerLinkIcon}"></i> 
 						<span class="xs-hidden"><c:out value='${headerLinkName}'/></span>
 					</a>
@@ -284,7 +279,7 @@
 			</li>
 					
 			<li role="presentation" class="dropdown">
-				<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+				<a href="javascript:;" id="index-tour" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
 					<i class="fa fa-question-circle"></i>
 					<span class="xs-hidden"><fmt:message key="label.tour"/></span>
 				</a>

@@ -32,15 +32,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -65,7 +57,6 @@ import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
-import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -90,13 +81,9 @@ public class LeaderselectionService
 
     private ILeaderselectionUserDAO leaderselectionUserDAO = null;
 
-    private ILearnerService learnerService;
-
     private ILamsToolService toolService;
 
     private IToolContentHandler leaderselectionToolContentHandler = null;
-
-    private IRepositoryService repositoryService = null;
 
     private IExportToolContentService exportContentService;
 
@@ -128,7 +115,7 @@ public class LeaderselectionService
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -195,8 +182,7 @@ public class LeaderselectionService
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Leaderselection toContent = Leaderselection.newInstance(fromContent, toContentId,
-		leaderselectionToolContentHandler);
+	Leaderselection toContent = Leaderselection.newInstance(fromContent, toContentId);
 	leaderselectionDAO.saveOrUpdate(toContent);
     }
 
@@ -268,9 +254,7 @@ public class LeaderselectionService
 	    throw new DataMissingException("Unable to find default content for the leaderselection tool");
 	}
 
-	// set ResourceToolContentHandler as null to avoid copy file node in
-	// repository again.
-	content = Leaderselection.newInstance(content, toolContentId, null);
+	content = Leaderselection.newInstance(content, toolContentId);
 	content.setLeaderselectionSessions(null);
 	try {
 	    exportContentService.exportToolContent(toolContentId, content, leaderselectionToolContentHandler, rootPath);
@@ -426,7 +410,7 @@ public class LeaderselectionService
 	Leaderselection defaultContent = getDefaultContent();
 	// create new leaderselection using the newContentID
 	Leaderselection newContent = new Leaderselection();
-	newContent = Leaderselection.newInstance(defaultContent, newContentID, leaderselectionToolContentHandler);
+	newContent = Leaderselection.newInstance(defaultContent, newContentID);
 	leaderselectionDAO.saveOrUpdate(newContent);
 	return newContent;
     }
@@ -487,32 +471,6 @@ public class LeaderselectionService
 	return leaderselectionUser;
     }
 
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws LeaderselectionException {
-	ICredentials credentials = new SimpleCredentials(LeaderselectionToolContentHandler.repositoryUser,
-		LeaderselectionToolContentHandler.repositoryId);
-	try {
-	    ITicket ticket = repositoryService.login(credentials,
-		    LeaderselectionToolContentHandler.repositoryWorkspaceName);
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new LeaderselectionException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new LeaderselectionException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new LeaderselectionException("Login failed." + e.getMessage());
-	}
-    }
-
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */
 
@@ -556,14 +514,6 @@ public class LeaderselectionService
 	leaderselectionUserDAO = userDAO;
     }
 
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public IExportToolContentService getExportContentService() {
 	return exportContentService;
     }
@@ -578,14 +528,6 @@ public class LeaderselectionService
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
-    }
-
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public LeaderselectionOutputFactory getLeaderselectionOutputFactory() {

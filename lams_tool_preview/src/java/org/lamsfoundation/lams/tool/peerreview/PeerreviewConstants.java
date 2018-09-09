@@ -28,8 +28,6 @@ public class PeerreviewConstants {
 
     public static final String PEERREVIEW_SERVICE = "peerreviewService";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "peerreviewToolContentHandler";
-
     public static final int COMPLETED = 1;
 
     public static final int SORT_BY_NO = 0;

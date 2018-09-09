@@ -70,7 +70,7 @@ public class ServerSaveAction extends Action {
 
 	DynaActionForm extServerForm = (DynaActionForm) form;
 	ActionMessages errors = new ActionMessages();
-	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl" };
+	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
 	for (String requiredField : requiredFields) {
 	    if (StringUtils.trimToNull(extServerForm.getString(requiredField)) == null) {
 		errors.add(requiredField,

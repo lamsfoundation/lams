@@ -79,7 +79,6 @@
 	<form-property name="fax" type="java.lang.String" />
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
-	<form-property name="tutorialsDisabled" type="java.lang.Boolean" initial="false" />
 	<form-property name="firstLogin" type="java.lang.Boolean" initial="true" />
 	<form-property name="timeZone" type="java.lang.String" />
 	<form-property name="userTheme" type="java.lang.Long" />
@@ -110,6 +109,13 @@
 	<form-property name="disabled" type="java.lang.Boolean" initial="false"/>
 	<form-property name="timeToLiveLoginRequestEnabled" type="java.lang.Boolean" initial="true"/>
 	<form-property name="timeToLiveLoginRequest" type="java.lang.Integer" initial="80"/>
+	<form-property name="learnerPresenceAvailable" type="java.lang.Boolean" initial="false"/>
+	<form-property name="learnerImAvailable" type="java.lang.Boolean" initial="false"/>
+	<form-property name="liveEditEnabled" type="java.lang.Boolean" initial="true"/>
+	<form-property name="enableLessonNotifications" type="java.lang.Boolean" initial="true"/>
+	<form-property name="forceLearnerRestart" type="java.lang.Boolean" initial="false"/>
+	<form-property name="allowLearnerRestart" type="java.lang.Boolean" initial="false"/>
+	<form-property name="gradebookOnComplete" type="java.lang.Boolean" initial="true"/>
 </form-bean>
 
 <form-bean name="LtiConsumerForm" type="org.apache.struts.action.DynaActionForm">

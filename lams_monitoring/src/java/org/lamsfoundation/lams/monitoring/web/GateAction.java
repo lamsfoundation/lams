@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -46,13 +47,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -80,15 +81,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  * @author Jacky Fang
  * @since 2005-4-15
- * @version 1.1
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
@@ -96,8 +88,8 @@ public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     // private static Logger log = Logger.getLogger(GateAction.class);
 
-    private IMonitoringService monitoringService;
-    private ICoreLearnerService learnerService;
+    private IMonitoringFullService monitoringService;
+    private ILearnerService learnerService;
     private ILessonService lessonService;
     // ---------------------------------------------------------------------
     // Class level constants - Struts forward
@@ -354,9 +346,22 @@ public class GateAction extends LamsDispatchAction {
 	    learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	    Lesson lesson = learnerService.getLessonByActivity(scheduleGate);
 	    Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
-	    startingTime.setTime(lesson.getStartDateTime());
-	    startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
-	    gateForm.set("startingTime", startingTime.getTime());
+	    Date lessonStartTime = lesson.getStartDateTime();
+	    if (lessonStartTime == null && Lesson.NOT_STARTED_STATE.equals(lesson.getLessonStateId())) {
+		// Assume the lesson will start at the scheduled time
+		lessonStartTime = lesson.getScheduleStartDate();
+	    }
+	    if (lessonStartTime != null) {
+		startingTime.setTime(lessonStartTime);
+		startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		gateForm.set("startingTime", startingTime.getTime());
+	    } else {
+		log.error(new StringBuilder(
+			"Unable to calculate schedule gate opening time as we are missing the lesson starting time. Schedule gate ")
+				.append(scheduleGate).append(" lesson ").append(lesson.getLessonId()).append(" status ")
+				.append(lesson.getLessonStateId()).toString());
+		gateForm.set("startingTime", null);
+	    }
 	}
 
 	return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);

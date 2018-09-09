@@ -34,7 +34,6 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -86,8 +85,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     private IPixlrUserDAO pixlrUserDAO = null;
 
-    private ILearnerService learnerService;
-
     private ILamsToolService toolService;
 
     private IToolContentHandler pixlrToolContentHandler = null;
@@ -127,7 +124,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -646,14 +643,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     public void setPixlrUserDAO(IPixlrUserDAO userDAO) {
 	pixlrUserDAO = userDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

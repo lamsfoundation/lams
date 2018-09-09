@@ -43,8 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
-import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
@@ -71,7 +70,7 @@ public class DisplayGroupAction extends Action {
     private static LessonService lessonService;
     private static ILearningDesignService learningDesignService;
     private static ISecurityService securityService;
-    private static IKumaliveService kumaliveService;
+    private static ILearnerService learnerService;
 
     @Override
     @SuppressWarnings({ "unchecked" })
@@ -218,9 +217,9 @@ public class DisplayGroupAction extends Action {
 	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()
 		&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
 			|| roles.contains(Role.ROLE_LEARNER))) {
-	    Kumalive kumalive = getKumaliveService().getKumaliveByOrganisation(organisationId);
+	    boolean isKumaliveDisabledForOrganisation = getLearnerService().isKumaliveDisabledForOrganisation(organisationId);
 	    boolean isMonitor = roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR);
-	    boolean disabled = !isMonitor && (kumalive == null || kumalive.getFinished());
+	    boolean disabled = !isMonitor && isKumaliveDisabledForOrganisation;
 	    links.add(new IndexLinkBean(isMonitor ? "index.kumalive.teacher" : "index.kumalive",
 		    "javascript:openKumalive(" + organisationId + ")",
 		    "fa fa-fw fa-bolt" + (disabled ? " disabled" : ""), "index.kumalive.tooltip"));
@@ -285,7 +284,7 @@ public class DisplayGroupAction extends Action {
 	while (lessonIter.hasNext()) {
 	    Entry<Long, IndexLessonBean> entry = lessonIter.next();
 	    if (entry.getValue().isDependent()
-		    && !DisplayGroupAction.lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
+		    && !lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
 		lessonIter.remove();
 	    }
 	}
@@ -360,47 +359,47 @@ public class DisplayGroupAction extends Action {
     }
 
     private IUserManagementService getUserManagementService() {
-	if (DisplayGroupAction.service == null) {
+	if (service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.service = (IUserManagementService) ctx.getBean("userManagementService");
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return DisplayGroupAction.service;
+	return service;
     }
 
     private LessonService getLessonService() {
-	if (DisplayGroupAction.lessonService == null) {
+	if (lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.lessonService = (LessonService) ctx.getBean("lessonService");
+	    lessonService = (LessonService) ctx.getBean("lessonService");
 	}
-	return DisplayGroupAction.lessonService;
+	return lessonService;
     }
 
     private ILearningDesignService getLearningDesignService() {
-	if (DisplayGroupAction.learningDesignService == null) {
+	if (learningDesignService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
+	    learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
-	return DisplayGroupAction.learningDesignService;
+	return learningDesignService;
     }
 
     private ISecurityService getSecurityService() {
-	if (DisplayGroupAction.securityService == null) {
+	if (securityService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.securityService = (ISecurityService) ctx.getBean("securityService");
+	    securityService = (ISecurityService) ctx.getBean("securityService");
 	}
-	return DisplayGroupAction.securityService;
+	return securityService;
     }
 
-    private IKumaliveService getKumaliveService() {
-	if (DisplayGroupAction.kumaliveService == null) {
+    private ILearnerService getLearnerService() {
+	if (learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    DisplayGroupAction.kumaliveService = (IKumaliveService) ctx.getBean("kumaliveService");
+	    learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
-	return DisplayGroupAction.kumaliveService;
+	return learnerService;
     }
 }

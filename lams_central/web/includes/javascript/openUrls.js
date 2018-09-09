@@ -45,14 +45,14 @@ function closeAllChildren() {
 
 function openPedagogicalPlanner() {
 	if(isMac) {
-			authorWin = window.open('pedagogicalPlanner.do','aWindow','width=' + pedagogical_planner_width
+			authorWin = window.open('planner/pedagogicalPlanner.do','aWindow','width=' + pedagogical_planner_width
 						+ ',height=' + pedagogical_planner_height + ',resizable,scrollbars'
 						+ getCenterParams(pedagogical_planner_width, pedagogical_planner_height));
 	} else {
 		if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner.do') > -1) {
 			authorWin.focus();
 		} else {
-			authorWin = window.open('pedagogicalPlanner.do','aWindow','width=' + pedagogical_planner_width
+			authorWin = window.open('planner/pedagogicalPlanner.do','aWindow','width=' + pedagogical_planner_width
 					+ ',height=' + pedagogical_planner_height + ',resizable,scrollbars'
 					+ getCenterParams(pedagogical_planner_width, pedagogical_planner_height));
 			authorWin.focus();

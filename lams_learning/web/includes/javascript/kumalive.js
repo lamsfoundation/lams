@@ -393,7 +393,7 @@ function processPoll(message) {
 			chartPieDiv = $('#pollRunChartPie', pollRunDiv),
 			chartBarDiv = $('#pollRunChartBar', pollRunDiv);
 		$('#pollRunTotalVotes').text(voterCount + '/' + learnerCount + ' (' 
-				+ Math.round(voterCount / learnerCount * 100) + '%)');
+				+ (learnerCount > 0 ? Math.round(voterCount / learnerCount * 100) : 0) + '%)');
 		$.each(chartData, function() {
 			this.value = Math.round(this.value / learnerCount * 100);
 		});

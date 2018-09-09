@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
@@ -46,6 +45,7 @@ import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -199,7 +199,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	mindmapService.saveOrUpdateMindmap(mindmap);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authForm.setSessionMapID(map.getSessionID());

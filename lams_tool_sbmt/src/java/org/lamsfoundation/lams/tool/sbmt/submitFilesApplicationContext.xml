@@ -48,15 +48,12 @@
 		<property name="submissionDetailsDAO"><ref bean="submissionDetailsDAO"/></property>
 		<property name="submitUserDAO"><ref bean="submitUserDAO"/></property>
 		<property name="sbmtToolContentHandler"><ref bean="sbmtToolContentHandler"/></property>
-		<property name="learnerService"><ref bean="learnerService"/></property>
 		<property name="toolService"><ref bean="lamsToolService"/></property>
 		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>		
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="messageService"><ref bean="sbmtMessageService"/></property>
-		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
-		<property name="repositoryService"><ref bean="repositoryService" /></property>
-		<property name="gradebookService"><ref bean="gradebookService" /></property>
+		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property>
 		<property name="logEventService"><ref bean="logEventService" /></property>
 		<property name="submitFilesOutputFactory"><ref bean="submitFilesOutputFactory"/></property>
 	</bean>
@@ -98,8 +95,12 @@
 			</props>
 		</property>
 	</bean>	
-	<bean id="sbmtToolContentHandler" class="org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+
+	<bean id="sbmtToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>SubmitFilesWorkspace</value></property>
+		<property name="repositoryUser"><value>SubmitFilesLogin</value></property>
+		<property name="repositoryId"><value>SubmitFilesPassword</value></property>
+	</bean>
 	
 </beans>

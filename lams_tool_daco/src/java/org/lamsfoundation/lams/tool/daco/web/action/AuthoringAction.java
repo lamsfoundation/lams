@@ -53,7 +53,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
@@ -66,6 +65,7 @@ import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
 import org.lamsfoundation.lams.tool.daco.web.form.DacoForm;
 import org.lamsfoundation.lams.tool.daco.web.form.DacoQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -820,7 +820,7 @@ public class AuthoringAction extends Action {
 	}
 	dacoForm.setDaco(dacoPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	return mapping.findForward(DacoConstants.SUCCESS);
     }

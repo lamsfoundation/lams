@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.client;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -104,51 +103,38 @@ public class ToolDownload extends Download {
     /** The name of the servlet parameter used to define the implementation bean name */
     public final static String TOOL_CONTENT_HANDLER_BEAN_NAME = "toolContentHandlerBeanName";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.contentrepository.client.Download#getTicket()
-     */
     @Override
     public ITicket getTicket() throws RepositoryCheckedException {
-	IToolContentHandler toolContentHandler = getToolContentHandler(); // make sure it is set up
+	IToolContentFullHandler toolContentHandler = getToolContentHandler(); // make sure it is set up
 	return toolContentHandler != null ? toolContentHandler.getTicket(false) : null;
     }
 
     @Override
     public ITicket getTicket(String toolContentHandlerName) throws RepositoryCheckedException {
-	IToolContentHandler toolContentHandler = getToolContentHandler(toolContentHandlerName); // make sure it is set
-												// up
+	IToolContentFullHandler toolContentHandler = getToolContentHandler(toolContentHandlerName); // make sure it is set up
 	return toolContentHandler != null ? toolContentHandler.getTicket(false) : null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.contentrepository.client.Download#getRepositoryService()
-     */
     @Override
     public IRepositoryService getRepositoryService() throws RepositoryCheckedException {
-	IToolContentHandler toolContentHandler = getToolContentHandler(); // make sure it is set up
+	IToolContentFullHandler toolContentHandler = getToolContentHandler(); // make sure it is set up
 	return toolContentHandler != null ? toolContentHandler.getRepositoryService() : null;
     }
 
-    protected IToolContentHandler getToolContentHandler() {
-
-	Download.log.debug("ToolDownload servlet calling context and getting repository singleton.");
+    protected IToolContentFullHandler getToolContentHandler() {
+	log.debug("ToolDownload servlet calling context and getting repository singleton.");
 
 	String toolContentHandlerBeanName = getInitParameter(ToolDownload.TOOL_CONTENT_HANDLER_BEAN_NAME);
 	if (toolContentHandlerBeanName == null) {
-	    Download.log
-		    .error("Accessing Download servlet but tool content handler bean has not been defined. Please define init parameter"
+	    log.error("Accessing Download servlet but tool content handler bean has not been defined. Please define init parameter"
 			    + ToolDownload.TOOL_CONTENT_HANDLER_BEAN_NAME + ".");
 	    return null;
 	}
 	return getToolContentHandler(toolContentHandlerBeanName);
     }
 
-    protected IToolContentHandler getToolContentHandler(String toolContentHandlerName) {
+    protected IToolContentFullHandler getToolContentHandler(String toolContentHandlerName) {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	return (IToolContentHandler) wac.getBean(toolContentHandlerName);
+	return (IToolContentFullHandler) wac.getBean(toolContentHandlerName);
     }
 }

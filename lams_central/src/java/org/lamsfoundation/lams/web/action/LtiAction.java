@@ -220,8 +220,11 @@ public class LtiAction extends LamsDispatchAction {
 
 	// 1. init lesson
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
-		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro, false, false, true,
-		true, false, false, true, null, null);
+		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro,
+		extServer.getLearnerPresenceAvailable(), extServer.getLearnerImAvailable(),
+		extServer.getLiveEditEnabled(), extServer.getEnableLessonNotifications(),
+		extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
+		extServer.getGradebookOnComplete(), null, null);
 	// 2. create lessonClass for lesson
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(user);
@@ -284,7 +287,7 @@ public class LtiAction extends LamsDispatchAction {
 	String key = extServer.getServerid();
 	String secret = extServer.getServerkey();
 
-	//required parameters
+	//required parameters df
 //	  <input type="hidden" name="lti_message_type" value="ContentItemSelection" />
 //	  <input type="hidden" name="lti_version" value="LTI-1p0" />
 //	  <input type="hidden" name="content_items" value="{ &quot;@context&quot;: &quot;http://purl.imsglobal.org/ctx/lti/v1/ContentItem&quot;, &quot;@graph&quot;: [ { &quot;@type&quot;: &quot;FileItem&quot;, &quot;url&quot;: &quot;https://www.imsglobal.org/sites/default/files/IMSconformancelogosm.png&quot;, &quot;mediaType&quot;: &quot;image/png&quot;, &quot;text&quot;: &quot;IMS logo for certified products&quot;, &quot;title&quot;: &quot;The logo used to identify IMS certified products&quot;, &quot;placementAdvice&quot;: { &quot;displayWidth&quot;: 147, &quot;displayHeight&quot;: 184, &quot;presentationDocumentTarget&quot;: &quot;embed&quot; } } ] }" />

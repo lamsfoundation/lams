@@ -33,10 +33,4 @@ public class AuthoringConstants {
     /** Spring context name for refering to the authoring service */
     public static final String AUTHORING_SERVICE_BEAN_NAME = "authoringService";
     public static final String TOOL_SERVICE_BEAN_NAME = "lamsToolService";
-
-    //used by all tool authoring action class to mark the success flag.
-    public static final String LAMS_AUTHORING_SUCCESS_FLAG = "LAMS_AUTHORING_SUCCESS_FLAG";
-
-    // used for tool content folder creation.
-    public static final String LAMS_WWW_FOLDER = "www/";
 }

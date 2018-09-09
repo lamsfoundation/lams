@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.qa.web.form;
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
+import org.lamsfoundation.lams.web.form.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Q&A needs.

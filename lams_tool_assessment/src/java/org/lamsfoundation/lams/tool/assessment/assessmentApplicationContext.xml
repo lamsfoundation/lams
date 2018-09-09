@@ -54,8 +54,11 @@
 
 
     <!-- Managers -->
-	<bean id="laasseAssessmentToolContentHandler" class="org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	<bean id="laasseAssessmentToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
+	 	<property name="repositoryWorkspaceName" ><value>sharedassessmentworkspace</value></property>
+	 	<property name="repositoryUser"><value>sharedassessment</value></property>
+	 	<property name="repositoryId"><value>lams-sharedresources</value></property>
 	</bean> 
 	
     <bean id="laasseAssessmentManagerTarget" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl">
@@ -94,9 +97,6 @@
    		</property>
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
-   		</property>
-   		<property name="gradebookService">
-   			<ref bean="gradebookService" />
    		</property>
    		<property name="messageService">
    			<ref bean="laasseMessageService"/>

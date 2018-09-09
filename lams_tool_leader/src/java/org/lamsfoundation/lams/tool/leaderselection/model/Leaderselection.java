@@ -29,13 +29,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionService;
 
 /**
  *
  */
-
 public class Leaderselection implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 579733009969321015L;
@@ -229,8 +227,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Leaderselection newInstance(Leaderselection fromContent, Long toContentId,
-	    IToolContentHandler leaderselectionToolContentHandler) {
+    public static Leaderselection newInstance(Leaderselection fromContent, Long toContentId) {
 	Leaderselection toContent = new Leaderselection();
 	toContent = (Leaderselection) fromContent.clone();
 	toContent.setToolContentId(toContentId);

@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -145,8 +144,7 @@ public class LearningAction extends LamsDispatchAction {
 	    pixlrService.saveOrUpdatePixlr(pixlr);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet().getServletContext());
 
 	// get the user
 	PixlrUser pixlrUser;
@@ -368,7 +366,7 @@ public class LearningAction extends LamsDispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
 		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
@@ -456,8 +454,7 @@ public class LearningAction extends LamsDispatchAction {
 	request.setAttribute("mode", mode);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet().getServletContext());
 
 	return mapping.findForward("viewAll");
     }

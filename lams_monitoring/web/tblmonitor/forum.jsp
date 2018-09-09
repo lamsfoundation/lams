@@ -1,5 +1,5 @@
 <%@ include file="/template/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.util.CentralConstants"%>
+<%@ page import="org.lamsfoundation.lams.util.CommonConstants"%>
 <script>
 	$(document).ready(function(){
 		//insert total learners number taken from the parent tblmonitor.jsp
@@ -48,7 +48,7 @@
 		
 		<div class="panel-body">
 			<div class="table-responsive">
-				<a href="/lams/tool/<%= CentralConstants.TOOL_SIGNATURE_FORUM %>/learning/viewForum.do?toolSessionID=${toolSession.toolSessionId}&mode=teacher&hideReflection=true" target="_blank" class="btn btn-default btn-sm">
+				<a href="/lams/tool/<%= CommonConstants.TOOL_SIGNATURE_FORUM %>/learning/viewForum.do?toolSessionID=${toolSession.toolSessionId}&mode=teacher&hideReflection=true" target="_blank" class="btn btn-default btn-sm">
 					<i class="fa fa-comments"></i> <fmt:message key="label.view.forum" />
 				</a>
 			</div>

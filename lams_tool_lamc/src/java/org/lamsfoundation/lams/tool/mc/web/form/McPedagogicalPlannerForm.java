@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private static Logger logger = Logger.getLogger(McPedagogicalPlannerForm.class);
@@ -50,6 +50,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<Integer> candidateAnswerCount;
     private String candidateAnswersString;
     private List<String> correct;
+    protected String httpSessionID;
 
     public ActionMessages validate(HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
@@ -221,14 +222,27 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	}
 	this.correct.set(number, correct);
     }
+    
+    /**
+     * @return Returns the httpSessionID.
+     */
+    public String getHttpSessionID() {
+	return httpSessionID;
+    }
+
+    /**
+     * @param httpSessionID
+     *            The httpSessionID to set.
+     */
+    public void setHttpSessionID(String httpSessionID) {
+	this.httpSessionID = httpSessionID;
+    }
 
     public List<Integer> getCandidateAnswerCount() {
-
 	return candidateAnswerCount;
     }
 
     public void setCandidateAnswerCount(List<Integer> candidateAnswerCount) {
-
 	this.candidateAnswerCount = candidateAnswerCount;
     }
 

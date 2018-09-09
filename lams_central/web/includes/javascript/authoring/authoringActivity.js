@@ -632,6 +632,7 @@ ActivityDraw = {
 			icon = imageData ? paper.image(imageData, x + 47, y + 3, 30, 30) : null,
 			label = paper.text(x + 62, y + 43, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
+			 			 .attr('id', 'toolActivityTitle')
 			 			 .attr('fill', layout.colors.activityText);
 		
 		this.items = paper.g(shape, label);
@@ -643,6 +644,7 @@ ActivityDraw = {
 		}
 		// uiid is needed in Monitoring
 		this.items.attr('uiid', this.uiid);
+        this.items.attr('id' , 'toolActivity');
 		this.items.shape = shape;
 		
 		if (this.grouping) {

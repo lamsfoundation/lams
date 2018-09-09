@@ -43,13 +43,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.action.GroupingAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -81,8 +81,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class GroupingAJAXAction extends LamsDispatchAction {
 
-    // ---------------------------------------------------------------------
-
     private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
     private static final String VIEW_GROUPS_SCREEN = "viewGroups";
     private static final String PARAM_ACTIVITY_TITLE = "title";
@@ -93,6 +91,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     public static final String PARAM_MAY_DELETE = "mayDelete";
     public static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
     public static final String PARAM_VIEW_MODE = "viewMode";
+    public static final String GROUPS = "groups";
 
     private static ISecurityService securityService;
 
@@ -112,7 +111,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	Activity activity = monitoringService.getActivityById(activityID);
 
@@ -164,7 +163,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    group.setUsers(sortedUsers);
 	}
 
-	request.setAttribute(GroupingAction.GROUPS, groups);
+	request.setAttribute(GroupingAJAXAction.GROUPS, groups);
 	// go to a view only screen for random grouping
 	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
     }
@@ -204,7 +203,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    }
 	}
 
-	request.setAttribute(GroupingAction.GROUPS, groups);
+	request.setAttribute(GroupingAJAXAction.GROUPS, groups);
 	request.setAttribute("isCourseGrouping", true); // flag to page it is a course grouping so use the field names for OrganisationGroup
 	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
     }
@@ -222,7 +221,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	String[] members = StringUtils.isBlank(membersParam) ? null : membersParam.split(",");
 
 	// remove users from current group
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	if (members != null) {
 	    Activity activity = monitoringService.getActivityById(activityID);
@@ -303,7 +302,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
      */
     public ActionForward saveAsCourseGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	IUserManagementService userManagementService = MonitoringServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
@@ -362,7 +361,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
 		LamsDispatchAction.log.debug("Renaming group  " + groupID + " to \"" + name + "\"");
 	    }
-	    IMonitoringService monitoringService = MonitoringServiceProxy
+	    IMonitoringFullService monitoringService = MonitoringServiceProxy
 		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.setGroupName(groupID, name);
 	}
@@ -405,7 +404,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	boolean result = true;
 

@@ -32,7 +32,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * Condition that is based on text search. Several properties set what needs to be found in a tool output. Based on the
@@ -279,17 +278,6 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	setPhraseCondition(splitSentence(phraseString, TextSearchCondition.WHITESPACE_DELIMITER_REGEX));
 	setAnyWordsCondition(splitSentence(anyWordsString, TextSearchCondition.NON_WORD_DELIMITER_REGEX));
 	setExcludedWordsCondition(splitSentence(excludedWordsString, TextSearchCondition.NON_WORD_DELIMITER_REGEX));
-    }
-
-    /**
-     * Fills the condition parameters using strings provided by an user in the form.
-     *
-     * @param textSearchActionForm
-     *            form to parse
-     */
-    public void parseConditionStrings(TextSearchActionForm textSearchActionForm) {
-	parseConditionStrings(textSearchActionForm.getAllWords(), textSearchActionForm.getPhrase(),
-		textSearchActionForm.getAnyWords(), textSearchActionForm.getExcludedWords());
     }
 
     public void setAllWords(String allWords) {

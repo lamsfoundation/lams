@@ -47,9 +47,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.index.IndexLessonBean;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -58,7 +57,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -66,6 +65,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
@@ -131,7 +131,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 	Lesson lesson = learnerService.getLesson(lessonId);
 	if (!lesson.getEnableLessonNotifications()) {
 	    getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, lessonId,
@@ -160,10 +160,10 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
+	IMonitoringFullService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
 	// getting the organisation
-	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
+	Organisation org = monitoringService.getOrganisation(orgId);
 
 	boolean isGroupMonitor = getSecurityService().hasOrgRole(orgId, getCurrentUser().getUserID(),
 		new String[] { Role.GROUP_MANAGER }, "show course email notifications", false);
@@ -260,7 +260,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward showArchivedEmails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, SchedulerException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	boolean isLessonNotifications = (lessonId != null);
@@ -293,7 +293,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     public ActionForward getArchivedRecipients(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
@@ -318,8 +318,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	}
 
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
 
 	// get only recipients we want on the page
 	List<User> recipients = monitoringService.getArchivedEmailNotificationRecipients(emailNotificationUid, rowLimit,
@@ -327,24 +327,24 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 	// build JSON which is understood by jqGrid
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put(GradebookConstants.ELEMENT_PAGE, page);
-	responseJSON.put(GradebookConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
-	responseJSON.put(GradebookConstants.ELEMENT_RECORDS, recipients.size());
+	responseJSON.put(CommonConstants.ELEMENT_PAGE, page);
+	responseJSON.put(CommonConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
+	responseJSON.put(CommonConstants.ELEMENT_RECORDS, recipients.size());
 
 	ArrayNode rowsJSON = JsonNodeFactory.instance.arrayNode();
 	for (User recipient : recipients) {
 	    ObjectNode rowJSON = JsonNodeFactory.instance.objectNode();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
+	    rowJSON.put(CommonConstants.ELEMENT_ID, recipient.getUserId());
 
 	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
 	    cellJSON.add(new StringBuilder(recipient.getLastName()).append(", ").append(recipient.getFirstName())
 		    .append(" [").append(recipient.getLogin()).append("]").toString());
 
-	    rowJSON.set(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.set(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.add(rowJSON);
 	}
 
-	responseJSON.set(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	responseJSON.set(CommonConstants.ELEMENT_ROWS, rowsJSON);
 	writeResponse(response, "text/json", LamsDispatchAction.ENCODING_UTF8, responseJSON.toString());
 	return null;
     }
@@ -363,7 +363,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 	getUserManagementService();
 	Scheduler scheduler = getScheduler();
@@ -426,7 +426,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward exportArchivedNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
@@ -473,7 +473,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	String emailBody = WebUtil.readStrParam(request, "emailBody");
@@ -587,7 +587,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	}
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
+	IMonitoringFullService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
 
 	int searchType = (Integer) map.get("searchType");

@@ -41,12 +41,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -142,7 +142,7 @@ public class LearnerAction extends LamsDispatchAction {
     public ActionForward joinLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	// initialize service object
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Integer learner = null;
 	try {
 
@@ -199,7 +199,7 @@ public class LearnerAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 	// fetch necessary parameters
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	User user = LearningWebUtil.getUser(learnerService);
 	Integer userID = user.getUserId();
 
@@ -277,7 +277,7 @@ public class LearnerAction extends LamsDispatchAction {
 
 	responseJSON.set("messages", getProgressBarMessages());
 
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
 	if (ret == null) {
 	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -319,7 +319,7 @@ public class LearnerAction extends LamsDispatchAction {
      */
     public ActionForward forceMoveRedirect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	ILearnerFullService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
 	Long fromActivityId = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_ACTIVITY_ID, true);
 	Long toActivityId = WebUtil.readLongParam(request, AttributeNames.PARAM_DEST_ACTIVITY_ID, true);

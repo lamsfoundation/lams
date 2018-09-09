@@ -8,9 +8,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ExtServer implements Serializable, Comparable {
 
     private static final long serialVersionUID = 337894825609071182L;
-    
+
     /*
-     * static final variables indicating the type of servers available. 
+     * static final variables indicating the type of servers available.
      */
     /* **************************************************************** */
     public static final int INTEGRATION_SERVER_TYPE = 1;
@@ -31,7 +31,7 @@ public class ExtServer implements Serializable, Comparable {
 
     /** persistent field */
     private String serverdesc;
-    
+
     /** The type of activity */
     private Integer serverTypeId;
 
@@ -54,12 +54,37 @@ public class ExtServer implements Serializable, Comparable {
     /** persistent field */
     private int timeToLiveLoginRequest;
 
+    private Boolean learnerPresenceAvailable;
+
+    private Boolean learnerImAvailable;
+
+    private Boolean liveEditEnabled;
+
+    private Boolean enableLessonNotifications;
+
+    /**
+     * Should Learner start the lesson from the beginning each time he enters it.
+     * Content is not removed, LessonProgress is deleted, not archived.
+     */
+    private Boolean forceLearnerRestart;
+
+    /**
+     * Should Learners be allowed to restart the lesson after finishing it.
+     * Content is not removed, LessonProgress is archived and then deleted.
+     */
+    private Boolean allowLearnerRestart;
+
+    /**
+     * Should learners be displayed activity gradebook on lesson complete.
+     */
+    private Boolean gradebookOnComplete;
+
     /** persistent field */
     private Set extCourseClassMaps;
 
     /** persistent field */
     private Set extUserUseridMaps;
-    
+
     /**
      * Comma-separated list of roles that LTI tool consumer uses to indicate user monitor role
      */
@@ -109,7 +134,7 @@ public class ExtServer implements Serializable, Comparable {
     public void setServerdesc(String serverdesc) {
 	this.serverdesc = serverdesc;
     }
-    
+
     public Integer getServerTypeId() {
 	return serverTypeId;
     }
@@ -194,11 +219,11 @@ public class ExtServer implements Serializable, Comparable {
     public void setExtUserUseridMaps(Set extUserUseridMaps) {
 	this.extUserUseridMaps = extUserUseridMaps;
     }
-    
+
     public String getLtiToolConsumerMonitorRoles() {
 	return this.ltiToolConsumerMonitorRoles;
     }
-    
+
     public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
     }
@@ -213,13 +238,68 @@ public class ExtServer implements Serializable, Comparable {
     public int compareTo(Object o) {
 	return serverid.compareToIgnoreCase(((ExtServer) o).getServerid());
     }
-    
+
     public boolean isIntegrationServer() {
 	return getServerTypeId().intValue() == ExtServer.INTEGRATION_SERVER_TYPE;
     }
-    
+
     public boolean isLtiConsumer() {
 	return getServerTypeId().intValue() == ExtServer.LTI_CONSUMER_SERVER_TYPE;
     }
 
+    public Boolean getLearnerPresenceAvailable() {
+	return learnerPresenceAvailable;
+    }
+
+    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
+	this.learnerPresenceAvailable = learnerPresenceAvailable;
+    }
+
+    public Boolean getLearnerImAvailable() {
+	return learnerImAvailable;
+    }
+
+    public void setLearnerImAvailable(Boolean learnerImAvailable) {
+	this.learnerImAvailable = learnerImAvailable;
+    }
+
+    public Boolean getLiveEditEnabled() {
+	return liveEditEnabled;
+    }
+
+    public void setLiveEditEnabled(Boolean liveEditEnabled) {
+	this.liveEditEnabled = liveEditEnabled;
+    }
+
+    public Boolean getEnableLessonNotifications() {
+	return enableLessonNotifications;
+    }
+
+    public void setEnableLessonNotifications(Boolean enableLessonNotifications) {
+	this.enableLessonNotifications = enableLessonNotifications;
+    }
+
+    public Boolean getForceLearnerRestart() {
+	return forceLearnerRestart;
+    }
+
+    public void setForceLearnerRestart(Boolean forceLearnerRestart) {
+	this.forceLearnerRestart = forceLearnerRestart;
+    }
+
+    public Boolean getAllowLearnerRestart() {
+	return allowLearnerRestart;
+    }
+
+    public void setAllowLearnerRestart(Boolean allowLearnerRestart) {
+	this.allowLearnerRestart = allowLearnerRestart;
+    }
+
+    public Boolean getGradebookOnComplete() {
+	return gradebookOnComplete;
+    }
+
+    public void setGradebookOnComplete(Boolean gradebookOnComplete) {
+	this.gradebookOnComplete = gradebookOnComplete;
+    }
 }

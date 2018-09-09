@@ -45,7 +45,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -156,7 +155,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		getServlet().getServletContext());
 
 	return (mapping.findForward(ALL_NOMINATIONS));
@@ -227,7 +226,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteLearningForm.resetCommands();
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		getServlet().getServletContext());
 	return (mapping.findForward(VIEW_ANSWERS));
     }
@@ -625,7 +624,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	voteLearningForm.resetCommands();
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		getServlet().getServletContext());
 
 	return (mapping.findForward(NOTEBOOK));
@@ -799,7 +798,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    }
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		getServlet().getServletContext());
 
 	/* find out if the content is being modified at the moment. */

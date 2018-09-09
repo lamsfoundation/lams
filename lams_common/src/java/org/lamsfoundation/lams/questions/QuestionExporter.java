@@ -41,7 +41,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -59,9 +59,10 @@ import org.w3c.dom.Element;
 public class QuestionExporter {
     private static final Logger log = Logger.getLogger(QuestionExporter.class);
 
-    private static final Pattern IMAGE_PATTERN = Pattern.compile("<img.*?src=['\"]/+lams/+www/+([\\w\\.\\/\\-\\s]+).+?>",
-	    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    private static final String IMAGE_MARKER = "[matimage]";
+    private static final Pattern IMAGE_PATTERN = Pattern.compile(
+	    "<img.*?src=['\"]/+lams/+www/+([\\w\\.\\/\\-\\s]+).+?>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+    private static final Pattern IMAGE_ATTRIBUTES_PATTERN = Pattern
+	    .compile("(<img\\b|(?!^)\\G)[^>]*?\\b(class|width|height)=([\"']?)([^\"]*)\\3", Pattern.CASE_INSENSITIVE);
 
     private static final String EXPORT_TEMP_FOLDER_SUFFIX = "qti";
 
@@ -99,9 +100,9 @@ public class QuestionExporter {
 	try {
 	    String fileName = FileUtil.getFileName(packagePath);
 	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
-	    response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
-	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION,
-		    CentralConstants.HEADER_CONTENT_ATTACHMENT + fileName);
+	    response.setContentType(CommonConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	    response.setHeader(CommonConstants.HEADER_CONTENT_DISPOSITION,
+		    CommonConstants.HEADER_CONTENT_ATTACHMENT + fileName);
 
 	    // write out the ZIP to respose error
 	    FileUtils.copyFile(packageFile, response.getOutputStream());
@@ -160,8 +161,9 @@ public class QuestionExporter {
      * Builds QTI XML file containing structured questions & answers content.
      *
      * @return XML file content
+     * @throws IOException 
      */
-    public String exportQTIFile() {
+    public String exportQTIFile() throws IOException {
 	itemId = 1000;
 	DocumentBuilder docBuilder;
 	try {
@@ -578,25 +580,23 @@ public class QuestionExporter {
     }
 
     /**
-     * Extracts images from HTML text (probably created by CKEditor) and substitutes them with markers, so further
-     * processing knows how to handle them.
+     * Appends material XML element, i.e. list of HTML & image parts
      */
-    private String[] parseImages(String text) {
-	List<String> result = new ArrayList<String>();
+    private void appendMaterialElements(Element materialElem, String text) {
 	int index = 0;
 	// looks for images stored in LAMS WWW secure folder
-	Matcher matcher = QuestionExporter.IMAGE_PATTERN.matcher(text);
+	Matcher imageTagMatcher = QuestionExporter.IMAGE_PATTERN.matcher(text);
 
-	while (matcher.find()) {
+	while (imageTagMatcher.find()) {
 	    // add HTML which is before the image
-	    result.add(text.substring(index, matcher.start()));
-	    index = matcher.end();
+	    appendTextElement(materialElem, text.substring(index, imageTagMatcher.start()));
+	    index = imageTagMatcher.end();
 
 	    // find the image in file system
-	    String relativePath = matcher.group(1);
+	    String relativePath = imageTagMatcher.group(1);
 	    File image = new File(QuestionExporter.EAR_IMAGE_FOLDER, relativePath);
 	    if (!image.isFile() || !image.canRead()) {
-		QuestionExporter.log.warn("Image could not be parsed: " + matcher.group());
+		log.warn("Image could not be parsed: " + imageTagMatcher.group());
 		continue;
 	    }
 
@@ -623,36 +623,40 @@ public class QuestionExporter {
 		images.put(imageName, image);
 	    }
 
-	    result.add(QuestionExporter.IMAGE_MARKER + imageName);
+	    //append image element
+	    String imageType = "image/" + FileUtil.getFileExtension(imageName);
+	    Element matimageElem = (Element) materialElem.appendChild(doc.createElement("matimage"));
+	    matimageElem.setAttribute("imagtype", imageType);
+	    matimageElem.setAttribute("uri", imageName);
+	    
+	    //set image attributes: width, length, and class
+	    Matcher attributesMatcher = IMAGE_ATTRIBUTES_PATTERN.matcher(imageTagMatcher.group(0));
+	    while (attributesMatcher.find()) {
+		String attributeName = attributesMatcher.group(2);
+		String attributeValue = attributesMatcher.group(4);
+
+		if ("class".equals(attributeName)) {
+		    matimageElem.setAttribute("entityref", attributeValue);
+		} else {
+		    matimageElem.setAttribute(attributeName, attributeValue);
+		}
+	    }
 	}
 
 	// write out the rest of HTML text
 	if (index < text.length()) {
-	    result.add(text.substring(index));
+	    appendTextElement(materialElem, text.substring(index));
 	}
-
-	return result.toArray(new String[] {});
     }
-
+    
     /**
-     * Appends material XML element, i.e. list of HTML & image parts
+     * Appends mattext element to materialElem. Used in appendMaterialElements(...) method only
      */
-    private void appendMaterialElements(Element materialElem, String text) {
-	String[] answerParts = parseImages(text);
-	for (String answerPart : answerParts) {
-	    if (StringUtils.isNotBlank(answerPart)) {
-		if (answerPart.startsWith(QuestionExporter.IMAGE_MARKER)) {
-		    String imageName = answerPart.substring(QuestionExporter.IMAGE_MARKER.length());
-		    String imageType = "image/" + FileUtil.getFileExtension(imageName);
-		    Element matimageElem = (Element) materialElem.appendChild(doc.createElement("matimage"));
-		    matimageElem.setAttribute("imagtype", imageType);
-		    matimageElem.setAttribute("uri", imageName);
-		} else {
-		    Element mattextElem = (Element) materialElem.appendChild(doc.createElement("mattext"));
-		    mattextElem.setAttribute("texttype", "text/html");
-		    mattextElem.appendChild(doc.createCDATASection(answerPart));
-		}
-	    }
+    private void appendTextElement(Element materialElem, String text) {
+	if (StringUtils.isNotBlank(text)) {
+	    Element mattextElem = (Element) materialElem.appendChild(doc.createElement("mattext"));
+	    mattextElem.setAttribute("texttype", "text/html");
+	    mattextElem.appendChild(doc.createCDATASection(text));
 	}
     }
 

@@ -32,7 +32,6 @@ import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 
 /**
  * Wraps up interface to the Commons FileUpload as much as possible. Reads configuration information such the maximum
@@ -220,7 +219,7 @@ public class UploadFileUtil {
      */
     public static String getUploadWebPath(String contentFolderID, String type) {
 	return "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) + "/"
-		+ AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + "/"
+		+ CommonConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR + "/"
 		+ String.join("/", UploadFileUtil.splitContentDir(contentFolderID)) + "/" + type;
     }
 

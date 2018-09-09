@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *

@@ -27,6 +27,15 @@
 								</c:forEach>
 							</html:select>
 						</c:when>
+						<c:when test="${row.key == 'SMTPAuthSecurity'}">
+							<html:select styleId="${row.key}" name="row" property="value" styleClass="form-control form-control-sm">
+								<c:forEach items="${smtpAuthTypes}" var="authType">
+									<html:option value="${authType.key}" >
+										${authType.value}
+									</html:option>
+								</c:forEach>
+							</html:select>
+						</c:when>
 						<c:when test="${row.format==BOOLEAN}">
 							<html:select styleId="${row.key}" name="row" property="value" styleClass="form-control form-control-sm">
 							<html:option value="true">true</html:option>

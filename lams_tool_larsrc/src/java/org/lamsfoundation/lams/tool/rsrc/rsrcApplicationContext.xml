@@ -47,9 +47,12 @@
 
 
     <!-- Managers -->
-	<bean id="resourceToolContentHandler" class="org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="resourceToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedresourcesworkspace</value></property>
+		<property name="repositoryUser"><value>sharedresources</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
 	
     <bean id="resourceManagerTarget" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceImpl">
         <property name="resourceDao">
@@ -70,14 +73,8 @@
         <property name="resourceToolContentHandler">
             <ref bean="resourceToolContentHandler"/>
         </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
-        </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
-   		</property>
-   		<property name="learnerService">
-   			<ref bean="learnerService"/>
    		</property>
    		<property name="logEventService">
    			<ref bean="logEventService"/>

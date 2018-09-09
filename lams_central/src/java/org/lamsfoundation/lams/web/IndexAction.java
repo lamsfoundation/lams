@@ -67,8 +67,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class IndexAction extends LamsDispatchAction {
 
-    private static final String PATH_PEDAGOGICAL_PLANNER = "pedagogical_planner";
-    private static final String PATH_LAMS_CENTRAL = "lams-central.war";
+    private static final String PATH_LAMS_PLANNER_WAR = "lams-planner.war";
 
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
@@ -83,7 +82,7 @@ public class IndexAction extends LamsDispatchAction {
 	IndexAction.setHeaderLinks(request);
 	setAdminLinks(request);
 
-	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
+	// check if this is user's first login; some action (like displaying a tour) can be
 	// taken based on that parameter; immediatelly, the value in DB is updated
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -322,9 +321,8 @@ public class IndexAction extends LamsDispatchAction {
 
     private static boolean isPedagogicalPlannerAvailable() {
 	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_CENTRAL + File.separator
-		+ PATH_PEDAGOGICAL_PLANNER;
+	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_PLANNER_WAR;
 	File plannerDir = new File(plannerPath);
-	return plannerDir.isDirectory();
+	return plannerDir.exists();
     }
 }
