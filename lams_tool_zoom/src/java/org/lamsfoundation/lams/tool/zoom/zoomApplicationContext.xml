@@ -53,8 +53,10 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
- 	<bean id="zoomToolContentHandler" class="org.lamsfoundation.lams.tool.zoom.util.ZoomToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
-
+	<bean id="zoomToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>zoomworkspace</value></property>
+		<property name="repositoryUser"><value>zoom</value></property>
+		<property name="repositoryId"><value>lams-zoom</value></property>
+	</bean>
 </beans>
