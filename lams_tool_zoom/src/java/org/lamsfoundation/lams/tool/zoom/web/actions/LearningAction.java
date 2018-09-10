@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -137,7 +136,7 @@ public class LearningAction extends DispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
 		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
@@ -210,8 +209,7 @@ public class LearningAction extends DispatchAction {
 	    zoomService.saveOrUpdateZoom(zoom);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet().getServletContext());
 
 	ZoomUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {

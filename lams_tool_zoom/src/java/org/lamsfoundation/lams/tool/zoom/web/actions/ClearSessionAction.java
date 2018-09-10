@@ -21,13 +21,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.zoom.web.actions;
 
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.web.action.LamsAuthoringFinishAction;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
