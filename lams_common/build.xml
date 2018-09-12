@@ -4,6 +4,8 @@
 	
 	<import file="../lams_build/build_base.xml"/>
 	
+	<target name="_compile-java" depends="_compile-java-nocommon" />
+	
 	<target name="build-db" depends="_clean-dirs"
 		description="Rebuilds LAMS database.">
 		

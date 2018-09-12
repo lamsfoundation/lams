@@ -46,12 +46,6 @@
 	<!-- Product deployment			                                         -->
 	<!-- =================================================================== -->
 	
-	<target name="copy-to-lams-lib" depends="_target-not-available"
-			    description="Copies JAR file to lams_build/lib/lams for other projects to use.">
-		<echo>Tools JARs need not be copied to lams_build</echo>
-	</target>
-	
-
 	<target name="deploy-tool" depends="_package-create, _package-run" 
 	   description="Build Tool archives and run deployment. Do not run on a production environment." />
 	
