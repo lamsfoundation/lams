@@ -35,36 +35,41 @@
 			finishButton.disabled = true;
 		}
 	}
-         function submitForm(methodName){
-                var f = document.getElementById('learningForm');
-                f.submit();
-        }
+    function submitForm(metodName){
+        var f = document.getElementById("learningForm");
+        f.submit();
+    }
 </script>
 
-<form:form action="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}" method="post"
-	onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
-	<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+<c:choose>
+		<c:when test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
+	
+			<form:form action="openNotebook.do" method="post"
+			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+			<input type="submit" value="<fmt:message key="button.continue" />" class="btn btn-responsive btn-primary pull-right voffset10"/>
+			</form:form>
+		
+		</c:when>
+		<c:otherwise>
+		
+			<form:form action="finishActivity.do" method="post"
+			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+			<a href="#nogo" type="button" class="btn btn-primary pull-right voffset10 na btn-autoresize" id="finishButton"  onclick="submitForm('finishActivity')">
+						 <span class="nextActivity">
+							 <c:choose>
+							 	<c:when test="${activityPosition.last}">
+							 		 <fmt:message key="button.submit" />
+							 	</c:when>
+							 	<c:otherwise>
+							 		 <fmt:message key="button.finish" />
+							 	</c:otherwise>
+							 </c:choose>
+						 </span>
+					</a>
+			</form:form>
+		</c:otherwise>
+</c:choose>
 
-		<c:choose>
-			<c:when
-				test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
 
-				<input type="submit" value="<fmt:message key="button.continue" />" class="btn btn-responsive btn-primary pull-right voffset10"/>
-			</c:when>
-			<c:otherwise>
-				<a href="#nogo" class="btn btn-primary pull-right voffset10 na btn-autoresize" id="finishButton"  onclick="submitForm('finish')">
-					 <span class="nextActivity">
-						 <c:choose>
-						 	<c:when test="${activityPosition.last}">
-						 		 <fmt:message key="button.submit" />
-						 	</c:when>
-						 	<c:otherwise>
-						 		 <fmt:message key="button.finish" />
-						 	</c:otherwise>
-						 </c:choose>
-					 </span>
-				</a>
-			</c:otherwise>
-		</c:choose>
-	</div>
-</form:form>

@@ -27,8 +27,8 @@ input[type="checkbox"] {
 	var IS_AJAX_CALL_REQUIRED = false;
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}iincludes/javascript/jquery.form.js"></script>
-<script type="text/javascript" src="${lams}iincludes/javascript/instantedit.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/instantedit.js"></script>
 <script type="text/javascript"
 	src="/lams/includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">
