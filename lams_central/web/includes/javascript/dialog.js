@@ -333,7 +333,7 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 			var url = LAMS_URL + 'authoring/openAuthoring.do';
 			
 			if (learningDesignID) {
-				url += '&learningDesignID=' + learningDesignID;
+				url += '?learningDesignID=' + learningDesignID;
 			}
 			
 			// load contents after opening the dialog

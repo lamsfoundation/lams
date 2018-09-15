@@ -51,9 +51,9 @@
 		</c:forEach>
 	</table>
 		
-	<c:if test="${question.hedgingJustificationEnabled}">			
-		<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
-				disabled="true" styleClass="mark-hedging-select margin-top-minus-10"/>
+	<c:if test="${question.hedgingJustificationEnabled}">
+		<textarea id="justification-question${questionIndex}" name="question${questionIndex}" rows="4" cols="60" readonly="readonly" class="mark-hedging-select margin-top-minus-10"
+		>${question.answerString}</textarea>
 	</c:if>
 	
 </div>

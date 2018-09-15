@@ -149,15 +149,15 @@ variable.
 
   <tag>
     <description>
-        Loads a assessment bundle to be used by its tag body
+        Loads a survey bundle to be used by its tag body
     </description>
     <name>bundle</name>
     <tag-class>org.apache.taglibs.standard.tag.rt.fmt.BundleTag</tag-class>
     <body-content>JSP</body-content>
     <attribute>
         <description>
-Assessment bundle base name. This is the bundle's
-fully-qualified assessment name, which has the same
+Survey bundle base name. This is the bundle's
+fully-qualified survey name, which has the same
 form as a fully-qualified class name, that is, it uses
 "." as the package component separator and does not
 have any file type (such as ".class" or ".properties")
@@ -180,7 +180,7 @@ key of any nested &lt;fmt:message&gt; action.
 
   <tag>
     <description>
-        Loads a assessment bundle and stores it in the named scoped variable or
+        Loads a survey bundle and stores it in the named scoped variable or
         the bundle configuration variable
     </description>
     <name>setBundle</name>
@@ -188,8 +188,8 @@ key of any nested &lt;fmt:message&gt; action.
     <body-content>empty</body-content>
     <attribute>
         <description>
-Assessment bundle base name. This is the bundle's
-fully-qualified assessment name, which has the same
+Survey bundle base name. This is the bundle's
+fully-qualified survey name, which has the same
 form as a fully-qualified class name, that is, it uses
 "." as the package component separator and does not
 have any file type (such as ".class" or ".properties")
@@ -238,7 +238,7 @@ Message key to be looked up.
     </attribute>
     <attribute>
         <description>
-Localization context in whose assessment
+Localization context in whose survey
 bundle the message key is looked up.
         </description>
         <name>bundle</name>

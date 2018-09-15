@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.assessment.web.action;
+package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,12 +10,8 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -34,22 +30,26 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class TblMonitoringAction extends LamsDispatchAction {
-    private static Logger logger = Logger.getLogger(TblMonitoringAction.class.getName());
+@Controller
+@RequestMapping("/tblmonitoring")
+public class TblMonitoringController {
+    private static Logger logger = Logger.getLogger(TblMonitoringController.class.getName());
 
+    @Autowired
+    @Qualifier("laasseAssessmentService")
     private IAssessmentService assessmentService;
 
     /**
      * Shows ira page in case of Assessment activity
      */
-    public ActionForward iraAssessment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initAssessmentService();
+    @RequestMapping("iraAssessment")
+    public String iraAssessment(HttpServletRequest request) throws IOException, ServletException {
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentID");
 
 	String[] toolContentIds = new String[] { toolContentId.toString() };
@@ -59,16 +59,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute("isIraAssessment", true);
-	return mapping.findForward("assessment");
+	return "pages/tblmonitoring/assessment";
     }
 
     /**
      * Shows ira page in case of Assessment activity
      */
-    public ActionForward iraAssessmentStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initAssessmentService();
-
+    @RequestMapping("iraAssessmentStudentChoices")
+    public String iraAssessmentStudentChoices(HttpServletRequest request) throws IOException, ServletException {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
@@ -113,7 +111,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("questions", mcqQuestions);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	return mapping.findForward("iraAssessmentStudentChoices");
+	return "pages/tblmonitoring/iraAssessmentStudentChoices";
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
@@ -169,10 +167,8 @@ public class TblMonitoringAction extends LamsDispatchAction {
     /**
      * Shows aes page
      */
-    public ActionForward aes(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initAssessmentService();
-
+    @RequestMapping("aes")
+    public String aes(HttpServletRequest request) throws IOException, ServletException {
 	String[] toolContentIds = request.getParameter("assessmentToolContentIds").split(",");
 	String[] activityTitles = request.getParameter("assessmentActivityTitles").split("\\,");
 
@@ -182,15 +178,14 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, true);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 
-	return mapping.findForward("assessment");
+	return "pages/tblmonitoring/assessment";
     }
 
     /**
      * Shows ira StudentChoices page
      */
-    public ActionForward aesStudentChoices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initAssessmentService();
+    @RequestMapping("aesStudentChoices")
+    public String aesStudentChoices(HttpServletRequest request) throws IOException, ServletException {
 
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
@@ -201,7 +196,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
 	    tblQuestionDto.setQuestion(question);
-	    tblQuestionDto.setQuestionTypeLabel(TblMonitoringAction.getAssessmentQuestionTypeLabel(question.getType()));
+	    tblQuestionDto.setQuestionTypeLabel(TblMonitoringController.getAssessmentQuestionTypeLabel(question.getType()));
 	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(question));
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<TblAssessmentQuestionResultDTO>();
@@ -234,7 +229,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("sessions", sessions);
 	request.setAttribute("questionDtos", tblQuestionDtos);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	return mapping.findForward("assessmentStudentChoices");
+	return "pages/tblmonitoring/assessmentStudentChoices";
     }
 
     /**
@@ -333,9 +328,8 @@ public class TblMonitoringAction extends LamsDispatchAction {
      * @throws JSONException
      * @throws IOException
      */
-    public ActionForward getModalDialogForTeamsTab(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	initAssessmentService();
+    @RequestMapping("getModalDialogForTeamsTab")
+    public String getModalDialogForTeamsTab(HttpServletRequest request) throws IOException {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 
@@ -343,19 +337,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	AssessmentResultDTO result = assessmentService.getUserMasterDetail(user.getSession().getSessionId(), userId);
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 
-	return mapping.findForward("teams");
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private IAssessmentService initAssessmentService() {
-	if (assessmentService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    assessmentService = (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
-	}
-	return assessmentService;
+	return "pages/tblmonitoring/teams";
     }
 
 }

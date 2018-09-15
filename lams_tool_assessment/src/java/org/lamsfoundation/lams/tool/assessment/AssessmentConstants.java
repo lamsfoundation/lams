@@ -55,21 +55,6 @@ public class AssessmentConstants {
 
     public static final short QUESTION_TYPE_MARK_HEDGING = 8;
 
-    // for action forward name
-    public static final String SUCCESS = "success";
-    
-    public static final String LEARNING = "learning";
-    
-    public static final String SHOW_RESULTS = "showResults";
-
-    public static final String ERROR = "error";
-
-    public static final String DEFINE_LATER = "definelater";
-
-    public static final String WAIT_FOR_LEADER = "waitForLeader";
-    
-    public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
-
     // for parameters' name
     
     public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";

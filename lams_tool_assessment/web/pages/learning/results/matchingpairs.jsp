@@ -22,12 +22,15 @@
 				</td>
 				
 				<td style="width: 100px;">
-					<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="true">
-						<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
+					<select name="question${status.index}_${option.sequenceId}" disabled="disabled">
+						<option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></option>
+
 						<c:forEach var="selectOption" items="${question.matchingPairOptions}">
-							<html:option value="${selectOption.uid}">${selectOption.optionString}</html:option>
+							<option value="${selectOption.uid}"
+									<c:if test="${option.answerInt == selectOption.uid}">selected="selected"</c:if>>
+								${selectOption.optionString}</option>
 						</c:forEach>
-					</html:select>
+					</select>
 				</td>
 			</tr>
 		</c:forEach>

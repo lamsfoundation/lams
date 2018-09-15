@@ -25,23 +25,15 @@ package org.lamsfoundation.lams.tool.assessment.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 
 /**
- *
  * Assessment Form.
- *
- *
  *
  * @author Andrey Balan
  */
-public class AssessmentForm extends ActionForm {
-    private static final long serialVersionUID = 3599879328307492312L;
+public class AssessmentForm {
 
     private static Logger logger = Logger.getLogger(AssessmentForm.class.getName());
 
@@ -49,8 +41,6 @@ public class AssessmentForm extends ActionForm {
     private String sessionMapID;
     private String contentFolderID;
     private int currentTab;
-    private FormFile offlineFile;
-    private FormFile onlineFile;
 
     private Assessment assessment;
 
@@ -68,24 +58,18 @@ public class AssessmentForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
-	// if it is start page, all data read out from database or current session
-	// so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    assessment.setAllowGradesAfterAttempt(false);
-	    assessment.setAllowOverallFeedbackAfterQuestion(false);
-	    assessment.setAllowQuestionFeedback(false);
-	    assessment.setAllowDiscloseAnswers(false);
-	    assessment.setAllowRightAnswersAfterQuestion(false);
-	    assessment.setAllowWrongAnswersAfterQuestion(false);
-	    assessment.setDefineLater(false);
-	    assessment.setShuffled(false);
-	    assessment.setNumbered(false);
-	    assessment.setDisplaySummary(false);
-	    assessment.setReflectOnActivity(false);
-	}
+    public void reset(HttpServletRequest request) {
+	assessment.setAllowGradesAfterAttempt(false);
+	assessment.setAllowOverallFeedbackAfterQuestion(false);
+	assessment.setAllowQuestionFeedback(false);
+	assessment.setAllowDiscloseAnswers(false);
+	assessment.setAllowRightAnswersAfterQuestion(false);
+	assessment.setAllowWrongAnswersAfterQuestion(false);
+	assessment.setDefineLater(false);
+	assessment.setShuffled(false);
+	assessment.setNumbered(false);
+	assessment.setDisplaySummary(false);
+	assessment.setReflectOnActivity(false);
     }
 
     public int getCurrentTab() {
@@ -94,22 +78,6 @@ public class AssessmentForm extends ActionForm {
 
     public void setCurrentTab(int currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public FormFile getOfflineFile() {
-	return offlineFile;
-    }
-
-    public void setOfflineFile(FormFile offlineFile) {
-	this.offlineFile = offlineFile;
-    }
-
-    public FormFile getOnlineFile() {
-	return onlineFile;
-    }
-
-    public void setOnlineFile(FormFile onlineFile) {
-	this.onlineFile = onlineFile;
     }
 
     public Assessment getAssessment() {

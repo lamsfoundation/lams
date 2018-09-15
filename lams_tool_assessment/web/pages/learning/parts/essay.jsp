@@ -18,7 +18,7 @@
 			    value = CKEDITOR.instances.question${status.index}.getData();
 			    
 			} else {
-				value =  $("#question${status.index}__lamstextarea").val();
+				value =  $("#essay-question${status.index}").val();
 			}
 		    
 			var wordCount = getNumberOfWords(value, isCkeditor);
@@ -43,7 +43,7 @@
 		    CKEDITOR.instances["question${status.index}"].on('instanceReady', counter${status.index});
 		      
 		} else {
-			$("#question${status.index}__lamstextarea").on('change keydown keypress keyup paste', counter${status.index});
+			$("#essay-question${status.index}").on('change keydown keypress keyup paste', counter${status.index});
 			//count words initially
 			counter${status.index}();
 		}
@@ -97,7 +97,9 @@
 						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px"></lams:CKEditor>
 					</c:when>
 					<c:otherwise>
-						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${!hasEditRight}" rows="8"/>
+						<textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" rows="8"
+								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
+						>${question.answerString}</textarea>
 					</c:otherwise>
 				</c:choose>
 			</td>

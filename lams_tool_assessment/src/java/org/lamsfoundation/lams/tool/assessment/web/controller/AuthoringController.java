@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.assessment.web.action;
+package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,10 +56,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
@@ -74,7 +70,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
-import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
@@ -86,8 +81,11 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -96,133 +94,56 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 /**
  * @author Andrey Balan
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	String param = mapping.getParameter();
-	// -----------------------Assessment Author functions ---------------------------
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    IAssessmentService service = getAssessmentService();
-	    Assessment assessment = service.getAssessmentByContentId(contentId);
-
-	    assessment.setDefineLater(true);
-	    service.saveOrUpdateAssessment(assessment);
-
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
-	// ----------------------- Add assessment question functions ---------------------------
-	if (param.equals("newQuestionInit")) {
-	    return newQuestionInit(mapping, form, request, response);
-	}
-	if (param.equals("editQuestion")) {
-	    return editQuestion(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateQuestion")) {
-	    return saveOrUpdateQuestion(mapping, form, request, response);
-	}
-	if (param.equals("saveQTI")) {
-	    return saveQTI(mapping, form, request, response);
-	}
-	if (param.equals("exportQTI")) {
-	    return exportQTI(mapping, form, request, response);
-	}
-	if (param.equals("removeQuestion")) {
-	    return removeQuestion(mapping, form, request, response);
-	}
-	// ----------------------- Question Reference functions ---------------------------
-	if (param.equals("addQuestionReference")) {
-	    return addQuestionReference(mapping, form, request, response);
-	}
-	if (param.equals("removeQuestionReference")) {
-	    return removeQuestionReference(mapping, form, request, response);
-	}
-	if (param.equals("upQuestionReference")) {
-	    return upQuestionReference(mapping, form, request, response);
-	}
-	if (param.equals("downQuestionReference")) {
-	    return downQuestionReference(mapping, form, request, response);
-	}
-	// ----------------------- Import/Export Questions functions ---------------------------
-	if (param.equals("importInit")) {
-	    return importInit(mapping, form, request, response);
-	}
-	if (param.equals("importQuestions")) {
-	    return importQuestions(mapping, form, request, response);
-	}
-	if (param.equals("exportQuestions")) {
-	    return exportQuestions(mapping, form, request, response);
-	}
-	// -----------------------Assessment Answer Option functions ---------------------------
-	if (param.equals("addOption")) {
-	    return addOption(mapping, form, request, response);
-	}
-	if (param.equals("removeOption")) {
-	    return removeOption(mapping, form, request, response);
-	}
-	if (param.equals("upOption")) {
-	    return upOption(mapping, form, request, response);
-	}
-	if (param.equals("downOption")) {
-	    return downOption(mapping, form, request, response);
-	}
-	// -----------------------Assessment Unit functions ---------------------------
-	if (param.equals("newUnit")) {
-	    return newUnit(mapping, form, request, response);
-	}
-	// -----------------------Assessment Overall Feedback functions ---------------------------
-	if (param.equals("initOverallFeedback")) {
-	    return initOverallFeedback(mapping, form, request, response);
-	}
-	if (param.equals("newOverallFeedback")) {
-	    return newOverallFeedback(mapping, form, request, response);
-	}
-
-	return mapping.findForward(AssessmentConstants.ERROR);
-    }
+    @Autowired
+    @Qualifier("laasseAssessmentService")
+    private IAssessmentService service;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
      *
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
-     *
-     * @throws ServletException
-     *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/start")
+    public String start(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm, HttpServletRequest request)
+	    throws ServletException {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return showStartPage(assessmentForm, request);
+    }
 
+    @RequestMapping("/definelater")
+    public String definelater(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
+	    HttpServletRequest request) throws ServletException {
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Assessment assessment = service.getAssessmentByContentId(contentId);
+
+	assessment.setDefineLater(true);
+	service.saveOrUpdateAssessment(assessment);
+
+	//audit log the teacher has started editing activity in monitor
+	service.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return showStartPage(assessmentForm, request);
+    }
+
+    /**
+     * Common method for "start" and "defineLater"
+     */
+    private String showStartPage(AssessmentForm assessmentForm, HttpServletRequest request) throws ServletException {
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID));
 
-	// get back the assessment and question list and display them on page
-	IAssessmentService service = getAssessmentService();
-
 	List<AssessmentQuestion> questions = null;
 	Assessment assessment = null;
-	AssessmentForm assessmentForm = (AssessmentForm) form;
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -243,7 +164,7 @@ public class AuthoringAction extends Action {
 
 	    assessmentForm.setAssessment(assessment);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
@@ -269,27 +190,20 @@ public class AuthoringAction extends Action {
 	reinitializeAvailableQuestions(sessionMap);
 
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/start";
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    public String init(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm, HttpServletRequest request)
+	    throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	AssessmentForm existForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 
-	AssessmentForm assessmentForm = (AssessmentForm) form;
 	try {
 	    PropertyUtils.copyProperties(assessmentForm, existForm);
 	} catch (Exception e) {
@@ -299,32 +213,21 @@ public class AuthoringAction extends Action {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/authoring";
     }
 
     /**
      * This method will persist all inforamtion in this authoring page, include all assessment question, information
      * etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	AssessmentForm assessmentForm = (AssessmentForm) (form);
-
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
+	    HttpServletRequest request) throws Exception {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(assessmentForm.getSessionMapID());
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
 	Assessment assessment = assessmentForm.getAssessment();
-	IAssessmentService service = getAssessmentService();
 
 	// **********************************Get Assessment PO*********************
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
@@ -437,26 +340,20 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	return mapping.findForward("author");
+	return "pages/authoring/authoring";
     }
 
     /**
      * Display empty page for new assessment question.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newQuestionInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newQuestionInit")
+    public String newQuestionInit(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
+	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 	questionForm.setSessionMapID(sessionMapID);
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
@@ -488,20 +385,15 @@ public class AuthoringAction extends Action {
 	short type = (short) NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return findForward(type, mapping);
+	return findForward(type);
     }
 
     /**
      * Display edit page for existed assessment question.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward editQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/editQuestion")
+    public String editQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
+	    HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -517,14 +409,13 @@ public class AuthoringAction extends Action {
 	    List<AssessmentQuestion> rList = new ArrayList<>(assessmentList);
 	    question = rList.get(questionIdx);
 	    if (question != null) {
-		AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 		populateQuestionToForm(questionIdx, question, questionForm, request);
 		questionForm.setContentFolderID(contentFolderID);
 	    }
 	}
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, question.getType());
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return findForward(question == null ? -1 : question.getType(), mapping);
+	return findForward(question == null ? -1 : question.getType());
     }
 
     /**
@@ -532,18 +423,10 @@ public class AuthoringAction extends Action {
      * <code>HttpSession</code> AssessmentQuestionList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-    private ActionForward saveOrUpdateQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
+    @RequestMapping("/saveOrUpdateQuestion")
+    public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
+	    HttpServletRequest request) {
 	extractFormToAssessmentQuestion(request, questionForm);
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -552,17 +435,15 @@ public class AuthoringAction extends Action {
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, questionForm.getSessionMapID());
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Parses questions extracted from IMS QTI file and adds them as new items.
-     *
-     * @throws UnsupportedEncodingException
      */
     @SuppressWarnings("rawtypes")
-    private ActionForward saveQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UnsupportedEncodingException {
+    @RequestMapping("/saveQTI")
+    public String saveQTI(HttpServletRequest request) throws UnsupportedEncodingException {
 	String sessionMapId = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -617,7 +498,7 @@ public class AuthoringAction extends Action {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 				question.getResourcesFolderPath());
 			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    AuthoringAction.log
+			    AuthoringController.log
 				    .warn("Skipping an answer with same text as the correct answer: " + answerText);
 			    continue;
 			}
@@ -635,7 +516,7 @@ public class AuthoringAction extends Action {
 				assessmentAnswer.setGrade(1);
 				correctAnswer = answerText;
 			    } else {
-				AuthoringAction.log
+				AuthoringController.log
 					.warn("Choosing only first correct answer, despite another one was found: "
 						+ answerText);
 				assessmentAnswer.setGrade(0);
@@ -651,7 +532,7 @@ public class AuthoringAction extends Action {
 		}
 
 		if (correctAnswer == null) {
-		    AuthoringAction.log.warn("No correct answer found for question: " + question.getText());
+		    AuthoringController.log.warn("No correct answer found for question: " + question.getText());
 		    continue;
 		}
 
@@ -697,7 +578,7 @@ public class AuthoringAction extends Action {
 		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_TRUE_FALSE);
 
 		if (question.getAnswers() == null) {
-		    AuthoringAction.log.warn("Answers missing from true-false question: " + question.getText());
+		    AuthoringController.log.warn("Answers missing from true-false question: " + question.getText());
 		    continue;
 		} else {
 		    for (Answer answer : question.getAnswers()) {
@@ -769,7 +650,7 @@ public class AuthoringAction extends Action {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 				question.getResourcesFolderPath());
 			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    AuthoringAction.log
+			    AuthoringController.log
 				    .warn("Skipping an answer with same text as the correct answer: " + answerText);
 			    continue;
 			}
@@ -787,7 +668,7 @@ public class AuthoringAction extends Action {
 				assessmentAnswer.setGrade(1);
 				correctAnswer = answerText;
 			    } else {
-				AuthoringAction.log
+				AuthoringController.log
 					.warn("Choosing only first correct answer, despite another one was found: "
 						+ answerText);
 				assessmentAnswer.setGrade(0);
@@ -803,20 +684,20 @@ public class AuthoringAction extends Action {
 		}
 
 		if (correctAnswer == null) {
-		    AuthoringAction.log.warn("No correct answer found for question: " + question.getText());
+		    AuthoringController.log.warn("No correct answer found for question: " + question.getText());
 		    continue;
 		}
 
 	    } else {
-		AuthoringAction.log.warn("Unknow QTI question type: " + question.getType());
+		AuthoringController.log.warn("Unknow QTI question type: " + question.getType());
 		continue;
 	    }
 
 	    assessmentQuestion.setDefaultGrade(questionGrade);
 
 	    questionList.add(assessmentQuestion);
-	    if (AuthoringAction.log.isDebugEnabled()) {
-		AuthoringAction.log.debug("Added question: " + assessmentQuestion.getTitle());
+	    if (AuthoringController.log.isDebugEnabled()) {
+		AuthoringController.log.debug("Added question: " + assessmentQuestion.getTitle());
 	    }
 	}
 
@@ -824,15 +705,16 @@ public class AuthoringAction extends Action {
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Prepares Assessment content for QTI packing
      */
     @SuppressWarnings("rawtypes")
-    private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UnsupportedEncodingException {
+    @RequestMapping("/exportQTI")
+    public String exportQTI(HttpServletRequest request, HttpServletResponse response)
+	    throws UnsupportedEncodingException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -1003,15 +885,9 @@ public class AuthoringAction extends Action {
     /**
      * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeQuestion")
+    public String removeQuestion(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -1061,21 +937,15 @@ public class AuthoringAction extends Action {
 	reinitializeAvailableQuestions(sessionMap);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward addQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/addQuestionReference")
+    public String addQuestionReference(HttpServletRequest request) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -1118,21 +988,15 @@ public class AuthoringAction extends Action {
 	reinitializeAvailableQuestions(sessionMap);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward removeQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeQuestionReference")
+    public String removeQuestionReference(HttpServletRequest request) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -1156,38 +1020,26 @@ public class AuthoringAction extends Action {
 	reinitializeAvailableQuestions(sessionMap);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Move up current question reference.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward upQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchQuestionReferences(mapping, request, true);
+    @RequestMapping("/upQuestionReference")
+    public String upQuestionReference(HttpServletRequest request) {
+	return switchQuestionReferences(request, true);
     }
 
     /**
      * Move down current question reference.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward downQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchQuestionReferences(mapping, request, false);
+    @RequestMapping("/downQuestionReference")
+    public String downQuestionReference(HttpServletRequest request) {
+	return switchQuestionReferences(request, false);
     }
 
-    private ActionForward switchQuestionReferences(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchQuestionReferences(HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -1217,25 +1069,25 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Initializes import questions page.
      */
-    private ActionForward importInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/importInit")
+    public String importInit(HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/importQuestions";
     }
 
     /**
      * Imports questions into question bank from uploaded xml file.
      */
-    private ActionForward importQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/importQuestions")
+    public String importQuestions(HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -1298,7 +1150,7 @@ public class AuthoringAction extends Action {
 	    }
 
 	} catch (Exception e) {
-	    AuthoringAction.log.error("Error occured during import", e);
+	    AuthoringController.log.error("Error occured during import", e);
 	    toolsErrorMsgs.add(e.getClass().getName() + " " + e.getMessage());
 	}
 
@@ -1307,14 +1159,14 @@ public class AuthoringAction extends Action {
 	}
 
 	reinitializeAvailableQuestions(sessionMap);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Exports xml format questions from question bank.
      */
-    private ActionForward exportQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/exportQuestions")
+    public String exportQuestions(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -1339,18 +1191,18 @@ public class AuthoringAction extends Action {
 		response.setContentType("application/x-download");
 		response.setHeader("Content-Disposition",
 			"attachment;filename=" + AssessmentConstants.EXPORT_QUESTIONS_FILENAME);
-		AuthoringAction.log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
+		AuthoringController.log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
 
 		OutputStream out = null;
 		try {
 		    out = response.getOutputStream();
 		    out.write(resultedXml.getBytes());
 		    int count = resultedXml.getBytes().length;
-		    AuthoringAction.log.debug("Wrote out " + count + " bytes");
+		    AuthoringController.log.debug("Wrote out " + count + " bytes");
 		    response.setContentLength(count);
 		    out.flush();
 		} catch (Exception e) {
-		    AuthoringAction.log.error("Exception occured writing out file:" + e.getMessage());
+		    AuthoringController.log.error("Exception occured writing out file:" + e.getMessage());
 		    throw new ExportToolContentException(e);
 		} finally {
 		    try {
@@ -1358,14 +1210,14 @@ public class AuthoringAction extends Action {
 			    out.close();
 			}
 		    } catch (Exception e) {
-			AuthoringAction.log
+			AuthoringController.log
 				.error("Error Closing file. File already written out - no exception being thrown.", e);
 		    }
 		}
 
 	    } catch (Exception e) {
 		errors = "Unable to export tool content: " + e.toString();
-		AuthoringAction.log.error(errors);
+		AuthoringController.log.error(errors);
 	    }
 
 	}
@@ -1382,15 +1234,9 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, will add one more input line for new resource item instruction.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward addOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/addOption")
+    public String addOption(HttpServletRequest request) {
 	TreeSet<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 	AssessmentQuestionOption option = new AssessmentQuestionOption();
 	int maxSeq = 1;
@@ -1407,20 +1253,14 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
 		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/optionlist";
     }
 
     /**
      * Ajax call, remove the given line of instruction of resource item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/removeOption")
+    public String removeOption(HttpServletRequest request) {
 	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
@@ -1435,38 +1275,26 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
 		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/optionlist";
     }
 
     /**
      * Move up current option.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward upOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchOption(mapping, request, true);
+    @RequestMapping("/upOption")
+    public String upOption(HttpServletRequest request) {
+	return switchOption(request, true);
     }
 
     /**
      * Move down current option.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward downOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchOption(mapping, request, false);
+    @RequestMapping("/downOption")
+    public String downOption(HttpServletRequest request) {
+	return switchOption(request, false);
     }
 
-    private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchOption(HttpServletRequest request, boolean up) {
 	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 
 	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
@@ -1496,20 +1324,14 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
 		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/optionlist";
     }
 
     /**
      * Ajax call, will add one more input line for new Unit.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newUnit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newUnit")
+    public String newUnit(HttpServletRequest request) {
 	TreeSet<AssessmentUnit> unitList = getUnitsFromRequest(request, false);
 	AssessmentUnit unit = new AssessmentUnit();
 	int maxSeq = 1;
@@ -1521,20 +1343,14 @@ public class AuthoringAction extends Action {
 	unitList.add(unit);
 
 	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/unitlist";
     }
 
     /**
      * Ajax call, will add one more input line for new resource item instruction.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward initOverallFeedback(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/initOverallFeedback")
+    public String initOverallFeedback(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -1557,20 +1373,14 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST, overallFeedbackList);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/overallfeedbacklist";
     }
 
     /**
      * Ajax call, will add one more input line for new OverallFeedback.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    private ActionForward newOverallFeedback(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newOverallFeedback")
+    public String newOverallFeedback(HttpServletRequest request) {
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromRequest(request, false);
 	AssessmentOverallFeedback overallFeedback = new AssessmentOverallFeedback();
 	int maxSeq = 1;
@@ -1582,12 +1392,13 @@ public class AuthoringAction extends Action {
 	overallFeedbackList.add(overallFeedback);
 
 	request.setAttribute(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST, overallFeedbackList);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/authoring/parts/overallfeedbacklist";
     }
 
     // *************************************************************************************
-    // Private method
+    // Private methods
     // *************************************************************************************
+
     /**
      * refreshes set of all available questions for adding to question list
      *
@@ -1605,15 +1416,6 @@ public class AuthoringAction extends Action {
 	availableQuestions.addAll(CollectionUtils.subtract(bankQuestions, questionsFromList));
 
 	sessionMap.put(AssessmentConstants.ATTR_AVAILABLE_QUESTIONS, availableQuestions);
-    }
-
-    /**
-     * Return AssessmentService bean.
-     */
-    private IAssessmentService getAssessmentService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
     }
 
     /**
@@ -1685,38 +1487,38 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * Get back relative <code>ActionForward</code> from request.
+     * Get back jsp name.
      *
      * @param type
      * @param mapping
      * @return
      */
-    private ActionForward findForward(short type, ActionMapping mapping) {
-	ActionForward forward;
+    private String findForward(short type) {
+	String forward;
 	switch (type) {
 	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-		forward = mapping.findForward("multiplechoice");
+		forward = "pages/authoring/parts/addmultiplechoice";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		forward = mapping.findForward("matchingpairs");
+		forward = "pages/authoring/parts/addmatchingpairs";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		forward = mapping.findForward("shortanswer");
+		forward = "pages/authoring/parts/addshortanswer";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-		forward = mapping.findForward("numerical");
+		forward = "pages/authoring/parts/addnumerical";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		forward = mapping.findForward("truefalse");
+		forward = "pages/authoring/parts/addtruefalse";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		forward = mapping.findForward("essay");
+		forward = "pages/authoring/parts/addessay";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
-		forward = mapping.findForward("ordering");
+		forward = "pages/authoring/parts/addordering";
 		break;
 	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-		forward = mapping.findForward("markhedging");
+		forward = "pages/authoring/parts/addmarkhedging";
 		break;
 	    default:
 		forward = null;
@@ -1777,11 +1579,6 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web form content to assessment question.
-     *
-     * @param request
-     * @param optionList
-     * @param questionForm
-     * @throws AssessmentApplicationException
      */
     private void extractFormToAssessmentQuestion(HttpServletRequest request, AssessmentQuestionForm questionForm) {
 	/*
@@ -1911,7 +1708,7 @@ public class AuthoringAction extends Action {
 
 		questionReference.setDefaultGrade(grade);
 	    } catch (Exception e) {
-		AuthoringAction.log.debug(e.getMessage());
+		AuthoringController.log.debug(e.getMessage());
 	    }
 	}
 
@@ -2137,7 +1934,7 @@ public class AuthoringAction extends Action {
 	    try {
 		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
-		AuthoringAction.log.error("Error occurs when decode instruction string:" + e.toString());
+		AuthoringController.log.error("Error occurs when decode instruction string:" + e.toString());
 	    }
 	}
 	return paramMap;

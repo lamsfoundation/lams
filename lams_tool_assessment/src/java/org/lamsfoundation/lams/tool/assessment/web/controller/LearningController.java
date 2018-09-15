@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.assessment.web.action;
+package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -50,11 +50,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -85,8 +80,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -94,63 +93,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Andrey Balan
  */
-public class LearningAction extends Action {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
-    private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, IllegalAccessException,
-	    InstantiationException, InvocationTargetException, NoSuchMethodException {
+    @Autowired
+    @Qualifier("laasseAssessmentService")
+    private IAssessmentService service;
 
-	String param = mapping.getParameter();
-	if (param.equals("start")) {
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("nextPage")) {
-	    return nextPage(mapping, form, request, response);
-	}
-	if (param.equals("submitSingleMarkHedgingQuestion")) {
-	    return submitSingleMarkHedgingQuestion(mapping, form, request, response);
-	}
-	if (param.equals("submitAll")) {
-	    return submitAll(mapping, form, request, response);
-	}
-	if (param.equals("resubmit")) {
-	    return resubmit(mapping, form, request, response);
-	}
-	if (param.equals("finish")) {
-	    return finish(mapping, form, request, response);
-	}
-	if (param.equals("upOption")) {
-	    return upOption(mapping, form, request, response);
-	}
-	if (param.equals("downOption")) {
-	    return downOption(mapping, form, request, response);
-	}
-	if (param.equals("autoSaveAnswers")) {
-	    return autoSaveAnswers(mapping, form, request, response);
-	}
-	if (param.equals("launchTimeLimit")) {
-	    return launchTimeLimit(mapping, form, request, response);
-	}
-	if (param.equals("checkLeaderProgress")) {
-	    return checkLeaderProgress(mapping, form, request, response);
-	}
-	if (param.equals("getSecondsLeft")) {
-	    return getSecondsLeft(mapping, form, request, response);
-	}
-
-	// ================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
-
-	return mapping.findForward(AssessmentConstants.ERROR);
-    }
+    @Autowired
+    private WebApplicationContext applicationContext;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -159,9 +113,9 @@ public class LearningAction extends Action {
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page".
      */
     @SuppressWarnings("unchecked")
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IllegalAccessException, InstantiationException,
-	    InvocationTargetException, NoSuchMethodException {
+    @RequestMapping("/start")
+    public String start(HttpServletRequest request) throws ServletException, IllegalAccessException,
+	    InstantiationException, InvocationTargetException, NoSuchMethodException {
 
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -177,7 +131,6 @@ public class LearningAction extends Action {
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// get back the assessment and question list and display them on page
-	IAssessmentService service = getAssessmentService();
 	AssessmentUser user = null;
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
@@ -202,7 +155,7 @@ public class LearningAction extends Action {
 		request.setAttribute(AssessmentConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 
-		return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER);
+		return "pages/learning/waitforleader";
 	    }
 
 	    AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
@@ -218,7 +171,7 @@ public class LearningAction extends Action {
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.launch.time.limit");
-		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		    return "pages/learning/waitForLeaderTimeLimit";
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
@@ -226,7 +179,7 @@ public class LearningAction extends Action {
 		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
-		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		    return "pages/learning/waitForLeaderTimeLimit";
 		}
 	    }
 
@@ -312,12 +265,12 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
 
 	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId,
-		request, getServlet().getServletContext());
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// add define later support
 	if (assessment.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return "pages/learning/definelater";
 	}
 
 	//check if there is submission deadline
@@ -334,7 +287,7 @@ public class LearningAction extends Action {
 
 	    //calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return mapping.findForward("submissionDeadline");
+		return "pages/learning/submissionDeadline";
 	    }
 	}
 
@@ -405,8 +358,8 @@ public class LearningAction extends Action {
 	if (showResults) {
 
 	    // display results page
-	    showResults(request, mapping, sessionMap);
-	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
+	    showResults(request, sessionMap);
+	    return "pages/learning/results";
 
 	} else {
 	    // set attempt started
@@ -414,17 +367,15 @@ public class LearningAction extends Action {
 		service.setAttemptStarted(assessment, user, toolSessionId);
 	    }
 
-	    return mapping.findForward(AssessmentConstants.LEARNING);
+	    return "pages/learning/learning";
 	}
     }
 
     /**
      * Checks Leader Progress
      */
-    private ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	IAssessmentService service = getAssessmentService();
+    @RequestMapping("/checkLeaderProgress")
+    public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	AssessmentSession session = service.getSessionBySessionId(toolSessionId);
@@ -443,19 +394,15 @@ public class LearningAction extends Action {
 
     /**
      * Shows next page. It's available only to leaders as non-leaders see all questions on one page.
-     *
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
-    private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @RequestMapping("/nextPage")
+    public String nextPage(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	return nextPage(mapping, request, false, -1);
+	return nextPage(request, false, -1);
     }
 
     /**
-     * Auxiliary method to be called by nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+     * Auxiliary method to be called by nextPage(HttpServletRequest request,
      * HttpServletResponse response) or submitAll.
      *
      * @param mapping
@@ -466,10 +413,9 @@ public class LearningAction extends Action {
      *            page number with questions required to be answered
      * @return
      */
-    private ActionForward nextPage(ActionMapping mapping, HttpServletRequest request, boolean isAnswersValidationFailed,
+    private String nextPage(HttpServletRequest request, boolean isAnswersValidationFailed,
 	    int pageNumberWithUnasweredQuestions)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -498,7 +444,7 @@ public class LearningAction extends Action {
 	boolean showResults = (Boolean) sessionMap.get(AssessmentConstants.ATTR_SHOW_RESULTS);
 	if (showResults) {
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
+	    return "pages/learning/results";
 
 	} else {
 	    //get user answers from request and store them into sessionMap
@@ -510,10 +456,12 @@ public class LearningAction extends Action {
 	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
 	    // use redirect to prevent form resubmission
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.LEARNING));
-	    redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	    redirect.addParameter(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, isAnswersValidationFailed);
-	    return redirect;
+	    String redirectURL = "redirect:/pages/learning/learning.jsp";
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AssessmentConstants.ATTR_SESSION_MAP_ID,
+		    sessionMapID);
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL,
+		    AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, "" + isAnswersValidationFailed);
+	    return redirectURL;
 	}
     }
 
@@ -526,11 +474,10 @@ public class LearningAction extends Action {
      * @throws JSONException
      * @throws IOException
      */
-    private ActionForward getSecondsLeft(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException,
-	    NoSuchMethodException, IOException {
+    @RequestMapping("/getSecondsLeft")
+    public String getSecondsLeft(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+	    IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
 
-	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -551,10 +498,9 @@ public class LearningAction extends Action {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    private ActionForward submitSingleMarkHedgingQuestion(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response)
+    @RequestMapping("/submitSingleMarkHedgingQuestion")
+    public String submitSingleMarkHedgingQuestion(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -599,7 +545,7 @@ public class LearningAction extends Action {
 	request.setAttribute("isLeadershipEnabled", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("isUserLeader", sessionMap.get(AssessmentConstants.ATTR_IS_USER_LEADER));
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/learning/results/markhedging";
     }
 
     /**
@@ -609,8 +555,8 @@ public class LearningAction extends Action {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    private ActionForward submitAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @RequestMapping("/submitAll")
+    public String submitAll(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -627,7 +573,7 @@ public class LearningAction extends Action {
 	    int pageNumberWithUnasweredQuestions = validateAnswers(sessionMap);
 	    // if some were not then forward to nextPage()
 	    if (pageNumberWithUnasweredQuestions != 0) {
-		return nextPage(mapping, request, true, pageNumberWithUnasweredQuestions);
+		return nextPage(request, true, pageNumberWithUnasweredQuestions);
 	    }
 	}
 
@@ -639,22 +585,21 @@ public class LearningAction extends Action {
 	    loadupLastAttempt(sessionMap);
 	}
 
-	ActionRedirect redirect = new ActionRedirect("start.do");
+	String redirectURL = "redirect:/learning/start.do";
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	if (mode != null) {
-	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
 	}
-	redirect.addParameter(AssessmentConstants.ATTR_TOOL_SESSION_ID,
-		sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
-	return redirect;
+	redirectURL = WebUtil.appendParameterToURL(redirectURL, AssessmentConstants.ATTR_TOOL_SESSION_ID,
+		((Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID)).toString());
+	return redirectURL;
     }
 
     /**
      * User pressed Resubmit button.
      */
-    private ActionForward resubmit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
-	IAssessmentService service = getAssessmentService();
+    @RequestMapping("/resubmit")
+    public String resubmit(HttpServletRequest request) throws ServletException {
 
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -673,10 +618,11 @@ public class LearningAction extends Action {
 
 	// in case of content was modified in monitor - redirect to start.do in order to refresh info from the DB
 	if (assessment.isContentModifiedInMonitor(lastAttemptStartingDate)) {
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStartMethod"));
-	    redirect.addParameter(AttributeNames.PARAM_MODE, mode.toString());
-	    redirect.addParameter(AssessmentConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
-	    return redirect;
+	    String redirectURL = "redirect:/learning/start.do";
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.PARAM_MODE, mode.toString());
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AssessmentConstants.PARAM_TOOL_SESSION_ID,
+		    toolSessionId.toString());
+	    return redirectURL;
 
 	    //otherwise use data from SessionMap
 	} else {
@@ -692,7 +638,7 @@ public class LearningAction extends Action {
 	    sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
 	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
 
-	    return mapping.findForward(AssessmentConstants.LEARNING);
+	    return "pages/learning/learning";
 	}
 
     }
@@ -700,15 +646,12 @@ public class LearningAction extends Action {
     /**
      * Finish learning session.
      */
-    private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
+    @RequestMapping("/finish")
+    public String finish(HttpServletRequest request) {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	IAssessmentService service = getAssessmentService();
-
 	String nextActivityUrl = null;
 	try {
 	    HttpSession ss = SessionManager.getSession();
@@ -719,29 +662,29 @@ public class LearningAction extends Action {
 	    nextActivityUrl = service.finishToolSession(sessionId, userID);
 	    request.setAttribute(AssessmentConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (AssessmentApplicationException e) {
-	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
+	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/learning/finish";
     }
 
     /**
      * Move up current option.
      */
-    private ActionForward upOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchOption(mapping, request, true);
+    @RequestMapping("/upOption")
+    public String upOption(HttpServletRequest request) {
+	return switchOption(request, true);
     }
 
     /**
      * Move down current option.
      */
-    private ActionForward downOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchOption(mapping, request, false);
+    @RequestMapping("/downOption")
+    public String downOption(HttpServletRequest request) {
+	return switchOption(request, false);
     }
 
-    private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
+    private String switchOption(HttpServletRequest request, boolean up) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -780,20 +723,15 @@ public class LearningAction extends Action {
 
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, questionDto);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/learning/parts/ordering";
     }
 
     /**
      * auto saves responses
-     *
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
-    private ActionForward autoSaveAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response)
+    @RequestMapping("/autoSaveAnswers")
+    public String autoSaveAnswers(HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -810,9 +748,8 @@ public class LearningAction extends Action {
     /**
      * Stores date when user has started activity with time limit
      */
-    private ActionForward launchTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	IAssessmentService service = getAssessmentService();
+    @RequestMapping("/launchTimeLimit")
+    public String launchTimeLimit(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -829,13 +766,11 @@ public class LearningAction extends Action {
     /**
      * Display empty reflection form.
      */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/newReflection")
+    public String newReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request) {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
@@ -843,8 +778,6 @@ public class LearningAction extends Action {
 	refForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	IAssessmentService service = getAssessmentService();
-
 	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = service.getEntry(toolSessionID, user.getUserID());
@@ -853,23 +786,21 @@ public class LearningAction extends Action {
 	    refForm.setEntryText(entry.getEntry());
 	}
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return "pages/learning/notebook";
     }
 
     /**
      * Submit reflection form input database.
      */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
+    @RequestMapping("/submitReflection")
+    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm,
+	    HttpServletRequest request) {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	IAssessmentService service = getAssessmentService();
 
 	// check for existing notebook entry
 	NotebookEntry entry = service.getEntry(sessionId, userId);
@@ -884,7 +815,7 @@ public class LearningAction extends Action {
 	    service.updateEntry(entry);
 	}
 
-	return finish(mapping, form, request, response);
+	return finish(request);
     }
 
     // *************************************************************************************
@@ -984,7 +915,7 @@ public class LearningAction extends Action {
 		//store justification of hedging if enabled
 		if (questionDto.isHedgingJustificationEnabled()) {
 		    String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		    answerString = answerString.replaceAll("[\n\r\f]", "");
+//		    answerString = answerString.replaceAll("[\n\r\f]", "");
 		    questionDto.setAnswerString(answerString);
 		}
 	    }
@@ -1104,12 +1035,11 @@ public class LearningAction extends Action {
     /**
      * Prepare data for displaying results page
      */
-    private void showResults(HttpServletRequest request, ActionMapping mapping, SessionMap<String, Object> sessionMap) {
+    private void showResults(HttpServletRequest request, SessionMap<String, Object> sessionMap) {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	IAssessmentService service = getAssessmentService();
 
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
@@ -1189,11 +1119,10 @@ public class LearningAction extends Action {
 		// such entities should not go into session map, but as request attributes instead
 		SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(
 			new AssessmentSessionComparator());
-		sessions.addAll(getAssessmentService().getSessionsByContentId(assessment.getContentId()));
+		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
 		request.setAttribute("sessions", sessions);
 
-		Map<Long, QuestionSummary> questionSummaries = getAssessmentService()
-			.getQuestionSummaryForExport(assessment);
+		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
 		request.setAttribute("questionSummaries", questionSummaries);
 	    }
 	}
@@ -1205,8 +1134,6 @@ public class LearningAction extends Action {
     }
 
     private void loadupLastAttempt(SessionMap<String, Object> sessionMap) {
-	IAssessmentService service = getAssessmentService();
-
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
@@ -1303,7 +1230,6 @@ public class LearningAction extends Action {
 
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
-	IAssessmentService service = getAssessmentService();
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -1322,15 +1248,7 @@ public class LearningAction extends Action {
 	return isResultsStored;
     }
 
-    private IAssessmentService getAssessmentService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
-    }
-
     private AssessmentUser getCurrentUser(Long sessionId) {
-	IAssessmentService service = getAssessmentService();
-
 	// try to get form system session
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
@@ -1348,7 +1266,7 @@ public class LearningAction extends Action {
     private AssessmentUser getSpecifiedUser(IAssessmentService service, Long sessionId, Integer userId) {
 	AssessmentUser assessmentUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
 	if (assessmentUser == null) {
-	    LearningAction.log.error(
+	    LearningController.log.error(
 		    "Unable to find specified user for assessment activity. Screens are likely to fail. SessionId="
 			    + sessionId + " UserId=" + userId);
 	}
