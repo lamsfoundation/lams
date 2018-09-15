@@ -101,7 +101,7 @@
 					saveButtonLabelKey="button.save"
 					accessMode="${accessMode}"
 					defineLater="${nbAuthoringForm.defineLater}"
-					contentFolderID="${NbAuthoringForm.contentFolderID}" />
+					contentFolderID="${nbAuthoringForm.contentFolderID}" />
 			</lams:TabBodyArea>
 
 <div id="footer"></div>

@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 

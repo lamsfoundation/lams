@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -271,19 +272,6 @@ public class MonitoringController {
 	// get service then update report table
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	submitFilesService.releaseMarksForSession(sessionID);
-
-	try {
-	    response.setContentType("text/html;charset=utf-8");
-	    PrintWriter out = response.getWriter();
-	    SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
-	    String sessionName = "";
-	    if (session != null) {
-		sessionName = session.getSessionName();
-	    }
-	    out.write(messageService.getMessage("msg.mark.released", new String[] { sessionName }));
-	    out.flush();
-	} catch (IOException e) {
-	}
     }
 
     /**
@@ -415,6 +403,7 @@ public class MonitoringController {
 	content.setSubmissionDeadline(tzSubmissionDeadline);
 	submitFilesService.saveOrUpdateContent(content);
 
+	response.setContentType("text/plain;charset=utf-8");
 	return formattedDate;
     }
 
@@ -427,12 +416,14 @@ public class MonitoringController {
     @RequestMapping("/listMark")
     public String listMark(HttpServletRequest request) {
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	Integer userID = WebUtil.readIntParam(request, "userID");
 
 	// return FileDetailsDTO list according to the given userID and sessionID
 	List files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), true);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
+	request.setAttribute(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 	request.setAttribute("report", files);
 	return "monitoring/mark/mark";
     }
@@ -444,11 +435,15 @@ public class MonitoringController {
     public String listAllMarks(HttpServletRequest request) {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+
 	// return FileDetailsDTO list according to the given sessionID
-	Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	Map<SubmitUserDTO, List<FileDetailsDTO>> userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID,
+		request.getLocale());
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	// request.setAttribute("user",submitFilesService.getUserDetails(userID));
 	request.setAttribute("reports", userFilesMap);
+	request.setAttribute(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
 	return "monitoring/mark/allmarks";
 
@@ -564,14 +559,6 @@ public class MonitoringController {
     // **********************************************************
 
     /**
-     * Save file mark information into HttpRequest
-     */
-    private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID,
-	    String updateMode) {
-
-    }
-
-    /**
      * Save Summary information into HttpRequest.
      */
     private void summary(HttpServletRequest request, List submitFilesSessionList) {
@@ -586,6 +573,7 @@ public class MonitoringController {
 	    Long sessionID = sfs.getSessionID();
 	    sessionDto.setSessionID(sessionID);
 	    sessionDto.setSessionName(sfs.getSessionName());
+	    sessionDto.setMarksReleased(sfs.isMarksReleased());
 	    sessions.add(sessionDto);
 	}
 

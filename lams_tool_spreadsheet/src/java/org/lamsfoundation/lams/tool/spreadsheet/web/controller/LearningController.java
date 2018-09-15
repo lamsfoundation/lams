@@ -29,8 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -169,8 +168,8 @@ public class LearningController {
 	    request.setAttribute(SpreadsheetConstants.ATTR_USER_IS_MARKED, false);
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, applicationContext.getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
+		applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	return "pages/learning/learning";

@@ -38,9 +38,10 @@ import org.apache.http.HttpException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -57,11 +58,11 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -89,10 +90,18 @@ public abstract class LdTemplateController {
 
     private final HttpClient httpClient = new DefaultHttpClient();
 
-    private static ILamsCoreToolService lamsCoreToolService;
-    private static IWorkspaceManagementService workspaceManagementService;
-    private static IAuthoringService authoringService;
-    private static IToolDAO toolDAO;
+    @Autowired
+    @Qualifier("lamsCoreToolService")
+    protected static ILamsCoreToolService lamsCoreToolService;
+    @Autowired
+    @Qualifier("workspaceManagementService")
+    protected static IWorkspaceManagementService workspaceManagementService;
+    @Autowired
+    @Qualifier(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME)
+    protected static IAuthoringFullService authoringFullService;
+    @Autowired
+    @Qualifier("toolDAO")
+    protected static IToolDAO toolDAO;
 
     protected static final String CONTENT_TYPE_JSON = "application/json;charset=utf-8";
 
@@ -306,7 +315,7 @@ public abstract class LdTemplateController {
     private String createTitle(String templateCode, String userEnteredString, Integer workspaceFolderID) {
 	String title = WebUtil.removeHTMLtags(userEnteredString);
 	title = title.replaceAll("[@%<>/^/*/$]", "");
-	title = getAuthoringService().getUniqueNameForLearningDesign(title, workspaceFolderID);
+	title = authoringFullService.getUniqueNameForLearningDesign(title, workspaceFolderID);
 	if (title.length() > 220) {
 	    title.substring(0, 220);
 	}
@@ -318,7 +327,7 @@ public abstract class LdTemplateController {
      *
      * @throws IOException
      * @
-     * @throws
+     *       @throws
      *       HttpException
      */
     protected ObjectNode saveLearningDesign(String templateCode, String userEnteredTitleString,
@@ -346,7 +355,7 @@ public abstract class LdTemplateController {
 
 	LearningDesign learningDesign = null;
 	try {
-	    learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
+	    learningDesign = authoringFullService.saveLearningDesignDetails(ldJSON);
 	} catch (Exception e) {
 	    LdTemplateController.log.error("Unable to learning design with details " + ldJSON, e);
 	    throw new HttpException("Unable to learning design with details " + ldJSON);
@@ -621,10 +630,10 @@ public abstract class LdTemplateController {
 
 	try {
 	    Tool tool = getTool(toolSignature);
-	    Long toolContentID = getAuthoringService().insertToolContentID(tool.getToolId());
+	    Long toolContentID = authoringFullService.insertToolContentID(tool.getToolId());
 
 	    // Tools' services implement an interface for processing REST requests
-	    ToolRestManager toolRestService = (ToolRestManager) getLamsCoreToolService().findToolService(tool);
+	    ToolRestManager toolRestService = (ToolRestManager) lamsCoreToolService.findToolService(tool);
 	    toolRestService.createRestToolContent(user.getUserID(), toolContentID, toolContentJSON);
 
 	    return toolContentID;
@@ -938,11 +947,13 @@ public abstract class LdTemplateController {
      * details of questions). Other fields are optional.
      */
     protected Long createMCQToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, ArrayNode questions) throws HttpException, IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, ArrayNode questions)
+	    throws HttpException, IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
+	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevel);
 	return createToolContent(user, LdTemplateController.MCQ_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -1086,10 +1097,14 @@ public abstract class LdTemplateController {
      * full details of questions). Other fields are optional.
      */
     protected Long createScratchieToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, ArrayNode questions) throws HttpException, IOException {
+	    boolean useSelectLeaderToolOuput, Integer confidenceLevelsActivityUiid, ArrayNode questions)
+	    throws HttpException, IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
+	if (confidenceLevelsActivityUiid != null) {
+	    toolContentJSON.put(RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID, confidenceLevelsActivityUiid);
+	}
 	return createToolContent(user, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -1270,41 +1285,8 @@ public abstract class LdTemplateController {
      */
     /* ************************************** I18N related methods ************************************************* */
 
-    protected final IAuthoringService getAuthoringService() {
-	if (LdTemplateController.authoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applictionContext.getServletContext());
-	    LdTemplateController.authoringService = (IAuthoringService) ctx.getBean("authoringService");
-	}
-	return LdTemplateController.authoringService;
-    }
-
     protected final Tool getTool(String toolSignature) {
-	if (LdTemplateController.toolDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applictionContext.getServletContext());
-	    LdTemplateController.toolDAO = (IToolDAO) ctx.getBean("toolDAO");
-	}
 	return LdTemplateController.toolDAO.getToolBySignature(toolSignature);
-    }
-
-    protected final IWorkspaceManagementService getWorkspaceManagementService() {
-	if (LdTemplateController.workspaceManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applictionContext.getServletContext());
-	    LdTemplateController.workspaceManagementService = (IWorkspaceManagementService) ctx
-		    .getBean("workspaceManagementService");
-	}
-	return LdTemplateController.workspaceManagementService;
-    }
-
-    private ILamsCoreToolService getLamsCoreToolService() {
-	if (LdTemplateController.lamsCoreToolService == null) {
-	    LdTemplateController.lamsCoreToolService = (ILamsCoreToolService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applictionContext.getServletContext())
-		    .getBean("lamsCoreToolService");
-	}
-	return LdTemplateController.lamsCoreToolService;
     }
 
     class ToolDetails {
@@ -1354,38 +1336,38 @@ public abstract class LdTemplateController {
 	String forward = request.getParameter("forward");
 	String path = null;
 	if (forward != null) {
-        	switch (forward) {
-        	    case ("init"):
-        		path = "authoring/template/tbl/tbl";
-        		break;
-        	    case ("question"):
-        		path = "authoring/template/tool/mcquestion";
-        		break;
-        	    case ("questionoption"):
-        		path = "authoring/template/tool/mcoption";
-        		break;
-        	    case ("redooption"):
-        		path = "authoring/template/tool/mcredooption";
-        		break;
-        	    case ("assess"):
-        		path = "authoring/template/tool/assessment";
-        		break;
-        	    case ("assessmcq"):
-        		path = "authoring/template/tool/assessmcq";
-        		break;
-        	    case ("assessredooption"):
-        		path = "authoring/template/tool/assessredooption";
-        		break;
-        	    case ("assessoption"):
-        		path = "authoring/template/tool/assessoption";
-        		break;
-        	    case ("peerreviewstar"):
-        		path = "authoring/template/tool/peerreviewstar";
-        		break;
-        	    default:
-        		path = null;
-        		break;
-        	}
+	    switch (forward) {
+		case ("init"):
+		    path = "authoring/template/tbl/tbl";
+		    break;
+		case ("question"):
+		    path = "authoring/template/tool/mcquestion";
+		    break;
+		case ("questionoption"):
+		    path = "authoring/template/tool/mcoption";
+		    break;
+		case ("redooption"):
+		    path = "authoring/template/tool/mcredooption";
+		    break;
+		case ("assess"):
+		    path = "authoring/template/tool/assessment";
+		    break;
+		case ("assessmcq"):
+		    path = "authoring/template/tool/assessmcq";
+		    break;
+		case ("assessredooption"):
+		    path = "authoring/template/tool/assessredooption";
+		    break;
+		case ("assessoption"):
+		    path = "authoring/template/tool/assessoption";
+		    break;
+		case ("peerreviewstar"):
+		    path = "authoring/template/tool/peerreviewstar";
+		    break;
+		default:
+		    path = null;
+		    break;
+	    }
 	}
 	return (path != null && path.length() > 0 ? path : "authoring/template/tool/mcquestion");
     }

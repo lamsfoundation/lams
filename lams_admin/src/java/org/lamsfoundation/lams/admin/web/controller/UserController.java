@@ -64,7 +64,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -118,7 +117,7 @@ public class UserController {
 
 	userForm.setOrgId(orgId);
 	userForm.setUserId(userId);
-	
+
 	// Get all the css themess
 	List<Theme> themes = UserController.themeService.getAllThemes();
 	request.setAttribute("themes", themes);
@@ -195,9 +194,14 @@ public class UserController {
 	    try {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
 		userForm.setLocaleId(locale.getLocaleId());
+		String country = LanguageUtil.getDefaultCountry();
+		userForm.setCountry(country);
 	    } catch (Exception e) {
 		UserController.log.debug(e);
 	    }
+
+	    Timezone serverTimezone = timezoneService.getServerTimezone();
+	    userForm.setTimeZone(serverTimezone.getTimezoneId());
 	}
 	userForm.setOrgId(org == null ? null : org.getOrganisationId());
 
@@ -229,6 +233,7 @@ public class UserController {
 	}
 
 	request.setAttribute("locales", UserController.locales);
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 	request.setAttribute("authenticationMethods", UserController.authenticationMethods);
 
 	return "user";

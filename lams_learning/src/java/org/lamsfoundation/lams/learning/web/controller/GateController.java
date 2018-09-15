@@ -33,15 +33,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.form.GateForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -75,15 +75,6 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Jacky Fang
  * @since 2005-4-7
  * @version 1.1
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/gate")
@@ -91,7 +82,7 @@ public class GateController {
 
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

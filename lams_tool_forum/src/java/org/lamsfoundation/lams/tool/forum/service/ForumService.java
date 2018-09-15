@@ -42,25 +42,18 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -102,7 +95,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
-import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -145,11 +137,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // system level handler and service
     private ILamsToolService toolService;
 
-    private ForumToolContentHandler forumToolContentHandler;
-
-    private IRepositoryService repositoryService;
-
-    private ILearnerService learnerService;
+    private IToolContentHandler forumToolContentHandler;
 
     private ILogEventService logEventService;
 
@@ -162,8 +150,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private ICoreNotebookService coreNotebookService;
 
     private ForumOutputFactory forumOutputFactory;
-
-    private IGradebookService gradebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -290,8 +276,15 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public void updateContainedReport(Message message) {
+    public void updateMark(Message message) {
 	messageDao.saveOrUpdate(message);
+	
+	// send marks to gradebook, if marks are released for that session
+	ForumUser user = message.getCreatedBy();
+	ForumToolSession session = user.getSession();
+	if (session.isMarkReleased()) {
+	    sendMarksToGradebook(user, session.getSessionId());
+	}
     }
 
     @Override
@@ -420,7 +413,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getTopicThread(Long rootTopicId) {
+    public List<MessageDTO> getTopicThread(Long rootTopicId) {
 	List unsortedThread = messageSeqDao.getCompleteTopic(rootTopicId);
 	Iterator iter = unsortedThread.iterator();
 	MessageSeq msgSeq;
@@ -600,51 +593,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public void releaseMarksForSession(Long sessionID) {
 	// udate release mark date for each message.
-	List<Message> list = messageDao.getBySession(sessionID);
-	Iterator<Message> iter = list.iterator();
+	List<Message> messages = messageDao.getBySession(sessionID);
 	ForumToolSession session = forumToolSessionDao.getBySessionId(sessionID);
 	Forum forum = session.getForum();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
 		ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId());
-	Map<Integer, StringBuilder> notificationMessages = null;
-	Object[] notificationMessageParameters = null;
-	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<>();
-	    notificationMessageParameters = new Object[3];
-	}
-
-	while (iter.hasNext()) {
-	    Message msg = iter.next();
-	    ForumReport report = msg.getReport();
-	    if (report != null) {
-		report.setDateMarksReleased(new Date());
-		if (notifyLearnersOnMarkRelease) {
-		    ForumUser user = msg.getCreatedBy();
-		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
-		    if (notificationMessage == null) {
-			notificationMessage = new StringBuilder();
-		    }
-		    notificationMessageParameters[0] = msg.getSubject();
-		    notificationMessageParameters[1] = msg.getUpdated();
-		    notificationMessageParameters[2] = report.getMark();
-		    notificationMessage
-			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
-		}
-	    }
-	    messageDao.saveOrUpdate(msg);
-
-	}
-	if (notifyLearnersOnMarkRelease) {
-	    notificationMessageParameters = new Object[1];
-	    for (Integer userID : notificationMessages.keySet()) {
-		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
-		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
-			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
-			notificationMessageParameters);
-
-	    }
-	}
 
 	List<ForumUser> users = getUsersBySessionId(sessionID);
 	if (users != null) {
@@ -654,9 +607,46 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	}
 
-	// update session to set MarkRelease flag.
+	// update session to set MarkRelease flag
 	session.setMarkReleased(true);
 	forumToolSessionDao.saveOrUpdate(session);
+	
+	// notify learners on mark release
+	if (notifyLearnersOnMarkRelease) {
+	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
+
+	    for (Message message : messages) {
+		ForumReport report = message.getReport();
+		if (report != null) {
+		    ForumUser user = message.getCreatedBy();
+		    StringBuilder notificationMessage = notificationMessages.get(user.getUserId().intValue());
+		    if (notificationMessage == null) {
+			notificationMessage = new StringBuilder();
+		    }
+		    Object[] notificationMessageParameters = new Object[3];
+		    notificationMessageParameters[0] = message.getSubject();
+		    notificationMessageParameters[1] = message.getUpdated();
+		    notificationMessageParameters[2] = report.getMark();
+		    notificationMessage
+			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
+		}
+	    }
+
+	    for (Integer userID : notificationMessages.keySet()) {
+		Object[] notificationMessageParameters = new Object[1];
+		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
+		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
+			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
+			notificationMessageParameters);
+
+	    }
+	}
+	
+	//audit log event
+	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionId() + ")"; 
+	String message = messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, forum.getContentId(), null, message);
 
     }
 
@@ -706,7 +696,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @param map
      * @return
      */
-    private List getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
+    private List<MessageDTO> getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
 	Iterator iter;
 	MessageSeq msgSeq;
 	Message message;
@@ -759,31 +749,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	}
 	return node;
-    }
-
-    /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws SubmitFilesException
-     */
-    private ITicket getRepositoryLoginTicket() throws ForumException {
-	ICredentials credentials = new SimpleCredentials(forumToolContentHandler.getRepositoryUser(),
-		forumToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, forumToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new ForumException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new ForumException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new ForumException("Login failed." + e.getMessage());
-	}
     }
 
     private Forum getDefaultForum() {
@@ -971,7 +936,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		user.setSessionFinished(false);
 		forumUserDao.save(user);
 
-		gradebookService.removeActivityMark(userId, session.getSessionId());
+		toolService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -1168,7 +1133,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find submit file session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -1255,7 +1220,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    }
 	    if (totalMark != null) {
 		Double mark = new Double(totalMark);
-		gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
+		toolService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
 	    }
 	}
 
@@ -1336,28 +1301,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.forumUserDao = forumUserDao;
     }
 
-    public IRepositoryService getRepositoryService() {
-	return repositoryService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
-    }
-
-    public ForumToolContentHandler getForumToolContentHandler() {
+    public IToolContentHandler getForumToolContentHandler() {
 	return forumToolContentHandler;
     }
 
-    public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
+    public void setForumToolContentHandler(IToolContentHandler toolContentHandler) {
 	forumToolContentHandler = toolContentHandler;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {
@@ -1398,10 +1347,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return messageService.getMessage(key, args);
     }
 
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
-    }
-
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
@@ -1410,9 +1355,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.activityDAO = activityDAO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String createTextSearchConditionName(Collection<ForumCondition> existingConditions) {
 	String uniqueNumber = null;

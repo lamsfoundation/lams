@@ -35,7 +35,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -52,7 +51,6 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
-import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapException;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
@@ -158,7 +156,7 @@ public class LearningController {
 	    mindmapService.saveOrUpdateMindmap(mindmap);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	HttpSession ss = SessionManager.getSession();
@@ -597,7 +595,7 @@ public class LearningController {
 	    request.setAttribute("reflectEntry", entry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(mindmapSession.getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(mindmapSession.getSessionId(), request,
 		applicationContext.getServletContext());
 
 	return "pages/learning/reflect";
@@ -658,12 +656,10 @@ public class LearningController {
 		    "finishActivity(): couldn't find MindmapUser is null " + " and toolSessionID: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = MindmapServiceProxy
-		.getMindmapSessionManager(applicationContext.getServletContext());
-
 	String nextActivityUrl;
 	try {
-	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, mindmapUser.getUserId());
+	    nextActivityUrl = ((ToolSessionManager) mindmapService).leaveToolSession(toolSessionID,
+		    mindmapUser.getUserId());
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new MindmapException(e);

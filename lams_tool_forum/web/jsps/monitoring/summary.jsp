@@ -11,6 +11,14 @@
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
+ <style>
+ 	.group-mark-release-label {
+ 		margin-top: 8px;
+ 	}
+ 	.group-mark-release-label span{
+ 		font-size: small;
+ 	}
+</style>
 	
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -34,20 +42,19 @@
 <script type="text/javascript">
 
 	function releaseMarks(sessionId){
-		var url = "<c:url value="/monitoring/releaseMark.do"/>";
-		
 		$("#message-area-busy").show();
-		$("#message-area").load(
-			url,
-			{
+		$.ajax({
+			url: "<c:url value="/monitoring/releaseMark.do"/>",
+			data: {
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
 			},
-			function() {
-				$("#message-area").show("slow").effect("highlight", {}, 2000);;
+			success: function() {
 				$("#message-area-busy").hide();
+				$("#release-marks-" + sessionId).hide();
+				$("#release-marks-info-" + sessionId).show();
 			}
-		);
+		});
 	}
 	
   	$(document).ready(function(){
@@ -170,8 +177,6 @@
 	
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="message-area-busy"/>
-	<div id="message-area"></div>
-
 </div>
 
 <c:if test="${sessionMap.isGroupedActivity}">
@@ -215,6 +220,14 @@
 		</lams:TSTable>
 
 		<P style="display: inline"> 
+			<div id="release-marks-info-${sessionDto.sessionID}" class="loffset5 group-mark-release-label"
+					<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
+				<span class="label label-success">
+					<i class="fa fa-check-circle"></i>
+					<fmt:message key="label.marks.released" />
+				</span>
+			</div>
+					
 			<c:set var="viewforum">
 				<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true
 			</c:set>

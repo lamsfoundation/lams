@@ -44,7 +44,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
@@ -58,6 +57,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeForm
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeItemForm;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -517,7 +517,7 @@ public class AuthoringController {
 
 	authoringForm.setCommonCartridge(commonCartridgePO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return "pages/authoring/authoring";
     }
 
@@ -785,7 +785,7 @@ public class AuthoringController {
 	    HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	CommonCartridge taskList = commonCartridgeService.getCommonCartridgeByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
+	String command = WebUtil.readStrParam(request, "command", true);
 	if (command == null) {
 	    pedagogicalPlannerForm.fillForm(taskList);
 	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);

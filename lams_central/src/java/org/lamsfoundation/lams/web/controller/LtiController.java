@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -69,18 +70,25 @@ public class LtiController {
     private static Logger log = Logger.getLogger(LtiController.class);
 
     @Autowired
+    @Qualifier("integrationService")
     private IIntegrationService integrationService;
     @Autowired
+    @Qualifier("monitoringService")
     private IMonitoringService monitoringService;
     @Autowired
+    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
+    @Qualifier("learningDesignService")
     private ILearningDesignService learningDesignService;
     @Autowired
+    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
+    @Qualifier("workspaceManagementService")
     private IWorkspaceManagementService workspaceManagementService;
     @Autowired
+    @Qualifier("securityService")
     private ISecurityService securityService;
 
     /**
@@ -222,12 +230,15 @@ public class LtiController {
 
 	// 1. init lesson
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
-		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro, false, false, true,
-		true, false, false, true, null, null);
+		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro,
+		extServer.getLearnerPresenceAvailable(), extServer.getLearnerImAvailable(),
+		extServer.getLiveEditEnabled(), extServer.getEnableLessonNotifications(),
+		extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
+		extServer.getGradebookOnComplete(), null, null);
 	// 2. create lessonClass for lesson
-	List<User> staffList = new LinkedList<>();
+	List<User> staffList = new LinkedList<User>();
 	staffList.add(user);
-	List<User> learnerList = new LinkedList<>();
+	List<User> learnerList = new LinkedList<User>();
 	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);

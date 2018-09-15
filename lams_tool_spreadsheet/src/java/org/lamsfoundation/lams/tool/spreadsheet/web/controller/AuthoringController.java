@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
@@ -40,6 +39,7 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.web.form.SpreadsheetForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -218,7 +218,7 @@ public class AuthoringController {
 
 	spreadsheetForm.setSpreadsheet(spreadsheetPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return "pages/authoring/authoring";
     }
 

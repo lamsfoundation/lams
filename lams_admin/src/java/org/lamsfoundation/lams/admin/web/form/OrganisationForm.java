@@ -38,8 +38,6 @@ public class OrganisationForm {
 
     private String description;
 
-    private Integer localeId = 1;
-
     private Integer stateId;
 
     private boolean courseAdminCanAddNewUsers = false;
@@ -112,14 +110,6 @@ public class OrganisationForm {
 
     public void setDescription(String description) {
 	this.description = description;
-    }
-
-    public Integer getLocaleId() {
-	return localeId;
-    }
-
-    public void setLocaleId(Integer localeId) {
-	this.localeId = localeId;
     }
 
     public Integer getStateId() {

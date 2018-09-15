@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.usermanagement.dto;
 
 import java.io.Serializable;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -49,17 +48,14 @@ public class UserDTO implements Serializable {
     private ThemeDTO theme;
     private TimeZone timeZone;
     private Integer authenticationMethodId;
-    private Boolean tutorialsDisabled;
-    private Set<String> pagesWithDisabledTutorials;
     private Boolean firstLogin;
     private Integer lastVisitedOrganisationId;
     private Long portraitUuid;
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, ThemeDTO htmlTheme, TimeZone timezone,
-	    Integer authenticationMethodId, String fckLanguageMapping, Boolean tutorialsDisabled,
-	    Set<String> pagesWithDisabledTutorials, Boolean firstLogin, Integer lastVisitedOrganisationId,
-	    Long portraitUuid) {
+	    Integer authenticationMethodId, String fckLanguageMapping, Boolean firstLogin,
+	    Integer lastVisitedOrganisationId, Long portraitUuid) {
 	this.userID = userID;
 	this.firstName = firstName;
 	this.lastName = lastName;
@@ -72,8 +68,6 @@ public class UserDTO implements Serializable {
 	timeZone = timezone;
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
-	this.tutorialsDisabled = tutorialsDisabled;
-	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
 	this.firstLogin = firstLogin;
 	this.lastVisitedOrganisationId = lastVisitedOrganisationId;
 	this.setPortraitUuid(portraitUuid);
@@ -170,28 +164,11 @@ public class UserDTO implements Serializable {
 		.append("localeLanguage", getLocaleLanguage()).append("localeCountry", getLocaleCountry())
 		.append("direction", getDirection()).append("email", getEmail()).append("htmlTheme", getTheme())
 		.append("timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())
-		.append("fckLanguageMapping", getFckLanguageMapping())
-		.append("tutorialsDisabled", "" + getTutorialsDisabled()).toString();
+		.append("fckLanguageMapping", getFckLanguageMapping()).toString();
     }
 
     public String getFckLanguageMapping() {
 	return fckLanguageMapping;
-    }
-
-    public Boolean getTutorialsDisabled() {
-	return tutorialsDisabled;
-    }
-
-    public void setTutorialsDisabled(Boolean tutorialsDisabled) {
-	this.tutorialsDisabled = tutorialsDisabled;
-    }
-
-    public Set<String> getPagesWithDisabledTutorials() {
-	return pagesWithDisabledTutorials;
-    }
-
-    public void setPagesWithDisabledTutorials(Set<String> pagesWithDisabledTutorials) {
-	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
     }
 
     public Boolean isFirstLogin() {

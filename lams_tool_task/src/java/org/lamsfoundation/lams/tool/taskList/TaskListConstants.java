@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.taskList;
 public interface TaskListConstants {
     public static final String TOOL_SIGNATURE = "latask10";
     public static final String TASKLIST_SERVICE = "lataskTaskListService";
-    public static final String TOOL_CONTENT_HANDLER_NAME = "lataskTaskListToolContentHandler";
 
     public static final int COMPLETED = 1;
 

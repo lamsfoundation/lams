@@ -47,10 +47,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -90,7 +90,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -126,7 +125,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGalleryConfigItemDAO imageGalleryConfigItemDAO;
 
     // tool service
-    private ImageGalleryToolContentHandler imageGalleryToolContentHandler;
+    private IToolContentHandler imageGalleryToolContentHandler;
 
     private MessageService messageService;
 
@@ -135,8 +134,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // system services
 
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
 
     private ILogEventService logEventService;
 
@@ -560,7 +557,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    image.setOriginalFileUuid(nodeKey.getUuid());
 	    String fileName = file.getOriginalFilename();
 
-	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    InputStream originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
 	    BufferedImage originalImage = ImageIO.read(originalIS);
 	    //throw exception if image was not successfully read
 	    if (originalImage == null) {
@@ -577,14 +574,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName, "image/jpeg");
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
 	    //store MediumImageWidth and MediumImageHeight
-	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
+	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileInputStream(mediumNodeKey.getUuid());
 	    BufferedImage mediumImage = ImageIO.read(mediumIS2);
 	    image.setMediumImageWidth(mediumImage.getWidth(null));
 	    image.setMediumImageHeight(mediumImage.getHeight(null));
 	    mediumIS2.close();
 
 	    // prepare thumbnail image
-	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
 	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
 	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
@@ -657,10 +654,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.logEventService = logEventService;
     }
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -681,7 +674,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.imageGallerySessionDao = imageGallerySessionDao;
     }
 
-    public void setImageGalleryToolContentHandler(ImageGalleryToolContentHandler imageGalleryToolContentHandler) {
+    public void setImageGalleryToolContentHandler(IToolContentHandler imageGalleryToolContentHandler) {
 	this.imageGalleryToolContentHandler = imageGalleryToolContentHandler;
     }
 
@@ -1025,7 +1018,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared imageGallery session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override

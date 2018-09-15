@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -54,7 +55,7 @@ public class SequenceController {
 
     @Autowired
     @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
 
     public static final String VIEW_SEQUENCE = "viewSequence";
     public static final String PARAM_LEARNERS = "learners";

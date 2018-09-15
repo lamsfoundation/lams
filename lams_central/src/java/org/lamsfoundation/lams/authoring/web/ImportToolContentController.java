@@ -25,18 +25,11 @@ package org.lamsfoundation.lams.authoring.web;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -51,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Import tool content servlet. It needs an uploaded learning design zip file.
@@ -58,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Steve.Ni
  */
 @Controller
+@RequestMapping("/authoring/importToolContent")
 public class ImportToolContentController {
 
     public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
@@ -84,87 +80,47 @@ public class ImportToolContentController {
     @Qualifier("authoringMessageService")
     MessageService authoringMessageService;
 
-    @RequestMapping("/authoring/importToolContent")
-    public String execute(HttpServletRequest request) throws Exception {
-	String param = request.getParameter("method");
+    @RequestMapping("/import")
+    public String execute(HttpServletRequest request) {
 	String customCSV = WebUtil.readStrParam(request, AttributeNames.PARAM_CUSTOM_CSV, true);
-	//-----------------------Resource Author function ---------------------------
-	if (StringUtils.equals(param, "import")) {
-	    if (customCSV != null) {
-		request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
-	    }
-	    //display initial page for upload
-	    return "toolcontent/import";
-	} else {
-	    importLD(request);
-	    return "toolcontent/importresult";
+	if (customCSV != null) {
+	    request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
 	}
+	return "toolcontent/import";
     }
 
-    /**
-     * @param request
-     */
-    private void importLD(HttpServletRequest request) {
+    @RequestMapping("")
+    public String importLD(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request) {
 
 	List<String> ldErrorMsgs = new ArrayList<>();
 	List<String> toolsErrorMsgs = new ArrayList<>();
 	Long ldId = null;
 
 	try {
-	    Integer workspaceFolderUid = null;
-
 	    //get shared session
 	    HttpSession ss = SessionManager.getSession();
 	    //get back login user DTO
 	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    User user = (User) userManagementService.findById(User.class, userDto.getUserID());
 
-	    File designFile = null;
-	    Map<String, String> params = new HashMap<>();
-	    String filename = null;
-
-	    String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign");
-
-	    DiskFileUpload fu = new DiskFileUpload();
-	    // maximum size that will be stored in memory
-	    fu.setSizeThreshold(4096);
-	    // the location for saving data that is larger than getSizeThreshold()
-	    // fu.setRepositoryPath(uploadPath);
-
-	    List fileItems = fu.parseRequest(request);
-	    Iterator iter = fileItems.iterator();
-	    while (iter.hasNext()) {
-		FileItem fi = (FileItem) iter.next();
-		//UPLOAD_FILE is input field from HTML page
-		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE")) {
-		    params.put(fi.getFieldName(), fi.getString());
-		} else {
-		    // filename on the client
-		    filename = FileUtil.getFileName(fi.getName());
-		    designFile = new File(uploadPath + filename);
-		    fi.write(designFile);
-
-		}
-		workspaceFolderUid = NumberUtils.createInteger(params.get("WORKSPACE_FOLDER_UID"));
-	    }
-
-	    // get customCSV for tool adapters if it was an external LMS request
-	    String customCSV = params.get(AttributeNames.PARAM_CUSTOM_CSV);
-
-	    if (designFile == null) {
+	    if (file == null) {
 		MessageService msgService = authoringMessageService;
-		log.error("Upload file missing. Filename was " + filename);
+		log.error("Upload file missing");
 		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_NOT_FOUND);
 		ldErrorMsgs.add(msg != null ? msg : "Upload file missing");
 
 	    } else {
-
-		Object[] ldResults = exportToolContentService.importLearningDesign(designFile, user, workspaceFolderUid,
+		// get customCSV for tool adapters if it was an external LMS request
+		String customCSV = request.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
+		String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign");
+		String filename = FileUtil.getFileName(file.getOriginalFilename());
+		File designFile = new File(uploadPath, filename);
+		file.transferTo(designFile);
+		Object[] ldResults = exportToolContentService.importLearningDesign(designFile, user, null,
 			toolsErrorMsgs, customCSV);
 		ldId = (Long) ldResults[0];
 		ldErrorMsgs = (List<String>) ldResults[1];
 		toolsErrorMsgs = (List<String>) ldResults[2];
-
 	    }
 
 	} catch (Exception e) {
@@ -183,6 +139,8 @@ public class ImportToolContentController {
 	if (toolsErrorMsgs.size() > 0) {
 	    request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
 	}
+
+	return ("toolcontent/importresult");
 
     }
 }

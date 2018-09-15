@@ -28,8 +28,6 @@ public class CommonCartridgeConstants {
 
     public static final String RESOURCE_SERVICE = "commonCartridgeService";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "commonCartridgeToolContentHandler";
-
     public static final int COMPLETED = 1;
 
     // commonCartridge type;

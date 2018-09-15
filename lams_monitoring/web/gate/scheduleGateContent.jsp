@@ -88,7 +88,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:when>
 				<c:otherwise>
 					<c:if test="${not gateForm.gate.gateOpen}" >
-						<p><fmt:message key="label.schedule.gate.open.message"/> <lams:Date value="${gateForm.startingTime}"/></p>
+						<p><fmt:message key="label.schedule.gate.open.message"/>&nbsp;<lams:Date value="${gateForm.startingTime}"/></p>
 						
 						<form:form action="scheduleGate.do" modelAttribute="gateForm" id="gateForm" target="_self" cssClass="form-inline">
 						<input type="hidden" name="activityId" value="${gateForm.activityId}" />

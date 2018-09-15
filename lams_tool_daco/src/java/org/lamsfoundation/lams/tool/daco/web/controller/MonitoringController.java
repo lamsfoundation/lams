@@ -54,7 +54,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.tool.daco.util.DacoExcelUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -451,9 +450,9 @@ public class MonitoringController {
 	// Prepare response headers
 	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME;
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
-	response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
-	response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION,
-		CentralConstants.HEADER_CONTENT_ATTACHMENT + fileName);
+	response.setContentType(CommonConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	response.setHeader(CommonConstants.HEADER_CONTENT_DISPOSITION,
+		CommonConstants.HEADER_CONTENT_ATTACHMENT + fileName);
 	MonitoringController.log.debug("Exporting to a spreadsheet tool content with UID: " + daco.getUid());
 	ServletOutputStream out = response.getOutputStream();
 

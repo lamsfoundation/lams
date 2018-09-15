@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,19 +34,17 @@ import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.dto.PermissionGateDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblGroupDTO;
 import org.lamsfoundation.lams.monitoring.dto.TblUserDTO;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Displays TBL monitor.
@@ -57,26 +54,29 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Controller
 @RequestMapping("/tblmonitor")
 public class TblMonitoringController {
-
-    @Autowired
-    private WebApplicationContext applicationContext;
-
     private static Logger log = Logger.getLogger(TblMonitoringController.class);
 
-    private static ILessonService lessonService;
-    private static IMonitoringService monitoringService;
-    private static ILamsCoreToolService coreToolService;
-    private static ILamsToolService toolService;
-    private static IActivityDAO activityDAO;
-    private static IGradebookService gradebookService;
+    @Autowired
+    @Qualifier("lessonService")
+    private ILessonService lessonService;
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringFullService monitoringService;
+    @Autowired
+    @Qualifier("lamsToolService")
+    private ILamsToolService toolService;
+    @Autowired
+    @Qualifier("activityDAO")
+    private IActivityDAO activityDAO;
+    @Autowired
+    @Qualifier("gradebookService")
+    private IGradebookService gradebookService;
 
     /**
      * Displays addStudent page.
      */
     @RequestMapping("/start")
     public String unspecified(HttpServletRequest request) throws Exception {
-	initServices();
-
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 	request.setAttribute("lesson", lesson);
@@ -367,7 +367,7 @@ public class TblMonitoringController {
 	    if (activity instanceof ToolActivity) {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		String toolSignature = toolActivity.getTool().getToolSignature();
-		if (CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
 		    isScratchieAvailable = true;
 		    break;
 		}
@@ -387,10 +387,10 @@ public class TblMonitoringController {
 		String toolTitle = toolActivity.getTitle();
 
 		//count only the first MCQ or Assessmnet as iRA
-		if (!iraPassed && (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| isScratchieAvailable && CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
+			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
 		    iraPassed = true;
-		    if (CentralConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 			request.setAttribute("isIraMcqAvailable", true);
 
 		    } else {
@@ -404,22 +404,22 @@ public class TblMonitoringController {
 
 		//aes are counted only after Scratchie activity, or for LKC TBL monitoring
 		if ((scratchiePassed || !isScratchieAvailable)
-			&& CentralConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    request.setAttribute("isAeAvailable", true);
 		    //prepare assessment details to be passed to Assessment tool
 		    assessmentToolContentIds += toolContentId + ",";
 		    assessmentActivityTitles += toolTitle + "\\,";
 
-		} else if (CentralConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
+		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
 		    request.setAttribute("isForumAvailable", true);
 		    request.setAttribute("forumActivityId", toolActivityId);
 
-		} else if (CentralConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
+		} else if (CommonConstants.TOOL_SIGNATURE_PEER_REVIEW.equals(toolSignature)) {
 		    request.setAttribute("isPeerreviewAvailable", true);
 		    request.setAttribute("peerreviewToolContentId", toolContentId);
 
 		    //tRA is the first scratchie activity
-		} else if (!scratchiePassed && CentralConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+		} else if (!scratchiePassed && CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
 		    scratchiePassed = true;
 
 		    request.setAttribute("isScratchieAvailable", true);
@@ -427,7 +427,7 @@ public class TblMonitoringController {
 		    request.setAttribute("traToolActivityId", toolActivityId);
 		}
 
-		if (CentralConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
+		if (CommonConstants.TOOL_SIGNATURE_LEADERSELECTION.equals(toolSignature)) {
 		    request.setAttribute("leaderselectionToolActivityId", toolActivityId);
 		    request.setAttribute("leaderselectionToolContentId", toolContentId);
 		}
@@ -440,34 +440,4 @@ public class TblMonitoringController {
 	request.setAttribute("assessmentToolContentIds", assessmentToolContentIds);
 	request.setAttribute("assessmentActivityTitles", assessmentActivityTitles);
     }
-
-    private void initServices() {
-	ServletContext servletContext = this.applicationContext.getServletContext();
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	if (lessonService == null) {
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-
-	if (monitoringService == null) {
-	    monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-
-	if (coreToolService == null) {
-	    coreToolService = (ILamsCoreToolService) ctx.getBean("lamsCoreToolService");
-	}
-
-	if (toolService == null) {
-	    toolService = (ILamsToolService) ctx.getBean("lamsToolService");
-	}
-
-	if (activityDAO == null) {
-	    activityDAO = (IActivityDAO) ctx.getBean("activityDAO");
-	}
-
-	if (gradebookService == null) {
-	    gradebookService = (IGradebookService) ctx.getBean("gradebookService");
-	}
-
-    }
-
 }

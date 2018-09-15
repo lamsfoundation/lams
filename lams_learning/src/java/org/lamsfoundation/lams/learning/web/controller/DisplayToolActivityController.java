@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -43,21 +43,15 @@ import org.springframework.web.context.WebApplicationContext;
  * Action class to forward the user to a Tool.
  *
  * @author daveg
- *
- *         XDoclet definition:
- *
- *
- *
  */
 @Controller
 public class DisplayToolActivityController {
 
     private static Logger log = Logger.getLogger(DisplayToolActivityController.class);
-    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
-
+    
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

@@ -21,6 +21,7 @@
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
 		
 		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
+<script src="${lams}includes/javascript/fullscreen.js"></script>
 		<script src="${tool}includes/javascript/jquery.timer.js"></script>
 		<script src="${tool}includes/javascript/mapjs/main.js"></script>
 		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>

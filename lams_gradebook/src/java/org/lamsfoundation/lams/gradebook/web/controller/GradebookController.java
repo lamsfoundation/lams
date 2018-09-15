@@ -35,15 +35,15 @@ import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -80,23 +81,23 @@ public class GradebookController {
 
     @Autowired
     @Qualifier("gradebookService")
-    private  IGradebookService gradebookService;
+    private IGradebookFullService gradebookService;
 
     @Autowired
     @Qualifier("userManagementService")
-    private  IUserManagementService userService;
+    private IUserManagementService userService;
 
     @Autowired
     @Qualifier("lessonService")
-    private  ILessonService lessonService;
+    private ILessonService lessonService;
 
     @Autowired
     @Qualifier("securityService")
-    private  ISecurityService securityService;
+    private ISecurityService securityService;
 
     @Autowired
     @Qualifier("learnerService")
-    private  ICoreLearnerService learnerService;
+    private ILearnerService learnerService;
 
     @RequestMapping("")
     @ResponseBody
@@ -124,10 +125,10 @@ public class GradebookController {
     @ResponseBody
     public String getActivityGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
@@ -175,6 +176,47 @@ public class GradebookController {
 	return ret;
     }
 
+    @RequestMapping("/getActivityArchiveGridData")
+    @ResponseBody
+    public String getActivityArchiveGridData(HttpServletRequest request, HttpServletResponse response)
+	    throws Exception {
+	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
+
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	if (!securityService.isLessonParticipant(lessonID, getUser().getUserID(), "get activity archive gradebook data",
+		false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a learner in the lesson");
+	    return null;
+	}
+
+	// Getting userID param, it is passed differently from different views
+	UserDTO currentUserDTO = getUser();
+	Integer userID = null;
+	if (view == GBGridView.MON_USER) {
+	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
+	} else if (view == GBGridView.LRN_ACTIVITY) {
+	    if (currentUserDTO != null) {
+		userID = currentUserDTO.getUserID();
+	    }
+	}
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+
+	// Get the user gradebook list from the db
+	// A slightly different list is needed for userview or activity view
+	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
+	    gradebookActivityDTOs = gradebookService.getGBActivityArchiveRowsForLearner(activityID, userID,
+		    currentUserDTO.getTimeZone());
+	}
+
+	String ret = GradebookUtil.toGridXML(gradebookActivityDTOs, view, GradebookConstants.PARAM_ID, false, null,
+		null, null, GradebookConstants.SORT_DESC, 100, 1);
+
+	response.setContentType("text/xml; charset=utf-8");
+	return ret;
+    }
+
     @SuppressWarnings("unchecked")
     @RequestMapping("/getLessonCompleteGridData")
     @ResponseBody
@@ -190,7 +232,7 @@ public class GradebookController {
 	List<GradebookGridRowDTO> gradebookActivityDTOs = gradebookService.getGBLessonComplete(lessonId, userId);
 
 	ObjectNode resultJSON = JsonNodeFactory.instance.objectNode();
-	resultJSON.put(GradebookConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
+	resultJSON.put(CommonConstants.ELEMENT_RECORDS, gradebookActivityDTOs.size());
 
 	ArrayNode rowsJSON = JsonNodeFactory.instance.arrayNode();
 	for (GradebookGridRowDTO gradebookActivityDTO : gradebookActivityDTOs) {
@@ -212,10 +254,10 @@ public class GradebookController {
 	    cellJSON.add(gradebookActivityDTO.getMark() == null ? GradebookConstants.CELL_EMPTY
 		    : GradebookUtil.niceFormatting(gradebookActivityDTO.getMark()));
 
-	    rowJSON.set(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.set(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.add(rowJSON);
 	}
-	resultJSON.set(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	resultJSON.set(CommonConstants.ELEMENT_ROWS, rowsJSON);
 
 	// make a mapping of activity ID -> URL, same as in progress bar
 	ObjectNode activityURLJSON = JsonNodeFactory.instance.objectNode();
@@ -274,10 +316,10 @@ public class GradebookController {
     public String getUserGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
@@ -375,7 +417,6 @@ public class GradebookController {
 	String ret = GradebookUtil.toGridXML(gradebookUserDTOs, page, totalPages, view);
 
 	response.setContentType("text/xml; charset=utf-8");
-	;
 	return ret;
     }
 
@@ -400,10 +441,10 @@ public class GradebookController {
     @ResponseBody
     public String getCourseGridData(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
 	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
@@ -490,7 +531,6 @@ public class GradebookController {
 	}
 
 	response.setContentType("text/xml; charset=utf-8");
-	;
 	return ret;
     }
 

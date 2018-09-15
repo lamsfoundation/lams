@@ -36,14 +36,6 @@
         />
 
         <property
-            name="dateMarksReleased"
-            type="java.util.Date"
-            update="true"
-            insert="true"
-            column="release_date"
-        />
-
-        <property
             name="mark"
             type="java.lang.Float"
             update="true"

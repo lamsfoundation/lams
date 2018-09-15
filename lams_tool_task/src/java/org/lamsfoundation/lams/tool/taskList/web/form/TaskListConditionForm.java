@@ -20,13 +20,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.web.form;
-
 
 import java.util.Map;
 
-import org.lamsfoundation.lams.web.TextSearchForm;
+import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**
  * Form responsible for representing <code>TaskListCondition</code> objects on a view layer.
@@ -53,7 +51,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Returns TaskListCondition name.
-     * 
+     *
      * @return TaskListCondition name
      */
     public String getName() {
@@ -62,7 +60,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Sets TaskListCondition title.
-     * 
+     *
      * @param title
      *            TaskListCondition title
      */
@@ -72,7 +70,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Returns TaskListCondition sequence Id.
-     * 
+     *
      * @return TaskListCondition sequence Id
      */
     public String getSequenceId() {
@@ -81,7 +79,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Sets TaskListCondition sequence Id.
-     * 
+     *
      * @param sequenceId
      *            TaskListCondition sequence Id
      */
@@ -91,7 +89,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Returns current SessionMapID.
-     * 
+     *
      * @return current SessionMapID
      */
     public String getSessionMapID() {
@@ -100,7 +98,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Sets current SessionMapID.
-     * 
+     *
      * @param sessionMapID
      *            current SessionMapID
      */
@@ -110,7 +108,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Returns working mode.
-     * 
+     *
      * @return working mode
      */
     public String getMode() {
@@ -119,7 +117,7 @@ public class TaskListConditionForm extends TextSearchForm {
 
     /**
      * Returns working mode.
-     * 
+     *
      * @param mode
      *            working mode
      */

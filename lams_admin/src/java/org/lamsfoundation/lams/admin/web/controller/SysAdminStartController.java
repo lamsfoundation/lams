@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -64,6 +63,7 @@ public class SysAdminStartController {
 	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
 	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
+	    links.add(new LinkBean("policyManagement/list.do", "admin.policies.title"));
 	    links.add(new LinkBean("toolcontentlist/start.do", "sysadmin.tool.management"));
 	    links.add(new LinkBean("themeManagement/start.do", "admin.themes.title"));
 	    links.add(new LinkBean("sessionmaintain/list.do", "sysadmin.maintain.session"));

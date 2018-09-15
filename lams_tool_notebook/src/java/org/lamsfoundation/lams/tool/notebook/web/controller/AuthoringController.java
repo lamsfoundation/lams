@@ -33,15 +33,14 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -69,7 +68,6 @@ public class AuthoringController {
     @Autowired
     @Qualifier("notebookService")
     private INotebookService notebookService;
-
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -125,8 +123,9 @@ public class AuthoringController {
 	return "pages/authoring/authoring";
     }
 
-    @RequestMapping(value= "/updateContent", method=RequestMethod.POST)
-    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm, HttpServletRequest request) {
+    @RequestMapping(value = "/updateContent", method = RequestMethod.POST)
+    public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
+	    HttpServletRequest request) {
 	// TODO need error checking.
 
 	// get authForm and session map.
@@ -170,7 +169,7 @@ public class AuthoringController {
 
 	notebookService.saveOrUpdateNotebook(notebook);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authoringForm.setSessionMapID(map.getSessionID());

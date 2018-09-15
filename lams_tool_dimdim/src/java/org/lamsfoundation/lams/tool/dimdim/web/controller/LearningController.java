@@ -27,23 +27,23 @@ package org.lamsfoundation.lams.tool.dimdim.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    @Qualifier("lamsToolService")
+    private ILamsToolService toolService;
 
     @RequestMapping("")
     public String execute(HttpServletRequest request) {
@@ -51,10 +51,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
-	String finishURL = learnerService.completeToolSession(toolSessionId, user.getUserID().longValue());
-	return "index";
+	String finishURL = toolService.completeToolSession(toolSessionId, user.getUserID().longValue());
+	return "redirect:" + finishURL;
     }
 }

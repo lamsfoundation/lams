@@ -32,6 +32,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function changeServerTimezone() {
+			var timeZoneId = encodeURIComponent($("#timeZoneId").val());
 			parent.document.location.href ='<c:url value="/timezonemanagement/changeServerTimezone.do?timeZoneId="/>' + $("#timeZoneId").val();
 		}
 	</script>

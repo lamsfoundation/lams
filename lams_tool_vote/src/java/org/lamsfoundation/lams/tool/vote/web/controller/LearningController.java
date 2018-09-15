@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -63,7 +62,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -144,7 +142,7 @@ public class LearningController implements VoteAppConstants {
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		applicationContext.getServletContext());
 
 	return "/learning/AllNominations";
@@ -210,7 +208,7 @@ public class LearningController implements VoteAppConstants {
 	voteLearningForm.resetCommands();
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		applicationContext.getServletContext());
 	return "/learning/ViewAnswers";
     }
@@ -579,7 +577,7 @@ public class LearningController implements VoteAppConstants {
 
 	voteLearningForm.resetCommands();
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		applicationContext.getServletContext());
 
 	return "/learning/Notebook";
@@ -748,7 +746,7 @@ public class LearningController implements VoteAppConstants {
 	    }
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
 		applicationContext.getServletContext());
 
 	/* find out if the content is being modified at the moment. */

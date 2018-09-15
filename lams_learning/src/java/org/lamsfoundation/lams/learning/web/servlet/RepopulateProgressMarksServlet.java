@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -62,14 +62,14 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
     private static ILogEventService logEventService;
     private static ILessonService lessonService;
-    private static ICoreLearnerService learnerService;
+    private static ILearnerFullService learnerService;
 
     @Override
     public void init() throws ServletException {
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 	RepopulateProgressMarksServlet.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	RepopulateProgressMarksServlet.lessonService = (ILessonService) ctx.getBean("lessonService");
-	RepopulateProgressMarksServlet.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	RepopulateProgressMarksServlet.learnerService = (ILearnerFullService) ctx.getBean("learnerService");
     }
 
     @Override

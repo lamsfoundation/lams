@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+
+	<class name="org.lamsfoundation.lams.outcome.Outcome" table="lams_outcome">
+
+		<id name="outcomeId" type="java.lang.Long" column="outcome_id">
+			<generator class="native" />
+		</id>
+		<property name="name" type="java.lang.String" column="name"
+			length="255">
+		</property>
+		<property name="code" type="java.lang.String" column="code"
+			length="50">
+		</property>
+		<property name="description" type="java.lang.String" column="description"
+			length="65535">
+		</property>
+		<property name="contentFolderId" type="java.lang.String" column="content_folder_id"
+			length="36">
+		</property>
+		<property name="createDateTime" type="java.sql.Timestamp"
+			column="create_date_time" not-null="true" length="19">
+		</property>
+		<!-- Associations -->
+		<many-to-one name="scale"
+			class="org.lamsfoundation.lams.outcome.OutcomeScale">
+			<column name="scale_id" />
+		</many-to-one>
+		
+		<many-to-one name="createBy"
+			class="org.lamsfoundation.lams.usermanagement.User"
+			not-null="false">
+			<column name="create_by" />
+		</many-to-one>
+
+		<many-to-one name="organisation"
+			class="org.lamsfoundation.lams.usermanagement.Organisation">
+			<column name="organisation_id" />
+		</many-to-one>
+	</class>
+</hibernate-mapping>

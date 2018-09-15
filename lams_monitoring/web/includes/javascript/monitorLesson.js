@@ -91,6 +91,33 @@ function initLessonTab(){
 	});
 	
 	$('#openImButton').click(openChatWindow);
+
+	//turn to inline mode for x-editable.js
+	$.fn.editable.defaults.mode = 'inline';
+	//enable renaming of lesson title  
+	$('#lesson-name-strong').editable({
+	    type: 'text',
+	    pk: lessonId,
+	    url: LAMS_URL + 'monitoring/monitoring.do?method=renameLesson',
+	    validate: function(value) {
+		    //close editing area on validation failure
+            if (!value.trim()) {
+                $('.editable-open').editableContainer('hide', 'cancel');
+                return 'Can not be empty!';
+            }
+        },
+	    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+	    success: function(response, newValue) {
+	        if(response.status == 'error') {
+	        	return response.msg; //msg will be shown in editable form
+	        }
+	    }
+    //hide and show pencil on showing and hiding editing widget
+	}).on('shown', function(e, editable) {
+		$(this).nextAll('i.fa-pencil').hide();
+	}).on('hidden', function(e, reason) {
+		$(this).nextAll('i.fa-pencil').show();
+	});
 	
 	// sets up calendar for schedule date choice
 	$('#scheduleDatetimeField').datetimepicker({
@@ -448,7 +475,7 @@ function updateLessonTab(){
 			}
 			
 			updateContributeActivities(response.contributeActivities);
-			$('.lead','#tabLessonLessonName').html('<strong>'+response.lessonName+'</strong>');
+			$('#lesson-name-strong').html(response.lessonName);
 			$('#description').html(response.lessonDescription);
 		}
 	});
@@ -597,6 +624,7 @@ function updateContributeActivities(contributeActivities) {
 				switch(this.contributionType) {
 					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
+					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
 					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 				}

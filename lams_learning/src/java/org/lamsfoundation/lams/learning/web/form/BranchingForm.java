@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.learning.web.form;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 
 public class BranchingForm {
 

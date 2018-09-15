@@ -31,14 +31,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.BranchingForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -54,13 +54,6 @@ import org.springframework.web.context.WebApplicationContext;
  *
  * @author daveg
  *
- *         XDoclet definition:
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/branching")
@@ -73,7 +66,7 @@ public class BranchingActivityController {
 
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -44,11 +44,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author daveg
- *
- *         XDoclet definition:
- *
- *
- *
  */
 @Controller
 public class ChooseActivityController {
@@ -57,11 +52,9 @@ public class ChooseActivityController {
 
     private static Logger log = Logger.getLogger(ChooseActivityController.class);
 
-    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
-
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

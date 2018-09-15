@@ -22,9 +22,9 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 
 /**
  *

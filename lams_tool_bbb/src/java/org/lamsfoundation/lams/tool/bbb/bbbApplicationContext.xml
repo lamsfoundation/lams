@@ -24,7 +24,6 @@
 				<property name="bbbDAO"><ref bean="bbbDAO"/></property>
 				<property name="bbbConfigDAO"><ref bean="bbbConfigDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
  				<property name="bbbToolContentHandler"><ref bean="bbbToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
@@ -67,9 +66,12 @@
 	<bean id="bbbConfigDAO" class="org.lamsfoundation.lams.tool.bbb.dao.hibernate.BbbConfigDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
- 	<bean id="bbbToolContentHandler" class="org.lamsfoundation.lams.tool.bbb.util.BbbToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
+
+	<bean id="bbbToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>bbbworkspace</value></property>
+		<property name="repositoryUser"><value>bbb</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
 
 </beans>

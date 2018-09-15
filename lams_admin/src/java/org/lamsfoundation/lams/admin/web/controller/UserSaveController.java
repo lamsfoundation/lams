@@ -57,18 +57,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Jun-Dir Liew
- *
- * Created at 12:35:38 on 14/06/2006
- */
-
-/**
- *
- *
- *
- *
- *
- *
- *
  */
 
 @Controller

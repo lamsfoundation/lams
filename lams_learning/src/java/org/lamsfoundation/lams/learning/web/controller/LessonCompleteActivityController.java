@@ -29,7 +29,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -51,7 +51,7 @@ public class LessonCompleteActivityController {
 
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private static IntegrationService integrationService;
@@ -80,7 +80,7 @@ public class LessonCompleteActivityController {
 		releasedLessonNames.append(releasedLesson.getLessonName()).append(", ");
 	    }
 	    releasedLessonNames.delete(releasedLessonNames.length() - 2, releasedLessonNames.length());
-	    request.setAttribute(ActivityController.RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
+	    request.setAttribute(RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
 	}
 
 	//checks for lessonFinishUrl parameter

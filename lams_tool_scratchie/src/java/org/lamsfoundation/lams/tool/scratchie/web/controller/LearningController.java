@@ -44,8 +44,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -188,8 +187,8 @@ public class LearningController {
 	    return "pages/learning/definelater";
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
-		toolSessionId, request, applicationContext.getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId,
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// check if there is submission deadline

@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.web.form.MarkForm;
 import org.lamsfoundation.lams.util.MessageService;
@@ -49,15 +50,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author lfoxton
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/mark")
@@ -111,12 +103,13 @@ public class MarkController {
 	// Return to the appropriate screen based upon the updateMode
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 	if (StringUtils.equals(markForm.getUpdateMode(), "listMark")) {
-	    List report = submitFilesService.getFilesUploadedByUser(markForm.getUserID(), markForm.getToolSessionID(),
-		    request.getLocale(), true);
+	    List<FileDetailsDTO> report = submitFilesService.getFilesUploadedByUser(markForm.getUserID(),
+		    markForm.getToolSessionID(), request.getLocale(), true);
 	    request.setAttribute("report", report);
 	    return "monitoring/mark/mark";
 	} else {
-	    Map report = submitFilesService.getFilesUploadedBySession(markForm.getToolSessionID(), request.getLocale());
+	    Map<SubmitUserDTO, List<FileDetailsDTO>> report = submitFilesService
+		    .getFilesUploadedBySession(markForm.getToolSessionID(), request.getLocale());
 	    request.setAttribute("reports", report);
 	    return "monitoring/mark/allmarks";
 	}
@@ -131,7 +124,7 @@ public class MarkController {
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);
 
-	List report = new ArrayList<FileDetailsDTO>();
+	List<FileDetailsDTO> report = new ArrayList<FileDetailsDTO>();
 	report.add(submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale()));
 
 	request.setAttribute("updateMode", markForm.getUpdateMode());
@@ -161,7 +154,7 @@ public class MarkController {
      */
     @RequestMapping("/removeMarkFile")
     public String removeMarkFile(@ModelAttribute MarkForm markForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
 
 	submitFilesService.removeMarkFile(markForm.getReportID(), markForm.getMarkFileUUID(),
 		markForm.getMarkFileVersionID(), markForm.getToolSessionID());

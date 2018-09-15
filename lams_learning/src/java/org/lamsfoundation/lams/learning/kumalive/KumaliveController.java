@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
 import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
@@ -19,6 +18,7 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.ExcelCell;
@@ -123,10 +123,10 @@ public class KumaliveController {
 	    return null;
 	}
 
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
-	String sortColumn = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortColumn = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 
 	ObjectNode resultJSON = KumaliveController.getKumaliveService().getReportOrganisationData(organisationId,
 		sortColumn, !"DESC".equalsIgnoreCase(sortOrder), rowLimit, page);
@@ -192,7 +192,7 @@ public class KumaliveController {
 	    return null;
 	}
 
-	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 
 	ObjectNode responseJSON = KumaliveController.getKumaliveService().getReportKumaliveData(kumaliveId,
 		!"DESC".equalsIgnoreCase(sortOrder));

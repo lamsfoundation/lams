@@ -38,12 +38,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -100,7 +100,7 @@ public class LearnerController {
 
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     @Qualifier("userManagementService")
@@ -244,9 +244,10 @@ public class LearnerController {
 	attemptID++;
 
 	// make a copy of attempted and completed activities
+	Date archiveDate = new Date();
 	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
-	Map<Activity, Date> attemptedActivities = new HashMap<>(learnerProgress.getAttemptedActivities());
-	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<>();
+	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
+	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
 	for (Entry<Activity, CompletedActivityProgress> entry : learnerProgress.getCompletedActivities().entrySet()) {
 	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(learnerProgress,
 		    entry.getKey(), entry.getValue().getStartDate(), entry.getValue().getFinishDate());
@@ -256,8 +257,10 @@ public class LearnerController {
 	// save the historic attempt
 	LearnerProgressArchive learnerProgressArchive = new LearnerProgressArchive(user, learnerProgress.getLesson(),
 		attemptID, attemptedActivities, completedActivities, learnerProgress.getCurrentActivity(),
-		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate());
+		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate(),
+		archiveDate);
 	userManagementService.save(learnerProgressArchive);
+	gradebookService.archiveLearnerMarks(lessonID, userID, archiveDate);
 	gradebookService.removeLearnerFromLesson(lessonID, userID);
 	monitoringService.removeLearnerContent(lessonID, userID);
 	// remove learner progress

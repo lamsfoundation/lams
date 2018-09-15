@@ -101,6 +101,7 @@
 	<h4 class="space-left"><fmt:message key="label.questions"/></h4>
 	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" id="plannerForm" modelAttribute="plannerForm" method="post">
 		
+		<form:hidden path="toolContentID" id="toolContentID" />
 		<form:hidden path="valid" id="valid" />
 		<form:hidden path="callID" id="callID" />
 		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />

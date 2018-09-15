@@ -8,6 +8,15 @@
 	<lams:LAMSURL />
 </c:set>
 
+<style>
+	.group-mark-release-label {
+		margin-top: 8px;
+	}
+	.group-mark-release-label span{
+		font-size: small;
+	}
+</style>
+
 <script type="text/javascript">
 	// pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -123,20 +132,22 @@
 				"mark");
 	}
 
+
 	function releaseMarks(sessionId) {
-		var url = "<c:url value="/monitoring/releaseMarks.do"/>";
-		
 		$("#messageArea_Busy").show();
-		$("#messageArea").load(
-			url,
-			{
+		
+		$.ajax({
+			url: "<c:url value="/monitoring/releaseMarks.do"/>",
+			data: {
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
 			},
-			function() {
+			success: function() {
 				$("#messageArea_Busy").hide();
+				$("#release-marks-" + sessionId).hide();
+				$("#release-marks-info-" + sessionId).show();
 			}
-		);
+		});
 	}
 
 </script>
@@ -157,11 +168,8 @@
 	
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="messageArea_Busy"/>
-	<div id="messageArea"></div>
 
 </div>
-
-
 
 <c:forEach var="sessionDto" items="${sessions}" varStatus="status">
 		
@@ -188,14 +196,24 @@
 	</lams:TSTable>
 	
 	<P style="display: inline"> 
+		<div id="release-marks-info-${sessionDto.sessionID}" class="loffset5 group-mark-release-label"
+				<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
+			<span class="label label-success">
+                <i class="fa fa-check-circle"></i>
+				<fmt:message key="label.marks.released" />
+			</span>
+		</div>
+		
 		<button name="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
 					class="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.viewAllMarks.button" />
 		</button>
-		<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
+		<c:if test="${!sessionDto.marksReleased}">
+			<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
 					 class="btn btn-default loffset5 voffset10" >
-			<fmt:message key="label.monitoring.releaseMarks.button" />
-		</button>
+				<fmt:message key="label.monitoring.releaseMarks.button" />
+			</button>
+		</c:if>
 		<form action="downloadMarks.do" method="post" style="display:inline">
 			<input type="hidden" name="toolSessionID" value="${sessionDto.sessionID}" />
 			<input type="submit" name="downloadMarks" value="<fmt:message key="label.monitoring.downloadMarks.button" />" class="btn btn-default loffset5 voffset10" />

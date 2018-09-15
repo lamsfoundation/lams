@@ -294,8 +294,15 @@
 
 			//handler for expand/collapse all button
 			$("#toggle-burning-questions-button").click(function() {
-				$(".ui-jqgrid-titlebar-close").click();
 				var isExpanded = eval($(this).data("expanded"));
+				
+				//fire the actual buttons so burning questions can be closed/expanded
+				$(".ui-jqgrid-titlebar-close").each(function() {
+					if (!isExpanded && $('span', this).hasClass('fa-chevron-circle-down')
+							|| isExpanded && $('span', this).hasClass('fa-chevron-circle-up')) {
+						this.click();
+					}
+				});
 
 				//change button label
 				var newButtonLabel = isExpanded ? "<fmt:message key='label.expand.all' />" : "<fmt:message key='label.collapse.all' />";

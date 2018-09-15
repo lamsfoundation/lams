@@ -337,7 +337,7 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 			}
 			
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', url);
+			$('iframe', this).attr({'src' : url, 'id' : 'authoringModal'});
 		}
 	}, true);
 	

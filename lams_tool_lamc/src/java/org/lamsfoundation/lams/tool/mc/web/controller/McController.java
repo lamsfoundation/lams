@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -50,6 +49,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -138,8 +138,7 @@ public class McController {
 	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
 	return "authoring/AuthoringTabsHolder";
-	
-	
+
     }
 
     /**
@@ -165,7 +164,7 @@ public class McController {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
 	    request.setAttribute("errorMap", errorMap);
-            McController.logger.debug("errors saved: " + errorMap);
+	    McController.logger.debug("errors saved: " + errorMap);
 	    return "authoring/AuthoringTabsHolder";
 	}
 
@@ -216,7 +215,7 @@ public class McController {
 	    }
 	}
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return "authoring/AuthoringTabsHolder";
     }
 

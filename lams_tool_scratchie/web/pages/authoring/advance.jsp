@@ -120,6 +120,8 @@
 	</div>
 </lams:AdvancedAccordian>
 
+<lams:OutcomeAuthor toolContentId="${authoringForm.scratchie.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="reflect-on">

@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
@@ -92,7 +91,7 @@ public class OrganisationGroupController {
     private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerService learnerService;
     @Autowired
     @Qualifier("lessonService")
     private ILessonService lessonService;
@@ -103,9 +102,7 @@ public class OrganisationGroupController {
     @Qualifier("integrationService")
     private IIntegrationService integrationService;
 
-    private static final String MAPPING_VIEW_GROUPINGS = "viewGroupings";
-    private static final String MAPPING_VIEW_GROUPS = "viewGroups";
-    private static final String MAPPING_VIEW_EXT_GROUPS = "viewExtGroups";
+    private static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
 
     /**
      * Shows course grouping list or redirects to groups if a grouping was already chosen.
@@ -158,7 +155,7 @@ public class OrganisationGroupController {
 	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
 	// remove users from the groups, but not delete groups due to the branching relationships.
 	boolean isUsedForBranching = (grouping != null) && grouping.isUsedForBranching();
-	request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
+	request.setAttribute(PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
 	if (OrganisationGroupController.log.isDebugEnabled()) {
 	    OrganisationGroupController.log
@@ -274,7 +271,7 @@ public class OrganisationGroupController {
 	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
 	// remove users from the groups, but not delete groups due to the branching relationships.
 	boolean isUsedForBranching = (lessonGrouping != null) && lessonGrouping.isUsedForBranching();
-	request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
+	request.setAttribute(PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
 	ArrayNode orgGroupsJSON = JsonNodeFactory.instance.arrayNode();
 	Collection<User> learners = null;

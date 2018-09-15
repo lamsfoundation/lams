@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.web.TextSearchForm;
+import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Forum needs.

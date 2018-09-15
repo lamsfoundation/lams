@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -111,7 +110,7 @@ public class LearningController {
 	    scribeService.saveOrUpdateScribe(scribe);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	// Retrieve the current user
@@ -252,8 +251,8 @@ public class LearningController {
 
 	request.setAttribute("scribeDTO", scribeDTO);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(),
-		request, applicationContext.getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(), request,
+		applicationContext.getServletContext());
 
 	return "pages/learning/notebook";
     }
@@ -295,7 +294,7 @@ public class LearningController {
 	    setupOtherGroupReportDTO(request, session, scribeUser);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
 		applicationContext.getServletContext());
 
 	return "pages/learning/report";

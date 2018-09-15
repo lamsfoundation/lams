@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -57,7 +56,6 @@ import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.service.IPixlrService;
-import org.lamsfoundation.lams.tool.pixlr.service.PixlrServiceProxy;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrException;
 import org.lamsfoundation.lams.tool.pixlr.web.forms.LearningForm;
@@ -74,18 +72,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
@@ -140,7 +126,7 @@ public class LearningController {
 	    pixlrService.saveOrUpdatePixlr(pixlr);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	// get the user
@@ -272,7 +258,8 @@ public class LearningController {
     }
 
     @RequestMapping("/finishActivity")
-    public String finishActivity(@ModelAttribute("learningForm") LearningForm learningForm,HttpServletRequest request, HttpServletResponse response) {
+    public String finishActivity(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
@@ -286,8 +273,7 @@ public class LearningController {
 		    + "and toolSessionID: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = PixlrServiceProxy
-		.getPixlrSessionManager(applicationContext.getServletContext());
+	ToolSessionManager sessionMgrService = (ToolSessionManager) pixlrService;
 
 	String nextActivityUrl;
 	try {
@@ -341,8 +327,8 @@ public class LearningController {
     }
 
     @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute("learningForm") LearningForm learningForm,
-	    HttpServletRequest request, HttpServletResponse response) {
+    public String openNotebook(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	// set the finished flag
 	PixlrUser pixlrUser = this.getCurrentUser(learningForm.getToolSessionID());
@@ -357,15 +343,15 @@ public class LearningController {
 	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
 		applicationContext.getServletContext());
 
 	return "pages/learning/notebook";
     }
 
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String submitReflection(@ModelAttribute("learningForm") LearningForm learningForm,
+	    HttpServletRequest request, HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 
@@ -440,7 +426,7 @@ public class LearningController {
 	request.setAttribute("mode", mode);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	return "pages/learning/viewAll";

@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -102,7 +101,7 @@ public class LearningController {
 	    leaderselectionService.saveOrUpdateLeaderselection(content);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request,
 		applicationContext.getServletContext());
 
 	LeaderselectionUser user;

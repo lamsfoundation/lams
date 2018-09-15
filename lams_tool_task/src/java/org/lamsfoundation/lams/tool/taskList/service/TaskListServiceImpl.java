@@ -39,9 +39,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -77,7 +77,6 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
-import org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -101,12 +100,11 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     private TaskListItemAttachmentDAO taskListItemAttachmentDao;
     private TaskListItemCommentDAO taskListItemCommentDAO;
     // tool service
-    private TaskListToolContentHandler taskListToolContentHandler;
+    private IToolContentHandler taskListToolContentHandler;
     private MessageService messageService;
     private TaskListOutputFactory taskListOutputFactory;
     // system services
     private ILamsToolService toolService;
-    private ILearnerService learnerService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
@@ -485,10 +483,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     // Set methods for Spring Bean
     // *****************************************************************************
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -521,7 +515,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	this.taskListSessionDao = taskListSessionDao;
     }
 
-    public void setTaskListToolContentHandler(TaskListToolContentHandler taskListToolContentHandler) {
+    public void setTaskListToolContentHandler(IToolContentHandler taskListToolContentHandler) {
 	this.taskListToolContentHandler = taskListToolContentHandler;
     }
 
@@ -835,7 +829,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared taskList session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override

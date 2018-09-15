@@ -24,6 +24,12 @@
 				}
 			</script>
 			
+			<c:if test="${isMarksReleased}">
+ 				<div class="alert alert-success">
+ 					<fmt:message key="label.marks.released" />
+ 				</div>
+ 			</c:if>
+
 			<p>
 				<strong><c:out value="${user.lastName}" />&nbsp;<c:out value="${user.firstName}" /></strong>&nbsp;
 				<fmt:message key="monitoring.user.post.topic" />

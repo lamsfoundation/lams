@@ -274,7 +274,7 @@ public abstract class Download extends HttpServlet {
 	if (mimeType == null) {
 	    mimeType = "application/octet-stream";
 	}
-	response.setContentType(mimeType);
+	response.setContentType(mimeType + "; charset=UTF-8");
 
 	// Get the filename stored with the file
 	prop = fileNode.getProperty(PropertyName.FILENAME);

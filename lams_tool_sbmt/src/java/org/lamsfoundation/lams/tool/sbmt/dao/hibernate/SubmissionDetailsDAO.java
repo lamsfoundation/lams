@@ -44,22 +44,11 @@ public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDeta
     private static final String FIND_BY_SESSION_LEARNER = "from " + SubmissionDetails.class.getName()
 	    + " as d where d.submitFileSession.sessionID=? and d.learner.userID=?";
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#getSubmissionDetailsByID(java.lang.Long)
-     */
     @Override
     public SubmissionDetails getSubmissionDetailsByID(Long submissionID) {
 	return (SubmissionDetails) getSession().get(SubmissionDetails.class, submissionID);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#saveOrUpdate(org.lamsfoundation.lams.tool.sbmt.
-     * SubmitFilesSession)
-     */
     @Override
     public void saveOrUpdate(SubmitFilesSession session) {
 	getSession().saveOrUpdate(session);
@@ -71,13 +60,8 @@ public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDeta
 	getSession().save(submissionDetails);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#getSubmissionDetailsBySession(java.lang.Long)
-     */
     @Override
-    public List getSubmissionDetailsBySession(Long sessionID) {
+    public List<SubmissionDetails> getSubmissionDetailsBySession(Long sessionID) {
 	if (sessionID != null) {
 	    return getSessionFactory().getCurrentSession().createQuery(FIND_BY_SESSION)
 		    .setLong(0, sessionID.longValue()).list();

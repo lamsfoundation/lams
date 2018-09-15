@@ -47,6 +47,8 @@ public class ConfigurationKeys {
     public static String LAMS_EAR_DIR = "EARDir";
 
     public static String SMTP_SERVER = "SMTPServer";
+    
+    public static String SMTP_PORT = "SMTPPort";
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
@@ -84,6 +86,11 @@ public class ConfigurationKeys {
 
     /** Default locale for the server. Originally en_AU */
     public static String SERVER_LANGUAGE = "ServerLanguage";
+    
+    /**
+     * Default country for the server. Originally AU
+     */
+    public static String SERVER_COUNTRY = "ServerCountry";
 
     /**
      * Direction (left to right, right to left) for writing on HTML pages. Originally LTR
@@ -112,6 +119,8 @@ public class ConfigurationKeys {
     public static String ALLOW_KUMALIVE = "AllowKumalive";
     
     public static String DISPLAY_PORTRAIT = "DisplayPortrait";
+    
+    public static String ENABLE_PORTRAIT_EDITING = "EnablePortraitEditing";
 
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
 
@@ -212,6 +221,8 @@ public class ConfigurationKeys {
     public static String SMTP_AUTH_USER = "SMTPUser";
 
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
+    
+    public static String SMTP_AUTH_SECURITY = "SMTPAuthSecurity";
 
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
 

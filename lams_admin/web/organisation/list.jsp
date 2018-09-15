@@ -199,10 +199,6 @@
 							<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
 						</tr>
 						<tr>
-							<td><fmt:message key="admin.organisation.locale"/>:</td>
-							<td><c:out value="${org.locale.description}" /></td>
-						</tr>
-						<tr>
 							<td><fmt:message key="admin.can.add.user"/>:</td>
 							<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
 						</tr>
@@ -288,10 +284,6 @@
 							<td><fmt:formatDate value="${org.createDate}" pattern="${datePattern}" /></td>
 						</tr>
 						<tr>
-							<td><fmt:message key="admin.organisation.locale"/>:</td>
-							<td><c:out value="${org.locale.description}" /></td>
-						</tr>
-						<tr>
 							<td><fmt:message key="admin.can.add.user"/>:</td>
 							<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
 						</tr>
@@ -315,7 +307,7 @@
 			
 				<div class="voffset10">
 				<lams:TSTable numColumns="4"> 
-					<th width="3%" clas="filter-false">
+		<th width="3%" id="idsorter" class="filter-false">
 						Id
 					</th>
 					<th width="10%" align="center"> 
@@ -333,9 +325,3 @@
 	</lams:Page>
 </body>
 </lams:html>
-
-
-
-
-
-

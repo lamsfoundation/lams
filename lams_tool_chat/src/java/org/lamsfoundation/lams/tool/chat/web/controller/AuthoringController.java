@@ -32,7 +32,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
@@ -40,6 +39,7 @@ import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -163,7 +163,7 @@ public class AuthoringController {
 
 	chatService.saveOrUpdateChat(chat);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authoringForm.setSessionMapID(map.getSessionID());

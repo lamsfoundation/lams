@@ -39,8 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
-import org.lamsfoundation.lams.learning.kumalive.service.IKumaliveService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
@@ -80,8 +79,8 @@ public class DisplayGroupController {
     @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("kumaliveService")
-    private IKumaliveService kumaliveService;
+    @Qualifier("learnerService")
+    private ILearnerService learnerService;
 
     @RequestMapping("")
     @SuppressWarnings({ "unchecked" })
@@ -226,9 +225,10 @@ public class DisplayGroupController {
 	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()
 		&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
 			|| roles.contains(Role.ROLE_LEARNER))) {
-	    Kumalive kumalive = kumaliveService.getKumaliveByOrganisation(organisationId);
+	    boolean isKumaliveDisabledForOrganisation = learnerService
+		    .isKumaliveDisabledForOrganisation(organisationId);
 	    boolean isMonitor = roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR);
-	    boolean disabled = !isMonitor && (kumalive == null || kumalive.getFinished());
+	    boolean disabled = !isMonitor && isKumaliveDisabledForOrganisation;
 	    links.add(new IndexLinkBean(isMonitor ? "index.kumalive.teacher" : "index.kumalive",
 		    "javascript:openKumalive(" + organisationId + ")",
 		    "fa fa-fw fa-bolt" + (disabled ? " disabled" : ""), "index.kumalive.tooltip"));

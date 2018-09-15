@@ -78,10 +78,10 @@
 				},
 				{
 	                label: "tRA",
-	                fillColor: "rgba(220,220,220,0.5)",
-	                strokeColor: "rgba(220,220,220,0.8)",
-	                highlightFill: "rgba(220,220,220,0.75)",
-	                highlightStroke: "rgba(220,220,220,1)",              
+	                fillColor: "rgba(176,176,176,0.5)",
+	                strokeColor: "rgba(176,176,176,0.8)",
+	                highlightFill: "rgba(176,176,176,0.75)",
+	                highlightStroke: "rgba(176,176,176,1)",              
 	                data: traScores
 				}]
 			}, {});

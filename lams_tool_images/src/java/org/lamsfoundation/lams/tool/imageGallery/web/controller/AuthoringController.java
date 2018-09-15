@@ -43,7 +43,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
@@ -58,6 +57,7 @@ import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -386,7 +386,7 @@ public class AuthoringController {
 	}
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	return "pages/authoring/authoring";
     }

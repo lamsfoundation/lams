@@ -101,18 +101,6 @@
 						<td><form:input path="description" cols="50" rows="3" cssClass="form-control" id="description"/></td>
 					</tr>
 					<tr>
-						<td><fmt:message key="admin.organisation.locale"/></td>
-						<td>
-							<form:select path="localeId" cssClass="form-control" >
-								<c:forEach items="${locales}" var="locale">
-									<form:option value="${locale.localeId}">
-										<c:out value="${locale.description}" />
-									</form:option>
-								</c:forEach>	
-							</form:select>
-						</td>
-					</tr>
-					<tr>
 						<td><fmt:message key="admin.organisation.status"/></td>
 						<td>
 							<form:select path="stateId" cssClass="form-control" >

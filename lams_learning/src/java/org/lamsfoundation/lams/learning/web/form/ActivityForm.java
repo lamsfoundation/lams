@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 
 /**
  * @author daveg

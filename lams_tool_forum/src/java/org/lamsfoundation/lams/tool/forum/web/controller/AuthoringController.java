@@ -45,7 +45,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
@@ -64,6 +63,7 @@ import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -77,7 +77,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
@@ -119,7 +118,7 @@ public class AuthoringController {
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
 	// get back the topic list and display them on page
-	forumService = getForumManager();
+	forumService = forumService;
 
 	List<MessageDTO> topics = null;
 	Forum forum = null;
@@ -221,7 +220,7 @@ public class AuthoringController {
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
 	// get back the topic list and display them on page
-	forumService = getForumManager();
+	forumService = forumService;
 
 	List<MessageDTO> topics = null;
 	try {
@@ -326,7 +325,7 @@ public class AuthoringController {
 	// get back tool content ID
 	forum.setContentId(forumForm.getToolContentID());
 
-	forumService = getForumManager();
+	forumService = forumService;
 
 	// *******************************Handle user*******************
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -428,7 +427,7 @@ public class AuthoringController {
 
 	forum = forumService.updateForum(forum);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return "jsps/authoring/authoring";
     }
 
@@ -495,7 +494,7 @@ public class AuthoringController {
 	Set attSet = null;
 	if (topicFormId.getAttachmentFile() != null
 		&& !StringUtils.isEmpty(topicFormId.getAttachmentFile().getOriginalFilename())) {
-	    forumService = getForumManager();
+	    forumService = forumService;
 	    Attachment att = forumService.uploadAttachment(topicFormId.getAttachmentFile());
 	    // only allow one attachment, so replace whatever
 	    attSet = new HashSet();
@@ -627,7 +626,7 @@ public class AuthoringController {
 	    // update attachment
 	    if (topicFormId.getAttachmentFile() != null
 		    && !StringUtils.isEmpty(topicFormId.getAttachmentFile().getOriginalFilename())) {
-		forumService = getForumManager();
+		forumService = forumService;
 		Attachment att = forumService.uploadAttachment(topicFormId.getAttachmentFile());
 		// only allow one attachment, so replace whatever
 		Set attSet = new HashSet();
@@ -711,15 +710,6 @@ public class AuthoringController {
     // Private method for internal functions
     // ******************************************************************************************************************
 
-    private IForumService getForumManager() {
-	if (forumService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
-	}
-	return forumService;
-    }
-
     private SortedSet<MessageDTO> getTopics(SessionMap<String, Object> sessionMap) {
 	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
 	if (topics == null) {
@@ -769,7 +759,6 @@ public class AuthoringController {
 	    // define it later mode(TEACHER): need read out AllowNewTopic flag rather than get from HTML form
 	    // becuase defineLater does not include this field
 	    if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-		forumService = getForumManager();
 		Forum forumPO = forumService.getForumByContentId(form.getToolContentID());
 		if (forumPO != null) {
 		    allowNewTopic = forumPO.isAllowNewTopic();
@@ -849,7 +838,7 @@ public class AuthoringController {
 	    HttpServletRequest request) {
 
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Forum forum = getForumManager().getForumByContentId(toolContentID);
+	Forum forum = forumService.getForumByContentId(toolContentID);
 	plannerForm.fillForm(forum);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
@@ -863,7 +852,7 @@ public class AuthoringController {
 
 	MultiValueMap<String, String> errorMap = plannerForm.validate();
 	if (errorMap.isEmpty()) {
-	    Forum forum = getForumManager().getForumByContentId(plannerForm.getToolContentID());
+	    Forum forum = forumService.getForumByContentId(plannerForm.getToolContentID());
 	    forum.setInstructions(plannerForm.getInstructions());
 
 	    int topicIndex = 0;
@@ -885,7 +874,7 @@ public class AuthoringController {
 	    Matcher matcher = null;
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    ForumUser forumUser = getForumManager().getUserByID(new Long(user.getUserID().intValue()));
+	    ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
 
 	    do {
 		topic = plannerForm.getTopic(topicIndex);
@@ -930,7 +919,7 @@ public class AuthoringController {
 
 		    newTopics.add(message);
 		    message.setForum(forum);
-		    getForumManager().createRootTopic(forum.getUid(), null, message);
+		    forumService.createRootTopic(forum.getUid(), null, message);
 		}
 		topicIndex++;
 	    } while (topic != null);
@@ -938,10 +927,10 @@ public class AuthoringController {
 	    while (forumTopicIterator.hasNext()) {
 		message = forumTopicIterator.next();
 		forumTopicIterator.remove();
-		getForumManager().deleteTopic(message.getUid());
+		forumService.deleteTopic(message.getUid());
 	    }
 	    forum.getMessages().addAll(newTopics);
-	    getForumManager().updateForum(forum);
+	    forumService.updateForum(forum);
 	} else {
 	    request.setAttribute("errorMap", errorMap);
 	}

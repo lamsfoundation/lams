@@ -46,6 +46,8 @@
 </div>
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${authoringForm.daco.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
 <label for="lockOnFinished"><form:checkbox path="daco.lockOnFinished" id="lockOnFinished" />

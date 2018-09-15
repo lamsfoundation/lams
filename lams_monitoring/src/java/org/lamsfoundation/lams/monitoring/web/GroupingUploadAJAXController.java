@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -51,7 +50,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
@@ -59,7 +58,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
@@ -82,8 +81,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -98,19 +95,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/groupingUpload")
 public class GroupingUploadAJAXController {
 
-    @Autowired
-    private WebApplicationContext applicationContext;
+    private static Logger log = Logger.getLogger(GroupingUploadAJAXController.class);
 
     @Autowired
     @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
 
-    private static Logger log = Logger.getLogger(GroupingUploadAJAXController.class);
-
-    private static IUserManagementService userManagementService;
-    private static ILessonService lessonService;
-    private static ISecurityService securityService;
-    private static MessageService centralMessageService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("lessonService")
+    private ILessonService lessonService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
+    @Autowired
+    @Qualifier("centralMessageService")
+    private MessageService messageService;
 
     /**
      * Get the spreadsheet file containing list of the current users, ready for uploading with groups. If lesson
@@ -135,17 +137,17 @@ public class GroupingUploadAJAXController {
 	String lessonOrOrganisationName = null;
 
 	if (lessonId != null) {
-	    lesson = (Lesson) getUserManagementService().findById(Lesson.class, lessonId);
+	    lesson = (Lesson) userManagementService.findById(Lesson.class, lessonId);
 	    lessonOrOrganisationName = lesson.getLessonName();
 	    organisationId = lesson.getOrganisation().getOrganisationId();
 	} else {
-	    Organisation organisation = (Organisation) getUserManagementService().findById(Organisation.class,
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		    organisationId);
 	    lessonOrOrganisationName = organisation.getName();
 	}
 
 	// check if user is allowed to view and edit groups
-	if (!getSecurityService().hasOrgRole(organisationId, userId,
+	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"view organisation groups", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
@@ -153,7 +155,7 @@ public class GroupingUploadAJAXController {
 	}
 
 	String fileName = new StringBuilder(
-		getCentralMessageService().getMessage("filename.create.grouping.template").trim()).append(" ")
+		messageService.getMessage("filename.create.grouping.template").trim()).append(" ")
 			.append(lessonOrOrganisationName).append(".xls").toString().replaceAll(" ", "-");
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
@@ -172,13 +174,13 @@ public class GroupingUploadAJAXController {
 	    Long groupingId = WebUtil.readLongParam(request, "groupingId", true);
 	    Set<OrganisationGroup> groups = null;
 	    if (groupingId != null) {
-		OrganisationGrouping orgGrouping = (OrganisationGrouping) getUserManagementService()
+		OrganisationGrouping orgGrouping = (OrganisationGrouping) userManagementService
 			.findById(OrganisationGrouping.class, groupingId);
 		if (orgGrouping != null) {
 		    groups = orgGrouping.getGroups();
 		}
 	    }
-	    Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(organisationId,
+	    Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(organisationId,
 		    Role.LEARNER, true);
 	    dataToExport = exportLearnersForGrouping(learners, null, groups);
 	}
@@ -203,10 +205,10 @@ public class GroupingUploadAJAXController {
 	int numberOfColumns = 4;
 
 	ExcelCell[] title = new ExcelCell[numberOfColumns];
-	title[0] = new ExcelCell(getCentralMessageService().getMessage("spreadsheet.column.login"), false);
-	title[1] = new ExcelCell(getCentralMessageService().getMessage("spreadsheet.column.firstname"), false);
-	title[2] = new ExcelCell(getCentralMessageService().getMessage("spreadsheet.column.lastname"), false);
-	title[3] = new ExcelCell(getCentralMessageService().getMessage("spreadsheet.column.groupname"), false);
+	title[0] = new ExcelCell(messageService.getMessage("spreadsheet.column.login"), false);
+	title[1] = new ExcelCell(messageService.getMessage("spreadsheet.column.firstname"), false);
+	title[2] = new ExcelCell(messageService.getMessage("spreadsheet.column.lastname"), false);
+	title[3] = new ExcelCell(messageService.getMessage("spreadsheet.column.groupname"), false);
 	rowList.add(title);
 
 	if (groups != null) {
@@ -239,7 +241,7 @@ public class GroupingUploadAJAXController {
 
 	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
-	dataToExport.put(getCentralMessageService().getMessage("label.course.groups.prefix"), summaryData);
+	dataToExport.put(messageService.getMessage("label.course.groups.prefix"), summaryData);
 	return dataToExport;
     }
 
@@ -267,7 +269,7 @@ public class GroupingUploadAJAXController {
 	// used for lesson based grouping
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
-	Lesson lesson = lessonId != null ? (Lesson) getUserManagementService().findById(Lesson.class, lessonId) : null;
+	Lesson lesson = lessonId != null ? (Lesson) userManagementService.findById(Lesson.class, lessonId) : null;
 
 	// used for course grouping
 	Long groupingId = WebUtil.readLongParam(request, "groupingId", true);
@@ -288,11 +290,11 @@ public class GroupingUploadAJAXController {
 	    organisation = lesson.getOrganisation();
 	    organisationId = organisation.getOrganisationId();
 	} else {
-	    organisation = (Organisation) getUserManagementService().findById(Organisation.class, organisationId);
+	    organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	}
 
 	// check if user is allowed to save grouping
-	if (!getSecurityService().hasOrgRole(organisationId, userId,
+	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"save organisation grouping from spreadsheet", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
@@ -320,7 +322,7 @@ public class GroupingUploadAJAXController {
 
 	OrganisationGrouping orgGrouping = null;
 	if (orgGroupingId != null) {
-	    orgGrouping = (OrganisationGrouping) getUserManagementService().findById(OrganisationGrouping.class,
+	    orgGrouping = (OrganisationGrouping) userManagementService.findById(OrganisationGrouping.class,
 		    orgGroupingId);
 	}
 	if (orgGrouping == null) {
@@ -346,14 +348,14 @@ public class GroupingUploadAJAXController {
 	    // just overwrite existing groups; they will be updated if already exist
 	    Set<User> learners = new HashSet<>();
 	    for (String login : groupEntry.getValue()) {
-		User learner = getUserManagementService().getUserByLogin(login);
+		User learner = userManagementService.getUserByLogin(login);
 		if (learner == null) {
 		    log.warn("Unable to add learner " + login + " for group in related to grouping " + orgGroupingId
 			    + " as learner cannot be found.");
 		    totalUsersSkipped++;
 
 		    //Check user is a part of the organisation
-		} else if (!getSecurityService().hasOrgRole(organisation.getOrganisationId(), learner.getUserId(),
+		} else if (!securityService.hasOrgRole(organisation.getOrganisationId(), learner.getUserId(),
 			new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR },
 			"be added to grouping", false)) {
 
@@ -375,7 +377,7 @@ public class GroupingUploadAJAXController {
 	    orgGroups.add(orgGroup);
 	}
 
-	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
+	userManagementService.saveOrganisationGrouping(orgGrouping, orgGroups);
 	return createResponseJSON(false, null, true, orgGrouping.getGroupingId(), totalUsersAdded, totalUsersSkipped);
 
     }
@@ -397,7 +399,7 @@ public class GroupingUploadAJAXController {
 	for (Group group : grouping.getGroups()) {
 	    existingGroupNames.add(group.getGroupName());
 	    if (!group.mayBeDeleted()) {
-		String error = getCentralMessageService().getMessage("error.groups.upload.locked");
+		String error = messageService.getMessage("error.groups.upload.locked");
 		return createResponseJSON(true, error, true, grouping.getGroupingId(), 0, 0);
 	    }
 	}
@@ -413,7 +415,7 @@ public class GroupingUploadAJAXController {
 		    for (String name : existingGroupNames) {
 			groupNamesStrBlder.append("'").append(name).append("' ");
 		    }
-		    String error = getCentralMessageService().getMessage(
+		    String error = messageService.getMessage(
 			    "error.branching.upload.must.use.existing.groups",
 			    new String[] { groupNamesStrBlder.toString() });
 		    return createResponseJSON(true, error.toString(), false, grouping.getGroupingId(), 0, 0);
@@ -428,13 +430,13 @@ public class GroupingUploadAJAXController {
 	    Iterator<String> iter = logins.iterator();
 	    while (iter.hasNext()) {
 		String login = iter.next();
-		User learner = getUserManagementService().getUserByLogin(login);
+		User learner = userManagementService.getUserByLogin(login);
 		if (learner == null) {
 		    log.warn("Unable to add learner " + login + " to lesson grouping as learner cannot be found.");
 		    totalUsersSkipped++;
 		    iter.remove();
 
-		} else if (!getSecurityService().isLessonLearner(lessonId, learner.getUserId(), "be added to grouping",
+		} else if (!securityService.isLessonLearner(lessonId, learner.getUserId(), "be added to grouping",
 			false)) {
 		    //log.warn("Unable to add learner " + login + " to lesson grouping as learner doesn't belong to the lesson.");
 		    totalUsersSkipped++;
@@ -444,7 +446,7 @@ public class GroupingUploadAJAXController {
 	}
 
 	// remove all the existing users from their groups
-	getLessonService().removeAllLearnersFromGrouping(grouping);
+	lessonService.removeAllLearnersFromGrouping(grouping);
 
 	// Now put in the new users groupings
 	for (Map.Entry<String, Set<String>> groupEntry : groups.entrySet()) {
@@ -476,7 +478,7 @@ public class GroupingUploadAJAXController {
     /* XLS Version Parse */
     private String parseStringCell(HSSFCell cell) {
 	if (cell != null) {
-	    cell.setCellType(Cell.CELL_TYPE_STRING);
+	    cell.setCellType(CellType.STRING);
 	    if (cell.getStringCellValue() != null) {
 		return cell.getStringCellValue().trim();
 	    }
@@ -534,42 +536,6 @@ public class GroupingUploadAJAXController {
     private UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return userManagementService;
-    }
-
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return lessonService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return securityService;
-    }
-
-    private MessageService getCentralMessageService() {
-	if (centralMessageService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    centralMessageService = (MessageService) ctx.getBean("centralMessageService");
-	}
-	return centralMessageService;
     }
 
 }

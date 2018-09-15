@@ -33,13 +33,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralToolContentHandler;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
@@ -54,7 +55,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -77,7 +77,9 @@ public class PortraitSaveController {
     private MessageService messageService;
     @Autowired
     WebApplicationContext applicationContext;
-    private static CentralToolContentHandler centralToolContentHandler;
+    @Autowired
+    @Qualifier("centralToolContentHandler")
+    private IToolContentHandler centralToolContentHandler;
     private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
 
     /**
@@ -129,32 +131,29 @@ public class PortraitSaveController {
 	    }
 
 	    // upload to the content repository
-	    originalFileNode = getCentralToolContentHandler().uploadFile(is, fileNameWithoutExt + "_original.jpg",
+	    originalFileNode = centralToolContentHandler.uploadFile(is, fileNameWithoutExt + "_original.jpg",
 		    "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and version: "
 		    + originalFileNode.getVersion());
 
 	    //resize to the large size
-	    is = ResizePictureUtil.resize(file.getInputStream(),
-		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_LARGE);
-	    NodeKey node = getCentralToolContentHandler().updateFile(originalFileNode.getUuid(), is,
+	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_LARGE);
+	    NodeKey node = centralToolContentHandler.updateFile(originalFileNode.getUuid(), is,
 		    fileNameWithoutExt + "_large.jpg", "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	    //resize to the medium size
-	    is = ResizePictureUtil.resize(file.getInputStream(),
-		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
-	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg",
+	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
+	    node = centralToolContentHandler.updateFile(node.getUuid(), is, fileNameWithoutExt + "_medium.jpg",
 		    "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
 
 	    //resize to the small size
-	    is = ResizePictureUtil.resize(file.getInputStream(),
-		    IUserManagementService.PORTRAIT_LARGEST_DIMENSION_SMALL);
-	    node = getCentralToolContentHandler().updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg",
+	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
+	    node = centralToolContentHandler.updateFile(node.getUuid(), is, fileNameWithoutExt + "_small.jpg",
 		    "image/jpeg");
 	    is.close();
 	    log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
@@ -163,7 +162,7 @@ public class PortraitSaveController {
 
 	// delete old portrait file (we only want to keep the user's current portrait)
 	if (user.getPortraitUuid() != null) {
-	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
+	    centralToolContentHandler.deleteFile(user.getPortraitUuid());
 	}
 	user.setPortraitUuid(originalFileNode.getUuid());
 	service.saveUser(user);
@@ -197,7 +196,7 @@ public class PortraitSaveController {
 		    auditMessage);
 
 	    try {
-		getCentralToolContentHandler().deleteFile(userToModify.getPortraitUuid());
+		centralToolContentHandler.deleteFile(userToModify.getPortraitUuid());
 		userToModify.setPortraitUuid(null);
 		service.saveUser(userToModify);
 	    } catch (Exception e) {
@@ -213,14 +212,4 @@ public class PortraitSaveController {
 	response.getWriter().write(data);
 	return null;
     }
-
-    private CentralToolContentHandler getCentralToolContentHandler() {
-	if (centralToolContentHandler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    centralToolContentHandler = (CentralToolContentHandler) wac.getBean("centralToolContentHandler");
-	}
-	return centralToolContentHandler;
-    }
-
 }

@@ -369,3 +369,12 @@
 		function testURL(urlField) {
 			launchPopup($('#'+urlField).val(),'popupUrl');
 		}
+		
+		function validateNoSpecialCharacters(inputText) {
+			if ( inputText ) {
+				var validator = /^[^<>^*@%$]*$/igm;	
+				var result = validator.test(inputText);
+				return result;
+			} 
+			return true;
+		}

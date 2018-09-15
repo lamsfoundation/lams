@@ -41,8 +41,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -182,8 +181,8 @@ public class LearningController {
 	Integer totalRecordCount = dacoService.getGroupRecordCount(dacoUser.getSession().getSessionId());
 	sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, applicationContext.getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
+		applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// add define later support
@@ -533,7 +532,7 @@ public class LearningController {
      * @param response
      * @return
      */
-    @RequestMapping(path="/submitReflection", method = RequestMethod.POST)
+    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
     protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
 	    @ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 	Integer userId = messageForm.getUserId();

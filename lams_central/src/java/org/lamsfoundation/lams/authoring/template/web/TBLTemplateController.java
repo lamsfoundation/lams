@@ -40,7 +40,9 @@ import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
 import org.lamsfoundation.lams.authoring.template.TemplateData;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -83,7 +85,7 @@ public class TBLTemplateController extends LdTemplateController {
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Integer workspaceFolderID = getWorkspaceManagementService().getUserWorkspaceFolder(userDTO.getUserID())
+	Integer workspaceFolderID = workspaceManagementService.getUserWorkspaceFolder(userDTO.getUserID())
 		.getResourceID().intValue();
 	AtomicInteger maxUIID = new AtomicInteger();
 	int order = 0;
@@ -118,9 +120,11 @@ public class TBLTemplateController extends LdTemplateController {
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	activityTitle = data.getText("boilerplate.ira.title");
 	Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
-		data.getText("boilerplate.ira.instructions"), false, JsonUtil.readArray(data.testQuestions.values()));
-	activities.add(createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
-		data.contentFolderID, groupingUIID, null, null, activityTitle));
+		data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable,
+		JsonUtil.readArray(data.testQuestions.values()));
+	ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
+		data.contentFolderID, groupingUIID, null, null, activityTitle);
+	activities.add(iraActivityJSON);
 
 	// Stop!
 	currentActivityPosition = calcPositionNextRight(currentActivityPosition);
@@ -137,8 +141,12 @@ public class TBLTemplateController extends LdTemplateController {
 	// tRA Test
 	currentActivityPosition = calcPositionNextRight(firstActivityInRowPosition);
 	activityTitle = data.getText("boilerplate.tra.title");
+	Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable
+		? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
+		: null;
 	Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
-		data.getText("boilerplate.tra.instructions"), false, JsonUtil.readArray(data.testQuestions.values()));
+		data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
+		JsonUtil.readArray(data.testQuestions.values()));
 	activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		data.contentFolderID, groupingUIID, null, null, activityTitle));
 
@@ -222,6 +230,7 @@ public class TBLTemplateController extends LdTemplateController {
 	Integer numLearners;
 	Integer numGroups;
 	SortedMap<Integer, ObjectNode> testQuestions;
+	boolean confidenceLevelEnable;
 	SortedMap<Integer, Assessment> applicationExercises;
 	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
 
@@ -239,11 +248,11 @@ public class TBLTemplateController extends LdTemplateController {
 	    numLearners = WebUtil.readIntParam(request, "numLearners", true);
 	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
 
-	    testQuestions = new TreeMap<>();
-	    applicationExercises = new TreeMap<>();
-	    peerReviewCriteria = new TreeMap<>();
+	    testQuestions = new TreeMap<Integer, ObjectNode>();
+	    applicationExercises = new TreeMap<Integer, Assessment>();
+	    peerReviewCriteria = new TreeMap<Integer, PeerReviewCriteria>();
 
-	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<>();
+	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
 	    Enumeration parameterNames = request.getParameterNames();
 	    while (parameterNames.hasMoreElements()) {
 		String name = (String) parameterNames.nextElement();
@@ -270,6 +279,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    processInputPeerReviewRequestField(name, request);
 		}
 	    }
+	    confidenceLevelEnable = WebUtil.readBooleanParam(request, "confidenceLevelEnable", false);
 	    updateCorrectAnswers(correctAnswers);
 
 	    processAssessments(request);
@@ -410,8 +420,8 @@ public class TBLTemplateController extends LdTemplateController {
 	    if (contentFolderID == null) {
 		addValidationErrorMessage("authoring.error.content.id", null);
 	    }
-	    if (sequenceTitle == null) {
-		addValidationErrorMessage("authoring.error.sequence.title", null);
+	    if (sequenceTitle == null || !ValidationUtil.isOrgNameValid(sequenceTitle)) {
+		addValidationErrorMessage("authoring.fla.title.validation.error", null);
 	    }
 	    if (applicationExercises.size() == 0) {
 		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });

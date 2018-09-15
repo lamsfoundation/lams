@@ -95,6 +95,8 @@ $(document).ready(function() {
 
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${imageGalleryForm.imageGallery.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">

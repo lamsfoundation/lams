@@ -4,6 +4,8 @@
 
 <lams:CommentsAuthor/>
 
+<lams:OutcomeAuthor toolContentId="${nbAuthoringForm.toolContentID}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">

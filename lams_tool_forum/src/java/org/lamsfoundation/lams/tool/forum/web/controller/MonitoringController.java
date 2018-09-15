@@ -78,11 +78,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -102,9 +100,6 @@ public class MonitoringController {
     @Autowired
     @Qualifier("forumMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     /**
      * The initial method for monitoring
@@ -133,7 +128,7 @@ public class MonitoringController {
     /**
      * The initial method for monitoring. List all users according to given Content ID.
      */
-    public void summary(HttpServletRequest request) {
+    private void summary(HttpServletRequest request) {
 	Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	// create sessionMap
@@ -150,10 +145,7 @@ public class MonitoringController {
 	// build a map with all users in the forumSessionList
 	for (ForumToolSession session : sessions) {
 	    Long sessionId = session.getSessionId();
-	    SessionDTO sessionDto = new SessionDTO();
-
-	    sessionDto.setSessionID(sessionId);
-	    sessionDto.setSessionName(session.getSessionName());
+	    SessionDTO sessionDto = new SessionDTO(session);
 
 	    // used for storing data for MonitoringAction.getUsers() serving tablesorter paging
 	    List<MessageDTO> topics = forumService.getAllTopicsFromSession(sessionId);
@@ -492,9 +484,7 @@ public class MonitoringController {
 
 	    float averMark = totalMsg == 0 ? 0 : totalMsgMarkSum / totalMsg;
 
-	    SessionDTO sessionDto = new SessionDTO();
-	    sessionDto.setSessionID(session.getSessionId());
-	    sessionDto.setSessionName(session.getSessionName());
+	    SessionDTO sessionDto = new SessionDTO(session);
 
 	    sessionTopicsMap.put(sessionDto, topicList);
 	    sessionAvaMarkMap.put(session.getSessionId(), averMark);
@@ -684,7 +674,7 @@ public class MonitoringController {
 
 	report.setMark(mark);
 	report.setComment(markForm.getComment());
-	forumService.updateContainedReport(msg);
+	forumService.updateMark(msg);
 
 	// echo back to topic list page: it depends which screen is come from: view special user mark, or view all user
 	// marks.

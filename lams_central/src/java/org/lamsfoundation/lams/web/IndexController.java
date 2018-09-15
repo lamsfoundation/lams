@@ -36,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -66,8 +67,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/index")
 public class IndexController {
 
-    private static final String PATH_PEDAGOGICAL_PLANNER = "pedagogical_planner";
-    private static final String PATH_LAMS_CENTRAL = "lams-central.war";
+    private static final String PATH_LAMS_PLANNER_WAR = "lams-planner.war";
 
     private static Logger log = Logger.getLogger(IndexController.class);
     @Autowired
@@ -76,9 +76,11 @@ public class IndexController {
     @Autowired
     @Qualifier("integrationService")
     private IIntegrationService integrationService;
+    @Autowired
+    @Qualifier("policyService")
+    private IPolicyService policyService;
 
     @RequestMapping("")
-    @SuppressWarnings("unchecked")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	IndexController.setHeaderLinks(request);
@@ -106,6 +108,11 @@ public class IndexController {
 	if (loggedInUser.isTwoFactorAuthenticationEnabled()
 		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
 	    return "redirect:/twoFactorAuthentication.do";
+	}
+
+	// check if user needs to get his shared two-factor authorization secret
+	if (policyService.isPolicyConsentRequiredForUser(loggedInUser.getUserId())) {
+	    return "redirect:/policyConsents.do";
 	}
 
 	User user = userManagementService.getUserByLogin(userDTO.getLogin());
@@ -289,9 +296,8 @@ public class IndexController {
 
     private static boolean isPedagogicalPlannerAvailable() {
 	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
-	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_CENTRAL + File.separator
-		+ PATH_PEDAGOGICAL_PLANNER;
+	String plannerPath = lamsEarPath + File.separator + PATH_LAMS_PLANNER_WAR;
 	File plannerDir = new File(plannerPath);
-	return plannerDir.isDirectory();
+	return plannerDir.exists();
     }
 }

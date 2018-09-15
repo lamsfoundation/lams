@@ -48,9 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.ObjectExtractor;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -73,8 +73,8 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -84,7 +84,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -93,11 +93,11 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -127,22 +127,33 @@ public class MonitoringController {
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
-
-    private static ILogEventService logEventService;
-
-    private static ILessonService lessonService;
-
-    private static ISecurityService securityService;
-
-    private static IMonitoringService monitoringService;
-
-    private static IUserManagementService userManagementService;
-
-    private static ILearnerService learnerService;
-
-    private static ILamsToolService toolService;
-
-    private static MessageService messageService;
+    @Autowired
+    @Qualifier("logEventService")
+    private ILogEventService logEventService;
+    @Autowired
+    @Qualifier("lessonService")
+    private ILessonService lessonService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringFullService monitoringService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("learnerService")
+    private ILearnerService learnerService;
+    @Autowired
+    @Qualifier("lamsToolService")
+    private ILamsToolService toolService;
+    @Autowired
+    @Qualifier("monitoringMessageService")
+    private MessageService messageService;
+    @Autowired
+    @Qualifier("authoringService")
+    private IAuthoringService authoringService;
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -192,11 +203,11 @@ public class MonitoringController {
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
-	    newLesson = getMonitoringService().initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
+	    newLesson = monitoringService.initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
 		    learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
 	} else {
 	    try {
-		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
+		newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
 			forceRestart, allowRestart, gradebookOnComplete, null, null);
 	    } catch (SecurityException e) {
@@ -224,7 +235,7 @@ public class MonitoringController {
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    getMonitoringService().startLesson(lessonId, getUserId());
+	    monitoringService.startLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
@@ -235,15 +246,43 @@ public class MonitoringController {
 	return null;
     }
 
+    /**
+     * Renames lesson. Invoked by Ajax call from general LAMS monitoring.
+     */
+    @RequestMapping("/startLesson")
+    @ResponseBody
+    public String renameLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
+	long lessonId = WebUtil.readLongParam(request, "pk");
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "rename lesson", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
+	String newLessonName = request.getParameter("value");
+	if (StringUtils.isBlank(newLessonName)) {
+	    return null;
+	}
+
+	Lesson lesson = lessonService.getLesson(lessonId);
+	lesson.setLessonName(newLessonName);
+	userManagementService.save(lesson);
+
+	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
+	jsonObject.put("successful", true);
+	response.setContentType("application/json;charset=utf-8");
+	return jsonObject.toString();
+    }
+
     @RequestMapping("/createLessonClass")
     public String createLessonClass(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(applicationContext.getServletContext());
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	List<User> allUsers = userManagementService.getUsersFromOrganisation(organisationId);
@@ -253,7 +292,7 @@ public class MonitoringController {
 	List<User> staff = parseUserList(request, "monitors", allUsers);
 
 	try {
-	    getMonitoringService().createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
+	    monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
 		    staffGroupName, staff, userID);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
@@ -309,9 +348,6 @@ public class MonitoringController {
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
 	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(applicationContext.getServletContext());
-
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	Integer userId = getUserId();
 	User creator = (User) userManagementService.findById(User.class, userId);
@@ -355,12 +391,12 @@ public class MonitoringController {
 
 	    Lesson lesson = null;
 	    try {
-		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
-			organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
+		lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId, organisationId,
+			userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
 			notificationsEnable, forceRestart, allowRestart, gradebookOnComplete, timeLimitIndividual,
 			precedingLessonId);
 
-		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
+		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
 	    } catch (SecurityException e) {
 		try {
@@ -377,19 +413,18 @@ public class MonitoringController {
 	    if (!startMonitor) {
 		try {
 		    if (schedulingDatetime == null) {
-			getMonitoringService().startLesson(lesson.getLessonId(), userId);
+			monitoringService.startLesson(lesson.getLessonId(), userId);
 		    } else {
 			// if lesson should start in few days, set it here
-			getMonitoringService().startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
+			monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
 		    }
 
 		    // monitor has given an end date/time for the lesson
 		    if (schedulingEndDatetime != null) {
-			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), schedulingEndDatetime,
-				userId);
+			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), schedulingEndDatetime, userId);
 			// if lesson should finish in few days, set it here
 		    } else if (timeLimitLesson != null) {
-			getMonitoringService().finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
+			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
 		    }
 
 		} catch (SecurityException e) {
@@ -414,14 +449,14 @@ public class MonitoringController {
     public String addAllOrganisationLearnersToLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "add all lesson learners to lesson", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUserId(), "add all lesson learners to lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	Vector<User> learners = getUserManagementService()
+	Lesson lesson = lessonService.getLesson(lessonId);
+	Vector<User> learners = userManagementService
 		.getUsersFromOrganisationByRole(lesson.getOrganisation().getOrganisationId(), Role.LEARNER, true);
-	getLessonService().addLearners(lesson, learners);
+	lessonService.addLearners(lesson, learners);
 	return null;
     }
 
@@ -432,7 +467,7 @@ public class MonitoringController {
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
 	Date startDate = MonitoringController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr);
 	try {
-	    getMonitoringService().startLessonOnSchedule(lessonId, startDate, getUserId());
+	    monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -452,7 +487,7 @@ public class MonitoringController {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    getMonitoringService().archiveLesson(lessonId, getUserId());
+	    monitoringService.archiveLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -471,7 +506,7 @@ public class MonitoringController {
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    getMonitoringService().unarchiveLesson(lessonId, getUserId());
+	    monitoringService.unarchiveLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -490,9 +525,9 @@ public class MonitoringController {
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
 	try {
 	    if (dateStr == null || dateStr.length() == 0) {
-		getMonitoringService().suspendLesson(lessonId, getUserId(), true);
+		monitoringService.suspendLesson(lessonId, getUserId(), true);
 	    } else {
-		getMonitoringService().finishLessonOnSchedule(lessonId,
+		monitoringService.finishLessonOnSchedule(lessonId,
 			MonitoringController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr), getUserId());
 	    }
 	} catch (SecurityException e) {
@@ -518,7 +553,7 @@ public class MonitoringController {
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
-	    getMonitoringService().unsuspendLesson(lessonId, getUserId());
+	    monitoringService.unsuspendLesson(lessonId, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -546,7 +581,7 @@ public class MonitoringController {
 	boolean permanently = WebUtil.readBooleanParam(request, "permanently", false);
 
 	if (permanently) {
-	    getMonitoringService().removeLessonPermanently(lessonId, userId);
+	    monitoringService.removeLessonPermanently(lessonId, userId);
 	    response.setContentType("text/plain;charset=utf-8");
 	    response.getWriter().print("OK");
 	    return null;
@@ -556,14 +591,13 @@ public class MonitoringController {
 
 	try {
 	    // if this method throws an Exception, there will be no removeLesson=true in the JSON reply
-	    getMonitoringService().removeLesson(lessonId, userId);
+	    monitoringService.removeLesson(lessonId, userId);
 	    jsonObject.put("removeLesson", true);
 
 	} catch (Exception e) {
 	    String[] msg = new String[1];
 	    msg[0] = e.getMessage();
-	    jsonObject.put("removeLesson",
-		    getMonitoringService().getMessageService().getMessage("error.system.error", msg));
+	    jsonObject.put("removeLesson", messageService.getMessage("error.system.error", msg));
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -607,13 +641,13 @@ public class MonitoringController {
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
 
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
-	jsonCommand.put("message", getMessageService().getMessage("force.complete.learner.command.message"));
+	jsonCommand.put("message", messageService.getMessage("force.complete.learner.command.message"));
 	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
 	String command = jsonCommand.toString();
 
 	String activityDescription = null;
 	if (activityId != null) {
-	    Activity activity = getMonitoringService().getActivityById(activityId);
+	    Activity activity = monitoringService.getActivityById(activityId);
 	    activityDescription = new StringBuffer(activity.getTitle()).append(" (").append(activityId).append(")")
 		    .toString();
 	}
@@ -630,11 +664,11 @@ public class MonitoringController {
 		    oneOrMoreProcessed = true;
 		}
 		Integer learnerID = Integer.valueOf(learnerIDString);
-		message = getMonitoringService().forceCompleteActivitiesByUser(learnerID, requesterId, lessonId,
-			activityId, removeLearnerContent);
+		message = monitoringService.forceCompleteActivitiesByUser(learnerID, requesterId, lessonId, activityId,
+			removeLearnerContent);
 
-		learner = (User) getUserManagementService().findById(User.class, learnerID);
-		getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), command);
+		learner = (User) userManagementService.findById(User.class, learnerID);
+		learnerService.createCommandForLearner(lessonId, learner.getLogin(), command);
 		learnerIdNameBuf.append(learner.getLogin()).append(" (").append(learnerID).append(")");
 	    }
 	} catch (SecurityException e) {
@@ -651,8 +685,8 @@ public class MonitoringController {
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
 
 	Object[] args = new Object[] { learnerIdNameBuf.toString(), activityDescription, lessonId };
-	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
-	getLogEventService().logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, activityId,
+	String auditMessage = messageService.getMessage(messageKey, args);
+	logEventService.logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, activityId,
 		auditMessage + " " + message);
 
 	PrintWriter writer = response.getWriter();
@@ -668,7 +702,7 @@ public class MonitoringController {
     public String getLessonLearners(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -680,7 +714,7 @@ public class MonitoringController {
 	}
 	boolean orderAscending = WebUtil.readBooleanParam(request, "orderAscending", true);
 
-	List<User> learners = getLessonService().getLessonLearners(lessonId, searchPhrase,
+	List<User> learners = lessonService.getLessonLearners(lessonId, searchPhrase,
 		MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
 		orderAscending);
 	ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
@@ -688,7 +722,7 @@ public class MonitoringController {
 	    learnersJSON.add(WebUtil.userToJSON(learner));
 	}
 
-	Integer learnerCount = getLessonService().getCountLessonLearners(lessonId, searchPhrase);
+	Integer learnerCount = lessonService.getCountLessonLearners(lessonId, searchPhrase);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.set("learners", learnersJSON);
@@ -705,12 +739,12 @@ public class MonitoringController {
     public String getClassMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get class members", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUserId(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
 	boolean isMonitor = role.equals(Role.MONITOR);
 	User creator = isMonitor ? lesson.getUser() : null;
@@ -724,13 +758,13 @@ public class MonitoringController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
 	// find organisation users and whether they participate in the current lesson
-	Map<User, Boolean> users = getLessonService().getUsersWithLessonParticipation(lessonId, role, searchPhrase,
+	Map<User, Boolean> users = lessonService.getUsersWithLessonParticipation(lessonId, role, searchPhrase,
 		MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
 		orderAscending);
 
 	// if the result is less then page size, then no need for full check of user count
 	Integer userCount = users.size() < MonitoringController.USER_PAGE_SIZE ? users.size()
-		: getUserManagementService().getCountRoleForOrg(lesson.getOrganisation().getOrganisationId(),
+		: userManagementService.getCountRoleForOrg(lesson.getOrganisation().getOrganisationId(),
 			isMonitor ? Role.ROLE_MONITOR : Role.ROLE_LEARNER, searchPhrase);
 
 	responseJSON.put("userCount", userCount);
@@ -770,24 +804,23 @@ public class MonitoringController {
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	if (activityId == null) {
 	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson completed learners", false)) {
+	    if (!securityService.isLessonMonitor(lessonId, getUserId(), "get lesson completed learners", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
 
-	    List<User> learners = getMonitoringService().getUsersCompletedLesson(lessonId,
+	    List<User> learners = monitoringService.getUsersCompletedLesson(lessonId,
 		    MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
 		learnersJSON.add(WebUtil.userToJSON(learner));
 	    }
 
-	    learnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
+	    learnerCount = monitoringService.getCountLearnersCompletedLesson(lessonId);
 	} else {
-	    Activity activity = getMonitoringService().getActivityById(activityId);
+	    Activity activity = monitoringService.getActivityById(activityId);
 	    Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
-	    if (!getSecurityService().isLessonMonitor(lesson.getLessonId(), getUserId(), "get activity learners",
-		    false)) {
+	    if (!securityService.isLessonMonitor(lesson.getLessonId(), getUserId(), "get activity learners", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
@@ -795,13 +828,13 @@ public class MonitoringController {
 	    Set<Long> activities = new TreeSet<>();
 	    activities.add(activityId);
 
-	    List<User> learners = getMonitoringService().getLearnersByActivities(activities.toArray(new Long[] {}),
+	    List<User> learners = monitoringService.getLearnersByActivities(activities.toArray(new Long[] {}),
 		    MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
 		learnersJSON.add(WebUtil.userToJSON(learner));
 	    }
-	    learnerCount = getMonitoringService().getCountLearnersCurrentActivities(new Long[] { activityId })
+	    learnerCount = monitoringService.getCountLearnersCurrentActivities(new Long[] { activityId })
 		    .get(activityId);
 	}
 
@@ -818,7 +851,7 @@ public class MonitoringController {
     @RequestMapping("/updateLessonClass")
     public String updateLessonClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -830,16 +863,16 @@ public class MonitoringController {
 
 	if (role.equals(Role.MONITOR)) {
 	    if (add) {
-		result = getLessonService().addStaffMember(lessonId, userId);
+		result = lessonService.addStaffMember(lessonId, userId);
 	    } else {
-		result = getLessonService().removeStaffMember(lessonId, userId);
+		result = lessonService.removeStaffMember(lessonId, userId);
 	    }
 	} else if (role.equals(Role.LEARNER)) {
 	    if (add) {
-		result = getLessonService().addLearner(lessonId, userId);
+		result = lessonService.addLearner(lessonId, userId);
 	    } else {
-		getLessonService().removeLearnerProgress(lessonId, userId);
-		result = getLessonService().removeLearner(lessonId, userId);
+		lessonService.removeLearnerProgress(lessonId, userId);
+		result = lessonService.removeLearner(lessonId, userId);
 	    }
 	}
 
@@ -856,8 +889,6 @@ public class MonitoringController {
 
     @RequestMapping("/getDictionaryXML")
     public String getDictionaryXML(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	MessageService messageService = getMonitoringService().getMessageService();
 
 	String module = WebUtil.readStrParam(request, "module", false);
 
@@ -916,7 +947,7 @@ public class MonitoringController {
 	Long activityID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID));
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	try {
-	    String url = getMonitoringService().getLearnerActivityURL(lessonID, activityID, learnerUserID, getUserId());
+	    String url = monitoringService.getLearnerActivityURL(lessonID, activityID, learnerUserID, getUserId());
 	    return redirectToURL(response, url);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -932,8 +963,7 @@ public class MonitoringController {
 	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
 	try {
-	    String url = getMonitoringService().getActivityMonitorURL(lessonID, activityID, contentFolderID,
-		    getUserId());
+	    String url = monitoringService.getActivityMonitorURL(lessonID, activityID, contentFolderID, getUserId());
 	    return redirectToURL(response, url);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -949,7 +979,7 @@ public class MonitoringController {
 	    throws IOException, ServletException {
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	LessonDetailsDTO lessonDTO = getLessonService().getLessonDetails(lessonId);
+	LessonDetailsDTO lessonDTO = lessonService.getLessonDetails(lessonId);
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -960,7 +990,7 @@ public class MonitoringController {
 	// prepare encoded lessonId for shortened learner URL
 	lessonDTO.setEncodedLessonID(WebUtil.encodeLessonId(lessonId));
 
-	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "monitor lesson", false)) {
+	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "monitor lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -977,13 +1007,11 @@ public class MonitoringController {
 	    request.setAttribute("sequenceTabShowInfo", true);
 	}
 
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(applicationContext.getServletContext());
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
-	boolean enableLiveEdit = organisation.getEnableLiveEdit() && getUserManagementService()
-		.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
+	boolean enableLiveEdit = organisation.getEnableLiveEdit()
+		&& userManagementService.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
 	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
@@ -998,10 +1026,10 @@ public class MonitoringController {
      */
     private boolean isTBLSequence(Long lessonId) {
 
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
 	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
-	Activity firstActivity = getMonitoringService().getActivityById(firstActivityId);
+	Activity firstActivity = monitoringService.getActivityById(firstActivityId);
 
 	return verifyNextActivityFitsTbl(firstActivity, "Grouping");
     }
@@ -1037,9 +1065,9 @@ public class MonitoringController {
 
 	    case "MCQ or Assessment":
 		//the second activity shall be a MCQ or Assessment
-		if (activity.isToolActivity() && (CentralConstants.TOOL_SIGNATURE_ASSESSMENT
+		if (activity.isToolActivity() && (CommonConstants.TOOL_SIGNATURE_ASSESSMENT
 			.equals(((ToolActivity) activity).getTool().getToolSignature())
-			|| CentralConstants.TOOL_SIGNATURE_MCQ
+			|| CommonConstants.TOOL_SIGNATURE_MCQ
 				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
 		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
 
@@ -1049,7 +1077,7 @@ public class MonitoringController {
 
 	    case "Leaderselection":
 		//the third activity shall be a Leader Selection
-		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_LEADERSELECTION
+		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_LEADERSELECTION
 			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
 		    return verifyNextActivityFitsTbl(nextActivity, "Scratchie");
 
@@ -1059,7 +1087,7 @@ public class MonitoringController {
 
 	    case "Scratchie":
 		//the fourth activity shall be Scratchie
-		if (activity.isToolActivity() && CentralConstants.TOOL_SIGNATURE_SCRATCHIE
+		if (activity.isToolActivity() && CommonConstants.TOOL_SIGNATURE_SCRATCHIE
 			.equals(((ToolActivity) activity).getTool().getToolSignature())) {
 		    return true;
 
@@ -1082,7 +1110,7 @@ public class MonitoringController {
     @ResponseBody
     public String getLearnerProgressPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get learner progress page", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUserId(), "get learner progress page", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -1097,15 +1125,15 @@ public class MonitoringController {
 
 	// either sort by name or how much a learner progressed into the lesson
 	List<User> learners = isProgressSorted
-		? getMonitoringService().getLearnersByMostProgress(lessonId, searchPhrase, 10, (pageNumber - 1) * 10)
-		: getLessonService().getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10, true);
+		? monitoringService.getLearnersByMostProgress(lessonId, searchPhrase, 10, (pageNumber - 1) * 10)
+		: lessonService.getLessonLearners(lessonId, searchPhrase, 10, (pageNumber - 1) * 10, true);
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	for (User learner : learners) {
 	    responseJSON.withArray("learners").add(WebUtil.userToJSON(learner));
 	}
 
 	// get all possible learners matching the given phrase, if any; used for max page number
-	responseJSON.put("learnerPossibleNumber", getLessonService().getCountLessonLearners(lessonId, searchPhrase));
+	responseJSON.put("learnerPossibleNumber", lessonService.getCountLessonLearners(lessonId, searchPhrase));
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -1121,19 +1149,19 @@ public class MonitoringController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	if (!getSecurityService().isLessonMonitor(lessonId, user.getUserID(), "get lesson details", false)) {
+	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "get lesson details", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
 
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
 	responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesign.getLearningDesignId());
-	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
+	responseJSON.put("numberPossibleLearners", lessonService.getCountLessonLearners(lessonId, null));
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
 	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
@@ -1174,25 +1202,24 @@ public class MonitoringController {
     public String getLessonChartData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	Integer possibleLearnersCount = getLessonService().getCountLessonLearners(lessonId, null);
-	Integer completedLearnersCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
-	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId)
-		- completedLearnersCount;
+	Integer possibleLearnersCount = lessonService.getCountLessonLearners(lessonId, null);
+	Integer completedLearnersCount = monitoringService.getCountLearnersCompletedLesson(lessonId);
+	Integer startedLearnersCount = lessonService.getCountActiveLessonLearners(lessonId) - completedLearnersCount;
 	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
-	notStartedJSON.put("name", getMessageService().getMessage("lesson.chart.not.completed"));
+	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
 	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
 	responseJSON.withArray("data").add(notStartedJSON);
 
 	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
-	startedJSON.put("name", getMessageService().getMessage("lesson.chart.started"));
+	startedJSON.put("name", messageService.getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
 	responseJSON.withArray("data").add(startedJSON);
 
 	ObjectNode completedJSON = JsonNodeFactory.instance.objectNode();
-	completedJSON.put("name", getMessageService().getMessage("lesson.chart.completed"));
+	completedJSON.put("name", messageService.getMessage("lesson.chart.completed"));
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
 	responseJSON.withArray("data").add(completedJSON);
 
@@ -1209,13 +1236,13 @@ public class MonitoringController {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer monitorUserId = getUserId();
-	if (!getSecurityService().isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
+	if (!securityService.isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 	Integer searchedLearnerId = WebUtil.readIntParam(request, "searchedLearnerId", true);
 
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
 	String contentFolderId = learningDesign.getContentFolderID();
 
@@ -1227,7 +1254,7 @@ public class MonitoringController {
 		continue;
 	    }
 	    // get real activity object, not proxy
-	    activities.add(getMonitoringService().getActivityById(activity.getActivityId()));
+	    activities.add(monitoringService.getActivityById(activity.getActivityId()));
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
@@ -1239,7 +1266,7 @@ public class MonitoringController {
 	// check if the searched learner has started the lesson
 	LearnerProgress searchedLearnerProgress = null;
 	if (searchedLearnerId != null) {
-	    searchedLearnerProgress = getLessonService().getUserProgressForLesson(searchedLearnerId, lessonId);
+	    searchedLearnerProgress = lessonService.getUserProgressForLesson(searchedLearnerId, lessonId);
 	    responseJSON.put("searchedLearnerFound", searchedLearnerProgress != null);
 	}
 
@@ -1253,12 +1280,12 @@ public class MonitoringController {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
 			.equals(toolActivity.getTool().getToolSignature())) {
-		    leaders.addAll(getToolService().getLeaderUserId(activity.getActivityId()));
+		    leaders.addAll(toolService.getLeaderUserId(activity.getActivityId()));
 		}
 	    }
 	}
 
-	Map<Long, Integer> learnerCounts = getMonitoringService()
+	Map<Long, Integer> learnerCounts = monitoringService
 		.getCountLearnersCurrentActivities(activityIds.toArray(new Long[activityIds.size()]));
 
 	ArrayNode activitiesJSON = JsonNodeFactory.instance.arrayNode();
@@ -1292,7 +1319,7 @@ public class MonitoringController {
 		activityJSON.put("y", MonitoringController.getActivityCoordinate(activity.getYcoord()));
 	    }
 
-	    String monitorUrl = getMonitoringService().getActivityMonitorURL(lessonId, activityId, contentFolderId,
+	    String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
 		    monitorUserId);
 	    if (monitorUrl != null && !activity.isBranchingActivity()) {
 		// whole activity monitor URL
@@ -1302,7 +1329,7 @@ public class MonitoringController {
 	    // find few latest users and count of all users for each activity
 	    int learnerCount = learnerCounts.get(activityId);
 	    if (!activity.isBranchingActivity() && !activity.isOptionsWithSequencesActivity()) {
-		List<User> latestLearners = getMonitoringService().getLearnersLatestByActivity(activity.getActivityId(),
+		List<User> latestLearners = monitoringService.getLearnersLatestByActivity(activity.getActivityId(),
 			MonitoringController.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT, null);
 
 		// insert leaders as first of learners
@@ -1346,13 +1373,13 @@ public class MonitoringController {
 	responseJSON.set("activities", activitiesJSON);
 
 	// find learners who completed the lesson
-	List<User> completedLearners = getMonitoringService().getLearnersLatestCompleted(lessonId,
+	List<User> completedLearners = monitoringService.getLearnersLatestCompleted(lessonId,
 		MonitoringController.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT, null);
 	Integer completedLearnerCount = null;
 	if (completedLearners.size() < MonitoringController.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT) {
 	    completedLearnerCount = completedLearners.size();
 	} else {
-	    completedLearnerCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
+	    completedLearnerCount = monitoringService.getCountLearnersCompletedLesson(lessonId);
 	}
 	responseJSON.put("completedLearnerCount", completedLearnerCount);
 
@@ -1367,7 +1394,7 @@ public class MonitoringController {
 	    responseJSON.withArray("completedLearners").add(learnerJSON);
 	}
 
-	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
+	responseJSON.put("numberPossibleLearners", lessonService.getCountLessonLearners(lessonId, null));
 
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
 	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
@@ -1396,7 +1423,7 @@ public class MonitoringController {
     public String autocomplete(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "autocomplete in monitoring", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getUserId(), "autocomplete in monitoring", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -1407,13 +1434,13 @@ public class MonitoringController {
 	Collection<User> users = null;
 	if (isOrganisationSearch) {
 	    // search for Learners in the organisation
-	    Map<User, Boolean> result = getLessonService().getUsersWithLessonParticipation(lessonId, Role.LEARNER,
+	    Map<User, Boolean> result = lessonService.getUsersWithLessonParticipation(lessonId, Role.LEARNER,
 		    searchPhrase, MonitoringController.USER_PAGE_SIZE, null, true);
 	    users = result.keySet();
 	} else {
 	    // search for Learners in the lesson
-	    users = getLessonService().getLessonLearners(lessonId, searchPhrase, MonitoringController.USER_PAGE_SIZE,
-		    null, true);
+	    users = lessonService.getLessonLearners(lessonId, searchPhrase, MonitoringController.USER_PAGE_SIZE, null,
+		    true);
 	}
 
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
@@ -1439,8 +1466,6 @@ public class MonitoringController {
 	long activityBid = WebUtil.readLongParam(request, "activityB");
 	boolean result = false;
 
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(applicationContext.getServletContext());
 	Activity precedingActivity = monitoringService.getActivityById(activityBid);
 
 	// move back an look for activity A
@@ -1502,8 +1527,8 @@ public class MonitoringController {
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	try {
-	    getMonitoringService().createPreviewClassForLesson(userID, lessonID);
-	    getMonitoringService().startLesson(lessonID, getUserId());
+	    monitoringService.createPreviewClassForLesson(userID, lessonID);
+	    monitoringService.startLesson(lessonID, getUserId());
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 	}
@@ -1515,8 +1540,8 @@ public class MonitoringController {
     public String startLiveEdit(HttpServletRequest request, HttpServletResponse response)
 	    throws LearningDesignException, UserException, IOException {
 
-	long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	LearningDesign learningDesign = (LearningDesign) getUserManagementService().findById(LearningDesign.class,
+	long learningDesignId = WebUtil.readLongParam(request, CommonConstants.PARAM_LEARNING_DESIGN_ID);
+	LearningDesign learningDesign = (LearningDesign) userManagementService.findById(LearningDesign.class,
 		learningDesignId);
 	if (learningDesign.getLessons().isEmpty()) {
 	    throw new InvalidParameterException(
@@ -1525,14 +1550,11 @@ public class MonitoringController {
 	Integer organisationID = ((Lesson) learningDesign.getLessons().iterator().next()).getOrganisation()
 		.getOrganisationId();
 	Integer userID = getUserId();
-	if (!getSecurityService().hasOrgRole(organisationID, userID, new String[] { Role.AUTHOR }, "start live edit",
+	if (!securityService.hasOrgRole(organisationID, userID, new String[] { Role.AUTHOR }, "start live edit",
 		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
 	    return null;
 	}
-
-	IAuthoringService authoringService = MonitoringServiceProxy
-		.getAuthoringService(applicationContext.getServletContext());
 
 	if (authoringService.setupEditOnFlyLock(learningDesignId, userID)) {
 	    authoringService.setupEditOnFlyGate(learningDesignId, userID);
@@ -1541,78 +1563,6 @@ public class MonitoringController {
 	}
 
 	return null;
-    }
-
-    private ILogEventService getLogEventService() {
-	if (MonitoringController.logEventService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.logEventService = (ILogEventService) ctx.getBean("logEventService");
-	}
-	return MonitoringController.logEventService;
-    }
-
-    private ILessonService getLessonService() {
-	if (MonitoringController.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return MonitoringController.lessonService;
-    }
-
-    private IMonitoringService getMonitoringService() {
-	if (MonitoringController.monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-	return MonitoringController.monitoringService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (MonitoringController.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return MonitoringController.securityService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (MonitoringController.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return MonitoringController.userManagementService;
-    }
-
-    private ILearnerService getLearnerService() {
-	if (MonitoringController.learnerService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.learnerService = (ILearnerService) ctx.getBean("learnerService");
-	}
-	return MonitoringController.learnerService;
-    }
-
-    private MessageService getMessageService() {
-	if (MonitoringController.messageService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.messageService = (MessageService) ctx.getBean("monitoringMessageService");
-	}
-	return MonitoringController.messageService;
-    }
-
-    private ILamsToolService getToolService() {
-	if (MonitoringController.toolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    MonitoringController.toolService = (ILamsToolService) ctx.getBean("lamsToolService");
-	}
-	return MonitoringController.toolService;
     }
 
     /**
@@ -1628,10 +1578,10 @@ public class MonitoringController {
 	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
 
 	try {
-	    getMonitoringService().togglePresenceAvailable(lessonID, userID, presenceAvailable);
+	    monitoringService.togglePresenceAvailable(lessonID, userID, presenceAvailable);
 
 	    if (!presenceAvailable) {
-		getMonitoringService().togglePresenceImAvailable(lessonID, userID, false);
+		monitoringService.togglePresenceImAvailable(lessonID, userID, false);
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -1651,7 +1601,7 @@ public class MonitoringController {
 	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
 
 	try {
-	    getMonitoringService().togglePresenceImAvailable(lessonID, userID, presenceImAvailable);
+	    monitoringService.togglePresenceImAvailable(lessonID, userID, presenceImAvailable);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -1671,7 +1621,7 @@ public class MonitoringController {
 	Boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
 	try {
-	    getMonitoringService().toggleGradebookOnComplete(lessonID, userID, gradebookOnComplete);
+	    monitoringService.toggleGradebookOnComplete(lessonID, userID, gradebookOnComplete);
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -1687,7 +1637,7 @@ public class MonitoringController {
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");
 
 	    // check monitor privledges
-	    if (!getSecurityService().isLessonMonitor(lessonID, getUserId(), "open time chart", false)) {
+	    if (!securityService.isLessonMonitor(lessonID, getUserId(), "open time chart", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
 	    }
@@ -1728,8 +1678,8 @@ public class MonitoringController {
 
     @SuppressWarnings("unchecked")
     private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching) {
-	List<ContributeActivityDTO> contributeActivities = getMonitoringService().getAllContributeActivityDTO(lessonId);
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 
 	if (contributeActivities != null) {
 	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<>();
@@ -1744,7 +1694,7 @@ public class MonitoringController {
 			if (skipCompletedBranching
 				&& ContributionTypes.CHOSEN_BRANCHING.equals(contributeEntry.getContributionType())) {
 			    Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
-			    ChosenBranchingActivity branching = (ChosenBranchingActivity) getMonitoringService()
+			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService
 				    .getActivityById(contributeActivity.getActivityID());
 			    for (SequenceActivity branch : (Set<SequenceActivity>) branching.getActivities()) {
 				Group group = branch.getSoleGroupForBranch();
@@ -1771,7 +1721,7 @@ public class MonitoringController {
     }
 
     private static int getActivityCoordinate(Integer coord) {
-	return (coord == null) || (coord < 0) ? ObjectExtractor.DEFAULT_COORD : coord;
+	return (coord == null) || (coord < 0) ? CommonConstants.DEFAULT_COORD : coord;
     }
 
     /**

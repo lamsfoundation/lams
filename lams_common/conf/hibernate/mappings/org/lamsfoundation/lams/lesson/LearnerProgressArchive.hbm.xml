@@ -23,7 +23,13 @@
 			
 		<property name="finishDate" type="java.util.Date"
 			column="finish_date_time" />
-		
+		        
+        <property
+            name="archiveDate"
+            type="java.util.Date"
+            column="archive_date"
+        />
+        
 		<map name="attemptedActivities" lazy="false" batch-size="20" cascade="none" table="lams_progress_attempted_archive">
 			<key column="learner_progress_id"/>
 			<index-many-to-many column="activity_id" class="org.lamsfoundation.lams.learningdesign.Activity"/>

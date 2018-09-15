@@ -33,16 +33,17 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    @Qualifier("learnerService")
+    private ILearnerService learnerService;
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request) throws Exception {
@@ -50,8 +51,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	ILearnerService learnerService = (ILearnerService) applicationContext.getBean("learnerService");
 	String finishURL = learnerService.completeToolSession(toolSessionId, user.getUserID().longValue());
-	return "index";
+	return "redirect:" + finishURL;
     }
 }

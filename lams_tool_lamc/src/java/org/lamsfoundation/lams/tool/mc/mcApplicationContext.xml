@@ -43,10 +43,13 @@
 	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.tool.mc.util.McToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+
+	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>lamc11</value></property>
+		<property name="repositoryUser"><value>lamc11</value></property>
+		<property name="repositoryId"><value>lamc_11</value></property>
+	</bean>
 	
 	<!-- end of data access and repository access beans -->
 
@@ -77,12 +80,10 @@
 					<property name="mcQueContentDAO"><ref bean="mcQueContentDAO"/></property>
 					<property name="mcOptionsContentDAO"><ref bean="mcOptionsContentDAO"/></property>								
 					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>	
-					<property name="toolService"><ref bean="lamsToolService"/></property>
-			 		<property name="learnerService"><ref bean="learnerService"/></property>		
+					<property name="toolService"><ref bean="lamsToolService"/></property>	
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
 					<property name="logEventService"><ref bean="logEventService"/></property>					
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>
-					<property name="gradebookService"><ref bean="gradebookService" /></property>
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
 			   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>	
 			   		<property name="messageService"><ref bean="lamcMessageService"/></property>

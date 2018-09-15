@@ -7,6 +7,7 @@
 <%-- <script src="${tool}includes/javascript/jquery.timer.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/mapjs/main.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/mapjs/underscore-min.js"></script> --%>
+<%-- <script src="${tool}includes/javascript/fullscreen.js"></script> --%>
 
 <script type="text/javascript">
 
@@ -19,7 +20,10 @@
 		requestsProcessed = new Array(), 
 		contentAggregate = null,	// mindmup variable - dummy root idea that has all visible ideas
 		mindMupContent = null; // mindmup content processor - used for reloading map.
-		
+
+	$(document).ready(function(){
+		setupFullScreenEvents();
+	});
 
 	// *** getMindmapContainerId() and  loadRootIdea(content) called by customised mapjs code ***
 	// window.mapModel is set up by mapjs in main.js. 
@@ -107,9 +111,11 @@
 			if ( idea.creator ) {
 				labelMap[idea.id] = idea.creator;
 			}
-			if ( idea.ideas ) {
-				Object.values(idea.ideas).forEach(addLabel);
-	    		}
+			if ( idea.ideas ) { 
+				Object.keys(idea.ideas).forEach(function(key) {
+				    addLabel(idea.ideas[key]);
+				});
+ 	    		}
 		};
 		addLabel(idea);
 	    	return labelMap;
@@ -221,7 +227,7 @@
 		// Cannot use the standard function as that would be picked up by the onIdeaChangedLAMS listener
 		// Return all the elements for which a truth test fails.
 		function customRemoveSubIdea(subIdeaId) {
-			parent = contentAggregate.findParent(subIdeaId) || contentAggregate,
+			const parent = contentAggregate.findParent(subIdeaId) || contentAggregate,
 				oldRank = parent && parent.findChildRankById(subIdeaId),
 				oldIdea = parent && parent.ideas[oldRank],
 				oldLinks = contentAggregate.links,
@@ -230,7 +236,8 @@
 			if (!oldRank) {
 				return false;
 			}
-			oldIdea.traverse((traversed)=> removedNodeIds[traversed.id] = true);
+			// LAMS Modification comment out => entries so that it will work on IE11. These features are not being used.
+			// oldIdea.traverse((traversed)=> removedNodeIds[traversed.id] = true);
 			delete parent.ideas[oldRank];
 	
 			contentAggregate.links = _.reject(contentAggregate.links, function (link) {
@@ -409,6 +416,10 @@
 	
 </script>	
 
+	<div id="fullPageContentDiv">
+	<div id="flexDiv">
+	<div id="mainDiv">
+	
 	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
 		<div>
 		<c:if test="${not multiMode}">
@@ -419,9 +430,13 @@
 
 	<div id="mindmap-controls">
 	
-		<!-- Color picker must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
+		<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
+		<div style="display:inline" role="group">
+        <a href="#" class="btn btn-default btn-sm launch-fullscreen pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default btn-sm exit-fullscreen pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
 		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px"></input>
- 
+		</div>
+		 
 		<div>
 			<div class="btn-group btn-group-sm" role="group">
 			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom'/>:</a>
@@ -448,4 +463,7 @@
  	<div id="mindmap-container"></div>
  	<style id="themecss">
 	</style>
-
+	
+	</div>
+	</div>
+	</div>

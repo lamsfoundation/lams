@@ -36,10 +36,6 @@ import org.apache.log4j.Logger;
 
 /**
  * @author conradb
- *
- *
- *
- *
  */
 public class Message implements Cloneable {
 

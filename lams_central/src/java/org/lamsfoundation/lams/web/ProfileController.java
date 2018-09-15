@@ -36,8 +36,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.policies.Policy;
+import org.lamsfoundation.lams.policies.PolicyDTO;
+import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.timezone.Timezone;
@@ -48,12 +51,16 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -78,7 +85,7 @@ public class ProfileController {
     private static List<SupportedLocale> locales;
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerService learnerService;
     @Autowired
     @Qualifier("themeService")
     private IThemeService themeService;
@@ -88,6 +95,9 @@ public class ProfileController {
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
+    @Autowired
+    @Qualifier("policyService")
+    private IPolicyService policyService;
 
     @RequestMapping("/view")
     public String view(HttpServletRequest request) throws Exception {
@@ -191,6 +201,24 @@ public class ProfileController {
 	return null;
     }
 
+    @RequestMapping("/policyConsents")
+    public String policyConsents(HttpServletRequest request) throws Exception {
+	Integer userId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+	List<PolicyDTO> policyDtos = policyService.getPolicyDtosByUser(userId);
+	request.setAttribute("policyDtos", policyDtos);
+
+	return "profilePolicyConsents";
+    }
+
+    @RequestMapping("/displayPolicyDetails")
+    public String displayPolicyDetails(HttpServletRequest request) throws Exception {
+	long policyUid = WebUtil.readLongParam(request, "policyUid");
+	Policy policy = policyService.getPolicyByUid(policyUid);
+	request.setAttribute("policy", policy);
+
+	return "policyDetails";
+    }
+
     @RequestMapping("/edit")
     public String edit(@ModelAttribute("newForm") UserForm userForm, HttpServletRequest request) throws Exception {
 
@@ -221,6 +249,7 @@ public class ProfileController {
 	    locales = service.findAll(SupportedLocale.class);
 	}
 	request.setAttribute("locales", locales);
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 
 	// Get all the css themes
 	List<Theme> themes = themeService.getAllThemes();

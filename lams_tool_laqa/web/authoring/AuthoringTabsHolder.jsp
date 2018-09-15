@@ -13,7 +13,7 @@
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css/>
-	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
 	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>

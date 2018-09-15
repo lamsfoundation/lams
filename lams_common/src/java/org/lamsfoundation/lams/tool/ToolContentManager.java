@@ -131,4 +131,11 @@ public interface ToolContentManager {
      * Can the activity be modified?
      */
     public boolean isReadOnly(Long toolContentId);
+
+    /**
+     * Get contribution URL to show in monitoring
+     */
+    public default String getContributionURL(Long toolContentId) {
+	return null;
+    }
 }

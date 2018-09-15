@@ -49,6 +49,12 @@
 						<td></td>
 					</tr>
 					<tr>
+						<td><fmt:message key="admin.email.verify" />:</td>
+						<td colspan="2"><form:checkbox path="emailVerify" />&nbsp;&nbsp;
+							<span class="signupFieldDescription"><fmt:message key="admin.email.verify.desc" /></span>
+						</td>
+					</tr>
+					<tr>
 						<td colspan="2">
 						<c:set var="errorKey" value="courseKey" /> 
 						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 

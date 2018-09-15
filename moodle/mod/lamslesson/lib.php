@@ -125,6 +125,11 @@ function lamslesson_update_instance($lamslesson) {
     if (isset($originallamslesson->displaydesign) && !isset($lamslesson->displaydesign)) {
        	$lamslesson->displaydesign = 0;
     }
+    
+    // if the allowLearnerRestart setting is unchecked with make sure we do that
+    if (isset($originallamslesson->allowLearnerRestart) && !isset($lamslesson->allowLearnerRestart)) {
+       	$lamslesson->allowLearnerRestart = 0;
+    }
 
     return $DB->update_record('lamslesson', $lamslesson);
 }
@@ -452,13 +457,11 @@ function lamslesson_add_lesson($form) {
     
     $form->timemodified = time();
     
-    $locale = lamslesson_get_locale($form->course);
-    
     // start the lesson
     $form->lesson_id = lamslesson_get_lesson(
         $USER->username, $form->sequence_id, $form->course, 
-        $form->name, $form->intro, 'start',
-        $locale['country'], $locale['lang'], $form->customCSV, $form->displaydesign
+        $form->name, $form->intro, $form->allowLearnerRestart, 'start',
+        $USER->country, $USER->lang, $form->customCSV, $form->displaydesign
     );
 
     if (!isset($form->lesson_id) || $form->lesson_id <= 0) {
@@ -469,7 +472,7 @@ function lamslesson_add_lesson($form) {
 	
     // call threaded lams servlet to populate the class
     $result = lamslesson_fill_lesson($USER->username, $form->lesson_id,
-				     $form->course, $locale['country'], $locale['lang'], $members
+				     $form->course, $USER->country, $USER->lang, $members
 				     );
     
     // log adding of lesson
@@ -477,36 +480,6 @@ function lamslesson_add_lesson($form) {
     if ($cm = get_coursemodule_from_instance('lamslesson', $form->coursemodule, $form->course)) {
       $cmid = $cm->id;
     }
-}
-
-/**
- * Return array with 2 keys 'country' and 'lang', to be sent to LAMS as the
- * basis for a LAMS locale like en_AU.  Makes best effort to choose appropriate
- * locale based on course, user, or server setting.
- */
-function lamslesson_get_locale($courseid) {
-
-  global $CFG, $USER, $DB;
-  $locale = array('country' => '', 'lang' => '');
-	
-  if ($CFG->country != '') {
-    $locale['country'] = trim($CFG->country);
-  }
-	
-  // return course's language and server's country, if either exist
-  if ($course = $DB->get_record('course', array('id' => $courseid))) {
-    if ($course->lang != '') {
-      $locale['lang'] = substr(trim($course->lang), 0, 2);
-      return $locale;
-    }
-  }
-
-    
-  // use user's country and language if course has no language set
-  $locale['country'] = trim($USER->country);
-  $locale['lang'] = substr(trim($USER->lang), 0, 2);
-    
-  return $locale;
 }
 
 /*
@@ -579,7 +552,7 @@ function lamslesson_get_members($form) {
  * @param string $lang The Language's ISO code
  * @return int lesson id
  */
-function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$country,$lang,$customcsv='',$displaydesign) {
+function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$allowLearnerRestart,$method,$country,$lang,$customcsv='',$displaydesign) {
 
   global $CFG, $USER;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
@@ -597,17 +570,20 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$c
 
   $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
 
-  $load = array('method'	=>	$method,
-		'serverId'	=>	$CFG->lamslesson_serverid,
-		'datetime'	=>	$datetime,
-		'hashValue'	=>	$hashvalue,
-		'username'	=>	$username,
-		'ldId'		=>	$ldid,
-		'courseId'	=>	$courseid,
-		'title'		=>	$title,
-		'desc'		=>	$desc,
-		'country'	=>	$country,
-		'lang'		=>	$lang);
+  $load = array(
+  		'method'	  		  =>	$method,
+		'serverId'			  =>	$CFG->lamslesson_serverid,
+		'datetime'			  =>	$datetime,
+		'hashValue'			  =>	$hashvalue,
+		'username'			  =>	$username,
+		'ldId'				  =>	$ldid,
+		'courseId'			  =>	$courseid,
+		'title'				  =>	$title,
+		'desc'				  =>	$desc,
+		'country'			  =>	$country,
+		'lang'				  =>	$lang,
+		'allowLearnerRestart' =>	isset($allowLearnerRestart) && $allowLearnerRestart ? 'true' : 'false'
+	);
 
 
   // GET call to LAMS

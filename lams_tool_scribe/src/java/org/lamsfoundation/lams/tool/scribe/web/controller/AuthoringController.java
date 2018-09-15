@@ -34,13 +34,13 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -53,18 +53,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
@@ -120,7 +108,7 @@ public class AuthoringController {
 //	    request.setAttribute(ScribeConstants.ATTR_MESSAGE, messageService.getMessage("error.content.locked"));
 	    MultiValueMap<String, String> infoMap = new LinkedMultiValueMap<>();
 	    infoMap.add("MESSAGE", messageService.getMessage("error.content.locked"));
-	    request.setAttribute("infoMap",infoMap);
+	    request.setAttribute("infoMap", infoMap);
 	    return "common/message";
 	}
 
@@ -213,7 +201,7 @@ public class AuthoringController {
 
 	scribeService.saveOrUpdateScribe(scribe);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authoringForm.setSessionMapID(map.getSessionID());

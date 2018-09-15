@@ -29,7 +29,7 @@ import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.controller.DisplayActivityController;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -105,7 +105,7 @@ public class ActivityMapping implements Serializable {
      * @throws UnsupportedEncodingException
      */
     public String getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
-	    HttpServletRequest request, ICoreLearnerService learnerService) throws UnsupportedEncodingException {
+	    HttpServletRequest request, ILearnerFullService learnerService) throws UnsupportedEncodingException {
 	String forward = null;
 
 	if (progress.isComplete()) {

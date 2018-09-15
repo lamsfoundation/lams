@@ -45,7 +45,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
@@ -58,6 +57,7 @@ import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
 import org.lamsfoundation.lams.tool.daco.web.form.DacoForm;
 import org.lamsfoundation.lams.tool.daco.web.form.DacoQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -798,7 +798,7 @@ public class AuthoringController {
 	}
 	authoringForm.setDaco(dacoPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	return "pages/authoring/authoring";
     }

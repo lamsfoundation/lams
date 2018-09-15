@@ -429,3 +429,13 @@ td.progressBarLabel {
 .group-table>tbody>tr>td, .table>tfoot>tr>td {
     border-top: none;
 }
+
+/********** RENAME LESSON FEATURE **********/
+
+/* when item is editable - show pencil icon on hover */
+#lesson-name-strong:hover +span+ i {  /* when link is hovered select i */
+	visibility: visible;
+}
+#lesson-name-strong +span+ i { /* in all other case hide it */
+	visibility: hidden;
+}

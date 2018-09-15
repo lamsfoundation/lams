@@ -18,10 +18,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/slf4j/jcl-over-slf4j/main/jcl-over-slf4j-1.7.7.jbossorg-1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.1.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/websocket"/>

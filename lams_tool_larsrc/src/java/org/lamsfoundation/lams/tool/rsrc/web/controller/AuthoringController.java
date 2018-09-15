@@ -48,7 +48,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -64,6 +63,7 @@ import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourcePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
@@ -360,7 +360,8 @@ public class AuthoringController {
      *
      */
     @RequestMapping(value = "/start")
-    private String start(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request) throws ServletException {
+    private String start(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
+	    throws ServletException {
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
@@ -576,8 +577,8 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
-	    throws Exception {
+    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm,
+	    HttpServletRequest request) throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -688,7 +689,7 @@ public class AuthoringController {
 	}
 	authoringForm.setResource(resourcePO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	return "pages/authoring/authoring";
     }

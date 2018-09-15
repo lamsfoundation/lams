@@ -29,11 +29,9 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
+ * This class maps to one activity mark for a learner
+ * 
  * @author lfoxton
- *
- *         This class maps to one activity mark for a learner
- *
- *
  */
 public class GradebookUserActivity {
 

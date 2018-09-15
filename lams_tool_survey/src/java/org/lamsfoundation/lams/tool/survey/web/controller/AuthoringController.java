@@ -45,7 +45,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
@@ -61,6 +60,7 @@ import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.tool.survey.web.form.QuestionForm;
 import org.lamsfoundation.lams.tool.survey.web.form.SurveyForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -660,7 +660,7 @@ public class AuthoringController {
 
 	authoringForm.setSurvey(surveyPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute("authoringForm", authoringForm);
 	return "pages/authoring/authoring";
     }

@@ -54,9 +54,12 @@
 
 
     <!-- Managers -->
-	<bean id="lataskTaskListToolContentHandler" class="org.lamsfoundation.lams.tool.taskList.util.TaskListToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="lataskTaskListToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedtaskListworkspace</value></property>
+		<property name="repositoryUser"><value>sharedtaskList</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
 	
     <bean id="lataskTaskListManagerTarget" class="org.lamsfoundation.lams.tool.taskList.service.TaskListServiceImpl">
         <property name="taskListDao">
@@ -82,9 +85,6 @@
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
-   		</property>
-   		<property name="learnerService">
-   			<ref bean="learnerService"/>
    		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>

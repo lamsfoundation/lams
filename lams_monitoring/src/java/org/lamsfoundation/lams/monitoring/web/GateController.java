@@ -42,15 +42,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -61,7 +60,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * <p>
@@ -81,15 +79,6 @@ import org.springframework.web.context.WebApplicationContext;
  *
  * @author Jacky Fang
  * @since 2005-4-15
- * @version 1.1
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/gate")
@@ -97,17 +86,14 @@ public class GateController {
 
     @Autowired
     @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    @Qualifier("learnerService")
+    private ILearnerService learnerService;
 
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
-    // private static Logger log = Logger.getLogger(GateAction.class);
-
-    private ICoreLearnerService learnerService;
+    @Autowired
+    @Qualifier("lessonService")
     private ILessonService lessonService;
 
     private static final DateFormat SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
@@ -141,8 +127,6 @@ public class GateController {
 	    gateIdLong = gateForm.getActivityId();
 	}
 	long gateId = gateIdLong != null ? gateIdLong.longValue() : -1;
-
-	learnerService = MonitoringServiceProxy.getLearnerService(applicationContext.getServletContext());
 
 	GateActivity gate = (GateActivity) monitoringService.getActivityById(gateId);
 
@@ -216,9 +200,6 @@ public class GateController {
      *
      */
     private String findViewByGateType(@ModelAttribute GateForm gateForm, GateActivity gate) {
-
-	lessonService = MonitoringServiceProxy.getLessonService(applicationContext.getServletContext());
-
 	// reset all the other fields, so that the following code only has to set up its own values (LDEV-1237)
 	gateForm.setGate(null);
 	gateForm.setWaitingLearnerList(null);
@@ -281,7 +262,6 @@ public class GateController {
 	    gateForm.setActivityCompletionBased(true);
 	} else {
 	    gateForm.setActivityCompletionBased(false);
-	    learnerService = MonitoringServiceProxy.getLearnerService(applicationContext.getServletContext());
 	    Lesson lesson = learnerService.getLessonByActivity(scheduleGate);
 	    Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
 	    startingTime.setTime(lesson.getStartDateTime());

@@ -30,13 +30,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,24 +50,14 @@ import org.springframework.web.context.WebApplicationContext;
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
  * and gates (system tools). Displays the activity that is in the request. This allows it to show any arbitrary
  * activity, not just the current activity.
- *
- * XDoclet definition:
- *
- *
- *
- *
- *
- *
  */
 @Controller
 public class LoadToolActivityController {
 
     private static Logger log = Logger.getLogger(LoadToolActivityController.class);
-    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
-
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

@@ -88,6 +88,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -113,9 +114,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  */
 public class ObjectExtractor implements IObjectExtractor {
-
-    public static final Integer DEFAULT_COORD = new Integer(10); // default coordinate used if the entry came from Flash
-    // is 0 or less.
 
     protected IBaseDAO baseDAO = null;
     protected ILearningDesignDAO learningDesignDAO = null;
@@ -1020,8 +1018,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setDescription(JsonUtil.optString(activityDetails, AuthoringJsonTags.DESCRIPTION));
 	activity.setTitle(JsonUtil.optString(activityDetails, AuthoringJsonTags.ACTIVITY_TITLE));
 
-	activity.setXcoord(JsonUtil.optInt(activityDetails, AuthoringJsonTags.XCOORD, ObjectExtractor.DEFAULT_COORD));
-	activity.setYcoord(JsonUtil.optInt(activityDetails, AuthoringJsonTags.YCOORD, ObjectExtractor.DEFAULT_COORD));
+	activity.setXcoord(getCoord(activityDetails, AuthoringJsonTags.XCOORD));
+	activity.setYcoord(getCoord(activityDetails, AuthoringJsonTags.YCOORD));
 
 	Integer groupingUIID = JsonUtil.optInt(activityDetails, AuthoringJsonTags.GROUPING_UIID);
 
@@ -1062,6 +1060,13 @@ public class ObjectExtractor implements IObjectExtractor {
 		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.STOP_AFTER_ACTIVITY, false));
 
 	return activity;
+    }
+
+    private Integer getCoord(ObjectNode details, String tag) {
+	// the coordinate can be Integer or Double in JSON, need to be ready for any
+	Number number = JsonUtil.optDouble(details, tag);
+	Integer coord = number == null ? null : number.intValue();
+	return (coord == null) || (coord >= 0) ? coord : CommonConstants.DEFAULT_COORD;
     }
 
     private void clearGrouping(Activity activity) {
@@ -1134,14 +1139,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	    branchingActivity.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
 	}
 
-	branchingActivity.setStartXcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.START_XCOORD, ObjectExtractor.DEFAULT_COORD));
-	branchingActivity.setStartYcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.START_YCOORD, ObjectExtractor.DEFAULT_COORD));
-	branchingActivity.setEndXcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.END_XCOORD, ObjectExtractor.DEFAULT_COORD));
-	branchingActivity.setEndYcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.END_YCOORD, ObjectExtractor.DEFAULT_COORD));
+	branchingActivity.setStartXcoord(getCoord(activityDetails, AuthoringJsonTags.START_XCOORD));
+	branchingActivity.setStartYcoord(getCoord(activityDetails, AuthoringJsonTags.START_YCOORD));
+	branchingActivity.setEndXcoord(getCoord(activityDetails, AuthoringJsonTags.END_XCOORD));
+	branchingActivity.setEndYcoord(getCoord(activityDetails, AuthoringJsonTags.END_YCOORD));
     }
 
     private void buildGroupingActivity(GroupingActivity groupingActivity, ObjectNode activityDetails)
@@ -1170,14 +1171,11 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildOptionsWithSequencesActivity(OptionsWithSequencesActivity optionsActivity,
 	    ObjectNode activityDetails) {
 	buildOptionsActivity(optionsActivity, activityDetails);
-	optionsActivity.setStartXcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.START_XCOORD, ObjectExtractor.DEFAULT_COORD));
-	optionsActivity.setStartYcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.START_YCOORD, ObjectExtractor.DEFAULT_COORD));
-	optionsActivity.setEndXcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.END_XCOORD, ObjectExtractor.DEFAULT_COORD));
-	optionsActivity.setEndYcoord(
-		JsonUtil.optInt(activityDetails, AuthoringJsonTags.END_YCOORD, ObjectExtractor.DEFAULT_COORD));
+
+	optionsActivity.setStartXcoord(getCoord(activityDetails, AuthoringJsonTags.START_XCOORD));
+	optionsActivity.setStartYcoord(getCoord(activityDetails, AuthoringJsonTags.START_YCOORD));
+	optionsActivity.setEndXcoord(getCoord(activityDetails, AuthoringJsonTags.END_XCOORD));
+	optionsActivity.setEndYcoord(getCoord(activityDetails, AuthoringJsonTags.END_YCOORD));
     }
 
     private void buildParallelActivity(ParallelActivity activity) {

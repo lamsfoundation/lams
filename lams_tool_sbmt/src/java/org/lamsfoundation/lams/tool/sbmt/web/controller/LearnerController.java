@@ -38,11 +38,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -53,7 +51,6 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
-import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.web.form.LearnerForm;
 import org.lamsfoundation.lams.tool.sbmt.web.form.ReflectionForm;
@@ -87,8 +84,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/learning")
 public class LearnerController implements SbmtConstants {
 
-    private static final boolean MODE_OPTIONAL = false;
-
     public static Logger logger = Logger.getLogger(LearnerController.class);
 
     @Autowired
@@ -117,13 +112,13 @@ public class LearnerController implements SbmtConstants {
 	// get parameters from Request
 	ToolAccessMode mode = null;
 	try {
-	    mode = WebUtil.getToolAccessMode((String)request.getAttribute(AttributeNames.PARAM_MODE));
+	    mode = WebUtil.getToolAccessMode((String) request.getAttribute(AttributeNames.PARAM_MODE));
 	} catch (Exception e) {
 	}
 	if (mode == null) {
 	    mode = ToolAccessMode.LEARNER;
 	}
-	
+
 	request.setAttribute("mode", mode);
 
 	Long toolSessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -140,7 +135,6 @@ public class LearnerController implements SbmtConstants {
 	    userID = user.getUserID();
 	}
 
-	ToolContentManager contentManager = getContentManager();
 	SubmitFilesSession session = submitFilesService.getSessionById(toolSessionID);
 	SubmitFilesContent content = session.getContent();
 
@@ -165,6 +159,7 @@ public class LearnerController implements SbmtConstants {
 	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD, content.isLimitUpload());
 	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
+	sessionMap.put(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
 	sessionMap.put(SbmtConstants.ATTR_UPLOAD_MAX_FILE_SIZE,
 		FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)));
@@ -180,7 +175,7 @@ public class LearnerController implements SbmtConstants {
 	content.setDefineLater(false);
 	submitFilesService.saveOrUpdateContent(content);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	// check if there is submission deadline
@@ -304,6 +299,8 @@ public class LearnerController implements SbmtConstants {
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
+	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+	sessionMap.put(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
 	return "learner/sbmtlearner";
     }
@@ -322,8 +319,7 @@ public class LearnerController implements SbmtConstants {
 	// set the mode into http session
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
-		applicationContext.getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, applicationContext.getServletContext());
 
 	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.
@@ -332,8 +328,8 @@ public class LearnerController implements SbmtConstants {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Integer userID = user.getUserID();
 
-	    List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(),
-		    false);
+	    List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID,
+		    request.getLocale(), false);
 
 	    SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	    ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -383,9 +379,7 @@ public class LearnerController implements SbmtConstants {
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR)) {
-	    ToolSessionManager sessionMgrService = SubmitFilesServiceProxy
-		    .getToolSessionManager(applicationContext.getServletContext());
-
+	    ToolSessionManager sessionMgrService = (ToolSessionManager) submitFilesService;
 	    // get back login user DTO
 	    // get session from shared session.
 	    HttpSession ss = SessionManager.getSession();
@@ -409,12 +403,6 @@ public class LearnerController implements SbmtConstants {
     // **********************************************************************************************
     // Private mehtods
     // **********************************************************************************************
-
-    private ToolContentManager getContentManager() {
-	ToolContentManager contentManager = SubmitFilesServiceProxy
-		.getSubmitFilesContentManager(this.applicationContext.getServletContext());
-	return contentManager;
-    }
 
     // validate uploaded form
     private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
@@ -471,10 +459,6 @@ public class LearnerController implements SbmtConstants {
 		    } else {
 			filedto.setCurrentLearner(false);
 		    }
-//		    if (filedto.getDateMarksReleased() == null) {
-//			filedto.setComments(null);
-//			filedto.setMarks(null);
-//		    }
 		}
 	    }
 	    dto.setFilesUploaded(filesUploaded);

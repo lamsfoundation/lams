@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -50,11 +50,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author daveg
- *
- *         XDoclet definition:
- *
- *
- *
  */
 @Controller
 public class CompleteActivityController {
@@ -64,11 +59,9 @@ public class CompleteActivityController {
     protected static String className = "CompleteActivity";
     private static IntegrationService integrationService = null;
 
-    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
-
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

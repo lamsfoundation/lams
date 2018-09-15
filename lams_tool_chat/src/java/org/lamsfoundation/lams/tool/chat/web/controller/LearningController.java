@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -62,16 +61,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
@@ -135,7 +124,7 @@ public class LearningController {
 	    chatService.saveOrUpdateChat(chat);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	/* Check if submission deadline is null */
@@ -217,7 +206,7 @@ public class LearningController {
 	}
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, chatUser.getChatSession().getSessionId());
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
 		applicationContext.getServletContext());
 
 	return "pages/learning/notebook";

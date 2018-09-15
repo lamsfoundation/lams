@@ -148,15 +148,12 @@ public class LearningDesignService implements ILearningDesignService {
     /**********************************************
      * Service Methods
      *******************************************/
+    
+    @Override
+    public LearningDesign getLearningDesign(Long learningDesignID) {
+	return learningDesignDAO.getLearningDesignById(learningDesignID);
+    }
 
-    /**
-     * Get the learning design DTO
-     *
-     * @param learningDesignId
-     * @param languageCode
-     *            Two letter language code needed to I18N the help url
-     * @return LearningDesignDTO
-     */
     @Override
     public LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode) {
 	LearningDesign design = learningDesignID != null ? learningDesignDAO.getLearningDesignById(learningDesignID)
@@ -164,13 +161,6 @@ public class LearningDesignService implements ILearningDesignService {
 	return design != null ? new LearningDesignDTO(design, activityDAO, groupingDAO, languageCode) : null;
     }
 
-    /**
-     * This method calls other validation methods which apply the validation rules to determine whether or not the
-     * learning design is valid.
-     *
-     * @param learningDesign
-     * @return list of validation errors
-     */
     @Override
     public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign) {
 	LearningDesignValidator validator = new LearningDesignValidator(learningDesign, messageService);

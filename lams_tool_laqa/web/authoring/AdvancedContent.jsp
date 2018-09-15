@@ -134,6 +134,8 @@
 	
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${authoringForm.toolContentID}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="lockWhenFinished">

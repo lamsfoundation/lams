@@ -1,7 +1,7 @@
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
-import org.lamsfoundation.lams.web.TextSearchForm;
+import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Notebook needs.

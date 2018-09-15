@@ -72,7 +72,6 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 
     // Set needed vars
 	$context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
-	$locale = lamslesson_get_locale($COURSE->id);
 	$canmanage = has_capability('mod/lamslesson:manage', $context);
 
     //-- Open Author & Preview URL buttons
@@ -81,7 +80,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	if ($canmanage) {
 
 	  $customcsv = "$USER->username,$COURSE->id,$CFG->lamslesson_serverid";
-	  $authorurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $locale['lang'], $locale['country'], 0, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, LAMSLESSON_PARAM_AUTHOR_METHOD, $customcsv);
+	  $authorurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $USER->lang, $USER->country, 0, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, LAMSLESSON_PARAM_AUTHOR_METHOD, $customcsv);
 
 	  $previewurl = $CFG->wwwroot.'/mod/lamslesson/preview.php?';
 	  $popupoptions = LAMSLESSON_POPUP_OPTIONS;
@@ -102,20 +101,14 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 				js_writer::set_variable('currentsequence', $currentsequence));
 
         $authorpreviewbutton .= html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/preview.js');
-	
-        $authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right;'));
+    	$authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right'));
+        
         // Preview button
-        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'yui3-button yui3-link-button'));
-        $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
-        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 0))));
-        $authorpreviewbutton .= html_writer::end_tag('span');
-        $authorpreviewbutton .= html_writer::end_tag('span');
-	//Authoring button
-        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'authorbutton', 'class' => 'yui3-button yui3-link-button'));
-        $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
-        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('openAuthor', array('1' => $authorurl, '2' => 'author', '3' => 0))));
-        $authorpreviewbutton .= html_writer::end_tag('span');
-        $authorpreviewbutton .= html_writer::end_tag('span');
+        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 1280, '4' => 720)), 'id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'btn btn-primary'));
+
+        //Authoring button
+        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('PopupCenter', array('1' => $authorurl, '2' => 'author', '3' => 1280, '4' => 720)), 'class' => 'btn btn-primary', 'id' => 'authorbutton'));
+
         $authorpreviewbutton .= html_writer::end_tag('div');
 	}
 
@@ -135,21 +128,22 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $mform->setType('customCSV', PARAM_TEXT);
 
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
-	$mform->setExpanded('selectsequence', true);
+		$mform->setExpanded('selectsequence', true);
 
         $mform->addElement('static', 'sequencemessage', '', $html);
     	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
+    	$mform->addElement('checkbox', 'allowLearnerRestart', get_string('allowLearnerRestart', 'lamslesson'));
 
-//-------------------------------------------------------------------------------
-	$this->standard_grading_coursemodule_elements();
+		//-------------------------------------------------------------------------------
+		$this->standard_grading_coursemodule_elements();
 
-	// set the default grade to 'No Grade' so it doesn't record
-	// anything on gradebook unless specifically set.
-	$mform->setDefault('grade', 0);
+		// set the default grade to 'No Grade' so it doesn't record
+		// anything on gradebook unless specifically set.
+		$mform->setDefault('grade', 0);
 
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
-//-------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
     }
@@ -158,7 +152,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
       $errors = array();
       // a sequence needs to be selected                                                                                   
       if (empty($data['sequence_id']) || $data['sequence_id'] <= 0) {
-	$errors['sequencemessage'] = get_string('sequencenotselected', 'lamslesson');
+			$errors['sequencemessage'] = get_string('sequencenotselected', 'lamslesson');
       }
       return $errors;
     }

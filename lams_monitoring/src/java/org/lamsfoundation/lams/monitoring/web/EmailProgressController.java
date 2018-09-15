@@ -38,7 +38,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailProgressMessageJob;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -59,8 +59,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -72,13 +70,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/emailProgress")
 public class EmailProgressController {
-
-    @Autowired
-    private WebApplicationContext applicationContext;
-
     @Autowired
     @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
+    @Autowired
+    @Qualifier("eventNotificationService")
+    private IEventNotificationService eventNotificationService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
+    @Autowired
+    @Qualifier("scheduler")
+    private Scheduler scheduler;
 
     private static Logger log = Logger.getLogger(EmailNotificationsController.class);
 
@@ -88,13 +91,6 @@ public class EmailProgressController {
 
     private static final String TRIGGER_PREFIX_NAME = "emailProgressMessageTrigger:";
     private static final String JOB_PREFIX_NAME = "emailProgressMessageJob:";
-
-    private static IEventNotificationService eventNotificationService;
-    private static ISecurityService securityService;
-
-    // ---------------------------------------------------------------------
-    // Dispatch Method
-    // ---------------------------------------------------------------------
 
     /**
      * Gets learners or monitors of the lesson and organisation containing it.
@@ -106,7 +102,7 @@ public class EmailProgressController {
     public String getEmailProgressDates(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, SchedulerException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -118,7 +114,6 @@ public class EmailProgressController {
 	ArrayNode datesJSON = JsonNodeFactory.instance.arrayNode();
 
 	// find all the current dates set up to send the emails
-	Scheduler scheduler = getScheduler();
 	String triggerPrefix = getTriggerPrefix(lessonId);
 	SortedSet<Date> currentDatesSet = new TreeSet<>();
 	Set<TriggerKey> triggerKeys = scheduler
@@ -184,7 +179,7 @@ public class EmailProgressController {
     @ResponseBody
     public String updateEmailProgressDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "get class members", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -203,7 +198,6 @@ public class EmailProgressController {
 	ObjectNode dateJSON = null;
 
 	try {
-	    Scheduler scheduler = getScheduler();
 	    Set<TriggerKey> triggerKeys = scheduler
 		    .getTriggerKeys(GroupMatcher.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
 	    Trigger trigger = null;
@@ -263,7 +257,7 @@ public class EmailProgressController {
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer monitorUserId = getCurrentUser().getUserID();
-	if (!getSecurityService().isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
+	if (!securityService.isLessonMonitor(lessonId, monitorUserId, "get lesson progress", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -273,7 +267,7 @@ public class EmailProgressController {
 	int sent = 0;
 
 	try {
-	    if (getEventNotificationService().sendMessage(null, monitorUserId,
+	    if (eventNotificationService.sendMessage(null, monitorUserId,
 		    IEventNotificationService.DELIVERY_METHOD_MAIL, parts[0], parts[1], true)) {
 		sent = 1;
 	    }
@@ -297,34 +291,5 @@ public class EmailProgressController {
     private UserDTO getCurrentUser() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private IEventNotificationService getEventNotificationService() {
-	if (eventNotificationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    eventNotificationService = (IEventNotificationService) ctx.getBean("eventNotificationService");
-	}
-	return eventNotificationService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    securityService = (ISecurityService) webContext.getBean("securityService");
-	}
-
-	return securityService;
-    }
-
-    /**
-     *
-     * @return the bean that defines Scheduler.
-     */
-    private Scheduler getScheduler() {
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	return (Scheduler) ctx.getBean("scheduler");
     }
 }

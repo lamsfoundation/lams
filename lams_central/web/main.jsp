@@ -94,17 +94,17 @@
 				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />',
 				<fmt:message key="index.kumalive" var="KUMALIVE_TITLE_VAR"/>
 				KUMALIVE_TITLE : '<c:out value="${KUMALIVE_TITLE_VAR}" />',
+				<fmt:message key="index.outcome.manage" var="OUTCOME_MANAGE_TITLE_VAR"/>
+				OUTCOME_MANAGE_TITLE : '<c:out value="${OUTCOME_MANAGE_TITLE_VAR}" />',
+				<fmt:message key="outcome.manage.title" var="OUTCOME_COURSE_MANAGE_TITLE_VAR"/>
+				OUTCOME_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_COURSE_MANAGE_TITLE_VAR}" />'
 			},
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 
 		$(document).ready(function(){
-			<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
+			<%-- If it's the user's first login, show tour --%>
 			<c:if test="${firstLogin}">
-				<c:url var="disableAllTutorialVideosUrl" value="tutorial/disableAllTutorialVideos.do">
-				</c:url>
-				if (!confirm("<fmt:message key='label.tutorial.disable.all' />")){
-			 		$.get("${disableAllTutorialVideosUrl}");
-				}
+				startTour();
 			</c:if>
 
 			<c:if test="${showTimezoneWarning}"> 
@@ -188,7 +188,7 @@
 
 		<ul class="nav navbar-nav navbar-right">
 			<li>
-				<a href="javascript:;" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
+				<a href="javascript:;" id="index-profile" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
 	           		<c:choose>
 	           			<c:when test="${not empty portraitUuid}">
 	           				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false&version=4</c:set>
@@ -237,7 +237,7 @@
 					</c:forEach>
 							                  
 					<li>
-						<a href="#nogo" onclick="javascript:closeAllChildren(); document.location.href='home/logout.do?'">
+						<a href="#nogo" id="logoutButton" onclick="javascript:closeAllChildren(); document.location.href='home/logout.do?'">
 							<i class="fa fa-sign-out"></i> <fmt:message key="index.logout" />
 						</a>
 					</li>
@@ -268,7 +268,7 @@
 				</c:choose>
 						
 				<li role="presentation">
-					<a href="<c:out value='${headerlink.url}' />"  class="tour-${headerlink.id}" title="${headerLinkTitle}">
+					<a href="<c:out value='${headerlink.url}' />"  id="${headerlink.id}" class="tour-${headerlink.id}" title="${headerLinkTitle}">
 						<i class="fa ${headerLinkIcon}"></i> 
 						<span class="xs-hidden"><c:out value='${headerLinkName}'/></span>
 					</a>
@@ -283,7 +283,7 @@
 			</li>
 					
 			<li role="presentation" class="dropdown">
-				<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+				<a href="javascript:;" id="index-tour" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
 					<i class="fa fa-question-circle"></i>
 					<span class="xs-hidden"><fmt:message key="label.tour"/></span>
 				</a>

@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -54,10 +54,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author jliew
- *
- *
- *
- *
  */
 @Controller
 public class ComplexLearnerProgressController {
@@ -66,7 +62,7 @@ public class ComplexLearnerProgressController {
 
     @Autowired
     @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
 
     @RequestMapping("/complexProgress")
     public String execute(HttpServletRequest request, HttpServletResponse response)
@@ -186,7 +182,7 @@ public class ComplexLearnerProgressController {
      * If the page is for a Branching or Optional Sequence activity then subActivities will be null (as the sequence
      * activities go in the subactivities list) but parentContributeActivityDTO should not be null.
      */
-    private void processSequenceChildren(Long lessonID, Integer userID, IMonitoringService monitoringService,
+    private void processSequenceChildren(Long lessonID, Integer userID, IMonitoringFullService monitoringService,
 	    UserDTO user, HashMap<Long, Byte> statusMap, HashMap<Long, String> urlMap, LearnerProgress learnerProgress,
 	    SequenceActivity sequenceActivity, ContributeActivityDTO parentContributeActivityDTO,
 	    List<ContributeActivityDTO> subActivities) throws IOException {

@@ -37,8 +37,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -78,15 +77,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/learning")
@@ -155,8 +145,8 @@ public class LearningController {
 	    kalturaService.saveOrUpdateKaltura(kaltura);
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
-		toolSessionId, request, applicationContext.getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId,
+		request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// reflection information

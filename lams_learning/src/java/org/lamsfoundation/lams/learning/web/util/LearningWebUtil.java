@@ -31,12 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -51,8 +50,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author Jacky Fang
  * @since 2005-3-10
- * @version
- *
  */
 public class LearningWebUtil {
 
@@ -76,7 +73,7 @@ public class LearningWebUtil {
      * Helper method to retrieve the user data. Gets the id from the user details in the shared session then retrieves
      * the real user object.
      */
-    public static User getUser(ICoreLearnerService learnerService) {
+    public static User getUser(ILearnerFullService learnerService) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return learner != null
@@ -93,7 +90,7 @@ public class LearningWebUtil {
      * If the learner progress id isn't available, then we have to look it up using activity based on the activity /
      * activity id in the request.
      */
-    public static LearnerProgress getLearnerProgress(HttpServletRequest request, ICoreLearnerService learnerService) {
+    public static LearnerProgress getLearnerProgress(HttpServletRequest request, ILearnerFullService learnerService) {
 	LearnerProgress learnerProgress = null;
 
 	Long learnerProgressId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNER_PROGRESS_ID, true);
@@ -123,7 +120,7 @@ public class LearningWebUtil {
      * @param request
      * @return
      */
-    public static Activity getActivityFromRequest(HttpServletRequest request, ICoreLearnerService learnerService) {
+    public static Activity getActivityFromRequest(HttpServletRequest request, ILearnerFullService learnerService) {
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Activity activity = learnerService.getActivity(new Long(activityId));
 	return activity;
@@ -144,7 +141,7 @@ public class LearningWebUtil {
      */
     public static String completeActivity(HttpServletRequest request, HttpServletResponse response,
 	    ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity, Integer learnerId,
-	    ICoreLearnerService learnerService, boolean redirect)
+	    ILearnerFullService learnerService, boolean redirect)
 	    throws LearnerServiceException, UnsupportedEncodingException {
 
 	Lesson lesson = progress.getLesson();
@@ -209,30 +206,12 @@ public class LearningWebUtil {
     public static ActivityPositionDTO putActivityPositionInRequest(Long activityId, HttpServletRequest request,
 	    ServletContext context) {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
+	ILearnerFullService learnerService = (ILearnerFullService) wac.getBean("learnerService");
 	if (learnerService == null) {
 	    LearningWebUtil.log.warn("Can not set activity position, no Learner service in servlet context.");
 	    return null;
 	}
 	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
-	if (positionDTO != null) {
-	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
-	}
-	return positionDTO;
-    }
-
-    /**
-     * Finds activity position within Learning Design and stores it as request attribute.
-     */
-    public static ActivityPositionDTO putActivityPositionInRequestByToolSessionId(Long toolSessionId,
-	    HttpServletRequest request, ServletContext context) {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
-	if (learnerService == null) {
-	    LearningWebUtil.log.warn("Can not set activity position, no Learner service in servlet context.");
-	    return null;
-	}
-	ActivityPositionDTO positionDTO = learnerService.getActivityPositionByToolSessionId(toolSessionId);
 	if (positionDTO != null) {
 	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
 	}

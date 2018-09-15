@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +45,10 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -57,7 +61,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -124,6 +127,10 @@ public class TblMonitorController {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
+	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	items.addAll(scratchie.getScratchieItems());
+	request.setAttribute("items", items);
+
 	//find second page in excel file
 	LinkedHashMap<String, ExcelCell[][]> excelDoc = scratchieService.exportExcel(toolContentId);
 	ExcelCell[][] secondPageData = null;
@@ -138,20 +145,54 @@ public class TblMonitorController {
 	    }
 	}
 
+	//correct answers
 	ExcelCell[] correctAnswersRow = secondPageData[4];
 	request.setAttribute("correctAnswers", correctAnswersRow);
 
+	//prepare data for displaying user answers table
 	int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
-	ArrayList<ExcelCell[]> groupRows = new ArrayList<>();
+	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
 	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
 	    ExcelCell[] groupRow = secondPageData[6 + groupCount];
-	    groupRows.add(groupRow);
-	}
-	request.setAttribute("groupRows", groupRows);
 
-	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
-	items.addAll(scratchie.getScratchieItems());
-	request.setAttribute("items", items);
+	    GroupSummary groupSummary = new GroupSummary();
+	    String sessionName = groupRow[0].getCellValue().toString();
+	    groupSummary.setSessionName(sessionName);
+
+	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
+	    for (int i = 1; i <= items.size(); i++) {
+		ScratchieItemDTO itemDto = new ScratchieItemDTO();
+		String answersSequence = groupRow[i].getCellValue().toString();
+		String[] answerLetters = answersSequence.split(", ");
+
+		Set<ScratchieAnswer> answers = new LinkedHashSet<>();
+		for (int j = 0; j < answerLetters.length; j++) {
+		    String answerLetter = answerLetters[j];
+		    String correctAnswerLetter = correctAnswersRow[i].getCellValue().toString();
+
+		    ScratchieAnswer answer = new ScratchieAnswer();
+		    answer.setDescription(answerLetter);
+		    answer.setCorrect(correctAnswerLetter.equals(answerLetter));
+
+		    answers.add(answer);
+		}
+
+		itemDto.setAnswers(answers);
+		itemDtos.add(itemDto);
+	    }
+	    groupSummary.setItemDtos(itemDtos);
+
+	    if (!itemDtos.isEmpty()) {
+		int total = (Integer) groupRow[itemDtos.size() + 1].getCellValue();
+		groupSummary.setMark(total);
+
+		String totalPercentage = groupRow[itemDtos.size() + 2].getCellValue().toString();
+		groupSummary.setTotalPercentage(totalPercentage);
+	    }
+
+	    sessionDtos.add(groupSummary);
+	}
+	request.setAttribute("sessionDtos", sessionDtos);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	return "pages/tblmonitoring/traStudentChoices";

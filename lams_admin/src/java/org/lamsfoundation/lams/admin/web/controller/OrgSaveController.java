@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -58,26 +57,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @version
  *
- * <p>
- * <a href="OrgSaveAction.java.html"><i>View Source</i></a>
- * </p>
+ *          <p>
+ *          <a href="OrgSaveAction.java.html"><i>View Source</i></a>
+ *          </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  *
- * Created at 16:42:53 on 2006-6-7
- */
-
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ *         Created at 16:42:53 on 2006-6-7
  */
 
 @Controller
@@ -116,8 +102,6 @@ public class OrgSaveController {
 	if (errorMap.isEmpty()) {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    SupportedLocale locale = (SupportedLocale) service.findById(SupportedLocale.class,
-		    organisationForm.getLocaleId());
 	    OrganisationState state = (OrganisationState) service.findById(OrganisationState.class,
 		    organisationForm.getStateId());
 
@@ -129,7 +113,7 @@ public class OrgSaveController {
 			    .getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
 			org.setArchivedDate(new Date());
 		    }
-		    writeAuditLog(user, org, organisationForm, state, locale);
+		    writeAuditLog(user, org, organisationForm, state);
 		    BeanUtils.copyProperties(org, organisationForm);
 		} else {
 		    request.setAttribute("errorName", "UserController");
@@ -143,9 +127,8 @@ public class OrgSaveController {
 			(Organisation) service.findById(Organisation.class, organisationForm.getParentId()));
 		org.setOrganisationType(
 			(OrganisationType) service.findById(OrganisationType.class, organisationForm.getTypeId()));
-		writeAuditLog(user, org, organisationForm, org.getOrganisationState(), org.getLocale());
+		writeAuditLog(user, org, organisationForm, org.getOrganisationState());
 	    }
-	    org.setLocale(locale);
 	    org.setOrganisationState(state);
 	    if (log.isDebugEnabled()) {
 		log.debug("orgId: " + org.getOrganisationId() + " create date: " + org.getCreateDate());
@@ -160,8 +143,7 @@ public class OrgSaveController {
 	}
     }
 
-    private void writeAuditLog(UserDTO user, Organisation org, OrganisationForm orgForm, OrganisationState newState,
-	    SupportedLocale newLocale) {
+    private void writeAuditLog(UserDTO user, Organisation org, OrganisationForm orgForm, OrganisationState newState) {
 
 	WebApplicationContext ctx = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(applicationContext.getServletContext());
@@ -227,24 +209,6 @@ public class OrgSaveController {
 		args[0] = "courseAdminCanChangeStatusOfCourse";
 		args[2] = org.getCourseAdminCanChangeStatusOfCourse() ? "true" : "false";
 		args[3] = orgForm.isCourseAdminCanChangeStatusOfCourse() ? "true" : "false";
-		message = messageService.getMessage(key, args);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
-			null, null, message);
-	    }
-	    /*
-	     * this field not set yet
-	     * if(!org.getCourseAdminCanCreateGuestAccounts().equals(isCourseAdminCanCreateGuestAccounts())) {
-	     * args[0] = "courseAdminCanCreateGuestAccounts";
-	     * args[2] = org.getCourseAdminCanCreateGuestAccounts() ? "true" : "false";
-	     * args[3] = orgForm.isCourseAdminCanCreateGuestAccounts() ? "true" : "false";
-	     * message = messageService.getMessage(key, args);
-	     * auditService.log(AdminConstants.MODULE_NAME, message);
-	     * }
-	     */
-	    if (!org.getLocale().getLocaleId().equals(orgForm.getLocaleId())) {
-		args[0] = "locale";
-		args[2] = org.getLocale().getDescription();
-		args[3] = newLocale.getDescription();
 		message = messageService.getMessage(key, args);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, user != null ? user.getUserID() : null, null,
 			null, null, message);

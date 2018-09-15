@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -44,7 +43,6 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm;
@@ -75,15 +73,6 @@ import org.springframework.web.context.WebApplicationContext;
  * The difference between author mode (which is basically the preview)
  * is that if the defineLater flag is set, it will not be able to see the noticeboard screen
  * </p>
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/learning")
@@ -208,7 +197,7 @@ public class NbLearnerController {
 	Boolean userFinished = (nbUser != null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
 	request.setAttribute("userFinished", userFinished);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	/*
@@ -304,8 +293,7 @@ public class NbLearnerController {
 	    throw new NbApplicationException(error);
 	}
 
-	ToolSessionManager sessionMgrService = NoticeboardServiceProxy
-		.getNbSessionManager(applicationContext.getServletContext());
+	ToolSessionManager sessionMgrService = (ToolSessionManager) nbService;
 
 	ToolAccessMode mode = WebUtil.getToolAccessMode(nbLearnerForm.getMode());
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
@@ -379,7 +367,7 @@ public class NbLearnerController {
 	    request.setAttribute("reflectEntry", entry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
 		applicationContext.getServletContext());
 
 	return "reflect";

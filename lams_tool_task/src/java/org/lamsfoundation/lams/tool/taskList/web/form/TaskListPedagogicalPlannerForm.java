@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 

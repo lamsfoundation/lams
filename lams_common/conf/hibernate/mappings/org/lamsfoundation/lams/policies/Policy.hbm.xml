@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+
+	<class name="org.lamsfoundation.lams.policies.Policy" table="lams_policy">
+
+		<id name="uid" type="java.lang.Long" column="uid">
+			<generator class="native" />
+		</id>
+		<property name="policyId" type="java.lang.Long"
+			column="policy_id">
+		</property>
+    	<property name="policyName" type="java.lang.String" not-null="true"
+        	 	 column="policy_name" length="255">
+     	</property>
+    	<property name="version" type="java.lang.String"
+        	 	 column="version" length="255">
+     	</property>
+         <property name="summary" type="text" not-null="true"
+        	 	 column="summary">
+     	</property>
+    	<property name="fullPolicy" type="text" not-null="true"
+        	 	 column="full_policy">
+     	</property>
+		<property name="lastModified" type="java.sql.Timestamp"
+			column="last_modified" not-null="true" length="19">
+		</property>		
+		<property name="policyStateId" type="java.lang.Integer"
+			column="policy_state_id" length="3">
+		</property>
+		<property name="policyTypeId" type="java.lang.Integer"
+			column="policy_type_id" length="3">
+		</property>
+		
+		<!-- Associations -->
+		
+		<!-- bi-directional many-to-one association to User -->
+		<many-to-one name="createdBy"
+			class="org.lamsfoundation.lams.usermanagement.User"
+			not-null="true">
+			<column name="created_by" />
+		</many-to-one>
+		
+		<!-- bi-directional one-to-many association to PolicyConsents -->
+	 	<set
+            name="consents"
+            lazy="true"
+            inverse="false"
+            cascade="none"
+            sort="unsorted"
+            order-by="date_agreed_on asc"
+        >
+            <key
+                column="policy_uid"
+            >
+            </key>
+            <one-to-many
+                  class="org.lamsfoundation.lams.policies.PolicyConsent"
+            />
+        </set>
+
+	</class>
+	
+</hibernate-mapping>

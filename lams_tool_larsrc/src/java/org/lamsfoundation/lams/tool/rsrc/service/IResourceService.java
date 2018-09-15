@@ -27,7 +27,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -47,16 +48,6 @@ import org.springframework.web.multipart.MultipartFile;
  *         Interface that defines the contract that all ShareResource service provider must follow.
  */
 public interface IResourceService {
-
-    /**
-     * Get file <code>IVersiondNode</code> by given package id and path.
-     *
-     * @param packageId
-     * @param relPathString
-     * @return
-     * @throws ResourceApplicationException
-     */
-    IVersionedNode getFileNode(Long packageId, String relPathString) throws ResourceApplicationException;
 
     /**
      * Get <code>Resource</code> by toolContentID.
@@ -119,8 +110,12 @@ public interface IResourceService {
     // ********** Repository methods ***********************
     /**
      * Delete file from repository.
+     * 
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
      */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException;
+    void deleteFromRepository(Long fileUuid, Long fileVersionId)
+	    throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Save or update resource into database.

@@ -32,8 +32,6 @@ public class DacoConstants {
 
     public static final String DACO_SERVICE = "dacoService";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "dacoToolContentHandler";
-
     public static final int SESSION_COMPLETED = 1;
 
     // question types

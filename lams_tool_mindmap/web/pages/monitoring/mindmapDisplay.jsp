@@ -25,6 +25,7 @@
 		
 		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
 		<script src="${tool}includes/javascript/jquery.timer.js"></script>
+		<script src="<lams:LAMSURL/>includes/javascript/fullscreen.js"></script>
 		<script src="${tool}includes/javascript/mapjs/main.js"></script>
 		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
 	</lams:head>

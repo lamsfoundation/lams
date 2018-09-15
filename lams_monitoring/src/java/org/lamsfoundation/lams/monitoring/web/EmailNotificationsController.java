@@ -45,9 +45,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.index.IndexLessonBean;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -56,14 +55,14 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
 import org.lamsfoundation.lams.monitoring.quartz.job.EmailScheduleMessageJob;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
@@ -87,8 +86,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -105,13 +102,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/emailNotifications")
 public class EmailNotificationsController {
 
-    @Autowired
-    private WebApplicationContext applicationContext;
-
-    @Autowired
-    @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
-
     private static Logger log = Logger.getLogger(EmailNotificationsController.class);
 
     // ---------------------------------------------------------------------
@@ -121,15 +111,30 @@ public class EmailNotificationsController {
     private static final String TRIGGER_PREFIX_NAME = "emailMessageOnScheduleTrigger:";
     private static final String JOB_PREFIX_NAME = "emailScheduleMessageJob:";
 
-    private static IEventNotificationService eventNotificationService;
-    private static IUserManagementService userManagementService;
-    private static ILogEventService logEventService;
-    private static ISecurityService securityService;
-    private static ILessonService lessonService;
-
-    // ---------------------------------------------------------------------
-    // Method
-    // ---------------------------------------------------------------------
+    @Autowired
+    @Qualifier("eventNotificationService")
+    private IEventNotificationService eventNotificationService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("logEventService")
+    private ILogEventService logEventService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
+    @Autowired
+    @Qualifier("lessonService")
+    private ILessonService lessonService;
+    @Autowired
+    @Qualifier("monitoringService")
+    private IMonitoringFullService monitoringService;
+    @Autowired
+    @Qualifier("scheduler")
+    private Scheduler scheduler;
+    @Autowired
+    @Qualifier("learnerService")
+    private ILearnerService learnerService;
 
     /**
      * Shows "Email notification" page for particular lesson.
@@ -138,18 +143,16 @@ public class EmailNotificationsController {
     public String getLessonView(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
-		"show lesson email notifications", false)) {
+	if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(), "show lesson email notifications",
+		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
 
-	ICoreLearnerService learnerService = MonitoringServiceProxy
-		.getLearnerService(applicationContext.getServletContext());
 	Lesson lesson = learnerService.getLesson(lessonId);
 	if (!lesson.getEnableLessonNotifications()) {
-	    getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, lessonId,
-		    null, "Attempted to send notification when notifications are disabled in lesson " + lessonId);
+	    logEventService.logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, lessonId, null,
+		    "Attempted to send notification when notifications are disabled in lesson " + lessonId);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Notifications are disabled in the lesson");
 	    return null;
 	}
@@ -168,22 +171,19 @@ public class EmailNotificationsController {
     public String getCourseView(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	int orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	if (!getSecurityService().isGroupMonitor(orgId, getCurrentUser().getUserID(), "show course email notifications",
+	if (!securityService.isGroupMonitor(orgId, getCurrentUser().getUserID(), "show course email notifications",
 		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
 
-	ICoreLearnerService learnerService = MonitoringServiceProxy
-		.getLearnerService(applicationContext.getServletContext());
-
 	// getting the organisation
-	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
+	Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 
-	boolean isGroupMonitor = getSecurityService().hasOrgRole(orgId, getCurrentUser().getUserID(),
+	boolean isGroupMonitor = securityService.hasOrgRole(orgId, getCurrentUser().getUserID(),
 		new String[] { Role.GROUP_MANAGER }, "show course email notifications", false);
 	Integer userRole = isGroupMonitor ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
-	Map<Long, IndexLessonBean> staffMap = getLessonService()
+	Map<Long, IndexLessonBean> staffMap = lessonService
 		.getLessonsByOrgAndUserWithCompletedFlag(getCurrentUser().getUserID(), orgId, userRole);
 
 	// Already sorted, just double check that it does not contain finished or removed lessons
@@ -211,20 +211,18 @@ public class EmailNotificationsController {
     public String showScheduledEmails(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, SchedulerException {
 
-	getUserManagementService();
-	Scheduler scheduler = getScheduler();
 	TreeSet<EmailScheduleMessageJobDTO> scheduleList = new TreeSet<>();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (isLessonNotifications) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "show scheduled lesson email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else {
-	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "show scheduled course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
@@ -283,7 +281,7 @@ public class EmailNotificationsController {
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (isLessonNotifications) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "show archived lesson email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
@@ -292,7 +290,7 @@ public class EmailNotificationsController {
 	    List<EmailNotificationArchive> notifications = monitoringService.getArchivedEmailNotifications(lessonId);
 	    request.setAttribute("notifications", notifications);
 	} else {
-	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "show archived course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
@@ -311,11 +309,9 @@ public class EmailNotificationsController {
     @RequestMapping("getArchivedRecipients")
     @ResponseBody
     public String getArchivedRecipients(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy
-		.getMonitoringService(applicationContext.getServletContext());
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
-	EmailNotificationArchive notification = (EmailNotificationArchive) getUserManagementService()
+	EmailNotificationArchive notification = (EmailNotificationArchive) userManagementService
 		.findById(EmailNotificationArchive.class, emailNotificationUid);
 
 	Long lessonId = notification.getLessonId();
@@ -323,21 +319,21 @@ public class EmailNotificationsController {
 	boolean isLessonNotifications = (lessonId != null);
 	// check if the user is allowed to fetch this data
 	if (isLessonNotifications) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "show archived lesson email notification participants", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else {
-	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "show archived course email notification participants", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
 	    }
 	}
 
-	int page = WebUtil.readIntParam(request, GradebookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
 
 	// get only recipients we want on the page
 	List<User> recipients = monitoringService.getArchivedEmailNotificationRecipients(emailNotificationUid, rowLimit,
@@ -345,24 +341,24 @@ public class EmailNotificationsController {
 
 	// build JSON which is understood by jqGrid
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put(GradebookConstants.ELEMENT_PAGE, page);
-	responseJSON.put(GradebookConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
-	responseJSON.put(GradebookConstants.ELEMENT_RECORDS, recipients.size());
+	responseJSON.put(CommonConstants.ELEMENT_PAGE, page);
+	responseJSON.put(CommonConstants.ELEMENT_TOTAL, ((notification.getRecipients().size() - 1) / rowLimit) + 1);
+	responseJSON.put(CommonConstants.ELEMENT_RECORDS, recipients.size());
 
 	ArrayNode rowsJSON = JsonNodeFactory.instance.arrayNode();
 	for (User recipient : recipients) {
 	    ObjectNode rowJSON = JsonNodeFactory.instance.objectNode();
-	    rowJSON.put(GradebookConstants.ELEMENT_ID, recipient.getUserId());
+	    rowJSON.put(CommonConstants.ELEMENT_ID, recipient.getUserId());
 
 	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
 	    cellJSON.add(new StringBuilder(recipient.getLastName()).append(", ").append(recipient.getFirstName())
 		    .append(" [").append(recipient.getLogin()).append("]").toString());
 
-	    rowJSON.set(GradebookConstants.ELEMENT_CELL, cellJSON);
+	    rowJSON.set(CommonConstants.ELEMENT_CELL, cellJSON);
 	    rowsJSON.add(rowJSON);
 	}
 
-	responseJSON.set(GradebookConstants.ELEMENT_ROWS, rowsJSON);
+	responseJSON.set(CommonConstants.ELEMENT_ROWS, rowsJSON);
 	response.setContentType("application/json;charset=UTF-8");
 
 	return responseJSON.toString();
@@ -384,21 +380,18 @@ public class EmailNotificationsController {
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 
-	getUserManagementService();
-	Scheduler scheduler = getScheduler();
-
 	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 	String error = null;
 
 	try {
 	    // if this method throws an Exception, there will be no deleteNotification=true in the JSON reply
 	    if (isLessonNotifications) {
-		if (!getSecurityService().isLessonMonitor(lessonId, userId, "show scheduled lesson email notifications",
+		if (!securityService.isLessonMonitor(lessonId, userId, "show scheduled lesson email notifications",
 			false)) {
 		    error = "Unable to delete notification: the user is not a monitor in the lesson";
 		}
 	    } else {
-		if (!getSecurityService().isGroupMonitor(organisationId, userId,
+		if (!securityService.isGroupMonitor(organisationId, userId,
 			"show scheduled course course email notifications", false)) {
 		    error = "Unable to delete notification: the user is not a monitor in the organisation";
 		}
@@ -416,7 +409,7 @@ public class EmailNotificationsController {
 
 			JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobKey());
 			JobDataMap jobDataMap = jobDetail.getJobDataMap();
-			getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, userId, null, lessonId, null,
+			logEventService.logEvent(LogEvent.TYPE_NOTIFICATION, userId, null, lessonId, null,
 				"Deleting unsent scheduled notification " + jobKey + " "
 					+ jobDataMap.getString("emailBody"));
 
@@ -447,7 +440,7 @@ public class EmailNotificationsController {
 	    throws IOException {
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
-	EmailNotificationArchive notification = (EmailNotificationArchive) getUserManagementService()
+	EmailNotificationArchive notification = (EmailNotificationArchive) userManagementService
 		.findById(EmailNotificationArchive.class, emailNotificationUid);
 
 	Long lessonId = notification.getLessonId();
@@ -455,13 +448,13 @@ public class EmailNotificationsController {
 	boolean isLessonNotifications = (lessonId != null);
 	// check if the user is allowed to fetch this data
 	if (isLessonNotifications) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "export archived lesson email notification", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else {
-	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
+	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "export archived course email notification", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
@@ -507,7 +500,7 @@ public class EmailNotificationsController {
 		int userId = Integer.parseInt(userIdStr);
 		userIdInts.add(userId);
 		boolean isHtmlFormat = false;
-		isSuccessfullySent &= getEventNotificationService().sendMessage(null, userId,
+		isSuccessfullySent &= eventNotificationService.sendMessage(null, userId,
 			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
 				.getMessage("event.emailnotifications.email.subject", new Object[] {}),
 			emailBody, isHtmlFormat);
@@ -547,7 +540,6 @@ public class EmailNotificationsController {
 			.withIdentity(EmailNotificationsController.TRIGGER_PREFIX_NAME + now.getTimeInMillis())
 			.startAt(scheduleDate).build();
 		// start the scheduling job
-		Scheduler scheduler = getScheduler();
 		scheduler.scheduleJob(emailScheduleMessageJob, startLessonTrigger);
 		ObjectNode.put("isSuccessfullyScheduled", true);
 
@@ -571,7 +563,7 @@ public class EmailNotificationsController {
 	}
 
 	//audit log
-	getLogEventService().logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, null, null,
+	logEventService.logEvent(LogEvent.TYPE_NOTIFICATION, getCurrentUser().getUserID(), null, null, null,
 		"User " + getCurrentUser().getLogin() + " set a notification " + emailClauseStr + " " + scheduleDateStr
 			+ " with the following notice:  " + emailBody);
 
@@ -592,13 +584,13 @@ public class EmailNotificationsController {
 	Integer orgId = (Integer) map.get(AttributeNames.PARAM_ORGANISATION_ID);
 
 	if (lessonId != null) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
+	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "get users for lesson email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else if (orgId != null) {
-	    if (!getSecurityService().isGroupMonitor(orgId, getCurrentUser().getUserID(),
+	    if (!securityService.isGroupMonitor(orgId, getCurrentUser().getUserID(),
 		    "get users for course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
@@ -701,61 +693,5 @@ public class EmailNotificationsController {
     private UserDTO getCurrentUser() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private IEventNotificationService getEventNotificationService() {
-	if (eventNotificationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    eventNotificationService = (IEventNotificationService) ctx.getBean("eventNotificationService");
-	}
-	return eventNotificationService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return userManagementService;
-    }
-
-    private ILogEventService getLogEventService() {
-	if (logEventService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    logEventService = (ILogEventService) ctx.getBean("logEventService");
-	}
-	return logEventService;
-    }
-
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return lessonService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    securityService = (ISecurityService) webContext.getBean("securityService");
-	}
-
-	return securityService;
-    }
-
-    /**
-     *
-     * @return the bean that defines Scheduler.
-     */
-    private Scheduler getScheduler() {
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	return (Scheduler) ctx.getBean("scheduler");
     }
 }

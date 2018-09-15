@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -39,6 +38,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,7 +91,7 @@ public interface ISubmitFilesService {
 
     /**
      * Get a the details for a single file uploaded by a learner
-     *
+     * 
      * @param detailId
      * @return SubmissionDetails
      */
@@ -113,7 +113,7 @@ public interface ISubmitFilesService {
      *            Should files removed in monitor be included.
      * @return List The list of required objects.
      */
-    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale,
+    public List<FileDetailsDTO> getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale,
 	    boolean includeRemovedFiles);
 
     /**
@@ -123,7 +123,8 @@ public interface ISubmitFilesService {
      *            The <code>session_id</code> to be looked up
      * @return SortedMap, the key is UserDTO, the value is a List of FileDetailsDTO objects
      */
-    public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale);
+    public SortedMap<SubmitUserDTO, List<FileDetailsDTO>> getFilesUploadedBySession(Long sessionID,
+	    Locale currentLocale);
 
     /**
      * Updates the marks for a file, and also allows a file to be uploaded
@@ -143,20 +144,23 @@ public interface ISubmitFilesService {
      * @param reportID
      * @param markFileUUID
      * @param markFileVersionID
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
      */
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID);
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID)
+	    throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
      * from the content repository.
-     *
+     * 
      * @param detailID
      */
     public void removeLearnerFile(Long detailID, UserDTO monitor);
 
     /**
      * Mark a deleted original file as not deleted. Undoes what removeLearnerFile().
-     *
+     * 
      * @param detailID
      */
     public void restoreLearnerFile(Long detailID, UserDTO monitor);
@@ -171,17 +175,12 @@ public interface ISubmitFilesService {
      */
     public SubmitFilesSession getSessionById(Long sessionID);
 
-    public IVersionedNode downloadFile(Long uuid, Long versionID);
-
     /**
      * Release marks and comments information to learners, for a special session.
      *
      * @param sessionID
-     * @return success return true, otherwise return false.
      */
-    public boolean releaseMarksForSession(Long sessionID);
-
-    public void deleteFromRepository(Long uuid, Long versionID);
+    public void releaseMarksForSession(Long sessionID);
 
     /**
      * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.

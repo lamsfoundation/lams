@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.LinkedMultiValueMap;

@@ -22,6 +22,9 @@
  */
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +32,7 @@ import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -73,16 +77,18 @@ public class ConfigController {
     public String unspecified(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
 	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
+	Map<String, String> smtpAuthTypes = new LinkedHashMap<String, String>();
+	smtpAuthTypes.put("none", "None");
+	smtpAuthTypes.put("starttls", "STARTTLS");
+	smtpAuthTypes.put("ssl", "SSL");
+	request.setAttribute("smtpAuthTypes", smtpAuthTypes);
 
 	return "config/editconfig";
     }
 
     @RequestMapping(path = "/config/save", method = RequestMethod.POST)
     public String save(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
-
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
-	}
 
 	String[] keys = configForm.getKey();
 	String[] values = configForm.getValue();

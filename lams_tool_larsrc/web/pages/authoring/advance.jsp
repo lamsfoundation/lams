@@ -64,6 +64,8 @@
 	
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${authoringForm.resource.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 	<div class="checkbox">

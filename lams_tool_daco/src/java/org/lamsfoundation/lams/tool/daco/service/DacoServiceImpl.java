@@ -37,19 +37,11 @@ import java.util.SortedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -77,7 +69,6 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
-import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -104,17 +95,12 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     private DacoAnswerDAO dacoAnswerDao;
 
     // tool service
-    private DacoToolContentHandler dacoToolContentHandler;
+    private IToolContentHandler dacoToolContentHandler;
 
     private MessageService messageService;
 
-    // system services
-    private IRepositoryService repositoryService;
-
     private ILamsToolService toolService;
-
-    private ILearnerService learnerService;
-
+    
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
@@ -183,17 +169,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public void deleteDacoRecord(List<DacoAnswer> record) {
 	for (DacoAnswer answer : record) {
 	    deleteDacoAnswer(answer.getUid());
-	}
-    }
-
-    @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws DacoApplicationException {
-	ITicket ticket = getRepositoryLoginTicket();
-	try {
-	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
-	} catch (Exception e) {
-	    throw new DacoApplicationException(
-		    "Exception occured while deleting files from" + " the repository " + e.getMessage());
 	}
     }
 
@@ -369,53 +344,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     *
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath) throws DacoApplicationException {
-
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    DacoServiceImpl.log.error(error);
-	    throw new DacoApplicationException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    DacoServiceImpl.log.error(error);
-	    throw new DacoApplicationException(error, e);
-
-	}
-    }
-
-    @Override
-    public IVersionedNode getFileNode(Long answerUid, String relPathString) throws DacoApplicationException {
-	DacoAnswer answer = (DacoAnswer) dacoAnswerDao.getObject(DacoQuestion.class, answerUid);
-	if (answer == null) {
-	    throw new DacoApplicationException("Reource question " + answerUid + " not found.");
-	}
-
-	return getFile(answer.getFileUuid(), answer.getFileVersionId(), relPathString);
-    }
 
     @Override
     public Integer getGroupRecordCount(Long sessionId) {
@@ -604,31 +532,6 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
-    /**
-     * This method verifies the credentials of the Daco Tool and gives it the <code>Ticket</code> to login and access
-     * the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws DacoApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws DacoApplicationException {
-	ICredentials credentials = new SimpleCredentials(dacoToolContentHandler.getRepositoryUser(),
-		dacoToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials, dacoToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new DacoApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new DacoApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new DacoApplicationException("Login failed." + e.getMessage());
-	}
-    }
-
     @Override
     public DacoSession getSessionBySessionId(Long sessionId) {
 	return dacoSessionDao.getSessionBySessionId(sessionId);
@@ -785,7 +688,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared daco session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -969,7 +872,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	this.dacoSessionDao = dacoSessionDao;
     }
 
-    public void setDacoToolContentHandler(DacoToolContentHandler dacoToolContentHandler) {
+    public void setDacoToolContentHandler(IToolContentHandler dacoToolContentHandler) {
 	this.dacoToolContentHandler = dacoToolContentHandler;
     }
 
@@ -981,16 +884,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	this.exportContentService = exportContentService;
     }
 
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public void setToolService(ILamsToolService toolService) {

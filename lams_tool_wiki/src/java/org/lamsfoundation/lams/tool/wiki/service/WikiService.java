@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -97,8 +96,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     private IWikiSessionDAO wikiSessionDAO = null;
 
     private IWikiUserDAO wikiUserDAO = null;
-
-    private ILearnerService learnerService;
 
     private ILamsToolService toolService;
 
@@ -179,7 +176,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -950,14 +947,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public void setWikiUserDAO(IWikiUserDAO userDAO) {
 	wikiUserDAO = userDAO;
-    }
-
-    public ILearnerService getLearnerService() {
-	return learnerService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public IExportToolContentService getExportContentService() {

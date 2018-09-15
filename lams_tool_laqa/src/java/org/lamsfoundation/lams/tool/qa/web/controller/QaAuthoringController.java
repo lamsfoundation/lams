@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -57,6 +56,7 @@ import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -390,7 +390,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	    QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
 
-	    request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	    request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	} else {
 	    if (qaContent != null) {
@@ -619,7 +619,7 @@ public class QaAuthoringController implements QaAppConstants {
 	String editableQuestionIndex = request.getParameter("editableQuestionIndex");
 
 	boolean requiredBoolean = newQuestionForm.isRequired();
-	
+
 	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
 
 	if (newQuestion != null && newQuestion.length() > 0) {
@@ -1080,9 +1080,11 @@ public class QaAuthoringController implements QaAppConstants {
 	    replacedQuestionIndex = --intQuestionIndex;
 	}
 
-	QaQuestionDTO mainQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
+	QaQuestionDTO mainQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs,
+		intOriginalQuestionIndex);
 
-	QaQuestionDTO replacedQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
+	QaQuestionDTO replacedQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs,
+		replacedQuestionIndex);
 
 	List<QaQuestionDTO> newQuestionDtos = new LinkedList<>();
 

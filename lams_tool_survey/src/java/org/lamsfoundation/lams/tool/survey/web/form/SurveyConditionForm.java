@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
-import org.lamsfoundation.lams.web.TextSearchForm;
+import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Survey needs.

@@ -110,6 +110,12 @@ public class ProfileSaveController {
 	    errorMap.add("email", messageService.getMessage("error.valid.email.required"));
 	}
 
+	//country validation
+	String country = (userForm.getCountry() == null) ? null : (String) userForm.getCountry();
+	if (StringUtils.isBlank(country) || "0".equals(country)) {
+	    errorMap.add("email", messageService.getMessage("error.country.required"));
+	}
+
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("redirect", "editprofile");

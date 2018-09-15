@@ -33,10 +33,6 @@ public class GradebookConstants {
     public static final String MODULE_NAME = "gradebook";
 
     // Parameters
-    public static final String PARAM_PAGE = "page";
-    public static final String PARAM_ROWS = "rows";
-    public static final String PARAM_SIDX = "sidx";
-    public static final String PARAM_SORD = "sord";
     public static final String PARAM_LOGIN = "login";
     public static final String PARAM_ID = "id";
     public static final String PARAM_MARK = "mark";

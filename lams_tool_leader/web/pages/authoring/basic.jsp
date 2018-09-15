@@ -12,3 +12,5 @@
     <label for="instructions"><fmt:message key="label.authoring.basic.instructions" /></label>
     <lams:CKEditor id="instructions" value="${authoringForm.instructions}" contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 </div>
+
+<lams:OutcomeAuthor toolContentId="${sessionMap.toolContentID}" />

@@ -37,6 +37,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -107,8 +108,7 @@ public class LamsSecurityUtil {
 	String lastName  = ctx.getUser().getFamilyName();
 	String email = ctx.getUser().getEmailAddress();
 	String locale = ctx.getUser().getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(ctx.getUser().getCountry());
 
 	// Even for authoring calls we still need a 'course' the user, role & organisation are all bound up together
 	// do to be authorised to use authoring you must be in an organisation.
@@ -130,7 +130,7 @@ public class LamsSecurityUtil {
 	    String course = courseId != null ? "&courseid=" + URLEncoder.encode(courseId, "UTF8") : "";
 	    url = serverAddr + "/LoginRequest?" + "&uid=" + URLEncoder.encode(username, "UTF8") + "&method=" + method
 		    + "&ts=" + timestamp + "&sid=" + serverId + "&hash=" + hash + course + "&country=" + country
-		    + "&lang=" + lang + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
+		    + "&lang=" + locale + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
 		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8");
 	    
 	    if ("learnerStrictAuth".equals(method) || "monitor".equals(method)) {
@@ -246,9 +246,8 @@ public class LamsSecurityUtil {
 	String email = user.getEmailAddress();
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
 
-	String locale = user.getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String locale = ctx.getUser().getLocale();
+	String country = getCountryCode(ctx.getUser().getCountry());
 
 	// the mode to call upon learning designs
 	final Integer MODE = 2;
@@ -262,7 +261,7 @@ public class LamsSecurityUtil {
 		    + "/services/xml/LearningDesignRepository?method="+method+"&datetime="
 		    + timestamp + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + MODE
+		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + locale + "&mode=" + MODE
 		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
 		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8");
 	    
@@ -351,8 +350,7 @@ public class LamsSecurityUtil {
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
 
 	String locale = ctx.getUser().getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(ctx.getUser().getCountry());
 
 	try {
 
@@ -360,7 +358,7 @@ public class LamsSecurityUtil {
 		    + "/services/xml/LearningDesignRepository?method=deleteLearningDesignJSON&datetime="
 		    + timestamp + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang
+		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + locale
 		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8") + "&lastName="
 		    + URLEncoder.encode(lastName, "UTF-8") + "&email=" + URLEncoder.encode(email, "UTF-8")
 		    + "&learningDesignID="+ldId;
@@ -411,19 +409,25 @@ public class LamsSecurityUtil {
      * @param ctx
      *            the blackboard contect, contains session data
      * @param usernameFromParam
-     * 		  current user's username 
+     *            current user's username
      * @param courseIdStr
-     * 		  courseId 
+     *            courseId
      * @param ldId
      *            the learning design id for which you wish to start a lesson
      * @param title
      *            the title of the lesson
      * @param desc
-     *            the description of the lesson 
-     *            
+     *            the description of the lesson
+     * @param enforceAllowLearnerRestart
+     *            whether learners are allowed to restart the lesson. It has a higher priority than LAMS ExtServer's
+     *            according default setting
+     * @param isPreview
+     *            whether LAMS should start it as a preview or not
+     * 
      * @return the learning session id
      */
-    public static Long startLesson(User user, String courseId, long ldId, String title, String desc, boolean isPreview) {
+    public static Long startLesson(User user, String courseId, long ldId, String title, String desc,
+	    boolean enforceAllowLearnerRestart, boolean isPreview) {
 
 	String serverId = LamsPluginUtil.getServerId();
 	String serverAddr = LamsPluginUtil.getServerUrl();
@@ -431,8 +435,7 @@ public class LamsSecurityUtil {
 
 	String username = user.getUserName();
 	String locale = user.getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(user.getCountry());
 	String method = (isPreview) ? "preview" : "start";
 	
 	if (courseId == null || serverId == null || serverAddr == null || serverSecretKey == null) {
@@ -447,11 +450,11 @@ public class LamsSecurityUtil {
 
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
-		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + course
-		    + "&ldId=" + new Long(ldId).toString() + "&country="
-		    + country + "&lang=" + lang + "&method=" + method + "&title="
-		    + URLEncoder.encode(title, "utf8").trim() + "&desc=" + URLEncoder.encode(desc, "utf8").trim()
-		    + "&enableNotifications=true";
+		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + course + "&ldId="
+		    + new Long(ldId).toString() + "&country=" + country + "&lang=" + locale + "&method=" + method
+		    + "&title=" + URLEncoder.encode(title, "utf8").trim() + "&desc="
+		    + URLEncoder.encode(desc, "utf8").trim() + "&enableNotifications=true"
+		    + "&allowLearnerRestart=" + enforceAllowLearnerRestart;
 
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
 
@@ -549,8 +552,7 @@ public class LamsSecurityUtil {
 	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String username = teacher.getUserName();
 	String locale = teacher.getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(teacher.getCountry());
 	
 	if (courseId == null || serverId == null || serverAddr == null || serverSecretKey == null) {
 	    logger.info("Unable to clone lesson, one or more lams configuration properties or the course id is null");
@@ -565,7 +567,7 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
 		    + URLEncoder.encode(courseId, "UTF8") + "&country="
-			    + country + "&lang=" + lang + "&lsId=" + lsId + "&method=" + method;
+			    + country + "&lang=" + locale + "&lsId=" + lsId + "&method=" + method;
 
 	    logger.info("LAMS clone lesson request: " + serviceURL);
 	    
@@ -623,8 +625,7 @@ public class LamsSecurityUtil {
 	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String username = teacher.getUserName();
 	String locale = teacher.getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(teacher.getCountry());
 	
 	if (courseId == null || serverId == null || serverAddr == null || serverSecretKey == null) {
 	    logger.info("Unable to import lesson, one or more lams configuration properties or the course id is null");
@@ -641,8 +642,8 @@ public class LamsSecurityUtil {
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "UTF8") + "&country="
-			    + country + "&lang=" + lang + "&method=import&customCSV=&filePath=" + filePathParam;
+		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + locale
+		    + "&method=import&customCSV=&filePath=" + filePathParam;
 
 	    logger.info("LAMS import lesson request: " + serviceURL);
 
@@ -701,15 +702,13 @@ public class LamsSecurityUtil {
 	String serverSecretKey = LamsPluginUtil.getServerSecretKey();
 	String username = user.getUserName();
 	String locale = user.getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(user.getCountry());
 
 	if (serverId == null || serverAddr == null || serverSecretKey == null) {
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
 	}
 
 	try {
-	    
 	    /*
 	     * Returns a list of learners and monitors in the given course or group.
 	     */
@@ -781,9 +780,9 @@ public class LamsSecurityUtil {
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(course.getCourseId(), "utf8") + "&lsId=" + lessonId + "&country=" + country + "&lang="
-		    + lang + "&method=join" + "&firstNames="
-		    + firstNames + "&lastNames=" + lastNames + "&emails=" + emails;
+		    + URLEncoder.encode(course.getCourseId(), "utf8") + "&lsId=" + lessonId + "&country=" + country
+		    + "&lang=" + locale + "&method=join" + "&firstNames=" + firstNames + "&lastNames=" + lastNames
+		    + "&emails=" + emails;
 	    if (!monitorIds.isEmpty()) {
 		serviceURL += "&monitorIds=" + monitorIds;
 	    }
@@ -863,8 +862,7 @@ public class LamsSecurityUtil {
 	String lastName = ctx.getUser().getFamilyName();
 	String email = ctx.getUser().getEmailAddress();
 	String locale = ctx.getUser().getLocale();
-	String country = getCountry(locale);
-	String lang = getLanguage(locale);
+	String country = getCountryCode(ctx.getUser().getCountry());
 
 	if (serverId == null || serverAddr == null || serverSecretKey == null) {
 	    throw new RuntimeException("Unable to start lesson, one or more lams configuration properties is null");
@@ -878,7 +876,7 @@ public class LamsSecurityUtil {
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?method=singleStudentProgress" + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "utf8") + "&country=" + country + "&lang=" + lang + "&firstName="
+		    + URLEncoder.encode(courseId, "utf8") + "&country=" + country + "&lang=" + locale + "&firstName="
 		    + URLEncoder.encode(firstName, "UTF-8") + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
 		    + "&email=" + URLEncoder.encode(email, "UTF-8") + "&lsId=" + new Long(lsId).toString();
 
@@ -1105,34 +1103,25 @@ public class LamsSecurityUtil {
 	    throw new RuntimeException(e);
 	}
     }
-
+    
     /**
-     * 
-     * @param localeStr
-     *            the full balckboard locale string
-     * @return the language
+     * Returns country code based on country name. If it can't find according code - returns "XX".
      */
-    public static String getLanguage(String localeStr) {
-	if (localeStr == null)
-	    return "xx";
-	String[] split = localeStr.split("_");
-	return split[0];
-    }
-
-    /**
-     * 
-     * @param localeStr
-     *            the full balckboard locale string
-     * @return the country
-     */
-    public static String getCountry(String localeStr) {
-	if (localeStr == null)
-	    return "XX";
-	String[] split = localeStr.split("_");
+    public static String getCountryCode(String countryName) {
 	
-	//default country set to AU
-	String country = split.length > 1 ? split[1] : "AU";
-	return country;
+	if (StringUtils.isNotBlank(countryName)) {
+	    Locale[] locales = Locale.getAvailableLocales();
+	    for (Locale locale : locales) {
+		String code = locale.getCountry();
+		String name = locale.getDisplayCountry();
+
+		if (countryName.equals(name)) {
+		    return code;
+		}
+	    }
+	}
+	
+	return "XX";
     }
 
 }

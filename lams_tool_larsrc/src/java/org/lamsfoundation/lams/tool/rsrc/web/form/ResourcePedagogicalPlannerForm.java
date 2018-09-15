@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;

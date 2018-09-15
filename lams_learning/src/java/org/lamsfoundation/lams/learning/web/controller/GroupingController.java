@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.GroupingForm;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -83,7 +83,7 @@ public class GroupingController {
 
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -263,7 +263,8 @@ public class GroupingController {
      * @throws ServletException
      */
     @RequestMapping("/learnerChooseGroup")
-    public String learnerChooseGroup(@ModelAttribute GroupingForm GroupingForm, HttpServletRequest request) throws IOException, ServletException {
+    public String learnerChooseGroup(@ModelAttribute GroupingForm GroupingForm, HttpServletRequest request)
+	    throws IOException, ServletException {
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);

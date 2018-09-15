@@ -60,7 +60,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
@@ -81,6 +80,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -435,7 +435,7 @@ public class AuthoringAction extends Action {
 
 	assessmentForm.setAssessment(assessmentPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 	return mapping.findForward("author");
     }

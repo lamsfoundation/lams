@@ -47,7 +47,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
@@ -65,6 +64,7 @@ import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieItemForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -323,7 +323,7 @@ public class AuthoringController {
 
 	authoringForm.setScratchie(scratchiePO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return "pages/authoring/authoring";

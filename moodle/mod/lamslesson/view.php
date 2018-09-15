@@ -48,7 +48,6 @@ if ($id) {
 require_login($course, true, $cm);
 
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-$locale = lamslesson_get_locale($course->id);
 
 add_to_log($course->id, 'lamslesson', 'view', "view.php?id=$cm->id", $lamslesson->name, $cm->id);
 
@@ -95,19 +94,21 @@ echo $OUTPUT->box_end();
 
 echo $OUTPUT->box_start('generalbox', 'intro');
 if ($canparticipate || $canmanage) {
-  $learnerurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_STRICT_METHOD);
+  $learnerurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $USER->lang, $USER->country, $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_STRICT_METHOD);
+  $popupaction = new popup_action('click', $learnerurl, 'openlesson', array('height' => 720, 'width' => 1280));
+
   echo '<div class="centerlink">';
-  echo '<span id="learnerbutton" class="yui3-button yui3-link-button"><span class="first-child"> ';
-  echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), new popup_action('click', $learnerurl, '', array('height' => 600, 'width' => 996)));
-  echo '</span></span>';
+  echo $OUTPUT->action_link('#', get_string('openlesson', 'lamslesson'), $popupaction, array('class' => 'btn btn-success'), new pix_icon('t/go'));
   echo '</div>';
+
+
 }
 if ($canmanage) {
-    $monitorurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_MONITOR_METHOD);
+    $monitorurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $USER->lang, $USER->country, $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_MONITOR_METHOD);
+    $popupmonitoraction = new popup_action('click', $monitorurl, 'monitorlesson', array('height' => 720, 'width' => 1280));
+
   echo '<div class="centerlink">';
-  echo '<span id="monitorbutton" class="yui3-button yui3-link-button"><span class="first-child"> ';
-  echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
-  echo '</span></span>';
+  echo $OUTPUT->action_link('#', get_string('openmonitor', 'lamslesson'), $popupmonitoraction, array('class' => 'btn btn-default'), new pix_icon('i/dashboard'));
   echo '</div>';
 }
 
@@ -115,7 +116,7 @@ echo $OUTPUT->box_end();
 
 // Once we have progress info ready
 
-$progress = lamslesson_get_student_progress($USER->username,$lamslesson->lesson_id, $course->id,$USER->firstname,$USER->lastname,$USER->email,$locale['country'],$locale['lang']);
+$progress = lamslesson_get_student_progress($USER->username,$lamslesson->lesson_id, $course->id,$USER->firstname,$USER->lastname,$USER->email,$USER->country,$USER->lang);
 
 // Progress details
 

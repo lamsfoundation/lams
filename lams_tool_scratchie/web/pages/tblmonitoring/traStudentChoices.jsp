@@ -90,25 +90,39 @@
 				</td> 
 			</tr>
 			
-			<c:forEach var="groupRow" items="${groupRows}" varStatus="i">
+			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="i">
 				<tr>
 					<td class="text-center">
-						${groupRow[0].cellValue}
+						${sessionDto.sessionName}
 					</td>
 					
 					<c:choose>
-						<c:when test="${fn:length(groupRow) == 1}">
+						<c:when test="${empty sessionDto.itemDtos}">
 							<c:forEach begin="1" end="${fn:length(items) + 2}">
 								<td></td>
 							</c:forEach>
 						</c:when>
+						
 						<c:otherwise>
-							<c:forEach begin="1" end="${fn:length(groupRow) - 1}" var="j">
-								<td class="text-center <c:if test="${groupRow[j].color == 'GREEN'}">success</c:if>"
-								>
-									${groupRow[j].cellValue}
+							<c:forEach var="itemDto" items="${sessionDto.itemDtos}">
+								<td class="text-center">
+									<c:forEach var="answer" items="${itemDto.answers}">
+										<c:if test="${answer.description != ''}">
+											<span class="user-response <c:if test="${answer.correct}">successful-response</c:if> <c:if test="${!answer.correct}">wrong-response</c:if>">
+												<c:out value="${answer.description}"></c:out>
+											</span>
+										</c:if>
+									</c:forEach>
 								</td>
 							</c:forEach>
+							
+							<td class="text-center">
+								${sessionDto.mark}
+							</td>
+							
+							<td class="text-center">
+								${sessionDto.totalPercentage}
+							</td>
 						</c:otherwise>
 					</c:choose>
 					

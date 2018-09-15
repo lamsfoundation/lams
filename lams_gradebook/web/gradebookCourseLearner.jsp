@@ -29,6 +29,7 @@
 				height: 'auto',
 				width: $(window).width() - 100,
 				shrinkToFit: false,
+				cmTemplate: { title: false },
 			    sortorder: "asc", 
 			    sortname: "id", 
 			    pager: 'organisationGridPager',
@@ -47,29 +48,29 @@
 			    	"<fmt:message key="gradebook.columntitle.averageMark"/>", 
 			    	"<fmt:message key="gradebook.columntitle.mark"/>"],
 			    colModel:[
-			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'rowName',index:'rowName', sortable:true, editable:false},
-			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
-			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
-			      {name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
-			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
-			      {name:'feedback',index:'feedback', sortable:false, editable:false, search:false, width:200}, 
-			      {name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
-			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
-			      {name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
-			      {name:'mark',index:'mark', sortable:true, editable:false, search:false, width:50, align:"center"}
+			    	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+			    	{name:'rowName',index:'rowName', sortable:true, editable:false},
+			    	{name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
+			    	{name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
+			    	{name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
+			    	{name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
+			    	{name:'feedback',index:'feedback', sortable:false, editable:false, search:false, width:200}, 
+			    	{name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
+			    	{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
+			    	{name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
+			    	{name:'mark',index:'mark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
  			    loadError: function(xhr,st,err) {
-			    		$("#organisationGrid").jqGrid('clearGridData');
-			    		alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
+			    	$("#organisationGrid").jqGrid('clearGridData');
+			    	alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
 			    },
  			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
-				   var subgrid_table_id;
-				   var lessonID = $("#organisationGrid").getRowData(row_id)["id"];
-				   subgrid_table_id = subgrid_id+"_t";
-					 $("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
-					   	$("#"+subgrid_table_id).jqGrid({
+					var subgrid_table_id;
+					var lessonID = $("#organisationGrid").getRowData(row_id)["id"];
+					subgrid_table_id = subgrid_id+"_t";
+					$("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					$("#"+subgrid_table_id).jqGrid({
 							 guiStyle: "bootstrap",
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
@@ -77,6 +78,7 @@
 						     url: "<lams:LAMSURL />gradebook/gradebook/getActivityGridData.do?view=lrnActivity&lessonID=" + lessonID,
 						     height: "100%",
 						     autowidth:true,
+						     cmTemplate: { title: false },
 						     pager: subgrid_table_id + "_pager",
 						     rowList:[10,20,30,40,50,100],
 							 rowNum:10,
@@ -101,20 +103,18 @@
 								{name:'mark', width:100, index:'mark', sortable:true, editable: false, width:50, align:"center"}
 						     ],
  						     loadError: function(xhr,st,err) {
-						    		$("#"+subgrid_table_id).jqGrid('clearGridData');
-						    		alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
+						    	$("#"+subgrid_table_id).jqGrid('clearGridData');
+						    	alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
 						     },
  							 gridComplete: function(){
-							 	toolTip($(".jqgrow"));
 							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
 							 }
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
-					},
-					gridComplete: function(){
-						toolTip($(".jqgrow"));	// enable tooltips for grid
-						fixPagerInCenter('organisationGridPager', 0);
-					}	
-				}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false});
+				},
+				gridComplete: function(){
+					fixPagerInCenter('organisationGridPager', 0);
+				}	
+			}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false});
 
 			jQuery("#organisationGrid").jqGrid('filterToolbar');	
 

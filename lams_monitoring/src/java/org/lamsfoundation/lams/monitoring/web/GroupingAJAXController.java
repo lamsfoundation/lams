@@ -41,15 +41,13 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.controller.GroupingController;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
@@ -66,8 +64,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -86,11 +82,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class GroupingAJAXController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
-
-    @Autowired
     @Qualifier("monitoringService")
-    private IMonitoringService monitoringService;
+    private IMonitoringFullService monitoringService;
+    @Autowired
+    @Qualifier("securityService")
+    private ISecurityService securityService;
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService;
 
     private static Logger log = Logger.getLogger(GroupingAJAXController.class);
 
@@ -106,8 +105,7 @@ public class GroupingAJAXController {
     public static final String PARAM_MAY_DELETE = "mayDelete";
     public static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
     public static final String PARAM_VIEW_MODE = "viewMode";
-
-    private static ISecurityService securityService;
+    public static final String GROUPS = "groups";
 
     /**
      * Start the process of doing the chosen grouping
@@ -175,7 +173,7 @@ public class GroupingAJAXController {
 	    group.setUsers(sortedUsers);
 	}
 
-	request.setAttribute(GroupingController.GROUPS, groups);
+	request.setAttribute(GroupingAJAXController.GROUPS, groups);
 	// go to a view only screen for random grouping
 	return "grouping/viewGroups";
     }
@@ -196,8 +194,6 @@ public class GroupingAJAXController {
 	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId", true);
 	OrganisationGrouping orgGrouping = null;
 	if (orgGroupingId != null) {
-	    IUserManagementService userManagementService = MonitoringServiceProxy
-		    .getUserManagementService(applicationContext.getServletContext());
 	    orgGrouping = (OrganisationGrouping) userManagementService.findById(OrganisationGrouping.class,
 		    orgGroupingId);
 	}
@@ -215,7 +211,7 @@ public class GroupingAJAXController {
 	    }
 	}
 
-	request.setAttribute(GroupingController.GROUPS, groups);
+	request.setAttribute(GroupingAJAXController.GROUPS, groups);
 	request.setAttribute("isCourseGrouping", true); // flag to page it is a course grouping so use the field names for OrganisationGroup
 	return "grouping/viewGroups";
     }
@@ -239,9 +235,7 @@ public class GroupingAJAXController {
 	    Activity activity = monitoringService.getActivityById(activityID);
 	    Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
 		    : ((GroupingActivity) activity).getCreateGrouping();
-	    User exampleUser = (User) MonitoringServiceProxy
-		    .getUserManagementService(applicationContext.getServletContext())
-		    .findById(User.class, Integer.valueOf(members[0]));
+	    User exampleUser = (User) userManagementService.findById(User.class, Integer.valueOf(members[0]));
 	    Group group = grouping.getGroupBy(exampleUser);
 	    // null group means that user is not assigned anywhere in this grouping
 	    if (!group.isNull()) {
@@ -318,15 +312,13 @@ public class GroupingAJAXController {
     @ResponseBody
     public String saveAsCourseGrouping(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(applicationContext.getServletContext());
 	HttpSession ss = SessionManager.getSession();
 	Integer userId = ((UserDTO) ss.getAttribute(AttributeNames.USER)).getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	String newGroupingName = request.getParameter("name");
 
 	// check if user is allowed to view and edit groupings
-	if (!getSecurityService().hasOrgRole(organisationId, userId,
+	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"view organisation groupings", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
@@ -386,9 +378,6 @@ public class GroupingAJAXController {
     @RequestMapping("/checkGroupingNameUnique")
     @ResponseBody
     public String checkGroupingNameUnique(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(applicationContext.getServletContext());
-
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	String newGroupingName = request.getParameter("name");
 
@@ -418,8 +407,7 @@ public class GroupingAJAXController {
 	boolean result = true;
 
 	// check if the group can be removed
-	Group group = (Group) MonitoringServiceProxy.getUserManagementService(applicationContext.getServletContext())
-		.findById(Group.class, groupID);
+	Group group = (Group) userManagementService.findById(Group.class, groupID);
 	result = group.mayBeDeleted();
 
 	if (result) {
@@ -436,14 +424,5 @@ public class GroupingAJAXController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("result", result);
 	return responseJSON.toString();
-    }
-
-    private ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return securityService;
     }
 }

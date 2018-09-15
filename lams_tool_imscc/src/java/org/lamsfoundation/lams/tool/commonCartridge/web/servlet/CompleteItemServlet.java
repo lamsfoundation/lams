@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 import org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeServiceProxy;
 import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeService;
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeItemComparator;
-import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -53,7 +52,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 public class CompleteItemServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(CompleteItemServlet.class);
 
-    private CommonCartridgeToolContentHandler handler;
     private ICommonCartridgeService service;
 
     @Override

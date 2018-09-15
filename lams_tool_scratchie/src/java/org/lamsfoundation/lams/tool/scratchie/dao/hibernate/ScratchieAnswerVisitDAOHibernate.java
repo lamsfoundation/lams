@@ -41,10 +41,6 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
 
-    private static final String FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM = "SELECT r.scratchieAnswer from "
-	    + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
-
     private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId=? order by r.accessDate asc";
 
@@ -79,15 +75,6 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
     @Override
     public List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId) {
 	return (List<ScratchieAnswerVisitLog>) doFind(FIND_BY_SESSION, new Object[] { sessionId });
-    }
-
-    @Override
-    public ScratchieAnswer getFirstScratchedAnswerBySessionAndItem(Long sessionId, Long itemUid) {
-	Query q = getSession().createQuery(FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM);
-	q.setParameter(0, sessionId);
-	q.setParameter(1, itemUid);
-	q.setMaxResults(1);
-	return (ScratchieAnswer) q.uniqueResult();
     }
 
 }

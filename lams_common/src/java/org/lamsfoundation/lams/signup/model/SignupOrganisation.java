@@ -21,6 +21,7 @@ public class SignupOrganisation {
     private Boolean addAsStaff;
     private Boolean addWithAuthor;
     private Boolean addWithMonitor;
+    private Boolean emailVerify;
     private String courseKey;
     private String blurb;
     private Date createDate;
@@ -74,6 +75,14 @@ public class SignupOrganisation {
 
     public void setAddWithMonitor(Boolean addWithMonitor) {
 	this.addWithMonitor = addWithMonitor;
+    }
+
+    public Boolean getEmailVerify() {
+	return emailVerify;
+    }
+
+    public void setEmailVerify(Boolean emailValidation) {
+	this.emailVerify = emailValidation;
     }
 
     public String getCourseKey() {

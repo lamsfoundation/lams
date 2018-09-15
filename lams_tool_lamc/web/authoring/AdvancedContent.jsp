@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 
 <lams:SimplePanel titleKey="label.select.leader">
 	<div class="checkbox">
@@ -90,6 +91,8 @@
 	</lams:SimplePanel>
 	
 </lams:SimplePanel>
+
+<lams:OutcomeAuthor toolContentId="${sessionMap.toolContentID}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">

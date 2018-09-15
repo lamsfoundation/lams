@@ -47,9 +47,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -82,6 +81,7 @@ import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
@@ -92,7 +92,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -131,7 +130,7 @@ public class ScratchieServiceImpl
     private ScratchieConfigItemDAO scratchieConfigItemDao;
 
     // tool service
-    private ScratchieToolContentHandler scratchieToolContentHandler;
+    private IToolContentHandler scratchieToolContentHandler;
 
     private MessageService messageService;
 
@@ -139,13 +138,9 @@ public class ScratchieServiceImpl
 
     private ILamsToolService toolService;
 
-    private ILearnerService learnerService;
-
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private IGradebookService gradebookService;
 
     private ILogEventService logEventService;
 
@@ -386,7 +381,7 @@ public class ScratchieServiceImpl
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 
-	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
+	    toolService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
 		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
@@ -473,7 +468,7 @@ public class ScratchieServiceImpl
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
+		toolService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
 	}
@@ -817,6 +812,9 @@ public class ScratchieServiceImpl
 	return mark;
     }
 
+    /**
+     * Returns number of scraches user done for the specified item.
+     */
     private int calculateItemAttempts(List<ScratchieAnswerVisitLog> userLogs, ScratchieItem item) {
 
 	int itemAttempts = 0;
@@ -1096,12 +1094,12 @@ public class ScratchieServiceImpl
 	    row[columnCount++] = new ExcelCell(summary.getSessionName(), true);
 
 	    int numberOfFirstChoiceEvents = 0;
-	    for (ScratchieItem item : summary.getItems()) {
-		int attempts = item.getUserAttempts();
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		int attempts = itemDto.getUserAttempts();
 
 		String isFirstChoice;
 		IndexedColors color;
-		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
+		if (itemDto.isUnraveledOnFirstAttempt()) {
 		    isFirstChoice = getMessage("label.correct");
 		    color = IndexedColors.GREEN;
 		    numberOfFirstChoiceEvents++;
@@ -1178,14 +1176,14 @@ public class ScratchieServiceImpl
 	    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
 
 	    int numberOfFirstChoiceEvents = 0;
-	    for (ScratchieItem item : summary.getItems()) {
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
 
 		IndexedColors color = null;
-		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
+		if (itemDto.isUnraveledOnFirstAttempt()) {
 		    color = IndexedColors.GREEN;
 		    numberOfFirstChoiceEvents++;
 		}
-		row[columnCount++] = new ExcelCell(item.getFirstChoiceAnswerLetter(), color);
+		row[columnCount++] = new ExcelCell(itemDto.getAnswersSequence(), color);
 	    }
 	    row[columnCount++] = new ExcelCell(new Integer(numberOfFirstChoiceEvents), false);
 	    int percentage = (numberOfItems == 0) ? 0 : (100 * numberOfFirstChoiceEvents) / numberOfItems;
@@ -1274,12 +1272,12 @@ public class ScratchieServiceImpl
 
 	    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
 
-	    for (ScratchieItem item : summary.getItems()) {
-		int attempts = item.getUserAttempts();
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		int attempts = itemDto.getUserAttempts();
 
 		String isFirstChoice;
 		IndexedColors color;
-		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
+		if (itemDto.isUnraveledOnFirstAttempt()) {
 		    isFirstChoice = getMessage("label.correct");
 		    color = IndexedColors.GREEN;
 		} else if (attempts == 0) {
@@ -1291,7 +1289,7 @@ public class ScratchieServiceImpl
 		}
 		row[columnCount++] = new ExcelCell(isFirstChoice, color);
 		row[columnCount++] = new ExcelCell(new Long(attempts), color);
-		Long mark = (item.getUserMark() == -1) ? null : new Long(item.getUserMark());
+		Long mark = (itemDto.getUserMark() == -1) ? null : new Long(itemDto.getUserMark());
 		row[columnCount++] = new ExcelCell(mark, false);
 	    }
 	    rowList.add(row);
@@ -1516,15 +1514,12 @@ public class ScratchieServiceImpl
 
 	for (GroupSummary summary : summaryByTeam) {
 	    Long sessionId = summary.getSessionId();
-
-	    ScratchieSession session = getScratchieSessionBySessionId(sessionId);
-	    ScratchieUser groupLeader = session.getGroupLeader();
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
 
 	    for (ScratchieUser user : users) {
 
 		int questionCount = 1;
-		for (ScratchieItem item : summary.getItems()) {
+		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
 
 		    row = new ExcelCell[10 + (maxAnswers * 2)];
 		    columnCount = 0;
@@ -1537,11 +1532,11 @@ public class ScratchieServiceImpl
 		    // question number
 		    row[columnCount++] = new ExcelCell(new Long(questionCount++), false);
 		    // question title
-		    row[columnCount++] = new ExcelCell(item.getTitle(), false);
+		    row[columnCount++] = new ExcelCell(itemDto.getTitle(), false);
 
 		    // correct answer
 		    String correctAnswer = "";
-		    Set<ScratchieAnswer> answers = item.getAnswers();
+		    Set<ScratchieAnswer> answers = itemDto.getAnswers();
 		    for (ScratchieAnswer answer : answers) {
 			if (answer.isCorrect()) {
 			    correctAnswer = removeHtmlMarkup(answer.getDescription());
@@ -1550,9 +1545,9 @@ public class ScratchieServiceImpl
 		    row[columnCount++] = new ExcelCell(correctAnswer, false);
 
 		    // isFirstChoice
-		    int attempts = item.getUserAttempts();
+		    int attempts = itemDto.getUserAttempts();
 		    String isFirstChoice;
-		    if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
+		    if (itemDto.isUnraveledOnFirstAttempt()) {
 			isFirstChoice = getMessage("label.correct");
 		    } else if (attempts == 0) {
 			isFirstChoice = null;
@@ -1563,12 +1558,12 @@ public class ScratchieServiceImpl
 		    // attempts
 		    row[columnCount++] = new ExcelCell(new Long(attempts), false);
 		    // mark
-		    Object mark = (item.getUserMark() == -1) ? "" : new Long(item.getUserMark());
+		    Object mark = (itemDto.getUserMark() == -1) ? "" : new Long(itemDto.getUserMark());
 		    row[columnCount++] = new ExcelCell(mark, false);
 
 		    // Answers selected
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
-			    item.getUid());
+			    itemDto.getUid());
 		    if (logs == null) {
 			logs = new ArrayList<>();
 		    }
@@ -1577,7 +1572,7 @@ public class ScratchieServiceImpl
 			String answer = removeHtmlMarkup(log.getScratchieAnswer().getDescription());
 			row[columnCount++] = new ExcelCell(answer, false);
 		    }
-		    for (int i = logs.size(); i < item.getAnswers().size(); i++) {
+		    for (int i = logs.size(); i < itemDto.getAnswers().size(); i++) {
 			row[columnCount++] = new ExcelCell(getMessage("label.none"), false);
 		    }
 		    for (int i = answers.size(); i < maxAnswers; i++) {
@@ -1705,62 +1700,79 @@ public class ScratchieServiceImpl
 	    Long sessionId = session.getSessionId();
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
-	    ArrayList<ScratchieItem> items = new ArrayList<>();
+	    ArrayList<ScratchieItemDTO> itemDtos = new ArrayList<>();
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
 
 	    List<ScratchieAnswerVisitLog> answerLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
 
 	    for (ScratchieItem item : sortedItems) {
-		ScratchieItem newItem = new ScratchieItem();
+		ScratchieItemDTO itemDto = new ScratchieItemDTO();
 		int numberOfAttempts = 0;
 		int mark = -1;
-		boolean isFirstChoice = false;
-		String firstChoiceAnswerLetter = "";
+		boolean isUnraveledOnFirstAttempt = false;
+		String answersSequence = "";
 
 		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {
 
-		    numberOfAttempts = calculateItemAttempts(answerLogs, item);
+		    //create a list of attempts user done for the current item
+		    List<ScratchieAnswerVisitLog> itemAttempts = new ArrayList<>();
+		    for (ScratchieAnswerVisitLog answerLog : answerLogs) {
+			if (answerLog.getScratchieAnswer().getScratchieItem().getUid().equals(item.getUid())) {
+			    itemAttempts.add(answerLog);
+			}
+		    }
+		    numberOfAttempts = itemAttempts.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
 		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, answerLogs, presetMarks);
 
-		    isFirstChoice = (numberOfAttempts == 1) && isItemUnraveled(item, answerLogs);
+		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && isItemUnraveled(item, answerLogs);
 
-		    if (numberOfAttempts > 0) {
-			ScratchieAnswer firstChoiceAnswer = scratchieAnswerVisitDao
-				.getFirstScratchedAnswerBySessionAndItem(sessionId, item.getUid());
-
-			// find out the correct answer's sequential letter - A,B,C...
-			int answerCount = 1;
-			for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-			    if (answer.getUid().equals(firstChoiceAnswer.getUid())) {
-				firstChoiceAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
-				break;
-			    }
-			    answerCount++;
-			}
+		    // find out answers' sequential letters - A,B,C...
+		    for (ScratchieAnswerVisitLog itemAttempt : itemAttempts) {
+			String sequencialLetter = ScratchieServiceImpl.getSequencialLetter(item,
+				itemAttempt.getScratchieAnswer());
+			answersSequence += answersSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
 		    }
 
 		}
 
-		newItem.setUid(item.getUid());
-		newItem.setTitle(item.getTitle());
-		newItem.setAnswers(item.getAnswers());
-		newItem.setUserAttempts(numberOfAttempts);
-		newItem.setUserMark(mark);
-		newItem.setCorrectAnswer("" + isFirstChoice);
-		newItem.setFirstChoiceAnswerLetter(firstChoiceAnswerLetter);
+		itemDto.setUid(item.getUid());
+		itemDto.setTitle(item.getTitle());
+		itemDto.setAnswers(item.getAnswers());
+		itemDto.setUserAttempts(numberOfAttempts);
+		itemDto.setUserMark(mark);
+		itemDto.setUnraveledOnFirstAttempt(isUnraveledOnFirstAttempt);
+		itemDto.setAnswersSequence(answersSequence);
 
-		items.add(newItem);
+		itemDtos.add(itemDto);
 	    }
 
-	    groupSummary.setItems(items);
+	    groupSummary.setItemDtos(itemDtos);
 	    groupSummaries.add(groupSummary);
 	}
 
 	return groupSummaries;
+    }
+
+    /**
+     * Return specified answer's sequential letter (e.g. A,B,C) among other possible answers
+     */
+    private static String getSequencialLetter(ScratchieItem item, ScratchieAnswer asnwer) {
+	String sequencialLetter = "";
+
+	int answerCount = 1;
+	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    if (answer.getUid().equals(asnwer.getUid())) {
+		sequencialLetter = String.valueOf((char) ((answerCount + 'A') - 1));
+		break;
+	    }
+	    answerCount++;
+	}
+
+	return sequencialLetter;
     }
 
     private Scratchie getDefaultScratchie() throws ScratchieApplicationException {
@@ -1799,9 +1811,6 @@ public class ScratchieServiceImpl
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
@@ -1819,7 +1828,7 @@ public class ScratchieServiceImpl
 	this.scratchieSessionDao = scratchieSessionDao;
     }
 
-    public void setScratchieToolContentHandler(ScratchieToolContentHandler scratchieToolContentHandler) {
+    public void setScratchieToolContentHandler(IToolContentHandler scratchieToolContentHandler) {
 	this.scratchieToolContentHandler = scratchieToolContentHandler;
     }
 
@@ -2050,8 +2059,7 @@ public class ScratchieServiceImpl
 		}
 
 		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
-
-		gradebookService.removeActivityMark(userId, session.getSessionId());
+		toolService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }
@@ -2086,7 +2094,7 @@ public class ScratchieServiceImpl
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared scratchie session by given session id: " + toolSessionId);
 	}
-	return learnerService.completeToolSession(toolSessionId, learnerId);
+	return toolService.completeToolSession(toolSessionId, learnerId);
     }
 
     @Override
@@ -2157,10 +2165,6 @@ public class ScratchieServiceImpl
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public void setLogEventService(ILogEventService logEventService) {
@@ -2258,6 +2262,8 @@ public class ScratchieServiceImpl
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	scratchie.setShowScrachiesInResults(JsonUtil.optBoolean(toolContentJSON, "showScrachiesInResults", true));
+	scratchie.setConfidenceLevelsActivityUiid(
+		JsonUtil.optInt(toolContentJSON, RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID));
 
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();

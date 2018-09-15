@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
@@ -37,6 +36,7 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -211,7 +211,7 @@ public class NbAuthoringController {
 	nbContent.setDefineLater(false);
 	nbService.saveNoticeboard(nbContent);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	return "authoring/authoring";
     }
 

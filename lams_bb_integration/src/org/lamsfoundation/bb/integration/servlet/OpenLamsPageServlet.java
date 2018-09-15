@@ -138,7 +138,7 @@ public class OpenLamsPageServlet extends HttpServlet {
 
 	// start lesson-preview in LAMS and get back the lesson ID
 	User user = ctx.getUser();
-	Long lsId = LamsSecurityUtil.startLesson(user, "Previews", ldId, strTitle, "", true);
+	Long lsId = LamsSecurityUtil.startLesson(user, "Previews", ldId, strTitle, "", false, true);
 	// error checking
 	if (lsId == -1) {
 	    response.sendRedirect("lamsServerDown.jsp");

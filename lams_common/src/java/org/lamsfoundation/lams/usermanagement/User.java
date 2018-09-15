@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 public class User implements Serializable, Comparable {
-
     /** identifier field */
     private Integer userId;
 
@@ -112,6 +111,9 @@ public class User implements Serializable, Comparable {
     private String email;
 
     /** persistent field */
+    private Boolean emailVerified = true;
+
+    /** persistent field */
     private Boolean disabledFlag;
 
     /** persistent field */
@@ -158,12 +160,6 @@ public class User implements Serializable, Comparable {
 
     /** persistent field */
     private Boolean changePassword;
-
-    /** persistent field */
-    private Boolean tutorialsDisabled;
-
-    /** persistent field */
-    private Set<String> pagesWithDisabledTutorials = new HashSet<String>();
 
     /** persistent field - latch */
     private Boolean firstLogin;
@@ -355,6 +351,14 @@ public class User implements Serializable, Comparable {
 	this.email = email;
     }
 
+    public Boolean getEmailVerified() {
+	return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+	this.emailVerified = emailVerified;
+    }
+
     public Boolean getDisabledFlag() {
 	return disabledFlag;
     }
@@ -498,19 +502,10 @@ public class User implements Serializable, Comparable {
 
 	TimeZone timeZone = TimeZone.getTimeZone(getTimeZone());
 
-	Set<String> tutorialPages = (pagesWithDisabledTutorials == null) || pagesWithDisabledTutorials.isEmpty() ? null
-		: pagesWithDisabledTutorials;
-
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
-		theme != null ? new ThemeDTO(theme) : null,
-		// TimeZone.getTimeZone("Australia/Sydney"),
-		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping,
-		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
-		tutorialPages, 
-		(firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
-		lastVisitedOrganisationId,
-		portraitUuid
-	);
+		theme != null ? new ThemeDTO(theme) : null, timeZone, authenticationMethod.getAuthenticationMethodId(),
+		fckLanguageMapping, (firstLogin == null || firstLogin ? true : false), // assume no firstLogin value means they haven't logged in
+		lastVisitedOrganisationId, portraitUuid);
     }
 
     public UserBasicDTO getUserBasicDTO() {
@@ -596,29 +591,13 @@ public class User implements Serializable, Comparable {
 
     public String getTimeZone() {
 	if (timeZone == null) {
-	    timeZone = TimeZone.getDefault().getID();
+	    return TimeZone.getDefault().getID();
 	}
 	return timeZone;
     }
 
     public void setTimeZone(String timeZone) {
 	this.timeZone = timeZone;
-    }
-
-    public Boolean getTutorialsDisabled() {
-	return tutorialsDisabled;
-    }
-
-    public void setTutorialsDisabled(Boolean tutorialsDisabled) {
-	this.tutorialsDisabled = tutorialsDisabled;
-    }
-
-    public Set<String> getPagesWithDisabledTutorials() {
-	return pagesWithDisabledTutorials;
-    }
-
-    public void setPagesWithDisabledTutorials(Set<String> pagesWithDisabledTutorials) {
-	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
     }
 
     public Boolean isFirstLogin() {

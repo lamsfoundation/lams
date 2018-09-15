@@ -25,8 +25,7 @@
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>
-				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>			
+				<property name="toolService"><ref bean="lamsToolService"/></property>	
 				<property name="nbToolContentHandler"><ref bean="nbToolContentHandler"/></property>			
 				<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 				<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
@@ -73,9 +72,12 @@
 	<bean id="nbUserDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<bean id="nbToolContentHandler" class="org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+
+	<bean id="nbToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>nbworkspace</value></property>
+		<property name="repositoryUser"><value>noticeboard</value></property>
+		<property name="repositoryId"><value>lams-nb</value></property>
+	</bean>
 
 </beans>

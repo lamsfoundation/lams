@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.spreadsheet;
 public class SpreadsheetConstants {
     public static final String TOOL_SIGNATURE = "lasprd10";
     public static final String RESOURCE_SERVICE = "spreadsheetService";
-    public static final String TOOL_CONTENT_HANDLER_NAME = "spreadsheetToolContentHandler";
 
     public static final int COMPLETED = 1;
 

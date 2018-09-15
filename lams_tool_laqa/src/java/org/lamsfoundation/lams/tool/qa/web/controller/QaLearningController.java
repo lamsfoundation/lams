@@ -40,8 +40,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
@@ -75,7 +74,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -236,7 +234,7 @@ public class QaLearningController implements QaAppConstants {
 	    return "learning/defineLater";
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(
 		new Long(toolSessionID), request, applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
@@ -571,7 +569,7 @@ public class QaLearningController implements QaAppConstants {
 	return forwardName;
     }
 
-    @RequestMapping(value="/checkLeaderProgress")
+    @RequestMapping(value = "/checkLeaderProgress")
     @ResponseBody
     public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 

@@ -14,9 +14,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.2.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/lang/main/commons-lang-2.6.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/commons-lang">
 		<attributes>

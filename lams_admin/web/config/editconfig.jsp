@@ -50,6 +50,21 @@
 									<input type="hidden" name="key" value="${row.key}"/>
 									<c:set var="BOOLEAN"><c:out value="<%= ConfigurationItem.BOOLEAN_FORMAT %>" /></c:set>
 									<c:choose>
+									<c:when test="${row.key == 'SMTPAuthSecurity'}">
+										<select name="value" class="form-control form-control-sm" id="${row.key}">
+											<c:forEach items="${smtpAuthTypes}" var="authType">
+												<option value="${authType.key}" ${authType.key == row.value ? 'selected="selected"' : '' }>
+													${authType.value}
+												</option>
+											</c:forEach>
+										</select>
+									</c:when>
+									<c:when test="${row.format==BOOLEAN}">
+										<select name="value" class="form-control form-control-sm">
+											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
+											<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
+										</select>
+									</c:when>
 									<c:when test="${row.format==BOOLEAN}">
 										<select name="value" class="form-control form-control-sm">
 											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>

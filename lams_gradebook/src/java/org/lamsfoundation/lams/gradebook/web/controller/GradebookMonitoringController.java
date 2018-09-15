@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
@@ -82,7 +81,7 @@ public class GradebookMonitoringController {
 
     @Autowired
     @Qualifier("gradebookService")
-    private IGradebookService gradebookService;
+    private IGradebookFullService gradebookService;
 
     @Autowired
     @Qualifier("userManagementService")
@@ -100,8 +99,8 @@ public class GradebookMonitoringController {
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	try {
 	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    if (GradebookMonitoringController.log.isDebugEnabled()) {
-		GradebookMonitoringController.log.debug("Getting gradebook for lesson " + lessonId);
+	    if (log.isDebugEnabled()) {
+		log.debug("Getting gradebook for lesson " + lessonId);
 	    }
 	    UserDTO user = getUser();
 	    if (user == null) {
@@ -258,11 +257,11 @@ public class GradebookMonitoringController {
 	Lesson lesson = lessonService.getLesson(lessonID);
 	if ((markStr != null) && !markStr.equals("")) {
 	    Double mark = Double.parseDouble(markStr);
-	    gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true, true);
+	    gradebookService.updateUserLessonGradebookMark(lesson, learner, mark);
 	}
 
 	if (feedback != null) {
-	    gradebookService.updateUserActivityGradebookFeedback(activity, learner, feedback);
+	    gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
 	}
 
     }
@@ -300,7 +299,7 @@ public class GradebookMonitoringController {
 	gradebookService.toggleMarksReleased(lessonID);
 	response.setContentType("text/plain; charset=utf-8");
 	return "success";
-	
+
     }
 
     /**

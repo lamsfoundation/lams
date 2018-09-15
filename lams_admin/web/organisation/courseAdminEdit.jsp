@@ -53,18 +53,6 @@
 						<td><fmt:message key="admin.organisation.description"/>:</td>
 						<td><form:textarea path="description" cols="50" rows="3"  cssClass="form-control"></form:textarea></td>
 					</tr>
-					<tr>
-						<td><fmt:message key="admin.organisation.locale"/>:</td>
-						<td>
-							<form:select path="localeId"  cssClass="form-control">
-								<c:forEach items="${locales}" var="locale">
-									<form:option value="${locale.localeId}">
-										<c:out value="${locale.description}" />
-									</form:option>
-								</c:forEach>	
-							</form:select>
-						</td>
-					</tr>
 					<c:if test=${organisationForm.courseAdminCanChangeStatusOfCourse == true}>
 					<tr>
 						<td><fmt:message key="admin.organisation.status"/>:</td>

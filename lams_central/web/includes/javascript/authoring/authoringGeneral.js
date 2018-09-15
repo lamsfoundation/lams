@@ -134,7 +134,8 @@ var paper = null,
 			'selectEffect'        : 'black',
 			'transition'   		  : 'rgb(119,126,157)',
 			// highlight TBL activities which should be grouped
-			'activityRequireGrouping' : 'red'
+			'activityRequireGrouping' : 'red',
+			'activityReadOnly'	  : 'red'
 		},
 	
 		'defaultTextAttributes' : {
@@ -552,8 +553,7 @@ GeneralInitLib = {
 				return;
 			}
 			
-			var learningDesignID = null,
-				folderNode = null,
+			var folderNode = null,
 				folderID = null,
 				tree = dialog.data('ldTree'),
 				node = tree.getHighlightedNode();
@@ -584,21 +584,27 @@ GeneralInitLib = {
 			// if a node is highlighted but user modified the title,
 			// it is considered a new sequence
 			// otherwise check if there is no other sequence with the same name
+			var nodeData = null;
 			if (folderNode && folderNode.children) {
 				$.each(folderNode.children, function(){
 					if (this.label == title) {
 						this.highlight();
-						learningDesignID = this.data.learningDesignId;
+						nodeData = this.data;
 						return false;
 					}
 				});
 			}
-			if (learningDesignID
-					&& !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+			if (nodeData && (!nodeData.canModify || (!canSetReadOnly && nodeData.readOnly))){
+				alert(LABELS.READONLY_FORBIDDEN_ERROR);
 				return;
 			}
-	
-			var result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title);
+			if (nodeData && !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+				return;
+			}
+			var readOnly = (nodeData && !nodeData.canModify) || 
+						   (canSetReadOnly && $('#ldStoreDialogReadOnlyCheckbox', dialog).prop('checked')),
+				learningDesignID = nodeData ? nodeData.learningDesignId : null,
+				result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title, readOnly);
 			if (result) {
 				GeneralLib.openLearningDesign();
 				dialog.modal('hide');
@@ -750,8 +756,23 @@ GeneralInitLib = {
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
 					var rightButtons = $('#ldStoreDialogRightButtonContainer', layout.ldStoreDialog);
 					$('button', rightButtons).hide();
+					$('#ldStoreDialogReadOnlyLabel *', layout.ldStoreDialog).hide();
 					$('#ldStoreDialogNameContainer, #ldStoreDialogImportPartFrame', layout.ldStoreDialog).hide();
 					$(shownElementIDs, layout.ldStoreDialog).show();
+					
+					var isOpenDialog = shownElementIDs.indexOf('ldStoreDialogOpenButton') >= 0;
+					if (isOpenDialog) {
+						// in open dialog display only information
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).css('color', layout.colors.activityReadOnly);
+					} else if (canSetReadOnly) {
+							// the first highlighted folder is user's private folder
+							$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog).show()
+								.prop('disabled', false).prop('checked', false);
+							$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show().css('color', 'initial');
+					} else {
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).css('color', layout.colors.activityReadOnly);
+					}
+					
 				},
 				/**
 				 * Extracts a selected activity from another LD.
@@ -922,11 +943,11 @@ GeneralInitLib = {
 		// make folder contents load dynamically on open
 		tree.setDynamicLoad(function(node, callback){
 			// load subfolder contents
-			var childNodeData = MenuLib.getFolderContents(node.data.folderID);
+			var childNodeData = MenuLib.getFolderContents(node.data.folderID, node.data.canSave, node.data.canHaveReadOnly);
 			if (childNodeData) {
 				$.each(childNodeData, function(){
 						// create and add a leaf
-						new YAHOO.widget.TextNode(this, node);
+						new YAHOO.widget.HTMLNode(this, node);
 					});
 			}
 			
@@ -938,7 +959,8 @@ GeneralInitLib = {
 		});
 		tree.singleNodeHighlight = true;
 		tree.subscribe('clickEvent', function(event) {
-			var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden');
+			var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden')
+				nodeData = event.node.data;
 			
 			//prevent item from being deselected on any subsequent clicks
 			if (isOpenDialog && event.node.highlightState == 1) {
@@ -948,15 +970,36 @@ GeneralInitLib = {
 			//disable edit buttons if no elements is selected
 			$('#ldStoreDialogLeftButtonContainer button', layout.ldStoreDialog)
 				.prop('disabled', event.node.highlightState > 0);
-
+			
+			if (canSetReadOnly && !isOpenDialog) {
+				// detect which folders/sequences are marked as read-only
+				// and which ones are immutable
+				if (event.node.isLeaf) {
+					$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
+						.prop('disabled', !nodeData.canModify || !nodeData.canHaveReadOnly)
+						.prop('checked', nodeData.readOnly || !nodeData.canModify);
+				} else {
+					$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
+						.prop('disabled', !nodeData.canSave || !nodeData.canHaveReadOnly)
+						.prop('checked', !nodeData.canSave);
+				}
+			} else {
+				// is this is normal user or open dialog, only show/hide read-only label
+				if (event.node.isLeaf ? nodeData.readOnly || !nodeData.canModify : !nodeData.canSave){
+					$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show();
+				} else {
+					$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).hide();
+				}
+			}
+			
 			// if it's a folder in load sequence dialog - highlight but stop processing
-			if (isOpenDialog && !event.node.data.learningDesignId){
+			if (isOpenDialog && !nodeData.learningDesignId){
 				return true;
 			}
 			
 			//show LearningDesign thumbnail and title
-			var learningDesignID = event.node.highlightState == 0   ? +event.node.data.learningDesignId : null,
-				title            = !isOpenDialog && learningDesignID ? event.node.label : null;
+			var learningDesignID = event.node.highlightState == 0   ? +nodeData.learningDesignId : null,
+				title            = !isOpenDialog && learningDesignID ? nodeData.label : null;
 			GeneralLib.showLearningDesignThumbnail(learningDesignID, title);				
 		});
 		tree.subscribe('clickEvent', tree.onEventToggleHighlight);
@@ -1636,8 +1679,7 @@ GeneralLib = {
 		
 		if (force) {
 			layout.ld = {
-				'maxUIID' : 0,
-				'designType' : null
+				'maxUIID' : 0
 			};
 			layout.activities = [];
 			layout.regions = [];
@@ -1701,7 +1743,8 @@ GeneralLib = {
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
 					'maxUIID'		   : 0,
-					'designType'	   : ld.designType
+					'readOnly'		   : ld.readOnly,
+					'canModify'		   : ld.copyTypeID == 1
 				};
 				
 				if (!isReadOnlyMode) {
@@ -1714,6 +1757,8 @@ GeneralLib = {
 				var arrangeNeeded = false,
 					// if system gate is found, it is Live Edit
 					systemGate = null,
+					// should we allow the author to enter activity authoring
+					activitiesReadOnly = !layout.ld.canModify || (!canSetReadOnly && layout.ld.readOnly),
 					branchToBranching = {},
 					// helper for finding last activity in a branch
 					branchToActivityDefs = {};
@@ -1742,7 +1787,7 @@ GeneralLib = {
 											activityData.xCoord ? activityData.xCoord : 1,
 											activityData.yCoord ? activityData.yCoord : 1,
 											activityData.activityTitle,
-											activityData.readOnly,
+											activityData.readOnly || activitiesReadOnly,
 											activityData.evaluation);
 							// for later reference
 							activityData.activity = activity;
@@ -1790,7 +1835,7 @@ GeneralLib = {
 											activityData.xCoord,
 											activityData.yCoord,
 											activityData.activityTitle,
-											activityData.readOnly,
+											activityData.readOnly || activitiesReadOnly,
 											groupingData.groupingID,
 											groupingData.groupingUIID,
 											groupingType,
@@ -1820,7 +1865,7 @@ GeneralLib = {
 								activityData.yCoord,
 								activityData.activityTitle,
 								activityData.description,
-								activityData.readOnly,
+								activityData.readOnly || activitiesReadOnly,
 								gateType,
 								activityData.gateStartTimeOffset,
 								activityData.gateActivityCompletionBased);
@@ -1839,7 +1884,7 @@ GeneralLib = {
 									activityData.xCoord,
 									activityData.yCoord,
 									activityData.activityTitle,
-									activityData.readOnly);
+									activityData.readOnly || activitiesReadOnly);
 							// for later reference
 							activityData.activity = activity;
 							// for later reference
@@ -1854,7 +1899,7 @@ GeneralLib = {
 									activityData.xCoord,
 									activityData.yCoord,
 									activityData.activityTitle,
-									activityData.readOnly,
+									activityData.readOnly || activitiesReadOnly,
 									activityData.minOptions,
 									activityData.maxOptions);
 							break;
@@ -1873,7 +1918,7 @@ GeneralLib = {
 										arrangeNeeded ? 0 : activityData.startXCoord,
 										arrangeNeeded ? 0 : activityData.startYCoord,
 										activityData.activityTitle,
-										activityData.readOnly,
+										activityData.readOnly || activitiesReadOnly,
 										branchingType);
 							layout.activities.push(branchingEdge);
 							// for later reference
@@ -2645,7 +2690,6 @@ GeneralLib = {
 			'licenseText'   	 : $('#ldDescriptionLicenseSelect').val() == "0"
 								   || $('#ldDescriptionLicenseSelect option:selected').attr('url')
 								   ? null : $('#ldDescriptionLicenseText').val(),
-			'designType'		 : layout.ld.designType,
 			'systemGate'		 : systemGate,
 			'activities'		 : activities,
 			'transitions'		 : transitions,
@@ -2717,7 +2761,7 @@ GeneralLib = {
 	/**
 	 * Stores the sequece in database.
 	 */
-	saveLearningDesign : function(folderID, learningDesignID, title) {
+	saveLearningDesign : function(folderID, learningDesignID, title, readOnly) {
 		var ld = GeneralLib.prepareLearningDesignData(true);
 		if (!ld) {
 			return false;
@@ -2733,6 +2777,7 @@ GeneralLib = {
 		ld.description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData();
 		ld.saveMode = layout.ld.learningDesignID && layout.ld.learningDesignID != learningDesignID
 		   			  ? 1 : 0;
+		ld.readOnly = readOnly;
 		ld.systemGate = null;
 
 		$.ajax({

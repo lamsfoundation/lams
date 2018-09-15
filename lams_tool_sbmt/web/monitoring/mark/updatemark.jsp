@@ -56,7 +56,6 @@
 <c:set var="title"><fmt:message key="label.monitoring.updateMarks.button" /></c:set>
 <lams:Page title="${title}" type="monitor">
 
-
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
 			<form:form action="updateMark.do" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
 			
@@ -71,7 +70,7 @@
 				<%@include file="fileinfo.jsp"%>
 				
 				<logic:messagesPresent>
-							<%@include file="/common/messages.jsp"%>
+					<%@include file="/common/messages.jsp"%>
 				</logic:messagesPresent>
 			
 			<dl class="dl-horizontal">		
@@ -157,7 +156,6 @@
 				</div>
 			</form:form>
 		</c:forEach>
-
 
 <div id="footer"></div>
 </lams:Page>

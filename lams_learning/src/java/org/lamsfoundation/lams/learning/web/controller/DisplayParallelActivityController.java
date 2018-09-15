@@ -31,15 +31,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -50,24 +50,16 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * Action class to display a ParallelActivity.
  *
- * XDoclet definition:
- *
  * @author daveg
- *
- *
- *
- *
  */
 @Controller
 public class DisplayParallelActivityController {
 
     private static Logger log = Logger.getLogger(DisplayParallelActivityController.class);
 
-    public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
-
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

@@ -33,8 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -48,7 +47,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeServ
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeItemComparator;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -183,8 +182,8 @@ public class LearningController {
 	commonCartridge.setDefineLater(false);
 	commonCartridgeService.saveOrUpdateCommonCartridge(commonCartridge);
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, applicationContext.getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
+		applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// init commonCartridge item list
@@ -218,7 +217,7 @@ public class LearningController {
 		    sessionId.toString());
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CommonCartridgeConstants.ATTR_RESOURCE_ITEM_UID,
 		    runAutoItemUid.toString());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CentralConstants.PARAM_MODE, mode.toString());
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, CommonConstants.PARAM_MODE, mode.toString());
 	    return redirectURL;
 
 	} else {

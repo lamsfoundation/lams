@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
@@ -40,6 +39,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.web.form.DokumaranForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -235,7 +235,7 @@ public class AuthoringController {
 
 	authoringForm.setDokumaran(dokumaranPO);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return "pages/authoring/authoring";

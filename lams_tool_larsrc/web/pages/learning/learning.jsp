@@ -254,7 +254,7 @@
 						<c:if test="${item.complete && item.allowRating}">
 							<div style="display: inline-block">
 							<lams:Rating itemRatingDto="${item.ratingDTO}" 
-								disabled="${mode == 'teacher' || mode == 'author' || finishedLock}" allowRetries="true" />
+								disabled="${mode == 'teacher' || finishedLock}" allowRetries="true" />
 							</div>
 						</c:if>
 					</td>					

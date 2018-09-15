@@ -48,6 +48,15 @@ import org.lamsfoundation.lams.util.FileUtil;
 public interface ILearningDesignService {
     static final String LD_SVG_TOP_DIR = FileUtil.getFullPath(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR),
 	    "lams-www.war\\secure\\learning-design-images");
+    
+    /**
+     * Returns a populated LearningDesign object corresponding to the given learningDesignID
+     *
+     * @param learningDesignID
+     *            The learning_design_id of the design which has to be fetched
+     * @return LearningDesign The populated LearningDesign object corresponding to the given learningDesignID
+     */
+    LearningDesign getLearningDesign(Long learningDesignID);
 
     /**
      * Get the learning design DTO

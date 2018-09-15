@@ -48,13 +48,11 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -134,12 +132,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     private ILogEventService logEventService;
     private IUserManagementService userManagementService;
-    private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mcToolContentHandler = null;
     private IExportToolContentService exportContentService;
-    private IGradebookService gradebookService;
-
     private ICoreNotebookService coreNotebookService;
 
     private MessageService messageService;
@@ -437,22 +432,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (userAttempt != null) {
-
-		    McOptsContent previosAnswer = userAttempt.getMcOptionsContent();
-		    // check if answer hasn't been changed since the last time
-		    if (previosAnswer.getUid().equals(answerOption.getUid())) {
-			// don't save anything
-			continue;
-
-		    } else {
-			// in case answer has been changed update userttempt
-			userAttempt.setAttemptTime(attemptTime);
-			userAttempt.setMcOptionsContent(answerOption);
-			userAttempt.setMark(mark);
-			userAttempt.setPassed(passed);
-			userAttempt.setAttemptCorrect(isAttemptCorrect);
-			userAttempt.setConfidenceLevel(confidenceLevel);
-		    }
+		    userAttempt.setAttemptTime(attemptTime);
+		    userAttempt.setMcOptionsContent(answerOption);
+		    userAttempt.setMark(mark);
+		    userAttempt.setPassed(passed);
+		    userAttempt.setAttemptCorrect(isAttemptCorrect);
+		    userAttempt.setConfidenceLevel(confidenceLevel);
 
 		} else {
 		    // create new userAttempt
@@ -785,7 +770,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    updateMcQueUsr(user);
 
 	    // propagate changes to Gradebook
-	    gradebookService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(),
+	    toolService.updateActivityMark(new Double(totalMark), null, user.getQueUsrId().intValue(),
 		    mcSession.getMcSessionId(), false);
 
 	    // record mark change with audit service
@@ -922,8 +907,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		if (newTotalMark != oldTotalMark) {
 		    user.setLastAttemptTotalMark(newTotalMark);
 		    updateMcQueUsr(user);
-
-		    gradebookService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
+		    toolService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
 			    toolSessionId, false);
 		}
 
@@ -954,7 +938,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFCellStyle greenColor = wb.createCellStyle();
 	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
-	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	greenColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	Font whiteFont = wb.createFont();
 	whiteFont.setColor(IndexedColors.WHITE.getIndex());
 	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);
@@ -1320,8 +1304,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    }
 
 		    mcUserDAO.removeMcUser(user);
-
-		    gradebookService.removeActivityMark(userId, session.getMcSessionId());
+		    toolService.removeActivityMark(userId, session.getMcSessionId());
 		}
 	    }
 	}
@@ -1475,7 +1458,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 
-	if (learnerService == null) {
+	if (toolService == null) {
 	    return "dummyNextUrl";
 	}
 
@@ -1500,7 +1483,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcSession.setSessionStatus(McAppConstants.COMPLETED);
 	mcSessionDAO.updateMcSession(mcSession);
 
-	String nextUrl = learnerService.completeToolSession(toolSessionId, learnerId);
+	String nextUrl = toolService.completeToolSession(toolSessionId, learnerId);
 	if (nextUrl == null) {
 	    logger.error("nextUrl is null");
 	    throw new ToolException("nextUrl is null");
@@ -1706,20 +1689,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	this.mcToolContentHandler = mcToolContentHandler;
     }
 
-    /**
-     * @param learnerService
-     *            The learnerService to set.
-     */
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
-    }
-
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public void setMcOutputFactory(MCOutputFactory mcOutputFactory) {
@@ -1954,7 +1925,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setShowMarks(JsonUtil.optBoolean(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.optBoolean(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.optInt(toolContentJSON, "passMark", 0));
-	mcq.setEnableConfidenceLevels(JsonUtil.optBoolean(toolContentJSON, "enableConfidenceLevels", Boolean.FALSE));
+	mcq.setEnableConfidenceLevels(JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);

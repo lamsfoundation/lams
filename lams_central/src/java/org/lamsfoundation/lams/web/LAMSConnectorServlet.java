@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -137,7 +138,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	String currentDirPath = realBaseDir + designFolder + typeStr + "/" + currentFolderStr;
 	String validCurrentDirPath = currentDirPath.replace('/', File.separatorChar);
 
-	String currentWebPath = lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR
+	String currentWebPath = lamsContextPath + CommonConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR
 		+ designFolder + typeStr + "/" + currentFolderStr;
 
 	File currentDir = new File(validCurrentDirPath);
@@ -287,7 +288,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 
 	} else {
 	    // send back URL to new Paint file
-	    String currentWebPath = lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR
+	    String currentWebPath = lamsContextPath + CommonConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR
 		    + designFolder + fileType + "/" + currentFolderStr;
 	    out.println(currentWebPath + newName);
 	}

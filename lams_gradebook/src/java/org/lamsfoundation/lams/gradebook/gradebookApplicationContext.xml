@@ -24,6 +24,7 @@
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="messageService"><ref bean="gradebookMessageService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>
+		<property name="outcomeService"><ref bean="outcomeService"/></property> 
 	</bean>
 	
 	<bean id="gradebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >
@@ -45,5 +46,10 @@
 				<prop key="export*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>
+	</bean>
+	
+	<!--  Gradebook related beans -->
+	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 </beans>

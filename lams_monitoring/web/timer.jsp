@@ -18,7 +18,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/nprogress.js"></script>
-
+<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
 <script>
 	
 	var playSound = true;
@@ -177,57 +177,6 @@
 	    $('#countdownTarget').countdown('destroy'); 
 	}
 	 
-	// Increase to full screen - find the right method, call on correct element
-	function launchIntoFullscreen() {
-		var element = document.getElementById("fullPageContentDiv");		
-		if(element.requestFullscreen) {
-			element.requestFullscreen();
-		} else if(element.mozRequestFullScreen) {
-			element.mozRequestFullScreen();
-		} else if(element.webkitRequestFullscreen) {
-			element.webkitRequestFullscreen();
-		} else if(element.msRequestFullscreen) {
-			element.msRequestFullscreen();
-		}
-	}
-
-	// Reduce full screen back to normal screen
-	function exitFullscreen() {
-	  if(document.exitFullscreen) {
-	    document.exitFullscreen();
-	  } else if(document.mozCancelFullScreen) {
-	    document.mozCancelFullScreen();
-	  } else if(document.webkitExitFullscreen) {
-	    document.webkitExitFullscreen();
-	  }
-	}
-	
-	
-	// Detect when screen changes and update buttons
-	function setupFullScreenEvents() {
-		fullscreenEnabled = document.fullscreenEnabled || document.mozFullScreenEnabled || document.webkitFullscreenEnabled;
-		if ( fullscreenEnabled ) {
-			document.addEventListener("fullscreenchange", fullScreenChanged);
-			document.addEventListener("mozfullscreenchange", fullScreenChanged);
-			document.addEventListener("webkitfullscreenchange", fullScreenChanged);
-			document.addEventListener("msfullscreenchange", fullScreenChanged);
-		} else {
- 			$("#shrink").hide();
-			$("#expand").hide();
- 		}
-	}
-	
-	function fullScreenChanged( event ) {
-		var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
-		console.log("fullscreenElement: "+fullscreenElement);
-		if ( fullscreenElement && fullscreenElement != null ) {
-			$("#expand").hide();
-			$("#shrink").show();
-	    } else {
-			$("#shrink").hide();
-			$("#expand").show();
-	    }
-	}
 </script>
 						
 </lams:head>
@@ -274,8 +223,8 @@
 		<a href="#" class="btn btn-default btn-primary fixed-button-width timer" id="resume" onclick="javascript:resume()" ><fmt:message key="label.resume"/></a>
 		<a href="#" class="btn btn-default loffset10 fixed-button-width timer" id="reset" onclick="javascript:reset()"><fmt:message key="label.reset"/></a>
 
-        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right launch-fullscreen" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-default loffset10 fixed-button-width pull-right exit-fullscreen" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
 		<a href="#" class="btn btn-default loffset10 fixed-button-width pull-right" id="bellOn" onclick="javascript:toggleBell()"><i class="fa fa-volume-up" aria-hidden="true"></i></a>
 		<a href="#" class="btn btn-default loffset10 fixed-button-width pull-right" id="bellOff" onclick="javascript:toggleBell()" style="padding-top: 0px; padding-bottom: 0px; display: none;">
         <span class="fa fa-stack"><i class="fa fa-volume-up" aria-hidden="true"></i><i class="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>

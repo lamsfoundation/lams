@@ -39,8 +39,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -74,7 +73,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -82,7 +80,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -147,7 +144,6 @@ public class LearningController {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// Try to get ForumID according to sessionId
-	forumService = getForumManager();
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 
 	if (session == null || session.getForum() == null) {
@@ -204,8 +200,8 @@ public class LearningController {
 	sessionMap.put(ForumConstants.ATTR_MINIMUM_REPLY, forum.getMinimumReply());
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_REPLY, forum.getMaximumReply());
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, applicationContext.getServletContext());
+	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
+		applicationContext.getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(forumUser.getUid(), forum.getUid());
@@ -310,8 +306,6 @@ public class LearningController {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	forumService = getForumManager();
-
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
 	    if (!validateBeforeFinish(request, sessionMapID)) {
 		return "jsps/learning/viewforum";
@@ -398,11 +392,10 @@ public class LearningController {
 	reflectionForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	IForumService submitFilesService = getForumManager();
 
 	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = forumService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ForumConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
@@ -422,8 +415,6 @@ public class LearningController {
      */
     @RequestMapping("/viewTopic")
     public String viewTopic(HttpServletRequest request) {
-
-	forumService = getForumManager();
 
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
@@ -465,8 +456,6 @@ public class LearningController {
 
     @RequestMapping("/viewTopicNext")
     public String viewTopicNext(HttpServletRequest request) {
-
-	forumService = getForumManager();
 
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
@@ -534,8 +523,6 @@ public class LearningController {
     @RequestMapping("/viewTopicThread")
     public String viewTopicThread(HttpServletRequest request) {
 
-	forumService = getForumManager();
-
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 	Long highlightMessageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
 
@@ -574,8 +561,6 @@ public class LearningController {
      */
     @RequestMapping("/viewMessage")
     public String viewMessage(HttpServletRequest request) {
-
-	forumService = getForumManager();
 
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 	Long messageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
@@ -650,7 +635,7 @@ public class LearningController {
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
-	forumService = getForumManager();
+
 	forumService.createRootTopic(forumId, sessionId, message);
 
 	rootTopics.add(MessageDTO.getMessageDTO(message));
@@ -739,7 +724,6 @@ public class LearningController {
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
-	forumService = getForumManager();
 
 	forumService.replyTopic(parentId, sessionId, message);
 
@@ -787,7 +771,7 @@ public class LearningController {
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
-	forumService = getForumManager();
+
 	MessageSeq newMessageSeq = forumService.replyTopic(parentId, sessionId, message);
 
 	// check whether allow more posts for this user
@@ -870,8 +854,6 @@ public class LearningController {
     public String updateTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
 	    throws PersistenceException {
 
-	forumService = getForumManager();
-
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
@@ -931,8 +913,6 @@ public class LearningController {
     public String updateTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws PersistenceException, IOException {
 
-	forumService = getForumManager();
-
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
@@ -957,7 +937,6 @@ public class LearningController {
 
 	Long msgId = new Long(WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID));
 	Boolean hideFlag = new Boolean(WebUtil.readBooleanParam(request, "hideFlag"));
-	forumService = getForumManager();
 
 	// TODO Skipping permissions for now, currently having issues with default learning designs not having an
 	// create_by field
@@ -996,7 +975,6 @@ public class LearningController {
     @ResponseBody
     public String rateMessage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	forumService = getForumManager();
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
@@ -1065,6 +1043,7 @@ public class LearningController {
 		    // get all root topic to display on init page
 		    List rootTopics = forumService.getRootTopics(sessionId);
 		    request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+		    request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 		    return false;
 		}
 
@@ -1099,7 +1078,7 @@ public class LearningController {
 
     private MessageDTO getTopic(Long topicId) {
 	// get Topic content according to TopicID
-	forumService = getForumManager();
+
 	MessageDTO topic = MessageDTO.getMessageDTO(forumService.getMessage(topicId));
 	return topic;
     }
@@ -1126,19 +1105,11 @@ public class LearningController {
     /**
      * Get Forum Service.
      */
-    private IForumService getForumManager() {
-	if (forumService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
-	}
-	return forumService;
-    }
 
     private void setAttachment(MessageForm messageForm, Message message) {
 	if (messageForm.getAttachmentFile() != null
 		&& !StringUtils.isBlank(messageForm.getAttachmentFile().getOriginalFilename())) {
-	    forumService = getForumManager();
+
 	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 	    Set attSet = message.getAttachments();
 	    if (attSet == null) {

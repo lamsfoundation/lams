@@ -28,11 +28,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.LinkedMultiValueMap;
@@ -42,11 +42,11 @@ import org.springframework.util.MultiValueMap;
  *
  */
 public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
-    
+
     @Autowired
     @Qualifier("forumMessageService")
     private MessageService messageService;
-    
+
     private List<String> topic;
     private String contentFolderID;
     private String instructions;

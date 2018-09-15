@@ -42,7 +42,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -108,19 +108,19 @@ public class AuthoringController {
     @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    private  ILamsToolService toolService;
+    private ILamsToolService toolService;
     @Autowired
     @Qualifier("authoringService")
-    private  IAuthoringService authoringService;
+    private IAuthoringFullService authoringService;
     @Autowired
     @Qualifier("learningDesignService")
-    private  ILearningDesignService learningDesignService;
+    private ILearningDesignService learningDesignService;
     @Autowired
     @Qualifier("securityService")
-    private  ISecurityService securityService;
+    private ISecurityService securityService;
     @Autowired
     @Qualifier("integrationService")
-    private  IIntegrationService integrationService;
+    private IIntegrationService integrationService;
     @Autowired
     WebApplicationContext applicationContext;
 
@@ -161,6 +161,10 @@ public class AuthoringController {
 		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	request.setAttribute("access", JsonUtil.toString(accessList));
 	request.setAttribute("licenses", authoringService.getAvailableLicenses());
+
+	boolean canSetReadOnly = userManagementService.isUserSysAdmin()
+		|| userManagementService.isUserGlobalGroupAdmin();
+	request.setAttribute("canSetReadOnly", canSetReadOnly);
 
 	return "authoring/authoring";
     }

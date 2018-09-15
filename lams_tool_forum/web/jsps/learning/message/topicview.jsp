@@ -136,5 +136,4 @@
 			</c:set>
 			<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
 		</div>
-	</c:if>
-	
+	</c:if>	

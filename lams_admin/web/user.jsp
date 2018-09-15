@@ -44,6 +44,10 @@ bo<!DOCTYPE html>
 					.test(value)
 		});
 	
+	$.validator.addMethod("notEqualTo", function(value, element, param) {
+		return this.optional(element) || value != param;
+	}, "Please specify a different (non-default) value");
+
 		$(function() {
 			// Setup form validation 
 			$("#userForm").validate({
@@ -74,6 +78,10 @@ bo<!DOCTYPE html>
 									email : {
 										required: true,
 										email: true
+									},
+									country : {
+										required: true,
+										notEqualTo: "0"
 									}
 								},
 	
@@ -101,6 +109,10 @@ bo<!DOCTYPE html>
 									email: {
 										required: "<fmt:message key='error.email.required'/>",
 										email: "<fmt:message key='error.valid.email.required'/>"
+									},
+									country: {
+										required: "<fmt:message key='error.country.required'/>",
+										notEqualTo: "<fmt:message key='error.country.required'/>"
 									}
 								},
 	
@@ -143,7 +155,8 @@ bo<!DOCTYPE html>
 				} else {
 					alert("<fmt:message key='error.portrait.removal.failed'/>");
 				}
-			}});
+			}
+		});
 		}
 		</c:if>
 		</c:if>
@@ -394,8 +407,15 @@ bo<!DOCTYPE html>
 								<td class="align-right">
 									<fmt:message key="admin.user.country" />:
 								</td>
-								<td><form:input path="country"  maxlength="64"
-										cssClass="form-control" />
+								<td>
+									<form:select path="country" cssClass="form-control">
+										<form:option value="0"><fmt:message key="label.select.country" /></form:option>
+										<c:forEach items="${countryCodes}" var="countryCode">
+											<form:option value="${countryCode.key}">
+												${countryCode.value}
+											</form:option>
+										</c:forEach>
+									</form:select>
 								</td>
 							</tr>
 							<tr>
@@ -424,7 +444,8 @@ bo<!DOCTYPE html>
 							</tr>
 							<tr>
 								<td class="align-right">
-									<fmt:message key="admin.user.fax" />:</td>
+									<fmt:message key="admin.user.fax" />:
+								</td>
 								<td>
 									<form:input path="fax"  maxlength="64" cssClass="form-control"/>
 								</td>
@@ -493,6 +514,18 @@ bo<!DOCTYPE html>
 								</tr>
 							</c:if>
 							
+							<c:if test="${not empty createDate}">
+								<tr>
+									<td class="align-right">
+										<fmt:message key="admin.user.create.date" />:
+									</td>
+									<td>
+										<lams:Date value="${createDate}"/>
+									</td>
+								</tr>
+							</c:if>
+				
+				
 						</table>
 					</div>
 					</div>
@@ -596,6 +629,3 @@ bo<!DOCTYPE html>
 		
 </body>
 </lams:html>
-
-
-

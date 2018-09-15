@@ -48,9 +48,12 @@
 
 
     <!-- Managers -->
-	<bean id="commonCartridgeToolContentHandler" class="org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
+	<bean id="commonCartridgeToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedcommonCartridgeworkspace</value></property>
+		<property name="repositoryUser"><value>sharedcommonCartridge</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
 	
     <bean id="commonCartridgeManagerTarget" class="org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeServiceImpl">
         <property name="commonCartridgeDao">
@@ -74,14 +77,8 @@
         <property name="commonCartridgeToolContentHandler">
             <ref bean="commonCartridgeToolContentHandler"/>
         </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
-        </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
-   		</property>
-   		<property name="learnerService">
-   			<ref bean="learnerService"/>
    		</property>
    		<property name="logEventService">
    			<ref bean="logEventService"/>

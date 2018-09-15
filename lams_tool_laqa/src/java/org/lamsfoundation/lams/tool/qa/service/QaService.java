@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -115,7 +114,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     private IToolContentHandler qaToolContentHandler = null;
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
-    private ILearnerService learnerService;
     private ILogEventService logEventService;
     private IExportToolContentService exportContentService;
     private QaOutputFactory qaOutputFactory;
@@ -829,7 +827,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	updateSession(qaSession);
 
 	try {
-	    String nextUrl = learnerService.completeToolSession(toolSessionId, learnerId);
+	    String nextUrl = toolService.completeToolSession(toolSessionId, learnerId);
 	    return nextUrl;
 	} catch (DataAccessException e) {
 	    throw new ToolException("Exception occured when user is leaving tool session: " + e);
@@ -1004,10 +1002,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
      */
     public IUserManagementService getUserManagementService() {
 	return userManagementService;
-    }
-
-    public void setLearnerService(ILearnerService learnerService) {
-	this.learnerService = learnerService;
     }
 
     public void setQaDAO(IQaContentDAO qaDAO) {

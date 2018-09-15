@@ -22,8 +22,8 @@
 
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivitySpringForm;
 
 /**
  *

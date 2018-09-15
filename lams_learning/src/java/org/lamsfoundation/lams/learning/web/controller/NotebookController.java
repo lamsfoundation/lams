@@ -30,7 +30,7 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.NotebookForm;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -55,21 +55,13 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/notebook")
 public class NotebookController {
-
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
-    private static final String VIEW_ALL = "viewAll";
-    private static final String VIEW_SINGLE = "viewSingle";
-    private static final String VIEW_JOURNALS = "viewJournals";
-
     @Autowired
     @Qualifier("coreNotebookService")
     private ICoreNotebookService notebookService;
 
     @Autowired
     @Qualifier("learnerService")
-    private ICoreLearnerService learnerService;
+    private ILearnerFullService learnerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

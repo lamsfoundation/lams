@@ -30,6 +30,10 @@
     photo = document.getElementById('photo');
     startbutton = document.getElementById('startbutton');
     
+   //*LAMS* don't initialize anything if profile portrait editing setting is off
+    if (photo === null) {
+    	return;
+    }
     //*LAMS* onload event added by LAMS
     photo.onload = function() {
     	if (typeof objectURL !== 'undefined') {

@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.admin.web.controller;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +40,6 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -65,7 +63,6 @@ public class OrganisationController {
 
     private static IUserManagementService service;
     private static MessageService messageService;
-    private static List<SupportedLocale> locales;
     private static List status;
 
     private static Logger log = Logger.getLogger(OrganisationController.class);
@@ -96,9 +93,6 @@ public class OrganisationController {
 			organisationForm.setParentName(org.getParentOrganisation().getName());
 			organisationForm.setTypeId(org.getOrganisationType().getOrganisationTypeId());
 			organisationForm.setStateId(org.getOrganisationState().getOrganisationStateId());
-			SupportedLocale locale = org.getLocale();
-			organisationForm.setLocaleId(locale != null ? locale.getLocaleId() : null);
-			;
 
 			// find a course or subcourse with any lessons, so we warn user when he tries to delete the course
 			Integer courseToDeleteLessons = org.getLessons().size() > 0 ? orgId : null;
@@ -112,7 +106,6 @@ public class OrganisationController {
 			}
 			request.setAttribute("courseToDeleteLessons", courseToDeleteLessons);
 		    }
-		    request.getSession().setAttribute("locales", OrganisationController.locales);
 		    request.getSession().setAttribute("status", OrganisationController.status);
 		    if (OrganisationController.service.isUserSysAdmin()
 			    || OrganisationController.service.isUserGlobalGroupAdmin()) {
@@ -150,7 +143,6 @@ public class OrganisationController {
 		    parentId);
 	    organisationForm.setParentName(parentOrg.getName());
 	}
-	request.getSession().setAttribute("locales", OrganisationController.locales);
 	request.getSession().setAttribute("status", OrganisationController.status);
 	return "organisation/createOrEdit";
     }
@@ -240,11 +232,8 @@ public class OrganisationController {
 
     @SuppressWarnings("unchecked")
     private void initLocalesAndStatus() {
-	if ((OrganisationController.locales == null)
-		|| ((OrganisationController.status == null) && (OrganisationController.service != null))) {
-	    OrganisationController.locales = OrganisationController.service.findAll(SupportedLocale.class);
+	if ((OrganisationController.status == null) && (OrganisationController.service != null)) {
 	    OrganisationController.status = OrganisationController.service.findAll(OrganisationState.class);
-	    Collections.sort(OrganisationController.locales);
 	}
     }
 }

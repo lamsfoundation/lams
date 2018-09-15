@@ -15,7 +15,9 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="progressBar"/>
 	<lams:css suffix="chart"/>
 	<lams:css webapp="monitoring" suffix="monitorLesson"/>
@@ -41,7 +43,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
-
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	
 	<script type="text/javascript">
 		var lessonId = ${lesson.lessonID},
@@ -165,6 +167,8 @@
 				CONTRIBUTE_BRANCHING : '<c:out value="${CONTRIBUTE_BRANCHING_VAR}" />',
 				<fmt:message key="lesson.task.content.edited" var="CONTRIBUTE_CONTENT_EDITED_VAR"/>
 				CONTRIBUTE_CONTENT_EDITED : '<c:out value="${CONTRIBUTE_CONTENT_EDITED_VAR}" />',
+				<fmt:message key="lesson.task.tool" var="CONTRIBUTE_TOOL_VAR"/>
+				CONTRIBUTE_TOOL : '<c:out value="${CONTRIBUTE_TOOL_VAR}" />',
 				<fmt:message key="button.task.go.tooltip" var="CONTRIBUTE_TOOLTIP_VAR"/>
 				CONTRIBUTE_TOOLTIP : '<c:out value="${CONTRIBUTE_TOOLTIP_VAR}" />',
 				<fmt:message key="button.task.go" var="CONTRIBUTE_BUTTON_VAR"/>
@@ -302,7 +306,10 @@
 							   href="#" onClick="javascript:refreshMonitor('lesson')">
 							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>				
 							<p id="tabLessonLessonName">
-								<span class="lead"><strong><c:out value="${lesson.lessonName}" /></strong></span>
+								<span class="lead">
+									<strong id="lesson-name-strong"><c:out value="${lesson.lessonName}" /></strong>
+									<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+								</span>
 								<br/>
 								<span class="text-muted"><small><c:out value="${lesson.organisationName}" escapeXml="true"/></small></span>
 							</p>

@@ -29,12 +29,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -144,7 +144,7 @@ public class AuthoringController {
 
 	leaderselectionService.saveOrUpdateLeaderselection(leaderselection);
 
-	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
 	authoringForm.setSessionMapID(map.getSessionID());

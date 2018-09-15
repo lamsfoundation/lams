@@ -143,6 +143,7 @@ public class BlackboardUtil {
 	String strIsAvailable = request.getParameter("isAvailable");
 	String strIsGradecenter = request.getParameter("isGradecenter");
 	String strIsTracked = request.getParameter("isTracked");
+	String strIsAllowLearnerRestart = request.getParameter("isAllowLearnerRestart");
 	String isDisplayDesignImage = request.getParameter("isDisplayDesignImage");
 
 	// Internal Blackboard IDs for the course and parent content item
@@ -155,7 +156,8 @@ public class BlackboardUtil {
 	boolean isAvailable = (strIsAvailable == null || strIsAvailable.equals("true")) ? true : false; // default true
 	boolean isGradecenter = (strIsGradecenter != null && strIsGradecenter.equals("true")) ? true : false; // default false
 	boolean isTracked = (strIsTracked != null && strIsTracked.equals("true")) ? true : false; // default false
-
+	boolean enforceAllowLearnerRestart = (strIsAllowLearnerRestart != null && strIsAllowLearnerRestart.equals("true")); // default false
+	
 	// Set Availability Dates
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -190,6 +192,7 @@ public class BlackboardUtil {
 	bbContent.setIsAvailable(isAvailable);
 	bbContent.setIsDescribed(isGradecenter);// isDescribed field is used for storing isGradecenter parameter
 	bbContent.setIsTracked(isTracked);
+	//bbContent.setIsFromCartridge(isAllowLearnerRestart);// isFromCartridge field is used for storing isAllowLearnerRestart parameter
 	bbContent.setAllowGuests(false);
 	bbContent.setContentHandler(LamsPluginUtil.CONTENT_HANDLE);
 
@@ -211,7 +214,7 @@ public class BlackboardUtil {
 
 	// Start the Lesson in LAMS (via Webservices) and capture the lesson ID
 	final long lamsLessonIdLong = LamsSecurityUtil.startLesson(user, courseIdStr, ldId, strTitle, strDescription,
-		false);
+		enforceAllowLearnerRestart, false);
 	// error checking
 	if (lamsLessonIdLong == -1) {
 	    response.sendRedirect("lamsServerDown.jsp");

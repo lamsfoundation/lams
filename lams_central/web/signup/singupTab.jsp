@@ -43,21 +43,17 @@
 		return /^[^<>^*@%$]*$/.test(value)
 
 	});
-	$.validator
-			.addMethod(
-					"emailCheck",
-					function(value) {
-						return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-								.test(value)
-
-					});
+	$.validator.addMethod("emailCheck", function(value) {
+		return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+			.test(value)
+	});
+	$.validator.addMethod("notEqualTo", function(value, element, param) {
+		return this.optional(element) || value != param;
+	}, "Please specify a different (non-default) value");
 
 	$(function() {
 		// Setup form validation 
-
-		$("#SignupForm")
-				.validate(
-						{
+		$("#SignupForm").validate({
 							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
@@ -98,6 +94,10 @@
 									maxlength : 255,
 									equalTo : $('form input[name="email"]')
 								},
+								country : {
+									required: true,
+									notEqualTo: "0"
+								}
 
 							},
 
@@ -128,9 +128,16 @@
 								confirmEmail : {
 									equalTo : "<fmt:message key='error.emails.unequal'/>"
 								},
+								country: {
+									required: "<fmt:message key='error.country.required'/>",
+									notEqualTo: "<fmt:message key='error.country.required'/>"
+								}
 							},
 							submitHandler : function(form) {
 								form.submit();
+							},
+							invalidHandler : function(){
+								$('#submitButton').button('reset');
 							}
 						});
 
@@ -278,7 +285,32 @@
 										key="error.emails.unequal" /></span>
 							</div>
 
+							<div class="form-group">
+								<label for="country">
+									<fmt:message key="label.country" />
+								</label>:
 
+								<form:select path="country" cssClass="form-control">
+									<form:option value="0">
+										<fmt:message key="label.select.country" />
+									</form:option>
+									
+									<c:forEach items="${countryCodes}" var="countryCode">
+										<form:option value="${countryCode.key}">
+											${countryCode.value}
+										</form:option>
+									</c:forEach>
+								</form:select>
+								 <c:set var="errorKey" value="country" /> 
+								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
+								     <lams:Alert id="error" type="danger" close="false"> 
+								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
+								             <c:out value="${error}" /><br /> 
+								         </c:forEach> 
+								     </lams:Alert> 
+								</c:if>
+							</div>
+							
 							<div class="form-group">
 								<label for="courseKey"><fmt:message key="signup.course.key" /></label>:
 
@@ -295,14 +327,18 @@
 							</div>
 
 							<div class="form-group" align="right">
-								<button styleClass="btn btn-sm btn-default voffset5">
+								<button id="submitButton"
+										class="btn btn-sm btn-default voffset5"
+									    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='login.submit' /></span>"
+									    onClick="javascript:$(this).button('loading');$('#SignupForm').submit()"
+								>
 									<fmt:message key="login.submit" />
-								</</button>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</form>
+	</form:form>
 </div>

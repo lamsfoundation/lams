@@ -30,10 +30,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishController;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
+import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.web.controller.LamsAuthoringFinishController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,7 +61,7 @@ public class ClearSessionController extends LamsAuthoringFinishController implem
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
-	session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
+	session.removeAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 	if (mode.isAuthor()) {
 	    ClearSessionController.logger.debug("In Author mode");
 	    session.removeAttribute(customiseSessionID);

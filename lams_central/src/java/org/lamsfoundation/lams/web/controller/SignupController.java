@@ -1,5 +1,10 @@
 package org.lamsfoundation.lams.web.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -8,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.signup.service.ISignupService;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -31,16 +37,23 @@ public class SignupController {
 
     private static Logger log = Logger.getLogger(SignupController.class);
     @Autowired
+    @Qualifier("signupService")
     private ISignupService signupService;
     @Autowired
     @Qualifier("centralMessageService")
     MessageService messageService;
+    @Autowired
+    @Qualifier("timezoneService")
+    private ITimezoneService timezoneService ;
 
     @RequestMapping("")
     public String execute(@ModelAttribute SignupForm signupForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	String method = WebUtil.readStrParam(request, "method", true);
+	if (StringUtils.equals(method, "emailVerify")) {
+	    return emailVerify(request);
+	}
 	String context = WebUtil.readStrParam(request, "context", true);
 	SignupOrganisation signupOrganisation = null;
 	if (StringUtils.isNotBlank(context)) {
@@ -64,46 +77,53 @@ public class SignupController {
 
     @RequestMapping("/signUp")
     private String signUp(@ModelAttribute SignupForm signupForm, HttpServletRequest request) {
-
 	try {
-
 	    // validation
 	    MultiValueMap<String, String> errorMap = validateSignup(signupForm);
 	    if (!errorMap.isEmpty()) {
 		request.setAttribute("errorMap", errorMap);
 		return "signup/signup";
 	    } else {
+		boolean emailVerify = false;
+		String context = WebUtil.readStrParam(request, "context", true);
+		if (StringUtils.isNotBlank(context)) {
+		    SignupOrganisation signupOrganisation = signupService.getSignupOrganisation(context);
+		    emailVerify = signupOrganisation.getEmailVerify();
+		}
 		// proceed with signup
 		User user = new User();
 		user.setLogin(signupForm.getUsername());
 		user.setFirstName(signupForm.getFirstName());
 		user.setLastName(signupForm.getLastName());
 		user.setEmail(signupForm.getEmail());
+		user.setCountry(signupForm.getCountry());
+		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 		String salt = HashUtil.salt();
 		user.setSalt(salt);
 		user.setPassword(HashUtil.sha256(signupForm.getPassword(), salt));
-		signupService.signupUser(user, signupForm.getContext());
-
-		// send email
-		try {
-		    String subject = "Your LAMS account details";
-		    String body = "Hi there,\n\n";
-		    body += "You've successfully registered an account with username " + user.getLogin();
-		    body += " on the LAMS server at " + Configuration.get(ConfigurationKeys.SERVER_URL);
-		    body += ".  If you ever forget your password, you can reset it via this URL "
-			    + Configuration.get(ConfigurationKeys.SERVER_URL) + "/forgotPassword.jsp.";
-		    body += "\n\n";
-		    body += "Regards,\n";
-		    body += "LAMS Signup System";
-		    boolean isHtmlFormat = false;
-
-		    Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
-		} catch (Exception e) {
-		    SignupController.log.error(e.getMessage(), e);
-		    request.setAttribute("error", e.getMessage());
+		if (emailVerify) {
+		    user.setEmailVerified(false);
+		    user.setDisabledFlag(true);
+		    signupService.signupUser(user, signupForm.getContext());
+		    try {
+			sendVerificationEmail(user);
+		    } catch (Exception e) {
+			log.error(e.getMessage(), e);
+			request.setAttribute("error", e.getMessage());
+		    }
+		    request.setAttribute("email", user.getEmail());
+		    return "/signup/emailVerifyResult";
+		} else {
+		    user.setDisabledFlag(false);
+		    signupService.signupUser(user, signupForm.getContext());
+		    try {
+			sendWelcomeEmail(user);
+		    } catch (Exception e) {
+			log.error(e.getMessage(), e);
+			request.setAttribute("error", e.getMessage());
+		    }
+		    return "signup/successfulSignup";
 		}
-
-		return "signup/successfulSignup";
 	    }
 	} catch (Exception e) {
 	    SignupController.log.error(e.getMessage(), e);
@@ -111,6 +131,42 @@ public class SignupController {
 	}
 
 	return "/";
+    }
+
+    private void sendWelcomeEmail(User user) throws AddressException, MessagingException, UnsupportedEncodingException {
+	String subject = messageService.getMessage("signup.email.welcome.subject");
+	String body = new StringBuilder(messageService.getMessage("signup.email.welcome.body.1")).append("<br /><br />")
+		.append(messageService.getMessage("signup.email.welcome.body.2",
+			new Object[] { user.getLogin(), Configuration.get(ConfigurationKeys.SERVER_URL) }))
+		.append("<br />").append(messageService.getMessage("signup.email.welcome.body.3"))
+		.append("<br /><a href=\"").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("forgotPassword.jsp\">").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("forgotPassword.jsp</a><br /><br />")
+		.append(messageService.getMessage("signup.email.welcome.body.4")).append("<br />")
+		.append(messageService.getMessage("signup.email.welcome.body.5")).toString();
+	boolean isHtmlFormat = true;
+
+	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
+    }
+
+    private void sendVerificationEmail(User user)
+	    throws AddressException, MessagingException, UnsupportedEncodingException {
+	String hash = HashUtil.sha256(user.getEmail(), user.getSalt());
+	StringBuilder stringBuilder = new StringBuilder().append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("signup/signup.do?method=emailVerify&login=")
+		.append(URLEncoder.encode(user.getLogin(), "UTF-8")).append("&hash=").append(hash);
+	String link = stringBuilder.toString();
+
+	String subject = messageService.getMessage("signup.email.verify.subject");
+	stringBuilder = new StringBuilder(messageService.getMessage("signup.email.verify.body.1"))
+		.append("<br /><br />").append(messageService.getMessage("signup.email.verify.body.2"))
+		.append("<br /><a href=\"").append(link).append("\">").append(link).append("</a><br /><br />")
+		.append(messageService.getMessage("signup.email.verify.body.3")).append("<br />")
+		.append(messageService.getMessage("signup.email.verify.body.4"));
+	String body = stringBuilder.toString();
+	boolean isHtmlFormat = true;
+
+	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
     }
 
     @RequestMapping("/signIn")
@@ -231,5 +287,26 @@ public class SignupController {
 	}
 
 	return errorMap;
+    }
+
+    /**
+     * Checks whether incoming hash is the same as the expected hash for email verification
+     */
+    public String emailVerify(HttpServletRequest request) {
+	String login = WebUtil.readStrParam(request, "login", false);
+	String hash = WebUtil.readStrParam(request, "hash", false);
+
+	boolean verified = signupService.emailVerify(login, hash);
+	if (verified) {
+	    request.setAttribute("emailVerified", verified);
+	    User user = signupService.getUserByLogin(login);
+	    try {
+		sendWelcomeEmail(user);
+	    } catch (Exception e) {
+		log.error(e.getMessage(), e);
+		request.setAttribute("error", e.getMessage());
+	    }
+	}
+	return "/signup/emailVerify";
     }
 }

@@ -153,7 +153,7 @@
 		<p><input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />
 		
 		<span class="pull-right">
-			<fmt:message key="admin.search" />:&nbsp;<input class="search form-control form-control-inline" type="search" data-column="1">
+			<fmt:message key="admin.search" />:&nbsp;<input class="search form-control form-control-inline" type="search" name="term" data-column="1">
 		</span>
 		</p>
 		
@@ -182,7 +182,3 @@
 
 </body>
 </lams:html>
-
-
-
-
