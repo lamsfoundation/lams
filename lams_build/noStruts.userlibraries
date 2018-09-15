@@ -32,5 +32,6 @@
         <archive path="/lams_build/lib/spring/spring-web-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/spring/spring-webmvc-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
+        <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
     </library>
 </eclipse-userlibraries>
