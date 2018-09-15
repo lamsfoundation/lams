@@ -95,10 +95,6 @@ public class AuthoringController {
     @Qualifier("lataskMessageService")
     private MessageService messageService;
 
-    // **********************************************************
-    // Solid taskList methods
-    // **********************************************************
-
     /**
      * Read taskList data from database and put them into HttpSession. It will
      * redirect to init.do directly after this method run successfully.
@@ -106,12 +102,34 @@ public class AuthoringController {
      * This method will avoid read database again and lost un-saved resouce item
      * lost when user "refresh page",
      */
-
     @RequestMapping("/start")
     public String start(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request) throws ServletException {
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return readDatabaseData(taskListForm, request);
+    }
+
+    @RequestMapping("/definelater")
+    public String defineLater(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
+	    throws ServletException {
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	TaskList taskList = taskListService.getTaskListByContentId(contentId);
+
+	taskList.setDefineLater(true);
+	taskListService.saveOrUpdateTaskList(taskList);
+
+	// audit log the teacher has started editing activity in monitor
+	taskListService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return readDatabaseData(taskListForm, request);
+    }
+    
+    /**
+     * Common method for "start" and "defineLater"
+     */
+    private String readDatabaseData(TaskListForm taskListForm, HttpServletRequest request) throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, TaskListConstants.PARAM_TOOL_CONTENT_ID));
@@ -181,90 +199,6 @@ public class AuthoringController {
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	request.setAttribute("startForm", taskListForm);
 	return "pages/authoring/start";
-    }
-
-    @RequestMapping("/definelater")
-    public String defineLater(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
-	    throws ServletException {
-
-	// update define later flag to true
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	TaskList taskList = taskListService.getTaskListByContentId(contentId);
-
-	taskList.setDefineLater(true);
-	taskListService.saveOrUpdateTaskList(taskList);
-
-	// audit log the teacher has started editing activity in monitor
-	taskListService.auditLogStartEditingActivityInMonitor(contentId);
-
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-
-	// save toolContentID into HTTPSession
-
-	List<TaskListItem> items = null;
-
-	// Get contentFolderID and save to form.
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	taskListForm.setContentFolderID(contentFolderID);
-
-	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	taskListForm.setSessionMapID(sessionMap.getSessionID());
-
-	try {
-	    taskList = taskListService.getTaskListByContentId(contentId);
-	    // if taskList does not exist, try to use default content instead.
-	    if (taskList == null) {
-		taskList = taskListService.getDefaultContent(contentId);
-		if (taskList.getTaskListItems() != null) {
-		    items = new ArrayList<TaskListItem>(taskList.getTaskListItems());
-		} else {
-		    items = null;
-		}
-	    } else {
-		items = taskListService.getAuthoredItems(taskList.getUid());
-	    }
-
-	    taskListForm.setTaskList(taskList);
-	} catch (Exception e) {
-	    AuthoringController.log.error(e);
-	    throw new ServletException(e);
-	}
-
-	// initialize conditions list
-	SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
-	conditionList.clear();
-	conditionList.addAll(taskList.getConditions());
-
-	// init it to avoid null exception in following handling
-	if (items == null) {
-	    items = new ArrayList<>();
-	} else {
-	    TaskListUser taskListUser = null;
-	    // handle system default question: createBy is null, now set it to current user
-	    for (TaskListItem item : items) {
-		if (item.getCreateBy() == null) {
-		    if (taskListUser == null) {
-			// get back login user DTO
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			taskListUser = new TaskListUser(user, taskList);
-		    }
-		    item.setCreateBy(taskListUser);
-		}
-	    }
-	}
-	// init taskList item list
-	SortedSet<TaskListItem> taskListItemList = getTaskListItemList(sessionMap);
-	taskListItemList.clear();
-	taskListItemList.addAll(items);
-
-	sessionMap.put(TaskListConstants.ATTR_TASKLIST_FORM, taskListForm);
-	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
-		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return "pages/authoring/start";
-
     }
 
     /**

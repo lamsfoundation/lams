@@ -340,23 +340,47 @@ public class AuthoringController {
      * Read survey data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
      *
-     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     *
-     * @throws ServletException
-     *
+     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page".
      */
     @RequestMapping(value = "/start")
-    private String start(SurveyForm startForm, HttpServletRequest request) throws Exception {
-
+    private String start(SurveyForm startForm, HttpServletRequest request) throws SurveyApplicationException {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return readDatabaseData(startForm, request);
+    }
 
+    @RequestMapping(value = "/definelater")
+    public String definelater(SurveyForm startForm, HttpServletRequest request) throws Exception {
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Survey survey = surveyService.getSurveyByContentId(contentId);
+
+	boolean isEditable = SurveyWebUtils.isSurveyEditable(survey);
+	if (!isEditable) {
+	    request.setAttribute(SurveyConstants.PAGE_EDITABLE, new Boolean(isEditable));
+	    return "error";
+	}
+
+	if (!survey.isContentInUse()) {
+	    survey.setDefineLater(true);
+	    surveyService.saveOrUpdateSurvey(survey);
+
+	    // audit log the teacher has started editing activity in monitor
+	    surveyService.auditLogStartEditingActivityInMonitor(contentId);
+	}
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return readDatabaseData(startForm, request);
+    }
+    
+    /**
+     * Common method for "start" and "defineLater"
+     */
+    private String readDatabaseData(SurveyForm startForm, HttpServletRequest request) throws SurveyApplicationException {
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	// get back the survey and item list and display them on page
-	ISurveyService service = surveyService;
-
 	List<SurveyQuestion> questions = null;
 	Survey survey = null;
 
@@ -369,103 +393,10 @@ public class AuthoringController {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	startForm.setSessionMapID(sessionMap.getSessionID());
 
-	survey = service.getSurveyByContentId(contentId);
+	survey = surveyService.getSurveyByContentId(contentId);
 	// if survey does not exist, try to use default content instead.
 	if (survey == null) {
-	    survey = service.getDefaultContent(contentId);
-	    if (survey.getQuestions() != null) {
-		questions = new ArrayList<>(survey.getQuestions());
-	    } else {
-		questions = null;
-	    }
-	} else {
-	    questions = new ArrayList<>(survey.getQuestions());
-	}
-
-	startForm.setSurvey(survey);
-
-	// init it to avoid null exception in following handling
-	if (questions == null) {
-	    questions = new ArrayList();
-	} else {
-	    SurveyUser surveyUser = null;
-	    // handle system default question: createBy is null, now set it to current user
-	    for (SurveyQuestion question : questions) {
-		if (question.getCreateBy() == null) {
-		    if (surveyUser == null) {
-			// get back login user DTO
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			surveyUser = new SurveyUser(user, survey);
-		    }
-		    question.setCreateBy(surveyUser);
-		}
-	    }
-	}
-	// init survey item list
-	SortedSet<SurveyQuestion> surveyItemList = getSurveyItemList(sessionMap);
-	surveyItemList.clear();
-	retriveQuestionListForDisplay(questions);
-	surveyItemList.addAll(questions);
-
-	// init condition set
-	SortedSet<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
-	conditionSet.clear();
-	conditionSet.addAll(survey.getConditions());
-
-	sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, startForm);
-	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
-		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	request.setAttribute("startForm", startForm);
-	return "pages/authoring/start";
-    }
-
-    @RequestMapping(value = "/definelater")
-    public String definelater(SurveyForm startForm, HttpServletRequest request) throws Exception {
-
-	// update define later flag to true
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	ISurveyService service = surveyService;
-	Survey survey = service.getSurveyByContentId(contentId);
-
-	boolean isEditable = SurveyWebUtils.isSurveyEditable(survey);
-	if (!isEditable) {
-	    request.setAttribute(SurveyConstants.PAGE_EDITABLE, new Boolean(isEditable));
-	    return "error";
-	}
-
-	if (!survey.isContentInUse()) {
-	    survey.setDefineLater(true);
-	    service.saveOrUpdateSurvey(survey);
-
-	    // audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
-	}
-
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-
-	// save toolContentID into HTTPSession
-	contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	// get back the survey and item list and display them on page
-	service = surveyService;
-
-	List<SurveyQuestion> questions = null;
-	survey = null;
-
-	// Get contentFolderID and save to form.
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	startForm.setContentFolderID(contentFolderID);
-
-	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	startForm.setSessionMapID(sessionMap.getSessionID());
-
-	survey = service.getSurveyByContentId(contentId);
-	// if survey does not exist, try to use default content instead.
-	if (survey == null) {
-	    survey = service.getDefaultContent(contentId);
+	    survey = surveyService.getDefaultContent(contentId);
 	    if (survey.getQuestions() != null) {
 		questions = new ArrayList<>(survey.getQuestions());
 	    } else {

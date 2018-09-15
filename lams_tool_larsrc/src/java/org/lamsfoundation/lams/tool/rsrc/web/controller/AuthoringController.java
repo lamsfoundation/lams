@@ -366,6 +366,31 @@ public class AuthoringController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
+	return readDatabaseData(startForm, request);
+    }
+
+    @RequestMapping("/definelater")
+    private String defineLater(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
+	    throws ServletException {
+
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Resource resource = resourceService.getResourceByContentId(contentId);
+
+	resource.setDefineLater(true);
+	resourceService.saveOrUpdateResource(resource);
+
+	//audit log the teacher has started editing activity in monitor
+	resourceService.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+	return readDatabaseData(startForm, request);
+    }
+
+    /**
+     * Common method for "start" and "defineLater"
+     */
+    private String readDatabaseData(ResourceForm startForm, HttpServletRequest request) throws ServletException {
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_CONTENT_ID));
 
@@ -439,96 +464,6 @@ public class AuthoringController {
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
 	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return "pages/authoring/start";
-    }
-
-    @RequestMapping("/definelater")
-    private String defineLater(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
-	    throws ServletException {
-
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	Resource resource = resourceService.getResourceByContentId(contentId);
-
-	resource.setDefineLater(true);
-	resourceService.saveOrUpdateResource(resource);
-
-	//audit log the teacher has started editing activity in monitor
-	resourceService.auditLogStartEditingActivityInMonitor(contentId);
-
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-
-	// save toolContentID into HTTPSession
-
-	// get back the resource and item list and display them on page
-
-	List<ResourceItem> items = null;
-
-	// Get contentFolderID and save to form.
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	startForm.setContentFolderID(contentFolderID);
-
-	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	startForm.setSessionMapID(sessionMap.getSessionID());
-
-	try {
-	    resource = resourceService.getResourceByContentId(contentId);
-	    // if resource does not exist, try to use default content instead.
-	    if (resource == null) {
-		resource = resourceService.getDefaultContent(contentId);
-		if (resource.getResourceItems() != null) {
-		    items = new ArrayList<ResourceItem>(resource.getResourceItems());
-		} else {
-		    items = null;
-		}
-	    } else {
-		items = resourceService.getAuthoredItems(resource.getUid());
-	    }
-
-	    startForm.setResource(resource);
-	} catch (Exception e) {
-	    AuthoringController.log.error(e);
-	    throw new ServletException(e);
-	}
-
-	// init it to avoid null exception in following handling
-	if (items == null) {
-	    items = new ArrayList<>();
-	} else {
-	    ResourceUser resourceUser = null;
-	    // handle system default question: createBy is null, now set it to
-	    // current user
-	    for (ResourceItem item : items) {
-		if (item.getCreateBy() == null) {
-		    if (resourceUser == null) {
-			// get back login user DTO
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			resourceUser = new ResourceUser(user, resource);
-		    }
-		    item.setCreateBy(resourceUser);
-		}
-	    }
-	}
-	// init resource item list
-	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
-	resourceItemList.clear();
-	resourceItemList.addAll(items);
-
-	// If there is no order id, set it up
-	int i = 1;
-	for (ResourceItem resourceItem : resourceItemList) {
-	    if (resourceItem.getOrderId() == null || resourceItem.getOrderId() != i) {
-		resourceItem.setOrderId(i);
-	    }
-	    i++;
-	}
-
-	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, startForm);
-	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
-		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-
 	return "pages/authoring/start";
     }
 
