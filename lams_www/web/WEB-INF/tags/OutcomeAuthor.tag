@@ -8,7 +8,7 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -49,7 +49,7 @@
 		// keep mapped outcome IDs for search result filtering
 		outcomeMappingIds${outcomeTagId} = [],
 		
-		outcomeExistingNoneLabel = '<fmt:message key="advanced.outcome.existing.none" />',
+		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
 		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>';
 	
 	$(document).ready(function(){
@@ -143,13 +143,13 @@
 	}
 </script>
 
-<lams:SimplePanel titleKey="advanced.outcome.title">
+<lams:SimplePanel titleKey="outcome.authoring.title">
 	<div class="input-group">
 	    <span class="input-group-addon"><i class="fa fa-search"></i></span>
 	    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
-	    	   placeholder='<fmt:message key="advanced.outcome.input" />'></input>
+	    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
 	</div>
 	<div class="voffset10">
-		<fmt:message key="advanced.outcome.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
+		<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
 	</div>
 </lams:SimplePanel>
