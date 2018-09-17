@@ -31,48 +31,39 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
-import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
 import org.lamsfoundation.lams.tool.zoom.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class AuthoringController extends DispatchAction {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
+    @Autowired
+    @Qualifier("zoomService")
     private IZoomService zoomService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("zoomMessageService")
+    private MessageService messageService;
 
-	// set up zoomService
-	zoomService = ZoomServiceProxy.getZoomService(this.getServlet().getServletContext());
-
-	return super.execute(mapping, form, request, response);
-    }
-
-    /**
-     * Default method when no dispatch parameter is specified. It is expected that the parameter
-     * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     *
-     * @throws ServletException
-     *
-     */
-    @Override
-    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/start")
+    public String start(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -101,38 +92,37 @@ public class AuthoringController extends DispatchAction {
 	}
 
 	// Set up the authForm.
-	AuthoringForm authForm = (AuthoringForm) form;
-	copyProperties(authForm, zoom);
+	copyProperties(authoringForm, zoom);
 
 	// Set up sessionMap
 	SessionMap<String, Object> map = createSessionMap(zoom, mode, contentFolderID, toolContentID);
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(ZoomConstants.ATTR_SESSION_MAP, map);
 
 	if (zoomService.getApis().isEmpty()) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.none.configured"));
-	    this.addErrors(request, errors);
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>(1);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.api.none.configured"));
+	    request.setAttribute("errorMap", errorMap);
 	}
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
-    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/updateContent")
+    public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// get authForm and session map.
-	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = getSessionMap(request, authForm);
+	SessionMap<String, Object> map = getSessionMap(request, authoringForm);
 
 	// get zoom content.
 	Zoom zoom = zoomService.getZoomByContentId((Long) map.get(ZoomConstants.KEY_TOOL_CONTENT_ID));
 
 	// update zoom content using form inputs
-	copyProperties(zoom, authForm);
+	copyProperties(zoom, authoringForm);
 
 	// set the update date
 	zoom.setUpdateDate(new Date());
@@ -144,11 +134,11 @@ public class AuthoringController extends DispatchAction {
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	// add the sessionMapID to form
-	authForm.setSessionMapID(map.getSessionID());
+	authoringForm.setSessionMapID(map.getSessionID());
 
 	request.setAttribute(ZoomConstants.ATTR_SESSION_MAP, map);
 
-	return mapping.findForward("success");
+	return "pages/authoring/authoring";
     }
 
     /* ========== Private Methods */

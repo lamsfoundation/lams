@@ -24,46 +24,42 @@
 package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.dto.ContentDTO;
-import org.lamsfoundation.lams.tool.zoom.dto.NotebookEntryDTO;//import org.lamsfoundation.lams.tool.zoom.dto.UserDTO;
+import org.lamsfoundation.lams.tool.zoom.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
-import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class MonitoringController extends DispatchAction {
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
 
     private static final Logger logger = Logger.getLogger(MonitoringController.class);
 
+    @Autowired
+    @Qualifier("zoomService")
     private IZoomService zoomService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("zoomMessageService")
+    private MessageService messageService;
 
-	// set up zoomService
-	zoomService = ZoomServiceProxy.getZoomService(this.getServlet().getServletContext());
-
-	return super.execute(mapping, form, request, response);
-    }
-
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/start")
+    public String start(HttpServletRequest request) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -84,11 +80,11 @@ public class MonitoringController extends DispatchAction {
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
-	return mapping.findForward("success");
+	return "pages/monitoring/monitoring";
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    @RequestMapping("/openNotebook")
+    public String openNotebook(HttpServletRequest request) {
 	Long uid = new Long(WebUtil.readLongParam(request, ZoomConstants.PARAM_USER_UID));
 
 	ZoomUser user = zoomService.getUserByUID(uid);
@@ -99,11 +95,11 @@ public class MonitoringController extends DispatchAction {
 
 	request.setAttribute(ZoomConstants.ATTR_USER_DTO, userDTO);
 
-	return mapping.findForward("notebook");
+	return "pages/monitoring/notebook";
     }
 
-    public ActionForward startMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/startMeeting")
+    public String startMeeting(HttpServletRequest request) throws Exception {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
 	Zoom zoom = zoomService.getZoomByContentId(toolContentID);
 
@@ -112,11 +108,11 @@ public class MonitoringController extends DispatchAction {
 	contentDTO.setInstructions(zoom.getInstructions());
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 
-	ActionErrors errors = ZoomUtil.startMeeting(zoomService, zoom, request);
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
+	MultiValueMap<String, String> errorMap = ZoomUtil.startMeeting(zoomService, messageService, zoom, request);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	}
 
-	return mapping.findForward("learning");
+	return "pages/learning/learning";
     }
 }

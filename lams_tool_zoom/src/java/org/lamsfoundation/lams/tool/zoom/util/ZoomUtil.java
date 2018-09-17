@@ -27,35 +27,36 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 public class ZoomUtil {
 
     /**
      * Creates and starts a Zoom meeting
      */
-    public static ActionErrors startMeeting(IZoomService zoomService, Zoom zoom, HttpServletRequest request)
-	    throws IOException {
-	ActionErrors errors = new ActionErrors();
+    public static MultiValueMap<String, String> startMeeting(IZoomService zoomService, MessageService messageService,
+	    Zoom zoom, HttpServletRequest request) throws IOException {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+
 	String meetingURL = zoom.getMeetingStartUrl();
 	if (meetingURL == null) {
 	    Boolean apiOK = zoomService.chooseApi(zoom.getUid());
 	    if (apiOK == null) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.none.configured"));
+		errorMap.add("GLOBAL", messageService.getMessage("error.api.none.configured"));
 		request.setAttribute("skipContent", true);
 	    } else {
 		if (!apiOK) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.reuse"));
+		    errorMap.add("GLOBAL", messageService.getMessage("error.api.reuse"));
 		}
 		meetingURL = zoomService.createMeeting(zoom.getUid());
 	    }
 	}
 
 	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
-	return errors;
+	return errorMap;
     }
 }

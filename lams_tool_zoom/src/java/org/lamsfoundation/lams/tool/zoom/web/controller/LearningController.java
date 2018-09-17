@@ -30,11 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -46,41 +41,47 @@ import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
-import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomUtil;
 import org.lamsfoundation.lams.tool.zoom.web.forms.LearningForm;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 
-public class LearningController extends DispatchAction {
+@Controller
+@RequestMapping("/learning")
+public class LearningController {
 
     private static final Logger logger = Logger.getLogger(LearningController.class);
 
+    @Autowired
+    @Qualifier("zoomService")
     private IZoomService zoomService;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("zoomMessageService")
+    private MessageService messageService;
 
-	// set up zoomService
-	zoomService = ZoomServiceProxy.getZoomService(this.getServlet().getServletContext());
+    @Autowired
+    private WebApplicationContext applicationContext;
 
-	return super.execute(mapping, form, request, response);
-    }
-
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("finishActivity")
+    public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request)
+	    throws IOException {
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ZoomUser user = getCurrentUser(toolSessionID);
 
 	if (user != null) {
-
-	    LearningForm learningForm = (LearningForm) form;
-
 	    if (user.getNotebookEntryUID() == null) {
 		user.setNotebookEntryUID(zoomService.createNotebookEntry(toolSessionID,
 			CoreNotebookConstants.NOTEBOOK_TOOL, ZoomConstants.TOOL_SIGNATURE, user.getUserId().intValue(),
@@ -96,12 +97,10 @@ public class LearningController extends DispatchAction {
 	    logger.error("finishActivity(): couldn't find/create ZoomUser in toolSessionID: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = ZoomServiceProxy.getZoomSessionManager(getServlet().getServletContext());
+	ToolSessionManager sessionMgrService = (ToolSessionManager) zoomService;
 
 	String nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, user.getUserId().longValue());
-	response.sendRedirect(nextActivityUrl);
-
-	return null;
+	return "redirect:" + nextActivityUrl;
     }
 
     private ZoomUser getCurrentUser(Long toolSessionId) {
@@ -119,13 +118,12 @@ public class LearningController extends DispatchAction {
 	return user;
     }
 
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/openNotebook")
+    public String openNotebook(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	LearningForm lrnForm = (LearningForm) form;
-
 	// set the finished flag
-	ZoomUser user = getCurrentUser(lrnForm.getToolSessionID());
+	ZoomUser user = getCurrentUser(learningForm.getToolSessionID());
 	ContentDTO contentDTO = new ContentDTO(user.getZoomSession().getZoom());
 
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
@@ -133,24 +131,22 @@ public class LearningController extends DispatchAction {
 	NotebookEntry notebookEntry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
 
 	if (notebookEntry != null) {
-	    lrnForm.setEntryText(notebookEntry.getEntry());
+	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
-		getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(learningForm.getToolSessionID(), request,
+		applicationContext.getServletContext());
 
-	return mapping.findForward("notebook");
+	return "pages/learning/notebook";
 
     }
 
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    @RequestMapping("submitReflection")
+    public String submitReflection(@ModelAttribute LearningForm learningForm, HttpServletRequest request)
+	    throws IOException {
 
 	// save the reflection entry and call the notebook.
-
-	LearningForm lrnForm = (LearningForm) form;
-
-	ZoomUser user = getCurrentUser(lrnForm.getToolSessionID());
+	ZoomUser user = getCurrentUser(learningForm.getToolSessionID());
 	Long toolSessionID = user.getZoomSession().getSessionId();
 	Integer userID = user.getUserId().intValue();
 
@@ -160,25 +156,21 @@ public class LearningController extends DispatchAction {
 	if (entry == null) {
 	    // create new entry
 	    Long entryUID = zoomService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ZoomConstants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+		    ZoomConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
 	    user.setNotebookEntryUID(entryUID);
 	    zoomService.saveOrUpdateZoomUser(user);
 	} else {
 	    // update existing entry
-	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setEntry(learningForm.getEntryText());
 	    entry.setLastModified(new Date());
 	    zoomService.updateNotebookEntry(entry);
 	}
 
-	return finishActivity(mapping, form, request, response);
+	return finishActivity(learningForm, request);
     }
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	LearningForm learningForm = (LearningForm) form;
-
+    @RequestMapping("/start")
+    public String start(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 
@@ -209,7 +201,8 @@ public class LearningController extends DispatchAction {
 	    zoomService.saveOrUpdateZoom(zoom);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet().getServletContext());
+	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		applicationContext.getServletContext());
 
 	ZoomUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
@@ -231,9 +224,9 @@ public class LearningController extends DispatchAction {
 
 	if (mode.isAuthor() || !zoom.isStartInMonitor()) {
 	    // start a meeting just like a monitor would
-	    ActionErrors errors = ZoomUtil.startMeeting(zoomService, zoom, request);
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
+	    MultiValueMap<String, String> errorMap = ZoomUtil.startMeeting(zoomService, messageService, zoom, request);
+	    if (!errorMap.isEmpty()) {
+		request.setAttribute("errorMap", errorMap);
 	    }
 	}
 	if (!mode.isAuthor()) {
@@ -246,6 +239,6 @@ public class LearningController extends DispatchAction {
 	    request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
 	}
 
-	return mapping.findForward("zoom");
+	return "pages/learning/learning";
     }
 }

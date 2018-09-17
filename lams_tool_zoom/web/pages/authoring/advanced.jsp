@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="durationSet" value="${not empty formBean.duration && formBean.duration > 0}" />
+<c:set var="durationSet" value="${not empty authoringForm.duration && authoringForm.duration > 0}" />
 
 <!-- ========== Advanced Tab ========== -->
 
@@ -11,7 +10,7 @@
 
 	<div class="checkbox voffset10">
 		<label for="startInMonitor">
-			<html:checkbox property="startInMonitor" value="1" styleClass="noBorder" styleId="startInMonitor"></html:checkbox> 
+			<form:checkbox path="startInMonitor" cssClass="noBorder" id="startInMonitor" />
 			<fmt:message key="advanced.startInMonitor" />
 		</label>
 	</div>
@@ -33,7 +32,7 @@
 				   max="99999" min="1" style="width: 100px; display:inline-block; margin-right: 10px; margin-left: 20px"
 					<c:choose>
 						<c:when test="${durationSet}">
-							value="${formBean.duration}"
+							value="${authoringForm.duration}"
 						</c:when>
 						<c:otherwise>
 							disabled="disabled"
@@ -45,13 +44,13 @@
 	</div>
 
 	<div class="checkbox voffset10">
-		<label for="reflectOnActivity"> <html:checkbox property="reflectOnActivity" value="1" styleClass="noBorder"
-				styleId="reflectOnActivity"></html:checkbox> <fmt:message key="advanced.reflectOnActivity" />
+		<label for="reflectOnActivity"> <form:checkbox path="reflectOnActivity" cssClass="noBorder"	id="reflectOnActivity"/>
+			<fmt:message key="advanced.reflectOnActivity" />
 		</label>
 	</div>
 	
 	<div class="form-group">
-		<html:textarea property="reflectInstructions" styleId="reflectInstructions" styleClass="form-control" rows="3"/>
+		<form:textarea path="reflectInstructions" id="reflectInstructions" cssClass="form-control" rows="3"/>
 	</div>
 
 </lams:SimplePanel>

@@ -23,23 +23,11 @@
 
 package org.lamsfoundation.lams.tool.zoom.web.forms;
 
-import org.apache.struts.action.ActionForm;
-
-/**
- *
- * @author Ernie Ghiglione
- *
- *
- */
-public class LearningForm extends ActionForm {
-
-    private static final long serialVersionUID = -4728946254882237144L;
+public class LearningForm {
 
     private String title;
 
     private String instructions;
-
-    private String dispatch;
 
     private Long toolSessionID;
 
@@ -53,14 +41,6 @@ public class LearningForm extends ActionForm {
 
     public void setMode(String mode) {
 	this.mode = mode;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

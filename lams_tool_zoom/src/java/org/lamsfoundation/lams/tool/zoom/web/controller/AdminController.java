@@ -27,53 +27,49 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
-import org.lamsfoundation.lams.tool.zoom.service.ZoomServiceProxy;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class AdminController extends DispatchAction {
-
-    private IZoomService zoomService;
-
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	// set up zoomService
-	zoomService = ZoomServiceProxy.getZoomService(this.getServlet().getServletContext());
-	return super.execute(mapping, form, request, response);
-    }
+    @Autowired
+    @Qualifier("zoomService")
+    private IZoomService zoomService;
 
-    @Override
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("zoomMessageService")
+    private MessageService messageService;
+
+    @RequestMapping("/start")
+    public String start(HttpServletRequest request) throws Exception {
 	List<ZoomApi> apis = zoomService.getApis();
 	ArrayNode apisJSON = JsonNodeFactory.instance.arrayNode();
 	for (ZoomApi api : apis) {
 	    apisJSON.add(api.toJSON());
 	}
 	request.setAttribute("apis", apisJSON);
-	return mapping.findForward("success");
+	return "pages/admin/view";
     }
 
-    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @RequestMapping("/save")
+    public String save(HttpServletRequest request) throws Exception {
 	String apisJSONString = request.getParameter("apisJSON");
 	ArrayNode apisJSON = JsonUtil.readArray(apisJSONString);
 	List<ZoomApi> apis = new LinkedList<ZoomApi>();
@@ -88,17 +84,17 @@ public class AdminController extends DispatchAction {
 	    logger.debug("Saved " + apis.size() + " Zoom APIs");
 	}
 
-	ActionErrors errors = new ActionErrors();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	apis = zoomService.getApis();
 	for (ZoomApi api : apis) {
 	    if (!zoomService.pingZoomApi(api.getUid())) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.api.ping", api.getEmail()));
+		errorMap.add("GLOBAL", messageService.getMessage("error.api.ping", new Object[] { api.getEmail() }));
 	    }
 	}
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
 	}
 
-	return unspecified(mapping, form, request, response);
+	return start(request);
     }
 }

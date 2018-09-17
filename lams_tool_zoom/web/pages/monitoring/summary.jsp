@@ -19,11 +19,11 @@
 </div>
 
 
-<html:form action="monitoring"  target="zoomMonitor${dto.toolContentId}" onsubmit="window.open('', 'zoomMonitor${dto.toolContentId}', 'resizable=yes,scrollbars=yes')"> 
-	<html:hidden property="dispatch" value="startMeeting" />
-	<html:hidden property="toolContentID" value="${dto.toolContentId}" />
-	<html:submit styleClass="btn btn-primary"><fmt:message key="label.monitoring.startConference" /></html:submit>
-</html:form>
+<form action="/monitoring/startMeeting.do" target="zoomMonitor${dto.toolContentId}"
+	  onsubmit="window.open('', 'zoomMonitor${dto.toolContentId}', 'resizable=yes,scrollbars=yes')"> 
+	<input type="hidden" name="toolContentID" value="${dto.toolContentId}" />
+	<button type="submit" class="btn btn-primary"><fmt:message key="label.monitoring.startConference" /></button>
+</form>
 
 <div class="voffset5">&nbsp;</div>
 <c:if test="${dto.reflectOnActivity}">
@@ -50,8 +50,7 @@
 							</c:when>
 	
 							<c:otherwise>
-								<a
-									href="./monitoring.do?dispatch=openNotebook&amp;userUID=${user.uid}">
+								<a href="./monitoring/openNotebook.do?userUID=${user.uid}">
 									<fmt:message key="label.view" /> </a>
 							</c:otherwise>
 						</c:choose>

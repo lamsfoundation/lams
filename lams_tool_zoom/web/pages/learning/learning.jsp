@@ -1,18 +1,41 @@
+<!DOCTYPE html>
+
 <%@ include file="/common/taglibs.jsp"%>
 
+<lams:html>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
+<lams:head>  
+	<title>
+		<fmt:message key="activity.title" />
+	</title>
+	
+	<lams:css/>
+	
+	<%-- TODO is this the best place to import these scripts ?	--%>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+</lams:head>
+<body class="stripes">
 <lams:Page type="learner" title="${contentDTO.title}">
 	<div class="panel">
 		<c:out value="${contentDTO.instructions}" escapeXml="false" />
 	</div>
 
-	<logic:messagesPresent>
-		<lams:Alert type="danger" id="form-error" close="false">
-			<html:messages id="error">
-				<c:out value="${error}" escapeXml="false" />
-				<br />
-			</html:messages>
-		</lams:Alert>
-	</logic:messagesPresent>
+	<c:set var="errorKey" value="GLOBAL" />
+    <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+        <lams:Alert id="error" type="danger" close="false">
+            <c:forEach var="error" items="${errorMap[errorKey]}">
+                <c:out value="${error}" />
+            </c:forEach>
+        </lams:Alert>
+    </c:if>
 	
 	<c:if test="${not skipContent}">
 		<c:choose>
@@ -27,9 +50,7 @@
 				<p>
 					<fmt:message key="label.learning.conferenceNotAvailable" />
 				</p>
-				<html:link styleClass="btn btn-sm btn-default" href="#" onclick="window.location.reload()">
-					<fmt:message key="label.refresh" />
-				</html:link>
+				<a href="#" onclick="window.location.reload()" class="btn btn-default"><fmt:message key="label.refresh" /></a>
 			</c:when>
 			<c:otherwise>
 				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none; display: none" src="${meetingURL}"></iframe>
@@ -56,3 +77,5 @@
 	</c:if>
 
 </lams:Page>
+</body>
+</lams:html>
