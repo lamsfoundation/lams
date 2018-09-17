@@ -73,7 +73,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
-@RequestMapping("outcome")
+@RequestMapping("/outcome")
 public class OutcomeController {
 
     private static Logger log = Logger.getLogger(OutcomeController.class);
@@ -91,7 +91,7 @@ public class OutcomeController {
     @Qualifier("centralMessageService")
     private MessageService messageService;
 
-    @RequestMapping("outcomeManage")
+    @RequestMapping("/outcomeManage")
     public String outcomeManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -117,7 +117,7 @@ public class OutcomeController {
 	return "outcome/outcomeManage";
     }
 
-    @RequestMapping("outcomeEdit")
+    @RequestMapping("/outcomeEdit")
     public String outcomeEdit(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -160,7 +160,7 @@ public class OutcomeController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("outcomeEdit")
+    @RequestMapping("/outcomeEdit")
     public String outcomeSave(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -233,7 +233,7 @@ public class OutcomeController {
 	return "outcome/outcomeEdit";
     }
 
-    @RequestMapping("outcomeRemove")
+    @RequestMapping("/outcomeRemove")
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
 	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -263,7 +263,7 @@ public class OutcomeController {
 	return outcomeManage(request, response);
     }
 
-    @RequestMapping("outcomeSearch")
+    @RequestMapping("/outcomeSearch")
     @ResponseBody
     public String outcomeSearch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	String search = WebUtil.readStrParam(request, "term", true);
@@ -302,7 +302,7 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("outcomeMap")
+    @RequestMapping("/outcomeMap")
     @ResponseBody
     public String outcomeMap(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId");
@@ -353,7 +353,8 @@ public class OutcomeController {
 	return String.valueOf(outcomeMapping.getMappingId());
     }
 
-    @RequestMapping("outcomeGetMappings")
+    @RequestMapping("/outcomeGetMappings")
+    @ResponseBody
     public String outcomeGetMappings(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
@@ -383,7 +384,7 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("outcomeRemoveMapping")
+    @RequestMapping("/outcomeRemoveMapping")
     public void outcomeRemoveMapping(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long mappingId = WebUtil.readLongParam(request, "mappingId");
 	OutcomeMapping outcomeMapping = (OutcomeMapping) userManagementService.findById(OutcomeMapping.class,
@@ -409,7 +410,7 @@ public class OutcomeController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("outcomeSetResult")
+    @RequestMapping("/outcomeSetResult")
     @ResponseBody
     public String outcomeSetResult(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long mappingId = WebUtil.readLongParam(request, "pk");
@@ -471,7 +472,7 @@ public class OutcomeController {
 	return "OK";
     }
 
-    @RequestMapping("outcomeExport")
+    @RequestMapping("/outcomeExport")
     public void outcomeExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "export outcomes", true);
@@ -495,7 +496,7 @@ public class OutcomeController {
 	ExcelUtil.createExcelXLS(out, dataToExport, messageService.getMessage("outcome.export.date"), true);
     }
 
-    @RequestMapping("outcomeImport")
+    @RequestMapping("/outcomeImport")
     public String outcomeImport(MultipartFile file, HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
 	UserDTO user = getUserDTO();
@@ -514,7 +515,7 @@ public class OutcomeController {
 	return outcomeManage(request, response);
     }
 
-    @RequestMapping("scaleManage")
+    @RequestMapping("/scaleManage")
     public String scaleManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -540,7 +541,7 @@ public class OutcomeController {
 	return "outcome/scaleManage";
     }
 
-    @RequestMapping("scaleRemove")
+    @RequestMapping("/scaleRemove")
     public String scaleRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long scaleId = WebUtil.readLongParam(request, "scaleId", false);
 	OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
@@ -577,7 +578,7 @@ public class OutcomeController {
 	return scaleManage(request, response);
     }
 
-    @RequestMapping("scaleEdit")
+    @RequestMapping("/scaleEdit")
     public String scaleEdit(@ModelAttribute OutcomeScaleForm scaleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -615,7 +616,7 @@ public class OutcomeController {
 	return "outcome/scaleEdit";
     }
 
-    @RequestMapping("scaleSave")
+    @RequestMapping("/scaleSave")
     public String scaleSave(@ModelAttribute OutcomeScaleForm scaleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -720,7 +721,7 @@ public class OutcomeController {
 	return "outcome/scaleEdit";
     }
 
-    @RequestMapping("scaleExport")
+    @RequestMapping("/scaleExport")
     public void scaleExport(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "export outcome scales", true);
@@ -744,7 +745,7 @@ public class OutcomeController {
 	ExcelUtil.createExcelXLS(out, dataToExport, messageService.getMessage("outcome.export.date"), true);
     }
 
-    @RequestMapping("scaleImport")
+    @RequestMapping("/scaleImport")
     public String scaleImport(MultipartFile file, HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
 	UserDTO user = getUserDTO();
