@@ -31,7 +31,6 @@
 %>
 <%@ taglib uri="tags-core" prefix="c"%>
 
-
 <div class="panel-body panel-monitor-body">
 	 <jsp:doBody />
 </div>

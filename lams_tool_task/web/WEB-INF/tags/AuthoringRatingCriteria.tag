@@ -8,10 +8,9 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%@ attribute name="criterias" required="true" rtexprvalue="true" type="java.util.Collection" %>

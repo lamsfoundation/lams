@@ -285,7 +285,7 @@ $(document).ready(function() {
 						<fmt:message key="${minimumLabel}" />
 					</label>
 					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
-							class="form-control form-control-inline">
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMinimumLabel}" />
 						</form:option>
@@ -305,7 +305,7 @@ $(document).ready(function() {
 						<fmt:message key="${maximumLabel}" />
 					</label>
 					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
-							class="form-control form-control-inline">
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMaximumLabel}" />
 						</form:option>

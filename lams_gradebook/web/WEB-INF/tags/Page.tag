@@ -143,7 +143,7 @@
 			}
 
 			function viewNotebookEntries(){
-				openPopUp(LEARNING_URL + "notebook/lessonID.do?lessonID=" + lessonId,
+				openPopUp(LEARNING_URL + "notebook/viewAll.do?lessonID=" + lessonId,
 						"Notebook",
 						648,1152,
 						"no");

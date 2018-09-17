@@ -8,6 +8,7 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -283,8 +284,8 @@ $(document).ready(function() {
 					<label for="minimum-rates">
 						<fmt:message key="${minimumLabel}" />
 					</label>
-					<form:select property="${formContentPrefix}minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);" 
-							styleClass="form-control form-control-inline">
+					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMinimumLabel}" />
 						</form:option>
@@ -303,8 +304,8 @@ $(document).ready(function() {
 					<label for="maximum-rates">
 						<fmt:message key="${maximumLabel}" />
 					</label>
-					<form:select property="${formContentPrefix}maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);" 
-							styleClass="form-control form-control-inline">
+					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMaximumLabel}" />
 						</form:option>

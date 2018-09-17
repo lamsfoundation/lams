@@ -32,6 +32,7 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>
@@ -125,7 +126,7 @@
 		<a href="javascript:doSubmit_Form_Only();" id="saveButton" name="submit" class="btn btn-primary pull-right">
 			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
 		</a>
-		<a href="javascript:;" nname="cancel" id="cancelButton" onclick="javascript:doCancel()" class="btn btn-default roffset5 pull-right">
+		<a href="javascript:;" name="cancel" id="cancelButton" onclick="javascript:doCancel()" class="btn btn-default roffset5 pull-right">
 			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
 		</a>
 </div>

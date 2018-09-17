@@ -8,9 +8,9 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%@ attribute name="criterias" required="true" rtexprvalue="true" type="java.util.Collection" %>
@@ -285,7 +285,7 @@ $(document).ready(function() {
 						<fmt:message key="${minimumLabel}" />
 					</label>
 					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
-							class="form-control form-control-inline">
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMinimumLabel}" />
 						</form:option>
@@ -305,7 +305,7 @@ $(document).ready(function() {
 						<fmt:message key="${maximumLabel}" />
 					</label>
 					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
-							class="form-control form-control-inline">
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMaximumLabel}" />
 						</form:option>

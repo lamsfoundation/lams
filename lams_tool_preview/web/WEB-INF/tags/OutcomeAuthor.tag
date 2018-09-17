@@ -54,7 +54,7 @@
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({
-			'source' : "<lams:LAMSURL/>outcome.do?method=outcomeSearch&organisationIds=${organisations}",
+			'source' : "<lams:LAMSURL/>outcome/outcomeSearch.do?organisationIds=${organisations}",
 			'delay'  : 700,
 			'minLength' : 2,
 			'response' : function(event, ui) {

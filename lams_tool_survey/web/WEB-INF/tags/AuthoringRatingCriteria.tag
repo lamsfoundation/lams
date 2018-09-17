@@ -8,6 +8,7 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -283,42 +284,42 @@ $(document).ready(function() {
 					<label for="minimum-rates">
 						<fmt:message key="${minimumLabel}" />
 					</label>
-					<select property="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
-							class="form-control form-control-inline">
-						<option value="0">
+					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
+							cssClass="form-control form-control-inline">
+						<form:option value="0">
 							<fmt:message key="${noMinimumLabel}" />
-						</option>
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-						<option value="4">4</option>
-						<option value="5">5</option>
-						<option value="6">6</option>
-						<option value="7">7</option>
-						<option value="8">8</option>
-						<option value="9">9</option>
-						<option value="10">10</option>
-					</select>
+						</form:option>
+						<form:option value="1">1</form:option>
+						<form:option value="2">2</form:option>
+						<form:option value="3">3</form:option>
+						<form:option value="4">4</form:option>
+						<form:option value="5">5</form:option>
+						<form:option value="6">6</form:option>
+						<form:option value="7">7</form:option>
+						<form:option value="8">8</form:option>
+						<form:option value="9">9</form:option>
+						<form:option value="10">10</form:option>
+					</form:select>
 				
 					<label for="maximum-rates">
 						<fmt:message key="${maximumLabel}" />
 					</label>
-					<select property="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
-							class="form-control form-control-inline">
-						<option value="0">
+					<form:select path="${formContentPrefix}maximumRates" id="maximum-rates" onmouseup="validateRatingLimits(false);" 
+							cssClass="form-control form-control-inline">
+						<form:option value="0">
 							<fmt:message key="${noMaximumLabel}" />
-						</option>
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-						<option value="4">4</option>
-						<option value="5">5</option>
-						<option value="6">6</option>
-						<option value="7">7</option>
-						<option value="8">8</option>
-						<option value="9">9</option>
-						<option value="10">10</option>
-					</select>
+						</form:option>
+						<form:option value="1">1</form:option>
+						<form:option value="2">2</form:option>
+						<form:option value="3">3</form:option>
+						<form:option value="4">4</form:option>
+						<form:option value="5">5</form:option>
+						<form:option value="6">6</form:option>
+						<form:option value="7">7</form:option>
+						<form:option value="8">8</form:option>
+						<form:option value="9">9</form:option>
+						<form:option value="10">10</form:option>
+					</form:select>
 				</div>
 			</c:if>
 	

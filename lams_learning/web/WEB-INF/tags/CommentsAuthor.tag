@@ -57,7 +57,7 @@
 <div class="checkbox">
 	<label>
 	<form:checkbox path="${allowAnonymousVariableName}" 
-		id="${allowAnonymousVariableName}">
+		styleId="${allowAnonymousVariableName}">
 	</form:checkbox>
 	<fmt:message key="${allowAnonymousLabelKey}"/>
 	</label>

@@ -35,7 +35,6 @@
 <%@ attribute name="page" required="false" rtexprvalue="true"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
-
 <c:set var="class" value=""/>
 <c:if test="${id == 1}">
 	<c:set var="class">active</c:set>

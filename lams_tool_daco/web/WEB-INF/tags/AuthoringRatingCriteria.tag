@@ -8,6 +8,7 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -284,7 +285,7 @@ $(document).ready(function() {
 						<fmt:message key="${minimumLabel}" />
 					</label>
 					<form:select path="${formContentPrefix}minimumRates" id="minimum-rates" onmouseup="validateRatingLimits(true);" 
-							styleClass="form-control form-control-inline">
+							cssClass="form-control form-control-inline">
 						<form:option value="0">
 							<fmt:message key="${noMinimumLabel}" />
 						</form:option>

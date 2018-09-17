@@ -1,4 +1,5 @@
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
@@ -42,7 +43,7 @@
 <div class="checkbox">
 	<label>
 	<form:checkbox path="${allowCommentsVariableName}" value="1"
-		styleId="${allowCommentsVariableName}">
+		id="${allowCommentsVariableName}">
 	</form:checkbox>
 	<fmt:message key="${allowCommentLabelKey}"/>
 	</label>
@@ -50,8 +51,8 @@
 
 <div id="likedislike">
 <div class="loffset20">
-		<form:radio path="${likeDislikeVariableName}" value="false" />&nbsp;<fmt:message key="${likeOnlyCommentLabelKey}" /> &nbsp;
-		<form:radio path="${likeDislikeVariableName}" value="true" />&nbsp;<fmt:message key="${likeDislikeLabelKey}" /> 
+		<form:radiobutton path="${likeDislikeVariableName}" value="false" />&nbsp;<fmt:message key="${likeOnlyCommentLabelKey}" /> &nbsp;
+		<form:radiobutton path="${likeDislikeVariableName}" value="true" />&nbsp;<fmt:message key="${likeDislikeLabelKey}" /> 
 </div>
 <div class="checkbox">
 	<label>
