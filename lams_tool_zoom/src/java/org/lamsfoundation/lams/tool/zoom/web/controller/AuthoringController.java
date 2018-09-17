@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.zoom.web.actions;
+package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-public class AuthoringAction extends DispatchAction {
+public class AuthoringController extends DispatchAction {
 
     private IZoomService zoomService;
 

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.zoom.web.actions;
+package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import javax.servlet.http.HttpSession;
 
@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.web.action.LamsAuthoringFinishAction;
  *
  * @version $Revision$
  */
-public class ClearSessionAction extends LamsAuthoringFinishAction {
+public class ClearSessionController extends LamsAuthoringFinishAction {
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.zoom.web.actions;
+package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
@@ -54,9 +54,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-public class LearningAction extends DispatchAction {
+public class LearningController extends DispatchAction {
 
-    private static final Logger logger = Logger.getLogger(LearningAction.class);
+    private static final Logger logger = Logger.getLogger(LearningController.class);
 
     private IZoomService zoomService;
 

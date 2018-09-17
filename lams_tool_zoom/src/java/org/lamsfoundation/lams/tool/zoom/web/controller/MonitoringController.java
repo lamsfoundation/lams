@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.zoom.web.actions;
+package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,9 +45,9 @@ import org.lamsfoundation.lams.tool.zoom.util.ZoomUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-public class MonitoringAction extends DispatchAction {
+public class MonitoringController extends DispatchAction {
 
-    private static final Logger logger = Logger.getLogger(MonitoringAction.class);
+    private static final Logger logger = Logger.getLogger(MonitoringController.class);
 
     private IZoomService zoomService;
 

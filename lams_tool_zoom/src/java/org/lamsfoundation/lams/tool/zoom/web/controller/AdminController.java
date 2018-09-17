@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.zoom.web.actions;
+package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,11 +46,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class AdminAction extends DispatchAction {
+public class AdminController extends DispatchAction {
 
     private IZoomService zoomService;
 
-    private static final Logger logger = Logger.getLogger(AdminAction.class);
+    private static final Logger logger = Logger.getLogger(AdminController.class);
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
