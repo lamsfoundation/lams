@@ -239,7 +239,7 @@ public class AuthoringController {
      * @throws ServletException
      */
     @RequestMapping(value = "/saveOrUpdateItem")
-    private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
+    private String saveOrUpdateItem(@ModelAttribute("authoringForm") ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -912,7 +912,7 @@ public class AuthoringController {
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
-	    if (!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile().getSize(), false)) {
+	    if (!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile(), false)) {
 		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
 			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
 	    }
