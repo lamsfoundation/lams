@@ -111,7 +111,7 @@ public class ProfileController {
 	request.setAttribute("email", (email != null ? email : ""));
 	request.setAttribute("portraitUuid", requestor.getPortraitUuid());
 
-	return "profile";
+	return "profile/profile";
     }
 
     @RequestMapping("/lessons")
@@ -189,7 +189,7 @@ public class ProfileController {
 
 	request.setAttribute("beans", beans);
 
-	return "lessons";
+	return "profile/lessons";
     }
 
     private IndexOrgBean getOrgBean(String name, List<IndexOrgBean> list) {
@@ -207,7 +207,7 @@ public class ProfileController {
 	List<PolicyDTO> policyDtos = policyService.getPolicyDtosByUser(userId);
 	request.setAttribute("policyDtos", policyDtos);
 
-	return "profilePolicyConsents";
+	return "profile/profilePolicyConsents";
     }
 
     @RequestMapping("/displayPolicyDetails")
@@ -216,7 +216,7 @@ public class ProfileController {
 	Policy policy = policyService.getPolicyByUid(policyUid);
 	request.setAttribute("policy", policy);
 
-	return "policyDetails";
+	return "profile/policyDetails";
     }
 
     @RequestMapping("/edit")
@@ -285,7 +285,7 @@ public class ProfileController {
 	}
 	request.setAttribute("timezoneDtos", timezoneDtos);
 
-	return "editprofile";
+	return "profile/editprofile";
     }
 
 }

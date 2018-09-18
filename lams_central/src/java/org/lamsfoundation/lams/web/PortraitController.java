@@ -52,6 +52,6 @@ public class PortraitController {
 	log.debug("using portraitUuid=" + portraitUuid);
 	// if no portrait has been uploaded, set the uuid to 0
 	portraitForm.setPortraitUuid(portraitUuid == null ? 0 : portraitUuid);
-	return "portrait";
+	return "profile/portrait";
     }
 }
