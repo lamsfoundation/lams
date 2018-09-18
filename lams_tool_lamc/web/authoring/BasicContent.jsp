@@ -30,7 +30,7 @@
 	
     function saveQTI(formHTML, formName) {
     	var form = $(formHTML);
-    	form.prop("action", '<lams:WebAppURL />authoring/saveQTI.do?sessionMapId=${sessionMapId}"/>').appendTo(document.body);
+    	form.prop("action", '<lams:WebAppURL />authoring/saveQTI.do?sessionMapId=${sessionMapId}').appendTo(document.body);
     	form.ajaxSubmit({ 
     		target:  $('#resourceListArea'),
     		iframe: true,
