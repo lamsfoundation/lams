@@ -24,13 +24,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.io.File;
-import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 
@@ -49,100 +43,6 @@ public class UploadFileUtil {
 
     static {
 
-    }
-
-    /**
-     * Given the current servlet request and the name of a temporary directory, get a list of all the uploaded items
-     * from a multipart form. This includes any uploaded files and the "normal" input fields on the form. Gets the
-     * temporary directory from the configuration file. Equivalent to getUploadItems(request, useLargeFileSize, null)
-     *
-     * @param request
-     *            - current servlet request
-     * @param useLargeFileSize
-     *            - use the large file size. If not true, use the standard file size.
-     * @return List of items, of type FileItem
-     */
-    public static List<FileItem> getUploadItems(HttpServletRequest request, boolean useLargeFileSize)
-	    throws FileUploadException, Exception {
-	return UploadFileUtil.getUploadItems(request, useLargeFileSize, null);
-    }
-
-    /**
-     * Given the current servlet request and the name of a temporary directory, get a list of all the uploaded items
-     * from a multipart form. This includes any uploaded files and the "normal" input fields on the form.
-     *
-     * @param request
-     *            - current servlet request
-     * @param useLargeFileSize
-     *            - use the large file size. If not true, use the standard file size.
-     * @param tempDirName
-     *            - the name of the directory into which temporary files can be written
-     * @return List of items, of type FileItem
-     */
-    @SuppressWarnings("unchecked")
-    public static List<FileItem> getUploadItems(HttpServletRequest request, boolean useLargeFileSize,
-	    String tempDirNameInput) throws FileUploadException, Exception {
-
-	int max_size = UploadFileUtil.DEFAULT_MAX_SIZE;
-	int max_memory_size;
-	String tempDirName = null;
-
-	int tempInt = -1;
-
-	if (useLargeFileSize) {
-	    tempInt = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE);
-	    if (tempInt != -1) {
-		max_size = tempInt;
-	    } else {
-		UploadFileUtil.log.warn(
-			"Default Large Max Size for file upload missing, using " + UploadFileUtil.DEFAULT_MAX_SIZE);
-	    }
-	} else {
-	    tempInt = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
-	    if (tempInt != -1) {
-		max_size = tempInt;
-	    } else {
-		UploadFileUtil.log
-			.warn("Default Max Size for file upload missing, using " + UploadFileUtil.DEFAULT_MAX_SIZE);
-	    }
-	}
-
-	tempInt = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_MEMORY_SIZE);
-	if (tempInt != -1) {
-	    max_memory_size = tempInt;
-	} else {
-	    UploadFileUtil.log.warn(
-		    "Default Max Memory Size for file upload missing, using " + UploadFileUtil.DEFAULT_MEMORY_SIZE);
-	    max_memory_size = UploadFileUtil.DEFAULT_MEMORY_SIZE;
-	}
-
-	if (tempDirNameInput != null) {
-	    tempDirName = tempDirNameInput;
-	} else {
-	    tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
-	    if (tempDirName == null) {
-		UploadFileUtil.log.warn("Default Temporary Directory missing, using null");
-	    }
-	}
-	// would be nice to only do this once! never mind.
-	if (tempDirName != null) {
-	    File dir = new File(tempDirName);
-	    if (!dir.exists()) {
-		dir.mkdirs();
-	    }
-	}
-
-	// Create a new file upload handler
-	DiskFileUpload upload = new DiskFileUpload();
-
-	// Set upload parameters
-	upload.setSizeMax(max_size);
-	upload.setSizeThreshold(max_memory_size);
-	upload.setRepositoryPath(tempDirName);
-
-	// Parse the request
-	List<FileItem> items = upload.parseRequest(request);
-	return items;
     }
 
     /**

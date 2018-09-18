@@ -51,8 +51,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -86,6 +84,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -1086,7 +1086,7 @@ public class AuthoringController {
      * Imports questions into question bank from uploaded xml file.
      */
     @RequestMapping("/importQuestions")
-    public String importQuestions(HttpServletRequest request) throws ServletException {
+    public String importQuestions(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -1095,44 +1095,21 @@ public class AuthoringController {
 
 	List<String> toolsErrorMsgs = new ArrayList<>();
 	try {
-	    File designFile = null;
-	    Map<String, String> params = new HashMap<>();
-	    String filename = null;
-
 	    String uploadPath = FileUtil.createTempDirectory("_uploaded_2questions_xml");
 
-	    DiskFileUpload fu = new DiskFileUpload();
-	    // maximum size that will be stored in memory
-	    fu.setSizeThreshold(4096);
-	    // the location for saving data that is larger than getSizeThreshold()
-	    // fu.setRepositoryPath(uploadPath);
+	    // filename on the client
+	    String filename = FileUtil.getFileName(file.getOriginalFilename());
+	    File destinationFile = new File(uploadPath, filename);
+	    file.transferTo(destinationFile);
 
-	    List fileItems = fu.parseRequest(request);
-	    Iterator iter = fileItems.iterator();
-	    while (iter.hasNext()) {
-		FileItem fi = (FileItem) iter.next();
-		// UPLOAD_FILE is input field from HTML page
-		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE")) {
-		    params.put(fi.getFieldName(), fi.getString());
-		} else {
-		    // filename on the client
-		    filename = FileUtil.getFileName(fi.getName());
-		    designFile = new File(uploadPath + filename);
-		    fi.write(designFile);
-		}
-	    }
-
-	    String filename2 = designFile.getName();
-	    String fileExtension = (filename2 != null) && (filename2.length() >= 4)
-		    ? filename2.substring(filename2.length() - 4)
-		    : "";
-	    if (!fileExtension.equalsIgnoreCase(".xml")) {
+	    String fileExtension = FileUtil.getFileExtension(filename);
+	    if (!fileExtension.equalsIgnoreCase("xml")) {
 		throw new RuntimeException("Wrong file extension. Xml is expected");
 	    }
 	    // String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
 
 	    // import learning design
-	    String fullFilePath = designFile.getAbsolutePath();// FileUtil.getFullPath(learningDesignPath,
+	    String fullFilePath = destinationFile.getAbsolutePath();// FileUtil.getFullPath(learningDesignPath,
 							       // ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	    List<AssessmentQuestion> questions = (List<AssessmentQuestion>) FileUtil.getObjectFromXML(null,
 		    fullFilePath);

@@ -6,6 +6,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 package org.lamsfoundation.lams.web;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -18,8 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -27,9 +29,9 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.UploadFileUtil;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Servlet to upload files.<br>
@@ -69,11 +71,10 @@ public class LAMSUploadServlet extends HttpServlet {
      * javascript command in it.
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug("Upload started");
+	if (log.isDebugEnabled()) {
+	    log.debug("Upload started");
 	}
 
 	String currentFolderStr = request.getParameter("CurrentFolder");
@@ -88,24 +89,25 @@ public class LAMSUploadServlet extends HttpServlet {
 	    // get realBaseDir and lamsContextPath at request time from config values in memory
 	    String fileType = request.getParameter("Type");
 
-	    DiskFileUpload upload = new DiskFileUpload();
+	    DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+	    ServletFileUpload fileUpload = new ServletFileUpload(fileItemFactory);
 	    try {
-		List<FileItem> items = upload.parseRequest(request);
+		List<FileItem> fileItems = fileUpload.parseRequest(request);
 		Map<String, Object> fields = new HashMap<>();
 
-		Iterator<FileItem> iter = items.iterator();
+		Iterator<FileItem> iter = fileItems.iterator();
 		while (iter.hasNext()) {
-		    FileItem item = iter.next();
-		    if (item.isFormField()) {
-			fields.put(item.getFieldName(), item.getString());
+		    FileItem fileItem = iter.next();
+		    if (fileItem.isFormField()) {
+			fields.put(fileItem.getFieldName(), fileItem.getString());
 		    } else {
-			fields.put(item.getFieldName(), item);
+			fields.put(fileItem.getFieldName(), fileItem);
 		    }
 		}
-		MultipartFile uplFile = (MultipartFile) fields.get("NewFile");
+		FileItem uplFile = (FileItem) fields.get("NewFile");
 		if (uplFile == null) {
 		    // form field name used by CKEditor 3.x
-		    uplFile = (MultipartFile) fields.get("upload");
+		    uplFile = (FileItem) fields.get("upload");
 		}
 
 		String fileNameLong = uplFile.getName();
@@ -114,7 +116,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		String fileName = pathParts[pathParts.length - 1];
 
 		// validate file size
-		boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile, true);
+		boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile.getSize(), true);
 		if (!maxFilesizeExceededMessage) {
 		    fileName = messageService.getMessage("errors.maxfilesize",
 			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
@@ -132,13 +134,13 @@ public class LAMSUploadServlet extends HttpServlet {
 		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
 		    fileUrl = currentWebPath + '/' + fileName;
 
-		    uplFile.transferTo(destinationFile);
-		    if (LAMSUploadServlet.log.isDebugEnabled()) {
-			LAMSUploadServlet.log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
+		    FileCopyUtils.copy(uplFile.getInputStream(), new FileOutputStream(destinationFile));
+		    if (log.isDebugEnabled()) {
+			log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
 		    }
 		}
 	    } catch (Exception e) {
-		LAMSUploadServlet.log.error(e);
+		log.error(e);
 		returnMessage = "Error while uploading file: " + e.getMessage();
 	    }
 	}
@@ -160,14 +162,13 @@ public class LAMSUploadServlet extends HttpServlet {
 	    out.println("</script>");
 	    out.flush();
 	    out.close();
-	} else if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log
-		    .debug("No CKEditor method found to run after completion, but upload finished with message: "
-			    + returnMessage);
+	} else if (log.isDebugEnabled()) {
+	    log.debug("No CKEditor method found to run after completion, but upload finished with message: "
+		    + returnMessage);
 	}
 
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug("Upload finished");
+	if (log.isDebugEnabled()) {
+	    log.debug("Upload finished");
 	}
     }
 }

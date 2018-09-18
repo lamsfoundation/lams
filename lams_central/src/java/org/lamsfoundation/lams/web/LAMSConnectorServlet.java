@@ -29,9 +29,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
@@ -43,9 +44,9 @@ import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -305,15 +306,15 @@ public class LAMSConnectorServlet extends HttpServlet {
 	if (LAMSConnectorServlet.debug) {
 	    log.debug("File save started");
 	}
-	String newName = "";
-	DiskFileUpload upload = new DiskFileUpload();
-	List<FileItem> items = upload.parseRequest(request);
 
-	Map fields = new HashMap();
+	DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+	ServletFileUpload fileUpload = new ServletFileUpload(fileItemFactory);
+	List<FileItem> items = fileUpload.parseRequest(request);
 
-	Iterator iter = items.iterator();
+	Map<String, Object> fields = new HashMap<>();
+	Iterator<FileItem> iter = items.iterator();
 	while (iter.hasNext()) {
-	    FileItem item = (FileItem) iter.next();
+	    FileItem item = iter.next();
 	    if (item.isFormField()) {
 		fields.put(item.getFieldName(), item.getString());
 	    } else {
@@ -321,14 +322,14 @@ public class LAMSConnectorServlet extends HttpServlet {
 	    }
 	}
 
-	MultipartFile uplFile = (MultipartFile) fields.get("NewFile");
+	FileItem uplFile = (FileItem) fields.get("NewFile");
 	String fileNameLong = uplFile.getName();
 	fileNameLong = fileNameLong.replace('\\', '/');
 	String[] pathParts = fileNameLong.split("/");
 	String fileName = pathParts[pathParts.length - 1];
 
 	// validate file size
-	boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile, true);
+	boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile.getSize(), true);
 	if (!maxFilesizeExceededMessage) {
 	    //assign fileName an error message to be shown on a client side
 	    fileName = messageService.getMessage("errors.maxfilesize",
@@ -356,7 +357,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		counter++;
 	    }
 
-	    uplFile.transferTo(pathToSave);
+	    FileCopyUtils.copy(uplFile.getInputStream(), new FileOutputStream(pathToSave));
 
 	    if (counter > 1) {
 		retVal.append("201");
