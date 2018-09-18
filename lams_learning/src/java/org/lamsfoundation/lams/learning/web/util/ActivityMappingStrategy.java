@@ -83,7 +83,7 @@ public class ActivityMappingStrategy implements Serializable {
      * Returns the struts action for triggering the window to close.
      */
     protected String getCloseWindowAction() {
-	return "../close.jsp";
+	return "/close.jsp";
     }
 
     /**
