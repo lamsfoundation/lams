@@ -47,14 +47,12 @@
 		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter
 		</filter-class>
 	</filter>
-
 	<filter>
 		<filter-name>SystemSessionFilter</filter-name>
 		<filter-class>
 			org.lamsfoundation.lams.web.session.SystemSessionFilter
 		</filter-class>
 	</filter>
-
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
 		<filter-class>
@@ -65,12 +63,15 @@
 			<param-value>coreSessionFactory</param-value>
 		</init-param>
 	</filter>
-
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
 		<filter-class>
 			org.lamsfoundation.lams.web.filter.LocaleFilter
 		</filter-class>
+	</filter>
+	<filter>
+	    <filter-name>springMultipartFilter</filter-name>
+	    <filter-class>org.springframework.web.multipart.support.MultipartFilter</filter-class>
 	</filter>
 
 	<filter-mapping>
@@ -78,95 +79,89 @@
 		<url-pattern>/signup/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>*.jsp</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>*.xml</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/servlet/*</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/ckeditor/*</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>*.jsp</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>*.xml</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/servlet/*</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/services/*</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/ckeditor/*</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/LoginRequest</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/ForgotPasswordRequest</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>*.jsp</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>*.xml</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/servlet/*</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/ckeditor/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+	    <filter-name>springMultipartFilter</filter-name>
+	    <url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+	    <filter-name>springMultipartFilter</filter-name>
+	    <url-pattern>/ckeditor/filemanager/upload/simpleuploader</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+	    <filter-name>springMultipartFilter</filter-name>
+	    <url-pattern>/questions.do</url-pattern>
 	</filter-mapping>
 
 	<listener>
