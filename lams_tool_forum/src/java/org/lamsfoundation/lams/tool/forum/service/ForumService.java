@@ -281,7 +281,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	
 	// send marks to gradebook, if marks are released for that session
 	ForumUser user = message.getCreatedBy();
-	ForumToolSession session = user.getSession();
+	ForumToolSession session = message.getToolSession();
 	if (session.isMarkReleased()) {
 	    sendMarksToGradebook(user, session.getSessionId());
 	}
