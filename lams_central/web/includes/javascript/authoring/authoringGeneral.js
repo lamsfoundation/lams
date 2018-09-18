@@ -2256,9 +2256,10 @@ GeneralLib = {
 					layout.liveEdit = true;
 					
 					// remove unnecessary buttons, show Cancel, move Open after Save and Cancel
-					$('#newButton, #importSequenceButton, #saveAsButton, #exportLamsButton, #previewButton').remove();
-					$('#cancelLiveEditButton').show()
-											  .after($('#openButton').parent().parent());
+					$('#newButton, #openButton').parent().remove();
+					$('#importSequenceButton, #previewButton').remove();
+					$('#saveButton').parent().children('.dropdown-toggle, .dropdown-menu').remove();
+					$('#cancelLiveEditButton').show();
 				}
 				
 				GeneralLib.setModified(false);
