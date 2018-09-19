@@ -611,6 +611,11 @@ public class LearningController {
     @RequestMapping("/createTopic")
     public String createTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
 	    throws IOException, ServletException, PersistenceException {
+	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/learning/create";
+	}
 
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);

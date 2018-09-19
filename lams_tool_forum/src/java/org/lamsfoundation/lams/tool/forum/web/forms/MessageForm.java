@@ -32,8 +32,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,10 +47,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageForm {
     private static final long serialVersionUID = -9054365604649146734L;
     private static Logger logger = Logger.getLogger(MessageForm.class.getName());
-
-    @Autowired
-    @Qualifier("forumMessageService")
-    private MessageService messageService;
 
     protected Message message;
     protected String sessionMapID;
@@ -74,7 +68,7 @@ public class MessageForm {
      * MessageForm validation method from STRUCT interface.
      *
      */
-    public MultiValueMap<String, String> validate(HttpServletRequest request) {
+    public MultiValueMap<String, String> validate(HttpServletRequest request, MessageService messageService) {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
 
