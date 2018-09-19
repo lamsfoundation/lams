@@ -11,7 +11,7 @@
 
 	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
+	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" />
 	<style type="text/css">
 		.ui-jqgrid-labels {
 			display:none; !important;

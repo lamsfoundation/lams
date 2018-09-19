@@ -23,12 +23,7 @@
 
 package org.lamsfoundation.lams.tool.peerreview.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 
 /**
@@ -39,7 +34,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
  *
  * User: Andrey Balan
  */
-public class PeerreviewForm extends ActionForm {
+public class PeerreviewForm  {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(PeerreviewForm.class.getName());
@@ -65,17 +60,18 @@ public class PeerreviewForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
-	// if it is start page, all data read out from database or current session
-	// so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    peerreview.setLockWhenFinished(false);
-	    peerreview.setDefineLater(false);
-	    peerreview.setReflectOnActivity(false);
-	}
-    }
+    // TODO is this used?
+//    @Override
+//    public void reset(ActionMapping mapping, HttpServletRequest request) {
+//	String param = mapping.getParameter();
+//	// if it is start page, all data read out from database or current session
+//	// so need not reset checkbox to refresh value!
+//	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
+//	    peerreview.setLockWhenFinished(false);
+//	    peerreview.setDefineLater(false);
+//	    peerreview.setReflectOnActivity(false);
+//	}
+//    }
 
     public int getCurrentTab() {
 	return currentTab;

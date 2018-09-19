@@ -60,7 +60,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " AS u WHERE u.session.sessionId=?";
 
     @Override
-    public PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
+    @SuppressWarnings("rawtypes")
+   public PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 	List list = find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
@@ -74,7 +75,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     }
 
     @Override
-    public PeerreviewUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+    @SuppressWarnings("rawtypes")
+   public PeerreviewUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 	List list = find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
@@ -82,13 +84,15 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	return (PeerreviewUser) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<PeerreviewUser> getBySessionID(Long sessionId) {
 	return find(FIND_BY_SESSION_ID, sessionId);
     }
 
     @Override
-    public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
+    @SuppressWarnings("rawtypes")
+   public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 
 	List list = find(GET_COUNT_USERS_FOR_SESSION_EXCLUDE_USER, new Object[] { toolSessionId, excludeUserId });
 	if (list == null || list.size() == 0) {
@@ -98,7 +102,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     }
 
     @Override
-    public int getCountUsersBySession(final Long toolSessionId) {
+    @SuppressWarnings("rawtypes")
+   public int getCountUsersBySession(final Long toolSessionId) {
 
 	List list = find(GET_COUNT_USERS_FOR_SESSION, new Object[] { toolSessionId });
 	if (list == null || list.size() == 0) {
@@ -223,6 +228,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " LEFT JOIN ( SELECT item_id, comment, user_id FROM lams_rating_comment "
 	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND (item_id = :itemId || item_id = rating_criteria_id) ) rc ON rc.user_id = user.user_id " 
 	    + " WHERE r.rating IS NOT NULL OR rc.comment IS NOT NULL";
+    @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId ) {
 	Query query = getSession().createSQLQuery(SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM)
@@ -242,6 +248,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " 	FROM lams_rating_comment r "
 	    + "		WHERE r.rating_criteria_id = :ratingCriteriaId "
 	    + " 	GROUP BY r.item_id ) rating ON user.user_id = rating.item_id ";
+    @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
 	    Integer page, Integer size, int sorting, String searchString,
@@ -342,6 +349,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting,
 	    String searchString) {

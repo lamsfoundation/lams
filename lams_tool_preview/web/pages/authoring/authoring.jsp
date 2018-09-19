@@ -30,14 +30,13 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" scope="request"/>		
-	<html:hidden property="peerreview.contentId" />
-	<html:hidden property="mode" value="${mode}"/>
-	<html:hidden property="sessionMapID" />
-	<html:hidden property="contentFolderID" />
-	<html:hidden property="currentTab" styleId="currentTab" />
+<!--  TODO removed enctype="multipart/form-data" -->
+<form:form action="update.do" method="post" modelAttribute="peerreviewForm" enctype="multipart/form-data">
+	<form:hidden path="peerreview.contentId" />
+	<input type="hidden" name="mode" value="${mode}"/>
+	<form:hidden path="sessionMapID" />
+	<form:hidden path="contentFolderID" />
+	<form:hidden path="currentTab" styleId="currentTab" />
 
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -68,16 +67,21 @@
 				cancelConfirmMsgKey="authoring.msg.cancel.save"
 				accessMode="author"
 			--%>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-				toolSignature="<%=PeerreviewConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.peerreview.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-				 contentFolderID="${formBean.contentFolderID}" />
+			<lams:AuthoringButton formID="peerreviewForm"
+						clearSessionActionUrl="/clearsession.do"
+						toolSignature="<%=PeerreviewConstants.TOOL_SIGNATURE%>"
+						toolContentID="${peerreviewForm.peerreview.contentId}"
+						customiseSessionID="${peerreviewForm.sessionMapID}"
+						contentFolderID="${peerreviewForm.contentFolderID}" 
+						accessMode="${mode}" 
+						defineLater="${mode=='teacher'}"/>
+
 		</lams:TabBodyArea>
 
 		<div id="footer"></div>
 		
 	</lams:Page>
 	
-</html:form>
+</form:form>
 </body>
 </lams:html>

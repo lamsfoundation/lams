@@ -1,39 +1,35 @@
-package org.lamsfoundation.lams.tool.peerreview.web.action;
+package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
-import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class TblMonitoringAction extends LamsDispatchAction {
-    private static Logger log = Logger.getLogger(TblMonitoringAction.class);
+@Controller
+@RequestMapping("/tblmonitoring")
+public class TblMonitoringController {
 
-    private static IPeerreviewService peerreviewService;
+    @Autowired
+    @Qualifier("peerreviewService")
+    private IPeerreviewService peerreviewService;
 
     /**
      * Shows tra page
      */
-    public ActionForward peerreview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	initializePeerreviewService();
+    @RequestMapping("/peerreview")
+    public String peerreview(HttpServletRequest request) {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -56,17 +52,7 @@ public class TblMonitoringAction extends LamsDispatchAction {
 	List<RatingCriteria> criterias = peerreviewService.getRatingCriterias(contentId);
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
 	
-	return mapping.findForward("summary");
+	return "/pages/monitoring/summary";
     }
     
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private void initializePeerreviewService() {
-	if (peerreviewService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    peerreviewService = (IPeerreviewService) wac.getBean(PeerreviewConstants.PEERREVIEW_SERVICE);
-	}
-    }
 }

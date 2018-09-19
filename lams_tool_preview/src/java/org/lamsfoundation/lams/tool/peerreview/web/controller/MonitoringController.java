@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.peerreview.web.action;
+package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -38,10 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.EmailPreviewDTO;
@@ -56,9 +52,12 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -66,63 +65,28 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MonitoringAction extends Action {
-    public static Logger log = Logger.getLogger(MonitoringAction.class);
+@Controller
+@RequestMapping("/monitoring")
+public class MonitoringController {
+    public static Logger log = Logger.getLogger(MonitoringController.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	String param = mapping.getParameter();
+    private static final String MONITORING_PATH = "/pages/monitoring/monitoring";
+    private static final String CRITERIA_PATH = "/pages/monitoring/criteria";
+    private static final String STATISTICS_PATH = "/pages/monitoring/statisticpart";
+    private static final String REFLECTIONS_PATH = "/pages/monitoring/reflections";
+    private static final String EMAIL_PREVIEW_PATH = "pages/monitoring/emailpreview";
+    private static final String MANAGE_USERS_PATH = "/pages/monitoring/manageUsers";
 
-	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+    @Autowired
+    @Qualifier("peerreviewService")
+    private IPeerreviewService service;
 
-	if (param.equals("summary")) {
-	    return summary(mapping, form, request, response);
-	}
-	if (param.equals("criteria")) {
-	    return criteria(mapping, form, request, response);
-	}
-	if (param.equals("getUsers")) {
-	    return getUsers(mapping, form, request, response);
-	}
-	if (param.equals("getSubgridData")) {
-	    return getSubgridData(mapping, form, request, response);
-	}
-	// refresh statistic page by Ajax call.
-	if (param.equals("statistic")) {
-	    return statistic(mapping, form, request, response);
-	}
-	if (param.equals("reflections")) {
-	    return reflections(mapping, form, request, response);
-	}
-	if (param.equals("getReflections")) {
-	    return getReflections(mapping, form, request, response);
-	}
-	if (param.equals("previewResultsToUser")) {
-	    return previewResultsToUser(mapping, form, request, response);
-	}
-	if (param.equals("sendPreviewedResultsToUser")) {
-	    return sendPreviewedResultsToUser(mapping, form, request, response);
-	}
-	if (param.equals("sendResultsToSessionUsers")) {
-	    return sendResultsToSessionUsers(mapping, form, request, response);
-	}
-	if (param.equals("exportTeamReport")) {
-	    return exportTeamReport(mapping, form, request, response);
-	}
-	if (param.equals("manageUsers")) {
-	    return manageUsers(mapping, form, request, response);
-	}
-	if (param.equals("getManageUsers")) {
-	    return getManageUsers(mapping, form, request, response);
-	}
-	if (param.equals("setUserHidden")) {
-	    return setUserHidden(mapping, form, request, response);
-	}
-	return mapping.findForward(PeerreviewConstants.ERROR);
-    }
-
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+//    private void addTab(HttpServletRequest request) {
+//	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
+//    }
+    
+    @RequestMapping("/summary")
+    public String summary(HttpServletRequest request,
 	    HttpServletResponse response) {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -133,7 +97,6 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	IPeerreviewService service = getPeerreviewService();
 	List<GroupSummary> groupList = service.getGroupSummaries(contentId);
 
 	Peerreview peerreview = service.getPeerreviewByContentId(contentId);
@@ -147,11 +110,12 @@ public class MonitoringAction extends Action {
 
 	List<RatingCriteria> criterias = service.getRatingCriterias(contentId);
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
-
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return MONITORING_PATH;
     }
 
-    private ActionForward criteria(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/criteria")
+    @SuppressWarnings("unchecked")
+    public String criteria(HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -160,24 +124,23 @@ public class MonitoringAction extends Action {
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
 
-	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
-	IPeerreviewService service = getPeerreviewService();
 	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
 
 	request.setAttribute("criteria", criteria);
 	request.setAttribute("toolSessionId", toolSessionId);
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return CRITERIA_PATH;
     }
 
     /**
      * Refreshes user list.
      */
-    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/getUsers")
+    @ResponseBody
+    public String  getUsers(HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException {
-	IPeerreviewService service = getPeerreviewService();
 
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
@@ -293,8 +256,7 @@ public class MonitoringAction extends Action {
 	responseData.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responseData.toString()));
-	return null;
+	return responseData.toString();
     }
 
     private String generatePreviewButton(Object toolSessionId, Object userId, String emailResultsText) {
@@ -304,9 +266,10 @@ public class MonitoringAction extends Action {
 		.append(emailResultsText).append("</button>").toString();
     }
 
-    private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/getSubgridData")
+    @ResponseBody
+    public String getSubgridData(HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	IPeerreviewService service = getPeerreviewService();
 
 	Long itemId = WebUtil.readLongParam(request, "itemId");
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
@@ -371,21 +334,22 @@ public class MonitoringAction extends Action {
 	responseJSON.set("rows", rows);
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responseJSON.toString());
-	return null;
+	return responseJSON.toString();
     }
 
-    private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/statistic")
+    public String statistic(HttpServletRequest request,
 	    HttpServletResponse response) {
-	IPeerreviewService service = getPeerreviewService();
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	request.setAttribute("summaryList", service.getStatistics(toolContentId));
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return STATISTICS_PATH;
     }
 
-    private ActionForward reflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/reflections")
+    @SuppressWarnings("unchecked")
+    public String reflections(HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -397,10 +361,13 @@ public class MonitoringAction extends Action {
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 	request.setAttribute("toolSessionId", toolSessionId);
 
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return REFLECTIONS_PATH;
     }
 
-    private ActionForward getReflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/getReflections")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public String  getReflections(HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -439,7 +406,6 @@ public class MonitoringAction extends Action {
 	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
 	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-	IPeerreviewService service = getPeerreviewService();
 	int sessionUserCount = service.getCountUsersBySession(toolSessionId, -1L);
 
 	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
@@ -482,11 +448,12 @@ public class MonitoringAction extends Action {
 	responcedata.set("rows", rows);
 
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(responcedata.toString());
-	return null;
+	return responcedata.toString();
     }
 
-    private ActionForward previewResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/previewResultsToUser")
+    @SuppressWarnings("unchecked")
+    public String previewResultsToUser(HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -498,17 +465,18 @@ public class MonitoringAction extends Action {
 	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
-	IPeerreviewService service = getPeerreviewService();
-
 	// only supports single user
 	Long userId = WebUtil.readLongParam(request, PeerreviewConstants.PARAM_USERID);
 	String emailHTML = service.generateEmailReportToUser(contentId, toolSessionId, userId);
 	EmailPreviewDTO dto = new EmailPreviewDTO(emailHTML, toolSessionId, userId);
 	sessionMap.put("emailPreviewDTO", dto);
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return EMAIL_PREVIEW_PATH;
     }
 
-    private ActionForward sendPreviewedResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/sendPreviewedResultsToUser")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public String sendPreviewedResultsToUser(HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	// if we regenerate the results, it is more work for the server and the results may change. if we want to
 	// just send what the monitor already sees, get it back from the sessionMap, check that it should be the
@@ -524,8 +492,6 @@ public class MonitoringAction extends Action {
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 	Long userId = WebUtil.readLongParam(request, "userID");
 
-	IPeerreviewService service = getPeerreviewService();
-
 	if (previewDTO == null || !dateTimeStamp.equals(previewDTO.getDateTimeStamp())
 		|| !toolSessionId.equals(previewDTO.getToolSessionId())
 		|| !userId.equals(previewDTO.getLearnerUserId())) {
@@ -534,9 +500,7 @@ public class MonitoringAction extends Action {
 			    + previewDTO);
 	    sessionMap.remove("emailPreviewDTO"); // Cached email removed so it can't be resent.
 	    response.setContentType("text/html;charset=utf-8");
-	    response.getWriter()
-		    .write(service.getLocalisedMessage("label.email.send.failed.preview.wrong", new Object[] {}));
-	    return null;
+	    return service.getLocalisedMessage("label.email.send.failed.preview.wrong", new Object[] {});
 	}
 
 	// Use the details from the DTO, so that if somehow something has got stuff up (and the above check has not picked
@@ -545,12 +509,13 @@ public class MonitoringAction extends Action {
 		previewDTO.getLearnerUserId(), previewDTO.getEmailHTML());
 	sessionMap.remove("emailPreviewDTO"); // Cached email removed so it can't be resent.
 	response.setContentType("text/html;charset=utf-8");
-	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
-	return null;
-
+	return service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent });
     }
 
-    private ActionForward sendResultsToSessionUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/sendResultsToSessionUsers")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public String sendResultsToSessionUsers(HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -562,13 +527,10 @@ public class MonitoringAction extends Action {
 	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
-	IPeerreviewService service = getPeerreviewService();
-
 	int numEmailsSent = service.emailReportToSessionUsers(contentId, toolSessionId);
 
 	response.setContentType("text/html;charset=utf-8");
-	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
-	return null;
+	return service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent });
     }
 
     /**
@@ -577,10 +539,11 @@ public class MonitoringAction extends Action {
      * @throws ServletException
      * @throws IOException
      */
-    private ActionForward exportTeamReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/exportTeamReport")
+    @ResponseBody
+    public String exportTeamReport(HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
-	IPeerreviewService service = getPeerreviewService();
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 
 	Peerreview peerreview = service.getPeerreviewByContentId(toolContentId);
@@ -620,26 +583,28 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    private ActionForward manageUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/manageUsers")
+    @SuppressWarnings("unchecked")
+   public String manageUsers(HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
-	IPeerreviewService service = getPeerreviewService();
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return MANAGE_USERS_PATH;
     }
 
     /**
      * Gets a paged set of data for stars or comments. These are directly saved to the database, not through
      * LearnerAction like Ranking and Hedging.
      */
-    private ActionForward getManageUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/getManagedUsers")
+    @ResponseBody
+    public String getManageUsers(HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException {
 
-	IPeerreviewService service = getPeerreviewService();
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
 	// Getting the params passed in from the jqGrid
@@ -683,28 +648,21 @@ public class MonitoringAction extends Action {
 	responcedata.set("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responcedata.toString()));
-	return null;
+	return responcedata.toString();
     }
 
-    private ActionForward setUserHidden(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    @RequestMapping("/setUserHidden")
+    @ResponseBody
+    public String setUserHidden(HttpServletRequest request,
 	    HttpServletResponse response) {
-	IPeerreviewService service = getPeerreviewService();
 
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long userUid = WebUtil.readLongParam(request, "userUid");
 	boolean isHidden = !WebUtil.readBooleanParam(request, "hidden");
 
 	service.setUserHidden(toolContentId, userUid, isHidden);
-	return null;
+	return "";
     }
 
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    private IPeerreviewService getPeerreviewService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IPeerreviewService) wac.getBean(PeerreviewConstants.PEERREVIEW_SERVICE);
-    }
+   
 }

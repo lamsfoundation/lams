@@ -13,13 +13,13 @@
 	
 	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
+	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" />
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 
-	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	<script type="text/javascript" src="${lams}ncludes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 
 	<script type="text/javascript">
 	
