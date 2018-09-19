@@ -289,8 +289,6 @@ public class PeerreviewServiceImpl
 		return false;
 	    }
 
-	    // long start = System.currentTimeMillis();
-
 	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
 	    int numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
 	    int numberActualLearners = peerreviewUserDao.getCountUsersBySession(toolSessionId);
@@ -299,9 +297,9 @@ public class PeerreviewServiceImpl
 		numUsersCreated = peerreviewUserDao.createUsersForSession(session);
 	    }
 
-	    // log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated+" took:
-	    // "
-	    // + (System.currentTimeMillis() - start) + "ms.");
+	    if ( log.isDebugEnabled() ) {
+		log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated);
+	    }
 
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
@@ -499,7 +497,6 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId) {
 
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
@@ -535,26 +532,24 @@ public class PeerreviewServiceImpl
     // *****************************************************************************
 
     private Peerreview getDefaultPeerreview() throws PeerreviewApplicationException {
-	Long defaultPeerreviewId = getToolDefaultContentIdBySignature(PeerreviewConstants.TOOL_SIGNATURE);
+	Long defaultPeerreviewId = new Long(
+		toolService.getToolDefaultContentIdBySignature(PeerreviewConstants.TOOL_SIGNATURE));
+	if (defaultPeerreviewId.equals(0L)) {
+	    String error = new StringBuilder("Could not retrieve default content id for this tool ")
+		    .append(PeerreviewConstants.TOOL_SIGNATURE).toString();
+	    log.error(error);
+	    throw new PeerreviewApplicationException(error);
+	}
 	Peerreview defaultPeerreview = getPeerreviewByContentId(defaultPeerreviewId);
 	if (defaultPeerreview == null) {
-	    String error = messageService.getMessage("error.msg.default.content.not.find");
+	    String error = new StringBuilder("Could not retrieve default content id for this tool ")
+		    .append(PeerreviewConstants.TOOL_SIGNATURE).append(" Looking for id ").append(defaultPeerreviewId)
+		    .toString();
 	    log.error(error);
 	    throw new PeerreviewApplicationException(error);
 	}
 
 	return defaultPeerreview;
-    }
-
-    private Long getToolDefaultContentIdBySignature(String toolSignature) throws PeerreviewApplicationException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-	if (contentId == null) {
-	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    log.error(error);
-	    throw new PeerreviewApplicationException(error);
-	}
-	return contentId;
     }
 
     // *******************************************************************************
@@ -725,7 +720,6 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Removing Peerreview content for user ID " + userId + " and toolContentId " + toolContentId);
@@ -856,6 +850,7 @@ public class PeerreviewServiceImpl
 	return null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
 	    throws DataMissingException, ToolException {
@@ -893,7 +888,8 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+    @SuppressWarnings("rawtypes")
+   public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
 

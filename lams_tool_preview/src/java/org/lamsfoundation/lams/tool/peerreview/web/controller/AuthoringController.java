@@ -21,25 +21,19 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.peerreview.web.action;
+package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -50,52 +44,52 @@ import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.web.form.PeerreviewForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Steve.Ni
  */
-public class AuthoringAction extends Action {
+@Controller
+@RequestMapping("/authoring")
+public class AuthoringController {
 
-    private static Logger log = Logger.getLogger(AuthoringAction.class);
+    private static Logger log = Logger.getLogger(AuthoringController.class);
+    private static final String START_PATH = "/pages/authoring/start";
+    private static final String AUTHORING_PATH = "/pages/authoring/authoring";
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    @Autowired
+    @Qualifier("peerreviewService")
+    private IPeerreviewService service;
 
-	String param = mapping.getParameter();
-	if (param.equals("start")) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("definelater")) {
-	    // update define later flag to true
-	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    IPeerreviewService service = getPeerreviewService();
-	    Peerreview peerreview = service.getPeerreviewByContentId(contentId);
+    @RequestMapping("/start")
+    public String start(@ModelAttribute PeerreviewForm peerreviewForm, HttpServletRequest request, HttpSession session)
+	    throws ServletException {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	return doStart(peerreviewForm, request, session);
+    }
 
-	    peerreview.setDefineLater(true);
-	    service.saveOrUpdatePeerreview(peerreview);
-	    
-	    //audit log the teacher has started editing activity in monitor
-	    service.auditLogStartEditingActivityInMonitor(contentId);
+    @RequestMapping("/defineLater")
+    public String defineLater(@ModelAttribute PeerreviewForm peerreviewForm, HttpServletRequest request,
+	    HttpSession session) throws ServletException {
+	// update define later flag to true
+	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Peerreview peerreview = service.getPeerreviewByContentId(contentId);
 
-	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
-	}
-	if (param.equals("updateContent")) {
-	    return updateContent(mapping, form, request, response);
-	}
+	peerreview.setDefineLater(true);
+	service.saveOrUpdatePeerreview(peerreview);
 
-	return mapping.findForward(PeerreviewConstants.ERROR);
+	//audit log the teacher has started editing activity in monitor
+	service.auditLogStartEditingActivityInMonitor(contentId);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	return doStart(peerreviewForm, request, session);
     }
 
     /**
@@ -104,21 +98,16 @@ public class AuthoringAction extends Action {
      *
      * This method will avoid read database again and lost un-saved resouce item
      * lost when user "refresh page",
-     *
+     * 
      * @throws ServletException
-     *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    private String doStart(PeerreviewForm peerreviewForm, HttpServletRequest request, HttpSession session)
+	    throws ServletException {
+
+	Peerreview peerreview = null;
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, PeerreviewConstants.PARAM_TOOL_CONTENT_ID));
-
-	// get back the peerreview and item list and display them on page
-	IPeerreviewService service = getPeerreviewService();
-
-	Peerreview peerreview = null;
-	PeerreviewForm peerreviewForm = (PeerreviewForm) form;
 
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -126,7 +115,7 @@ public class AuthoringAction extends Action {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	session.setAttribute(sessionMap.getSessionID(), sessionMap);
 	peerreviewForm.setSessionMapID(sessionMap.getSessionID());
 
 	try {
@@ -138,7 +127,7 @@ public class AuthoringAction extends Action {
 
 	    peerreviewForm.setPeerreview(peerreview);
 	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
+	    AuthoringController.log.error(e);
 	    throw new ServletException(e);
 	}
 
@@ -147,29 +136,25 @@ public class AuthoringAction extends Action {
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
 
 	sessionMap.put(PeerreviewConstants.ATTR_PEERREVIEW_FORM, peerreviewForm);
-	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+	session.setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
 		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+
+	return START_PATH;
     }
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
+     * 
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    @RequestMapping("/init")
+    @SuppressWarnings("unchecked")
+    public String initPage(@ModelAttribute PeerreviewForm peerreviewForm, HttpServletRequest request,
+	    HttpSession session) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) session.getAttribute(sessionMapID);
 	PeerreviewForm existForm = (PeerreviewForm) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW_FORM);
 
-	PeerreviewForm peerreviewForm = (PeerreviewForm) form;
 	try {
 	    PropertyUtils.copyProperties(peerreviewForm, existForm);
 	} catch (Exception e) {
@@ -179,33 +164,30 @@ public class AuthoringAction extends Action {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return AUTHORING_PATH;
     }
 
     /**
-     * This method will persist all inforamtion in this authoring page, include
-     * all peerreview item, information etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
+     * This method will persist all information in this authoring page, include
+     * all peer review item, information etc.
+     * 
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	PeerreviewForm peerreviewForm = (PeerreviewForm) form;
+    @SuppressWarnings("unchecked")
+    @RequestMapping("/update")
+    public String updateContent(@ModelAttribute PeerreviewForm peerreviewForm, HttpServletRequest request,
+	    HttpSession session) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) session
 		.getAttribute(peerreviewForm.getSessionMapID());
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	Peerreview peerreview = peerreviewForm.getPeerreview();
-	IPeerreviewService service = getPeerreviewService();
 
 	// **********************************Get Peerreview PO*********************
 	Peerreview peerreviewPO = service.getPeerreviewByContentId(peerreviewForm.getPeerreview().getContentId());
@@ -214,26 +196,24 @@ public class AuthoringAction extends Action {
 	    peerreviewPO = peerreview;
 	    peerreviewPO.setCreated(new Timestamp(new Date().getTime()));
 	    peerreviewPO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = peerreviewPO.getUid();
 	    PropertyUtils.copyProperties(peerreviewPO, peerreview);
 	    // get back UID
 	    peerreviewPO.setUid(uid);
-		
+
 	    // if it's a teacher - change define later status
 	    if (mode.isTeacher()) {
 		peerreviewPO.setDefineLater(false);
 	    }
-	    
+
 	    peerreviewPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
 	// *******************************Handle user*******************
-	// try to get form system session
-	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
 	PeerreviewUser peerreviewUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
 		peerreviewForm.getPeerreview().getContentId());
 	if (peerreviewUser == null) {
@@ -253,19 +233,7 @@ public class AuthoringAction extends Action {
 	peerreviewForm.setPeerreview(peerreviewPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
-    }
-
-    // *************************************************************************************
-    // Private method
-    // *************************************************************************************
-    /**
-     * Return PeerreviewService bean.
-     */
-    private IPeerreviewService getPeerreviewService() {
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext());
-	return (IPeerreviewService) wac.getBean(PeerreviewConstants.PEERREVIEW_SERVICE);
+	return AUTHORING_PATH;
     }
 
 }

@@ -23,9 +23,9 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5">
+						<form:button path="FinishButton" onclick="return continueReflect()" cssClass="btn btn-sm btn-default voffset5">
 						<fmt:message key="label.edit" />
-						</html:button>
+						</form:button>
 					</c:if>
 				</div>
 			</div>

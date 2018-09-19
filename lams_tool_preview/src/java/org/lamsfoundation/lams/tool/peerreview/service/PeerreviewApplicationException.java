@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.peerreview.service;
 
 public class PeerreviewApplicationException extends Exception {
 
+    private static final long serialVersionUID = 5380954540582297042L;
+
     public PeerreviewApplicationException() {
 	super();
 
