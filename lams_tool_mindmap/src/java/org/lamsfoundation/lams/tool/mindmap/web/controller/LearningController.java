@@ -79,13 +79,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Ruslan Kazakov
- * @version 1.0.1
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/learning")

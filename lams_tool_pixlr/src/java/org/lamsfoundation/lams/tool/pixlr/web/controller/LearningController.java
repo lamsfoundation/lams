@@ -258,8 +258,7 @@ public class LearningController {
     }
 
     @RequestMapping("/finishActivity")
-    public String finishActivity(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String finishActivity(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 
@@ -374,7 +373,7 @@ public class LearningController {
 	    pixlrService.updateEntry(entry);
 	}
 
-	return finishActivity(learningForm, request, response);
+	return finishActivity(request, response);
     }
 
     @RequestMapping("/viewAllImages")

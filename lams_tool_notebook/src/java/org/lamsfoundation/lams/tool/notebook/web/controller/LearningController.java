@@ -60,13 +60,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * @author
- * @version
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/learning")

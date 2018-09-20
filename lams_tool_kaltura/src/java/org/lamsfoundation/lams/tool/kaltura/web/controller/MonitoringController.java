@@ -109,8 +109,6 @@ public class MonitoringController {
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
-
-
 	return "pages/monitoring/monitoring";
     }
 
@@ -161,22 +159,13 @@ public class MonitoringController {
     @RequestMapping("/setCommentVisibility")
     @ResponseBody
     public void setCommentVisibility(HttpServletRequest request) {
-
 	Long commentUid = WebUtil.readLongParam(request, KalturaConstants.PARAM_COMMENT_UID);
 	boolean isHide = WebUtil.readBooleanParam(request, KalturaConstants.PARAM_IS_HIDING);
 	kalturaService.hideComment(commentUid, isHide);
-
     }
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
     @RequestMapping("/setSubmissionDeadline")
     @ResponseBody
