@@ -104,10 +104,12 @@ public class QaMonitoringController implements QaAppConstants {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
-	String validateParameters = validateParameters(request, qaMonitoringForm);
-	if (validateParameters != null) {
-	    return validateParameters;
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	if ((strToolContentID == null) || (strToolContentID.length() == 0)) {
+	    QaUtils.cleanUpSessionAbsolute(request);
+	    throw new ServletException("No Tool Content ID found");
 	}
+	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String toolContentID = qaMonitoringForm.getToolContentID();
 	QaContent qaContent = qaService.getQaContent(new Long(toolContentID).longValue());
@@ -116,10 +118,7 @@ public class QaMonitoringController implements QaAppConstants {
 	    throw new ServletException("Data not initialised in Monitoring");
 	}
 
-	qaMonitoringForm.setCurrentTab("1");
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	qaMonitoringForm.setToolContentID(strToolContentID);
+	qaMonitoringForm.setCurrentTab("1");	
 
 	/* this section is related to summary tab. Starts here. */
 //	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -209,35 +208,6 @@ public class QaMonitoringController implements QaAppConstants {
 	}
 
 	return "monitoring/MonitoringMaincontent";
-    }
-
-    /**
-     * validates request paramaters based on tool contract
-     *
-     * @param request
-     * @param mapping
-     * @return ActionForward
-     * @throws ServletException
-     */
-    protected String validateParameters(HttpServletRequest request,
-	    @ModelAttribute("qaMonitoringForm") QaMonitoringForm qaMonitoringForm) throws ServletException {
-
-	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	if ((strToolContentId == null) || (strToolContentId.length() == 0)) {
-	    QaUtils.cleanUpSessionAbsolute(request);
-	    throw new ServletException("No Tool Content ID found");
-	} else {
-	    try {
-		long toolContentId = new Long(strToolContentId).longValue();
-
-		qaMonitoringForm.setToolContentID(new Long(toolContentId).toString());
-	    } catch (NumberFormatException e) {
-		QaUtils.cleanUpSessionAbsolute(request);
-		throw e;
-	    }
-	}
-	return null;
     }
 
     @RequestMapping("/updateResponse")
