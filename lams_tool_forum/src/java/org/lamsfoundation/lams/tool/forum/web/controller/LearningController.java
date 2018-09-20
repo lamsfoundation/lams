@@ -301,7 +301,7 @@ public class LearningController {
 	    HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -351,7 +351,7 @@ public class LearningController {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
@@ -419,7 +419,7 @@ public class LearningController {
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -460,7 +460,7 @@ public class LearningController {
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -527,7 +527,7 @@ public class LearningController {
 	Long highlightMessageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -566,7 +566,7 @@ public class LearningController {
 	Long messageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -611,13 +611,14 @@ public class LearningController {
     @RequestMapping("/createTopic")
     public String createTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
 	    throws IOException, ServletException, PersistenceException {
+	//validate form
 	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
 	    return "jsps/learning/create";
 	}
 
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	List<MessageDTO> rootTopics = forumService.getRootTopics(sessionId);
@@ -669,7 +670,7 @@ public class LearningController {
     public String newReplyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
 
 	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	messageForm.setSessionMapID(sessionMapID);
 
 	Long parentId = WebUtil.readLongParam(request, ForumConstants.ATTR_PARENT_TOPIC_ID);
@@ -701,62 +702,32 @@ public class LearningController {
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 	return "jsps/learning/reply";
     }
-
+    
     /**
      * Create a replayed topic for a parent topic.
      */
     @RequestMapping("/replyTopic")
     public String replyTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException {
-
-	SessionMap sessionMap = getSessionMap(request, messageForm);
-	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	Message message = messageForm.getMessage();
-	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
-	if (isTestHarness) {
-	    message.setBody(request.getParameter("message.body__textarea"));
+	    HttpServletResponse response) throws InterruptedException, IOException {
+	//validate form
+	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/learning/reply";
 	}
-	message.setIsAuthored(false);
-	message.setCreated(new Date());
-	message.setUpdated(new Date());
-	message.setLastReplyDate(new Date());
-	ForumUser forumUser = getCurrentUser(request, sessionId);
-	message.setCreatedBy(forumUser);
-	message.setModifiedBy(forumUser);
-	setAttachment(messageForm, message);
-	setMonitorMode(sessionMap, message);
-
-	// save message into database
-
-	forumService.replyTopic(parentId, sessionId, message);
-
-	// echo back this topic thread into page
-	Long rootTopicId = forumService.getRootTopicId(parentId);
-
-	// check whether allow more posts for this user
-	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
-	Forum forum = session.getForum();
-
-	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
-
-	// notify learners and teachers
-	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
-	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
-	sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
-	return "jsps/learning/viewtopic";
+	
+	return "forward:/learning/replyTopicJSON.do";
     }
 
     /**
-     * Create a replayed topic for a parent topic.
+     * In case validation was successful, we store message and return JSON object back to HTML
      */
-    @RequestMapping("/replyTopicInline")
+    @RequestMapping("/replyTopicJSON")
     @ResponseBody
-    public String replyTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
+    public String replyTopicJSON(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException, IOException {
 
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -776,7 +747,6 @@ public class LearningController {
 	setMonitorMode(sessionMap, message);
 
 	// save message into database
-
 	MessageSeq newMessageSeq = forumService.replyTopic(parentId, sessionId, message);
 
 	// check whether allow more posts for this user
@@ -822,7 +792,7 @@ public class LearningController {
 	}
 
 	// cache this topicID, using in Update topic
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
@@ -846,7 +816,7 @@ public class LearningController {
 	dto.setHasAttachment(false);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC, dto);
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
 	request.setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD, sessionMap.get(ForumConstants.ATTR_ALLOW_UPLOAD));
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	return "jsps/learning/message/msgattachment";
@@ -856,25 +826,30 @@ public class LearningController {
      * Update a topic.
      */
     @RequestMapping("/updateTopic")
-    public String updateTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request)
-	    throws PersistenceException {
+    public String updateTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
+	    HttpServletResponse response) throws PersistenceException, IOException {
+	//validate form
+	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/learning/edit";
+	}
 
-	SessionMap sessionMap = getSessionMap(request, messageForm);
+	return "forward:/learning/updateTopicJSON.do";
+    }
+    
+    /**
+     * In case validation was successful, we store message and return JSON object back to HTML
+     */
+    @RequestMapping("/updateTopicJSON")
+    @ResponseBody
+    public String updateTopicJSON(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
+	    HttpServletResponse response) throws PersistenceException, IOException {
+	
+	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
 
-	doUpdateTopic(request, messageForm, sessionMap, topicId, message);
-
-	// echo back this topic thread into page
-	Long rootTopicId = forumService.getRootTopicId(topicId);
-	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
-	Forum forum = forumUser.getSession().getForum();
-	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
-	return "jsps/learning/viewtopic";
-    }
-
-    private void doUpdateTopic(HttpServletRequest request, MessageForm messageForm, SessionMap sessionMap, Long topicId,
-	    Message message) {
 	boolean makeAuditEntry = ToolAccessMode.TEACHER.equals(sessionMap.get(AttributeNames.ATTR_MODE));
 	String oldMessageString = null;
 
@@ -908,30 +883,15 @@ public class LearningController {
 	// save message into database
 	// if we are in monitoring then we are probably editing some else's entry so log the change.
 	forumService.updateTopic(messagePO);
-    }
 
-    /**
-     * Update a topic.
-     */
-    @RequestMapping("/updateTopicInline")
-    @ResponseBody
-    public String updateTopicInline(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException, IOException {
-
-	SessionMap sessionMap = getSessionMap(request, messageForm);
-	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
-	Message message = messageForm.getMessage();
-
-	doUpdateTopic(request, messageForm, sessionMap, topicId, message);
-
-	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
-	ObjectNode.put(ForumConstants.ATTR_MESS_ID, topicId);
-	ObjectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
+	ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+	objectNode.put(ForumConstants.ATTR_MESS_ID, topicId);
+	objectNode.put(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 	Long rootTopicId = forumService.getRootTopicId(topicId);
-	ObjectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
+	objectNode.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	response.setContentType("application/json;charset=UTF-8");
-	return ObjectNode.toString();
+	return objectNode.toString();
     }
 
     /**
@@ -1023,7 +983,7 @@ public class LearningController {
      * Validation method to check whether user posts meet minimum number.
      */
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
@@ -1136,9 +1096,8 @@ public class LearningController {
 	}
     }
 
-    private SessionMap getSessionMap(HttpServletRequest request, MessageForm messageForm) {
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
-	return sessionMap;
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request, MessageForm messageForm) {
+	return (SessionMap<String, Object>) request.getSession().getAttribute(messageForm.getSessionMapID());
     }
 
 }

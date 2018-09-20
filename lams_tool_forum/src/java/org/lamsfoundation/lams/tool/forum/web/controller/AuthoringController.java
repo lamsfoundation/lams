@@ -450,12 +450,18 @@ public class AuthoringController {
      * Create a topic in memory. This topic will be saved when user save entire authoring page.
      */
     @RequestMapping("/createTopic")
-    public String createTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request)
+    public String createTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
 	    throws IOException, ServletException, PersistenceException {
+	//validate form
+	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/authoring/message/create";
+	}
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(topicFormId.getSessionMapID());
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, topicFormId.getSessionMapID());
+		.getAttribute(messageForm.getSessionMapID());
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	SortedSet topics = getTopics(sessionMap);
 	// get login user (author)
@@ -464,7 +470,7 @@ public class AuthoringController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	// get message info from web page
-	Message message = topicFormId.getMessage();
+	Message message = messageForm.getMessage();
 	// init some basic variables for first time create
 	message.setIsAuthored(true);
 	message.setCreated(new Date());
@@ -492,10 +498,10 @@ public class AuthoringController {
 
 	// set attachment of this topic
 	Set attSet = null;
-	if (topicFormId.getAttachmentFile() != null
-		&& !StringUtils.isEmpty(topicFormId.getAttachmentFile().getOriginalFilename())) {
+	if (messageForm.getAttachmentFile() != null
+		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
 	    forumService = forumService;
-	    Attachment att = forumService.uploadAttachment(topicFormId.getAttachmentFile());
+	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 	    // only allow one attachment, so replace whatever
 	    attSet = new HashSet();
 	    attSet.add(att);
@@ -599,19 +605,25 @@ public class AuthoringController {
      * whole authoring page.
      */
     @RequestMapping("/updateTopic")
-    public String updateTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request)
+    public String updateTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
 	    throws PersistenceException {
+	//validate form
+	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("errorMap", errorMap);
+	    return "jsps/authoring/message/edit";
+	}
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(topicFormId.getSessionMapID());
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, topicFormId.getSessionMapID());
+		.getAttribute(messageForm.getSessionMapID());
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	// get param from HttpServletRequest
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
 
 	if (topicIdx != -1) {
-	    Message message = topicFormId.getMessage();
+	    Message message = messageForm.getMessage();
 
 	    Set topics = getTopics(sessionMap);
 	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
@@ -624,16 +636,16 @@ public class AuthoringController {
 	    newMsg.getMessage().setBody(message.getBody());
 	    newMsg.getMessage().setUpdated(new Date());
 	    // update attachment
-	    if (topicFormId.getAttachmentFile() != null
-		    && !StringUtils.isEmpty(topicFormId.getAttachmentFile().getOriginalFilename())) {
+	    if (messageForm.getAttachmentFile() != null
+		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
 		forumService = forumService;
-		Attachment att = forumService.uploadAttachment(topicFormId.getAttachmentFile());
+		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 		// only allow one attachment, so replace whatever
 		Set attSet = new HashSet();
 		attSet.add(att);
 		newMsg.setHasAttachment(true);
 		newMsg.getMessage().setAttachments(attSet);
-	    } else if (!topicFormId.isHasAttachment()) {
+	    } else if (!messageForm.isHasAttachment()) {
 		Set att = newMsg.getMessage().getAttachments();
 		if (att != null && att.size() > 0) {
 		    List delTopicAtt = getTopicDeletedAttachmentList(sessionMap);

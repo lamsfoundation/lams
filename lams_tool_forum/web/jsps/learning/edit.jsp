@@ -13,7 +13,6 @@
 		<title><fmt:message key="activity.title" /></title>
 
 		<!-- ********************  CSS ********************** -->
-
 		<lams:css />
 		<style media="screen,projection" type="text/css">
 			.info {
@@ -115,8 +114,7 @@
 			
 		</script>
 		
-		<form:form action="updateTopicInline.do"
-				focus="message.subject" enctype="multipart/form-data" id="messageForm" modelAttribute="messageForm">
+		<form:form action="updateTopic.do" focus="message.subject" enctype="multipart/form-data" id="messageForm" modelAttribute="messageForm">
 				
 			<form:hidden path="sessionMapID"/>	
 			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
