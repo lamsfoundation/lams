@@ -9,7 +9,7 @@
 </div>
 <div class="form-group">
     <label for="peerreview.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
-     <lams:CKEditor id="peerreview.instructions" value="${peerreviewForm.peerreview.instructions}" contentFolderID="${contentFolderID}"></lams:CKEditor>
+     <lams:CKEditor id="peerreview.instructions" value="${peerreviewForm.peerreview.instructions}" contentFolderID="${peerreviewForm.contentFolderID}"></lams:CKEditor>
 </div>
 
 <div id="criterias-holder">

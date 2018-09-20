@@ -135,24 +135,24 @@
 	</c:if>
 				
 	<!-- Reflection -->
-	<c:if test="${sessionMap.isSessionCompleted and sessionMap.reflectOn}">
+	<c:if test="${sessionMap.reflectOn and not empty sessionMap.reflectEntry}">
 		<%@ include file="notebookdisplay.jsp"%>
 	</c:if>
 	<!-- End Reflection -->
 
 	<c:if test="${!peerreview.lockWhenFinished}">
-		<form:button path="redoRatings" cssClass="btn btn-default voffset5 pull-left" onclick="redoRatings();">
+		<a href="#nogo" class="btn btn-default voffset5 pull-left" onclick="redoRatings();">
 			<fmt:message key="label.redo" />
-		</form:button>
+		</a>
 	</c:if>	
 
 	<c:if test="${mode != 'teacher'}">
 		<div>
 			<c:choose>			
-				<c:when test="${(not sessionMap.isSessionCompleted) and sessionMap.reflectOn}">
-					<form:button path="FinishButton" onclick="return continueReflect()" cssClass="btn btn-default voffset5 pull-right">
+				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
+					<a href="#nogo" id="finishButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 						<fmt:message key="label.continue" />
-					</form:button>
+					</a>
 				</c:when>
 				<c:otherwise>
 					<a href="#nogo" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">

@@ -23,9 +23,9 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	
-	<form:form action="/learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm">
-		<form:hidden property="userID" />
-		<form:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 

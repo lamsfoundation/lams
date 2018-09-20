@@ -74,7 +74,7 @@ public interface PeerreviewUserDAO extends IBaseDAO {
     int createUsersForSession(PeerreviewSession session);
 
     List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService);
+	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
 
     /**
      * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.

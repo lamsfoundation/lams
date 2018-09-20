@@ -134,7 +134,23 @@ public class MonitoringController {
 	return CRITERIA_PATH;
     }
 
-    /**
+    // may be a BigInteger, may be a Long. Who knows as it has come from Hibernate and it seems to change!
+    private Long asLong(Object value) {
+	if (value != null) {
+	    try {
+		Number num = (Number) value;
+		return num.longValue();
+	    } catch (Exception e1) {
+		try {
+		    return new Long((String) value);
+		} catch (Exception e2) {
+		}
+	    }
+	}
+	return null;
+    }
+    
+    /** 
      * Refreshes user list.
      */
     @RequestMapping("/getUsers")
@@ -197,12 +213,12 @@ public class MonitoringController {
 	    for (int i = 0; i < rawRows.size(); i++) {
 		Object[] rawRow = rawRows.get(i);
 		ObjectNode cell = JsonNodeFactory.instance.objectNode();
-		cell.put("itemId", (Long) rawRow[0]);
+		cell.put("itemId", asLong(rawRow[0]));
 		cell.put("itemDescription", (String) rawRow[2]);
-		cell.put("itemDescription2", (String) rawRow[3]);
+		cell.put("itemDescription2", asLong(rawRow[3]));
 
-		Number numCommentsNumber = (Number) rawRow[1];
-		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;
+		Long numCommentsLong = asLong(rawRow[1]);
+		int numComments = numCommentsLong != null ? numCommentsLong.intValue() : 0;
 		if (numComments > 0) {
 		    cell.put("rating", service.getLocalisedMessage("label.monitoring.num.of.comments",
 			    new Object[] { numComments }));
@@ -290,8 +306,8 @@ public class MonitoringController {
 	    if (ratingDetails[2] != null) {
 		ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 		userData.add(i);
-		userData.add(JsonUtil.readObject(ratingDetails[4]));
-		userData.add(JsonUtil.readObject(ratingDetails[2]));
+		userData.add((String)ratingDetails[4]);
+		userData.add((String)ratingDetails[2]);
 		userData.add(title);
 
 		ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -312,7 +328,7 @@ public class MonitoringController {
 			|| (criteria.isHedgeStyleRating() && ratingDetails[2] != null))) {
 		    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 		    userData.add(i);
-		    userData.add(JsonUtil.readObject(ratingDetails[4]));
+		    userData.add((String)ratingDetails[4]);
 		    String commentText = HtmlUtils.htmlEscape(comment);
 		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>");
 		    userData.add(commentText);
@@ -423,20 +439,21 @@ public class MonitoringController {
 
 	for (Object[] nbEntry : nbEntryList) {
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
-	    userData.add(JsonUtil.readObject(nbEntry[0]));
-
-	    Date entryTime = (Date) nbEntry[4];
+	    userData.add(asLong(nbEntry[0])); // user id
+	    userData.add((String) nbEntry[2]); // user name
+	    
+	    Date entryTime = (Date) nbEntry[5];  // when....
 	    if (entryTime == null) {
-		userData.add((String) nbEntry[2]);
+		userData.add("");
 	    } else {
-		StringBuilder nameField = new StringBuilder((String) nbEntry[2]).append("<BR/>")
-			.append("<time class=\"timeago\" title=\"")
+		StringBuilder nameField = new StringBuilder("<time class=\"timeago\" title=\"")
 			.append(DateUtil.convertToStringForJSON(entryTime, request.getLocale()))
 			.append("\" datetime=\"").append(dateFormatterTimeAgo.format(entryTime)).append("\"></time>");
 		userData.add(nameField.toString());
 	    }
 
-	    userData.add(HtmlUtils.htmlEscape((String) nbEntry[3]));
+	    userData.add(asLong(nbEntry[3]));
+	    userData.add(HtmlUtils.htmlEscape((String) nbEntry[4]));
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
 	    userRow.put("id", i++);
@@ -600,7 +617,7 @@ public class MonitoringController {
      * Gets a paged set of data for stars or comments. These are directly saved to the database, not through
      * LearnerAction like Ranking and Hedging.
      */
-    @RequestMapping("/getManagedUsers")
+    @RequestMapping("/getManageUsers")
     @ResponseBody
     public String getManageUsers(HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException {
@@ -637,7 +654,7 @@ public class MonitoringController {
 	    Object[] rawRow = rawRows.get(i);
 	    ObjectNode cell = JsonNodeFactory.instance.objectNode();
 	    cell.put("hidden", !(Boolean) rawRow[1]);
-	    cell.put("userUid", (Integer) rawRow[0]);
+	    cell.put("userUid", asLong(rawRow[0]));
 	    cell.put("userName", (String) rawRow[2]);
 
 	    ObjectNode row = JsonNodeFactory.instance.objectNode();

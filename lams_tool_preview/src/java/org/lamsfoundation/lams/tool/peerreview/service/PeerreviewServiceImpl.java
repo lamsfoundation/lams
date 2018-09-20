@@ -438,7 +438,7 @@ public class PeerreviewServiceImpl
     public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting,
 	    String searchString) {
 	List<Object[]> rawData = peerreviewUserDao.getUserNotebookEntriesForTablesorter(toolSessionId, page, size,
-		sorting, searchString, coreNotebookService);
+		sorting, searchString, coreNotebookService, userManagementService);
 
 	for (Object[] raw : rawData) {
 	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);

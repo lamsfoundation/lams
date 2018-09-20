@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
@@ -18,8 +20,9 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 
-	<script type="text/javascript" src="${lams}ncludes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 
 	<script type="text/javascript">
 	
@@ -34,11 +37,15 @@
 			   	colNames:[
 						'itemId',
 						'<fmt:message key="label.user.name" />',
+						'timeago',
+						'portraitId',
 						'<fmt:message key="title.reflection" />'
 				],
 			   	colModel:[
 			   		{name:'itemId', index:'itemId', width:0, hidden: true},
-			   		{name:'itemDescription', index:'itemDescription', width:100, searchoptions: { clearSearch: false }},
+			   		{name:'itemDescription', index:'itemDescription', width:100, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+			   		{name:'timeago', index:'timeago', width:0, hidden: true},
+			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
 			   		{name:'notebook', index:'notebook', width:200, search:false}
 			   	],
 			   	rowNum:10,
@@ -47,6 +54,7 @@
 			   	viewrecords:true,
 				loadComplete: function(){
 					$("time.timeago").timeago();
+					initializePortraitPopover('<lams:LAMSURL/>');
 				},
 			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
 				subGrid: false
@@ -74,6 +82,11 @@
             });
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
+        function userNameFormatter (cellvalue, options, rowObject) {
+			return definePortraitPopover(rowObject[3], rowObject[0],  rowObject[1]);
+		}
+
 	});
 	
     </script>

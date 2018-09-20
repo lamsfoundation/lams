@@ -60,19 +60,6 @@ public class PeerreviewForm  {
 	}
     }
 
-    // TODO is this used?
-//    @Override
-//    public void reset(ActionMapping mapping, HttpServletRequest request) {
-//	String param = mapping.getParameter();
-//	// if it is start page, all data read out from database or current session
-//	// so need not reset checkbox to refresh value!
-//	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-//	    peerreview.setLockWhenFinished(false);
-//	    peerreview.setDefineLater(false);
-//	    peerreview.setReflectOnActivity(false);
-//	}
-//    }
-
     public int getCurrentTab() {
 	return currentTab;
     }

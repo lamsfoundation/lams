@@ -75,8 +75,8 @@ public class LearningController {
     private static final String LEARNING_SUCCESS_PATH = "/pages/learning/learning";
     private static final String HIDDEN_USER_PATH = "/pages/learning/learningHiddenUser";
     private static final String DEFINE_LATER_PATH = "/pages/learning/definelater";
-    private static final String SHOW_RESULTS_PATH = "/learning/showResults.do";
-    private static final String NEW_REFLECTION_PATH = "/learning/newReflection.do";
+    private static final String SHOW_RESULTS_REDIRECT = "redirect:/learning/showResults.do?" + PeerreviewConstants.ATTR_SESSION_MAP_ID + "=";
+    private static final String NEW_REFLECTION_REDIRECT = "redirect:/learning/newReflection.do?" + PeerreviewConstants.ATTR_SESSION_MAP_ID + "=";
     private static final String FINISH_PATH = "/pages/learning/finish";
     private static final String SHOW_RESULTS_PAGE_PATH = "/pages/learning/results";
     private static final String NOTEBOOK_PATH = "/pages/learning/notebook";
@@ -143,7 +143,7 @@ public class LearningController {
 	    throw new IOException(e);
 	}
 
-	// goto refresh screen TODO create a specialised page
+	// goto refresh screen
 	if (user == null) {
 	    request.setAttribute(PeerreviewConstants.ATTR_CREATING_USERS, "true");
 	    return DEFINE_LATER_PATH;
@@ -331,20 +331,13 @@ public class LearningController {
 	sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, user.isSessionFinished());
 	sessionMap.put("isSessionCompleted", user.getSession().getStatus() == PeerreviewConstants.COMPLETED);
 
-// TODO add parameters and fix redirects
 	// finally, work out which page to go to!
 	if (user.isSessionFinished()) {
-	    String redirect;
 	    if (peerreview.isShowRatingsLeftForUser() || peerreview.isShowRatingsLeftByUser()
 		    || entryText.length() > 0) {
-		redirect = SHOW_RESULTS_PATH;
-		// redirect.addParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		return redirect;
+		return SHOW_RESULTS_REDIRECT + sessionMap.getSessionID();
 	    } else if (peerreview.isReflectOnActivity()) {
-		// do reflection
-		redirect = NEW_REFLECTION_PATH;
-		// redirect.addParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-		return redirect;
+		return NEW_REFLECTION_REDIRECT + sessionMap.getSessionID();
 	    } else {
 		// finish
 		return finish(request, session);
