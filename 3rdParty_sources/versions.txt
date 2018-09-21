@@ -53,8 +53,6 @@ Servlet API 3.1
 
 Spring 4.3.12
 
-Struts 1.2.9
-
 Undertow core 1.4.0
 
 Undertow servlet 1.4.0
