@@ -98,14 +98,6 @@ public class GroupingController {
     public static final String VIEW_STUDENTS_BEFORE_SELECTION = "viewStudentsBeforeSelection";
 
     // ---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    // ---------------------------------------------------------------------
-    public static final String VIEW_GROUP = "viewGroup";
-    public static final String WAIT_GROUP = "waitGroup";
-    public static final String SHOW_GROUP = "showGroup";
-    public static final String CHOOSE_GROUP = "chooseGroup";
-
-    // ---------------------------------------------------------------------
     // Struts Dispatch Method
     // ---------------------------------------------------------------------
     /**
@@ -121,7 +113,7 @@ public class GroupingController {
      * @throws ServletException
      */
     @RequestMapping("/performGrouping")
-    public String performGrouping(@ModelAttribute GroupingForm GroupingForm, HttpServletRequest request)
+    public String performGrouping(@ModelAttribute GroupingForm groupingForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 
 	boolean forceGroup = WebUtil.readBooleanParam(request, GroupingController.PARAM_FORCE_GROUPING, false);
@@ -137,9 +129,9 @@ public class GroupingController {
 	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
 		LearningWebUtil.getUserId(), forceGroup);
 
-	GroupingForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
-	GroupingForm.setTitle(activity.getTitle());
-	GroupingForm.setActivityID(activity.getActivityId());
+	groupingForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
+	groupingForm.setTitle(activity.getTitle());
+	groupingForm.setActivityID(activity.getActivityId());
 
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {
@@ -263,7 +255,7 @@ public class GroupingController {
      * @throws ServletException
      */
     @RequestMapping("/learnerChooseGroup")
-    public String learnerChooseGroup(@ModelAttribute GroupingForm GroupingForm, HttpServletRequest request)
+    public String learnerChooseGroup(@ModelAttribute GroupingForm groupingForm, HttpServletRequest request)
 	    throws IOException, ServletException {
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Long groupId = WebUtil.readLongParam(request, "groupId");

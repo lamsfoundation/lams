@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><c:out value="${title}" /></title>
 	<lams:css />
 	<META HTTP-EQUIV="Refresh"
-		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
+		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 		
@@ -51,8 +51,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<lams:Alert type="info" close="false" id="waitingAtTheGate">
 			<fmt:message key="label.gate.waiting.learners">
-				<fmt:param value="${GateForm.map.waitingLearners}" />
-				<fmt:param value="${GateForm.map.totalLearners}" />
+				<fmt:param value="${gateForm.waitingLearners}" />
+				<fmt:param value="${gateForm.totalLearners}" />
 			</fmt:message>
 		</lams:Alert>
 

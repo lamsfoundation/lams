@@ -75,8 +75,8 @@ public class LearningController {
     private static final String LEARNING_SUCCESS_PATH = "/pages/learning/learning";
     private static final String HIDDEN_USER_PATH = "/pages/learning/learningHiddenUser";
     private static final String DEFINE_LATER_PATH = "/pages/learning/definelater";
-    private static final String SHOW_RESULTS_REDIRECT = "redirect:/learning/showResults.do?" + PeerreviewConstants.ATTR_SESSION_MAP_ID + "=";
-    private static final String NEW_REFLECTION_REDIRECT = "redirect:/learning/newReflection.do?" + PeerreviewConstants.ATTR_SESSION_MAP_ID + "=";
+    private static final String SHOW_RESULTS_REDIRECT = "redirect:/learning/showResults.do";
+    private static final String NEW_REFLECTION_REDIRECT = "redirect:/learning/newReflection.do";
     private static final String FINISH_PATH = "/pages/learning/finish";
     private static final String SHOW_RESULTS_PAGE_PATH = "/pages/learning/results";
     private static final String NOTEBOOK_PATH = "/pages/learning/notebook";
@@ -335,9 +335,13 @@ public class LearningController {
 	if (user.isSessionFinished()) {
 	    if (peerreview.isShowRatingsLeftForUser() || peerreview.isShowRatingsLeftByUser()
 		    || entryText.length() > 0) {
-		return SHOW_RESULTS_REDIRECT + sessionMap.getSessionID();
+		String redirectURL = SHOW_RESULTS_REDIRECT;
+		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		return redirectURL;
 	    } else if (peerreview.isReflectOnActivity()) {
-		return NEW_REFLECTION_REDIRECT + sessionMap.getSessionID();
+		String redirectURL = NEW_REFLECTION_REDIRECT;
+		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+		return redirectURL;
 	    } else {
 		// finish
 		return finish(request, session);

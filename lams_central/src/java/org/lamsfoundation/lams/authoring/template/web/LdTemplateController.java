@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.http.HttpException;
 import org.apache.http.client.HttpClient;
@@ -76,7 +77,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Marcin Cieslak, Fiona Malikoff
  */
 @Controller
-@RequestMapping("authoring/template/tbl")
 public abstract class LdTemplateController {
 
     @Autowired
@@ -92,16 +92,16 @@ public abstract class LdTemplateController {
 
     @Autowired
     @Qualifier("lamsCoreToolService")
-    protected static ILamsCoreToolService lamsCoreToolService;
+    protected ILamsCoreToolService lamsCoreToolService;
     @Autowired
     @Qualifier("workspaceManagementService")
-    protected static IWorkspaceManagementService workspaceManagementService;
+    protected IWorkspaceManagementService workspaceManagementService;
     @Autowired
     @Qualifier(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME)
-    protected static IAuthoringFullService authoringFullService;
+    protected IAuthoringFullService authoringFullService;
     @Autowired
     @Qualifier("toolDAO")
-    protected static IToolDAO toolDAO;
+    protected IToolDAO toolDAO;
 
     protected static final String CONTENT_TYPE_JSON = "application/json;charset=utf-8";
 
@@ -150,10 +150,10 @@ public abstract class LdTemplateController {
 
     @RequestMapping("")
     @ResponseBody
-    public final String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public final String unspecified(HttpServletRequest request, HttpServletResponse response, HttpSession httpSession) throws Exception {
 	ObjectNode responseJSON = null;
 	try {
-	    responseJSON = createLearningDesign(request);
+	    responseJSON = createLearningDesign(request, httpSession);
 
 	    if (!responseJSON.has("learningDesignID") && !responseJSON.has("errors")) {
 		log.error(
@@ -192,7 +192,7 @@ public abstract class LdTemplateController {
 	return "authoring/template/tbl/tbl";
     }
 
-    protected abstract ObjectNode createLearningDesign(HttpServletRequest request) throws Exception;
+    protected abstract ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession) throws Exception;
 
     /**
      * Creates transitions between activities in the order they were created.
@@ -1286,7 +1286,7 @@ public abstract class LdTemplateController {
     /* ************************************** I18N related methods ************************************************* */
 
     protected final Tool getTool(String toolSignature) {
-	return LdTemplateController.toolDAO.getToolBySignature(toolSignature);
+	return toolDAO.getToolBySignature(toolSignature);
     }
 
     class ToolDetails {

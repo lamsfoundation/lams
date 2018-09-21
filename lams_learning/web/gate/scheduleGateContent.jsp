@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><c:out value="${title}" /></title>
 	<lams:css />
 	<META HTTP-EQUIV="Refresh"
-		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
+		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 		
@@ -50,26 +50,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<%@ include file="gateDescription.jsp"%>
 		
 		<lams:Alert type="info" close="false" id="whenOpens">
-		<fmt:message key="label.schedule.gate.open.remaining" />&nbsp;<strong><lams:Date value="${GateForm.map.startingTime}" timeago="true"/></strong>
+		<fmt:message key="label.schedule.gate.open.remaining" />&nbsp;<strong><lams:Date value="${gateForm.startingTime}" timeago="true"/></strong>
 		</lams:Alert>
 		
 		<c:choose>
-			<c:when test="${not empty GateForm.map.reachDate}">
+			<c:when test="${not empty gateForm.reachDate}">
 				<p>
 					<fmt:message key="label.schedule.gate.reach" />&nbsp;
-					<strong><lams:Date value="${GateForm.map.reachDate}" /></strong>
+					<strong><lams:Date value="${gateForm.reachDate}" /></strong>
 				</p>
 			</c:when>
 			<c:otherwise>
-				<c:if test="${GateForm.map.startingTime!=null}">
+				<c:if test="${gateForm.startingTime!=null}">
 					<p>
-						<fmt:message key="label.schedule.gate.open.message" />&nbsp;<strong><lams:Date value="${GateForm.map.startingTime}" /></strong>
+						<fmt:message key="label.schedule.gate.open.message" />&nbsp;<strong><lams:Date value="${gateForm.startingTime}" /></strong>
 					</p>
 				</c:if>
-				<c:if test="${GateForm.map.endingTime!=null}">
+				<c:if test="${gateForm.endingTime!=null}">
 					<p>
 						<fmt:message key="label.schedule.gate.close.message" />
-						<lams:Date value="${GateForm.map.endingTime}" />
+						<lams:Date value="${gateForm.endingTime}" />
 					</p>
 				</c:if>
 			</c:otherwise>

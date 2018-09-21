@@ -75,7 +75,7 @@ public class BranchingActivityController {
      * Gets an options activity from the request (attribute) and forwards to the display JSP.
      */
     @RequestMapping("/performBranching")
-    public String performBranching(@ModelAttribute("BranchingForm") BranchingForm branchForm,
+    public String performBranching(@ModelAttribute BranchingForm branchingForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 
 	ActivityMapping actionMappings = LearningWebUtil
@@ -102,17 +102,17 @@ public class BranchingActivityController {
 	    SequenceActivity branch = learnerService.determineBranch(learnerProgress.getLesson(), branchingActivity,
 		    learnerId);
 
-	    branchForm.setActivityID(activity.getActivityId());
-	    branchForm.setProgressID(learnerProgress.getLearnerProgressId());
-	    branchForm.setShowFinishButton(Boolean.TRUE);
-	    branchForm.setTitle(activity.getTitle());
+	    branchingForm.setActivityID(activity.getActivityId());
+	    branchingForm.setProgressID(learnerProgress.getLearnerProgressId());
+	    branchingForm.setShowFinishButton(Boolean.TRUE);
+	    branchingForm.setTitle(activity.getTitle());
 
 	    if (learnerProgress.getLesson().isPreviewLesson()) {
 
 		// The preview version gives you a choice of branches
 		// If a "normal" branch can be determined based on the group, tool marks, etc then it is marked as the default branch
 
-		branchForm.setPreviewLesson(Boolean.TRUE);
+		branchingForm.setPreviewLesson(Boolean.TRUE);
 		forward = "branching/preview";
 
 		List<ActivityURL> activityURLs = new ArrayList<>();
@@ -127,21 +127,21 @@ public class BranchingActivityController {
 		    }
 		    activityURLs.add(activityURL);
 		}
-		branchForm.setActivityURLs(activityURLs);
+		branchingForm.setActivityURLs(activityURLs);
 
 	    } else if (branch == null) {
 
 		// show the learner waiting page
-		branchForm.setPreviewLesson(Boolean.FALSE);
+		branchingForm.setPreviewLesson(Boolean.FALSE);
 		forward = "branching/wait";
-		branchForm.setShowNextButton(Boolean.TRUE);
+		branchingForm.setShowNextButton(Boolean.TRUE);
 
 		if (branchingActivity.isChosenBranchingActivity()) {
-		    branchForm.setType(BranchingActivity.CHOSEN_TYPE);
+		    branchingForm.setType(BranchingActivity.CHOSEN_TYPE);
 		} else if (branchingActivity.isGroupBranchingActivity()) {
-		    branchForm.setType(BranchingActivity.GROUP_BASED_TYPE);
+		    branchingForm.setType(BranchingActivity.GROUP_BASED_TYPE);
 		} else if (branchingActivity.isToolBranchingActivity()) {
-		    branchForm.setType(BranchingActivity.TOOL_BASED_TYPE);
+		    branchingForm.setType(BranchingActivity.TOOL_BASED_TYPE);
 		}
 		// lessonId needed for the progress bar
 		request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
@@ -165,7 +165,7 @@ public class BranchingActivityController {
      * We are in the preview lesson and the author has selected a particular branch. Force it to take that branch.
      */
     @RequestMapping("/forceBranching")
-    public String forceBranching(@ModelAttribute("BranchingForm") BranchingForm branchForm,
+    public String forceBranching(@ModelAttribute BranchingForm branchingForm,
 	    HttpServletRequest request) {
 
 	ActivityMapping actionMappings = LearningWebUtil

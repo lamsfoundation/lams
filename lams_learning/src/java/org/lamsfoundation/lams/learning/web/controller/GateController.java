@@ -115,7 +115,7 @@ public class GateController {
      * @throws IOException
      * @throws ServletException
      */
-    @RequestMapping("")
+    @RequestMapping("knockGate")
     public String knockGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	boolean forceGate = WebUtil.readBooleanParam(request, GateController.PARAM_FORCE_GATE_OPEN, false);

@@ -340,10 +340,10 @@ public class ActivityMapping implements Serializable {
      */
     public String getDisplayActivityAction(Long lessonID) {
 	if (lessonID != null) {
-	    return WebUtil.appendParameterToURL("DisplayActivity.do", AttributeNames.PARAM_LESSON_ID,
+	    return WebUtil.appendParameterToURL("/DisplayActivity.do", AttributeNames.PARAM_LESSON_ID,
 		    lessonID.toString());
 	} else {
-	    return "DisplayActivity.do";
+	    return "/DisplayActivity.do";
 	}
     }
 

@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,7 +73,7 @@ public class TBLTemplateController extends LdTemplateController {
     }
 
     @Override
-    protected ObjectNode createLearningDesign(HttpServletRequest request) throws Exception {
+    protected ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession) throws Exception {
 
 	TBLData data = new TBLData(request);
 	if (data.getErrorMessages() != null && data.getErrorMessages().size() > 0) {
@@ -83,8 +82,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    return restRequestJSON;
 	}
 
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	UserDTO userDTO = (UserDTO) httpSession.getAttribute(AttributeNames.USER);
 	Integer workspaceFolderID = workspaceManagementService.getUserWorkspaceFolder(userDTO.getUserID())
 		.getResourceID().intValue();
 	AtomicInteger maxUIID = new AtomicInteger();

@@ -25,7 +25,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
     <lams:head>
 		<lams:css/>
-		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
 		<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 		

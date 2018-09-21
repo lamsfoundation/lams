@@ -25,15 +25,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
     <lams:head>
 		<lams:css/>
-		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
     </lams:head>
     
     <body class="stripes">
+		<lams:Page type="admin">
 		<H1><fmt:message key="not.supported"/></H1>
 		
 		<div id="footer">
 		</div><!--closes footer-->
-
+		</lams:Page>
     </body>
 </lams:html>
 

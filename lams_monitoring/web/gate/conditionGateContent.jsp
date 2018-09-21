@@ -25,7 +25,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
     <lams:head>
 		<lams:css/>
-		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
 		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript">

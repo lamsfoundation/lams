@@ -98,7 +98,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:otherwise>
 									<form:form
 										action="learnerChooseGroup.do?userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
-										 modelAttribute="GroupingForm" id="form${user.userID}${activityID}${group.groupID}" >
+										 modelAttribute="groupingForm" id="form${user.userID}${activityID}${group.groupID}" >
 									</form:form>							
 									<button type="button" class="btn btn-sm btn-primary" 
 										data-toggle="modal" data-target="#confirmationModal" 

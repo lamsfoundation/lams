@@ -85,7 +85,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			<div class="group-box">
 		
-				<form:form action="ChooseActivity.do mo`" modelAttribute="activityForm" method="post" onsubmit="return validate();">
+				<form:form action="ChooseActivity.do" modelAttribute="activityForm" method="post" onsubmit="return validate();">
 					<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
 		
 					<div class="options">

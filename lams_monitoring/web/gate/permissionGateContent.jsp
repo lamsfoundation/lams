@@ -39,7 +39,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		</script>
 		<lams:css/>
-		<fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
     </lams:head>
     
     <body class="stripes">

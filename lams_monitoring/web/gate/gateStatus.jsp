@@ -12,7 +12,7 @@
 
 				<c:if test="${not GateForm.readOnly}">
 					<form:form action="openGate.do" id="gateForm" modelAttribute="gateForm" target="_self">
-						<input type="hidden" name="activityId" value="${gateForm.map.activityId}" />
+						<input type="hidden" name="activityId" value="${gateForm.activityId}" />
 						<p><input type="submit" class="btn btn-primary btn-sm voffset10" value="<fmt:message key="label.gate.open"/>" /></p>
 					</form:form>
 				</c:if>        
@@ -27,10 +27,10 @@
 					</div>
 					<div class="media-body">
 						<strong><fmt:message key="label.gate.gate.open"/>
-						<c:if test="${not empty gateForm.map.gate.gateOpenTime}">
+						<c:if test="${not empty gateForm.gate.gateOpenTime}">
 							&nbsp;<lams:Date value="${gateForm.gate.gateOpenTime}" timeago="true" />
 						</c:if>
-						<c:if test="${not empty gateForm.map.gate.gateOpenUser}">
+						<c:if test="${not empty gateForm.gate.gateOpenUser}">
 							&nbsp;<fmt:message key="label.gate.gate.open.user">
 								<fmt:param value="${gateForm.gate.gateOpenUser.firstName} ${gateForm.gate.gateOpenUser.lastName}" />
 							</fmt:message>

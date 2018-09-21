@@ -28,21 +28,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="label.view.groups.title"/></title>
 		<lams:css/>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>grouping/performGrouping.do?activityID=${GroupingForm.map.activityID}">
+		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>grouping/performGrouping.do?activityID=${groupingForm.activityID}">
 	  </lams:head>
 
 	<body class="stripes">
-		<lams:Page type="learner" title="${GroupingForm.map.title}">
-			<form:form action="performGrouping.do" modelAttribute="GroupingForm" target="_self">
-				<input type="hidden" name="activityID" value="${GroupingForm.map.activityID}" />
-				<input type="hidden" name="force" value="${GroupingForm.map.previewLesson}" />
+		<lams:Page type="learner" title="${groupingForm.title}">
+			<form:form action="performGrouping.do" modelAttribute="groupingForm" target="_self">
+				<input type="hidden" name="activityID" value="${groupingForm.activityID}" />
+				<input type="hidden" name="force" value="${groupingForm.previewLesson}" />
 				
 		
 				<lams:Alert id="waitingGroups" close="false" type="info">
 					<fmt:message key="label.view.view.groups.wait.message" />
 				</lams:Alert>
 		
-				<c:if test="${GroupingForm.map.previewLesson == true}">
+				<c:if test="${groupingForm.previewLesson == true}">
 					<div class="voffset10">
 						<em><fmt:message key="label.grouping.preview.message" /></em>
 					</div>
