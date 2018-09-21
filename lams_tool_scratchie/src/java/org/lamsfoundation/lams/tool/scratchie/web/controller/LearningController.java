@@ -387,7 +387,7 @@ public class LearningController {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
-	response.setContentType("application/x-json;charset=utf-8");
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(ObjectNode);
 
 	// create a new thread to record item scratched (in order to do this task in parallel not to slow down sending
