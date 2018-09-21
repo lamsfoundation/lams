@@ -4,8 +4,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ page import="org.apache.struts.action.ActionMessages"
-	import="org.lamsfoundation.lams.web.PasswordChangeActionForm"%>
+<%@ page import="org.lamsfoundation.lams.web.PasswordChangeActionForm"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 

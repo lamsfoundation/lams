@@ -50,10 +50,6 @@ spring            spring-core-4.3.12.RELEASE.jar		4.3.12				   Apache License 2.
 				  spring-web-4.3.12.RELEASE.jar
 				  spring-webmvc-4.3.12.RELEASE.jar
 
-struts            jakarta-oro.jar                       2.0.7                  Apache License 2.0            Apache						      regular expressions
-				  struts.jar                            1.2.7                  Apache License 2.0            Apache						      Struts Framework
-				  struts-el.jar                         1.2.9                  Apache License 2.0            Apache						      Struts extensions
-
 urlrewritefilter urlrewritefilter-4.0.3.jar             4.0.3                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
 
 xstream           xstream-1.5.0-SNAPSHOT.jar            1.5.0																				  XML serializer

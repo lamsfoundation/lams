@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@page import="org.apache.struts.action.ActionMessages"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 

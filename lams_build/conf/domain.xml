@@ -189,9 +189,6 @@
                 <logger category="org.springframework.beans.factory.annotation">
                     <level name="WARN"/>
                 </logger>
-                <logger category="org.apache.struts.tiles">
-                    <level name="WARN"/>
-                </logger>
                 <logger category="com.arjuna">
                     <level name="WARN"/>
                 </logger>

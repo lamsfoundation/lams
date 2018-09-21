@@ -23,13 +23,13 @@
 
 package org.lamsfoundation.lams.web.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.apache.struts.action.ActionForward;
 
 /**
  * @author daveg
@@ -61,9 +61,6 @@ public class TokenProcessor {
      * The singleton instance of this class.
      */
     private static TokenProcessor instance = new TokenProcessor();
-
-    private static org.apache.struts.util.TokenProcessor strutsTokenProcessor = org.apache.struts.util.TokenProcessor
-	    .getInstance();
 
     /**
      * Retrieves the singleton instance of this class.
@@ -243,110 +240,48 @@ public class TokenProcessor {
 	}
 
     }
-
+    
     /**
-     * Generate a new transaction token, calls the struts TokenProcessor.
+     * Generate a new transaction token, to be used for enforcing a single
+     * request for a particular transaction. 
+     * Note: method is identical to org.apache.struts.util.TokenProcessor (struts 1.2.7 version).
      * 
-     * @param request
-     *            The servlet request
+     * @param request The request we are processing
      */
     public synchronized String generateToken(HttpServletRequest request) {
-	// hopefully this will have no side effects.
-	return strutsTokenProcessor.generateToken(request);
+
+        HttpSession session = request.getSession();
+        try {
+            byte id[] = session.getId().getBytes();
+            long current = System.currentTimeMillis();
+            if (current == previous) {
+                current++;
+            }
+            previous = current;
+            byte now[] = new Long(current).toString().getBytes();
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(id);
+            md.update(now);
+            return toHex(md.digest());
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+
     }
-
+    
     /**
-     * Saves the ActionForward that was used for this token. For use with
-     * auto-recovery.
+     * Convert a byte array to a String of hexadecimal digits and return it.
+     * Note: method is identical to org.apache.struts.util.TokenProcessor (struts 1.2.7 version).
+     * 
+     * @param buffer The byte array to be converted
      */
-    public synchronized void saveForward(javax.servlet.http.HttpServletRequest request, ActionForward actionForward) {
-	HttpSession session = request.getSession(false);
-	if (session == null) {
-	    return;
-	}
-
-	String token = getTokenFromRequest(request);
-	if (token == null) {
-	    return;
-	}
-
-	HashMap forwards = getForwards(session);
-	if (forwards == null) {
-	    forwards = new HashMap();
-	}
-
-	Long timestamp = new Long((new Date()).getTime());
-	Forward forward = new Forward();
-	forward.setActionForward(actionForward);
-	forward.setTimestamp(timestamp);
-
-	forwards.put(token, forward);
-	setForwards(session, forwards);
-    }
-
-    /**
-     * Returns the ActionForward that was saved for this token. For use with
-     * auto-recovery.
-     */
-    public synchronized ActionForward getForward(javax.servlet.http.HttpServletRequest request) {
-	return getForward(request, false);
-    }
-
-    /**
-     * Returns the ActionForward that was saved for this token. For use with
-     * auto-recovery.
-     */
-    public synchronized ActionForward getForward(javax.servlet.http.HttpServletRequest request, boolean reset) {
-	HttpSession session = request.getSession(false);
-	if (session == null) {
-	    return null;
-	}
-
-	String token = getTokenFromRequest(request);
-	if (token == null) {
-	    return null;
-	}
-
-	HashMap forwards = getForwards(session);
-	if (forwards == null) {
-	    return null;
-	}
-
-	Forward forward = (Forward) forwards.get(token);
-	if (forward == null) {
-	    return null;
-	}
-
-	if (reset) {
-	    forwards.remove(forward);
-	}
-
-	return forward.getActionForward();
-    }
-
-    /**
-     * Holds an ActionForward and the timestamp it was saved. For use with
-     * auto-recovery.
-     */
-    private class Forward {
-	private ActionForward actionForward;
-	private Long timestamp;
-
-	public ActionForward getActionForward() {
-	    return actionForward;
-	}
-
-	public void setActionForward(ActionForward actionForward) {
-	    this.actionForward = actionForward;
-	}
-
-	public Long getTimestamp() {
-	    return timestamp;
-	}
-
-	public void setTimestamp(Long timestamp) {
-	    this.timestamp = timestamp;
-	}
+    private String toHex(byte buffer[]) {
+        StringBuffer sb = new StringBuffer(buffer.length * 2);
+        for (int i = 0; i < buffer.length; i++) {
+            sb.append(Character.forDigit((buffer[i] & 0xf0) >> 4, 16));
+            sb.append(Character.forDigit(buffer[i] & 0x0f, 16));
+        }
+        return sb.toString();
     }
 
 }

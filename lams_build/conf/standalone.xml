@@ -236,10 +236,6 @@
                 <level name="WARN"/>
             </logger>
             
-            <logger category="org.apache.struts.tiles">
-                <level name="WARN"/>
-            </logger>
-            
             <root-logger>
                 <level name="DEBUG" />
                 <handlers>

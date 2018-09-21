@@ -1,5 +1,4 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@page import="org.apache.struts.action.ActionMessages"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.lamsfoundation.lams.web.ForgotPasswordServlet"%>
 <%@page import="org.lamsfoundation.lams.util.MessageService"%>
