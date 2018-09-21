@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -77,7 +77,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 			 * File should be saved already or it should be provided. This functionality required some
 			 * changes in pedagogicalPlanner.js in lams_central (see prepareFormData() there)
 			 */
-			FileValidatorSpringUtil.validateFileSize(file.get(index), true);
+			FileValidatorUtil.validateFileSize(file.get(index), true);
 			if (fileUuid.get(index) == null && file.get(index) == null) {
 			    errorMap.add("GLOBAL",
 				    messageService.getMessage("error.planner.file.blank", new Object[] { index + 1 }));

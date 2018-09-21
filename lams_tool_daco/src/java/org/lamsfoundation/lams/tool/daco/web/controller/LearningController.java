@@ -59,7 +59,7 @@ import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
 import org.lamsfoundation.lams.tool.daco.web.form.RecordForm;
 import org.lamsfoundation.lams.tool.daco.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -786,7 +786,7 @@ public class LearningController {
 				    new Object[] { questionNumber }));
 			}
 		    } else {
-			FileValidatorSpringUtil.validateFileSize(file, true);
+			FileValidatorUtil.validateFileSize(file, true);
 		    }
 		    fileNumber++;
 		}
@@ -815,7 +815,7 @@ public class LearningController {
 			    errorMap.add("GLOBAL", messageService.getMessage(
 				    DacoConstants.ERROR_MSG_RECORD_IMAGE_FORMAT, new Object[] { questionNumber }));
 			} else {
-			    FileValidatorSpringUtil.validateFileSize(file, true);
+			    FileValidatorUtil.validateFileSize(file, true);
 			}
 		    }
 		    fileNumber++;

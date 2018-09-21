@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -912,7 +912,7 @@ public class AuthoringController {
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
-	    if (!FileValidatorSpringUtil.validateFileSize(resourceItemForm.getFile(), false)) {
+	    if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
 		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
 			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
 	    }

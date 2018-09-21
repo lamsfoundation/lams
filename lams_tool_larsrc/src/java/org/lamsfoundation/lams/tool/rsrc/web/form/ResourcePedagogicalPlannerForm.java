@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -73,7 +73,7 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivitySp
 			 * File should be saved already or it should be provided. This functionality required some
 			 * changes in pedagogicalPlanner.js in lams_central (see prepareFormData() there)
 			 */
-			boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(file.get(index), true);
+			boolean fileSizeValid = FileValidatorUtil.validateFileSize(file.get(index), true);
 			if (!fileSizeValid) {
 			    if (fileUuid.get(index) == null && file.get(index) == null) {
 				errorMap.add("GLOBAL", messageService.getMessage("error.planner.file.blank",

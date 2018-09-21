@@ -59,7 +59,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -417,7 +416,7 @@ public class LearnerController implements SbmtConstants {
 	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxdescsize"));
 	}
 
-	boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(learnerForm.getFile().getSize(), false);
+	boolean fileSizeValid = FileValidatorUtil.validateFileSize(learnerForm.getFile().getSize(), false);
 	if (!fileSizeValid) {
 	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
 		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));

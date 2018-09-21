@@ -58,7 +58,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgeItem
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.CommonCartridgePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -769,7 +769,7 @@ public class AuthoringController {
 	// }
 	if (itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
 	    // validate item size
-	    FileValidatorSpringUtil.validateFileSize(itemForm.getFile(), true);
+	    FileValidatorUtil.validateFileSize(itemForm.getFile(), true);
 	    // for edit validate: file already exist
 	    if (!itemForm.isHasFile()
 		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getName()))) {

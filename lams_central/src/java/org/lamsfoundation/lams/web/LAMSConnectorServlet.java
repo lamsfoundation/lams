@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -330,7 +330,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	String fileName = pathParts[pathParts.length - 1];
 
 	// validate file size
-	boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile.getSize(), true);
+	boolean maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile.getSize(), true);
 	if (!maxFilesizeExceededMessage) {
 	    //assign fileName an error message to be shown on a client side
 	    fileName = messageService.getMessage("errors.maxfilesize",

@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -293,7 +293,7 @@ public class AuthoringController {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// validate file size
-	FileValidatorSpringUtil.validateFileSize(itemForm.getFile(), true);
+	FileValidatorUtil.validateFileSize(itemForm.getFile(), true);
 	// for edit validate: file already exist
 	if (!itemForm.isHasFile()
 		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getOriginalFilename()))) {

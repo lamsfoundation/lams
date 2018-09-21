@@ -7,10 +7,10 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorSpringUtil" %> 
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %> 
 
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set> 
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorSpringUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set> 
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set> 
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set> 
 <c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
 <c:set var="courseTypeId"><%= OrganisationType.COURSE_TYPE %></c:set>

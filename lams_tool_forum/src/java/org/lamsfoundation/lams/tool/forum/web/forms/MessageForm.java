@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -91,7 +91,7 @@ public class MessageForm {
 		largeFile = false;
 	    }
 
-	    FileValidatorSpringUtil.validateFileSize(this.getAttachmentFile(), largeFile);
+	    FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile);
 
 	} catch (Exception e) {
 	    MessageForm.logger.error("", e);

@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +29,7 @@ public class ImageGalleryUtils {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// validate file size
-	FileValidatorSpringUtil.validateFileSize(itemForm.getFile(), largeFile);
+	FileValidatorUtil.validateFileSize(itemForm.getFile(), largeFile);
 	// for edit validate: file already exist
 	if (!itemForm.isHasFile()
 		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getOriginalFilename()))) {
@@ -59,7 +59,7 @@ public class ImageGalleryUtils {
 
 	// validate files size
 	for (MultipartFile file : fileList) {
-	    FileValidatorSpringUtil.validateFileSize(file, largeFile);
+	    FileValidatorUtil.validateFileSize(file, largeFile);
 
 	    // check for allowed format : gif, png, jpg
 	    String contentType = file.getContentType();

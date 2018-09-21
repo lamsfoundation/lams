@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.springframework.util.FileCopyUtils;
@@ -116,7 +116,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		String fileName = pathParts[pathParts.length - 1];
 
 		// validate file size
-		boolean maxFilesizeExceededMessage = FileValidatorSpringUtil.validateFileSize(uplFile.getSize(), true);
+		boolean maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile.getSize(), true);
 		if (!maxFilesizeExceededMessage) {
 		    fileName = messageService.getMessage("errors.maxfilesize",
 			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });

@@ -61,7 +61,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.FileValidatorSpringUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -525,7 +525,7 @@ public class LearningController implements TaskListConstants {
 
 	// validate file size
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	boolean fileSizeValid = FileValidatorSpringUtil.validateFileSize(file, false);
+	boolean fileSizeValid = FileValidatorUtil.validateFileSize(file, false);
 	if (!fileSizeValid) {
 	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
 		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
