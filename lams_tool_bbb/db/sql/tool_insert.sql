@@ -36,7 +36,7 @@ VALUES
 'tool/labbb10/learning.do?mode=teacher',
 'tool/labbb10/authoring.do',
 'tool/labbb10/monitoring.do',
-'http://wiki.lamsfoundation.org/display/lamsdocs/labbb10',
+NULL,
 'tool/labbb10/admin/view.do',
 'org.lamsfoundation.lams.tool.bbb.ApplicationResources',
 NOW(),
