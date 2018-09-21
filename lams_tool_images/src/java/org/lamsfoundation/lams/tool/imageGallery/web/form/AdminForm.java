@@ -22,13 +22,9 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 /**
  *
@@ -44,13 +40,6 @@ public class AdminForm {
     private String mediumImageDimensions;
 
     private String thumbnailImageDimensions;
-
-    public MultiValueMap<String, String> validate(HttpServletRequest arg1) {
-
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap.add("GLOBAL", messageService.getMessage("this is an error"));
-	return errorMap;
-    }
 
     public String getMediumImageDimensions() {
 	return mediumImageDimensions;

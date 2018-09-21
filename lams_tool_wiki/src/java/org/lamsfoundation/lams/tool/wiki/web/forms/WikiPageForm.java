@@ -135,12 +135,4 @@ public class WikiPageForm {
     public void setNewPageIsEditable(Boolean newPageIsEditable) {
 	this.newPageIsEditable = newPageIsEditable;
     }
-
-    public MultiValueMap<String, String> validate(HttpServletRequest arg1) {
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-
-	errorMap.add("GLOBAL", messageService.getMessage("this is an error"));
-
-	return errorMap;
-    }
 }

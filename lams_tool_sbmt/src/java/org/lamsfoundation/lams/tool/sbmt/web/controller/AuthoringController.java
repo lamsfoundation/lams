@@ -71,7 +71,6 @@ public class AuthoringController {
      * <BR>
      * Define later will use this method to initial page as well.
      */
-
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 
@@ -189,7 +188,7 @@ public class AuthoringController {
 	return content;
     }
 
-    private MultiValueMap validate(AuthoringForm authoringForm, HttpServletRequest request) {
+    private MultiValueMap<String, String> validate(AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// if (StringUtils.isBlank(sbmtForm.getTitle())) {
 	// ActionMessage error = new ActionMessage("error.title.blank");

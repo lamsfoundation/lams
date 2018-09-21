@@ -79,7 +79,7 @@
 		        			var threadUid = response.threadUid;
 		        			var messageUid = response.messageUid;
 		        			var rootUid = response.rootUid;
-							
+
 		        			if ( rootUid ) {
 			        			if ( ! threadDiv) {
 		    	    				// must have replied to the top level, so show the posting at the top.
@@ -133,8 +133,7 @@
 			
 		</script>
 		
-		<form:form action="replyTopicInline.do"
-				focus="textarea#messageBody" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
+		<form:form action="replyTopic.do" focus="textarea#messageBody" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
 				
 			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
 			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>

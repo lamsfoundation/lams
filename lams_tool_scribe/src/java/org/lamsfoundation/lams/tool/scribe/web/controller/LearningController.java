@@ -262,7 +262,6 @@ public class LearningController {
 	    HttpServletRequest request, HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
-
 	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 
 	scribeService.createNotebookEntry(scribeUser.getScribeSession().getSessionId(),

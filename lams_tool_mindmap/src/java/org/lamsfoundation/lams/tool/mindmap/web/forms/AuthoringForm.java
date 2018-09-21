@@ -50,14 +50,6 @@ public class AuthoringForm {
     private boolean reflectOnActivity;
     private String reflectInstructions;
 
-    public MultiValueMap<String, String> validate(MessageService messageService, HttpServletRequest arg1) {
-
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap.add("GLOBAL", messageService.getMessage("this is an error"));
-
-	return errorMap;
-    }
-
     public String getSessionMapID() {
 	return sessionMapID;
     }
