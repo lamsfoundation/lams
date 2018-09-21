@@ -72,6 +72,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -176,7 +177,7 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
-	if (questionUid.equals(-1)) {
+	if (questionUid.equals(-1l)) {
 	    return null;
 	}
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
@@ -203,7 +204,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/saveUserGrade")
-    public String saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
+    public void saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
 
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
@@ -211,14 +212,13 @@ public class MonitoringController {
 	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));
 	    service.changeQuestionResultMark(questionResultUid, newGrade);
 	}
-
-	return null;
     }
 
     /**
      * Set Submission Deadline
      */
     @RequestMapping("/setSubmissionDeadline")
+    @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -256,6 +256,7 @@ public class MonitoringController {
      * @throws IOException
      */
     @RequestMapping("/setActivityEvaluation")
+    @ResponseBody
     public String setActivityEvaluation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -273,8 +274,7 @@ public class MonitoringController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("success", "true");
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responseJSON.toString()));
-	return null;
+	return responseJSON.toString();
     }
 
     /**
@@ -602,7 +602,7 @@ public class MonitoringController {
      * Allows displaying correct answers to learners
      */
     @RequestMapping("/discloseCorrectAnswers")
-    public String discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) {
+    public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
@@ -616,15 +616,13 @@ public class MonitoringController {
 	    log.debug("Disclosed correct answers for Assessment tool content ID " + toolContentId + " and question ID "
 		    + questionUid);
 	}
-
-	return null;
     }
 
     /**
      * Allows displaying other groups' answers to learners
      */
     @RequestMapping("/discloseGroupsAnswers")
-    public String discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) {
+    public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
@@ -638,8 +636,6 @@ public class MonitoringController {
 	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
 		    + " and question ID " + questionUid);
 	}
-
-	return null;
     }
 
 }

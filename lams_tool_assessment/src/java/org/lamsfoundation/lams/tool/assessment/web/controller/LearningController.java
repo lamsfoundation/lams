@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -82,9 +84,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -375,6 +380,7 @@ public class LearningController {
      * Checks Leader Progress
      */
     @RequestMapping("/checkLeaderProgress")
+    @ResponseBody
     public String checkLeaderProgress(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -385,11 +391,10 @@ public class LearningController {
 	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
 	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
 
-	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
-	ObjectNode.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(ObjectNode);
-	return null;
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**
@@ -475,6 +480,7 @@ public class LearningController {
      * @throws IOException
      */
     @RequestMapping("/getSecondsLeft")
+    @ResponseBody
     public String getSecondsLeft(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	    IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
 
@@ -486,9 +492,8 @@ public class LearningController {
 	long secondsLeft = service.getSecondsLeft(assessment, user);
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(responseJSON);
-	return null;
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**
@@ -730,7 +735,8 @@ public class LearningController {
      * auto saves responses
      */
     @RequestMapping("/autoSaveAnswers")
-    public String autoSaveAnswers(HttpServletRequest request)
+    @ResponseStatus(HttpStatus.OK)
+    public void autoSaveAnswers(HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -741,15 +747,14 @@ public class LearningController {
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
-
-	return null;
     }
 
     /**
      * Stores date when user has started activity with time limit
      */
     @RequestMapping("/launchTimeLimit")
-    public String launchTimeLimit(HttpServletRequest request) {
+    @ResponseStatus(HttpStatus.OK)
+    public void launchTimeLimit(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -759,8 +764,6 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, false);
 
 	service.launchTimeLimit(assessmentUid, userId);
-
-	return null;
     }
 
     /**
