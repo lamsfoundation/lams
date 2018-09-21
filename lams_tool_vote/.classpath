@@ -25,6 +25,6 @@
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/noStruts"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

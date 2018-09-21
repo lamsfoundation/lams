@@ -9,8 +9,6 @@
         <archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
         <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
-        <archive path="/lams_build/lib/struts/struts-el.jar"/>
-        <archive javadoc="http://struts.apache.org/1.x/apidocs/" path="/lams_build/lib/struts/struts.jar" source="/3rdParty_sources/struts"/>
         <archive path="/lams_build/lib/fckeditor/fckeditor-java-core-2.6.jar" source="/3rdParty_sources/ckeditor"/>
         <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
         <archive path="/lams_build/lib/xstream/xstream-1.5.0-SNAPSHOT.jar" source="/3rdParty_sources/xstream"/>
