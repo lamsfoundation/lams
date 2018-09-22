@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.web.util.TokenProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -68,13 +67,6 @@ public class ChooseActivityController {
 	    HttpServletResponse response) {
 	ActivityMapping actionMappings = LearningWebUtil
 		.getActivityMapping(this.applicationContext.getServletContext());
-
-	// check token
-	if (!TokenProcessor.getInstance().isTokenValid(request, true)) {
-	    // didn't come here from options page
-	    log.info("No valid token in request");
-	    return "error";
-	}
 
 	// Get learner and lesson details.
 	Integer learnerId = LearningWebUtil.getUserId();

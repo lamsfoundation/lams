@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.TokenProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -118,8 +117,6 @@ public class DisplayOptionsActivityController {
 	form.setTitle(optionsActivity.getTitle());
 	form.setLessonID(learnerProgress.getLesson().getLessonId());
 	form.setProgressID(learnerProgress.getLearnerProgressId());
-
-	TokenProcessor.getInstance().saveToken(request);
 
 	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request,
 		applicationContext.getServletContext());
