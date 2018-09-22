@@ -301,7 +301,6 @@ public class GroupingAJAXController {
 	}
 
 	responseJSON.put("result", result);
-	response.getWriter().write(responseJSON.toString());
 	return responseJSON.toString();
     }
 

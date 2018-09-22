@@ -122,7 +122,7 @@ public class GroupingUploadAJAXController {
      * @throws Exception
      */
     @RequestMapping("/getGroupTemplateFile")
-    public String getGroupTemplateFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void getGroupTemplateFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -151,12 +151,11 @@ public class GroupingUploadAJAXController {
 		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"view organisation groups", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
-	    return null;
+	    return;
 	}
 
-	String fileName = new StringBuilder(
-		messageService.getMessage("filename.create.grouping.template").trim()).append(" ")
-			.append(lessonOrOrganisationName).append(".xls").toString().replaceAll(" ", "-");
+	String fileName = new StringBuilder(messageService.getMessage("filename.create.grouping.template").trim())
+		.append(" ").append(lessonOrOrganisationName).append(".xls").toString().replaceAll(" ", "-");
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = null;
@@ -180,8 +179,8 @@ public class GroupingUploadAJAXController {
 		    groups = orgGrouping.getGroups();
 		}
 	    }
-	    Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(organisationId,
-		    Role.LEARNER, true);
+	    Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(organisationId, Role.LEARNER,
+		    true);
 	    dataToExport = exportLearnersForGrouping(learners, null, groups);
 	}
 
@@ -195,7 +194,6 @@ public class GroupingUploadAJAXController {
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcelXLS(out, dataToExport, null, false);
-	return null;
     }
 
     private LinkedHashMap<String, ExcelCell[][]> exportLearnersForGrouping(Collection<User> learners, Set<Group> groups,
@@ -301,17 +299,18 @@ public class GroupingUploadAJAXController {
 	    return null;
 	}
 
-	MultipartFile fileElements = uploadForm.getAttachmentFile();
-	if (fileElements.getSize() == 0) {
+	MultipartFile file = uploadForm.getGroupUploadFile();
+	if (file == null || file.getSize() == 0) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "No file provided");
+	    return null;
 	}
 	if (log.isDebugEnabled()) {
 	    log.debug("Saving course groups from spreadsheet for user " + userId + " and organisation " + organisationId
-		    + " filename " + fileElements);
+		    + " filename " + file);
 	}
 
-	ObjectNode responseJSON = isLessonMode ? saveLessonGrouping(lessonId, activityId, fileElements)
-		: saveCourseGrouping(organisation, groupingId, name, fileElements);
+	ObjectNode responseJSON = isLessonMode ? saveLessonGrouping(lessonId, activityId, file)
+		: saveCourseGrouping(organisation, groupingId, name, file);
 
 	return responseJSON.toString();
     }
@@ -415,8 +414,7 @@ public class GroupingUploadAJAXController {
 		    for (String name : existingGroupNames) {
 			groupNamesStrBlder.append("'").append(name).append("' ");
 		    }
-		    String error = messageService.getMessage(
-			    "error.branching.upload.must.use.existing.groups",
+		    String error = messageService.getMessage("error.branching.upload.must.use.existing.groups",
 			    new String[] { groupNamesStrBlder.toString() });
 		    return createResponseJSON(true, error.toString(), false, grouping.getGroupingId(), 0, 0);
 		}

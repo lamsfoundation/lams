@@ -32,7 +32,7 @@ public class FileUploadForm {
     private Integer organisationID;
     private Long lessonID;
     private Long activityID;
-    private MultipartFile attachmentFile;
+    private MultipartFile groupUploadFile;
 
     public Integer getOrganisationID() {
 	return organisationID;
@@ -58,12 +58,11 @@ public class FileUploadForm {
 	this.activityID = activityID;
     }
 
-    public MultipartFile getAttachmentFile() {
-	return attachmentFile;
+    public MultipartFile getGroupUploadFile() {
+	return groupUploadFile;
     }
 
-    public void setAttachmentFile(MultipartFile attachmentFile) {
-	this.attachmentFile = attachmentFile;
+    public void setGroupUploadFile(MultipartFile groupUploadFile) {
+	this.groupUploadFile = groupUploadFile;
     }
-
 }

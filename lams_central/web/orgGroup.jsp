@@ -155,7 +155,7 @@
 			<div class="userContainerTitle">
 				<fmt:message key="label.course.groups.unassigned" />
 				<span class="sortUsersButton"
-				      title="<fmt:message key='label.course.groups.sort.tooltip' />">▲</span>
+				      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
 			</div>
 			<div class="userContainer"></div>
 		</td>
@@ -181,7 +181,7 @@
 			</c:if>
 		/>
 		<span class="sortUsersButton"
-		      title="<fmt:message key='label.course.groups.sort.tooltip' />">▲</span>
+		      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
 	</div>
 	<div class="userContainer"></div>
 </div>
@@ -236,17 +236,15 @@
 				</button>
 			</div>
 			<div class="voffset5">
-				<form:form action="monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" modelAttribute="uploadForm" id="uploadForm">
-				<form:hidden path="activityID" id="activityID" value="${param.activityID}"/>
-				<form:hidden path="lessonID" id="lessonID" value="${lessonID}"/>
-				<%-- <form:hidden path="organisationID" id="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
-				<%-- <form:hidden path="groupingId" id="groupingId" value="${groupingId}"/> Value is set in Javascript as only used for some modes  --%>
-				<button id="import" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
-					<fmt:message key="button.import" />
-				</button>
-				<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
-					uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-				</form:form>
+				<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
+					<input type="hidden" name="activityID" value="${param.activityID}"/>
+					<input type="hidden" name="lessonID" value="${lessonID}"/>
+					<button id="import" type="button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
+						<fmt:message key="button.import" />
+					</button>
+					<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
+						uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+				</form>
 			</div>
 			<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</div>
