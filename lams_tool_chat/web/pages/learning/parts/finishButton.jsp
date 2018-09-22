@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<form:form action="openNotebook.do" method="post" modelAttribute="learningForm" id="learningForm">
-	<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+<form action="openNotebook.do" method="post">
+	<input type="hidden" name="chatUserUID" value="${chatUserDTO.uid}" />
 
 	<c:if
 		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
@@ -26,7 +26,7 @@
 			<input type="submit" class="button" value="<fmt:message key="button.edit" />">
 		</div>
 	</c:if>
-</form:form>
+</form>
 
 <script type="text/javascript">
 	function disableFinishButton() {
