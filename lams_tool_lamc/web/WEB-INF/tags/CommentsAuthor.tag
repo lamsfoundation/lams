@@ -42,9 +42,7 @@
 
 <div class="checkbox">
 	<label>
-	<form:checkbox path="${allowCommentsVariableName}" value="1"
-		id="${allowCommentsVariableName}">
-	</form:checkbox>
+	<form:checkbox path="${allowCommentsVariableName}" value="1" id="${allowCommentsVariableName}" />
 	<fmt:message key="${allowCommentLabelKey}"/>
 	</label>
 </div>
@@ -56,9 +54,7 @@
 </div>
 <div class="checkbox">
 	<label>
-	<form:checkbox path="${allowAnonymousVariableName}" 
-		styleId="${allowAnonymousVariableName}">
-	</form:checkbox>
+	<form:checkbox path="${allowAnonymousVariableName}" styleId="${allowAnonymousVariableName}" />
 	<fmt:message key="${allowAnonymousLabelKey}"/>
 	</label>
 </div>

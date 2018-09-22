@@ -1,4 +1,5 @@
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
@@ -41,9 +42,7 @@
 
 <div class="checkbox">
 	<label>
-	<form:checkbox path="${allowCommentsVariableName}" value="1"
-		id="${allowCommentsVariableName}">
-	</form:checkbox>
+	<form:checkbox path="${allowCommentsVariableName}" value="1" id="${allowCommentsVariableName}" />
 	<fmt:message key="${allowCommentLabelKey}"/>
 	</label>
 </div>
@@ -55,9 +54,7 @@
 </div>
 <div class="checkbox">
 	<label>
-	<form:checkbox path="${allowAnonymousVariableName}" 
-		id="${allowAnonymousVariableName}">
-	</form:checkbox>
+	<form:checkbox path="${allowAnonymousVariableName}" styleId="${allowAnonymousVariableName}" />
 	<fmt:message key="${allowAnonymousLabelKey}"/>
 	</label>
 </div>

@@ -212,6 +212,7 @@
 
    </tag>
 
+	
 	<tag>
       <description>Small portrait of a user</description>
       <display-name>User Portrait</display-name>
@@ -338,6 +339,10 @@
    	<tag-file>
 	    <name>LeaderDisplay</name>
 		<path>/WEB-INF/tags/LeaderDisplay.tag</path>
+   	</tag-file> 
+   	<tag-file>
+       <name>OutcomeAuthor</name>
+       <path>/WEB-INF/tags/OutcomeAuthor.tag</path>
    	</tag-file>  
    	<tag>
     <name>textarea</name>
