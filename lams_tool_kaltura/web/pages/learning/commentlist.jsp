@@ -67,8 +67,7 @@
 
 <c:if test="${isGroupMonitoring || (mode != 'teacher') && !finishedLock}">
 	<div id="comment-textarea">
-		<textarea name="comment" rows="3" class="form-control"></textarea>	
-		
+		<lams:textarea name="comment" rows="3" class="form-control"></lams:textarea>
 		<div class="pull-right">
 			<button name="commentButton" type="button" onclick="javascript:addNewComment(document.getElementById('comment__lamshidden').value);" class="btn btn-default" style="vertical-align:bottom;">
 				<fmt:message key="label.learning.post.comment" />

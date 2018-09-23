@@ -45,7 +45,7 @@
 		</div>
 		<div class="form-group">
 			<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<textarea rows="5" tabindex="2" id="description" class="form-control" name="description"></textarea>
+			<lams:textarea irows="5" tabindex="2" id="description" class="form-control" name="description"></lams:textarea>
 		</div>
 	</form:form>
 

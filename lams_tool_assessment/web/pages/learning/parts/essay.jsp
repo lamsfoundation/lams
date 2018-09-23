@@ -97,9 +97,9 @@
 						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px"></lams:CKEditor>
 					</c:when>
 					<c:otherwise>
-						<textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" rows="8"
-								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
-						>${question.answerString}</textarea>
+						<lams:textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" disabled="${!hasEditRight}" rows="8">
+							<c:out value="${question.answerString}" />
+						</lams:textarea>
 					</c:otherwise>
 				</c:choose>
 			</td>

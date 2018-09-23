@@ -45,7 +45,7 @@
 
 				<c:choose>
 					<c:when test="${saveUsingLearningAction}">
-						<textarea rows="5" tabindex="2" class="text-area form-control" name="description"></textarea>
+						<lams:textarea rows="5" tabindex="2" class="text-area form-control" name="description"></lams:textarea>
 					</c:when>
 					<c:otherwise>
 						<lams:CKEditor id="description" value="${imageGalleryItemForm.description}" width="99%" 

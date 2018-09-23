@@ -11,8 +11,10 @@
 		</c:when>
 		
 		<c:otherwise>
-			<%-- Does not user general tag because this field need keep compatible with CKEditor's content --%>
-			<textarea rows="10" class="form-control" tabindex="2" name="message.body" id="messageBody">${messageForm.message.body}</textarea> 
+			<%-- Does not use general tag because this field need keep compatible with CKEditor's content --%>
+			<lams:textarea id="messageBody" name="messageBody" class="form-control" tabindex="2" rows="10">
+				<c:out value="${messageForm.message.body}" />
+			</lams:textarea>
 		</c:otherwise>
 	</c:choose>
  

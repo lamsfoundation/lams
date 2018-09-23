@@ -38,9 +38,10 @@
 							<fmt:message key="label.justify.hedging.marks" />
 						</div>
 					</c:if>
-					<textarea id="justification-question${questionIndex}" name="question${questionIndex}" rows="4" cols="60" class="mark-hedging-select"
-							<c:if test="${!hasEditRight}">readonly="readonly"</c:if> data-question-index="${questionIndex}"
-					>${question.answerString}</textarea>
+					<lams:textarea id="justification-question${questionIndex}" name="question${questionIndex}" class="mark-hedging-select" disabled="${!hasEditRight}" 
+								    data-question-index="${questionIndex}" rows="4" cols="60">
+						<c:out value="${question.answerString}" />
+					</lams:textarea>
 				</td>
 			</tr>
 		</c:if>

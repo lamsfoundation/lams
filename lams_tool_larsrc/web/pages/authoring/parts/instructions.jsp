@@ -16,8 +16,10 @@
 						${status.index+1}
 					</td>
 					<td>
-						<textarea name="instructionItemDesc${status.index}" class="form-control"
-							id="instructionItemDesc${status.index}" rows="3" cols="82"><c:out value="${item}"/></textarea>
+						<lams:textarea name="instructionItemDesc${status.index}" class="form-control"
+									   id="instructionItemDesc${status.index}" rows="3" cols="82">
+							<c:out value="${item}" />
+						</lams:textarea>
 					</td>
 
 					<td class="arrows" style="width:5%">
