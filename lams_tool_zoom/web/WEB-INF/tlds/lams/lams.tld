@@ -211,6 +211,7 @@
       </attribute>
 
    </tag>
+
 	
 	<tag>
       <description>Small portrait of a user</description>
@@ -369,6 +370,13 @@
         <description>
         </description>
         <name>onchange</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+        <description>
+        </description>
+        <name>disabled</name>
         <required>false</required>
         <rtexprvalue>true</rtexprvalue>
     </attribute>
