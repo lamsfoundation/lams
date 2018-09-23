@@ -18,16 +18,11 @@
 		Available targets are:
 		print-usage               --> Display this information
 		copy-tags                 --> Copies custom JSP tags from Central to all other projects
-		build-tool-deploy-utility --> Rebuilds Tool deployer and updates copy in lams_build
 		build-db                  --> Creates database tables and entries
-		deploy-ear                --> Builds and deploys LAMS EAR
 		deploy-ear-updater        --> Builds and deploys LAMS EAR for updater
-		deploy-tools              --> Standard Tool deployment
-		deploy-tools-minimal      --> Deploys only Tools required to run LAMS
-		deploy-tools-updater      --> Deploys Tools for updater
-		deploy-learning-libraries --> Deploys complex Tools
-		lams-cruise               --> Runs full LAMS redeployment
-		lams-cruise-min-tools     --> Runs full LAMS redeployment with minimal Tools set
+		deploy-lams	              --> Runs full LAMS redeployment
+		deploy-lams-min-tools     --> Runs full LAMS redeployment with minimal Tools set
+		deploy-lams-min-tools     --> Runs full LAMS redeployment with full Tools set. Mainly for development.
 		slim-wildfly              --> Removes unused WidlFly files
 			
 		If you want to run full deployment, execute lams-cruise.
@@ -63,12 +58,9 @@
 	<target name="_clean-tools">
 		<!-- Internal target: Removes output dirs of Tools -->
 		<ant antfile="../lams_tool_assessment/build.xml"    target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_bbb/build.xml"           target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="_clean-dirs" inheritAll="false"/>
-		<!--<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false"/>-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_gmap/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_images/build.xml"        target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_imscc/build.xml"         target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_lamc/build.xml"          target="_clean-dirs" inheritAll="false"/>
@@ -86,18 +78,21 @@
 		<ant antfile="../lams_tool_task/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_kaltura/build.xml"       target="_clean-dirs" inheritAll="false"/>
+		
 		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="_clean-dirs" inheritAll="false" />
 			<ant antfile="../lams_tool_eadventure/build.xml"    target="_clean-dirs" inheritAll="false"/>
 			<ant antfile="../lams_tool_videorecorder/build.xml" target="_clean-dirs" inheritAll="false"/>
 			<ant antfile="../lams_tool_wookie/build.xml"    	target="_clean-dirs" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="_clean-dirs" inheritAll="false" />
+			
+			<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_zoom/build.xml"          target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_preview/build.xml"       target="_clean-dirs" inheritAll="false" />
 		-->
 	</target>
-	
-	
-	<target name="clean-all" depends="_clean-core, _clean-tools" 
-		    description="Removes output dirs of Core projects and Tools (used for CruiseControl instance)" />
-
 	
 	<target name="copy-tags" description="Copies lams.tld and LAMS Tags from lams-central to other projects.">
 		<ant antfile="../lams_admin/build.xml"              target="copy-tags" inheritAll="false"/>
@@ -109,7 +104,7 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="copy-tags" inheritAll="false"/>
-		<!--<ant antfile="../lams_tool_doku/build.xml"          target="copy-tags" inheritAll="false"/>-->
+		<ant antfile="../lams_tool_doku/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_forum/build.xml"         target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_gmap/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_images/build.xml"        target="copy-tags" inheritAll="false"/>
@@ -122,6 +117,7 @@
 		<ant antfile="../lams_tool_mindmap/build.xml"       target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_notebook/build.xml"      target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_pixlr/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_preview/build.xml"       target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_sbmt/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_scratchie/build.xml"     target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_scribe/build.xml"        target="copy-tags" inheritAll="false"/>
@@ -130,14 +126,18 @@
 		<ant antfile="../lams_tool_task/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_vote/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_wiki/build.xml"          target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_tool_kaltura/build.xml"       target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_zoom/build.xml"          target="copy-tags" inheritAll="false"/>
+		
 		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="copy-tags" inheritAll="false" />
 			<ant antfile="../lams_tool_eadventure/build.xml"    target="copy-tags" inheritAll="false"/>
 			<ant antfile="../lams_tool_videorecorder/build.xml" target="copy-tags" inheritAll="false"/>
 			<ant antfile="../lams_tool_wookie/build.xml"    	target="copy-tags" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="copy-tags" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="copy-tags" inheritAll="false" />
 		-->
-		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS:
-			  Kaltura and other public and private tools</echo>
+		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS</echo>
 	</target>
 
 	
@@ -166,20 +166,6 @@
 		<ant antfile="../lams_www/build.xml"               target="_build-war"     inheritAll="false" />
 		<ant antfile="../lams_gradebook/build.xml"         target="_build-product" inheritAll="false" />
 	</target>
-	
-	
-	<target name="copy-to-lams-lib"
-		    description="Copies LAMS core JARs to lams_build library for other projects to use">
-		<echo>Copying LAMS core projects' JARs to lams_build/lib/lams</echo>
-		<ant antfile="../lams_common/build.xml"            target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_central/build.xml"           target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_contentrepository/build.xml" target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_learning/build.xml"          target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_monitoring/build.xml"        target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_admin/build.xml"             target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_gradebook/build.xml"         target="copy-to-lams-lib" inheritAll="false" />
-	</target>
-	
 	
 	<target name="_build-ear" depends="_clean-dirs, _build-core">
 		<!-- Internal target: Assembles LAMS EAR in exploded form -->
@@ -254,7 +240,7 @@
 	</target>
 
 	
-	<target name="deploy-ear" depends="_build-ear" description="Deploys EAR.">
+	<target name="_deploy-ear" depends="_build-ear">
 		<echo>Deploying EAR</echo>
 		<delete dir="${server.home}/standalone/deployments/lams.ear"/>
 		<copy todir="${server.home}/standalone/deployments/lams.ear">
@@ -272,23 +258,12 @@
 		</copy>
 	</target>
 
-	
-	<target name="deploy-tools-minimal" description="Deploys minimal set of Tools.">
-		<echo>Deploying minimal set of Tools</echo>
-  		<ant antfile="../lams_tool_notebook/build.xml" target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_wiki/build.xml" 	 target="deploy-tool" inheritAll="false" />
-	</target>
-	
-	
 	<target name="_deploy-tools">
 		<echo>Deploying Tools</echo>
 		<ant antfile="../lams_tool_assessment/build.xml"    target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_chat/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_daco/build.xml"          target="deploy-tool" inheritAll="false" />
-		<!--<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_images/build.xml"        target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_imscc/build.xml"         target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_lamc/build.xml"          target="deploy-tool" inheritAll="false" />
@@ -307,19 +282,23 @@
   		<ant antfile="../lams_tool_task/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_vote/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_wiki/build.xml"          target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
+		
 		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
 			<ant antfile="../lams_tool_eadventure/build.xml"    target="deploy-tool" inheritAll="false"/>
 			<ant antfile="../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false"/>
 			<ant antfile="../lams_tool_wookie/build.xml"    	target="deploy-tool" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
+			
+			<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
 		-->
 	</target>
 	
 
-	<target name="deploy-tools" depends="_deploy-tools, deploy-learning-libraries" 
-		    description="Deploys LAMS Tools and special parallel activities." />
-
-	
 	<target name="_deploy-learning-library">
 		<!-- Internal target: Deploys a parallel activity. -->
 		
@@ -398,8 +377,7 @@
 	</target>
 	
 	
-	<target name="deploy-learning-libraries"
-		    description="Builds and deploys parallel and other complex activities. Can be done only after Tools are deployed">
+	<target name="_deploy-learning-libraries">
 		<echo>${ant.project.name}: Deploying Library Activities</echo>
 
 		<echo>Generating deployment package for share resources / forum parallel activity</echo>
@@ -690,12 +668,9 @@
 		<ant antfile="../lams_admin/build.xml"              target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_gradebook/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_assessment/build.xml"    target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_bbb/build.xml"           target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_chat/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_daco/build.xml"          target="explode-war" inheritAll="false" />
-		<!--<ant antfile="../lams_tool_doku/build.xml"          target="explode-war" inheritAll="false" />-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_gmap/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_images/build.xml"        target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_imscc/build.xml"         target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_lamc/build.xml"          target="explode-war" inheritAll="false" />
@@ -714,24 +689,51 @@
   		<ant antfile="../lams_tool_task/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_vote/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_wiki/build.xml"          target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_kaltura/build.xml"       target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_mindmap/build.xml"       target="explode-war" inheritAll="false" />
 		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="explode-war" inheritAll="false" />
 			<ant antfile="../lams_tool_eadventure/build.xml"    target="explode-war" inheritAll="false"/>
 			<ant antfile="../lams_tool_videorecorder/build.xml" target="explode-war" inheritAll="false"/>
 			<ant antfile="../lams_tool_wookie/build.xml"    	target="explode-war" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="explode-war" inheritAll="false" />
+			
+			<ant antfile="../lams_tool_doku/build.xml"          target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_zoom/build.xml"          target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_preview/build.xml"       target="explode-war" inheritAll="false" />
 		-->
 	</target>
 	
 	
 	<!-- cruise control task : build lams -->
-	<target name="lams-cruise" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools"
-		    description="Builds entire LAMS (used for CruiseControl instance)" />
+	<target name="deploy-lams" depends="_build-ear, build-db, _deploy-ear, _deploy-resources, _deploy-tools, _deploy-learning-libraries"
+		    description="Builds entire LAMS" />
 	
 	
 	<!-- cruise control task : build lams without tools -->
-	<target name="lams-cruise-min-tools" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools-minimal"
-	        description="Builds entire LAMS without tools (used for CruiseControl instance)" />
+	<target name="deploy-lams-min-tools" depends="_build-ear, build-db, _deploy-ear, _deploy-resources"
+	        description="Builds entire LAMS without tools">
+		<echo>${ant.project.name}: Deploying minimal set of Tools</echo>
+  		<ant antfile="../lams_tool_notebook/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml" 	 target="deploy-tool" inheritAll="false" />
+	</target>
+	
+	<target name="deploy-lams-all-tools" depends="_build-ear, build-db, _deploy-ear, _deploy-resources, _deploy-tools, _deploy-learning-libraries"
+		    description="Builds entire LAMS with all tools including optional ones and stubs. Mainly for development.">
+		<echo>${ant.project.name}: Deploying optional set of Tools</echo>
+		<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_eadventure/build.xml"    target="deploy-tool" inheritAll="false"/>
+		<ant antfile="../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false"/>
+		<ant antfile="../lams_tool_wookie/build.xml"    	target="deploy-tool" inheritAll="false"/>
+		<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_dimdim/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
+		
+		<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
+	</target>
+	
 	
 	<!-- cruise control task : build lams -->
 	<target name="deploy-cluster" description="Prepare cluster environment">
