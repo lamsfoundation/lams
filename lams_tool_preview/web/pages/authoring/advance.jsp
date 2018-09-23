@@ -50,7 +50,7 @@
 
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.peerreview.contentId}" />
+<lams:OutcomeAuthor toolContentId="${peerreviewForm.peerreview.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">

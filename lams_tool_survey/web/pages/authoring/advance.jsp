@@ -31,7 +31,7 @@
 
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.survey.contentId}" />
+<lams:OutcomeAuthor toolContentId="${authoringForm.survey.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 

@@ -237,7 +237,7 @@
 </iframe>
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.assessment.contentId}" />
+<lams:OutcomeAuthor toolContentId="${assessmentForm.assessment.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 
