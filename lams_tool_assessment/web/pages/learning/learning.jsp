@@ -325,8 +325,8 @@
 
 						</c:when>
 						
-						<c:when test="${(question.type == 3) || (question.type == 4)}">
-							//shortanswer or numerical
+						<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6 && !question.allowRichEditor)}">
+							//shortanswer or numerical or essay without ckeditor
 							var inputText = $("input[name=question${status.index}]")[0];
 							if($.trim(inputText.value).length == 0) {
 								missingRequiredQuestions.push("${status.index}");
@@ -337,15 +337,6 @@
 						<c:when test="${question.type == 5}">
 							//truefalse
 							if ($("input[name=question${status.index}]:checked").length == 0) {
-								missingRequiredQuestions.push("${status.index}");
-							}
-						</c:when>
-							
-						<c:when test="question.type == 6 && !question.allowRichEditor}">
-							//  essay without ckeditor
-							debugger;
-							var inputText = $("textarea[name=question${status.index}]")[0];
-							if($.trim(inputText.value).length == 0) {
 								missingRequiredQuestions.push("${status.index}");
 							}
 						</c:when>
