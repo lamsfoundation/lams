@@ -30,7 +30,7 @@
 
 	<tr>
 		<td colspan="2">
-			<c:url  var="authoringUrl" value="/definelater.do">
+			<c:url  var="authoringUrl" value="/authoring/defineLater.do">
 				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 			</c:url>
