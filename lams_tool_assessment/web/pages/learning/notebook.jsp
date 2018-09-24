@@ -23,7 +23,7 @@
 <body class="stripes">
 	<lams:Page type="learner" title="${sessionMap.title}">
 	
-		<form:form action="/lams/tool/laasse10/learning/submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
+		<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm" id="reflectionForm">
 			<form:hidden path="userID" />
 			<form:hidden path="sessionMapID" />
 

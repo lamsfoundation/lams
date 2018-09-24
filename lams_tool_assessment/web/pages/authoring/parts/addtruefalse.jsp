@@ -87,7 +87,7 @@
 				</lams:Alert>	
 		    </div>
 			
-			<form:form action="/lams/tool/laasse10/authoring/saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<form:hidden path="questionIndex" />

@@ -45,7 +45,7 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<form:form action="/lams/tool/laasse10/authoring/updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" enctype="multipart/form-data"
+	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" enctype="multipart/form-data"
 			onsubmit="return validateQuestionBankIsNotEmpty();">
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
