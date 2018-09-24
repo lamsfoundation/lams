@@ -45,13 +45,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- *
- *
- *
- */
 @Controller
-//@RequestMapping("")
+@RequestMapping("/authoring")
 public class AuthoringController {
 
     private static Logger logger = Logger.getLogger(AuthoringController.class);
@@ -70,7 +65,7 @@ public class AuthoringController {
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
      *
      */
-    @RequestMapping("/authoring")
+    @RequestMapping("")
     protected String unspecified(AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
