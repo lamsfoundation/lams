@@ -642,7 +642,7 @@ public class MonitoringController {
 
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("message", messageService.getMessage("force.complete.learner.command.message"));
-	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
+	jsonCommand.put("redirectURL", "/lams/learning/learner/joinLesson.do?lessonID=" + lessonId);
 	String command = jsonCommand.toString();
 
 	String activityDescription = null;
