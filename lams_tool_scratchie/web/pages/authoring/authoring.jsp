@@ -44,10 +44,9 @@
 		<form:hidden path="scratchie.contentId" />
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
-		<form:hidden property="mode" value="${mode}"/>
+		<input type="hidden" name="mode" value="${mode}"/>
 		<form:hidden path="currentTab" id="currentTab" />
 		<input type="hidden" name="itemList" id="itemList" />
-	
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">
