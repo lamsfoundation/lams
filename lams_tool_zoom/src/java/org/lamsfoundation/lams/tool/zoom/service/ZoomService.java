@@ -29,7 +29,6 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,6 +72,7 @@ import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -304,7 +304,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
 	    // reset it to new toolContentId
 	    zoom.setToolContentId(toolContentId);
-	    zoom.setCreateBy(new Long(newUserUid.longValue()));
+	    zoom.setCreateBy(newUserUid.longValue());
 	    zoom.setApi(null);
 
 	    saveOrUpdateZoom(zoom);
@@ -746,8 +746,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     private static HttpURLConnection getZoomConnection(String urlSuffix, String method, String body, ZoomApi api)
 	    throws IOException {
-	URL url = new URL(ZoomConstants.ZOOM_API_URL + urlSuffix);
-	HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+	HttpsURLConnection connection = (HttpsURLConnection) HttpUrlConnectionUtil
+		.getConnection(ZoomConstants.ZOOM_API_URL + urlSuffix);
 	connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
 	switch (method) {
 	    case "PATCH":
