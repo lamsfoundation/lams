@@ -5,7 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
-			<attribute name="limit-modules" value="java.se,jdk.accessibility,jdk.attach,jdk.compiler,jdk.httpserver,jdk.jartool,jdk.javadoc,jdk.jconsole,jdk.jdi,jdk.management,jdk.sctp,jdk.security.auth,jdk.security.jgss,jdk.unsupported,jdk.dynalink,jdk.incubator.httpclient,jdk.jshell,jdk.jsobject,jdk.net,jdk.scripting.nashorn,jdk.xml.dom,java.activation"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
@@ -49,6 +48,7 @@
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/dmr/main/jboss-dmr-1.3.0.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/activation/api/main/activation-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath=""/>
 </classpath>
