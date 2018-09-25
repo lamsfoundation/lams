@@ -137,10 +137,7 @@ public class DrawTextShape extends DrawSimpleShape {
         DrawFactory fact = DrawFactory.getInstance(graphics);
 
         double y0 = y;
-        //noinspection RedundantCast
-        @SuppressWarnings("cast")
-        Iterator<? extends TextParagraph<?,?,? extends TextRun>> paragraphs =
-            (Iterator<? extends TextParagraph<?,?,? extends TextRun>>) getShape().iterator();
+        Iterator<? extends TextParagraph<?,?,? extends TextRun>> paragraphs = getShape().iterator();
         
         boolean isFirstLine = true;
         for (int autoNbrIdx=0; paragraphs.hasNext(); autoNbrIdx++){
@@ -158,7 +155,9 @@ public class DrawTextShape extends DrawSimpleShape {
             dp.setAutoNumberingIdx(autoNbrIdx);
             dp.breakText(graphics);
 
-            if (!isFirstLine) {
+            if (isFirstLine) {
+                y += dp.getFirstLineLeading();
+            } else {
                 // the amount of vertical white space before the paragraph
                 Double spaceBefore = p.getSpaceBefore();
                 if (spaceBefore == null) spaceBefore = 0d;
@@ -208,7 +207,7 @@ public class DrawTextShape extends DrawSimpleShape {
      * @param oldGraphics the graphics context, which properties are to be copied, may be null
      * @return the height in points
      */
-    protected double getTextHeight(Graphics2D oldGraphics) {
+    public double getTextHeight(Graphics2D oldGraphics) {
         // dry-run in a 1x1 image and return the vertical advance
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = img.createGraphics();
@@ -221,7 +220,7 @@ public class DrawTextShape extends DrawSimpleShape {
     }
     
     @Override
-    protected TextShape<?,?> getShape() {
-        return (TextShape<?,?>)shape;
+    protected TextShape<?,? extends TextParagraph<?,?,? extends TextRun>> getShape() {
+        return (TextShape<?,? extends TextParagraph<?,?,? extends TextRun>>)shape;
     }
 }

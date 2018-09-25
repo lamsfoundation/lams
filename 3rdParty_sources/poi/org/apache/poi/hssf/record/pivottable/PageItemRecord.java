@@ -17,14 +17,14 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
-import org.apache.poi.hssf.record.RecordFormatException;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndianOutput;
+import org.apache.poi.util.RecordFormatException;
 
 /**
- * SXPI - Page Item (0x00B6)<br/>
+ * SXPI - Page Item (0x00B6)<br>
  * 
  * @author Patrick Cheng
  */

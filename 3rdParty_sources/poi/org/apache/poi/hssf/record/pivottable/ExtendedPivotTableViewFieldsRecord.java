@@ -17,15 +17,15 @@
 
 package org.apache.poi.hssf.record.pivottable;
 
-import org.apache.poi.hssf.record.RecordFormatException;
 import org.apache.poi.hssf.record.RecordInputStream;
 import org.apache.poi.hssf.record.StandardRecord;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndianOutput;
+import org.apache.poi.util.RecordFormatException;
 import org.apache.poi.util.StringUtil;
 
 /**
- * SXVDEX - Extended PivotTable View Fields (0x0100)<br/>
+ * SXVDEX - Extended PivotTable View Fields (0x0100)<br>
  * 
  * @author Patrick Cheng
  */

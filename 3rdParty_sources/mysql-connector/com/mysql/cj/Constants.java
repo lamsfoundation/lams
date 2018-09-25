@@ -57,13 +57,13 @@ public class Constants {
     public static final String OS_VERSION = System.getProperty(PropertyDefinitions.SYSP_os_version);
     public static final String PLATFORM_ENCODING = System.getProperty(PropertyDefinitions.SYSP_file_encoding);
 
-    public static final String CJ_NAME = "@MYSQL_CJ_DISPLAY_PROD_NAME@";
-    public static final String CJ_FULL_NAME = "@MYSQL_CJ_FULL_PROD_NAME@";
-    public static final String CJ_REVISION = "@MYSQL_CJ_REVISION@";
-    public static final String CJ_VERSION = "@MYSQL_CJ_VERSION@";
-    public static final String CJ_MAJOR_VERSION = "@MYSQL_CJ_MAJOR_VERSION@";
-    public static final String CJ_MINOR_VERSION = "@MYSQL_CJ_MINOR_VERSION@";
-    public static final String CJ_LICENSE = "@MYSQL_CJ_LICENSE_TYPE@";
+    public static final String CJ_NAME = "MySQL Connector/J";
+    public static final String CJ_FULL_NAME = "mysql-connector-java-8.0.11";
+    public static final String CJ_REVISION = "6d4eaa273bc181b4cf1c8ad0821a2227f116fedf";
+    public static final String CJ_VERSION = "8.0.11";
+    public static final String CJ_MAJOR_VERSION = "8";
+    public static final String CJ_MINOR_VERSION = "0";
+    public static final String CJ_LICENSE = "GPL";
 
     /**
      * Prevents instantiation

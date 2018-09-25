@@ -29,12 +29,12 @@ public final class BoolEval implements NumericValueEval, StringValueEval {
 	public static final BoolEval TRUE = new BoolEval(true);
 
 	/**
-	 * Convenience method for the following:<br/>
+	 * Convenience method for the following:<br>
 	 * <code>(b ? BoolEval.TRUE : BoolEval.FALSE)</code>
 	 *
 	 * @return the <tt>BoolEval</tt> instance representing <tt>b</tt>.
 	 */
-	public static final BoolEval valueOf(boolean b) {
+	public static BoolEval valueOf(boolean b) {
 		return b ? TRUE : FALSE;
 	}
 
@@ -55,10 +55,8 @@ public final class BoolEval implements NumericValueEval, StringValueEval {
 	}
 
 	public String toString() {
-		StringBuilder sb = new StringBuilder(64);
-		sb.append(getClass().getName()).append(" [");
-		sb.append(getStringValue());
-		sb.append("]");
-		return sb.toString();
+		return getClass().getName() + " [" +
+				getStringValue() +
+				"]";
 	}
 }

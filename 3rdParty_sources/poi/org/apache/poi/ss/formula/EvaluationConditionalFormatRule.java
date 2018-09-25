@@ -41,24 +41,29 @@ import org.apache.poi.ss.usermodel.ConditionFilterType;
 import org.apache.poi.ss.usermodel.ConditionType;
 import org.apache.poi.ss.usermodel.ConditionalFormatting;
 import org.apache.poi.ss.usermodel.ConditionalFormattingRule;
+import org.apache.poi.ss.usermodel.ExcelNumberFormat;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellReference;
 
 /**
  * Abstracted and cached version of a Conditional Format rule for use with a
  * {@link ConditionalFormattingEvaluator}. This references a rule, its owning
  * {@link ConditionalFormatting}, its priority order (lower index = higher priority in Excel),
  * and the information needed to evaluate the rule for a given cell.
- * <p/>
+ * <p>
  * Having this all combined and cached avoids repeated access calls to the
  * underlying structural objects, XSSF CT* objects and HSSF raw byte structures.
  * Those objects can be referenced from here. This object will be out of sync if
  * anything modifies the referenced structures' evaluation properties.
- * <p/>
+ * <p>
  * The assumption is that consuming applications will read the display properties once and
  * create whatever style objects they need, caching those at the application level.
  * Thus this class only caches values needed for evaluation, not display.
+ */
+/**
+ *
  */
 public class EvaluationConditionalFormatRule implements Comparable<EvaluationConditionalFormatRule> {
 
@@ -82,6 +87,8 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
     private final String formula2;
     private final OperatorEnum operator;
     private final ConditionType type;
+    // cached for performance, to avoid reading the XMLBean every time a conditinally formatted cell is rendered
+    private final ExcelNumberFormat numberFormat;
     
     /**
      *
@@ -108,11 +115,15 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
         this.regions = regions;
         formula1 = rule.getFormula1();
         formula2 = rule.getFormula2();
+        numberFormat = rule.getNumberFormat();
         
         operator = OperatorEnum.values()[rule.getComparisonOperation()];
         type = rule.getConditionType();
     }
 
+    /**
+     * @return sheet
+     */
     public Sheet getSheet() {
         return sheet;
     }
@@ -124,8 +135,18 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
         return formatting;
     }
     
+    /**
+     * @return conditional formatting index
+     */
     public int getFormattingIndex() {
         return formattingIndex;
+    }
+    
+    /**
+     * @return Excel number format string to apply to matching cells, or null to keep the cell default
+     */
+    public ExcelNumberFormat getNumberFormat() {
+        return numberFormat;
     }
     
     /**
@@ -135,6 +156,9 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
         return rule;
     }
     
+    /**
+     * @return rule index
+     */
     public int getRuleIndex() {
         return ruleIndex;
     }
@@ -185,9 +209,14 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
      * Defined as equal sheet name and formatting and rule indexes
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (! obj.getClass().equals(this.getClass())) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (! obj.getClass().equals(this.getClass())) {
+            return false;
+        }
         final EvaluationConditionalFormatRule r = (EvaluationConditionalFormatRule) obj;
         return getSheet().getSheetName().equalsIgnoreCase(r.getSheet().getSheetName())
             && getFormattingIndex() == r.getFormattingIndex()
@@ -197,27 +226,35 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
     /**
      * Per Excel Help, XSSF rule priority is sheet-wide, not just within the owning ConditionalFormatting object.
      * This can be seen by creating 4 rules applying to two different ranges and examining the XML.
-     * <p/>
+     * <p>
      * HSSF priority is based on definition/persistence order.
      * 
      * @param o
      * @return comparison based on sheet name, formatting index, and rule priority
      */
+    @Override
     public int compareTo(EvaluationConditionalFormatRule o) {
         int cmp = getSheet().getSheetName().compareToIgnoreCase(o.getSheet().getSheetName());
-        if (cmp != 0) return cmp;
+        if (cmp != 0) {
+            return cmp;
+        }
         
         final int x = getPriority();
         final int y = o.getPriority();
         // logic from Integer.compare()
         cmp = (x < y) ? -1 : ((x == y) ? 0 : 1);
-        if (cmp != 0) return cmp;
+        if (cmp != 0) {
+            return cmp;
+        }
 
         cmp = new Integer(getFormattingIndex()).compareTo(new Integer(o.getFormattingIndex()));
-        if (cmp != 0) return cmp;
+        if (cmp != 0) {
+            return cmp;
+        }
         return new Integer(getRuleIndex()).compareTo(new Integer(o.getRuleIndex()));
     }
     
+    @Override
     public int hashCode() {
         int hash = sheet.getSheetName().hashCode();
         hash = 31 * hash + formattingIndex;
@@ -226,20 +263,23 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
     }
     
     /**
-     * @param cell
+     * @param ref
      * @return true if this rule evaluates to true for the given cell
      */
-    /* package */ boolean matches(Cell cell) {
+    /* package */ boolean matches(CellReference ref) {
         // first check that it is in one of the regions defined for this format
         CellRangeAddress region = null;
         for (CellRangeAddress r : regions) {
-            if (r.isInRange(cell)) {
+            if (r.isInRange(ref)) {
                 region = r;
                 break;
             }
         }
         
-        if (region == null) return false; // cell not in range of this rule
+        if (region == null) {
+            // cell not in range of this rule
+            return false;
+        }
         
         final ConditionType ruleType = getRule().getConditionType();
         
@@ -251,14 +291,22 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
            return true; 
         }
         
+        Cell cell = null;
+        final Row row = sheet.getRow(ref.getRow());
+        if (row != null) {
+            cell = row.getCell(ref.getCol());
+        }
+        
         if (ruleType.equals(ConditionType.CELL_VALUE_IS)) {
+            // undefined cells never match a VALUE_IS condition
+            if (cell == null) return false;
             return checkValue(cell, region);
         }
         if (ruleType.equals(ConditionType.FORMULA)) {
-            return checkFormula(cell, region);
+            return checkFormula(ref, region);
         }
         if (ruleType.equals(ConditionType.FILTER)) {
-            return checkFilter(cell, region);
+            return checkFilter(cell, ref, region);
         }
         
         // TODO: anything else, we don't handle yet, such as top 10
@@ -276,7 +324,9 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
            || (DataValidationEvaluator.isType(cell,CellType.STRING) 
                    && (cell.getStringCellValue() == null || cell.getStringCellValue().isEmpty())
                )
-           ) return false;
+           ) {
+            return false;
+        }
         
         ValueEval eval = unwrapEval(workbookEvaluator.evaluate(rule.getFormula1(), ConditionalFormattingEvaluator.getRef(cell), region));
         
@@ -320,16 +370,20 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
         return comp;
     }
     /**
-     * @param cell needed for offsets from region anchor
+     * @param cell needed for offsets from region anchor - may be null!
      * @param region for adjusting relative formulas
      * @return true/false using the same rules as Data Validation evaluations
      */
-    private boolean checkFormula(Cell cell, CellRangeAddress region) {
-        ValueEval comp = unwrapEval(workbookEvaluator.evaluate(rule.getFormula1(), ConditionalFormattingEvaluator.getRef(cell), region));
+    private boolean checkFormula(CellReference ref, CellRangeAddress region) {
+        ValueEval comp = unwrapEval(workbookEvaluator.evaluate(rule.getFormula1(), ref, region));
         
         // Copied for now from DataValidationEvaluator.ValidationEnum.FORMULA#isValidValue()
-        if (comp instanceof BlankEval) return true;
-        if (comp instanceof ErrorEval) return false;
+        if (comp instanceof BlankEval) {
+            return true;
+        }
+        if (comp instanceof ErrorEval) {
+            return false;
+        }
         if (comp instanceof BoolEval) {
             return ((BoolEval) comp).getBooleanValue();
         }
@@ -341,9 +395,13 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
         return false; // anything else is false, such as text
     }
     
-    private boolean checkFilter(Cell cell, CellRangeAddress region) {
+    private boolean checkFilter(Cell cell, CellReference ref, CellRangeAddress region) {
         final ConditionFilterType filterType = rule.getConditionFilterType();
-        if (filterType == null) return false;
+        if (filterType == null) {
+            return false;
+        }
+
+        final ValueAndFormat cv = getCellValue(cell);
         
         // TODO: this could/should be delegated to the Enum type, but that's in the usermodel package,
         // we may not want evaluation code there.  Of course, maybe the enum should go here in formula,
@@ -356,28 +414,38 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             // from testing, Excel only operates on numbers and dates (which are stored as numbers) in the range.
             // numbers stored as text are ignored, but numbers formatted as text are treated as numbers.
             
-            final ValueAndFormat cv10 = getCellValue(cell);
-            if (! cv10.isNumber()) return false;
+            if (! cv.isNumber()) {
+                return false;
+            }
             
             return getMeaningfulValues(region, false, new ValueFunction() {
+                @Override
                 public Set<ValueAndFormat> evaluate(List<ValueAndFormat> allValues) {
                     List<ValueAndFormat> values = allValues;
                     final ConditionFilterData conf = rule.getFilterConfiguration();
                     
-                    if (! conf.getBottom()) Collections.sort(values, Collections.reverseOrder());
-                    else Collections.sort(values);
+                    if (! conf.getBottom()) {
+                        Collections.sort(values, Collections.reverseOrder());
+                    } else {
+                        Collections.sort(values);
+                    }
                     
                     int limit = (int) conf.getRank();
-                    if (conf.getPercent()) limit = allValues.size() * limit / 100;
-                    if (allValues.size() <= limit) return new HashSet<ValueAndFormat>(allValues);
+                    if (conf.getPercent()) {
+                        limit = allValues.size() * limit / 100;
+                    }
+                    if (allValues.size() <= limit) {
+                        return new HashSet<ValueAndFormat>(allValues);
+                    }
 
                     return new HashSet<ValueAndFormat>(allValues.subList(0, limit));
                 }
-            }).contains(cv10);
+            }).contains(cv);
         case UNIQUE_VALUES:
             // Per Excel help, "duplicate" means matching value AND format
             // https://support.office.com/en-us/article/Filter-for-unique-values-or-remove-duplicate-values-ccf664b0-81d6-449b-bbe1-8daaec1e83c2
             return getMeaningfulValues(region, true, new ValueFunction() {
+                @Override
                 public Set<ValueAndFormat> evaluate(List<ValueAndFormat> allValues) {
                     List<ValueAndFormat> values = allValues;
                     Collections.sort(values);
@@ -397,11 +465,12 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
                     
                     return unique;
                 }
-            }).contains(getCellValue(cell));
+            }).contains(cv);
         case DUPLICATE_VALUES:
             // Per Excel help, "duplicate" means matching value AND format
             // https://support.office.com/en-us/article/Filter-for-unique-values-or-remove-duplicate-values-ccf664b0-81d6-449b-bbe1-8daaec1e83c2
             return getMeaningfulValues(region, true, new ValueFunction() {
+                @Override
                 public Set<ValueAndFormat> evaluate(List<ValueAndFormat> allValues) {
                     List<ValueAndFormat> values = allValues;
                     Collections.sort(values);
@@ -419,7 +488,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
                     }
                     return dup;
                 }
-            }).contains(getCellValue(cell));
+            }).contains(cv);
         case ABOVE_AVERAGE:
             // from testing, Excel only operates on numbers and dates (which are stored as numbers) in the range.
             // numbers stored as text are ignored, but numbers formatted as text are treated as numbers.
@@ -428,6 +497,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
 
             // actually ordered, so iteration order is predictable
             List<ValueAndFormat> values = new ArrayList<ValueAndFormat>(getMeaningfulValues(region, false, new ValueFunction() {
+                @Override
                 public Set<ValueAndFormat> evaluate(List<ValueAndFormat> allValues) {
                     List<ValueAndFormat> values = allValues;
                     double total = 0;
@@ -447,9 +517,10 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
                 }
             }));
             
-            final ValueAndFormat cv = getCellValue(cell);
             Double val = cv.isNumber() ? cv.getValue() : null;
-            if (val == null) return false;
+            if (val == null) {
+                return false;
+            }
             
             double avg = values.get(0).value.doubleValue();
             double stdDev = values.get(1).value.doubleValue();
@@ -464,28 +535,34 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             
             OperatorEnum op = null;
             if (conf.getAboveAverage()) {
-                if (conf.getEqualAverage()) op = OperatorEnum.GREATER_OR_EQUAL;
-                else op = OperatorEnum.GREATER_THAN;
+                if (conf.getEqualAverage()) {
+                    op = OperatorEnum.GREATER_OR_EQUAL;
+                } else {
+                    op = OperatorEnum.GREATER_THAN;
+                }
             } else {
-                if (conf.getEqualAverage()) op = OperatorEnum.LESS_OR_EQUAL;
-                else op = OperatorEnum.LESS_THAN;
+                if (conf.getEqualAverage()) {
+                    op = OperatorEnum.LESS_OR_EQUAL;
+                } else {
+                    op = OperatorEnum.LESS_THAN;
+                }
             }
             return op != null && op.isValid(val, comp, null);
         case CONTAINS_TEXT:
             // implemented both by a cfRule "text" attribute and a formula.  Use the formula.
-            return checkFormula(cell, region);
+            return checkFormula(ref, region);
         case NOT_CONTAINS_TEXT:
             // implemented both by a cfRule "text" attribute and a formula.  Use the formula.
-            return checkFormula(cell, region);
+            return checkFormula(ref, region);
         case BEGINS_WITH:
             // implemented both by a cfRule "text" attribute and a formula.  Use the formula.
-            return checkFormula(cell, region);
+            return checkFormula(ref, region);
         case ENDS_WITH:
             // implemented both by a cfRule "text" attribute and a formula.  Use the formula.
-            return checkFormula(cell, region);
+            return checkFormula(ref, region);
         case CONTAINS_BLANKS:
             try {
-                String v = cell.getStringCellValue();
+                String v = cv.getString();
                 // see TextFunction.TRIM for implementation
                 return v == null || v.trim().length() == 0;
             } catch (Exception e) {
@@ -494,7 +571,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             }
         case NOT_CONTAINS_BLANKS:
             try {
-                String v = cell.getStringCellValue();
+                String v = cv.getString();
                 // see TextFunction.TRIM for implementation
                 return v != null && v.trim().length() > 0;
             } catch (Exception e) {
@@ -507,7 +584,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             return cell == null || ! DataValidationEvaluator.isType(cell, CellType.ERROR);
         case TIME_PERIOD:
             // implemented both by a cfRule "text" attribute and a formula.  Use the formula.
-            return checkFormula(cell, region);
+            return checkFormula(ref, region);
         default:
             return false;
         }
@@ -522,17 +599,23 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
      */
     private Set<ValueAndFormat> getMeaningfulValues(CellRangeAddress region, boolean withText, ValueFunction func) {
         Set<ValueAndFormat> values = meaningfulRegionValues.get(region);
-        if (values != null) return values;
+        if (values != null) {
+            return values;
+        }
         
         List<ValueAndFormat> allValues = new ArrayList<ValueAndFormat>((region.getLastColumn() - region.getFirstColumn()+1) * (region.getLastRow() - region.getFirstRow() + 1));
         
         for (int r=region.getFirstRow(); r <= region.getLastRow(); r++) {
             final Row row = sheet.getRow(r);
-            if (row == null) continue;
+            if (row == null) {
+                continue;
+            }
             for (int c = region.getFirstColumn(); c <= region.getLastColumn(); c++) {
                 Cell cell = row.getCell(c);
                 final ValueAndFormat cv = getCellValue(cell);
-                if (cv != null && (withText || cv.isNumber()) ) allValues.add(cv);
+                if (cv != null && (withText || cv.isNumber()) ) {
+                    allValues.add(cv);
+                }
             }
         }
         
@@ -553,7 +636,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
                 return new ValueAndFormat(cell.getStringCellValue(), cell.getCellStyle().getDataFormatString());
             }
         }
-        return null;
+        return new ValueAndFormat("", "");
     }
     /**
      * instances evaluate the values for a region and return the positive matches for the function type.
@@ -578,21 +661,25 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
     public static enum OperatorEnum {
         NO_COMPARISON {
             /** always false/invalid */
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return false;
             }
         },
         BETWEEN {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return cellValue.compareTo(v1) >= 0 && cellValue.compareTo(v2) <= 0;
             }
         },
         NOT_BETWEEN {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return cellValue.compareTo(v1) < 0 || cellValue.compareTo(v2) > 0;
             }
         },
         EQUAL {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 // need to avoid instanceof, to work around a 1.6 compiler bug
                 if (cellValue.getClass() == String.class) {
@@ -602,6 +689,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             }
         },
         NOT_EQUAL {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 // need to avoid instanceof, to work around a 1.6 compiler bug
                 if (cellValue.getClass() == String.class) {
@@ -611,21 +699,25 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             }
         },
         GREATER_THAN {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return cellValue.compareTo(v1) > 0;
             }
         },
         LESS_THAN {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return cellValue.compareTo(v1) < 0;
             }
         },
         GREATER_OR_EQUAL {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return cellValue.compareTo(v1) >= 0;
             }
         },
         LESS_OR_EQUAL {
+            @Override
             public <C extends Comparable<C>> boolean isValid(C cellValue, C v1, C v2) {
                 return cellValue.compareTo(v1) <= 0;
             }
@@ -645,7 +737,7 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
     /**
      * Note: this class has a natural ordering that is inconsistent with equals.
      */
-    protected class ValueAndFormat implements Comparable<ValueAndFormat> {
+    protected static class ValueAndFormat implements Comparable<ValueAndFormat> {
         
         private final Double value;
         private final String string;
@@ -671,7 +763,15 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
             return value;
         }
         
+        public String getString() {
+            return string;
+        }
+        
+        @Override
         public boolean equals(Object obj) {
+            if (!(obj instanceof ValueAndFormat)) {
+                return false;
+            }
             ValueAndFormat o = (ValueAndFormat) obj;
             return ( value == o.value || value.equals(o.value))
                     && ( format == o.format || format.equals(o.format))
@@ -683,18 +783,30 @@ public class EvaluationConditionalFormatRule implements Comparable<EvaluationCon
          * @param o
          * @return value comparison
          */
+        @Override
         public int compareTo(ValueAndFormat o) {
-            if (value == null && o.value != null) return 1;
-            if (o.value == null && value != null) return -1;
+            if (value == null && o.value != null) {
+                return 1;
+            }
+            if (o.value == null && value != null) {
+                return -1;
+            }
             int cmp = value == null ? 0 : value.compareTo(o.value);
-            if (cmp != 0) return cmp;
+            if (cmp != 0) {
+                return cmp;
+            }
             
-            if (string == null && o.string != null) return 1;
-            if (o.string == null && string != null) return -1;
+            if (string == null && o.string != null) {
+                return 1;
+            }
+            if (o.string == null && string != null) {
+                return -1;
+            }
             
             return string == null ? 0 : string.compareTo(o.string);
         }
         
+        @Override
         public int hashCode() {
             return (string == null ? 0 : string.hashCode()) * 37 * 37 + 37 * (value == null ? 0 : value.hashCode()) + (format == null ? 0 : format.hashCode());
         }

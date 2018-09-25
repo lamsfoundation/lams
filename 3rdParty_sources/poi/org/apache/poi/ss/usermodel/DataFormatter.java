@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import org.apache.poi.ss.format.CellFormat;
 import org.apache.poi.ss.format.CellFormatResult;
+import org.apache.poi.ss.formula.ConditionalFormattingEvaluator;
 import org.apache.poi.ss.util.DateFormatConverter;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.util.LocaleUtil;
@@ -128,6 +129,9 @@ public class DataFormatter implements Observer {
 
     /** Pattern to find "AM/PM" marker */
     private static final Pattern amPmPattern = Pattern.compile("((A|P)[M/P]*)", Pattern.CASE_INSENSITIVE);
+    
+    /** Pattern to find formats with condition ranges e.g. [>=100] */
+    private static final Pattern rangeConditionalPattern = Pattern.compile(".*\\[\\s*(>|>=|<|<=|=)\\s*[0-9]*\\.*[0-9].*");
 
     /** 
      * A regex to find locale patterns like [$$-1009] and [$?-452].
@@ -288,13 +292,17 @@ public class DataFormatter implements Observer {
      * @param cell The cell to retrieve a Format for
      * @return A Format for the format String
      */
-    private Format getFormat(Cell cell) {
-        if ( cell.getCellStyle() == null) {
+    private Format getFormat(Cell cell, ConditionalFormattingEvaluator cfEvaluator) {
+        if (cell == null) return null;
+        
+        ExcelNumberFormat numFmt = ExcelNumberFormat.from(cell, cfEvaluator);
+        
+        if ( numFmt == null) {
             return null;
         }
 
-        int formatIndex = cell.getCellStyle().getDataFormat();
-        String formatStr = cell.getCellStyle().getDataFormatString();
+        int formatIndex = numFmt.getIdx();
+        String formatStr = numFmt.getFormat();
         if(formatStr == null || formatStr.trim().length() == 0) {
             return null;
         }
@@ -303,26 +311,28 @@ public class DataFormatter implements Observer {
 
     private Format getFormat(double cellValue, int formatIndex, String formatStrIn) {
         localeChangedObservable.checkForLocaleChange();
-        
-//      // Might be better to separate out the n p and z formats, falling back to p when n and z are not set.
-//      // That however would require other code to be re factored.
-//      String[] formatBits = formatStrIn.split(";");
-//      int i = cellValue > 0.0 ? 0 : cellValue < 0.0 ? 1 : 2; 
-//      String formatStr = (i < formatBits.length) ? formatBits[i] : formatBits[0];
+
+        // Might be better to separate out the n p and z formats, falling back to p when n and z are not set.
+        // That however would require other code to be re factored.
+        // String[] formatBits = formatStrIn.split(";");
+        // int i = cellValue > 0.0 ? 0 : cellValue < 0.0 ? 1 : 2; 
+        // String formatStr = (i < formatBits.length) ? formatBits[i] : formatBits[0];
 
         String formatStr = formatStrIn;
         
-        // Excel supports 3+ part conditional data formats, eg positive/negative/zero,
+        // Excel supports 2+ part conditional data formats, eg positive/negative/zero,
         //  or (>1000),(>0),(0),(negative). As Java doesn't handle these kinds
         //  of different formats for different ranges, just +ve/-ve, we need to 
         //  handle these ourselves in a special way.
-        // For now, if we detect 3+ parts, we call out to CellFormat to handle it
+        // For now, if we detect 2+ parts, we call out to CellFormat to handle it
         // TODO Going forward, we should really merge the logic between the two classes
-        if (formatStr.contains(";") &&
-                formatStr.indexOf(';') != formatStr.lastIndexOf(';')) {
+        if (formatStr.contains(";") && 
+                (formatStr.indexOf(';') != formatStr.lastIndexOf(';')
+                 || rangeConditionalPattern.matcher(formatStr).matches()
+                ) ) {
             try {
                 // Ask CellFormat to get a formatter for it
-                CellFormat cfmt = CellFormat.getInstance(formatStr);
+                CellFormat cfmt = CellFormat.getInstance(locale, formatStr);
                 // CellFormat requires callers to identify date vs not, so do so
                 Object cellValueO = Double.valueOf(cellValue);
                 if (DateUtil.isADateFormat(formatIndex, formatStr) && 
@@ -593,7 +603,7 @@ public class DataFormatter implements Observer {
         try {
             return new ExcelStyleDateFormatter(formatStr, dateSymbols);
         } catch(IllegalArgumentException iae) {
-
+            logger.log(POILogger.DEBUG, "Formatting failed for format " + formatStr + ", falling back", iae);
             // the pattern could not be parsed correctly,
             // so fall back to the default number format
             return getDefaultFormat(cellValue);
@@ -677,6 +687,57 @@ public class DataFormatter implements Observer {
         return sb.toString();
     }
 
+    private static class InternalDecimalFormatWithScale extends Format {
+
+        private static final Pattern endsWithCommas = Pattern.compile("(,+)$");
+        private BigDecimal divider;
+        private static final BigDecimal ONE_THOUSAND = new BigDecimal(1000);
+        private final DecimalFormat df;
+        private static final String trimTrailingCommas(String s) {
+            return s.replaceAll(",+$", "");
+        }
+
+        public InternalDecimalFormatWithScale(String pattern, DecimalFormatSymbols symbols) {
+            df = new DecimalFormat(trimTrailingCommas(pattern), symbols);
+            setExcelStyleRoundingMode(df);
+            Matcher endsWithCommasMatcher = endsWithCommas.matcher(pattern);
+            if (endsWithCommasMatcher.find()) {
+                String commas = (endsWithCommasMatcher.group(1));
+                BigDecimal temp = BigDecimal.ONE;
+                for (int i = 0; i < commas.length(); ++i) {
+                    temp = temp.multiply(ONE_THOUSAND);
+                }
+                divider = temp;
+            } else {
+                divider = null;
+            }
+        }
+
+        private Object scaleInput(Object obj) {
+            if (divider != null) {
+                if (obj instanceof BigDecimal) {
+                    obj = ((BigDecimal) obj).divide(divider, RoundingMode.HALF_UP);
+                } else if (obj instanceof Double) {
+                    obj = (Double) obj / divider.doubleValue();
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            }
+            return obj;
+        }
+
+        @Override
+        public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+            obj = scaleInput(obj);
+            return df.format(obj, toAppendTo, pos);
+        }
+
+        @Override
+        public Object parseObject(String source, ParsePosition pos) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private Format createNumberFormat(String formatStr, double cellValue) {
         String format = cleanFormatForNumber(formatStr);
         DecimalFormatSymbols symbols = decimalSymbols;
@@ -700,11 +761,9 @@ public class DataFormatter implements Observer {
         }
         
         try {
-            DecimalFormat df = new DecimalFormat(format, symbols);
-            setExcelStyleRoundingMode(df);
-            return df;
+            return new InternalDecimalFormatWithScale(format, symbols);
         } catch(IllegalArgumentException iae) {
-
+            logger.log(POILogger.DEBUG, "Formatting failed for format " + formatStr + ", falling back", iae);
             // the pattern could not be parsed correctly,
             // so fall back to the default number format
             return getDefaultFormat(cellValue);
@@ -743,12 +802,17 @@ public class DataFormatter implements Observer {
      * Returns the formatted value of an Excel date as a <tt>String</tt> based
      * on the cell's <code>DataFormat</code>. i.e. "Thursday, January 02, 2003"
      * , "01/02/2003" , "02-Jan" , etc.
+     * <p>
+     * If any conditional format rules apply, the highest priority with a number format is used.
+     * If no rules contain a number format, or no rules apply, the cell's style format is used.
+     * If the style does not have a format, the default date format is applied.
      *
-     * @param cell The cell
-     * @return a formatted date string
+     * @param cell to format
+     * @param cfEvaluator ConditionalFormattingEvaluator (if available)
+     * @return Formatted value
      */
-    private String getFormattedDateString(Cell cell) {
-        Format dateFormat = getFormat(cell);
+    private String getFormattedDateString(Cell cell, ConditionalFormattingEvaluator cfEvaluator) {
+        Format dateFormat = getFormat(cell, cfEvaluator);
         if(dateFormat instanceof ExcelStyleDateFormatter) {
            // Hint about the raw excel value
            ((ExcelStyleDateFormatter)dateFormat).setDateToBeFormatted(
@@ -764,13 +828,17 @@ public class DataFormatter implements Observer {
      * based on the cell's <code>DataFormat</code>. Supported formats include
      * currency, percents, decimals, phone number, SSN, etc.:
      * "61.54%", "$100.00", "(800) 555-1234".
-     *
+     * <p>
+     * Format comes from either the highest priority conditional format rule with a
+     * specified format, or from the cell style.
+     * 
      * @param cell The cell
+     * @param cfEvaluator if available, or null
      * @return a formatted number string
      */
-    private String getFormattedNumberString(Cell cell) {
+    private String getFormattedNumberString(Cell cell, ConditionalFormattingEvaluator cfEvaluator) {
 
-        Format numberFormat = getFormat(cell);
+        Format numberFormat = getFormat(cell, cfEvaluator);
         double d = cell.getNumericCellValue();
         if (numberFormat == null) {
             return String.valueOf(d);
@@ -858,7 +926,7 @@ public class DataFormatter implements Observer {
     /**
      * <p>
      * Returns the formatted value of a cell as a <tt>String</tt> regardless
-     * of the cell type. If the Excel format pattern cannot be parsed then the
+     * of the cell type. If the Excel number format pattern cannot be parsed then the
      * cell value will be formatted using a default format.
      * </p>
      * <p>When passed a null or blank cell, this method will return an empty
@@ -873,6 +941,37 @@ public class DataFormatter implements Observer {
      * @return a string value of the cell
      */
     public String formatCellValue(Cell cell, FormulaEvaluator evaluator) {
+        return formatCellValue(cell, evaluator, null);
+    }
+    
+    /**
+     * <p>
+     * Returns the formatted value of a cell as a <tt>String</tt> regardless
+     * of the cell type. If the Excel number format pattern cannot be parsed then the
+     * cell value will be formatted using a default format.
+     * </p>
+     * <p>When passed a null or blank cell, this method will return an empty
+     * String (""). Formula cells will be evaluated using the given
+     * {@link FormulaEvaluator} if the evaluator is non-null. If the
+     * evaluator is null, then the formula String will be returned. The caller
+     * is responsible for setting the currentRow on the evaluator
+     *</p>
+     * <p>
+     * When a ConditionalFormattingEvaluator is present, it is checked first to see
+     * if there is a number format to apply.  If multiple rules apply, the last one is used.
+     * If no ConditionalFormattingEvaluator is present, no rules apply, or the applied
+     * rules do not define a format, the cell's style format is used.
+     * </p>
+     * <p>
+     * The two evaluators should be from the same context, to avoid inconsistencies in cached values.
+     *</p>
+     *
+     * @param cell The cell (can be null)
+     * @param evaluator The FormulaEvaluator (can be null)
+     * @param cfEvaluator ConditionalFormattingEvaluator (can be null)
+     * @return a string value of the cell
+     */
+    public String formatCellValue(Cell cell, FormulaEvaluator evaluator, ConditionalFormattingEvaluator cfEvaluator) {
         localeChangedObservable.checkForLocaleChange();
         
         if (cell == null) {
@@ -889,10 +988,10 @@ public class DataFormatter implements Observer {
         switch (cellType) {
             case NUMERIC :
 
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return getFormattedDateString(cell);
+                if (DateUtil.isCellDateFormatted(cell, cfEvaluator)) {
+                    return getFormattedDateString(cell, cfEvaluator);
                 }
-                return getFormattedNumberString(cell);
+                return getFormattedNumberString(cell, cfEvaluator);
 
             case STRING :
                 return cell.getRichStringCellValue().getString();

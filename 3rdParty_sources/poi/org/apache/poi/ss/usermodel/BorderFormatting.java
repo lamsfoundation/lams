@@ -19,96 +19,11 @@
 
 package org.apache.poi.ss.usermodel;
 
-import org.apache.poi.util.Removal;
-
 /**
  * High level representation for Border Formatting component
  * of Conditional Formatting settings
  */
 public interface BorderFormatting {
-    /** No border
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#NONE}
-     */
-    @Removal(version="3.17")
-    short BORDER_NONE                = 0x0;
-    
-    /** Thin border
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#THIN}
-     */
-    @Removal(version="3.17")
-    short BORDER_THIN                = 0x1;
-    
-    /** Medium border
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#MEDIUM}
-     */
-    @Removal(version="3.17")
-    short BORDER_MEDIUM              = 0x2;
-    
-    /** dash border
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#DASHED}
-     */
-    @Removal(version="3.17")
-    short BORDER_DASHED              = 0x3;
-    
-    /** dot border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#DOTTED}
-     */
-    @Removal(version="3.17")
-    short BORDER_DOTTED              = 0x4;
-    
-    /** Thick border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#THICK}
-     */
-    @Removal(version="3.17")
-    short BORDER_THICK               = 0x5;
-    
-    /** double-line border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#DOUBLE}
-     */
-    @Removal(version="3.17")
-    short BORDER_DOUBLE              = 0x6;
-    
-    /** hair-line border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#HAIR}
-     */
-    @Removal(version="3.17")
-    short BORDER_HAIR                = 0x7;
-    
-    /** Medium dashed border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#MEDIUM_DASHED}
-     */
-    @Removal(version="3.17")
-    short BORDER_MEDIUM_DASHED       = 0x8;
-    
-    /** dash-dot border
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#DASH_DOT}
-     */
-    @Removal(version="3.17")
-    short BORDER_DASH_DOT            = 0x9;
-    
-    /** medium dash-dot border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#MEDIUM_DASH_DOT}
-     */
-    @Removal(version="3.17")
-    short BORDER_MEDIUM_DASH_DOT     = 0xA;
-    
-    /** dash-dot-dot border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#DASH_DOT_DOT}
-     */
-    @Removal(version="3.17")
-    short BORDER_DASH_DOT_DOT        = 0xB;
-    
-    /** medium dash-dot-dot border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#MEDIUM_DASH_DOT_DOT}
-     */
-    @Removal(version="3.17")
-    short BORDER_MEDIUM_DASH_DOT_DOT = 0xC;
-    
-    /** slanted dash-dot border 
-     * @deprecated 3.15 beta 2. Use {@link BorderStyle#SLANTED_DASH_DOT}
-     */
-    @Removal(version="3.17")
-    short BORDER_SLANTED_DASH_DOT    = 0xD;
 
     /**
      * @deprecated POI 3.15. Use {@link #getBorderBottomEnum()}.
@@ -150,6 +65,18 @@ public interface BorderFormatting {
     /** @since POI 3.15 */
     BorderStyle getBorderTopEnum();
 
+    /**
+     * Only valid for range borders, such as table styles
+     * @since 3.17 beta 1
+     * @return border style
+     */
+    BorderStyle getBorderVerticalEnum();
+    /**
+     * Only valid for range borders, such as table styles
+     * @since 3.17 beta 1
+     * @return border style
+     */
+    BorderStyle getBorderHorizontalEnum();
     
     short getBottomBorderColor();
     Color getBottomBorderColorColor();
@@ -166,6 +93,32 @@ public interface BorderFormatting {
     short getTopBorderColor();
     Color getTopBorderColorColor();
 
+    /**
+     * Range internal borders. Only relevant for range styles, such as table formatting
+     * @since  3.17 beta 1
+     * @return color index
+     */
+    short getVerticalBorderColor();
+    /**
+     * Range internal borders. Only relevant for range styles, such as table formatting
+     * @since  3.17 beta 1
+     * @return color
+     */
+    Color getVerticalBorderColorColor();
+    
+    /**
+     * Range internal borders. Only relevant for range styles, such as table formatting
+     * @since  3.17 beta 1
+     * @return color index
+     */
+    short getHorizontalBorderColor();
+    /**
+     * Range internal borders. Only relevant for range styles, such as table formatting
+     * @since  3.17 beta 1
+     * @return color
+     */
+    Color getHorizontalBorderColorColor();
+    
     /**
      * Set bottom border.
      *
@@ -240,6 +193,22 @@ public interface BorderFormatting {
      * @param border
      */
     void setBorderTop(BorderStyle border);
+    
+    /**
+     * Set range internal horizontal borders.
+     *
+     * @since 3.17 beta 1
+     * @param border
+     */
+    void setBorderHorizontal(BorderStyle border);
+    
+    /**
+     * Set range internal vertical borders.
+     *
+     * @since 3.17 beta 1
+     * @param border
+     */
+    void setBorderVertical(BorderStyle border);
 
     void setBottomBorderColor(short color);
     void setBottomBorderColor(Color color);
@@ -255,4 +224,30 @@ public interface BorderFormatting {
 
     void setTopBorderColor(short color);
     void setTopBorderColor(Color color);
+    
+    /**
+     * Range internal border color, such as table styles
+     * @since 3.17 beta 1
+     * @param color index
+     */
+    void setHorizontalBorderColor(short color);
+    /**
+     * Range internal border color, such as table styles
+     * @since 3.17 beta 1
+     * @param color index
+     */
+    void setHorizontalBorderColor(Color color);
+    
+    /**
+     * Range internal border color, such as table styles
+     * @since 3.17 beta 1
+     * @param color index
+     */
+    void setVerticalBorderColor(short color);
+    /**
+     * Range internal border color, such as table styles
+     * @since 3.17 beta 1
+     * @param color index
+     */
+    void setVerticalBorderColor(Color color);
 }

@@ -19,10 +19,8 @@ package org.apache.poi.ss.usermodel;
 
 import java.util.Map;
 
-import org.apache.poi.util.Internal;
-
 /**
- * Evaluates formula cells.<p/>
+ * Evaluates formula cells.<p>
  * 
  * For performance reasons, this class keeps a cache of all previously calculated intermediate
  * cell values.  Be sure to call {@link #clearAllCachedResultValues()} if any workbook cells are changed between
