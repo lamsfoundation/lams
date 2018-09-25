@@ -170,6 +170,7 @@
                destdir="${basedir}/build/classes/java">
                <compilerarg line="-encoding utf-8"/>
 			   <compilerarg line="--add-modules java.activation"/>
+			   <compilerarg line="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED"/>
         </javac>
         
 		<echo>${ant.project.name}: Copying additional non-Java resources</echo>

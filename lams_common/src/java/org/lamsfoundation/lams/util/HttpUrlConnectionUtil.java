@@ -169,12 +169,10 @@ public class HttpUrlConnectionUtil {
 	return cookieString.toString();
     }
 
-    private static HttpURLConnection getConnection(String urlToConnectTo) throws IOException {
+    public static HttpURLConnection getConnection(String urlToConnectTo) throws IOException {
 	URL url = new URL(urlToConnectTo);
 	HttpURLConnection con = null;
-	if (urlToConnectTo.toLowerCase().startsWith("https")
-		&& urlToConnectTo.startsWith(Configuration.get(ConfigurationKeys.SERVER_URL))) {
-
+	if (urlToConnectTo.toLowerCase().startsWith("https")) {
 	    if (!HttpUrlConnectionUtil.defaultTrustManagerSet) {
 		TrustManager defaultTrustManager = new X509TrustManager() {
 		    @Override
