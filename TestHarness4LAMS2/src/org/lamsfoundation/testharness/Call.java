@@ -31,8 +31,11 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -45,8 +48,6 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
-import com.sun.net.ssl.HostnameVerifier;
-import com.sun.net.ssl.HttpsURLConnection;
 
 /**
  * @author Fei Yang, Marcin Cieslak
@@ -145,7 +146,7 @@ public class Call {
 
 	    HostnameVerifier hv = new HostnameVerifier() {
 		@Override
-		public boolean verify(String urlHostName, String other) {
+		public boolean verify(String hostname, SSLSession session) {
 		    return true;
 		}
 	    };

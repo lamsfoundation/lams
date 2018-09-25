@@ -81,7 +81,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
 /**
  * An implementation of the IZoomService interface.
@@ -807,8 +806,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     private static void setRequestMethod(HttpURLConnection connection, String method) {
 	try {
 	    final Object target;
-	    if (connection instanceof HttpsURLConnectionImpl) {
-		final Field delegate = HttpsURLConnectionImpl.class.getDeclaredField("delegate");
+	    if (connection instanceof HttpsURLConnection) {
+		final Field delegate = HttpsURLConnection.class.getDeclaredField("delegate");
 		delegate.setAccessible(true);
 		target = delegate.get(connection);
 	    } else {
