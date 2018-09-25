@@ -199,7 +199,8 @@
 						</div>	
 						<div class="checkbox">
 							<label>
-								<input id="startMonitorField" name="startMonitor" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.monitor" /></input><br />
+								<input id="startMonitorField" name="startMonitor" value="true" type="checkbox">
+								<fmt:message key="label.tab.advanced.field.monitor" />
 							</label>
 						</div>
 						<div class="checkbox">

@@ -52,7 +52,7 @@
 		<lams:Page title="${title}" type="navbar">
 		
 			<form:hidden path="assessment.contentId" />
-			<input type="hidden" name="mode" value="${mode}"/>
+			<input type="hidden" name="mode" value="${mode}">
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="currentTab" id="currentTab" />

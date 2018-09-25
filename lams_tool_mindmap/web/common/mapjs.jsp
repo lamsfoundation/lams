@@ -434,7 +434,7 @@
 		<div style="display:inline" role="group">
         <a href="#" class="btn btn-default btn-sm launch-fullscreen pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
         <a href="#" class="btn btn-default btn-sm exit-fullscreen pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
-		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px"></input>
+		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px">
 		</div>
 		 
 		<div>
@@ -453,8 +453,8 @@
 			<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
 	<%-- Not yet implemented in back end  --%> 
 	<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
-	<%--  		<input type="button" class="insertRoot" value="add root node"></input>  --%> 
-	<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root"></input>  --%> 
+	<%--  		<input type="button" class="insertRoot" value="add root node">  --%> 
+	<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root">  --%> 
 	 	</c:if>
 	 		</div>
  		</div>

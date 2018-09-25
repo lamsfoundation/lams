@@ -37,9 +37,9 @@
 			<form:hidden path="method" value="finish"/>
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
-					<input type="submit" name="method" class="button">
+					<button type="submit" name="method" class="btn">
 						<fmt:message key="button.continue" />
-					</input>
+					</button>
 				</c:when>
 				<c:otherwise>
 					<a href="#nogo" class="button" id="finishButton" onclick="submitForm('finish')">

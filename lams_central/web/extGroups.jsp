@@ -29,9 +29,8 @@
 
 	<c:forEach var="group" items="${extGroups}">
 		<div class="groupingContainer">
-			<input name="extGroupIds" value="${group.groupId}" type="checkbox">
-				<c:out value="${group.groupName}" />
-			</input>
+			<input name="extGroupIds" id="extGroupIds" value="${group.groupId}" type="checkbox">
+			<label for="extGroupIds"><c:out value="${group.groupName}" /></label>
 			
 			<span class="groupCount" title='<fmt:message key="label.course.groups.grouping.count.label" />'>
 				(<fmt:message key='authoring.fla.page.prop.groups.learners' /> ${group.numberUsers})

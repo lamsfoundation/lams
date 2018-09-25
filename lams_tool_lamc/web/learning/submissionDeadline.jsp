@@ -62,9 +62,9 @@
 			</c:if>
 
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
-				<input type="submit" name="forwardtoReflection" class="button">
+				<button type="submit" name="forwardtoReflection" class="btn">
 					<fmt:message key="label.continue" />
-				</input>
+				</button>
 			</c:if>
 			</div>
 			<div id="footer"></div>

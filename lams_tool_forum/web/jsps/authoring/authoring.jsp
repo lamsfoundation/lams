@@ -52,13 +52,13 @@
 	<body class="stripes" onLoad="init()">
 	
 		<form:form action="update.do" method="post" id="forumForm" modelAttribute="forumForm" enctype="multipart/form-data" 
-		onsubmit="return verifyAllowRateMessagesCheckbox();">
+				onsubmit="return verifyAllowRateMessagesCheckbox();">
 
 			<form:hidden path="toolContentID" />
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="currentTab" id="currentTab" />
-			<input type="hidden" name="mode" value="${mode}"/>
+			<input type="hidden" name="mode" value="${mode}">
 			
 			<c:set var="title"><fmt:message key="activity.title" /></c:set>
 			<lams:Page title="${title}" type="navbar" formID="forumForm">

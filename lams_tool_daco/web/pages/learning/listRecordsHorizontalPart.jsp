@@ -110,7 +110,7 @@
 										<td class="fixedCellHeight ${questionStatus.first ? 'border-thick' : ''}">
 										<c:choose>
 											<c:when test="${question.type==1}">
-												<input type="text" size="45" readonly="readonly" value="<c:out  value='${answer.answer}'/>" />
+												<input type="text" size="45" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 											</c:when>
 											<c:when test="${question.type==2}">
 												<textarea cols="35" 
@@ -125,10 +125,10 @@
 												 readonly="readonly">${answer.answer}</textarea>
 											</c:when>
 											<c:when test="${question.type==3}">
-												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
+												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 											</c:when>
  											<c:when test="${question.type==4}">
-												<input type="text" size="20" readonly="readonly" value="${answer.answer}" />
+												<input type="text" size="20" readonly="readonly" value="${answer.answer}">
 											</c:when>
 											<c:when test="${question.type==5 || question.type==6}">
 												<c:choose>
@@ -151,11 +151,11 @@
 																	<td>
 																</c:if>
 																<input type="radio" readonly="readonly" 
-																<c:if test="${answer.answer==status.index+1}">
-																checked="checked"
-																</c:if>
-																>&nbsp;
-																<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
+																	<c:if test="${answer.answer==status.index+1}">
+																		checked="checked"
+																	</c:if>>
+																&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																<br />
 															</c:forEach>
 														</td>
 													</tr>
@@ -184,7 +184,9 @@
 																	</td>
 																	<td>
 																</c:if>
-																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
+																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">
+																&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																<br />
 															</c:forEach>
 														</td>
 													</tr>
@@ -198,7 +200,7 @@
 														</td>
 														<td>
 															<c:set var="longitude"><c:out  value='${answer.answer}'/></c:set>
-															<input type="text" size="10" readonly="readonly" value="${longitude}"/>
+															<input type="text" size="10" readonly="readonly" value="${longitude}">
 															<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
 														</td>
 													</tr>
@@ -207,7 +209,7 @@
 															<label><fmt:message key="label.learning.longlat.latitude" /></label>
 														</td>
 														<td>
-														<input type="text" size="10" readonly="readonly" id="latitude-record${recordStatus.index+1}-question${questionStatus.index+1}" />
+														<input type="text" size="10" readonly="readonly" id="latitude-record${recordStatus.index+1}-question${questionStatus.index+1}">
 														<label><fmt:message key="label.learning.longlat.latitude.unit" /></label><br />
 														</td>
 													</tr>

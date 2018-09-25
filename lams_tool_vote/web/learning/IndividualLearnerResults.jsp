@@ -110,7 +110,7 @@
 				</c:when>
 
 				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<input type="submit" name="learnerFinished" id="finishButton" onclick="javascript:submitMethod('learnerFinished')"
+					<button type="submit" name="learnerFinished" id="finishButton" onclick="javascript:submitMethod('learnerFinished')"
 						class="btn btn-primary voffset10 pull-right"
 						value='
 							<c:choose>
@@ -124,7 +124,7 @@
 						     '
 						/>
 
-					</input>
+					</button>
 				</c:when>
 
 				<c:otherwise>

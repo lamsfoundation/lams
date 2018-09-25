@@ -152,7 +152,7 @@
 				<a href="<lams:LAMSURL/>admin/policyManagement/list.do" class="btn btn-default">
 					<fmt:message key="admin.cancel" />
 				</a>
-				<input type="submit" id="submitButton" class="btn btn-primary loffset5"><fmt:message key="admin.submit" /></input>
+				<button type="submit" id="submitButton" class="btn btn-primary loffset5"><fmt:message key="admin.submit" /></button>
 			</div>
 		
 		</form:form>

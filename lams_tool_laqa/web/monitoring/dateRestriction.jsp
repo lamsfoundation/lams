@@ -47,7 +47,7 @@
 	<div id="datetimeDiv" <c:if test='${not empty submissionDeadline}'> style="display: none;" </c:if>>
 		<div class="form-group">
 		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;
-		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline"/>
+		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline">
 		</label>							
 		<a	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.set.restriction" />
@@ -70,7 +70,7 @@
 			<input type="checkbox" name="showOtherAnswersAfterDeadline" id="show-other-answers-after-deadline" value="1" 
 				<c:if test="${empty submissionDeadline}">disabled="disabled"</c:if>
 				<c:if test="${content.showOtherAnswersAfterDeadline}">checked="checked"</c:if>
-			></input>
+			>
 			<fmt:message key="label.allow.review.other.responses" />
 		</label>
 	</div>

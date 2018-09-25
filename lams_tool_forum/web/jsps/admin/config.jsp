@@ -29,7 +29,7 @@
 					<form:checkbox path="keepLearnerContent"/>
 					<fmt:message key="admin.keep.learner.content" /></label>
 				</div>
-				<input type="submit" class="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></input>
+				<button type="submit" class="btn btn-primary pull-right" ><fmt:message key="admin.button.save" /></button>
 			</form:form>
 			
 		<div id="footer"></div>

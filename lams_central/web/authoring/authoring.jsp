@@ -652,7 +652,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -660,7 +660,7 @@
 					<fmt:message key="authoring.fla.page.prop.default" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldDefault" type="checkbox"></input>
+					<input class="propertiesContentFieldDefault" type="checkbox">
 				</td>
 			</tr>
 		</table>
@@ -673,7 +673,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -703,7 +703,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -724,8 +724,8 @@
 				</td>
 				<td>
 					 <input class="propertiesContentFieldGroupCountEnable" type="radio"
-					 		name="propertiesContentFieldGroupDivide"></input>
-					 <input class="propertiesContentFieldGroupCount spinner" type="text"></input>
+					 		name="propertiesContentFieldGroupDivide">
+					 <input class="propertiesContentFieldGroupCount spinner" type="text">
 				</td>
 			</tr>
 			<tr>
@@ -734,8 +734,8 @@
 				</td>
 				<td>
 					<input class="propertiesContentFieldLearnerCountEnable" type="radio"
-					 		name="propertiesContentFieldGroupDivide"></input>
-					 <input class="propertiesContentFieldLearnerCount spinner" type="text"></input>
+					 		name="propertiesContentFieldGroupDivide">
+					 <input class="propertiesContentFieldLearnerCount spinner" type="text">
 				</td>
 			</tr>
 			<tr>
@@ -743,7 +743,7 @@
 					<fmt:message key="authoring.fla.page.prop.groups.equal" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldEqualSizes" type="checkbox"></input>
+					 <input class="propertiesContentFieldEqualSizes" type="checkbox">
 				</td>
 			</tr>
 			<tr>
@@ -751,7 +751,7 @@
 					<fmt:message key="authoring.fla.page.prop.groups.view.learners" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldViewLearners" type="checkbox"></input>
+					 <input class="propertiesContentFieldViewLearners" type="checkbox">
 				</td>
 			</tr>
 			<tr>
@@ -770,7 +770,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td colspan="3">
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -807,13 +807,16 @@
 					<fmt:message key="authoring.fla.page.prop.gate.delay" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetDay spinner" type="text"></input> <fmt:message key="authoring.fla.page.prop.days" />
+					<input class="propertiesContentFieldOffsetDay spinner" type="text"> 
+					<fmt:message key="authoring.fla.page.prop.days" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetHour spinner" type="text"></input> <fmt:message key="authoring.fla.page.prop.hours" />
+					<input class="propertiesContentFieldOffsetHour spinner" type="text"> 
+					<fmt:message key="authoring.fla.page.prop.hours" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetMinute spinner" type="text"></input> <fmt:message key="authoring.fla.page.prop.minutes" />
+					<input class="propertiesContentFieldOffsetMinute spinner" type="text"> 
+					<fmt:message key="authoring.fla.page.prop.minutes" />
 				</td>
 			</tr>
 			<tr class="propertiesContentRowGateSchedule">
@@ -821,7 +824,7 @@
 					<fmt:message key="authoring.fla.page.prop.gate.activity.finish.based" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox"></input>
+					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox">
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
@@ -845,7 +848,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -897,7 +900,7 @@
 					<fmt:message key="authoring.fla.page.prop.branching.sequences.min" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalSequenceMin spinner" type="text"></input>
+					<input class="propertiesContentFieldOptionalSequenceMin spinner" type="text">
 				</td>
 			</tr>
 			<tr>
@@ -905,7 +908,7 @@
 					<fmt:message key="authoring.fla.page.prop.branching.sequences.max" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalSequenceMax spinner" type="text"></input>
+					<input class="propertiesContentFieldOptionalSequenceMax spinner" type="text">
 				</td>
 			</tr>
 		</table>
@@ -919,7 +922,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -941,7 +944,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text" maxlength="50"></input>
+					 <input class="propertiesContentFieldTitle" type="text" maxlength="50">
 				</td>
 			</tr>
 			<tr>
@@ -949,7 +952,7 @@
 					<fmt:message key="authoring.fla.page.prop.optional.activities.min" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalActivityMin spinner" type="text"></input>
+					<input class="propertiesContentFieldOptionalActivityMin spinner" type="text">
 				</td>
 			</tr>
 			<tr>
@@ -957,7 +960,7 @@
 					<fmt:message key="authoring.fla.page.prop.optional.activities.max" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalActivityMax spinner" type="text"></input>
+					<input class="propertiesContentFieldOptionalActivityMax spinner" type="text">
 				</td>
 			</tr>
 		</table>
@@ -971,7 +974,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text">
 				</td>
 			</tr>
 			<tr height="50px" valign="top">
@@ -979,7 +982,7 @@
 					<fmt:message key="authoring.fla.page.prop.color" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldColor" type="text"></input>
+					 <input class="propertiesContentFieldColor" type="text">
 				</td>
 			</tr>
 		</table>
@@ -993,7 +996,7 @@
 					<fmt:message key="authoring.fla.page.prop.title" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldTitle" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text">
 				</td>
 			</tr>
 			<tr height="50px" valign="top">
@@ -1001,7 +1004,7 @@
 					<fmt:message key="authoring.fla.page.prop.color" />
 				</td>
 				<td>
-					 <input class="propertiesContentFieldColor" type="text"></input>
+					 <input class="propertiesContentFieldColor" type="text">
 				</td>
 			</tr>
 			<tr >
