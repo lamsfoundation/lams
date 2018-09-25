@@ -26,8 +26,9 @@
 			<form:form action="saveContent.do" id="adminForm" modelAttribute="adminForm" method="post" enctype="multipart/form-data">
 				<div class="checkbox">
 					<label for="keepLearnerContent">
-					<form:checkbox path="keepLearnerContent"/>
-					<fmt:message key="admin.keep.learner.content" /></label>
+						<form:checkbox path="keepLearnerContent" id="keepLearnerContent"/>
+						<fmt:message key="admin.keep.learner.content" />
+					</label>
 				</div>
 				<button type="submit" class="btn btn-primary pull-right" ><fmt:message key="admin.button.save" /></button>
 			</form:form>

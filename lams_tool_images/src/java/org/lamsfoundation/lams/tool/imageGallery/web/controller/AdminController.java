@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Andrey Balan
- * @version
  */
 @Controller
 @RequestMapping("/laimag10admin")
@@ -50,7 +49,7 @@ public class AdminController {
 
     @Autowired
     @Qualifier("laimagMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @RequestMapping("/start")
     public String start(@ModelAttribute AdminForm adminForm, HttpServletRequest request) {

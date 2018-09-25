@@ -64,6 +64,6 @@ public class AdminController {
 	forumService.saveForumConfigItem(keepLearnerContent);
 
 	request.setAttribute("savedSuccess", true);
-	return "jsps/admin/configE";
+	return "jsps/admin/config";
     }
 }
