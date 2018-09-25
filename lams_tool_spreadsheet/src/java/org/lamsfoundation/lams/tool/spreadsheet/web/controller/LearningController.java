@@ -232,8 +232,8 @@ public class LearningController {
     /**
      * Finish learning session.
      */
-    @RequestMapping("/finish")
-    public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    @RequestMapping("/finishSession")
+    public String finishSession(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
@@ -315,7 +315,7 @@ public class LearningController {
 	    service.updateEntry(entry);
 	}
 
-	return finish(reflectionForm, request);
+	return finishSession(reflectionForm, request);
     }
 
     //*************************************************************************************
