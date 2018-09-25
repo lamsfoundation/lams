@@ -16,7 +16,7 @@
 
 	<target name="compile" depends="clean">
 		<javac destdir="${basedir}/build" srcdir="${src}"
-        	debug="on" source="1.8" target="1.8" includeantruntime="false" >
+        	debug="on" source="10" target="10" includeantruntime="false" >
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>

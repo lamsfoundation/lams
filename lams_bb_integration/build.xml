@@ -46,7 +46,7 @@
 	<!-- ================================================================ -->
    <target name="compile" depends="clean, preparedirs" description="compile java sources">
    		<javac srcdir="${src}"
-         	 	destdir="${build.classes}" deprecation="on" debug="on" target="1.7">
+         	 	destdir="${build.classes}" deprecation="on" debug="on" target="10">
   			<classpath>
       			<path refid="project.classpath"/>
       		</classpath>

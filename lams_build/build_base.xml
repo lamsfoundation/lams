@@ -161,14 +161,15 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-	           source="1.8"
-			   target="1.8"
+	           source="10"
+			   target="10"
                debug="on"
                includeantruntime="false"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
                destdir="${basedir}/build/classes/java">
                <compilerarg line="-encoding utf-8"/>
+			   <compilerarg line="--add-modules java.activation"/>
         </javac>
         
 		<echo>${ant.project.name}: Copying additional non-Java resources</echo>
