@@ -187,7 +187,7 @@
 								<div class="form-group">
 									<label><fmt:message key="label.language" />:</label>
 									<form:select path="localeId"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+										disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${locales}" var="locale">
 											<form:option value="${locale.localeId}">
 												<c:out value="${locale.description}" />
