@@ -238,6 +238,4 @@ public interface QaAppConstants {
     public static final String USER_ANSWERS_DEFINITION_NAME = "user.answers.output.definition.qa";
     public static final String GROUP_ANSWERS_DEFINITION_NAME = "group.answers.output.definition.qa";
     public static final String QUESTIONS_DEFINITION_NAME = "questions.output.definition.qa";
-    public static final String ATTR_WIZARD_CATEGORIES = "wizardCategories";
-    public static final String ATTR_WIZARD_ENABLED = "wizardEnabled";
 }

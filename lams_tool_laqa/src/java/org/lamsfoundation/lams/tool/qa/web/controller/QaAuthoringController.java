@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -805,15 +804,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	Collection<QaQuestionDTO> questionDTOs = (Collection<QaQuestionDTO>) sessionMap
 		.get(QaAppConstants.LIST_QUESTION_DTOS);
-
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-
-	// Adding in the qa wizard data if it is turned on
-	if (qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD) != null
-		&& qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD).getConfigValue().equals("true")) {
-	    request.setAttribute(QaAppConstants.ATTR_WIZARD_ENABLED, true);
-	    request.setAttribute(QaAppConstants.ATTR_WIZARD_CATEGORIES, qaService.getWizardCategories());
-	}
 	request.setAttribute("authoringForm", newQuestionForm);
 
 	return "authoring/newQuestionBox";

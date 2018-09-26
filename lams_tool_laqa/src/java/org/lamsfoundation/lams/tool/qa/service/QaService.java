@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,20 +64,16 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
-import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -106,7 +101,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     private IQaContentDAO qaDAO;
     private IQaQuestionDAO qaQuestionDAO;
-
     private IQaSessionDAO qaSessionDAO;
     private IQaQueUsrDAO qaQueUsrDAO;
     private IQaUsrRespDAO qaUsrRespDAO;
@@ -117,9 +111,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     private ILogEventService logEventService;
     private IExportToolContentService exportContentService;
     private QaOutputFactory qaOutputFactory;
-    private IQaConfigItemDAO qaConfigItemDAO;
-    private IQaWizardDAO qaWizardDAO;
-
     private ICoreNotebookService coreNotebookService;
     private IRatingService ratingService;
     private IEventNotificationService eventNotificationService;
@@ -200,7 +191,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     @Override
     public void setDefineLater(String strToolContentID, boolean value) {
-
 	QaContent qaContent = getQaContent(new Long(strToolContentID).longValue());
 
 	if (qaContent != null) {
@@ -1105,22 +1095,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	this.qaOutputFactory = qaOutputFactory;
     }
 
-    public IQaConfigItemDAO getQaConfigItemDAO() {
-	return qaConfigItemDAO;
-    }
-
-    public void setQaConfigItemDAO(IQaConfigItemDAO qaConfigItemDAO) {
-	this.qaConfigItemDAO = qaConfigItemDAO;
-    }
-
-    public IQaWizardDAO getQaWizardDAO() {
-	return qaWizardDAO;
-    }
-
-    public void setQaWizardDAO(IQaWizardDAO qaWizardDAO) {
-	this.qaWizardDAO = qaWizardDAO;
-    }
-
     @Override
     public QaContent getQaContentBySessionId(Long sessionId) {
 	QaSession session = qaSessionDAO.getQaSessionById(sessionId);
@@ -1150,46 +1124,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	if ((condition != null) && (condition.getConditionId() != null)) {
 	    qaDAO.deleteCondition(condition);
 	}
-    }
-
-    @Override
-    public QaConfigItem getConfigItem(String configKey) {
-	return qaConfigItemDAO.getConfigItemByKey(configKey);
-    }
-
-    @Override
-    public void saveOrUpdateConfigItem(QaConfigItem configItem) {
-	qaConfigItemDAO.saveOrUpdate(configItem);
-    }
-
-    @Override
-    public SortedSet<QaWizardCategory> getWizardCategories() {
-	return qaWizardDAO.getWizardCategories();
-    }
-
-    @Override
-    public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories) {
-	qaWizardDAO.saveOrUpdateCategories(categories);
-    }
-
-    @Override
-    public void deleteWizardCategoryByUID(Long uid) {
-	qaWizardDAO.deleteWizardCategoryByUID(uid);
-    }
-
-    @Override
-    public void deleteWizardSkillByUID(Long uid) {
-	qaWizardDAO.deleteWizardSkillByUID(uid);
-    }
-
-    @Override
-    public void deleteWizardQuestionByUID(Long uid) {
-	qaWizardDAO.deleteWizardQuestionByUID(uid);
-    }
-
-    @Override
-    public void deleteAllWizardCategories() {
-	qaWizardDAO.deleteAllWizardCategories();
     }
 
     @Override
