@@ -145,11 +145,6 @@
 										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.country" />:</label>
-									<form:input path="country" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" cssClass="form-control" />
-								</div>
-								<div class="form-group">
 									<label><fmt:message key="label.country" /> *:</label>
 
 									<form:select path="country" disabled="${!profileEditEnabled}" cssClass="form-control">
@@ -394,7 +389,3 @@
 	</div>
 </body>
 </lams:html>
-
-
-
-
