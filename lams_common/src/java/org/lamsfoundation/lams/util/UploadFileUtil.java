@@ -138,6 +138,11 @@ public class UploadFileUtil {
     private static String[] splitContentDir(String contentFolderID) {
 	String[] result = new String[6];
 	String trimmedFolder = contentFolderID.replace("-", "").replace("/", "");
+	//if trimmedFolder length is less than 12, supplement it with missing character
+	if (trimmedFolder.length() < 12) {
+	    trimmedFolder += "123456789012".substring(0, 12-trimmedFolder.length());
+	}
+	
 	for (int groupIndex = 0; groupIndex < 6; groupIndex++) {
 	    result[groupIndex] = "" + trimmedFolder.charAt(groupIndex * 2) + trimmedFolder.charAt(groupIndex * 2 + 1);
 	}
