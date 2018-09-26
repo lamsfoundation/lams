@@ -252,7 +252,7 @@ public class LearningController {
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 
 	if (runAuto) {
-	    String redirectURL = "redirect:/learning/reviewItem.do";
+	    String redirectURL = "redirect:/reviewItem.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_SESSION_MAP_ID,
 		    sessionMap.getSessionID());
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ResourceConstants.ATTR_TOOL_SESSION_ID,
