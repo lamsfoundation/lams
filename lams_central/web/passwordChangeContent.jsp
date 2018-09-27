@@ -103,9 +103,8 @@
 				<div class="panel voffset20">
 					<lams:errors/>
 					<div class="panel-body">
-					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
-							<form:hidden name="<%=PasswordChangeActionForm.formName%>"
-								path="login" />
+						<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
+						<form:hidden name="<%=PasswordChangeActionForm.formName%>" path="login" />
 							<div class="form-group">
 								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
  								<lams:errors path="oldPassword"/>	
@@ -133,25 +132,27 @@
 								 </lams:Alert> 
 							</div>
 							
-							<lams:errors path="password"/>	
- 							<div class="input-group voffset5">
-								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-								<input class="form-control" type="password"  
+						<lams:errors path="password"/>	
+ 						<div class="input-group voffset5">
+							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							<input class="form-control" type="password"  
 									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="25"/> 			
-							</div>
-							<div class="input-group voffset5">
-								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-								<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm"
+						</div>
+						<div class="input-group voffset5">
+							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm"
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
-							</div>
-							<div class="form-group" align="right">
-							<a href="/lams/profile.jsp" type="submit" id="cancelButton" class="btn btn-sm btn-default voffset5"><fmt:message key="button.cancel"/></a>
-								&nbsp;&nbsp;
-								<button class="btn btn-sm btn-primary voffset5">
-									<fmt:message key="button.save" />
-								</button>
-
-							</div>
+						</div>
+							
+						<div class="form-group" align="right">
+							<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+								<fmt:message key="button.cancel"/>
+							</button>
+							&nbsp;&nbsp;
+							<button type="submit" class="btn btn-sm btn-primary voffset5">
+								<fmt:message key="button.save" />
+							</button>
+						</div>
 					</div>
 
 				</div>

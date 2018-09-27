@@ -356,8 +356,7 @@
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
 									<c:set var="timeZone">
-										<input type="text" class="form-control"
-											value="${UserForm.timeZone}" />
+										<input type="text" class="form-control" value="${UserForm.timeZone}" />
 									</c:set>
 									${timeZone}
 								</div>
@@ -369,12 +368,13 @@
 			</div>
 	</form:form>
 	<div class="form-group" align="right">
-		<a href="<lams:LAMSURL />profile.jsp"   class="btn btn-sm btn-default voffset5" >
-			<fmt:message key="button.cancel" /></a>
+		<button type="button" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+			<fmt:message key="button.cancel" />
+		</button>
 		&nbsp;&nbsp;
 		<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
-			<button class="btn btn-sm btn-primary voffset5" type="button"
-				name="submit" onclick="submitMessage()"> 
+			<button type="button" class="btn btn-sm btn-primary voffset5" 
+					name="submit" onclick="submitMessage()"> 
 				<fmt:message key="button.save" />
 			</button>
 		</c:if>

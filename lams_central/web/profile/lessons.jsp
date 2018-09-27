@@ -74,9 +74,9 @@
 					</div>
 					
 					<div align="center">
-						<input class="btn btn-sm btn-default offset5" type="button"
-							value="<fmt:message key="label.return.to.myprofile" />"
-							onclick="javascript:document.location='<lams:LAMSURL/>index.do?redirect=profile'" />
+						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+							<fmt:message key="label.return.to.myprofile" />
+						</button>
 					</div>
 
 				</div>

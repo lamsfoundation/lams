@@ -227,9 +227,9 @@
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
-				<a class="btn btn-sm btn-file btn-default offset5" role="button" href="<c:url value='/index.do?redirect=profile'/>">
+				<button type="button" class="btn btn-sm btn-file btn-default offset5" onclick="history.go(-1);">
 					<fmt:message key="label.return.to.myprofile" />
-				</a>
+				</button>
 			</div>
 		</c:if>
 	</div>
