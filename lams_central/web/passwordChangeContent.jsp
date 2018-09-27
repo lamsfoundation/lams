@@ -101,39 +101,15 @@
 		<div class="row vertical-center-row">
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel voffset20">
-						 <c:set var="errorKey" value="GLOBAL" /> 
-						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						 	<p class="warning">
-							         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-							             <c:out value="${error}" /><br /> 
-							         </c:forEach> 
-						     </p>
-						</c:if>
-						<c:set var="errorKey" value="password" /> 
-						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						 	<p class="warning">
-							         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-							             <c:out value="${error}" /><br /> 
-							         </c:forEach> 
-						     </p>
-						</c:if>
-						<c:set var="errorKey" value="oldPassword" /> 
-						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						 	<p class="warning">
-							         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-							             <c:out value="${error}" /><br /> 
-							         </c:forEach> 
-						     </p>
-						</c:if>
-						
-
+					<lams:Errors/>
 					<div class="panel-body">
 					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 							<form:hidden name="<%=PasswordChangeActionForm.formName%>"
 								path="login" />
 							<div class="form-group">
 								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
-								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
+ 								<lams:Errors errorKey="oldPassword"/>	
+ 								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
 							</div>
 							
 							<div class="col-xs-12">
@@ -157,8 +133,8 @@
 								 </lams:Alert> 
 							</div>
 							
-
-							<div class="input-group voffset5">
+							<lams:Errors errorKey="password"/>	
+ 							<div class="input-group voffset5">
 								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 								<input class="form-control" type="password"  
 									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="25"/> 			

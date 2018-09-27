@@ -143,9 +143,7 @@ public class PasswordChangeController {
 	// -- Report any errors
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    passwordChangeForm.reset(request);
-	    request.setAttribute("redirect", "password");
-	    return "redirect:/index.do";
+	    return "passwordChangeContent";
 	}
 	request.setAttribute("redirectURL", passwordChangeForm.getRedirectURL());
 	return "/passwordChangeOkContent";

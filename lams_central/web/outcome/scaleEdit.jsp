@@ -47,15 +47,8 @@
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel">
 					<div class="panel-body">
-						<%-- Error Messages --%>
-						 <c:set var="errorKey" value="GLOBAL" />
-						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-						     <lams:Alert id="error" type="danger" close="false">
-						         <c:forEach var="error" items="${errorMap[errorKey]}">
-						             <c:out value="${error}" />
-						         </c:forEach>
-						     </lams:Alert>
-						 </c:if>
+					
+						<lams:Errors/>
 						
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.name" />:
