@@ -49,11 +49,7 @@
 			</fmt:param>
 			</fmt:message>
 			
-			<c:if test="${not empty error}">
-				<lams:Alert type="danger" id="errorKey" close="false">				
-					<c:out value="${error}"/></p>
-				</lams:Alert>
-			</c:if>
+			<lams:errors/>
 			
 			<form:form action="save.do" id="timezoneForm" modelAttribute="timezoneForm" method="post">
 				

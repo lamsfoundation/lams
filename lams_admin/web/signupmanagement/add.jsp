@@ -56,14 +56,7 @@
 					</tr>
 					<tr>
 						<td colspan="2">
-						<c:set var="errorKey" value="courseKey" /> 
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
+						<lams:errors path="courseKey"/>
 						</td>
 					</tr>
 					<tr>
@@ -96,14 +89,7 @@
 					</tr>		
 					<tr>
 						<td colspan="2">
-						<c:set var="errorKey" value="context" /> 
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
+						<lams:errors path="context"/>
 						</td>
 					</tr>
 					<tr>

@@ -131,14 +131,7 @@
 							</ul>
 						</lams:Alert>
 						
-					    <c:set var="errorKey" value="password" /> 
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
+						<lams:errors path="password"/>
 						
 						<div>
 							<label for="login"><fmt:message key="admin.user.login" />:</label>

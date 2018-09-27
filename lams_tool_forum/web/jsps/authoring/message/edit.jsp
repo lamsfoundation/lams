@@ -25,14 +25,7 @@
 		    <label for="message.subject"><fmt:message key="message.label.subject" /> *</label>
 			<form:input type="text" size="30" tabindex="1" path="message.subject" value="${message.subject}" maxlength="60" cssClass="form-control"/>
 		    
-		    <c:set var="errorKey" value="message.subject" />
-	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	            <lams:Alert id="error" type="danger" close="false">
-	                <c:forEach var="error" items="${errorMap[errorKey]}">
-	                    <c:out value="${error}" />
-	                </c:forEach>
-	            </lams:Alert>
-	        </c:if>
+		    <lams:errors path="message.subject"/>
 			</div>
 			
 			<div class="form-group">
@@ -42,14 +35,7 @@
 				<c:set var="body" value="${topicFormId.message.body}"/>
 			</c:if>
 			<lams:CKEditor id="message.body" value="${body}" contentFolderID="${sessionMap.contentFolderID}" />
-			<c:set var="errorKey" value="message.body" />
-	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	            <lams:Alert id="error" type="danger" close="false">
-	                <c:forEach var="error" items="${errorMap[errorKey]}">
-	                    <c:out value="${error}" />
-	                </c:forEach>
-	            </lams:Alert>
-	        </c:if>
+		    <lams:errors path="message.body"/>
 			</div>
 
 			<c:set var="itemAttachment" value="${topicFormId}" />

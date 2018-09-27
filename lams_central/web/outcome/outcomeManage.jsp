@@ -35,13 +35,7 @@
 </lams:head>
 <body class="stripes">
 <lams:Page type="admin" >
-	<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	     <lams:Alert id="error" type="danger" close="false">
-	         <c:forEach var="error" items="${errorMap[errorKey]}">
-	             <c:out value="${error}" />
-	         </c:forEach>
-	     </lams:Alert>
-	 </c:if>
+	<lams:errors path="*"/>
 	
 	<div class="outcomeContainer">
 		<div class="row">

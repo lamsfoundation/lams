@@ -8,7 +8,6 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -69,9 +68,8 @@
 			'select' : function(event, ui){
 				var input = $(this);
 				$.ajax({
-					'url' : '<lams:LAMSURL/>outcome.do',
+					'url' : '<lams:LAMSURL/>outcome/outcomeMap',
 					'data': $.extend({
-						'method' : 'outcomeMap',
 						'outcomeId' : ui.item.value
 					}, outcomeData${outcomeTagId}),
 					'method' : 'post',
@@ -95,10 +93,8 @@
 	 */
 	function refreshOutcomeMappings(outcomeTagId) {
 		$.ajax({
-			'url' 	   : '<lams:LAMSURL/>outcome.do',
-			'data'	   : $.extend({
-							'method' : 'outcomeGetMappings'
-						 }, outcomeData${outcomeTagId}),
+			'url' 	   : '<lams:LAMSURL/>outcome/outcomeGetMappings.do',
+			'data'	   : outcomeData${outcomeTagId},
 			'cache'    : false,
 			'dataType' : 'json',
 			'success'  : function(outcomeMappings) {
@@ -130,9 +126,8 @@
 	 */
 	function removeOutcomeMapping(button) {
 		$.ajax({
-			'url' : '<lams:LAMSURL/>outcome.do',
+			'url' : '<lams:LAMSURL/>outcome/outcomeRemoveMapping.do',
 			'data': {
-					'method' 	: 'outcomeRemoveMapping',
 					'mappingId' :  $(button).attr('mappingId')
 				}, 
 			'cache' : false,

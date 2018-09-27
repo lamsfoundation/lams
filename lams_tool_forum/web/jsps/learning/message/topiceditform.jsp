@@ -3,15 +3,8 @@
 <div class="form-group">
     <label><fmt:message key="message.label.subject" />&nbsp;</label>
     <form:input size="50" tabindex="1" value="${message.subject}" path="message.subject" maxlength="60"/> &nbsp;
-	<form:errors path="message.subject" />
-	<c:set var="errorKey" value="message.subject" />
-	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	            <lams:Alert id="error" type="danger" close="false">
-	                <c:forEach var="error" items="${errorMap[errorKey]}">
-	                    <c:out value="${error}" />
-	                </c:forEach>
-	            </lams:Alert>
-	        </c:if>
+	<form:errors path="message.subject"/>
+	<lams:errors path="message.subject"/>
 </div>
 
 <div class="form-group">

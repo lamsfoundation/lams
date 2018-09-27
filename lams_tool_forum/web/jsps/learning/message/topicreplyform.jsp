@@ -4,14 +4,7 @@
 	<label><fmt:message key="message.label.subject" />&nbsp;</label>&nbsp;
 	<form:input cssClass="form-control" tabindex="1" path="message.subject" value="${message.subject}" maxlength="60" />
 	&nbsp;
-	 <c:set var="errorKey" value="message.subject" />
-	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	            <lams:Alert id="error" type="danger" close="false">
-	                <c:forEach var="error" items="${errorMap[errorKey]}">
-	                    <c:out value="${error}" />
-	                </c:forEach>
-	            </lams:Alert>
-	        </c:if>
+	<lams:errors path="message.subject"/>
 </div>
 <div class="form-group">
 	<label><fmt:message key="message.label.body" /> *</label><BR />
@@ -21,14 +14,7 @@
 
 	<div class="form-group">
  		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
- 		<c:set var="errorKey" value="message.attachments" />
-		        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-		            <lams:Alert id="error" type="danger" close="false">
-		                <c:forEach var="error" items="${errorMap[errorKey]}">
-		                    <c:out value="${error}" />
-		                </c:forEach>
-		            </lams:Alert>
-		        </c:if>
+ 		<lams:errors path="message.attachments"/>
 	</div>
 	
 	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>

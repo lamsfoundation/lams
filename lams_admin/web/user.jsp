@@ -198,51 +198,6 @@ bo<!DOCTYPE html>
 					</a>
 				</c:if>
 			
-				 <c:set var="errorKey" value="login" /> 
-				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-				     <lams:Alert id="error" type="danger" close="false"> 
-				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-				             <c:out value="${error}" /><br /> 
-				         </c:forEach> 
-				     </lams:Alert> 
-				</c:if>
-				
-				 <c:set var="errorKey" value="firstName" /> 
-				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-				     <lams:Alert id="error" type="danger" close="false"> 
-				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-				             <c:out value="${error}" /><br /> 
-				         </c:forEach> 
-				     </lams:Alert> 
-				</c:if>
-				
-				 <c:set var="errorKey" value="lastName" /> 
-				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-				     <lams:Alert id="error" type="danger" close="false"> 
-				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-				             <c:out value="${error}" /><br /> 
-				         </c:forEach> 
-				     </lams:Alert> 
-				</c:if>
-				
-				 <c:set var="errorKey" value="email" /> 
-				 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-				     <lams:Alert id="error" type="danger" close="false"> 
-				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-				             <c:out value="${error}" /><br /> 
-				         </c:forEach> 
-				     </lams:Alert> 
-				</c:if>
-				
-				<c:set var="errorKey" value="password" /> 
-				<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-				     <lams:Alert id="error" type="danger" close="false"> 
-				         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-				             <c:out value="${error}" /><br /> 
-				         </c:forEach> 
-				     </lams:Alert> 
-				</c:if>
-			
 				<div class="panel panel-default voffset5">
 					<div class="panel-heading">
 						<span class="panel-title"> <c:if test="${not empty userForm.userId}">
@@ -312,14 +267,16 @@ bo<!DOCTYPE html>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.login" />
 									*:</td>
-								<td><form:input id="login" path="login"  maxlength="50"
+								<td><lams:errors path="login"/>
+								<form:input id="login" path="login"  maxlength="50"
 										cssClass="form-control"/></td>
 							</tr>
 							<c:if test="${empty userForm.userId}">
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.password" />
 									*:</td>
-								<td><form:input type="password" path="password" 
+								<td><lams:errors path="password"/>
+									<form:input type="password" path="password" 
 										maxlength="25" id="password" cssClass="form-control" /></td>
 							</tr>
 							<tr>
@@ -349,19 +306,22 @@ bo<!DOCTYPE html>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.first_name" /> *:</td>
-								<td><form:input path="firstName" 
+								<td><lams:errors path="firstName"/>
+									<form:input path="firstName" 
 										id="firstName" maxlength="128" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message
 										key="admin.user.last_name" /> *:</td>
-								<td><form:input path="lastName" 
+								<td><lams:errors path="lastName"/>
+									<form:input path="lastName" 
 										id="lastName" maxlength="128" cssClass="form-control"/></td>
 							</tr>
 							<tr>
 								<td class="align-right"><fmt:message key="admin.user.email" />
 									*:</td>
-								<td><form:input path="email" maxlength="128"
+								<td><lams:errors path="email"/>
+									<form:input path="email" maxlength="128"
 										cssClass="form-control"/></td>
 							</tr>
 							<tr>

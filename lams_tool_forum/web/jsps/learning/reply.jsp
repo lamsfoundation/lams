@@ -147,14 +147,7 @@
 					<fmt:message key="title.message.reply" />
 				</div>
 		 		<div class="panel-body">
-						 <c:set var="errorKey" value="GLOBAL" />
-					        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-					            <lams:Alert id="error" type="danger" close="false">
-					                <c:forEach var="error" items="${errorMap[errorKey]}">
-					                    <c:out value="${error}" />
-					                </c:forEach>
-					            </lams:Alert>
-					        </c:if>
+					<lams:errors/>
 					<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
 				</div> 
 			</div>

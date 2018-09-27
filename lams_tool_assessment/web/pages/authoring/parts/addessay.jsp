@@ -113,11 +113,6 @@
 			
 		<div class="panel-body">
 			<%@ include file="/common/messages.jsp"%>
-		    <div class="error">
-		    	<lams:Alert id="errorMessages" type="danger" close="false" >
-					<span></span>
-				</lams:Alert>	
-		    </div>
 			
 			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
 				<form:hidden path="sessionMapID" />

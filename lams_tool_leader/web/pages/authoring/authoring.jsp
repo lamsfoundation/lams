@@ -37,16 +37,7 @@
 				<form:hidden path="currentTab" id="currentTab" />
 				<form:hidden path="sessionMapID" />
 				<lams:TabBodyArea>
-					<div id="message" style="text-align: center;">
-						 <c:set var="errorKey" value="GLOBAL" /> 
-						 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>		
-					</div>
+					 <lams:errors/>
 					<%-- Page tabs --%>
 		            <lams:TabBodys>
 						<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />

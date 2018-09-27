@@ -163,14 +163,7 @@
 								<label for="username"><fmt:message key="signup.username" /></label>:
 								<form:input path="username" size="40" maxlength="255"
 									cssClass="form-control" />
-								 <c:set var="errorKey" value="username" /> 
-								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-								     <lams:Alert id="error" type="danger" close="false"> 
-								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-								             <c:out value="${error}" /><br /> 
-								         </c:forEach> 
-								     </lams:Alert> 
-								</c:if>
+								<lams:errors path="username"/>
 								<span style="display: none;'" class="msg error"> <fmt:message
 										key="error.username.invalid.characters" /></span>
 							</div>
@@ -208,14 +201,7 @@
 
 								<form:password path="password" size="40"
 									cssClass="form-control" maxlength="25" />
-								 <c:set var="errorKey" value="password" /> 
-								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-								     <lams:Alert id="error" type="danger" close="false"> 
-								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-								             <c:out value="${error}" /><br /> 
-								         </c:forEach> 
-								     </lams:Alert> 
-								</c:if>
+								<lams:errors path="password"/>
 							</div>
 
 							<div class="form-group">
@@ -231,14 +217,7 @@
 
 								<form:input path="firstName" size="40" maxlength="255"
 									cssClass="form-control" />
-								 <c:set var="errorKey" value="firstName" /> 
-								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-								     <lams:Alert id="error" type="danger" close="false"> 
-								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-								             <c:out value="${error}" /><br /> 
-								         </c:forEach> 
-								     </lams:Alert> 
-								</c:if>
+								<lams:errors path="firstName"/>
 								<span style="display: none;'" class="first error"><fmt:message
 										key="error.firstname.invalid.characters" /></span>
 							</div>
@@ -248,14 +227,7 @@
 
 								<form:input path="lastName" size="40" maxlength="255"
 									cssClass="form-control" />
-								 <c:set var="errorKey" value="lastName" /> 
-									 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-									     <lams:Alert id="error" type="danger" close="false"> 
-									         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-									             <c:out value="${error}" /><br /> 
-									         </c:forEach> 
-									     </lams:Alert> 
-									</c:if>
+								<lams:errors path="lastName"/>
 								<span style="display: none;'" class="last error"><fmt:message
 										key="error.lastname.invalid.characters" /></span>
 							</div>
@@ -264,14 +236,7 @@
 
 								<form:input path="email" size="40" maxlength="255"
 									cssClass="form-control" />
-								 <c:set var="errorKey" value="email" /> 
-								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-								     <lams:Alert id="error" type="danger" close="false"> 
-								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-								             <c:out value="${error}" /><br /> 
-								         </c:forEach> 
-								     </lams:Alert> 
-								</c:if>
+								<lams:errors path="email"/>
 								<span style="display: none;'" class="email error"><fmt:message
 										key="error.email.invalid.format" /></span>
 							</div>
@@ -301,14 +266,7 @@
 										</form:option>
 									</c:forEach>
 								</form:select>
-								 <c:set var="errorKey" value="country" /> 
-								 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-								     <lams:Alert id="error" type="danger" close="false"> 
-								         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-								             <c:out value="${error}" /><br /> 
-								         </c:forEach> 
-								     </lams:Alert> 
-								</c:if>
+								<lams:errors path="country"/>
 							</div>
 							
 							<div class="form-group">
@@ -316,14 +274,7 @@
 
 								<form:input path="courseKey" size="40" maxlength="255"
 									cssClass="form-control" />
-								 <c:set var="errorKey" value="courseKey" /> 
-									 <c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-									     <lams:Alert id="error" type="danger" close="false"> 
-									         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-									             <c:out value="${error}" /><br /> 
-									         </c:forEach> 
-									     </lams:Alert> 
-									</c:if>
+								<lams:errors path="courseKey"/>
 							</div>
 
 							<div class="form-group" align="right">

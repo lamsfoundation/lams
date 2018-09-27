@@ -25,16 +25,7 @@
 			<div class="form-group">
 		    <label for="message.subject"><fmt:message key="message.label.subject" /> *</label>
 		    <form:input type="text" size="30" tabindex="1" path="message.subject" value="${message.subject}" maxlength="60" cssClass="form-control"/>
-		    
-		    <c:set var="errorKey" value="message.subject" />
-	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	            <lams:Alert id="error" type="danger" close="false">
-	                <c:forEach var="error" items="${errorMap[errorKey]}">
-	                    <c:out value="${error}" />
-	                </c:forEach>
-	            </lams:Alert>
-	        </c:if>
-			</div>
+		    <lams:errors path="message.subject"/>
 			
 			<div class="form-group">
 		    <label for="forum.instructions"><fmt:message key="message.label.body" /> *</label>
@@ -43,14 +34,7 @@
 				<c:set var="body" value="${topicFormId.message.body}"/>
 			</c:if>
 			<lams:CKEditor id="message.body" value="${body}" contentFolderID="${sessionMap.contentFolderID}"/>
-			<c:set var="errorKey" value="message.body" />
-	        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-	            <lams:Alert id="error" type="danger" close="false">
-	                <c:forEach var="error" items="${errorMap[errorKey]}">
-	                    <c:out value="${error}" />
-	                </c:forEach>
-	            </lams:Alert>
-	        </c:if>
+		    <lams:errors path="message.body"/>
 			</div>
 
 			<c:set var="itemAttachment" value="${topicFormId}" />
@@ -58,14 +42,7 @@
 				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
 				<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="3" />
 				<form:errors path="message.attachments" />
-				<c:set var="errorKey" value="message.attachments" />
-		        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-		            <lams:Alert id="error" type="danger" close="false">
-		                <c:forEach var="error" items="${errorMap[errorKey]}">
-		                    <c:out value="${error}" />
-		                </c:forEach>
-		            </lams:Alert>
-		        </c:if>
+			    <lams:errors path="message.attachments"/>
 				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 			</div>
 

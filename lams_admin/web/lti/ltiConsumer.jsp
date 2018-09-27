@@ -26,7 +26,7 @@
 	
 			// validate signup form on keyup and submit
 			var validator = $("#ltiConsumerForm").validate({
-				rules: {
+ 				rules: {
 					serverid: "required", 
 					serverkey: "required",
 					servername: "required",
@@ -38,7 +38,7 @@
 					servername: "<c:set var="namev"><fmt:message key='sysadmin.servername' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 					prefix: "<c:set var="namev"><fmt:message key='sysadmin.prefix' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>"
 				}
-			});
+ 			});
 		});
 	</script>
 </lams:head>
@@ -56,42 +56,7 @@
 					</a>
 				</p>
 					
-				<c:set var="errorKey" value="serverid" /> 
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
-						
-				<c:set var="errorKey" value="serverkey" /> 		
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						            <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
-						
-				<c:set var="errorKey" value="servername" /> 		
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						            <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
-						
-				<c:set var="errorKey" value="prefix" /> 		
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						            <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>				
-				<br />
+				<lams:errors path="*"/>
 				
 				<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
 					<form:hidden path="sid" />
@@ -101,15 +66,18 @@
 					<table class="table table-no-border">
 						<tr>
 							<td><fmt:message key="sysadmin.serverkey" />&nbsp;*</td>
-							<td><form:input path="serverid" size="20" cssClass="form-control"/></td>
+							<td><lams:errors path="serverid"/>
+								<form:input path="serverid" size="20" cssClass="form-control"/></td>
 						</tr>
 						<tr>
 							<td><fmt:message key="sysadmin.serversecret" />&nbsp;*</td>
-							<td><form:input path="serverkey" size="30" cssClass="form-control"/></td>
+							<td><lams:errors path="serverkey"/>
+								<form:input path="serverkey" size="30" cssClass="form-control"/></td>
 						</tr>
 						<tr>
 							<td><fmt:message key="sysadmin.servername" />&nbsp;*</td>
-							<td><form:input path="servername" size="30" cssClass="form-control"/></td>
+							<td><lams:errors path="servername"/>
+								<form:input path="servername" size="30" cssClass="form-control"/></td>
 						</tr>
 						<tr>
 							<td valign="top"><fmt:message key="sysadmin.serverdesc" />:</td>
@@ -117,7 +85,8 @@
 						</tr>
 						<tr>
 							<td><fmt:message key="sysadmin.prefix" />&nbsp;*</td>
-							<td><form:input path="prefix" size="10" cssClass="form-control"/></td>
+							<td><lams:errors path="prefix"/>
+								<form:input path="prefix" size="10" cssClass="form-control"/></td>
 						</tr>
 						
 						<tr>

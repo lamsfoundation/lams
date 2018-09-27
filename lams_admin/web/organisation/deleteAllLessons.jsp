@@ -80,15 +80,7 @@
 					:  <a href="<lams:LAMSURL/>admin/orgmanage.do?org=${param.orgId}" class="btn btn-default"><c:out value="${courseName}" /></a>
 				</p>
 				
-				<%-- Error Messages --%>
-				 <c:set var="errorKey" value="GLOBAL" />
-				        <c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
-				            <lams:Alert id="error" type="danger" close="false">
-				                <c:forEach var="error" items="${errorMap[errorKey]}">
-				                    <c:out value="${error}" />
-				                </c:forEach>
-				            </lams:Alert>
-				        </c:if>
+				<lams:errors/>
 				
 				<fmt:message key="label.delete.all.lesson.count" />&nbsp;<span id="lessonCount">${lessonCount}</span>&nbsp;/&nbsp;<span>${lessonCount}</span>
 				<div id="deletingBox" style="display: none">

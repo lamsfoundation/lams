@@ -69,17 +69,7 @@
 					</c:if>
 				</h4>
 				
-				<div align="center">
-					 <c:set var="errorKey" value="name" /> 
-						<c:if test="${not empty errorMap and not empty errorMap[errorKey]}"> 
-						     <lams:Alert id="error" type="danger" close="false"> 
-						         <c:forEach var="error" items="${errorMap[errorKey]}"> 
-						             <c:out value="${error}" /><br /> 
-						         </c:forEach> 
-						     </lams:Alert> 
-						</c:if>
-						
-				</div>
+				<lams:errors path="*"/>
 				
 				<div id="deleteAllLessonsBox" class="alert alert-info" style="display: none">
 					<fmt:message key="label.delete.all.lesson.count" />&nbsp;<span id="lessonCount"></span> / <span id="totalLessonCount"></span>
