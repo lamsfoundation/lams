@@ -145,7 +145,6 @@ import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
-
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -707,7 +706,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ldDto.setDescription(ldDto.getDescription().replaceAll(oldResourcePath, newResourcePath));
 	    }
 	    for (AuthoringActivityDTO activity : activities) {
-		getLearningDesignService().fillLearningLibraryID(activity);
+		getLearningDesignService().fillLearningLibraryID(activity, activities);
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		    continue;

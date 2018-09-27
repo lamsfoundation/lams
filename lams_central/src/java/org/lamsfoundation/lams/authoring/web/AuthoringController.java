@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -194,7 +195,7 @@ public class AuthoringController {
     @RequestMapping("/openLearningDesign")
     @ResponseBody
     public String openLearningDesign(HttpServletRequest request, HttpServletResponse response)
-	    throws ServletException, IOException {
+	    throws ServletException, IOException, ImportToolContentException {
 	long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID,
 		getUserLanguage());
@@ -202,7 +203,7 @@ public class AuthoringController {
 	// some old LDs may not have learning library IDs filled in, try to find them
 	for (AuthoringActivityDTO activity : (List<AuthoringActivityDTO>) learningDesignDTO.getActivities()) {
 	    if (activity.getLearningLibraryID() == null) {
-		learningDesignService.fillLearningLibraryID(activity);
+		learningDesignService.fillLearningLibraryID(activity, learningDesignDTO.getActivities());
 	    }
 	}
 

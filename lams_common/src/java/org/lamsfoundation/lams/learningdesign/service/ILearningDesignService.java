@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 public interface ILearningDesignService {
     static final String LD_SVG_TOP_DIR = FileUtil.getFullPath(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR),
 	    "lams-www.war\\secure\\learning-design-images");
-    
+
     /**
      * Returns a populated LearningDesign object corresponding to the given learningDesignID
      *
@@ -95,7 +95,8 @@ public interface ILearningDesignService {
 
     List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName) throws IOException;
 
-    void fillLearningLibraryID(AuthoringActivityDTO activity);
+    void fillLearningLibraryID(AuthoringActivityDTO activity, Collection<AuthoringActivityDTO> activities)
+	    throws ImportToolContentException;
 
     String internationaliseActivityTitle(Long learningLibraryID);
 }
