@@ -91,7 +91,7 @@ input[type="checkbox"] {
 			<div class="panel-heading">
 				<fmt:message key="email.compose.mail" />
 			</div>
-			<lams:Errors/>	
+			<lams:errors/>	
 			<div class="panel-body">
 				<form id="emailUserForm"
 					action="<lams:LAMSURL/>emailUser/send.do" method="post">

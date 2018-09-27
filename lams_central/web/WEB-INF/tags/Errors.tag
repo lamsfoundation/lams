@@ -1,16 +1,28 @@
 <%@ tag body-content="scriptless"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ attribute name="showAll" required="false" rtexprvalue="true"%>
-<%@ attribute name="errorKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="path" required="false" rtexprvalue="true"%>
 
 <%-- To show the GLOBAL messages (default case) use no parameters --%>
-<%-- To show the all messages, ignoring their keys (e.g. Change Password) use showAll="true" --%>
-<%-- To show the messages for a particular key use errorKey="theKey" --%>
+<%-- To show the all messages, ignoring their keys (e.g. Change Password) use path="*" --%>
+<%-- To show the messages for a particular item use path="itemName" --%>
+
+<c:choose>
+
+<%-- Show Messages for GLOBAL. Usual alert box --%>
+<c:when test="${empty path}">
+   	<c:set var="apath" value="GLOBAL" />
+	<c:if test="${not empty errorMap and not empty errorMap[apath]}"> 
+   	<lams:Alert id="error" type="danger" close="false"> 
+       <c:forEach var="error" items="${errorMap[apath]}"> 
+       	<c:out value="${error}" /><br /> 
+       </c:forEach> 
+	</lams:Alert> 
+	</c:if>
+</c:when>
 
 <%-- Show All Messages --%>
-<c:choose>
-<c:when test="${showAll}">
+<c:when test="${path eq '*'}">
 	<c:if test="${not empty errorMap}"> 
    	<lams:Alert id="error" type="danger" close="false"> 
        <c:forEach var="error" items="${errorMap}"> 
@@ -23,25 +35,14 @@
 </c:when>
 
 <%-- Show messages for a particular key --%>
-<c:when test="${not empty errorKey}">
-	<c:if test="${not empty errorMap and not empty errorMap[errorKey]}">
+<c:otherwise>
+	<c:if test="${not empty errorMap and not empty errorMap[path]}">
 		<span class="text-danger">
-		<c:forEach var="error" items="${errorMap[errorKey]}"> 
+		<c:forEach var="error" items="${errorMap[path]}"> 
 	       	<c:out value="${error}" /><br /> 
         </c:forEach> 
         </span>
     </c:if>
-</c:when>
-
-<%-- Show Messages for GLOBAL. Usual alert box --%>
-<c:otherwise>
-   	<c:set var="errorKeyisGlobal" value="GLOBAL" />
-	<c:if test="${not empty errorMap and not empty errorMap[errorKeyisGlobal]}"> 
-   	<lams:Alert id="error" type="danger" close="false"> 
-       <c:forEach var="error" items="${errorMap[errorKeyisGlobal]}"> 
-       	<c:out value="${error}" /><br /> 
-       </c:forEach> 
-	</lams:Alert> 
-	</c:if>
 </c:otherwise>
+
 </c:choose>

@@ -58,7 +58,7 @@ div#errorArea {
 	</c:set>
 	<lams:Page type="admin" title="${title}">
 			
-		<lams:Errors/>				
+		<lams:errors/>				
 
 			<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post" onsubmit="return verifyAndSubmit();">
 				<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 

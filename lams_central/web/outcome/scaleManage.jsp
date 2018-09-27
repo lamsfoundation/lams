@@ -35,7 +35,7 @@
 <body class="stripes">
 <lams:Page type="admin" >
 
-	<lams:Errors/>	
+	<lams:errors/>	
 
 	<div class="outcomeContainer">
 		<div class="row">

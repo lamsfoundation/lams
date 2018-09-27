@@ -101,14 +101,14 @@
 		<div class="row vertical-center-row">
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel voffset20">
-					<lams:Errors/>
+					<lams:errors/>
 					<div class="panel-body">
 					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 							<form:hidden name="<%=PasswordChangeActionForm.formName%>"
 								path="login" />
 							<div class="form-group">
 								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
- 								<lams:Errors errorKey="oldPassword"/>	
+ 								<lams:errors path="oldPassword"/>	
  								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
 							</div>
 							
@@ -133,7 +133,7 @@
 								 </lams:Alert> 
 							</div>
 							
-							<lams:Errors errorKey="password"/>	
+							<lams:errors path="password"/>	
  							<div class="input-group voffset5">
 								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 								<input class="form-control" type="password"  

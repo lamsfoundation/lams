@@ -46,7 +46,7 @@
     
 <body class="stripes">
 <lams:Page type="admin" title="">
-	<lams:Errors/>	
+	<lams:errors/>	
 
 	<!-- Preceding lessons setup -->
 		<p class="lead">

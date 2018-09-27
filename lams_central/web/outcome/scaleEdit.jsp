@@ -48,7 +48,7 @@
 				<div class="panel">
 					<div class="panel-body">
 					
-						<lams:Errors/>
+						<lams:errors/>
 						
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.name" />:
