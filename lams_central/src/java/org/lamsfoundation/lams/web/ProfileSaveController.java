@@ -68,8 +68,7 @@ public class ProfileSaveController {
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
 	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
-		request.setAttribute("redirect", "editprofile");
-		return "redirect:/index.do";
+		return "forward:/profile/edit.do";
 	    }
 	}
 
@@ -81,8 +80,7 @@ public class ProfileSaveController {
 		    .warn(requestor.getLogin() + " tried to edit profile of user " + userForm.getLogin());
 	    errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("redirect", "editprofile");
-	    return "redirect:/index.do";
+	    return "forward:/profile/edit.do";
 	}
 
 	// (dyna)form validation
@@ -118,8 +116,8 @@ public class ProfileSaveController {
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("redirect", "editprofile");
-	    return "redirect:/index.do";
+	    request.setAttribute("bbb", "OK!");
+	    return "profile/editprofile";
 	}
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)
@@ -146,8 +144,7 @@ public class ProfileSaveController {
 	HttpSession ss = SessionManager.getSession();
 	ss.setAttribute(AttributeNames.USER, requestor.getUserDTO());
 
-	request.setAttribute("redirect", "profile");
-	return "redirect:/index.do";
+	return "forward:/profile/view.do";
     }
 
 }

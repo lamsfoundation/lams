@@ -122,7 +122,7 @@ public class IndexController {
 	if (StringUtils.equals(redirectURL, "profile")) {
 	    return "redirect:/profile/view.do";
 	} else if (StringUtils.equals(redirectURL, "editprofile")) {
-	    return "redirect:/profile/edit.do";
+	    return "forward:/profile/edit.do";
 	} else if (StringUtils.equals(redirectURL, "password")) {
 	    return "redirect:/password.do";
 	} else if (StringUtils.equals(redirectURL, "portrait")) {
