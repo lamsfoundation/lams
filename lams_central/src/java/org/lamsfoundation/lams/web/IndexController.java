@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,16 +119,22 @@ public class IndexController {
 	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
 
-	String redirectURL = WebUtil.readStrParam(request, "redirect", true);
-	if (StringUtils.equals(redirectURL, "profile")) {
+    	String redirectParam = WebUtil.readStrParam(request, "redirect", true);
+	if (StringUtils.equals(redirectParam, "profile")) {
 	    return "redirect:/profile/view.do";
-	} else if (StringUtils.equals(redirectURL, "editprofile")) {
+	} else if (StringUtils.equals(redirectParam, "editprofile")) {
 	    return "forward:/profile/edit.do";
-	} else if (StringUtils.equals(redirectURL, "password")) {
-	    return "redirect:/password.do";
-	} else if (StringUtils.equals(redirectURL, "portrait")) {
+	} else if (StringUtils.equals(redirectParam, "password")) {
+	    String passwordUrl = "redirect:/password.do";
+	    String redirectUrlParam = WebUtil.readStrParam(request, "redirectURL", true);
+	    if (StringUtils.isNotBlank(redirectUrlParam)) {
+		passwordUrl = WebUtil.appendParameterToURL(passwordUrl, "redirectURL",
+			URLEncoder.encode(redirectUrlParam, "UTF-8"));
+	    }
+	    return passwordUrl;
+	} else if (StringUtils.equals(redirectParam, "portrait")) {
 	    return "redirect:/portrait.do";
-	} else if (StringUtils.equals(redirectURL, "lessons")) {
+	} else if (StringUtils.equals(redirectParam, "lessons")) {
 	    return "redirect:/profile/lessons.do";
 	}
 
