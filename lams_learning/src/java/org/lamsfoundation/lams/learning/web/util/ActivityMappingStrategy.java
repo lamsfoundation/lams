@@ -69,7 +69,7 @@ public class ActivityMappingStrategy implements Serializable {
      * Returns the struts action for displaying the parallel wait.
      */
     protected String getWaitingAction() {
-	return "/parallelWait.do";
+	return "/partialCompleted.jsp";
     }
 
     /**
