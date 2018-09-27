@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/portrait.js"></script>
-	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/blockexportbutton.js"></script>
 
 	<script type="text/javascript">
 	
@@ -367,8 +367,8 @@
 					
 					var areaToBlock = "select-lessons-area";
 					var simplified = jQuery("#export-selected-simplified").prop('checked');
-					simplified = "&simplified="+simplified;
-					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelSelectedLessons"+simplified+".do?organisationID=${organisationID}" + lessonIds;
+					simplified = "simplified="+simplified;
+					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelSelectedLessons.do?"+simplified+"&organisationID=${organisationID}" + lessonIds;
 					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				}
 				
