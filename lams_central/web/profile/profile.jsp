@@ -36,13 +36,11 @@
 						<c:choose>
 							<c:when test="${empty portraitUuid}">
 								<div class="text-center">
-									<span class="fa-stack fa-4x text-muted"
-										title="<fmt:message key="msg.portrait.none" />"> <i
-										class="fa fa-circle fa-stack-2x"></i> <i
-										class="fa fa-user fa-stack-1x fa-inverse"></i>
+									<span class="fa-stack fa-4x text-muted" title="<fmt:message key="msg.portrait.none" />"> 
+										<i class="fa fa-circle fa-stack-2x"></i> 
+										<i class="fa fa-user fa-stack-1x fa-inverse"></i>
 									</span>
 								</div>
-
 							</c:when>
 							<c:otherwise>
 								<img style="margin: 0 auto;" class="img-circle img-responsive"
@@ -61,9 +59,11 @@
 					<!-- Split button -->
 					<div class="col-xs-12 text-center">
 						<a class="btn btn-sm btn-default offset5"
-							href="<lams:LAMSURL/>index.do?redirect=editprofile" role="button"><i
-							class="fa fa-fw fa-pencil"></i> <span class="hidden-xs"><fmt:message
-									key="title.profile.edit.screen" /></span></i>
+								href="<lams:LAMSURL/>index.do?redirect=editprofile" role="button">
+							<i class="fa fa-fw fa-pencil"></i> 
+							<span class="hidden-xs">
+								<fmt:message key="title.profile.edit.screen" />
+							</span>
 						</a>&nbsp;&nbsp;
 						
 						<c:set var="authenticationMethodId">
@@ -71,20 +71,21 @@
 						</c:set>
 						<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 						<c:if test="${authenticationMethodId eq dbId}">
-
 							<a class="btn btn-sm btn-default offset5"
-								href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26redirect%3Dprofile" role="button">
-									<i class="fa fa-fw fa-lock"></i> 
-										<span class="hidden-xs"><fmt:message
-											key="title.password.change.screen" />
-										</span>
-									</i>
+									href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26redirect%3Dprofile" role="button">
+								<i class="fa fa-fw fa-lock"></i>
+								<span class="hidden-xs">
+									<fmt:message key="title.password.change.screen" />
+								</span>
 							</a>
 						</c:if>
+
 						<a class="btn btn-sm btn-default offset5"
-							href="<lams:LAMSURL/>index.do?redirect=portrait" role="button">
-							<i class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
-									key="title.portrait.change.screen" /></span></i>
+								href="<lams:LAMSURL/>index.do?redirect=portrait" role="button">
+							<i class="fa fa-fw fa-camera"></i> 
+							<span class="hidden-xs">
+								<fmt:message key="title.portrait.change.screen" />
+							</span>
 						</a>&nbsp;&nbsp;
 
 						<a class="btn btn-sm btn-default offset5" href="profile/policyConsents.do" role="button">
@@ -96,10 +97,11 @@
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-								href="<lams:LAMSURL/>index.do?redirect=lessons" role="button">
-								<i class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
-										key="title.all.my.lessons" /></span>
-								</i>
+									href="<lams:LAMSURL/>index.do?redirect=lessons" role="button">
+								<i class="fa fa-fw fa-book"></i> 
+								<span class="hidden-xs">
+									<fmt:message key="title.all.my.lessons" />
+								</span>
 							</a>
 						</c:if>
 					</div>
