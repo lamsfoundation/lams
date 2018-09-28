@@ -93,7 +93,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	var draggable = initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 	if (draggable) {
 		modalDialog.draggable({
-			'cancel' : '.modal-body'
+			'cancel' : '.modal-body, button.close'
 		});
 	}
 	dialog.data("isDraggable", draggable);
