@@ -102,30 +102,30 @@ public class IndexController {
 	// check if user is flagged as needing to change their password
 	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());
 	if (loggedInUser.getChangePassword() != null && loggedInUser.getChangePassword()) {
-	    return "redirect:/password.do";
+	    return "forward:/password.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
 	if (loggedInUser.isTwoFactorAuthenticationEnabled()
 		&& loggedInUser.getTwoFactorAuthenticationSecret() == null) {
-	    return "redirect:/twoFactorAuthentication.do";
+	    return "forward:/twoFactorAuthentication.do";
 	}
 
 	// check if user needs to get his shared two-factor authorization secret
 	if (policyService.isPolicyConsentRequiredForUser(loggedInUser.getUserId())) {
-	    return "redirect:/policyConsents.do";
+	    return "forward:/policyConsents.do";
 	}
 
 	User user = userManagementService.getUserByLogin(userDTO.getLogin());
 	request.setAttribute("portraitUuid", user.getPortraitUuid());
 
-    	String redirectParam = WebUtil.readStrParam(request, "redirect", true);
+	String redirectParam = WebUtil.readStrParam(request, "redirect", true);
 	if (StringUtils.equals(redirectParam, "profile")) {
-	    return "redirect:/profile/view.do";
+	    return "forward:/profile/view.do";
 	} else if (StringUtils.equals(redirectParam, "editprofile")) {
 	    return "forward:/profile/edit.do";
 	} else if (StringUtils.equals(redirectParam, "password")) {
-	    String passwordUrl = "redirect:/password.do";
+	    String passwordUrl = "forward:/password.do";
 	    String redirectUrlParam = WebUtil.readStrParam(request, "redirectURL", true);
 	    if (StringUtils.isNotBlank(redirectUrlParam)) {
 		passwordUrl = WebUtil.appendParameterToURL(passwordUrl, "redirectURL",
@@ -133,9 +133,9 @@ public class IndexController {
 	    }
 	    return passwordUrl;
 	} else if (StringUtils.equals(redirectParam, "portrait")) {
-	    return "redirect:/portrait.do";
+	    return "forward:/portrait.do";
 	} else if (StringUtils.equals(redirectParam, "lessons")) {
-	    return "redirect:/profile/lessons.do";
+	    return "forward:/profile/lessons.do";
 	}
 
 	// This test also appears in LoginAsAction

@@ -102,8 +102,7 @@ public class PortraitSaveController {
 	if (!mediaType.equals("image")) {
 	    errorMap.add("file", messageService.getMessage("error.portrait.not.image"));
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("redirect", "portrait");
-	    return "redirect:/index.do";
+	    return "forward:/index.do?redirect=portrait";
 	}
 
 	// check file exists
@@ -111,8 +110,7 @@ public class PortraitSaveController {
 	if (is == null) {
 	    errorMap.add("file", messageService.getMessage("error.general.1"));
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("redirect", "portrait");
-	    return "redirect:/index.do";
+	    return "forward:/index.do?redirect=portrait";
 	}
 
 	// write to content repository
@@ -167,8 +165,7 @@ public class PortraitSaveController {
 	user.setPortraitUuid(originalFileNode.getUuid());
 	service.saveUser(user);
 
-	request.setAttribute("redirect", "profile");
-	return "redirect:/index.do";
+	return "forward:/index.do?redirect=portrait";
     }
 
     /** Called from sysadmin to delete an inappropriate portrait */

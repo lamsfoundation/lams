@@ -48,6 +48,31 @@ public class ExtServerForm {
 
     private Integer timeToLiveLoginRequest = 80;
 
+    private Boolean learnerPresenceAvailable;
+
+    private Boolean learnerImAvailable;
+
+    private Boolean liveEditEnabled;
+
+    private Boolean enableLessonNotifications;
+
+    /**
+     * Should Learner start the lesson from the beginning each time he enters it.
+     * Content is not removed, LessonProgress is deleted, not archived.
+     */
+    private Boolean forceLearnerRestart;
+
+    /**
+     * Should Learners be allowed to restart the lesson after finishing it.
+     * Content is not removed, LessonProgress is archived and then deleted.
+     */
+    private Boolean allowLearnerRestart;
+
+    /**
+     * Should learners be displayed activity gradebook on lesson complete.
+     */
+    private Boolean gradebookOnComplete;
+
     public Integer getSid() {
 	return sid;
     }
@@ -144,4 +169,59 @@ public class ExtServerForm {
 	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
     }
 
+    public Boolean getLearnerPresenceAvailable() {
+	return learnerPresenceAvailable;
+    }
+
+    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
+	this.learnerPresenceAvailable = learnerPresenceAvailable;
+    }
+
+    public Boolean getLearnerImAvailable() {
+	return learnerImAvailable;
+    }
+
+    public void setLearnerImAvailable(Boolean learnerImAvailable) {
+	this.learnerImAvailable = learnerImAvailable;
+    }
+
+    public Boolean getLiveEditEnabled() {
+	return liveEditEnabled;
+    }
+
+    public void setLiveEditEnabled(Boolean liveEditEnabled) {
+	this.liveEditEnabled = liveEditEnabled;
+    }
+
+    public Boolean getEnableLessonNotifications() {
+	return enableLessonNotifications;
+    }
+
+    public void setEnableLessonNotifications(Boolean enableLessonNotifications) {
+	this.enableLessonNotifications = enableLessonNotifications;
+    }
+
+    public Boolean getForceLearnerRestart() {
+	return forceLearnerRestart;
+    }
+
+    public void setForceLearnerRestart(Boolean forceLearnerRestart) {
+	this.forceLearnerRestart = forceLearnerRestart;
+    }
+
+    public Boolean getAllowLearnerRestart() {
+	return allowLearnerRestart;
+    }
+
+    public void setAllowLearnerRestart(Boolean allowLearnerRestart) {
+	this.allowLearnerRestart = allowLearnerRestart;
+    }
+
+    public Boolean getGradebookOnComplete() {
+	return gradebookOnComplete;
+    }
+
+    public void setGradebookOnComplete(Boolean gradebookOnComplete) {
+	this.gradebookOnComplete = gradebookOnComplete;
+    }
 }

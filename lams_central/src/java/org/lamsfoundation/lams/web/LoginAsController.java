@@ -115,7 +115,7 @@ public class LoginAsController {
 	    return "errorpages/errorWithMessage";
 	}
 
-	return "redirect:/admin/usersearch.do";
+	return "forward:/admin/usersearch.do";
     }
 
     private boolean isOnlyLearner(IUserManagementService service, Integer userId) {

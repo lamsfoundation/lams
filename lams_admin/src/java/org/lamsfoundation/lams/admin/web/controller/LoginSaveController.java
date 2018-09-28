@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Use DispatchAction for future extension convenience, e.g. add preview feature
@@ -54,11 +53,6 @@ public class LoginSaveController {
     @RequestMapping("/loginsave")
     public String save(@ModelAttribute LoginMaintainForm loginMaintainForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
-	}
-
 	BufferedWriter bWriter = null;
 	try {
 	    OutputStreamWriter ow = new OutputStreamWriter(

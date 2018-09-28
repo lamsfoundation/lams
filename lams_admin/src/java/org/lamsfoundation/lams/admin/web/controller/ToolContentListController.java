@@ -206,7 +206,7 @@ public class ToolContentListController {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, false);
-	return "redirect:/toolcontentlist/start.do";
+	return "forward:/toolcontentlist/start.do";
     }
 
     @RequestMapping("/enable")
@@ -214,7 +214,7 @@ public class ToolContentListController {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = getLearningDesignService();
 	ldService.setValid(learningLibraryId, true);
-	return "redirect:/toolcontentlist/start.do";
+	return "forward:/toolcontentlist/start.do";
     }
 
     /**
@@ -281,7 +281,7 @@ public class ToolContentListController {
 
 	getLearningDesignService().saveLearningLibraryGroups(groups);
 	
-	return "redirect:/toolcontentlist/start.do";
+	return "forward:/toolcontentlist/start.do";
     }
 
     private ILearningDesignService getLearningDesignService() {

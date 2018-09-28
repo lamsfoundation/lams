@@ -343,10 +343,10 @@ public class UserController {
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
-	    return "redirect:../usersearch.do";
+	    return "forward:../usersearch.do";
 	} else {
 	    request.setAttribute("org", orgId);
-	    return "redirect:../usermanage.do";
+	    return "forward:../usermanage.do";
 	}
     }
 

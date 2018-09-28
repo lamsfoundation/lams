@@ -139,7 +139,7 @@ public class OrgSaveController {
 	    return "forward:/orgmanage.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
-	    return "redirect:/organisation/edit.do";
+	    return "forward:/organisation/edit.do";
 	}
     }
 

@@ -91,11 +91,6 @@ public class TimezoneManagementController {
     @RequestMapping(path = "/save", method = RequestMethod.POST)
     public String save(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	if (request.getAttribute("CANCEL") != null) {
-	    return "redirect:/sysadminstart.do";
-	}
-
 	String[] selectedTimezoneIds = timezoneForm.getSelected();
 
 	List<Timezone> selectedTimezones = new ArrayList<>();
