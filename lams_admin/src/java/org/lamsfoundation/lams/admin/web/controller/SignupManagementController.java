@@ -22,66 +22,29 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
-/**
- *
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/signupManagement")
 public class SignupManagementController {
 
     private static Logger log = Logger.getLogger(SignupManagementController.class);
-    private static ISignupService signupService = null;
-    private static IUserManagementService userManagementService = null;
 
     @Autowired
-    private WebApplicationContext applicationContext;
-
+    @Qualifier("signupService")
+    private ISignupService signupService = null;
+    
+    @Autowired
+    @Qualifier("userManagementService")
+    private IUserManagementService userManagementService = null;
+    
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService adminMessageService;
 
     @RequestMapping("/start")
-    public String execute(@ModelAttribute("signupForm") SignupManagementForm signupForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	try {
-	    if (signupService == null) {
-		WebApplicationContext wac = WebApplicationContextUtils
-			.getRequiredWebApplicationContext(applicationContext.getServletContext());
-		signupService = (ISignupService) wac.getBean("signupService");
-	    }
-	    if (userManagementService == null) {
-		WebApplicationContext wac = WebApplicationContextUtils
-			.getRequiredWebApplicationContext(applicationContext.getServletContext());
-		userManagementService = (IUserManagementService) wac.getBean("userManagementService");
-	    }
-
-	    String action = WebUtil.readStrParam(request, "action", true);
-
-	    if (StringUtils.equals(action, "list") || request.getAttribute("CANCEL") != null) {
-		// do nothing
-	    } else if (StringUtils.equals(action, "edit")) {
-		return edit(signupForm, request);
-	    } else if (StringUtils.equals(action, "add")) {
-		return add(signupForm, request);
-	    } else if (StringUtils.equals(action, "delete")) {
-		return delete(request);
-	    }
-
-	    List signupOrganisations = signupService.getSignupOrganisations();
-	    request.setAttribute("signupOrganisations", signupOrganisations);
-	} catch (Exception e) {
-	    log.error(e.getMessage(), e);
-	    request.setAttribute("error", e.getMessage());
-	}
+    public String execute(HttpServletRequest request) {
+	List<SignupOrganisation> signupOrganisations = signupService.getSignupOrganisations();
+	request.setAttribute("signupOrganisations", signupOrganisations);
 
 	return "signupmanagement/list";
     }
@@ -109,7 +72,7 @@ public class SignupManagementController {
 		signupForm.setContext(signup.getContext());
 		request.setAttribute("signupForm", signupForm);
 
-		List organisations = signupService.getOrganisationCandidates();
+		List<Organisation> organisations = signupService.getOrganisationCandidates();
 		request.setAttribute("organisations", organisations);
 
 		return "signupmanagement/add";
@@ -168,7 +131,7 @@ public class SignupManagementController {
 	    signupForm.setBlurb("Register your LAMS account for this group using the form below.");
 	}
 
-	List organisations = signupService.getOrganisationCandidates();
+	List<Organisation> organisations = signupService.getOrganisationCandidates();
 	request.setAttribute("organisations", organisations);
 
 	return "signupmanagement/add";
@@ -176,13 +139,12 @@ public class SignupManagementController {
 
     @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
-
 	Integer soid = WebUtil.readIntParam(request, "soid");
 
 	if (soid != null && soid > 0) {
 	    userManagementService.deleteById(SignupOrganisation.class, soid);
 	}
 
-	return "forward:/signupManagement/start.do";
+	return "redirect:/signupManagement/start.do";
     }
 }

@@ -1,4 +1,4 @@
-bo<!DOCTYPE html>
+<!DOCTYPE html>
 
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>

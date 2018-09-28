@@ -36,6 +36,8 @@ public class SignupManagementForm {
     
     private boolean addWithMonitor = false;
     
+    private boolean emailVerify = false;
+    
     private String courseKey;
     
     private String confirmCourseKey;
@@ -94,6 +96,14 @@ public class SignupManagementForm {
 
     public void setAddWithMonitor(boolean addWithMonitor) {
         this.addWithMonitor = addWithMonitor;
+    }
+    
+    public boolean getEmailVerify() {
+	return emailVerify;
+    }
+
+    public void setEmailVerify(boolean emailValidation) {
+	this.emailVerify = emailValidation;
     }
 
     public String getCourseKey() {

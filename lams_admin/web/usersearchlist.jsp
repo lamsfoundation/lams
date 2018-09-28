@@ -101,7 +101,7 @@
 								rows += 		'<fmt:message key="admin.user.delete"/>';
 								rows += 	'</a>]';
 								rows += 	'&nbsp;';
-								rows += 	'[<a href="loginas.do?login=' + orgData["login"] + '">';
+								rows += 	'[<a href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';
 								rows += 		'<fmt:message key="label.login.as"/>';
 								rows += 	'</a>]';
 								rows += 	'&nbsp;';

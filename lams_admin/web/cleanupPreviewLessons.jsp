@@ -44,11 +44,12 @@
 			return;
 		}
 		$.ajax({
-			'cache'   : false,
 			'url'     : '<lams:WebAppURL />cleanupPreviewLessons/delete.do',
 			'data'    : {
 				'limit'  : 5
 			},
+			type: 'POST',
+			'cache'   : false,
 			'success' : function(response){
 				try {
 					previewCount = response[0];
