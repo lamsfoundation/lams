@@ -96,7 +96,7 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	isFloating = false;
 	//if ( previewMode ) {
 	// setup the basic call to the learner screen, ready just to put the activity id on the end. Saves calculating it for every activity
-	this.forceLearnerURL = "learner/forceMoveRedirect.do?lessonID=" + progress.getLesson().getLessonId()
+	this.forceLearnerURL = "learning/learner/forceMoveRedirect.do?lessonID=" + progress.getLesson().getLessonId()
 		+ "&destActivityID=";
 	//}
 
