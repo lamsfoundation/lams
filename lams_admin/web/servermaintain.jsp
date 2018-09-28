@@ -97,7 +97,7 @@
 		</div>
 		<div class="checkbox">
 		    <label>
-		    <form:checkbox path="timeToLiveLoginRequestEnabled" id="ttl-login-request-enabled"/>
+		    <form:checkbox path="timeToLiveLoginRequestEnabled" id="ttl-login-request-enabled"/><fmt:message key="sysadmin.login.request.ttl.enable" />
 		    </label>
 		</div>
 		<div class="form-group" <c:if test="${!formBean.map.timeToLiveLoginRequestEnabled}">style="display:none;"</c:if> >
@@ -164,8 +164,6 @@
 		<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 	</div>
 	</form:form>
-	
-	<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default pull-left"><fmt:message key="sysadmin.maintain" /></a>
 </lams:Page>
 
 </body>
