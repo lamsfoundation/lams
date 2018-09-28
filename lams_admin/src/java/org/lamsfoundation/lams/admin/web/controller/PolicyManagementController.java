@@ -92,7 +92,7 @@ public class PolicyManagementController {
 
 	String currentDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-	Object policyUid = policyForm.getPolicyId();
+	Object policyUid = policyForm.getPolicyUid();
 	String version = policyForm.getVersion();
 	Integer policyStateId = policyForm.getPolicyStateId();
 	Boolean isMinorChange = policyForm.getMinorChange();

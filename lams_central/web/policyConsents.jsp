@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn"%>
 
 <lams:html>
 <lams:head>
@@ -123,9 +121,9 @@
 	</table>
 	
 		<div style="overflow:auto;">
-			<html:submit styleClass="btn btn-primary pull-right">
+			<button type="submit" class="btn btn-primary pull-right">
 				<fmt:message key="label.consent"/>
-			</html:submit>
+			</button>
 		</div>
 	</form>
 	

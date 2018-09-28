@@ -4,13 +4,12 @@
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.policies.title"/></c:set>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<title>${title}</title>
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/changeStyle.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -29,7 +28,6 @@
 	                		//skip out empty values
 	                		//CKEDITOR.instances.summary.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
 	
-	                    	
 	                    	CKEDITOR.instances.summary.updateElement();
 	                    	//alert("s"+ckeditorData);
 	                    	//return false;
@@ -55,7 +53,7 @@
 			            error.appendTo('#full-policy-error');
 			        } else {
 			            error.insertAfter(element);
-			          }
+			        }
 			    }
 			});
 		});
@@ -69,7 +67,7 @@
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
 				<fmt:message key="sysadmin.maintain" />
 			</a>
-			<a href="policyManagement/list.do" class="btn btn-default loffset5">
+			<a href="../policyManagement/list.do" class="btn btn-default loffset5">
 				<fmt:message key="admin.policies.title" />
 			</a>
 		</div>
@@ -80,7 +78,7 @@
 			<table class="table table-condensed table-no-border">
 				<tr>
 					<td><fmt:message key="label.name" />&nbsp;&nbsp;*</td>
-					<td><form:text path="policyName" size="40" maxlength="255" cssClass="form-control"/></td>
+					<td><form:input path="policyName" size="40" maxlength="255" cssClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td style="width: 250px;"><fmt:message key="label.policy.type" />:</td>
@@ -95,7 +93,7 @@
 				</tr>
 				<tr>
 					<td><fmt:message key="label.version" /></td>
-					<td><form:text path="version" size="40" maxlength="255" cssClass="form-control"/></td>
+					<td><form:input path="version" size="40" maxlength="255" cssClass="form-control"/></td>
 				</tr>
 				<tr>
 					<td><fmt:message key="label.summary" />&nbsp;&nbsp;*</td>
@@ -121,13 +119,15 @@
 					<td><fmt:message key="label.policy.status" /></td>
 					<td>
 		                <div class="radio">
-		                    <label><form:radio path="policyStateId" value="1" />
-		                            <fmt:message key="label.policy.status.active" />
+		                    <label>
+		                    	<form:radiobutton path="policyStateId" value="1" />
+		                        <fmt:message key="label.policy.status.active" />
 		                    </label>
 		                </div>
 		                <div class="radio">
-		                    <label><form:radio path="policyStateId" value="2" />
-		                            <fmt:message key="label.policy.status.inactive" />
+		                    <label>
+		                    	<form:radiobutton path="policyStateId" value="2" />
+		                        <fmt:message key="label.policy.status.inactive" />
 		                    </label>
 		                    <span id="helpBlock" class="help-block"><fmt:message key="label.policy.status.hint" /></span>
 		                </div>

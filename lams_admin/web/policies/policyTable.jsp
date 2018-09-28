@@ -66,7 +66,7 @@
 						
 			<td>
 				<c:if test="${!viewPreviousVersions && policy.hasPreviousVersions()}">
-					<a href="<lams:WebAppURL />policyManagement/viewPreviousVersion.do?policyId=${policy.Id}">
+					<a href="<lams:WebAppURL />policyManagement/viewPreviousVersions.do?policyId=${policy.policyId}">
 						<fmt:message key="label.view.previous.versions"/>
 					</a>
 				</c:if>	

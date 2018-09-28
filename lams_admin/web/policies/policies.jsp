@@ -54,7 +54,7 @@
 				var policyId = $(this).data("policy-id");
 				
 				$("#policy-table").load(
-					"policyManagement/togglePolicyStatus.do", 
+					"togglePolicyStatus.do", 
 					{
 						policyUid: policyUid,
 						policyId: policyId,

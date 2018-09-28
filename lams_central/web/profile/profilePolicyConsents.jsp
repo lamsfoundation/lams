@@ -48,7 +48,7 @@
 						<c:forEach items="${policyDtos}" var="policyDto">
 							<tr>
 								<td>
-									<a href="profile/displayPolicyDetails.do?policyUid=${policyDto.uid}" target="_new"
+									<a href="displayPolicyDetails.do?policyUid=${policyDto.uid}" target="_new"
 											title="<fmt:message key="label.policy.details"/>">
 										<c:out value="${policyDto.policyName}" />
 									</a>
