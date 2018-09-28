@@ -22,25 +22,11 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript">
-		function submitMessage() {
-			var formData = new FormData(document.getElementById("newForm"));
-
-			$.ajax({ // create an AJAX call...
-				data : formData,
-				processData : false, // tell jQuery not to process the data
-				contentType : false, // tell jQuery not to set contentType
-				type : $("#newForm").attr('method'),
-				url : $("#newForm").attr('action'),
-				success : function(data) {
-					if ( data.indexOf('profileRestrictions') > 0)
-						$("html").html(data);
-					else
-						window.parent.location.reload();
-				}
-			});
-		}
-		
 		$(document).ready( function() {
+			if ('${submitted}' == true && $('#error').length == 0) {
+				window.parent.location.reload();
+			} 
+			
 			//update dialog's height and title
 			updateMyProfileDialogSettings(
 				'<fmt:message key="title.profile.edit.screen" />',
@@ -366,18 +352,18 @@
 					</div>
 				</div>
 			</div>
-	</form:form>
-	<div class="form-group" align="right">
-		<button type="button" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
-			<fmt:message key="button.cancel" />
-		</button>
-		&nbsp;&nbsp;
-		<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
-			<button type="button" class="btn btn-sm btn-primary voffset5" 
-					name="submit" onclick="submitMessage()"> 
-				<fmt:message key="button.save" />
+		<div class="form-group" align="right">
+			<button type="button" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+				<fmt:message key="button.cancel" />
 			</button>
-		</c:if>
-	</div>
+			&nbsp;&nbsp;
+			<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
+				<button type="submit" class="btn btn-sm btn-primary voffset5" 
+						name="submit"> 
+					<fmt:message key="button.save" />
+				</button>
+			</c:if>
+		</div>
+	</form:form>
 </body>
 </lams:html>

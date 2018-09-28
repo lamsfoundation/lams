@@ -63,7 +63,6 @@ public class ProfileSaveController {
 
     @RequestMapping(path = "/saveprofile")
     public String execute(@ModelAttribute("newForm") UserForm userForm, HttpServletRequest request) throws Exception {
-
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
@@ -71,6 +70,8 @@ public class ProfileSaveController {
 		return "forward:/profile/edit.do";
 	    }
 	}
+	
+	request.setAttribute("submitted", true);
 
 	User requestor = service.getUserByLogin(request.getRemoteUser());
 
@@ -116,8 +117,7 @@ public class ProfileSaveController {
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    request.setAttribute("bbb", "OK!");
-	    return "profile/editprofile";
+	    return "forward:/profile/edit.do";
 	}
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)
