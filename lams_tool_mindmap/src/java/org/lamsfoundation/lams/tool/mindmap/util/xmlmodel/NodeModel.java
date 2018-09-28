@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.mindmap.util.xmlmodel;
 
 import java.util.ArrayList;
@@ -42,9 +40,13 @@ public class NodeModel {
 	this.setConcept(nodeConceptModel);
     }
 
+    public NodeModel() {
+
+    }
+
     /**
      * Sets Concept for Mindmap Node
-     * 
+     *
      * @param concept
      */
     public void setConcept(NodeConceptModel concept) {
@@ -53,7 +55,7 @@ public class NodeModel {
 
     /**
      * Returns Mindmap Concept
-     * 
+     *
      * @return concept
      */
     public NodeConceptModel getConcept() {
@@ -62,7 +64,7 @@ public class NodeModel {
 
     /**
      * Returns all children of the Node
-     * 
+     *
      * @return nodes
      */
     public List<NodeModel> getBranch() {
@@ -71,7 +73,7 @@ public class NodeModel {
 
     /**
      * Adds Node as a Child
-     * 
+     *
      * @param nodeModel
      */
     public void addNode(NodeModel nodeModel) {
