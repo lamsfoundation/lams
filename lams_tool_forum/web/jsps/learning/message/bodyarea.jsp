@@ -12,9 +12,7 @@
 		
 		<c:otherwise>
 			<%-- Does not use general tag because this field need keep compatible with CKEditor's content --%>
-			<lams:textarea id="messageBody" name="messageBody" class="form-control" tabindex="2" rows="10">
-				<c:out value="${messageForm.message.body}" />
-			</lams:textarea>
+			<lams:textarea name="message.body" class="form-control" tabindex="2" rows="10">${messageForm.message.body}</lams:textarea>
 		</c:otherwise>
 	</c:choose>
  
@@ -42,7 +40,7 @@
 			var counter = function(evt) {
 				
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea#messageBody').val();
+						: $('textarea[id="message.body__lamstextarea"]').val();
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
 				//limit is not exceeded
@@ -76,8 +74,7 @@
 					this.value = this.value.substring(0, limit);
 					//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
 					//manually handle onchange event. It is a kind of crack coding!
-					filterData(document.getElementById('messageBody'));
-						
+					filterData(document.getElementById('message.body__lamstextarea'),document.getElementById('message.body__lamshidden'));						
 				}
 			};
 			
@@ -94,7 +91,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea#messageBody').on('change keydown keypress keyup paste', counter);
+				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
@@ -115,7 +112,7 @@
 			//character count fuction
 			var counter = function() {
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea#messageBody').val();
+						: $('textarea[id="message.body__lamstextarea"]').val();
 			    
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
@@ -136,7 +133,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea#messageBody').on('change keydown keypress keyup paste', counter);
+				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
