@@ -234,8 +234,8 @@
 	
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.forms.learningForm.action=actionMethod+".do"; 
-			document.forms.learningForm.submit();
+			document.forms.qaLearningForm.action=actionMethod+".do"; 
+			document.forms.qaLearningForm.submit();
 		}
 	</script>
 </lams:head>
