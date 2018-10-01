@@ -799,7 +799,7 @@ public class LearningController {
 				    new Object[] { questionNumber }));
 			}
 		    } else {
-			String fileName = file.getName();
+			String fileName = file.getOriginalFilename();
 			boolean isImage = false;
 			if (fileName.length() > 5) {
 

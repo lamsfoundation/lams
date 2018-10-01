@@ -83,6 +83,14 @@ public class RecordForm {
 	return file.get(number);
     }
 
+    public List<MultipartFile> getFile() {
+	return file;
+    }
+
+    public void setFile(List<MultipartFile> file) {
+	this.file = file;
+    }
+
     public void reset(HttpServletRequest request) {
 	answer = null;
 	file = null;
@@ -108,6 +116,7 @@ public class RecordForm {
     public int getFileCount() {
 	return file.size();
     }
+
     public List<String> getAnswer() {
 	return answer;
     }

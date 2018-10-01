@@ -100,7 +100,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     private MessageService messageService;
 
     private ILamsToolService toolService;
-    
+
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
@@ -319,7 +319,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public void uploadDacoAnswerFile(DacoAnswer answer, MultipartFile file) throws UploadDacoFileException {
 	try {
 	    InputStream is = file.getInputStream();
-	    String fileName = file.getName();
+	    String fileName = file.getOriginalFilename();
 	    String fileType = file.getContentType();
 	    // For file only upload one sigle file
 	    if ((answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE)
@@ -716,8 +716,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
      */
     private NodeKey processFile(MultipartFile file) throws UploadDacoFileException {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
-	    String fileName = file.getName();
+	String fileName = file.getOriginalFilename();
+	if ((file != null) && !StringUtils.isEmpty(fileName)) {
 	    try {
 		node = dacoToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
