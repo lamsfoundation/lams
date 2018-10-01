@@ -539,19 +539,6 @@ public class QaAuthoringController implements QaAppConstants {
 
 	qaContent = qaService.getQaContent(toolContentId);
 
-	for (QaCondition condition : conditions) {
-	    condition.setQuestions(new TreeSet<>(new QaQueContentComparator()));
-	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
-		for (QaQueContent queContent : qaContent.getQaQueContents()) {
-		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
-			condition.getQuestions().add(queContent);
-		    }
-		}
-	    }
-	}
-	qaContent.setConditions(conditions);
-	qaService.updateQaContent(qaContent);
-
 	// persist questions
 	int displayOrder = 0;
 	for (QaQuestionDTO questionDTO : questionDTOs) {
@@ -586,6 +573,19 @@ public class QaAuthoringController implements QaAppConstants {
 
 	    qaService.saveOrUpdateQuestion(question);
 	}
+
+	for (QaCondition condition : conditions) {
+	    condition.setQuestions(new TreeSet<>(new QaQueContentComparator()));
+	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
+		for (QaQueContent queContent : qaContent.getQaQueContents()) {
+		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
+			condition.getQuestions().add(queContent);
+		    }
+		}
+	    }
+	}
+	qaContent.setConditions(conditions);
+	qaService.updateQaContent(qaContent);
 
 	return qaContent;
     }
