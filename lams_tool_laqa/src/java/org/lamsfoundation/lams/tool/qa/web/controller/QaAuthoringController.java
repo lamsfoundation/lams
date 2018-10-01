@@ -183,6 +183,8 @@ public class QaAuthoringController implements QaAppConstants {
 	authoringForm.setReflectionSubject(qaContent.getReflectionSubject());
 	authoringForm.setTitle(qaContent.getTitle());
 	authoringForm.setInstructions(qaContent.getInstructions());
+	authoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
+	authoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaContent.getTitle());
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
 
@@ -478,11 +480,11 @@ public class QaAuthoringController implements QaAppConstants {
 	    notifyTeachersOnResponseSubmitBoolean = true;
 	}
 
-	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("1")) {
+	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("true")) {
 	    allowRichEditorBoolean = true;
 	}
 
-	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
+	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("true")) {
 	    useSelectLeaderToolOuputBoolean = true;
 	}
 
