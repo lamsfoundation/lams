@@ -1594,6 +1594,9 @@ GeneralLib = {
 		var firstGroupingActivity = firstActivity instanceof ActivityDefs.GroupingActivity ? firstActivity : null;
 		if (!firstGroupingActivity) {
 			firstGroupingActivity = getNextActivity(firstActivity);
+			if (!firstGroupingActivity) {
+				return null;
+			}
 			if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
 				firstGroupingActivity = getNextActivity(firstGroupingActivity);
 				if (!(firstGroupingActivity instanceof ActivityDefs.GroupingActivity)){
