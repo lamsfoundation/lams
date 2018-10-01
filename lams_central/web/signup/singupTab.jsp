@@ -144,14 +144,9 @@
 	});
 </script>
 <div>
-
 	<form:form modelAttribute="SignupForm" id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
-	
-		<form:hidden path="method" value="register" />
 		<form:hidden path="submitted" value="1" />
 		<form:hidden path="context" value="${signupOrganisation.context}" />
-		<form:hidden path="selectedTab" value="0" />
-
 		<div class="container">
 			<div class="row vertical-center-row">
 				<div

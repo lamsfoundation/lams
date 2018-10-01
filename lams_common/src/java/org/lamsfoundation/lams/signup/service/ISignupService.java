@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.signup.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
 public interface ISignupService {
@@ -37,9 +38,9 @@ public interface ISignupService {
 
     boolean courseKeyIsValid(String context, String courseKey);
 
-    List getSignupOrganisations();
+    List<SignupOrganisation> getSignupOrganisations();
 
-    List getOrganisationCandidates();
+    List<Organisation> getOrganisationCandidates();
 
     boolean contextExists(Integer soid, String context);
 

@@ -65,6 +65,7 @@ public class SignupManagementController {
 		signupForm.setAddAsStaff(signup.getAddAsStaff());
 		signupForm.setAddWithAuthor(signup.getAddWithAuthor());
 		signupForm.setAddWithMonitor(signup.getAddWithMonitor());
+		signupForm.setEmailVerify(signup.getEmailVerify());
 		signupForm.setCourseKey(signup.getCourseKey());
 		signupForm.setBlurb(signup.getBlurb());
 		signupForm.setDisabled(signup.getDisabled());
@@ -115,6 +116,7 @@ public class SignupManagementController {
 		signup.setAddAsStaff(signupForm.isAddAsStaff());
 		signup.setAddWithAuthor(signupForm.isAddWithAuthor());
 		signup.setAddWithMonitor(signupForm.isAddWithMonitor());
+		signup.setEmailVerify(signupForm.getEmailVerify());
 		signup.setDisabled(signupForm.isDisabled());
 		signup.setLoginTabActive(signupForm.isLoginTabActive());
 		signup.setOrganisation((Organisation) userManagementService.findById(Organisation.class,
