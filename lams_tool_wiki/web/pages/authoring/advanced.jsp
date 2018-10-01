@@ -25,7 +25,7 @@
 	<div><fmt:message key="advanced.editingLimits.prompt" /></div>
 	
 	<div><fmt:message key="advanced.editingLimits.minimum" />&nbsp;
-	<form:select path="minimumEdits" id="minimumEdits" cssClass="form-control form-control-inline input-sm" multiple="multiple" onchange="validateEditCount(true);">
+	<form:select path="minimumEdits" id="minimumEdits" cssClass="form-control form-control-inline input-sm" onchange="validateEditCount(true);">
 		<form:option value="0"> <fmt:message key="advanced.editingLimits.nominimum" /> </form:option>
 		<form:option value="1" label="1"/>
 		<form:option value="2" label="2"/>
@@ -38,7 +38,7 @@
 		<form:option value="9" label="9"/>
 		<form:option value="10" label="10"/>
 	</form:select>&nbsp;<fmt:message key="advanced.editingLimits.maximum" />&nbsp;
-	<form:select path="maximumEdits" id="maximumEdits" cssClass="form-control form-control-inline input-sm" multiple="multiple" onchange="validateEditCount(true);">
+	<form:select path="maximumEdits" id="maximumEdits" cssClass="form-control form-control-inline input-sm" onchange="validateEditCount(true);">
 		<form:option value="0"> <fmt:message key="advanced.editingLimits.nomaximum" /> </form:option>
 		<form:option value="1" label="1"/>
 		<form:option value="2" label="2"/>
