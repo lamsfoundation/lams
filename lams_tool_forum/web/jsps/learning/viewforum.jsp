@@ -125,21 +125,23 @@
 									<fmt:param value="${sessionMap.minimumRate}"/>
 									<fmt:param value="${sessionMap.maximumRate}"/>
 								</fmt:message>						
+								<br>
 							</c:when>
 							
 							<c:when test="${sessionMap.minimumRate ne 0 and sessionMap.maximumRate eq 0}">
 								<fmt:message key="label.rateLimits.forum.reminder.min">
 									<fmt:param value="${sessionMap.minimumRate}"/>
 								</fmt:message>					
+								<br>
 							</c:when>
 							
 							<c:when test="${sessionMap.minimumRate eq 0 and sessionMap.maximumRate ne 0}">
 								<fmt:message key="label.rateLimits.forum.reminder.max">
 									<fmt:param value="${sessionMap.maximumRate}"/>
 								</fmt:message>					
+								<br>
 							</c:when>				
 						</c:choose>
-						<br>
 								
 						<fmt:message key="label.rateLimits.topic.reminder">
 							<fmt:param value="<span id='numOfRatings'>${sessionMap.numOfRatings}</span>"/>

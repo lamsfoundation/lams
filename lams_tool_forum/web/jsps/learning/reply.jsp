@@ -133,7 +133,7 @@
 			
 		</script>
 		
-		<form:form action="replyTopic.do" focus="textarea#messageBody" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
+		<form:form action="replyTopic.do" focus="message.body__lamstextarea" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
 				
 			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
 			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>

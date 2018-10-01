@@ -32,27 +32,11 @@
 			//]]>        
 		</script>
 		
-		<script type="text/javascript">
-		function verifyAllowRateMessagesCheckbox() {
-			  var minRateDropDown = document.getElementById("minimumRate");
-			   var minRatings = parseInt(minRateDropDown.value);
-			   var maxRateDropDown = document.getElementById("maximumRate");
-			   var maxRatings = parseInt(maxRateDropDown.value);
-			
-			if((minRatings == 0) && (maxRatings == 0)){
-				var allowRateMessages = document.getElementById("allowRateMessages");
-				allowRateMessages.checked = false;
-			}
-			
-		return true;
-	}
-		</script>
 	</lams:head>
 
 	<body class="stripes" onLoad="init()">
 	
-		<form:form action="update.do" method="post" id="forumForm" modelAttribute="forumForm" enctype="multipart/form-data" 
-				onsubmit="return verifyAllowRateMessagesCheckbox();">
+		<form:form action="update.do" method="post" id="forumForm" modelAttribute="forumForm" enctype="multipart/form-data">
 
 			<form:hidden path="toolContentID" />
 			<form:hidden path="sessionMapID" />
