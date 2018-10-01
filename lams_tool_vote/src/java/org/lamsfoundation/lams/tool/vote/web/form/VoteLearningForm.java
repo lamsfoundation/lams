@@ -766,9 +766,11 @@ public class VoteLearningForm implements VoteAppConstants {
 
     /** Get the votes based on the checkboxes as a collection */
     public Collection<String> votesAsCollection() {
-	ArrayList<String> votes = new ArrayList<String>();
-	for (String vote : checkedVotes) {
-	    votes.add(vote);
+	ArrayList<String> votes = new ArrayList<>();
+	if (checkedVotes != null) {
+	    for (String vote : checkedVotes) {
+		votes.add(vote);
+	    }
 	}
 	return votes;
     }
