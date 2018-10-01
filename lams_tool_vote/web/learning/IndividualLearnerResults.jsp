@@ -111,8 +111,7 @@
 
 				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
 					<button type="submit" name="learnerFinished" id="finishButton" onclick="javascript:submitMethod('learnerFinished')"
-						class="btn btn-primary voffset10 pull-right"
-						value='
+						class="btn btn-primary voffset10 pull-right">
 							<c:choose>
 								<c:when test="${activityPosition.last}">
 									<fmt:message key="button.submitActivity" />
@@ -121,9 +120,6 @@
 									<fmt:message key="button.endLearning" />
 								</c:otherwise>
 							</c:choose>
-						     '
-						/>
-
 					</button>
 				</c:when>
 
