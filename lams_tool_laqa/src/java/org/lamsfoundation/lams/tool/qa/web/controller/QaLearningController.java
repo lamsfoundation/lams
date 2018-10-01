@@ -944,7 +944,7 @@ public class QaLearningController implements QaAppConstants {
 	String totalQuestionCount = qaLearningForm.getTotalQuestionCount();
 
 	int remainingQuestionCount = new Long(totalQuestionCount).intValue()
-		- new Integer(currentQuestionIndex).intValue() + 1;
+		- new Integer(currentQuestionIndex).intValue();
 	String userFeedback = "";
 	if (remainingQuestionCount != 0) {
 	    userFeedback = "Remaining question count: " + remainingQuestionCount;
