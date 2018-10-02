@@ -39,7 +39,7 @@ public class LearningDesignRestServlet extends RestServlet {
     protected void doPostInternal(ObjectNode requestJSON, UserDTO userDTO, HttpServletResponse response)
 	    throws Exception {
 	ObjectNode learningDesignJSON = JsonUtil.optObject(requestJSON, "ld");
-	LearningDesign learningDesign = getAuthoringService().saveLearningDesignDetails(learningDesignJSON);
+	LearningDesign learningDesign = authoringService.saveLearningDesignDetails(learningDesignJSON);
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put("learningDesignID", learningDesign.getLearningDesignId());

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -70,34 +71,35 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Andrey Balan
  */
-public class RegisterAction extends HttpServlet {
+public class RegisterServlet extends HttpServlet {
+    private static Logger logger = Logger.getLogger(RegisterServlet.class);
 
-    private static Logger logger = Logger.getLogger(RegisterAction.class);
-
-    private static IntegrationService integrationService = null;
-
-    private static ILearnerProgressDAO learnerProgressDAO = null;
-
-    private static ILessonService lessonService = null;
-
-    private static ILearnerService learnerService = null;
-
-    private static IGroupUserDAO groupUserDAO = null;
-
-    private static IUserManagementService userManagementService = null;
-
-    private static IEventNotificationService eventNotificationService = null;
-
-    private static MessageService messageService = null;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private ILearnerProgressDAO learnerProgressDAO;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private ILearnerService learnerService;
+    @Autowired
+    private IGroupUserDAO groupUserDAO;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    private IEventNotificationService eventNotificationService;
+    @Autowired
+    private MessageService centralMessageService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	if (method.equals("addUserToGroupLessons")) {
 	    addUserToGroupLessons(request, response);
@@ -108,41 +110,16 @@ public class RegisterAction extends HttpServlet {
 	} else if (method.equals("resetUserTimeLimit")) {
 	    resetUserTimeLimit(request, response);
 	}
-
     }
 
-    /**
-     * Initialization of the servlet. <br>
-     *
-     * @throws ServletException
-     *             if an error occured
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
      */
     @Override
-    public void init() throws ServletException {
-	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerProgressDAO");
-
-	integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-
-	lessonService = (ILessonService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
-
-	learnerService = (ILearnerService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerService");
-
-	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext())
-		.getBean("groupUserDAO");
-
-	userManagementService = (IUserManagementService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
-
-	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("eventNotificationService");
-
-	messageService = (MessageService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext())
-		.getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     /**
@@ -294,8 +271,8 @@ public class RegisterAction extends HttpServlet {
 
 		eventNotificationService.sendMessage(null, user.getUserId(),
 			IEventNotificationService.DELIVERY_METHOD_MAIL,
-			messageService.getMessage("register.user.email.subject"),
-			messageService.getMessage("register.user.email.body", new Object[] { username, password }),
+			centralMessageService.getMessage("register.user.email.subject"),
+			centralMessageService.getMessage("register.user.email.body", new Object[] { username, password }),
 			isHtmlFormat);
 	    }
 
@@ -312,8 +289,8 @@ public class RegisterAction extends HttpServlet {
 		String registeredUserName = firstName + " " + lastName + " (" + username + ")";
 		eventNotificationService.sendMessage(null, coordinator.getUserId(),
 			IEventNotificationService.DELIVERY_METHOD_MAIL,
-			messageService.getMessage("notify.coordinator.register.user.email.subject"),
-			messageService.getMessage("notify.coordinator.register.user.email.body",
+			centralMessageService.getMessage("notify.coordinator.register.user.email.subject"),
+			centralMessageService.getMessage("notify.coordinator.register.user.email.body",
 				new Object[] { registeredUserName }),
 			isHtmlFormat);
 	    }

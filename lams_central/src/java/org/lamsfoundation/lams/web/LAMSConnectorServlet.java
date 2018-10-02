@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,6 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -45,8 +45,10 @@ import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -83,7 +85,18 @@ public class LAMSConnectorServlet extends HttpServlet {
     private String realBaseDir;
     private String lamsContextPath;
 
-    private static MessageService messageService;
+    @Autowired
+    private MessageService centralMessageService;
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     /**
      * Initialize the servlet.<br>
@@ -92,10 +105,6 @@ public class LAMSConnectorServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServletContext());
-	messageService = (MessageService) ctx.getBean("centralMessageService");
-
 	LAMSConnectorServlet.baseDir = getInitParameter("baseDir");
 	debug = (new Boolean(getInitParameter("debug"))).booleanValue() && log.isDebugEnabled();
 
@@ -333,7 +342,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	boolean maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile.getSize(), true);
 	if (!maxFilesizeExceededMessage) {
 	    //assign fileName an error message to be shown on a client side
-	    fileName = messageService.getMessage("errors.maxfilesize",
+	    fileName = centralMessageService.getMessage("errors.maxfilesize",
 		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
 	    retVal.append("1");
 

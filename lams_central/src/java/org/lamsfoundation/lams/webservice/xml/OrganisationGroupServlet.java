@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.webservice.xml;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -38,8 +40,10 @@ import org.w3c.dom.ls.LSSerializer;
 public class OrganisationGroupServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(OrganisationGroupServlet.class);
 
-    private static IntegrationService integrationService = null;
-    private static IUserManagementService userManagementService = null;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     private static DocumentBuilder docBuilder = null;
 
@@ -47,8 +51,18 @@ public class OrganisationGroupServlet extends HttpServlet {
 	try {
 	    OrganisationGroupServlet.docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	} catch (ParserConfigurationException e) {
-	    OrganisationGroupServlet.log.error("Error while initialising XML document builder", e);
+	    log.error("Error while initialising XML document builder", e);
 	}
+    }
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Override
@@ -59,7 +73,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 
 	try {
-	    ExtServer extServer = OrganisationGroupServlet.integrationService.getExtServer(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
@@ -71,25 +85,13 @@ public class OrganisationGroupServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown method: " + method);
 	    }
 	} catch (Exception e) {
-	    OrganisationGroupServlet.log.error("Error while getting notifications", e);
+	    log.error("Error while getting notifications", e);
 	}
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
-    }
-
-    /**
-     * Initialization of the servlet.
-     */
-    @Override
-    public void init() throws ServletException {
-	OrganisationGroupServlet.integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-
-	userManagementService = (IUserManagementService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
     }
 
     @SuppressWarnings("unchecked")

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,8 +46,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -55,20 +56,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Stores rating.
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class RatingServlet extends HttpServlet {
-
     private static Logger log = Logger.getLogger(RatingServlet.class);
-    private static RatingService ratingService;
+    @Autowired
+    private RatingService ratingService;
+
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	getRatingService();
 
 	String objectId = WebUtil.readStrParam(request, "idBox");
 	Long ratingCriteriaId = Long.parseLong(objectId.split("-")[0]);
@@ -160,14 +166,5 @@ public class RatingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	doGet(request, response);
-    }
-
-    private RatingService getRatingService() {
-	if (ratingService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    ratingService = (RatingService) ctx.getBean("ratingService");
-	}
-	return ratingService;
     }
 }

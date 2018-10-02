@@ -24,6 +24,7 @@ import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,18 +36,17 @@ import org.w3c.dom.ls.LSSerializer;
  * Allows notifications access for integrated environments.
  *
  * @author Marcin Cieslak
- *
  */
 public class NotificationServlet extends HttpServlet {
     private static final long serialVersionUID = 4856874776383254865L;
-
     private static Logger log = Logger.getLogger(NotificationServlet.class);
-
-    private static IntegrationService integrationService = null;
-    private static IEventNotificationService eventNotificationService = null;
-
-    private static DocumentBuilder docBuilder = null;
     private static final Pattern anchorPattern = Pattern.compile("<a .*href=(['\"])(.*)\\1.*>(.*)</a>");
+    private static DocumentBuilder docBuilder = null;
+
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IEventNotificationService eventNotificationService;
 
     static {
 	try {
@@ -67,15 +67,15 @@ public class NotificationServlet extends HttpServlet {
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 
 	try {
-	    ExtServer extServer = NotificationServlet.integrationService.getExtServer(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = NotificationServlet.integrationService.getExtUserUseridMap(extServer, username);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    if ("getNotifications".equalsIgnoreCase(method)) {
 		getNotifications(userMap.getUser().getUserId(), request, response);
 	    }
 	} catch (Exception e) {
-	    NotificationServlet.log.error("Error while getting notifications", e);
+	    log.error("Error while getting notifications", e);
 	}
     }
 
@@ -92,10 +92,10 @@ public class NotificationServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-	NotificationServlet.integrationService = (IntegrationService) WebApplicationContextUtils
+	integrationService = (IntegrationService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 
-	NotificationServlet.eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
+	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("eventNotificationService");
     }
 
@@ -110,7 +110,7 @@ public class NotificationServlet extends HttpServlet {
 	Integer offset = WebUtil.readIntParam(request, "offset", true);
 	Boolean pendingOnly = WebUtil.readBooleanParam(request, "pendingOnly", true);
 
-	List<Subscription> subscriptions = NotificationServlet.eventNotificationService
+	List<Subscription> subscriptions = eventNotificationService
 		.getNotificationSubscriptions(lessonId, userId, pendingOnly, limit, offset);
 	for (Subscription subscription : subscriptions) {
 	    Element notificationElement = doc.createElement("Notification");

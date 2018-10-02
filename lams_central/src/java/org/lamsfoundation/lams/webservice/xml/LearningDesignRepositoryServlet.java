@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,31 +41,29 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.lamsfoundation.lams.workspace.web.WorkspaceController;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class LearningDesignRepositoryServlet extends HttpServlet {
-
     private static final long serialVersionUID = -4962711640290319063L;
-
     private static Logger log = Logger.getLogger(LearningDesignRepositoryServlet.class);
-
-    private static IntegrationService integrationService = null;
-
-    private static IWorkspaceManagementService service = null;
-
-    private static MessageService msgService = null;
-
-    private static IExportToolContentService exportToolContentService = null;
-
     private static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
+
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IWorkspaceManagementService workspaceManagementService;
+    @Autowired
+    private MessageService centralMessageService;
+    @Autowired
+    private IExportToolContentService exportToolContentService;
 
     /**
      * Constructor of the object.
@@ -168,18 +167,16 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     private ContentTreeNode buildContentTree(Integer userId, Integer mode)
 	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
-	LearningDesignRepositoryServlet.log.debug("User Id - " + userId);
-	FolderContentDTO rootFolder = new FolderContentDTO(
-		LearningDesignRepositoryServlet.msgService.getMessage("label.workspace.root_folder"),
-		LearningDesignRepositoryServlet.msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+	log.debug("User Id - " + userId);
+	FolderContentDTO rootFolder = new FolderContentDTO(centralMessageService.getMessage("label.workspace.root_folder"),
+		centralMessageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
 		WorkspaceController.BOOTSTRAP_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
 	ContentTreeNode root = new ContentTreeNode(rootFolder);
-	FolderContentDTO userFolder = LearningDesignRepositoryServlet.service.getUserWorkspaceFolder(userId);
+	FolderContentDTO userFolder = workspaceManagementService.getUserWorkspaceFolder(userId);
 	root.addChild(buildContentTreeNode(userFolder, userId, mode));
 
-	FolderContentDTO dummyOrgFolder = new FolderContentDTO(
-		LearningDesignRepositoryServlet.msgService.getMessage("organisations"),
-		LearningDesignRepositoryServlet.msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+	FolderContentDTO dummyOrgFolder = new FolderContentDTO(centralMessageService.getMessage("organisations"),
+		centralMessageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
 		new Long(WorkspaceController.ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS, null);
 	ContentTreeNode dummyOrgNode = new ContentTreeNode(dummyOrgFolder);
 	// tried using service.getAccessibleOrganisationWorkspaceFolders(userId)
@@ -188,14 +185,14 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	// got from workspaceManagementService with the userId supplied is
 	// empty, which
 	// is not true.
-	Vector orgFolders = LearningDesignRepositoryServlet.service.getAccessibleOrganisationWorkspaceFolders(userId);
+	Vector orgFolders = workspaceManagementService.getAccessibleOrganisationWorkspaceFolders(userId);
 	for (int i = 0; i < orgFolders.size(); i++) {
 	    FolderContentDTO orgFolder = (FolderContentDTO) orgFolders.get(i);
 	    dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId, mode));
 	}
 	root.addChild(dummyOrgNode);
 
-	FolderContentDTO publicFolder = LearningDesignRepositoryServlet.service.getPublicWorkspaceFolder(userId);
+	FolderContentDTO publicFolder = workspaceManagementService.getPublicWorkspaceFolder(userId);
 	if (publicFolder != null) {
 	    root.addChild(buildContentTreeNode(publicFolder, userId, mode));
 	}
@@ -204,13 +201,12 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     private ContentTreeNode buildContentTreeNode(FolderContentDTO folder, Integer userId, Integer mode)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
-	LearningDesignRepositoryServlet.log.debug("build content tree node for folder - " + folder.getName());
+	log.debug("build content tree node for folder - " + folder.getName());
 	ContentTreeNode node = new ContentTreeNode(folder);
 	if (folder.getResourceType().equals(FolderContentDTO.FOLDER)) {
-	    LearningDesignRepositoryServlet.log.debug(folder.getName() + " is a folder");
-	    WorkspaceFolder wsfolder = LearningDesignRepositoryServlet.service
-		    .getWorkspaceFolder(folder.getResourceID().intValue());
-	    Vector items = LearningDesignRepositoryServlet.service.getFolderContentsExcludeHome(userId, wsfolder, mode);
+	    log.debug(folder.getName() + " is a folder");
+	    WorkspaceFolder wsfolder = workspaceManagementService.getWorkspaceFolder(folder.getResourceID().intValue());
+	    Vector items = workspaceManagementService.getFolderContentsExcludeHome(userId, wsfolder, mode);
 	    for (int i = 0; i < items.size(); i++) {
 		FolderContentDTO content = (FolderContentDTO) items.get(i);
 		node.addChild(buildContentTreeNode(content, userId, mode));
@@ -258,13 +254,13 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    if ((serverId == null) || (datetime == null) || (hashValue == null) || (username == null)
 		    || (courseId == null) || (country == null) || (locale == null)) {
 		String msg = "Parameters missing";
-		LearningDesignRepositoryServlet.log.error(msg);
+		log.error(msg);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // LDEV-2196 preserve character encoding if necessary
 	    if (request.getCharacterEncoding() == null) {
-		LearningDesignRepositoryServlet.log.debug(
+		log.debug(
 			"request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
 		username = new String(username.getBytes("8859_1"), "UTF-8");
 		if (courseName != null) {
@@ -273,7 +269,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    }
 
 	    // get Server map
-	    ExtServer extServer = LearningDesignRepositoryServlet.integrationService.getExtServer(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 
 	    // authenticate
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -296,17 +292,16 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		if (method.equals("getLearningDesignsJSON")) {
 		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
 		    String designType = request.getParameter("type");
-		    folderContentsJSON = LearningDesignRepositoryServlet.service.getFolderContentsJSON(folderID, userId,
-			    allowInvalidDesigns, designType);
+		    folderContentsJSON = workspaceManagementService.getFolderContentsJSON(folderID, userId, allowInvalidDesigns,
+			    designType);
 		} else {
 		    Integer page = WebUtil.readIntParam(request, "page", true);
 		    Integer size = WebUtil.readIntParam(request, "size", true);
 		    String sortName = request.getParameter("sortName");
 		    String sortDate = request.getParameter("sortDate");
 		    String search = request.getParameter("search");
-		    folderContentsJSON = LearningDesignRepositoryServlet.service.getPagedLearningDesignsJSON(userId,
-			    allowInvalidDesigns, search, page, size,
-			    sortName == null ? null : (sortName.equals("0") ? "DESC" : "ASC"),
+		    folderContentsJSON = workspaceManagementService.getPagedLearningDesignsJSON(userId, allowInvalidDesigns, search, page,
+			    size, sortName == null ? null : (sortName.equals("0") ? "DESC" : "ASC"),
 			    sortDate == null ? null : (sortDate.equals("0") ? "DESC" : "ASC"));
 		}
 
@@ -318,36 +313,32 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		Integer userId = getUserId(username, courseId, courseName, locale, country, usePrefix,
 			isUpdateUserDetails, firstName, lastName, email, extServer);
 
-		Long learningDesignId = WebUtil.readLongParam(request,
-			LearningDesignRepositoryServlet.PARAM_LEARING_DESIGN_ID);
-		LearningDesignRepositoryServlet.log
-			.debug("User " + userId + " " + username + " deleting learning design " + learningDesignId);
+		Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
+		log.debug("User " + userId + " " + username + " deleting learning design " + learningDesignId);
 		// if OK then just return HTTP 200, otherwise an exception will result in error code
-		LearningDesignRepositoryServlet.service.deleteResource(learningDesignId, FolderContentDTO.DESIGN,
-			userId);
+		workspaceManagementService.deleteResource(learningDesignId, FolderContentDTO.DESIGN, userId);
 
 		//TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {
 
 		if (mode == null) {
 		    String msg = "Parameter missing: mode";
-		    LearningDesignRepositoryServlet.log.error(msg);
+		    log.error(msg);
 		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
 		}
 
 		ExtUserUseridMap userMap = null;
 		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
 		if ((firstName == null) && (lastName == null)) {
-		    userMap = LearningDesignRepositoryServlet.integrationService.getExtUserUseridMap(extServer,
-			    username, prefix);
+		    userMap = integrationService.getExtUserUseridMap(extServer, username, prefix);
 		} else {
-		    userMap = LearningDesignRepositoryServlet.integrationService.getImplicitExtUserUseridMap(extServer,
-			    username, firstName, lastName, locale, country, email, prefix, isUpdateUserDetails);
+		    userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, firstName, lastName,
+			    locale, country, email, prefix, isUpdateUserDetails);
 		}
 
 		// create group for external course if necessary
-		LearningDesignRepositoryServlet.integrationService.getExtCourseClassMap(extServer, userMap, courseId,
-			courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+		integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
+			LoginRequestDispatcher.METHOD_AUTHOR);
 		Integer userId = userMap.getUser().getUserId();
 
 		String contentTree = buildContentTree(userId, mode).toString();
@@ -361,22 +352,22 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    }
 
 	} catch (NumberFormatException nfe) {
-	    LearningDesignRepositoryServlet.log.error("mode is not an integer", nfe);
+	    log.error("mode is not an integer", nfe);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "mode is not an integer");
 	} catch (AuthenticationException e) {
-	    LearningDesignRepositoryServlet.log.error("can not authenticate", e);
+	    log.error("can not authenticate", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "can not authenticate");
 	} catch (UserInfoFetchException e) {
-	    LearningDesignRepositoryServlet.log.error("can not retrieve user information", e);
+	    log.error("can not retrieve user information", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "can not retrieve user information");
 	} catch (UserAccessDeniedException e) {
-	    LearningDesignRepositoryServlet.log.error("user access denied", e);
+	    log.error("user access denied", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "user access denied");
 	} catch (RepositoryCheckedException e) {
-	    LearningDesignRepositoryServlet.log.error("repository checked", e);
+	    log.error("repository checked", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "repository checked");
 	} catch (Exception e) {
-	    LearningDesignRepositoryServlet.log.error("Problem with LearningDesignRepositoryServlet request", e);
+	    log.error("Problem with LearningDesignRepositoryServlet request", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 		    "Problem with LearningDesignRepositoryServlet request");
 	}
@@ -385,22 +376,19 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     private Integer getUserId(String username, String courseId, String courseName, String locale, String country,
 	    String usePrefix, final boolean isUpdateUserDetails, String firstName, String lastName, String email,
-	    ExtServer extServer)
-	    throws UserInfoFetchException, UserInfoValidationException {
+	    ExtServer extServer) throws UserInfoFetchException, UserInfoValidationException {
 	ExtUserUseridMap userMap = null;
 	boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
 	if ((firstName == null) && (lastName == null)) {
-	    userMap = LearningDesignRepositoryServlet.integrationService.getExtUserUseridMap(extServer, username,
-		    prefix);
+	    userMap = integrationService.getExtUserUseridMap(extServer, username, prefix);
 	} else {
-	    userMap = LearningDesignRepositoryServlet.integrationService.getImplicitExtUserUseridMap(extServer,
-		    username, firstName, lastName, locale, country, email, prefix,
-		    isUpdateUserDetails);
+	    userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, firstName, lastName, locale,
+		    country, email, prefix, isUpdateUserDetails);
 	}
 
 	// create group for external course if necessary
-	LearningDesignRepositoryServlet.integrationService.getExtCourseClassMap(extServer, userMap, courseId,
-		courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+	integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
+		LoginRequestDispatcher.METHOD_AUTHOR);
 	Integer userId = userMap.getUser().getUserId();
 	return userId;
     }
@@ -411,12 +399,11 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     }
 
     public void exportLD(HttpServletRequest request, HttpServletResponse response) {
-	Long learningDesignId = WebUtil.readLongParam(request, LearningDesignRepositoryServlet.PARAM_LEARING_DESIGN_ID);
+	Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 
 	try {
-	    String zipFilename = LearningDesignRepositoryServlet.exportToolContentService
-		    .exportLearningDesign(learningDesignId, toolsErrorMsgs);
+	    String zipFilename = exportToolContentService.exportLearningDesign(learningDesignId, toolsErrorMsgs);
 
 	    // get only filename
 	    String zipfile = FileUtil.getFileName(zipFilename);
@@ -426,7 +413,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 	    // Different browsers handle stream downloads differently LDEV-1243
 	    String filename = FileUtil.encodeFilenameForDownload(request, zipfile);
-	    LearningDesignRepositoryServlet.log.debug("Final filename to export: " + filename);
+	    log.debug("Final filename to export: " + filename);
 
 	    response.setContentType("application/x-download");
 	    //			response.setContentType("application/zip");
@@ -443,11 +430,11 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		    out.write((char) ch);
 		    count++;
 		}
-		LearningDesignRepositoryServlet.log.debug("Wrote out " + count + " bytes");
+		log.debug("Wrote out " + count + " bytes");
 		response.setContentLength(count);
 		out.flush();
 	    } catch (Exception e) {
-		LearningDesignRepositoryServlet.log.error("Exception occured writing out file:" + e.getMessage());
+		log.error("Exception occured writing out file:" + e.getMessage());
 		throw new ExportToolContentException(e);
 	    } finally {
 		try {
@@ -458,33 +445,21 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			out.close();
 		    }
 		} catch (Exception e) {
-		    LearningDesignRepositoryServlet.log
-			    .error("Error Closing file. File already written out - no exception being thrown.", e);
+		    log.error("Error Closing file. File already written out - no exception being thrown.", e);
 		}
 	    }
 	} catch (Exception e1) {
-	    LearningDesignRepositoryServlet.log
-		    .error("Unable to export tool content to external integrated server: " + e1.toString());
+	    log.error("Unable to export tool content to external integrated server: " + e1.toString());
 	}
     }
 
-    /**
-     * Initialization of the servlet. <br>
-     *
-     * @throws ServletException
-     *             if an error occure
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
      */
     @Override
-    public void init() throws ServletException {
-	LearningDesignRepositoryServlet.integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-
-	LearningDesignRepositoryServlet.service = (IWorkspaceManagementService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("workspaceManagementService");
-
-	LearningDesignRepositoryServlet.msgService = LearningDesignRepositoryServlet.service.getMessageService();
-
-	LearningDesignRepositoryServlet.exportToolContentService = (IExportToolContentService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("exportToolContentService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 }

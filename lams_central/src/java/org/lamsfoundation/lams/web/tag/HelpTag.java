@@ -34,7 +34,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -95,7 +94,7 @@ public class HelpTag extends TagSupport {
 
 		    // retrieve help URL for tool
 		    ILamsToolService toolService = (ILamsToolService) getContext()
-			    .getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+			    .getBean(CentralConstants.TOOL_SERVICE_BEAN_NAME);
 		    IToolVO tool = toolService.getToolBySignature(toolSignature);
 
 		    String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode);

@@ -35,17 +35,12 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Andrey Balan
- *
- *
- *
  */
 public class GetServerTimeServlet extends HttpServlet {
-
     private static Logger logger = Logger.getLogger(GetServerTimeServlet.class);
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-
 	try {
 	    long currentTime = (new Date()).getTime();
 

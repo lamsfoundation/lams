@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.web;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -56,10 +59,20 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 @SuppressWarnings("serial")
 public class LoginRequestServlet extends HttpServlet {
-
     private static Logger log = Logger.getLogger(LoginRequestServlet.class);
 
-    private static IntegrationService integrationService = null;
+    @Autowired
+    private IntegrationService integrationService;
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     /**
      * The doGet method of the servlet. <br>
@@ -111,14 +124,14 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
-	ExtServer extServer = getIntegrationService().getExtServer(serverId);
+	ExtServer extServer = integrationService.getExtServer(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
 	    ExtUserUseridMap userMap = null;
 	    if ((firstName == null) && (lastName == null)) {
-		userMap = getIntegrationService().getExtUserUseridMap(extServer, extUsername, prefix);
+		userMap = integrationService.getExtUserUseridMap(extServer, extUsername, prefix);
 	    } else {
-		userMap = getIntegrationService().getImplicitExtUserUseridMap(extServer, extUsername, firstName,
+		userMap = integrationService.getImplicitExtUserUseridMap(extServer, extUsername, firstName,
 			lastName, locale, country, email, prefix, isUpdateUserDetails);
 	    }
 
@@ -144,7 +157,7 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    if (extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
+		integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
 			prefix);
 	    }
 
@@ -206,13 +219,5 @@ public class LoginRequestServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
-    }
-
-    private IntegrationService getIntegrationService() {
-	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-	}
-	return integrationService;
     }
 }

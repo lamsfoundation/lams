@@ -201,7 +201,7 @@
 
 	<servlet>
 		<servlet-name>RegisterServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.RegisterAction
+		<servlet-class>org.lamsfoundation.lams.webservice.RegisterServlet
 		</servlet-class>
 	</servlet>
 

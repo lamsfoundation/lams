@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.gradebook.web.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +42,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
@@ -55,16 +56,21 @@ public class RecalculateTotalMarksForLessonServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(RecalculateTotalMarksForLessonServlet.class);
 
-    private static ILogEventService logEventService;
-    private static ILessonService lessonService;
-    private static IGradebookFullService gradebookService;
+    @Autowired
+    private ILogEventService logEventService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private IGradebookFullService gradebookService;
 
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
     @Override
-    public void init() throws ServletException {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	logEventService = (ILogEventService) ctx.getBean("logEventService");
-	lessonService = (ILessonService) ctx.getBean("lessonService");
-	gradebookService = (IGradebookFullService) ctx.getBean("gradebookService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Override

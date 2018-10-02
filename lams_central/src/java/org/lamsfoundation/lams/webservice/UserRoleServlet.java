@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,21 +23,23 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Allows user role granting for integrated environments.
  *
  * @author Marcin Cieslak
- *
  */
 public class UserRoleServlet extends HttpServlet {
-
     private static Logger log = Logger.getLogger(UserRoleServlet.class);
 
-    private static IntegrationService integrationService = null;
-    private static IUserManagementService userManagementService = null;
-    private static ISecurityService securityService = null;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    private ISecurityService securityService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -49,7 +52,7 @@ public class UserRoleServlet extends HttpServlet {
 	String role = request.getParameter(AttributeNames.PARAM_ROLE);
 
 	try {
-	    ExtServer extServer = UserRoleServlet.integrationService.getExtServer(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim()
 		    + targetUsername.toLowerCase().trim() + method.toLowerCase().trim() + role.toLowerCase().trim()
 		    + extServer.getServerid().toLowerCase().trim() + extServer.getServerkey().toLowerCase().trim();
@@ -58,14 +61,14 @@ public class UserRoleServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, invalid hash");
 		return;
 	    }
-	    ExtUserUseridMap sysadminUserMap = UserRoleServlet.integrationService.getExtUserUseridMap(extServer,
+	    ExtUserUseridMap sysadminUserMap = integrationService.getExtUserUseridMap(extServer,
 		    username);
 	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role", false)) {
 		log.error("Sysadmin role check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not sysadmin");
 		return;
 	    }
-	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(extServer,
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer,
 		    targetUsername);
 	    User targetUser = userMap.getUser();
 	    if ("grant".equalsIgnoreCase(method)) {
@@ -77,7 +80,7 @@ public class UserRoleServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown method: " + method);
 	    }
 	} catch (Exception e) {
-	    UserRoleServlet.log.error("Error while setting user roles", e);
+	    log.error("Error while setting user roles", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while setting user roles");
 	}
     }
@@ -87,17 +90,14 @@ public class UserRoleServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    /**
-     * Initialization of the servlet.
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
      */
     @Override
-    public void init() throws ServletException {
-	UserRoleServlet.integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-	UserRoleServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
-	UserRoleServlet.securityService = (ISecurityService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("securityService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     /**
