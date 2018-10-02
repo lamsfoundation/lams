@@ -79,7 +79,7 @@ public class LearningController {
     private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
-    private static final String PIXLR_UTL = "http://www.pixlr.com/editor/";
+    private static final String PIXLR_URL = "http://www.pixlr.com/editor/";
 
     @Autowired
     private IPixlrService pixlrService;
@@ -156,11 +156,10 @@ public class LearningController {
 	}
 	request.setAttribute("pixlrUserDTO", pixlrUserDTO);
 
-	String returnURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/lapixl10/learning.do?";
-	returnURL += "dispatch=updatePixlrImage";
-	returnURL += "&toolSessionID=" + pixlrSession.getSessionId();
+	String returnURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/lapixl10/learning/updatePixlrImage.do";
+	returnURL += "?toolSessionID=" + pixlrSession.getSessionId();
 
-	String url = PIXLR_UTL + "?";
+	String url = PIXLR_URL + "?";
 	url += "&title=" + URLEncoder.encode(pixlr.getTitle(), "UTF8");
 	url += "&referrer=LAMS";
 	url += "&loc=" + getPixlrLocale();
