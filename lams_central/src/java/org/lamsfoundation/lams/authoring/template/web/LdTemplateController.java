@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -97,7 +96,6 @@ public abstract class LdTemplateController {
     @Qualifier("workspaceManagementService")
     protected IWorkspaceManagementService workspaceManagementService;
     @Autowired
-    @Qualifier(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME)
     protected IAuthoringFullService authoringFullService;
     @Autowired
     @Qualifier("toolDAO")
