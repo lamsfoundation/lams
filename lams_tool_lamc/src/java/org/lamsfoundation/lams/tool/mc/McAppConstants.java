@@ -50,6 +50,7 @@ public interface McAppConstants {
 
     public static final int MAX_OPTION_COUNT = 25;
     public static final String QUESTION_AND_CANDIDATE_ANSWERS_KEY = "questionAndCandidateAnswersKey";
+    public static final String CONFIDENCE_LEVELS_KEY = "confidenceLevelsMap";
 
     /*
      * authoring mode constants
