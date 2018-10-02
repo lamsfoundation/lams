@@ -34,63 +34,59 @@
 	     mustHaveSymbols   = ${mustHaveSymbols};
 
 	     $.validator.addMethod("pwcheck", function(value) {
-	      return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
-	    (!mustHaveNumerics || /\d/.test(value)) && // has a digit
-	    (!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
-	    (!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+	     	return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+	    	(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+	    	(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+	    	(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
 	     });
 
-		$.validator
-				.addMethod(
-						"charactersAllowed",
-						function(value) {
-							return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
-									.test(value)
-
-						});
+		$.validator.addMethod(
+			"charactersAllowed",
+			function(value) {
+				return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
+				.test(value)
+			}
+		);
 
 		$(function() {
 			// Setup form validation 
+			$("form[name='changePass']").validate({
+				debug : true,
+				errorClass : 'help-block',
+				//  validation rules
+				rules : {
+					newPassword : {
+						required : true,
+						minlength : <c:out value="${minNumChars}"/>,
+						maxlength : 25,
+						charactersAllowed : true,
+						pwcheck : true
+					},
+					confirmNewPassword : {
+						required : true,
+						equalTo : "#newPassword"
+					}
+				},
 
-			$("form[name='changePass']")
-					.validate(
-							{
-								debug : true,
-								errorClass : 'help-block',
-								//  validation rules
-								rules : {
-									newPassword : {
-										required : true,
-										minlength : <c:out value="${minNumChars}"/>,
-										maxlength : 25,
-										charactersAllowed : true,
-										pwcheck : true
-									},
-									confirmNewPassword : {
-										required : true,
-										equalTo : "#newPassword"
-									}
-								},
+				// Specify the validation error messages
+				messages : {
+					newPassword : {
+						required : "<fmt:message key='error.password.empty'/>",
+						minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
+						maxlength : "<fmt:message key='label.password.max.length'/>",
+						charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
+						pwcheck : "<fmt:message key='label.password.restrictions'/>"
+					},
+					confirmNewPassword : {
+						required : "<fmt:message key='error.password.empty'/>",
+						equalTo : "<fmt:message key='error.newpassword.mismatch'/>"
+					},
+				},
 
-								// Specify the validation error messages
-								messages : {
-									newPassword : {
-										required : "<fmt:message key='error.password.empty'/>",
-										minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-										maxlength : "<fmt:message key='label.password.max.length'/>",
-										charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
-										pwcheck : "<fmt:message key='label.password.restrictions'/>"
-									},
-									confirmNewPassword : {
-										required : "<fmt:message key='error.password.empty'/>",
-										equalTo : "<fmt:message key='error.newpassword.mismatch'/>"
-									},
-								},
-
-								submitHandler : function(form) {
-									document.changePass.submit();
-								}
-							});
+				submitHandler : function(form) {
+					document.changePass.submit();
+				}
+			});
 
 		});
 	</script>
@@ -102,14 +98,14 @@
 
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
-		<form action="<lams:LAMSURL/>ForgotPasswordRequest/requestPasswordChange.do" method="post"
-			name="changePass">
-				<input type="hidden" name="key"
-				id="key" value="<c:out value='${param.key}' />" />
+		<form action="<lams:LAMSURL/>ForgotPasswordRequest" method="post" name="changePass">
+			<input type="hidden" name="method" id="method"	value="requestPasswordChange" />
+			<input type="hidden" name="key"	id="key" value="<c:out value='${param.key}' />" />
 
 			<h4>
 				<fmt:message key="label.forgot.password" />
 			</h4>
+			
 			<div class="col-xs-12">
 				<lams:Alert type="info" id="passwordConditions" close="false">
 					<strong><fmt:message key='label.password.must.contain' />:</strong>
@@ -138,6 +134,7 @@
 					</ul>
 				</lams:Alert>
 			</div>
+			
 			<div class="form-group">
 				<label for="newPassword"><fmt:message
 						key="label.password.new.password" /></label> <input class="form-control"

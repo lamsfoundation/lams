@@ -12,8 +12,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 
 <%
-	String languageKey = StringEscapeUtils.escapeHtml(request
-			.getParameter("languageKey"));
+	String languageKey = StringEscapeUtils.escapeHtml(request.getParameter("languageKey"));
 	String stateStr = request.getParameter("state");
 	String emailStr = request.getParameter("emailSent");
 %>
@@ -27,7 +26,6 @@
 <c:set var="emailStr" scope="request">
 	<%=emailStr%>
 </c:set>
-
 
 <!DOCTYPE html>
 <lams:html>
@@ -60,22 +58,18 @@
 			<fmt:message key="label.forgot.password.confirm" />
 		</h4>
 
-
 		<c:set var="type" value="info" />
 		<c:if test="${stateStr == 0}">
 			<c:set var="type" value="danger" />
 		</c:if>
 		
 		<lams:Alert id="output" type="${type}" close="false">
-
 			<fmt:message key="${languageKey}" />
-
 		</lams:Alert>
 
 		<button type="button" name="cancel" class="btn btn-primary pull-right voffset10" onclick="javascript:toHome();">
 			<fmt:message key="label.ok" />
 		</button>
-
 
 	</lams:Page>
 </body>
