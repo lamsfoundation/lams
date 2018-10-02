@@ -19,6 +19,7 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -46,41 +47,32 @@ public class SignupController {
     @Qualifier("timezoneService")
     private ITimezoneService timezoneService ;
 
-    @RequestMapping("")
-    public String execute(@ModelAttribute SignupForm signupForm, HttpServletRequest request,
+    @RequestMapping("init")
+    public String execute(@ModelAttribute("SignupForm") SignupForm signupForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	String method = WebUtil.readStrParam(request, "method", true);
-	if (StringUtils.equals(method, "emailVerify")) {
-	    return emailVerify(request);
-	}
 	String context = WebUtil.readStrParam(request, "context", true);
-	SignupOrganisation signupOrganisation = null;
-	if (StringUtils.isNotBlank(context)) {
-	    signupOrganisation = signupService.getSignupOrganisation(context);
-	    request.setAttribute("signupOrganisation", signupOrganisation);
+	SignupOrganisation signupOrganisation = StringUtils.isNotBlank(context)
+		? signupService.getSignupOrganisation(context)
+		: null;
+	if (signupOrganisation == null) {
+	    request.setAttribute("messageKey", "no.such.signup.page.exist");
+	    return "msgContent";
 	}
-	if ((signupForm.getSubmitted() == null) || !((Boolean) signupForm.getSubmitted())) {
-	    if (signupOrganisation == null) {
-		request.setAttribute("messageKey", "no.such.signup.page.exist");
-		return "msgContent";
-	    }
-
-	    // no context and unsubmitted form means it's the initial request
-	    return "signup/signup";
-	} else if (StringUtils.equals(method, "register")) {
-	    return signUp(signupForm, request);
-	} else {
-	    return signIn(signupForm, request, response);
-	}
+	
+	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
+	
+	request.setAttribute("signupOrganisation", signupOrganisation);
+	return "signup/signup";
     }
 
-    @RequestMapping("/signUp")
-    private String signUp(@ModelAttribute SignupForm signupForm, HttpServletRequest request) {
+    @RequestMapping("signup")
+    private String signup(@ModelAttribute("SignupForm") SignupForm signupForm, HttpServletRequest request) {
 	try {
 	    // validation
 	    MultiValueMap<String, String> errorMap = validateSignup(signupForm);
 	    if (!errorMap.isEmpty()) {
+		request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(true));
 		request.setAttribute("errorMap", errorMap);
 		return "signup/signup";
 	    } else {
@@ -153,8 +145,8 @@ public class SignupController {
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
 	String hash = HashUtil.sha256(user.getEmail(), user.getSalt());
 	StringBuilder stringBuilder = new StringBuilder().append(Configuration.get(ConfigurationKeys.SERVER_URL))
-		.append("signup/signup.do?method=emailVerify&login=")
-		.append(URLEncoder.encode(user.getLogin(), "UTF-8")).append("&hash=").append(hash);
+		.append("signup/emailVerify.do?login=").append(URLEncoder.encode(user.getLogin(), "UTF-8"))
+		.append("&hash=").append(hash);
 	String link = stringBuilder.toString();
 
 	String subject = messageService.getMessage("signup.email.verify.subject");
@@ -169,8 +161,8 @@ public class SignupController {
 	Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
     }
 
-    @RequestMapping("/signIn")
-    private String signIn(@ModelAttribute SignupForm signupForm, HttpServletRequest request,
+    @RequestMapping("login")
+    public String login(@ModelAttribute("SignupForm") SignupForm signupForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	try {
 
@@ -292,6 +284,7 @@ public class SignupController {
     /**
      * Checks whether incoming hash is the same as the expected hash for email verification
      */
+    @RequestMapping("emailVerify")
     public String emailVerify(HttpServletRequest request) {
 	String login = WebUtil.readStrParam(request, "login", false);
 	String hash = WebUtil.readStrParam(request, "hash", false);

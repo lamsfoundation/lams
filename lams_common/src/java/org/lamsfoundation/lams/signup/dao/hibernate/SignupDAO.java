@@ -5,6 +5,7 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.signup.dao.ISignupDAO;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -23,15 +24,15 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
     }
 
     @Override
-    public List getSignupOrganisations() {
+    public List<SignupOrganisation> getSignupOrganisations() {
 	return super.findAll(SignupOrganisation.class);
     }
 
     @Override
-    public List getOrganisationCandidates() {
+    public List<Organisation> getOrganisationCandidates() {
 	String query = "from Organisation o where o.organisationState.organisationStateId=" + OrganisationState.ACTIVE;
 	query += " and o.organisationType.organisationTypeId!=" + OrganisationType.ROOT_TYPE;
-	return doFind(query);
+	return (List<Organisation>) doFind(query);
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.signup.dao.ISignupDAO;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -128,12 +129,12 @@ public class SignupService implements ISignupService {
     }
 
     @Override
-    public List getSignupOrganisations() {
+    public List<SignupOrganisation> getSignupOrganisations() {
 	return signupDAO.getSignupOrganisations();
     }
 
     @Override
-    public List getOrganisationCandidates() {
+    public List<Organisation> getOrganisationCandidates() {
 	return signupDAO.getOrganisationCandidates();
     }
 

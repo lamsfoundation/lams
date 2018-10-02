@@ -28,7 +28,7 @@
 </lams:head>
 
 <body class="stripes">
-	<lams:Page type="admin">
+	<lams:Page type="admin" formID="SignupForm">
 		<div class="page-header">
 			<p class="text-center">
 				<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg"
