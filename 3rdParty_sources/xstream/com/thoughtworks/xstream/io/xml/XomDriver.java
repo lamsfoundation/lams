@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2016 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -20,128 +20,145 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.StreamException;
-import com.thoughtworks.xstream.io.naming.NameCoder;
-
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.StreamException;
+import com.thoughtworks.xstream.io.naming.NameCoder;
 
 public class XomDriver extends AbstractXmlDriver {
 
     private final Builder builder;
 
     public XomDriver() {
-        this(new Builder());
+        this(new XmlFriendlyNameCoder());
     }
 
-    public XomDriver(final Builder builder) {
+    /**
+     * @deprecated As of 1.4.9, use {@link #XomDriver()} and overload {@link #createBuilder()} instead
+     */
+    public XomDriver(Builder builder) {
         this(builder, new XmlFriendlyNameCoder());
     }
-
+    
     /**
      * @since 1.4
      */
-    public XomDriver(final NameCoder nameCoder) {
-        this(new Builder(), nameCoder);
+    public XomDriver(NameCoder nameCoder) {
+        super(nameCoder);
+        this.builder = null;
     }
-
+    
     /**
      * @since 1.4
+     * @deprecated As of 1.4.9, use {@link #XomDriver(NameCoder)} and overload {@link #createBuilder()} instead
      */
-    public XomDriver(final Builder builder, final NameCoder nameCoder) {
+    public XomDriver(Builder builder, NameCoder nameCoder) {
         super(nameCoder);
         this.builder = builder;
     }
 
     /**
      * @since 1.2
-     * @deprecated As of 1.4, use {@link #XomDriver(Builder, NameCoder)} instead
+     * @deprecated As of 1.4, use {@link #XomDriver(NameCoder)} instead
      */
-    @Deprecated
-    public XomDriver(final XmlFriendlyReplacer replacer) {
-        this(new Builder(), replacer);
+    public XomDriver(XmlFriendlyReplacer replacer) {
+        this((NameCoder)replacer);
+    }
+    
+    /**
+     * @since 1.2
+     * @deprecated As of 1.4, use {@link #XomDriver(NameCoder)} and overload {@link #createBuilder()} instead
+     */
+    public XomDriver(Builder builder, XmlFriendlyReplacer replacer) {
+        this(builder, (NameCoder)replacer);
     }
 
     /**
-     * @since 1.2
-     * @deprecated As of 1.4, use {@link #XomDriver(Builder, NameCoder)} instead
+     * @deprecated As of 1.4.9, overload {@link #createBuilder()} instead
      */
-    @Deprecated
-    public XomDriver(final Builder builder, final XmlFriendlyReplacer replacer) {
-        this((NameCoder)replacer);
-    }
-
     protected Builder getBuilder() {
-        return builder;
+        return this.builder;
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final Reader text) {
+    /**
+     * Create the Builder instance.
+     *
+     * A XOM builder is a wrapper around a {@link org.xml.sax.XMLReader}
+     * instance which is not thread-safe by definition. Therefore each reader
+     * should use its own builder instance to avoid concurrency problems.
+     *
+     * Overload this method to configure the generated builder instances e.g.
+     * to activate validation.
+     *
+     * @return the new builder
+     * @since 1.4.9
+     */
+    protected Builder createBuilder() {
+        final Builder builder = getBuilder();
+        return builder != null ? builder : new Builder();
+    }
+
+    public HierarchicalStreamReader createReader(Reader text) {
         try {
-            final Document document = builder.build(text);
+            final Document document = createBuilder().build(text);
             return new XomReader(document, getNameCoder());
-        } catch (final ValidityException e) {
+        } catch (ValidityException e) {
             throw new StreamException(e);
-        } catch (final ParsingException e) {
+        } catch (ParsingException e) {
             throw new StreamException(e);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final InputStream in) {
+    public HierarchicalStreamReader createReader(InputStream in) {
         try {
-            final Document document = builder.build(in);
+            final Document document = createBuilder().build(in);
             return new XomReader(document, getNameCoder());
-        } catch (final ValidityException e) {
+        } catch (ValidityException e) {
             throw new StreamException(e);
-        } catch (final ParsingException e) {
+        } catch (ParsingException e) {
             throw new StreamException(e);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final URL in) {
+    public HierarchicalStreamReader createReader(URL in) {
         try {
-            final Document document = builder.build(in.toExternalForm());
+            final Document document = createBuilder().build(in.toExternalForm());
             return new XomReader(document, getNameCoder());
-        } catch (final ValidityException e) {
+        } catch (ValidityException e) {
             throw new StreamException(e);
-        } catch (final ParsingException e) {
+        } catch (ParsingException e) {
             throw new StreamException(e);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final File in) {
+    public HierarchicalStreamReader createReader(File in) {
         try {
-            final Document document = builder.build(in);
+            final Document document = createBuilder().build(in);
             return new XomReader(document, getNameCoder());
-        } catch (final ValidityException e) {
+        } catch (ValidityException e) {
             throw new StreamException(e);
-        } catch (final ParsingException e) {
+        } catch (ParsingException e) {
             throw new StreamException(e);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
     public HierarchicalStreamWriter createWriter(final Writer out) {
         return new PrettyPrintWriter(out, getNameCoder());
     }
 
-    @Override
     public HierarchicalStreamWriter createWriter(final OutputStream out) {
         return new PrettyPrintWriter(new OutputStreamWriter(out), getNameCoder());
     }

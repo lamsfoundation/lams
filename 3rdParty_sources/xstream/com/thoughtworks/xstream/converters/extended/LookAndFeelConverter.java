@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008, 2013, 2014 XStream Committers.
+ * Copyright (C) 2007, 2008, 2013 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,21 +10,19 @@
  */
 package com.thoughtworks.xstream.converters.extended;
 
-import java.io.NotSerializableException;
-
-import javax.swing.LookAndFeel;
-
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import com.thoughtworks.xstream.mapper.Mapper;
 
+import javax.swing.LookAndFeel;
+
+import java.io.NotSerializableException;
+
 
 /**
- * A converter for Swing {@link LookAndFeel} implementations.
- * <p>
- * The JDK's implementations are serializable for historical reasons but will throw a {@link NotSerializableException}
- * in their writeObject method. Therefore XStream will use an implementation based on the ReflectionConverter.
- * </p>
+ * A converter for Swing LookAndFeel implementations. The JDK's implementations are serializable
+ * for historical reasons but will throw a {@link NotSerializableException} in their writeObject
+ * method. Therefore XStream will use an implementation based on the ReflectionConverter.
  * 
  * @author J&ouml;rg Schaible
  * @since 1.3
@@ -38,12 +36,11 @@ public class LookAndFeelConverter extends ReflectionConverter {
      * @param reflectionProvider the reflection provider
      * @since 1.3
      */
-    public LookAndFeelConverter(final Mapper mapper, final ReflectionProvider reflectionProvider) {
+    public LookAndFeelConverter(Mapper mapper, ReflectionProvider reflectionProvider) {
         super(mapper, reflectionProvider);
     }
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return LookAndFeel.class.isAssignableFrom(type) && canAccess(type);
     }
 }

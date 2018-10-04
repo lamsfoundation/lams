@@ -13,36 +13,31 @@ package com.thoughtworks.xstream.io;
 
 import java.util.Iterator;
 
-
 /**
  * Provide an iterator over the attribute names of the current node of a reader.
- * 
+ *
  * @author Joe Walnes
- * @deprecated As of upcoming, it is an internal helper class only
+ * @deprecated As of 1.4.8, it is an internal helper class only
  */
-@Deprecated
-public class AttributeNameIterator implements Iterator<String> {
+public class AttributeNameIterator implements Iterator {
 
     private int current;
     private final int count;
     private final HierarchicalStreamReader reader;
 
-    public AttributeNameIterator(final HierarchicalStreamReader reader) {
+    public AttributeNameIterator(HierarchicalStreamReader reader) {
         this.reader = reader;
         count = reader.getAttributeCount();
     }
 
-    @Override
     public boolean hasNext() {
         return current < count;
     }
 
-    @Override
-    public String next() {
+    public Object next() {
         return reader.getAttributeName(current++);
     }
 
-    @Override
     public void remove() {
         throw new UnsupportedOperationException();
     }

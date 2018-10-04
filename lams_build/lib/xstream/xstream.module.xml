@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.5" name="com.thoughtworks.xstream">
   <resources>
-    <resource-root path="xstream-1.5.0-SNAPSHOT.jar"/>
+    <resource-root path="xstream-1.4.10.jar"/>
   </resources>
   <dependencies>
   	<system>

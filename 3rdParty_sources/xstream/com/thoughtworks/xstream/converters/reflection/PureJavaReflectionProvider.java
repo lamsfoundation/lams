@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2009, 2011, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2013, 2016 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,6 +10,9 @@
  * Created on 07. March 2004 by Joe Walnes
  */
 package com.thoughtworks.xstream.converters.reflection;
+
+import com.thoughtworks.xstream.core.JVM;
+import com.thoughtworks.xstream.core.util.Fields;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,44 +26,43 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
+import java.util.WeakHashMap;
 
 /**
- * Pure Java ObjectFactory that instantiates objects using standard Java reflection, however the types of objects that
- * can be constructed are limited.
+ * Pure Java ObjectFactory that instantiates objects using standard Java reflection, however the types of objects
+ * that can be constructed are limited.
  * <p>
- * Can newInstance: classes with public visibility, outer classes, static inner classes, classes with default
- * constructors and any class that implements java.io.Serializable.
+ * Can newInstance: classes with public visibility, outer classes, static inner classes, classes with default constructors
+ * and any class that implements java.io.Serializable.
  * </p>
  * <p>
- * Cannot newInstance: classes without public visibility, non-static inner classes, classes without default
- * constructors. Note that any code in the constructor of a class will be executed when the ObjectFactory instantiates
- * the object.
+ * Cannot newInstance: classes without public visibility, non-static inner classes, classes without default constructors.
+ * Note that any code in the constructor of a class will be executed when the ObjectFactory instantiates the object.
  * </p>
- * 
  * @author Joe Walnes
  */
 public class PureJavaReflectionProvider implements ReflectionProvider {
 
-    private transient Map<Class<?>, byte[]> serializedDataCache;
+    private transient Map serializedDataCache;
     protected FieldDictionary fieldDictionary;
 
     public PureJavaReflectionProvider() {
         this(new FieldDictionary(new ImmutableFieldKeySorter()));
     }
 
-    public PureJavaReflectionProvider(final FieldDictionary fieldDictionary) {
+    public PureJavaReflectionProvider(FieldDictionary fieldDictionary) {
         this.fieldDictionary = fieldDictionary;
         init();
     }
 
-    @Override
-    public Object newInstance(final Class<?> type) {
+    public Object newInstance(Class type) {
+        ObjectAccessException oaex = null;
         try {
-            for (final Constructor<?> constructor : type.getDeclaredConstructors()) {
+            Constructor[] constructors = type.getDeclaredConstructors();
+            for (int i = 0; i < constructors.length; i++) {
+                final Constructor constructor = constructors[i];
                 if (constructor.getParameterTypes().length == 0) {
                     if (!constructor.isAccessible()) {
                         constructor.setAccessible(true);
@@ -71,134 +73,122 @@ public class PureJavaReflectionProvider implements ReflectionProvider {
             if (Serializable.class.isAssignableFrom(type)) {
                 return instantiateUsingSerialization(type);
             } else {
-                throw new ObjectAccessException("Cannot construct "
-                    + type.getName()
-                    + " as it does not have a no-args constructor");
+                oaex = new ObjectAccessException("Cannot construct type as it does not have a no-args constructor");
             }
-        } catch (final InstantiationException e) {
-            throw new ObjectAccessException("Cannot construct " + type.getName(), e);
-        } catch (final IllegalAccessException e) {
-            throw new ObjectAccessException("Cannot construct " + type.getName(), e);
-        } catch (final InvocationTargetException e) {
+        } catch (InstantiationException e) {
+            oaex = new ObjectAccessException("Cannot construct type", e);
+        } catch (IllegalAccessException e) {
+            oaex = new ObjectAccessException("Cannot construct type", e);
+        } catch (InvocationTargetException e) {
             if (e.getTargetException() instanceof RuntimeException) {
                 throw (RuntimeException)e.getTargetException();
             } else if (e.getTargetException() instanceof Error) {
                 throw (Error)e.getTargetException();
             } else {
-                throw new ObjectAccessException("Constructor for " + type.getName() + " threw an exception", e
-                    .getTargetException());
+                oaex = new ObjectAccessException("Constructor for type threw an exception", e.getTargetException());
             }
         }
+        oaex.add("construction-type", type.getName());
+        throw oaex;
     }
 
-    private Object instantiateUsingSerialization(final Class<?> type) {
+    private Object instantiateUsingSerialization(final Class type) {
+        ObjectAccessException oaex = null;
         try {
             synchronized (serializedDataCache) {
-                byte[] data = serializedDataCache.get(type);
-                if (data == null) {
-                    final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    final DataOutputStream stream = new DataOutputStream(bytes);
+                byte[] data = (byte[]) serializedDataCache.get(type);
+                if (data ==  null) {
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    DataOutputStream stream = new DataOutputStream(bytes);
                     stream.writeShort(ObjectStreamConstants.STREAM_MAGIC);
                     stream.writeShort(ObjectStreamConstants.STREAM_VERSION);
                     stream.writeByte(ObjectStreamConstants.TC_OBJECT);
                     stream.writeByte(ObjectStreamConstants.TC_CLASSDESC);
                     stream.writeUTF(type.getName());
                     stream.writeLong(ObjectStreamClass.lookup(type).getSerialVersionUID());
-                    stream.writeByte(2); // classDescFlags (2 = Serializable)
+                    stream.writeByte(2);  // classDescFlags (2 = Serializable)
                     stream.writeShort(0); // field count
                     stream.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
                     stream.writeByte(ObjectStreamConstants.TC_NULL);
                     data = bytes.toByteArray();
                     serializedDataCache.put(type, data);
                 }
-
-                final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data)) {
-                    @Override
-                    protected Class<?> resolveClass(final ObjectStreamClass desc) throws ClassNotFoundException {
+                
+                ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data)) {
+                    protected Class resolveClass(ObjectStreamClass desc)
+                        throws IOException, ClassNotFoundException {
                         return Class.forName(desc.getName(), false, type.getClassLoader());
                     }
                 };
                 return in.readObject();
             }
-        } catch (final IOException e) {
-            throw new ObjectAccessException("Cannot create " + type.getName() + " by JDK serialization", e);
-        } catch (final ClassNotFoundException e) {
-            throw new ObjectAccessException("Cannot find class " + e.getMessage(), e);
+        } catch (IOException e) {
+            oaex = new ObjectAccessException("Cannot create type by JDK serialization", e);
+        } catch (ClassNotFoundException e) {
+            oaex = new ObjectAccessException("Cannot find class", e);
         }
+        oaex.add("construction-type", type.getName());
+        throw oaex;
     }
 
-    @Override
-    public void visitSerializableFields(final Object object, final ReflectionProvider.Visitor visitor) {
-        for (final Iterator<Field> iterator = fieldDictionary.fieldsFor(object.getClass()); iterator.hasNext();) {
-            final Field field = iterator.next();
+    public void visitSerializableFields(Object object, ReflectionProvider.Visitor visitor) {
+        for (Iterator iterator = fieldDictionary.fieldsFor(object.getClass()); iterator.hasNext();) {
+            Field field = (Field) iterator.next();
             if (!fieldModifiersSupported(field)) {
                 continue;
             }
             validateFieldAccess(field);
-            try {
-                final Object value = field.get(object);
-                visitor.visit(field.getName(), field.getType(), field.getDeclaringClass(), value);
-            } catch (final IllegalArgumentException e) {
-                throw new ObjectAccessException("Could not get field " + field.getClass() + "." + field.getName(), e);
-            } catch (final IllegalAccessException e) {
-                throw new ObjectAccessException("Could not get field " + field.getClass() + "." + field.getName(), e);
-            }
+            Object value = Fields.read(field, object);
+            visitor.visit(field.getName(), field.getType(), field.getDeclaringClass(), value);
         }
     }
 
-    @Override
-    public void writeField(final Object object, final String fieldName, final Object value, final Class<?> definedIn) {
-        final Field field = fieldDictionary.field(object.getClass(), fieldName, definedIn);
+    public void writeField(Object object, String fieldName, Object value, Class definedIn) {
+        Field field = fieldDictionary.field(object.getClass(), fieldName, definedIn);
         validateFieldAccess(field);
-        try {
-            field.set(object, value);
-        } catch (final IllegalArgumentException e) {
-            throw new ObjectAccessException("Could not set field " + object.getClass() + "." + field.getName(), e);
-        } catch (final IllegalAccessException e) {
-            throw new ObjectAccessException("Could not set field " + object.getClass() + "." + field.getName(), e);
-        }
+        Fields.write(field, object, value);
     }
 
-    @Override
-    public Class<?> getFieldType(final Object object, final String fieldName, final Class<?> definedIn) {
+    public Class getFieldType(Object object, String fieldName, Class definedIn) {
         return fieldDictionary.field(object.getClass(), fieldName, definedIn).getType();
     }
 
     /**
      * @deprecated As of 1.4.5, use {@link #getFieldOrNull(Class, String)} instead
      */
-    @Deprecated
-    @Override
-    public boolean fieldDefinedInClass(final String fieldName, final Class<?> type) {
-        final Field field = fieldDictionary.fieldOrNull(type, fieldName, null);
+    public boolean fieldDefinedInClass(String fieldName, Class type) {
+        Field field = fieldDictionary.fieldOrNull(type, fieldName, null);
         return field != null && fieldModifiersSupported(field);
     }
 
-    protected boolean fieldModifiersSupported(final Field field) {
-        final int modifiers = field.getModifiers();
+    protected boolean fieldModifiersSupported(Field field) {
+        int modifiers = field.getModifiers();
         return !(Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers));
     }
 
-    protected void validateFieldAccess(final Field field) {
+    protected void validateFieldAccess(Field field) {
         if (Modifier.isFinal(field.getModifiers())) {
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
+            if (JVM.is15()) {
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
+            } else {
+                throw new ObjectAccessException("Invalid final field "
+                        + field.getDeclaringClass().getName() + "." + field.getName());
             }
         }
     }
 
-    @Override
-    public Field getField(final Class<?> definedIn, final String fieldName) {
+    public Field getField(Class definedIn, String fieldName) {
         return fieldDictionary.field(definedIn, fieldName, null);
     }
 
-    @Override
-    public Field getFieldOrNull(final Class<?> definedIn, final String fieldName) {
-        return fieldDictionary.fieldOrNull(definedIn, fieldName, null);
+    public Field getFieldOrNull(Class definedIn, String fieldName) {
+        return fieldDictionary.fieldOrNull(definedIn, fieldName,  null);
     }
 
-    public void setFieldDictionary(final FieldDictionary dictionary) {
-        fieldDictionary = dictionary;
+    public void setFieldDictionary(FieldDictionary dictionary) {
+        this.fieldDictionary = dictionary;
     }
 
     private Object readResolve() {
@@ -207,6 +197,6 @@ public class PureJavaReflectionProvider implements ReflectionProvider {
     }
 
     protected void init() {
-        serializedDataCache = new HashMap<Class<?>, byte[]>();
+        serializedDataCache = new WeakHashMap();
     }
 }

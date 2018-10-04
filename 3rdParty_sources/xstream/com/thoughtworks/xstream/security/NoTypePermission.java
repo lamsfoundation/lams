@@ -22,17 +22,14 @@ public class NoTypePermission implements TypePermission {
      */
     public static final TypePermission NONE = new NoTypePermission();
 
-    @Override
-    public boolean allows(Class<?> type) {
+    public boolean allows(Class type) {
         throw new ForbiddenClassException(type);
     }
 
-    @Override
     public int hashCode() {
         return 1;
     }
 
-    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == NoTypePermission.class;
     }

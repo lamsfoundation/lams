@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2010, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2010 XStream Committers.
  * All rights reserved.
  *
  * Created on 12.10.2010 by Joerg Schaible, extracted from TreeMapConverter.
@@ -9,177 +9,154 @@ package com.thoughtworks.xstream.core.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-
 /**
  * @author J&ouml;rg Schaible
  */
-public class PresortedMap<K, V> implements SortedMap<K, V> {
+public class PresortedMap implements SortedMap {
 
-    private static class ArraySet<T> extends ArrayList<T> implements Set<T> {}
+    private static class ArraySet extends ArrayList implements Set {
+    }
 
-    private final PresortedMap.ArraySet<Map.Entry<K, V>> set;
-    private final Comparator<K> comparator;
-
+    private final PresortedMap.ArraySet set;
+    private final Comparator comparator;
+    
     public PresortedMap() {
-        this(null, new ArraySet<Map.Entry<K, V>>());
+        this(null, new ArraySet());
     }
 
-    public PresortedMap(final Comparator<K> comparator) {
-        this(comparator, new ArraySet<Map.Entry<K, V>>());
+    public PresortedMap(Comparator comparator) {
+        this(comparator, new ArraySet());
     }
 
-    private PresortedMap(final Comparator<K> comparator, final PresortedMap.ArraySet<Map.Entry<K, V>> set) {
-        this.comparator = comparator != null ? comparator : new ArraySetComparator<K, V>(set);
+    private PresortedMap(Comparator comparator, PresortedMap.ArraySet set) {
+        this.comparator = comparator != null ? comparator : new ArraySetComparator(set);
         this.set = set;
     }
 
-    @Override
-    public Comparator<K> comparator() {
+    public Comparator comparator() {
         return comparator;
     }
 
-    @Override
-    public Set<Map.Entry<K, V>> entrySet() {
+    public Set entrySet() {
         return set;
     }
 
-    @Override
-    public K firstKey() {
+    public Object firstKey() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public SortedMap<K, V> headMap(final Object toKey) {
+    public SortedMap headMap(Object toKey) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Set<K> keySet() {
-        final Set<K> keySet = new ArraySet<K>();
-        for (final Map.Entry<K, V> entry : set) {
+    public Set keySet() {
+        Set keySet = new ArraySet();
+        for (final Iterator iterator = set.iterator(); iterator.hasNext();) {
+            final Entry entry = (Entry)iterator.next();
             keySet.add(entry.getKey());
         }
         return keySet;
     }
 
-    @Override
-    public K lastKey() {
+    public Object lastKey() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public SortedMap<K, V> subMap(final Object fromKey, final Object toKey) {
+    public SortedMap subMap(Object fromKey, Object toKey) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public SortedMap<K, V> tailMap(final Object fromKey) {
+    public SortedMap tailMap(Object fromKey) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Collection<V> values() {
-        final Set<V> values = new ArraySet<V>();
-        for (final Map.Entry<K, V> entry : set) {
+    public Collection values() {
+        Set values = new ArraySet();
+        for (final Iterator iterator = set.iterator(); iterator.hasNext();) {
+            final Entry entry = (Entry)iterator.next();
             values.add(entry.getValue());
         }
         return values;
     }
 
-    @Override
     public void clear() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean containsKey(final Object key) {
+    public boolean containsKey(Object key) {
         return false;
     }
 
-    @Override
-    public boolean containsValue(final Object value) {
+    public boolean containsValue(Object value) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public V get(final Object key) {
+    public Object get(Object key) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public boolean isEmpty() {
         return set.isEmpty();
     }
 
-    @Override
-    public V put(final K key, final V value) {
-        set.add(new Map.Entry<K, V>() {
+    public Object put(final Object key, final Object value) {
+        set.add(new Entry(){
 
-            @Override
-            public K getKey() {
+            public Object getKey() {
                 return key;
             }
 
-            @Override
-            public V getValue() {
+            public Object getValue() {
                 return value;
             }
 
-            @Override
-            public V setValue(final V value) {
+            public Object setValue(Object value) {
                 throw new UnsupportedOperationException();
-            }
-        });
+            }});
         return null;
     }
 
-    @Override
-    public void putAll(final Map<? extends K, ? extends V> m) {
-        for (final Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
-            @SuppressWarnings("unchecked")
-            final Map.Entry<K, V> e = (Map.Entry<K, V>)entry;
-            set.add(e);
+    public void putAll(Map m) {
+        for (final Iterator iter = m.entrySet().iterator(); iter.hasNext();) {
+            set.add(iter.next());
         }
     }
 
-    @Override
-    public V remove(final Object key) {
+    public Object remove(Object key) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public int size() {
         return set.size();
     }
+    
+    private static class ArraySetComparator implements Comparator {
 
-    private static class ArraySetComparator<K, V> implements Comparator<K> {
+        private final ArrayList list;
+        private Map.Entry[] array;
 
-        private final ArrayList<Map.Entry<K, V>> list;
-        private Map.Entry<K, V>[] array;
-
-        ArraySetComparator(final ArrayList<Map.Entry<K, V>> list) {
+        ArraySetComparator(ArrayList list) {
             this.list = list;
         }
-
-        @Override
-        public int compare(final K object1, final K object2) {
+        
+        public int compare(Object object1, Object object2) {
             if (array == null || list.size() != array.length) {
-                @SuppressWarnings("unchecked")
-                final Map.Entry<K, V>[] a = new Map.Entry[list.size()];
+                Map.Entry[] a = new Map.Entry[list.size()];
                 if (array != null) {
                     System.arraycopy(array, 0, a, 0, array.length);
                 }
                 for (int i = array == null ? 0 : array.length; i < list.size(); ++i) {
-                    a[i] = list.get(i);
+                    a[i] = (Map.Entry)list.get(i);
                 }
                 array = a;
             }
             int idx1 = Integer.MAX_VALUE, idx2 = Integer.MAX_VALUE;
-            for (int i = 0; i < array.length && !(idx1 < Integer.MAX_VALUE && idx2 < Integer.MAX_VALUE); ++i) {
+            for(int i = 0; i < array.length && !(idx1 < Integer.MAX_VALUE && idx2 < Integer.MAX_VALUE); ++i) {
                 if (idx1 == Integer.MAX_VALUE && object1 == array[i].getKey()) {
                     idx1 = i;
                 }

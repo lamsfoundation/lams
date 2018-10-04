@@ -29,17 +29,17 @@ public class WildcardTypePermission extends RegExpTypePermission {
     /**
      * @since 1.4.7
      */
-    public WildcardTypePermission(final String... patterns) {
+    public WildcardTypePermission(final String[] patterns) {
         super(getRegExpPatterns(patterns));
     }
 
-    private static String[] getRegExpPatterns(final String... wildcards) {
+    private static String[] getRegExpPatterns(final String[] wildcards) {
         if (wildcards == null)
             return null;
         final String[] regexps = new String[wildcards.length];
         for (int i = 0; i < wildcards.length; ++i) {
             final String wildcardExpression = wildcards[i];
-            final StringBuilder result = new StringBuilder(wildcardExpression.length() * 2);
+            final StringBuffer result = new StringBuffer(wildcardExpression.length() * 2);
             result.append("(?u)");
             final int length = wildcardExpression.length();
             for (int j = 0; j < length; j++) {

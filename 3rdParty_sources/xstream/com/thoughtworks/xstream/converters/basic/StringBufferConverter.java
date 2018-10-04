@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -12,19 +12,17 @@
 package com.thoughtworks.xstream.converters.basic;
 
 /**
- * Converts the contents of a {@link StringBuffer} to a string.
- * 
+ * Converts the contents of a StringBuffer to XML.
+ *
  * @author Joe Walnes
  */
 public class StringBufferConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
-        return type.equals(StringBuffer.class);
+    public Object fromString(String str) {
+        return new StringBuffer(str);
     }
 
-    @Override
-    public Object fromString(final String str) {
-        return new StringBuffer(str);
+    public boolean canConvert(Class type) {
+        return type.equals(StringBuffer.class);
     }
 }

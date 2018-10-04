@@ -30,8 +30,7 @@ public class NoPermission implements TypePermission {
         this.permission = permission;
     }
 
-    @Override
-    public boolean allows(final Class<?> type) {
+    public boolean allows(final Class type) {
         if (permission == null || permission.allows(type)) {
             throw new ForbiddenClassException(type);
         }

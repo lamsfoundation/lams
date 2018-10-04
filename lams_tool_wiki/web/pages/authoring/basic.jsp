@@ -250,7 +250,6 @@
 	function submitWiki(actionMethod)
 	{
 		document.forms.authoringForm.action=actionMethod+".do"; 
-		document.forms.authoringForm.submit();
 		replaceJavascriptTokenAndSubmit("authoringForm");
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2016 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,50 +10,46 @@
  */
 package com.thoughtworks.xstream.converters.extended;
 
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-
-
 /**
  * Convenient converter for classes with natural string representation.
- * <p>
- * Converter for classes that adopt the following convention: - a constructor that takes a single string parameter - a
- * toString() that is overloaded to issue a string that is meaningful
- * </p>
  * 
+ * Converter for classes that adopt the following convention:
+ *   - a constructor that takes a single string parameter
+ *   - a toString() that is overloaded to issue a string that is meaningful
+ *
  * @author Paul Hammant
  */
 public class ToStringConverter extends AbstractSingleValueConverter {
-    private final Class<?> clazz;
-    private final Constructor<?> ctor;
+    private static final Class[] STRING_PARAMETER = {String.class};
+    private final Class clazz;
+    private final Constructor ctor;
 
-    public ToStringConverter(final Class<?> clazz) throws NoSuchMethodException {
+    public ToStringConverter(Class clazz) throws NoSuchMethodException {
         this.clazz = clazz;
-        ctor = clazz.getConstructor(String.class);
+        ctor = clazz.getConstructor(STRING_PARAMETER);
     }
-
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(clazz);
     }
-
-    @Override
-    public String toString(final Object obj) {
+    public String toString(Object obj) {
         return obj == null ? null : obj.toString();
     }
 
-    @Override
-    public Object fromString(final String str) {
+    public Object fromString(String str) {
         try {
-            return ctor.newInstance(str);
-        } catch (final InstantiationException e) {
+            return ctor.newInstance(new Object[] {str});
+        } catch (InstantiationException e) {
             throw new ConversionException("Unable to instantiate single String param constructor", e);
-        } catch (final IllegalAccessException e) {
-            throw new ConversionException("Unable to access single String param constructor", e);
-        } catch (final InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            throw new ObjectAccessException("Unable to access single String param constructor", e);
+        } catch (InvocationTargetException e) {
             throw new ConversionException("Unable to target single String param constructor", e.getTargetException());
         }
     }

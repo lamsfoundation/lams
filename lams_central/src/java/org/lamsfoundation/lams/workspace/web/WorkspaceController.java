@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/workspace")
 public class WorkspaceController {
+
     protected Logger log = Logger.getLogger(WorkspaceController.class.getName());
 
     public static final String RESOURCE_ID = "resourceID";

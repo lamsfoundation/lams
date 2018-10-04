@@ -20,12 +20,12 @@ import java.util.Set;
  */
 public class ExplicitTypePermission implements TypePermission {
 
-    final Set<String> names;
+    final Set names;
 
     /**
      * @since 1.4.7
      */
-    public ExplicitTypePermission(final Class<?>... types) {
+    public ExplicitTypePermission(final Class[] types) {
         this(new Object() {
             public String[] getNames() {
                 if (types == null)
@@ -41,12 +41,11 @@ public class ExplicitTypePermission implements TypePermission {
     /**
      * @since 1.4.7
      */
-    public ExplicitTypePermission(String... names) {
-        this.names = names == null ? Collections.<String>emptySet() : new HashSet<String>(Arrays.asList(names));
+    public ExplicitTypePermission(String[] names) {
+        this.names = names == null ? Collections.EMPTY_SET : new HashSet(Arrays.asList(names));
     }
 
-    @Override
-    public boolean allows(Class<?> type) {
+    public boolean allows(Class type) {
         if (type == null)
             return false;
         return names.contains(type.getName());

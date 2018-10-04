@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -19,28 +19,24 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
- * Converts a char primitive or {@link Character} wrapper to
- * a string. If char is '\0' the representing string is empty.
+ * Converts a char primitive or java.lang.Character wrapper to
+ * a String. If char is \0 the representing String is empty.
  *
  * @author Joe Walnes
  * @author J&ouml;rg Schaible
  */
 public class CharConverter implements Converter, SingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(char.class) || type.equals(Character.class);
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
-        final Character ch = (Character)source;
-        writer.setValue(toString(ch));
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        writer.setValue(toString(source));
     }
 
-    @Override
-    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
-        final String nullAttribute = reader.getAttribute("null");
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        String nullAttribute = reader.getAttribute("null");
         if (nullAttribute != null && nullAttribute.equals("true")) {
             return new Character('\0');
         } else {
@@ -48,8 +44,7 @@ public class CharConverter implements Converter, SingleValueConverter {
         }
     }
 
-    @Override
-    public Object fromString(final String str) {
+    public Object fromString(String str) {
         if (str.length() == 0) {
             return new Character('\0');
         } else {
@@ -57,9 +52,8 @@ public class CharConverter implements Converter, SingleValueConverter {
         }
     }
 
-    @Override
-    public String toString(final Object obj) {
-        final char ch = ((Character)obj).charValue();
+    public String toString(Object obj) {
+        char ch = ((Character)obj).charValue();
         return ch == '\0' ? "" : obj.toString();
     }
 

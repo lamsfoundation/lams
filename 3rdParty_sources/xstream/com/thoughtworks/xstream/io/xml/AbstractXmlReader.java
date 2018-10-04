@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -16,29 +16,28 @@ import com.thoughtworks.xstream.io.naming.NameCoder;
 
 
 /**
- * Abstract base implementation of HierarchicalStreamReader that provides common functionality to all XML-based readers.
+ * Abstract base implementation of HierarchicalStreamReader that provides common functionality
+ * to all XML-based readers.
  * 
  * @author Mauro Talevi
  * @author J&ouml;rg Schaible
  * @since 1.2
  * @deprecated As of 1.4, use {@link AbstractReader} instead.
  */
-@Deprecated
-public abstract class AbstractXmlReader extends AbstractReader /* implements XmlFriendlyReader */{
+public abstract class AbstractXmlReader extends AbstractReader /* implements XmlFriendlyReader */ {
 
     protected AbstractXmlReader() {
         this(new XmlFriendlyNameCoder());
     }
 
     /**
-     * @deprecated As of 1.4, use {@link AbstractReader} instead.
-     */
-    @Deprecated
-    protected AbstractXmlReader(final XmlFriendlyReplacer replacer) {
+    * @deprecated As of 1.4, use {@link AbstractReader} instead.
+    */
+    protected AbstractXmlReader(XmlFriendlyReplacer replacer) {
         this((NameCoder)replacer);
     }
 
-    protected AbstractXmlReader(final NameCoder nameCoder) {
+    protected AbstractXmlReader(NameCoder nameCoder) {
         super(nameCoder);
     }
 
@@ -49,8 +48,7 @@ public abstract class AbstractXmlReader extends AbstractReader /* implements Xml
      * @return An unescaped name with original characters
      * @deprecated As of 1.4, use {@link #decodeNode(String)} or {@link #decodeAttribute(String)} instead.
      */
-    @Deprecated
-    public String unescapeXmlName(final String name) {
+    public String unescapeXmlName(String name) {
         return decodeNode(name);
     }
 
@@ -61,8 +59,7 @@ public abstract class AbstractXmlReader extends AbstractReader /* implements Xml
      * @return An escaped name with original characters
      * @deprecated As of 1.4, use {@link AbstractReader} instead.
      */
-    @Deprecated
-    protected String escapeXmlName(final String name) {
+    protected String escapeXmlName(String name) {
         return encodeNode(name);
     }
 

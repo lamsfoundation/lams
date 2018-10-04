@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2014 XStream Committers.
+ * Copyright (C) 2013, 2016 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,6 +10,7 @@
  */
 package com.thoughtworks.xstream.converters.extended;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -19,6 +20,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
+import com.thoughtworks.xstream.core.JVM;
 import com.thoughtworks.xstream.core.util.HierarchicalStreams;
 import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -29,11 +31,13 @@ import com.thoughtworks.xstream.mapper.Mapper;
 /**
  * A map converter that uses predefined names for its elements.
  * <p>
- * To be used as local converter. Note, suppress the usage of the implicit type argument, if registered with annotation.
- * Depending on the constructor arguments it is possible to support various formats:
+ * To be used as local converter. Note, suppress the usage of the implicit type argument, if
+ * registered with annotation. Depending on the constructor arguments it is possible to support
+ * various formats:
  * </p>
  * <ul>
- * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value", Integer.class);
+ * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value",
+ * Integer.class);
  * 
  * <pre>
  * &lt;map&gt;
@@ -45,7 +49,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * </pre>
  * 
  * </li>
- * <li>new NamedMapConverter(xstream.getMapper(), null, "key", String.class, "value", Integer.class);
+ * <li>new NamedMapConverter(xstream.getMapper(), null, "key", String.class, "value",
+ * Integer.class);
  * 
  * <pre>
  * &lt;map&gt;
@@ -55,8 +60,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * </pre>
  * 
  * </li>
- * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value", Integer.class, true, true,
- * xstream.getConverterLookup());
+ * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value",
+ * Integer.class, true, true, xstream.getConverterLookup());
  * 
  * <pre>
  * &lt;map&gt;
@@ -65,8 +70,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * </pre>
  * 
  * </li>
- * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value", Integer.class, true, false,
- * xstream.getConverterLookup());
+ * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value",
+ * Integer.class, true, false, xstream.getConverterLookup());
  * 
  * <pre>
  * &lt;map&gt;
@@ -77,8 +82,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * </pre>
  * 
  * </li>
- * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value", Integer.class, false, true,
- * xstream.getConverterLookup());
+ * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, "value",
+ * Integer.class, false, true, xstream.getConverterLookup());
  * 
  * <pre>
  * &lt;map&gt;
@@ -89,8 +94,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * </pre>
  * 
  * </li>
- * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, null, Integer.class, true, false,
- * xstream.getConverterLookup());
+ * <li>new NamedMapConverter(xstream.getMapper(), "entry", "key", String.class, null,
+ * Integer.class, true, false, xstream.getConverterLookup());
  * 
  * <pre>
  * &lt;map&gt;
@@ -108,9 +113,9 @@ public class NamedMapConverter extends MapConverter {
 
     private final String entryName;
     private final String keyName;
-    private final Class<?> keyType;
+    private final Class keyType;
     private final String valueName;
-    private final Class<?> valueType;
+    private final Class valueType;
     private final boolean keyAsAttribute;
     private final boolean valueAsAttribute;
     private final ConverterLookup lookup;
@@ -128,8 +133,8 @@ public class NamedMapConverter extends MapConverter {
      * @since 1.4.5
      */
     public NamedMapConverter(
-            final Mapper mapper, final String entryName, final String keyName, final Class<?> keyType,
-            final String valueName, final Class<?> valueType) {
+        Mapper mapper, String entryName, String keyName, Class keyType, String valueName,
+        Class valueType) {
         this(mapper, entryName, keyName, keyType, valueName, valueType, false, false, null);
     }
 
@@ -146,9 +151,10 @@ public class NamedMapConverter extends MapConverter {
      * @since 1.4.5
      */
     public NamedMapConverter(
-            @SuppressWarnings("rawtypes") final Class<? extends Map> type, final Mapper mapper, final String entryName,
-            final String keyName, final Class<?> keyType, final String valueName, final Class<?> valueType) {
-        this(type, mapper, entryName, keyName, keyType, valueName, valueType, false, false, null);
+        Class type, Mapper mapper, String entryName, String keyName, Class keyType,
+        String valueName, Class valueType) {
+        this(
+            type, mapper, entryName, keyName, keyType, valueName, valueType, false, false, null);
     }
 
     /**
@@ -166,10 +172,12 @@ public class NamedMapConverter extends MapConverter {
      * @since 1.4.5
      */
     public NamedMapConverter(
-            final Mapper mapper, final String entryName, final String keyName, final Class<?> keyType,
-            final String valueName, final Class<?> valueType, final boolean keyAsAttribute,
-            final boolean valueAsAttribute, final ConverterLookup lookup) {
-        this(null, mapper, entryName, keyName, keyType, valueName, valueType, keyAsAttribute, valueAsAttribute, lookup);
+        Mapper mapper, String entryName, String keyName, Class keyType, String valueName,
+        Class valueType, boolean keyAsAttribute, boolean valueAsAttribute,
+        ConverterLookup lookup) {
+        this(
+            null, mapper, entryName, keyName, keyType, valueName, valueType, keyAsAttribute,
+            valueAsAttribute, lookup);
     }
 
     /**
@@ -188,9 +196,9 @@ public class NamedMapConverter extends MapConverter {
      * @since 1.4.5
      */
     public NamedMapConverter(
-            @SuppressWarnings("rawtypes") final Class<? extends Map> type, final Mapper mapper, final String entryName,
-            final String keyName, final Class<?> keyType, final String valueName, final Class<?> valueType,
-            final boolean keyAsAttribute, final boolean valueAsAttribute, final ConverterLookup lookup) {
+        Class type, Mapper mapper, String entryName, String keyName, Class keyType,
+        String valueName, Class valueType, boolean keyAsAttribute, boolean valueAsAttribute,
+        ConverterLookup lookup) {
         super(mapper, type);
         this.entryName = entryName != null && entryName.length() == 0 ? null : entryName;
         this.keyName = keyName != null && keyName.length() == 0 ? null : keyName;
@@ -200,17 +208,19 @@ public class NamedMapConverter extends MapConverter {
         this.keyAsAttribute = keyAsAttribute;
         this.valueAsAttribute = valueAsAttribute;
         this.lookup = lookup;
-        enumMapper = UseAttributeForEnumMapper.createEnumMapper(mapper);
+        enumMapper = JVM.is15() ? UseAttributeForEnumMapper.createEnumMapper(mapper) : null;
 
         if (keyType == null || valueType == null) {
             throw new IllegalArgumentException("Class types of key and value are mandatory");
         }
         if (entryName == null) {
             if (keyAsAttribute || valueAsAttribute) {
-                throw new IllegalArgumentException("Cannot write attributes to map entry, if map entry must be omitted");
+                throw new IllegalArgumentException(
+                    "Cannot write attributes to map entry, if map entry must be omitted");
             }
             if (valueName == null) {
-                throw new IllegalArgumentException("Cannot write value as text of entry, if entry must be omitted");
+                throw new IllegalArgumentException(
+                    "Cannot write value as text of entry, if entry must be omitted");
             }
         }
         if (keyName == null) {
@@ -218,34 +228,37 @@ public class NamedMapConverter extends MapConverter {
         }
         if (valueName == null) {
             if (valueAsAttribute) {
-                throw new IllegalArgumentException("Cannot write value as attribute without name");
+                throw new IllegalArgumentException(
+                    "Cannot write value as attribute without name");
             } else if (!keyAsAttribute) {
-                throw new IllegalArgumentException("Cannot write value as text of entry, if key is also child element");
+                throw new IllegalArgumentException(
+                    "Cannot write value as text of entry, if key is also child element");
             }
         }
         if (keyAsAttribute && valueAsAttribute && keyName.equals(valueName)) {
-            throw new IllegalArgumentException("Cannot write key and value with same attribute name");
+            throw new IllegalArgumentException(
+                "Cannot write key and value with same attribute name");
         }
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
-        final Map<?, ?> map = (Map<?, ?>)source;
+    public void marshal(Object source, HierarchicalStreamWriter writer,
+        MarshallingContext context) {
+        Map map = (Map)source;
         SingleValueConverter keyConverter = null;
         SingleValueConverter valueConverter = null;
         if (keyAsAttribute) {
-            final SingleValueConverter singleValueConverter = getSingleValueConverter(keyType);
-            keyConverter = singleValueConverter;
+            keyConverter = getSingleValueConverter(keyType, "key");
         }
         if (valueAsAttribute || valueName == null) {
-            final SingleValueConverter singleValueConverter = getSingleValueConverter(valueType);
-            valueConverter = singleValueConverter;
+            valueConverter = getSingleValueConverter(valueType, "value");
         }
-        for (final Map.Entry<?, ?> entry : map.entrySet()) {
-            final Object key = entry.getKey();
-            final Object value = entry.getValue();
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry entry = (Map.Entry)iterator.next();
+            Object key = entry.getKey();
+            Object value = entry.getValue();
             if (entryName != null) {
-                ExtendedHierarchicalStreamWriterHelper.startNode(writer, entryName, entry.getClass());
+                ExtendedHierarchicalStreamWriterHelper.startNode(
+                    writer, entryName, entry.getClass());
                 if (keyConverter != null && key != null) {
                     writer.addAttribute(keyName, keyConverter.toString(key));
                 }
@@ -269,16 +282,15 @@ public class NamedMapConverter extends MapConverter {
         }
     }
 
-    @Override
-    protected void populateMap(final HierarchicalStreamReader reader, final UnmarshallingContext context,
-            final Map<?, ?> map, final Map<?, ?> target) {
+    protected void populateMap(HierarchicalStreamReader reader, UnmarshallingContext context,
+        Map map, Map target) {
         SingleValueConverter keyConverter = null;
         SingleValueConverter valueConverter = null;
         if (keyAsAttribute) {
-            keyConverter = getSingleValueConverter(keyType);
+            keyConverter = getSingleValueConverter(keyType, "key");
         }
         if (valueAsAttribute || valueName == null) {
-            valueConverter = getSingleValueConverter(valueType);
+            valueConverter = getSingleValueConverter(valueType, "value");
         }
 
         while (reader.hasMoreChildren()) {
@@ -289,14 +301,14 @@ public class NamedMapConverter extends MapConverter {
                 reader.moveDown();
 
                 if (keyConverter != null) {
-                    final String attribute = reader.getAttribute(keyName);
+                    String attribute = reader.getAttribute(keyName);
                     if (attribute != null) {
                         key = keyConverter.fromString(attribute);
                     }
                 }
 
                 if (valueAsAttribute && valueConverter != null) {
-                    final String attribute = reader.getAttribute(valueName);
+                    String attribute = reader.getAttribute(valueName);
                     if (attribute != null) {
                         value = valueConverter.fromString(attribute);
                     }
@@ -305,7 +317,9 @@ public class NamedMapConverter extends MapConverter {
 
             if (keyConverter == null) {
                 reader.moveDown();
-                if (valueConverter == null && !keyName.equals(valueName) && reader.getNodeName().equals(valueName)) {
+                if (valueConverter == null
+                    && !keyName.equals(valueName)
+                    && reader.getNodeName().equals(valueName)) {
                     value = readItem(valueType, reader, context, map);
                 } else {
                     key = readItem(keyType, reader, context, map);
@@ -322,12 +336,10 @@ public class NamedMapConverter extends MapConverter {
                 }
                 reader.moveUp();
             } else if (!valueAsAttribute) {
-                value = reader.getValue();
+                value = valueConverter.fromString(reader.getValue());
             }
 
-            @SuppressWarnings("unchecked")
-            final Map<Object, Object> targetMap = (Map<Object, Object>)target;
-            targetMap.put(key, value);
+            target.put(key, value);
 
             if (entryName != null) {
                 reader.moveUp();
@@ -335,26 +347,27 @@ public class NamedMapConverter extends MapConverter {
         }
     }
 
-    private SingleValueConverter getSingleValueConverter(final Class<?> type) {
-        SingleValueConverter conv = Enum.class.isAssignableFrom(type) ? enumMapper.getConverterFromItemType(null, type,
-            null) : mapper().getConverterFromItemType(null, type, null);
+    private SingleValueConverter getSingleValueConverter(Class type, String part) {
+        SingleValueConverter conv = UseAttributeForEnumMapper.isEnum(type) ? enumMapper
+            .getConverterFromItemType(null, type, null) : mapper().getConverterFromItemType(
+            null, type, null);
         if (conv == null) {
-            final Converter converter = lookup.lookupConverterForType(type);
+            Converter converter = lookup.lookupConverterForType(type);
             if (converter instanceof SingleValueConverter) {
                 conv = (SingleValueConverter)converter;
             } else {
-                throw new ConversionException("No SingleValueConverter for key available");
+                throw new ConversionException("No SingleValueConverter for " + part +  " available");
             }
         }
         return conv;
     }
 
-    protected void writeItem(final String name, final Class<?> type, final Object item,
-            final MarshallingContext context, final HierarchicalStreamWriter writer) {
-        final Class<?> itemType = item == null ? Mapper.Null.class : item.getClass();
+    protected void writeItem(String name, Class type, Object item, MarshallingContext context,
+        HierarchicalStreamWriter writer) {
+        Class itemType = item == null ? Mapper.Null.class : item.getClass();
         ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, itemType);
         if (!itemType.equals(type)) {
-            final String attributeName = mapper().aliasForSystemAttribute("class");
+            String attributeName = mapper().aliasForSystemAttribute("class");
             if (attributeName != null) {
                 writer.addAttribute(attributeName, mapper().serializedClass(itemType));
             }
@@ -365,10 +378,10 @@ public class NamedMapConverter extends MapConverter {
         writer.endNode();
     }
 
-    protected Object readItem(final Class<?> type, final HierarchicalStreamReader reader,
-            final UnmarshallingContext context, final Object current) {
-        final String className = HierarchicalStreams.readClassAttribute(reader, mapper());
-        final Class<?> itemType = className == null ? type : mapper().realClass(className);
+    protected Object readItem(Class type, HierarchicalStreamReader reader,
+        UnmarshallingContext context, Object current) {
+        String className = HierarchicalStreams.readClassAttribute(reader, mapper());
+        Class itemType = className == null ? type : mapper().realClass(className);
         if (Mapper.Null.class.equals(itemType)) {
             return null;
         } else {

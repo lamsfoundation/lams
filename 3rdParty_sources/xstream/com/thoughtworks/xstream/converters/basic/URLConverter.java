@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,29 +11,26 @@
  */
 package com.thoughtworks.xstream.converters.basic;
 
+import com.thoughtworks.xstream.converters.ConversionException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.thoughtworks.xstream.converters.ConversionException;
-
-
 /**
- * Converts a {@link URL} to a string.
- * 
+ * Converts a java.net.URL to a string.
+ *
  * @author J. Matthew Pryor
  */
 public class URLConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(URL.class);
     }
 
-    @Override
-    public Object fromString(final String str) {
+    public Object fromString(String str) {
         try {
             return new URL(str);
-        } catch (final MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new ConversionException(e);
         }
     }

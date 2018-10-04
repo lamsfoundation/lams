@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,28 +10,30 @@
  * Created on 06. April 2005 by Joe Walnes
  */
 
-package com.thoughtworks.xstream.converters.enums;
+// ***** READ THIS *****
+// This class will only compile with JDK 1.5.0 or above as it test Java enums.
+// If you are using an earlier version of Java, just don't try to build this class. XStream should work fine without it.
 
-import java.lang.reflect.Field;
-import java.util.EnumSet;
+package com.thoughtworks.xstream.converters.enums;
 
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.core.util.Fields;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.core.util.Fields;
 
+import java.lang.reflect.Field;
+import java.util.EnumSet;
+import java.util.Iterator;
 
 /**
- * Converts an {@link EnumSet}.
- * <p>
- * If a SecurityManager is set, the converter will only work with permissions for SecurityManager.checkPackageAccess,
- * SecurityManager.checkMemberAccess(this, EnumSet.MEMBER) and ReflectPermission("suppressAccessChecks").
- * </p>
- * 
+ * Serializes a Java 5 EnumSet. If a SecurityManager is set, the converter will only work with permissions
+ * for SecurityManager.checkPackageAccess, SecurityManager.checkMemberAccess(this, EnumSet.MEMBER)
+ * and ReflectPermission("suppressAccessChecks").   
+ *
  * @author Joe Walnes
  * @author J&ouml;rg Schaible
  */
@@ -40,30 +42,29 @@ public class EnumSetConverter implements Converter {
     private final static Field typeField = Fields.locate(EnumSet.class, Class.class, false);
     private final Mapper mapper;
 
-    public EnumSetConverter(final Mapper mapper) {
+    public EnumSetConverter(Mapper mapper) {
         this.mapper = mapper;
     }
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return typeField != null && EnumSet.class.isAssignableFrom(type);
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
-        final EnumSet<?> set = (EnumSet<?>)source;
-        final Class<?> enumTypeForSet = (Class<?>)Fields.read(typeField, set);
-        final String attributeName = mapper.aliasForSystemAttribute("enum-type");
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        EnumSet set = (EnumSet) source;
+        Class enumTypeForSet = (Class) Fields.read(typeField, set);
+        String attributeName = mapper.aliasForSystemAttribute("enum-type");
         if (attributeName != null) {
             writer.addAttribute(attributeName, mapper.serializedClass(enumTypeForSet));
         }
         writer.setValue(joinEnumValues(set));
     }
 
-    private String joinEnumValues(final EnumSet<?> set) {
+    private String joinEnumValues(EnumSet set) {
         boolean seenFirst = false;
-        final StringBuilder result = new StringBuilder();
-        for (final Enum<?> value : set) {
+        StringBuffer result = new StringBuffer();
+        for (Iterator iterator = set.iterator(); iterator.hasNext();) {
+            Enum value = (Enum) iterator.next();
             if (seenFirst) {
                 result.append(',');
             } else {
@@ -74,26 +75,19 @@ public class EnumSetConverter implements Converter {
         return result.toString();
     }
 
-    @Override
-    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
-        final String attributeName = mapper.aliasForSystemAttribute("enum-type");
+    @SuppressWarnings("unchecked")
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        String attributeName = mapper.aliasForSystemAttribute("enum-type");
         if (attributeName == null) {
             throw new ConversionException("No EnumType specified for EnumSet");
         }
-        @SuppressWarnings("rawtypes")
-        final Class enumTypeForSet = mapper.realClass(reader.getAttribute(attributeName));
-        @SuppressWarnings("unchecked")
-        final EnumSet<?> set = create(enumTypeForSet, reader.getValue());
-        return set;
-    }
-
-    private <T extends Enum<T>> EnumSet<T> create(final Class<T> type, final String s) {
-        final String[] enumValues = s.split(",");
-        final EnumSet<T> set = EnumSet.noneOf(type);
-        for (final String enumValue : enumValues) {
-            if (enumValue.length() > 0) {
-                final T value = Enum.valueOf(type, enumValue);
-                set.add(value);
+        Class enumTypeForSet = mapper.realClass(reader.getAttribute(attributeName));
+        EnumSet set = EnumSet.noneOf(enumTypeForSet);
+        String[] enumValues = reader.getValue().split(",");
+        for (int i = 0; i < enumValues.length; i++) {
+            String enumValue = enumValues[i];
+            if(enumValue.length() > 0) {
+                set.add(Enum.valueOf(enumTypeForSet, enumValue));
             }
         }
         return set;

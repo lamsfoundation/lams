@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2009, 2011, 2014, 2015 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,13 +10,12 @@
  */
 package com.thoughtworks.xstream.io.xml;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.ctc.wstx.stax.WstxOutputFactory;
 import com.thoughtworks.xstream.io.naming.NameCoder;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 
 /**
  * A driver using the Woodstox StAX implementation.
@@ -33,43 +32,41 @@ public class WstxDriver extends StaxDriver {
     /**
      * @deprecated As of 1.4.6 use {@link #WstxDriver(QNameMap, NameCoder)}
      */
-    @Deprecated
-    public WstxDriver(final QNameMap qnameMap, final XmlFriendlyNameCoder nameCoder) {
+    public WstxDriver(QNameMap qnameMap, XmlFriendlyNameCoder nameCoder) {
         super(qnameMap, nameCoder);
     }
 
     /**
      * @since 1.4.6
      */
-    public WstxDriver(final QNameMap qnameMap, final NameCoder nameCoder) {
+    public WstxDriver(QNameMap qnameMap, NameCoder nameCoder) {
         super(qnameMap, nameCoder);
     }
 
-    public WstxDriver(final QNameMap qnameMap) {
+    public WstxDriver(QNameMap qnameMap) {
         super(qnameMap);
     }
 
     /**
      * @deprecated As of 1.4.6 use {@link #WstxDriver(NameCoder)}
      */
-    @Deprecated
-    public WstxDriver(final XmlFriendlyNameCoder nameCoder) {
+    public WstxDriver(XmlFriendlyNameCoder nameCoder) {
         super(nameCoder);
     }
 
     /**
      * @since 1.4.6
      */
-    public WstxDriver(final NameCoder nameCoder) {
+    public WstxDriver(NameCoder nameCoder) {
         super(nameCoder);
     }
 
-    @Override
     protected XMLInputFactory createInputFactory() {
-        return new WstxInputFactory();
+        final XMLInputFactory instance = new WstxInputFactory();
+        instance.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+        return instance;
     }
 
-    @Override
     protected XMLOutputFactory createOutputFactory() {
         return new WstxOutputFactory();
     }

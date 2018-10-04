@@ -363,7 +363,6 @@
 		    function submitWiki(actionMethod)
 			{
 			  		document.forms.monitoringForm.action=actionMethod+".do"; 
-			  		document.forms.monitoringForm.submit();
 			  		replaceJavascriptTokenAndSubmit("monitoringForm");
 			}
 			

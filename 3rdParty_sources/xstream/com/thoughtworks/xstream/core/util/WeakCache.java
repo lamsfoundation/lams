@@ -23,26 +23,26 @@ import java.util.WeakHashMap;
 
 
 /**
- * A HashMap implementation with weak references values and by default for the key. When the value is garbage collected,
- * the key will also vanish from the map.
+ * A HashMap implementation with weak references values and by default for the key. When the
+ * value is garbage collected, the key will also vanish from the map.
  * 
  * @author J&ouml;rg Schaible
  * @since 1.4
  */
-public class WeakCache<K, V> extends AbstractMap<K, V> {
+public class WeakCache extends AbstractMap {
 
-    private final Map<K, Reference<V>> map;
+    private final Map map;
 
     /**
      * Construct a WeakCache with weak keys.
-     * <p>
-     * Note, that the internally used WeakHashMap is <b>not</b> thread-safe.
-     * </p>
      * 
+     * <p>Note, that the internally used WeakHashMap is <b>not</b> thread-safe.</p>
+     * 
+     * @param map the map to use
      * @since 1.4
      */
     public WeakCache() {
-        this(new WeakHashMap<K, Reference<V>>());
+        this(new WeakHashMap());
     }
 
     /**
@@ -51,46 +51,40 @@ public class WeakCache<K, V> extends AbstractMap<K, V> {
      * @param map the map to use
      * @since 1.4
      */
-    public WeakCache(final Map<K, Reference<V>> map) {
+    public WeakCache(Map map) {
         this.map = map;
     }
 
-    @Override
-    public V get(final Object key) {
-        final Reference<V> reference = map.get(key);
+    public Object get(Object key) {
+        Reference reference = (Reference)map.get(key);
         return reference != null ? reference.get() : null;
     }
 
-    @Override
-    public V put(final K key, final V value) {
-        final Reference<V> ref = map.put(key, createReference(value));
+    public Object put(Object key, Object value) {
+        Reference ref = (Reference)map.put(key, createReference(value));
         return ref == null ? null : ref.get();
     }
 
-    @Override
-    public V remove(final Object key) {
-        final Reference<V> ref = map.remove(key);
+    public Object remove(Object key) {
+        Reference ref = (Reference)map.remove(key);
         return ref == null ? null : ref.get();
     }
 
-    protected Reference<V> createReference(final V value) {
-        return new WeakReference<V>(value);
+    protected Reference createReference(Object value) {
+        return new WeakReference(value);
     }
 
-    @Override
     public boolean containsValue(final Object value) {
-        final Boolean result = (Boolean)iterate(new Visitor() {
+        Boolean result = (Boolean)iterate(new Visitor() {
 
-            @Override
-            public Object visit(final Object element) {
+            public Object visit(Object element) {
                 return element.equals(value) ? Boolean.TRUE : null;
             }
 
-        }, Visitor.Type.value);
+        }, 0);
         return result == Boolean.TRUE;
     }
 
-    @Override
     public int size() {
         if (map.size() == 0) {
             return 0;
@@ -99,60 +93,49 @@ public class WeakCache<K, V> extends AbstractMap<K, V> {
         i[0] = 0;
         iterate(new Visitor() {
 
-            @Override
-            public Object visit(final Object element) {
+            public Object visit(Object element) {
                 ++i[0];
                 return null;
             }
 
-        }, Visitor.Type.key);
+        }, 0);
         return i[0];
     }
 
-    @Override
-    public Collection<V> values() {
-        final Collection<V> collection = new ArrayList<V>();
+    public Collection values() {
+        final Collection collection = new ArrayList();
         if (map.size() != 0) {
             iterate(new Visitor() {
 
-                @Override
-                public Object visit(final Object element) {
-                    @SuppressWarnings("unchecked")
-                    final V value = (V)element;
-                    collection.add(value);
+                public Object visit(Object element) {
+                    collection.add(element);
                     return null;
                 }
 
-            }, Visitor.Type.value);
+            }, 0);
         }
         return collection;
     }
 
-    @Override
-    public Set<Map.Entry<K, V>> entrySet() {
-        final Set<Map.Entry<K, V>> set = new HashSet<Map.Entry<K, V>>();
+    public Set entrySet() {
+        final Set set = new HashSet();
         if (map.size() != 0) {
             iterate(new Visitor() {
 
-                @Override
-                public Object visit(final Object element) {
-                    @SuppressWarnings("unchecked")
-                    final Map.Entry<K, Reference<V>> entry = (Map.Entry<K, Reference<V>>)element;
-                    set.add(new Map.Entry<K, V>() {
+                public Object visit(Object element) {
+                    final Map.Entry entry = (Map.Entry)element;
+                    set.add(new Map.Entry() {
 
-                        @Override
-                        public K getKey() {
+                        public Object getKey() {
                             return entry.getKey();
                         }
 
-                        @Override
-                        public V getValue() {
-                            return entry.getValue().get();
+                        public Object getValue() {
+                            return ((Reference)entry.getValue()).get();
                         }
 
-                        @Override
-                        public V setValue(final V value) {
-                            final Reference<V> reference = entry.setValue(createReference(value));
+                        public Object setValue(Object value) {
+                            Reference reference = (Reference)entry.setValue(createReference(value));
                             return reference != null ? reference.get() : null;
                         }
 
@@ -160,30 +143,29 @@ public class WeakCache<K, V> extends AbstractMap<K, V> {
                     return null;
                 }
 
-            }, Visitor.Type.entry);
+            }, 2);
         }
         return set;
     }
 
-    private Object iterate(final Visitor visitor, final Visitor.Type type) {
+    private Object iterate(Visitor visitor, int type) {
         Object result = null;
-        for (final Iterator<Map.Entry<K, Reference<V>>> iter = map.entrySet().iterator(); result == null
-            && iter.hasNext();) {
-            final Map.Entry<K, Reference<V>> entry = iter.next();
-            final Reference<V> reference = entry.getValue();
-            final V element = reference.get();
+        for (Iterator iter = map.entrySet().iterator(); result == null && iter.hasNext();) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            Reference reference = (Reference)entry.getValue();
+            Object element = reference.get();
             if (element == null) {
                 iter.remove();
                 continue;
             }
             switch (type) {
-            case value:
+            case 0:
                 result = visitor.visit(element);
                 break;
-            case key:
+            case 1:
                 result = visitor.visit(entry.getKey());
                 break;
-            case entry:
+            case 2:
                 result = visitor.visit(entry);
                 break;
             }
@@ -191,38 +173,31 @@ public class WeakCache<K, V> extends AbstractMap<K, V> {
         }
         return result;
     }
-    
+
     private interface Visitor {
-        enum Type {key, value, entry};
         Object visit(Object element);
     }
 
-    @Override
-    public boolean containsKey(final Object key) {
+    public boolean containsKey(Object key) {
         return map.containsKey(key);
     }
 
-    @Override
     public void clear() {
         map.clear();
     }
 
-    @Override
-    public Set<K> keySet() {
+    public Set keySet() {
         return map.keySet();
     }
 
-    @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return map.equals(o);
     }
 
-    @Override
     public int hashCode() {
         return map.hashCode();
     }
 
-    @Override
     public String toString() {
         return map.toString();
     }

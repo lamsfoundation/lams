@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -13,21 +13,19 @@ package com.thoughtworks.xstream.converters.basic;
 
 import java.math.BigDecimal;
 
-
 /**
- * Converts a {@link BigDecimal} to a string, retaining its precision.
- * 
+ * Converts a java.math.BigDecimal to a String, retaining
+ * its precision.
+ *
  * @author Joe Walnes
  */
 public class BigDecimalConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(BigDecimal.class);
     }
 
-    @Override
-    public Object fromString(final String str) {
+    public Object fromString(String str) {
         return new BigDecimal(str);
     }
 

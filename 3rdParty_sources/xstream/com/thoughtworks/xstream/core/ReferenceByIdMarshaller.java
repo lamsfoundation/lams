@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -16,8 +16,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.path.Path;
 import com.thoughtworks.xstream.mapper.Mapper;
 
-
-public class ReferenceByIdMarshaller extends AbstractReferenceMarshaller<String> {
+public class ReferenceByIdMarshaller extends AbstractReferenceMarshaller {
 
     private final IDGenerator idGenerator;
 
@@ -25,31 +24,30 @@ public class ReferenceByIdMarshaller extends AbstractReferenceMarshaller<String>
         String next(Object item);
     }
 
-    public ReferenceByIdMarshaller(
-            final HierarchicalStreamWriter writer, final ConverterLookup converterLookup, final Mapper mapper,
-            final IDGenerator idGenerator) {
+    public ReferenceByIdMarshaller(HierarchicalStreamWriter writer,
+                                   ConverterLookup converterLookup,
+                                   Mapper mapper,
+                                   IDGenerator idGenerator) {
         super(writer, converterLookup, mapper);
         this.idGenerator = idGenerator;
     }
 
-    public ReferenceByIdMarshaller(
-            final HierarchicalStreamWriter writer, final ConverterLookup converterLookup, final Mapper mapper) {
+    public ReferenceByIdMarshaller(HierarchicalStreamWriter writer,
+                                   ConverterLookup converterLookup,
+                                   Mapper mapper) {
         this(writer, converterLookup, mapper, new SequenceGenerator(1));
     }
 
-    @Override
-    protected String createReference(final Path currentPath, final String existingReferenceKey) {
+    protected String createReference(Path currentPath, Object existingReferenceKey) {
         return existingReferenceKey.toString();
     }
 
-    @Override
-    protected String createReferenceKey(final Path currentPath, final Object item) {
+    protected Object createReferenceKey(Path currentPath, Object item) {
         return idGenerator.next(item);
     }
 
-    @Override
-    protected void fireValidReference(final String referenceKey) {
-        final String attributeName = getMapper().aliasForSystemAttribute("id");
+    protected void fireValidReference(Object referenceKey) {
+        String attributeName = getMapper().aliasForSystemAttribute("id");
         if (attributeName != null) {
             writer.addAttribute(attributeName, referenceKey.toString());
         }

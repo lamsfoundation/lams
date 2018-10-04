@@ -526,7 +526,6 @@
       function submitWiki(actionMethod)
 	  	{
 	  		document.forms.learningForm.action=actionMethod+".do"; 
-	  		document.forms.learningForm.submit();
 	  		replaceJavascriptTokenAndSubmit("learningForm");
 	  	}
 

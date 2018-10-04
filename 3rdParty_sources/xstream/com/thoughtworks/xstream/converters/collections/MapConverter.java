@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004, 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2010, 2011, 2012, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2010, 2011, 2012, 2013 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,12 +11,6 @@
  */
 package com.thoughtworks.xstream.converters.collections;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
@@ -24,64 +18,61 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * Converts a {@link Map}, specifying an 'entry' element with 'key' and 'value' children.
- * <p>
- * Note: 'key' and 'value' is not the name of the generated tag. The children are serialized as normal elements and the
- * implementation expects them in the order 'key'/'value'.
- * </p>
- * <p>
- * Supports {@link HashMap}, {@link Hashtable}, {@link LinkedHashMap}, {@link ConcurrentHashMap} and
- * sun.font.AttributeMap.
- * </p>
- * 
- * @see com.thoughtworks.xstream.converters.extended.NamedMapConverter
+ * Converts a java.util.Map to XML, specifying an 'entry'
+ * element with 'key' and 'value' children.
+ * <p>Note: 'key' and 'value' is not the name of the generated tag. The
+ * children are serialized as normal elements and the implementation expects
+ * them in the order 'key'/'value'.</p>
+ * <p>Supports java.util.HashMap, java.util.Hashtable,
+ * java.util.LinkedHashMap and java.util.concurrent.ConcurrentHashMap.</p>
+ *
  * @author Joe Walnes
  */
 public class MapConverter extends AbstractCollectionConverter {
 
-    private final Class<? extends Map<?, ?>> type;
+    private final Class type;
 
-    public MapConverter(final Mapper mapper) {
+    public MapConverter(Mapper mapper) {
         this(mapper, null);
     }
 
     /**
      * Construct a MapConverter for a special Map type.
-     * 
      * @param mapper the mapper
      * @param type the type to handle
      * @since 1.4.5
      */
-    public MapConverter(final Mapper mapper, @SuppressWarnings("rawtypes") final Class<? extends Map> type) {
+    public MapConverter(Mapper mapper, Class type) {
         super(mapper);
-        @SuppressWarnings("unchecked")
-        final Class<? extends Map<?, ?>> checkedType = (Class<? extends Map<?, ?>>)type;
-        this.type = checkedType;
+        this.type = type;
         if (type != null && !Map.class.isAssignableFrom(type)) {
             throw new IllegalArgumentException(type + " not of type " + Map.class);
         }
     }
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         if (this.type != null) {
             return type.equals(this.type);
         }
         return type.equals(HashMap.class)
             || type.equals(Hashtable.class)
-            || type.equals(LinkedHashMap.class)
-            || type.equals(ConcurrentHashMap.class)
-            || type.getName().equals("sun.font.AttributeMap") // Used by java.awt.Font since JDK 6
-        ;
+            || type.getName().equals("java.util.LinkedHashMap")
+            || type.getName().equals("java.util.concurrent.ConcurrentHashMap")
+            || type.getName().equals("sun.font.AttributeMap") // Used by java.awt.Font in JDK 6
+            ;
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
-        final Map<?, ?> map = (Map<?, ?>)source;
-        final String entryName = mapper().serializedClass(Map.Entry.class);
-        for (final Map.Entry<?, ?> entry : map.entrySet()) {
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        Map map = (Map) source;
+        String entryName = mapper().serializedClass(Map.Entry.class);
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+            Map.Entry entry = (Map.Entry) iterator.next();
             ExtendedHierarchicalStreamWriterHelper.startNode(writer, entryName, entry.getClass());
 
             writeItem(entry.getKey(), context, writer);
@@ -91,21 +82,17 @@ public class MapConverter extends AbstractCollectionConverter {
         }
     }
 
-    @Override
-    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
-        final Class<?> requiredType = context.getRequiredType();
-        final Map<?, ?> map = createCollection(requiredType);
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        Map map = (Map) createCollection(context.getRequiredType());
         populateMap(reader, context, map);
         return map;
     }
 
-    protected void populateMap(final HierarchicalStreamReader reader, final UnmarshallingContext context,
-            final Map<?, ?> map) {
+    protected void populateMap(HierarchicalStreamReader reader, UnmarshallingContext context, Map map) {
         populateMap(reader, context, map, map);
     }
 
-    protected void populateMap(final HierarchicalStreamReader reader, final UnmarshallingContext context,
-            final Map<?, ?> map, final Map<?, ?> target) {
+    protected void populateMap(HierarchicalStreamReader reader, UnmarshallingContext context, Map map, Map target) {
         while (reader.hasMoreChildren()) {
             reader.moveDown();
             putCurrentEntryIntoMap(reader, context, map, target);
@@ -113,23 +100,20 @@ public class MapConverter extends AbstractCollectionConverter {
         }
     }
 
-    protected void putCurrentEntryIntoMap(final HierarchicalStreamReader reader, final UnmarshallingContext context,
-            final Map<?, ?> map, final Map<?, ?> target) {
+    protected void putCurrentEntryIntoMap(HierarchicalStreamReader reader, UnmarshallingContext context,
+        Map map, Map target) {
         reader.moveDown();
-        final Object key = readItem(reader, context, map);
+        Object key = readItem(reader, context, map);
         reader.moveUp();
 
         reader.moveDown();
-        final Object value = readItem(reader, context, map);
+        Object value = readItem(reader, context, map);
         reader.moveUp();
 
-        @SuppressWarnings("unchecked")
-        final Map<Object, Object> targetMap = (Map<Object, Object>)target;
-        targetMap.put(key, value);
+        target.put(key, value);
     }
 
-    @Override
-    protected Map<?, ?> createCollection(final Class<?> type) {
-        return (Map<?, ?>)super.createCollection(this.type != null ? this.type : type);
+    protected Object createCollection(Class type) {
+        return super.createCollection(this.type != null ? this.type : type);
     }
 }

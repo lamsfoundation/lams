@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2014 XStream Committers.
+ * Copyright (C) 2008 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,19 +11,17 @@
 package com.thoughtworks.xstream.converters.basic;
 
 /**
- * Converts the contents of a {@link StringBuilder} to a string.
- * 
+ * Converts the contents of a StringBuilder to XML.
+ *
  * @author J&ouml;rg Schaible
  */
 public class StringBuilderConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
-        return type.equals(StringBuilder.class);
+    public Object fromString(String str) {
+        return new StringBuilder(str);
     }
 
-    @Override
-    public Object fromString(final String str) {
-        return new StringBuilder(str);
+    public boolean canConvert(Class type) {
+        return type.equals(StringBuilder.class);
     }
 }
