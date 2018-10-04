@@ -989,12 +989,6 @@ public class LessonManagerServlet extends HttpServlet {
 	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, null,
 		    method);
 
-	    if (lessonService == null) {
-		lessonService = (ILessonService) WebApplicationContextUtils
-			.getRequiredWebApplicationContext(request.getSession().getServletContext())
-			.getBean("lessonService");
-	    }
-
 	    User user = userMap.getUser();
 	    if (user == null) {
 		String error = "Unable to add user to lesson class as user is missing from the user map";

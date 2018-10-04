@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.UserRolesForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -43,45 +42,33 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 public class UserRolesController {
-
     private static Logger log = Logger.getLogger(UserRolesController.class);
-    private static IUserManagementService service;
-    private static MessageService messageService;
-    private static List<Role> rolelist;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
+    
+    private static List<Role> rolelist;
 
     @RequestMapping("/userroles")
     public String execute(@ModelAttribute UserRolesForm userRolesForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 	if (rolelist == null) {
-	    rolelist = service.findAll(Role.class);
+	    rolelist = userManagementService.findAll(Role.class);
 	    Collections.sort(rolelist);
 	}
 
@@ -114,19 +101,19 @@ public class UserRolesController {
 	log.debug("editing roles for userId: " + userId + " and orgId: " + orgId);
 
 	// test requestor's permission
-	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
-	User user = (User) service.findById(User.class, userId);
+	Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
+	User user = (User) userManagementService.findById(User.class, userId);
 	OrganisationType orgType = org.getOrganisationType();
 	Integer orgIdOfCourse = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE))
 		? org.getParentOrganisation().getOrganisationId()
 		: orgId;
 	Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
-	User requestor = service.getUserByLogin(request.getRemoteUser());
-	Integer rootOrgId = service.getRootOrganisation().getOrganisationId();
-	Boolean requestorHasRole = service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)
-		|| (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
+	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	Boolean requestorHasRole = userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)
+		|| (userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
 			&& !rootOrgId.equals(orgId))
-		|| (service.isUserGlobalGroupAdmin() && !rootOrgId.equals(orgId));
+		|| (userManagementService.isUserGlobalGroupAdmin() && !rootOrgId.equals(orgId));
 
 	if (!(requestorHasRole || isSysadmin)) {
 	    request.setAttribute("errorName", "UserRolesController");
@@ -137,18 +124,18 @@ public class UserRolesController {
 	userRolesForm.setUserId(userId);
 	userRolesForm.setOrgId(org.getOrganisationId());
 	// screen display vars
-	request.setAttribute("rolelist", service.filterRoles(rolelist, isSysadmin, orgType));
+	request.setAttribute("rolelist", userManagementService.filterRoles(rolelist, isSysadmin, orgType));
 	request.setAttribute("login", user.getLogin());
 	request.setAttribute("fullName", user.getFullName());
 	request.setAttribute("orgName", org.getName());
 	Organisation parentOrg = org.getParentOrganisation();
-	if (parentOrg != null && !parentOrg.equals(service.getRootOrganisation())) {
+	if (parentOrg != null && !parentOrg.equals(userManagementService.getRootOrganisation())) {
 	    request.setAttribute("pOrgId", parentOrg.getOrganisationId());
 	    request.setAttribute("parentName", parentOrg.getName());
 	}
 
 	String[] roles = null;
-	UserOrganisation uo = service.getUserOrganisation(userId, orgId);
+	UserOrganisation uo = userManagementService.getUserOrganisation(userId, orgId);
 	if (uo != null) {
 	    Iterator iter2 = uo.getUserOrganisationRoles().iterator();
 	    roles = new String[uo.getUserOrganisationRoles().size()];

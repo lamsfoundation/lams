@@ -26,54 +26,37 @@ package org.lamsfoundation.lams.admin.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.UserOrgForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Jun-Dir Liew
  *
  */
-
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- */
 @Controller
 public class UserOrgController {
-
     private static final Logger log = Logger.getLogger(UserOrgController.class);
-    private static IUserManagementService service;
-    private static MessageService messageService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/userorg")
     public String execute(@ModelAttribute UserOrgForm userOrgForm, HttpServletRequest request) throws Exception {
-
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	log.debug("orgId: " + orgId);
 	// get org name
-	Organisation organisation = (Organisation) service.findById(Organisation.class, orgId);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 
 	if ((orgId == null) || (orgId <= 0) || organisation == null) {
 	    request.setAttribute("errorName", "UserOrgController");
@@ -84,7 +67,7 @@ public class UserOrgController {
 	String orgName = organisation.getName();
 	log.debug("orgName: " + orgName);
 	Organisation parentOrg = organisation.getParentOrganisation();
-	if (parentOrg != null && !parentOrg.equals(service.getRootOrganisation())) {
+	if (parentOrg != null && !parentOrg.equals(userManagementService.getRootOrganisation())) {
 	    request.setAttribute("pOrgId", parentOrg.getOrganisationId());
 	    request.setAttribute("pOrgName", parentOrg.getName());
 	}

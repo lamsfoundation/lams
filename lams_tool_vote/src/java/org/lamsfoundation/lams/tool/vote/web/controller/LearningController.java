@@ -89,7 +89,6 @@ public class LearningController implements VoteAppConstants {
     private MessageService messageService;
 
     @Autowired
-    @Qualifier("voteService")
     private IVoteService voteService;
 
     @RequestMapping("/viewAllResults")

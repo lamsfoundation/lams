@@ -48,13 +48,11 @@ import org.springframework.web.context.WebApplicationContext;
 public class AdminController {
 
     @Autowired
-    @Qualifier("scratchieService")
     private IScratchieService scratchieService;
 
     @Autowired
     @Qualifier("scratchieMessageService")
     private MessageService messageService;
-
 
     @RequestMapping("/start")
     public String start(@ModelAttribute("scratchieAdminForm") AdminForm scratchieAdminForm,

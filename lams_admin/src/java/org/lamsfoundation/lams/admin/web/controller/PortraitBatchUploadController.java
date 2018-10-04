@@ -51,16 +51,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Controller
 public class PortraitBatchUploadController {
 
-    private static IUserManagementService userManagementService;
-    private static ISecurityService securityService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    private ISecurityService securityService;
 
     @RequestMapping("/uploadPortraits")
     @ResponseBody
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!getSecurityService().isSysadmin(getUserID(), "batch upload portraits", false)) {
+	if (!securityService.isSysadmin(getUserID(), "batch upload portraits", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
 	    return null;
 	}
@@ -69,7 +68,7 @@ public class PortraitBatchUploadController {
 	Integer maxUserId = WebUtil.readIntParam(request, "maxUserID");
 	String prefix = request.getParameter("prefix");
 
-	List<String> uploadedUserNames = getUserManagementService().uploadPortraits(minUserId, maxUserId, prefix);
+	List<String> uploadedUserNames = userManagementService.uploadPortraits(minUserId, maxUserId, prefix);
 	if (uploadedUserNames != null) {
 	    response.setCharacterEncoding("UTF-8");
 	    response.setContentType("text/plain");
@@ -88,23 +87,5 @@ public class PortraitBatchUploadController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user == null ? null : user.getUserID();
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return userManagementService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return securityService;
     }
 }

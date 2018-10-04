@@ -11,8 +11,6 @@ import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionServ
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,11 +21,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/TblMonitoring")
 public class TblMonitoringController {
-
     private static Logger log = Logger.getLogger(TblMonitoringController.class);
 
     @Autowired
-    @Qualifier(value = "leaderselectionService")
     private ILeaderselectionService leaderselectionService;
 
     /**

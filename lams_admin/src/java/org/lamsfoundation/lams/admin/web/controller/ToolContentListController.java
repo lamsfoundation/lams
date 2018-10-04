@@ -36,7 +36,6 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
@@ -47,16 +46,15 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -65,31 +63,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/toolcontentlist")
 public class ToolContentListController {
 
-    private static ILearningDesignService learningDesignService;
-    private static IUserManagementService userManagementService;
-    private static DataSource dataSource;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ILearningDesignService learningDesignService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    private DataSource dataSource;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request) throws Exception {
 	// check permission
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "ToolContentListAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
 
@@ -115,7 +109,7 @@ public class ToolContentListController {
 	}
 
 	// get learning library dtos and their validity
-	List<LearningLibraryDTO> learningLibraryDTOs = getLearningDesignService().getAllLearningLibraryDetails(false,
+	List<LearningLibraryDTO> learningLibraryDTOs = learningDesignService.getAllLearningLibraryDetails(false,
 		getUserLanguage());
 	// this is filled when executing following method, for efficiency purposes
 	HashMap<Long, Boolean> learningLibraryValidity = new HashMap<>(learningLibraryDTOs.size());
@@ -126,7 +120,7 @@ public class ToolContentListController {
 
 	// get tool versions
 	HashMap<Long, String> toolVersions = new HashMap<>();
-	List<Tool> tools = getUserManagementService().findAll(Tool.class);
+	List<Tool> tools = userManagementService.findAll(Tool.class);
 	for (Tool tool : tools) {
 	    toolVersions.put(tool.getToolId(), tool.getToolVersion());
 	}
@@ -134,7 +128,7 @@ public class ToolContentListController {
 
 	// get tool database versions
 	HashMap<String, Integer> dbVersions = new HashMap<>();
-	Connection conn = getDataSource().getConnection();
+	Connection conn = dataSource.getConnection();
 	PreparedStatement query = conn.prepareStatement("select system_name, patch_level from patches");
 	ResultSet results = query.executeQuery();
 	while (results.next()) {
@@ -191,11 +185,9 @@ public class ToolContentListController {
     }
 
     private boolean checkPriviledge(HttpServletRequest request) {
-	if (!getUserManagementService().isUserSysAdmin()) {
+	if (!userManagementService.isUserSysAdmin()) {
 	    request.setAttribute("errorName", "ToolContentListAction");
-	    request.setAttribute("errorMessage",
-		    AdminServiceProxy.getMessageService(applicationContext.getServletContext())
-			    .getMessage("error.no.sysadmin.priviledge"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.no.sysadmin.priviledge"));
 	    return false;
 	}
 	return true;
@@ -204,7 +196,7 @@ public class ToolContentListController {
     @RequestMapping("/disable")
     public String disableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
-	ILearningDesignService ldService = getLearningDesignService();
+	ILearningDesignService ldService = learningDesignService;
 	ldService.setValid(learningLibraryId, false);
 	return "forward:/toolcontentlist/start.do";
     }
@@ -212,7 +204,7 @@ public class ToolContentListController {
     @RequestMapping("/enable")
     public String enableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
-	ILearningDesignService ldService = getLearningDesignService();
+	ILearningDesignService ldService = learningDesignService;
 	ldService.setValid(learningLibraryId, true);
 	return "forward:/toolcontentlist/start.do";
     }
@@ -223,7 +215,7 @@ public class ToolContentListController {
     @RequestMapping(path = "/openLearningLibraryGroups")
     public String openLearningLibraryGroups(HttpServletRequest request) throws IOException {
 	// build full list of available learning libraries
-	List<LearningLibraryDTO> learningLibraries = getLearningDesignService()
+	List<LearningLibraryDTO> learningLibraries = learningDesignService
 		.getAllLearningLibraryDetails(getUserLanguage());
 	ArrayNode learningLibrariesJSON = JsonNodeFactory.instance.arrayNode();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
@@ -235,7 +227,7 @@ public class ToolContentListController {
 	request.setAttribute("learningLibraries", learningLibrariesJSON.toString());
 
 	// build list of existing groups
-	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
+	List<LearningLibraryGroup> groups = learningDesignService.getLearningLibraryGroups();
 	ArrayNode groupsJSON = JsonNodeFactory.instance.arrayNode();
 	for (LearningLibraryGroup group : groups) {
 	    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
@@ -274,42 +266,13 @@ public class ToolContentListController {
 	    ArrayNode learningLibrariesJSON = (ArrayNode) groupJSON.get("learningLibraries");
 	    for (JsonNode learningLibraryJSON : learningLibrariesJSON) {
 		long learningLibraryId = learningLibraryJSON.asLong();
-		LearningLibrary learningLibrary = getLearningDesignService().getLearningLibrary(learningLibraryId);
+		LearningLibrary learningLibrary = learningDesignService.getLearningLibrary(learningLibraryId);
 		group.getLearningLibraries().add(learningLibrary);
 	    }
 	}
 
-	getLearningDesignService().saveLearningLibraryGroups(groups);
+	learningDesignService.saveLearningLibraryGroups(groups);
 	
 	return "forward:/toolcontentlist/start.do";
-    }
-
-    private ILearningDesignService getLearningDesignService() {
-	if (ToolContentListController.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    ToolContentListController.learningDesignService = (ILearningDesignService) ctx
-		    .getBean("learningDesignService");
-	}
-	return ToolContentListController.learningDesignService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (ToolContentListController.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    ToolContentListController.userManagementService = (IUserManagementService) ctx
-		    .getBean("userManagementService");
-	}
-	return ToolContentListController.userManagementService;
-    }
-
-    private DataSource getDataSource() {
-	if (ToolContentListController.dataSource == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    ToolContentListController.dataSource = (DataSource) ctx.getBean("dataSource");
-	}
-	return ToolContentListController.dataSource;
     }
 }

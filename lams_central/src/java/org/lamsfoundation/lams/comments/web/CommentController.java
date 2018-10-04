@@ -65,20 +65,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/comments")
 public class CommentController {
-
     private static Logger log = Logger.getLogger(CommentController.class);
 
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userService;
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("commentService")
     private ICommentService commentService;
     @Autowired
-    @Qualifier("lamsCoreToolService")
-    private ILamsCoreToolService coreToolService;
+    private ILamsCoreToolService lamsCoreToolService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
 
     /**
@@ -183,7 +178,7 @@ public class CommentController {
     }
 
     private boolean learnerInToolSession(Long toolSessionId, User user) {
-	GroupedToolSession toolSession = (GroupedToolSession) coreToolService.getToolSessionById(toolSessionId);
+	GroupedToolSession toolSession = (GroupedToolSession) lamsCoreToolService.getToolSessionById(toolSessionId);
 	return toolSession.getSessionGroup().getUsers().contains(user);
     }
 
@@ -191,7 +186,7 @@ public class CommentController {
 
 	if (ToolAccessMode.TEACHER
 		.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)))) {
-	    GroupedToolSession toolSession = (GroupedToolSession) coreToolService.getToolSessionById(toolSessionId);
+	    GroupedToolSession toolSession = (GroupedToolSession) lamsCoreToolService.getToolSessionById(toolSessionId);
 	    return securityService.isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(),
 		    "Comment Monitoring Tasks", false);
 	} else {
@@ -660,7 +655,7 @@ public class CommentController {
      */
     private User getCurrentUser(HttpServletRequest request) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	return userService.getUserByLogin(user.getLogin());
+	return userManagementService.getUserByLogin(user.getLogin());
     }
 
 }

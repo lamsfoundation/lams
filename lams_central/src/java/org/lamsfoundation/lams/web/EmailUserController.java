@@ -59,14 +59,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/emailUser")
 public class EmailUserController {
-
     private static Logger log = Logger.getLogger(EmailUserController.class);
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
+    
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("eventNotificationService")
     private IEventNotificationService eventNotificationService;
     @Autowired
     @Qualifier("centralMessageService")

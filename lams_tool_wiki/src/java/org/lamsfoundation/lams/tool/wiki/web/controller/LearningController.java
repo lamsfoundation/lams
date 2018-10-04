@@ -60,7 +60,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,28 +72,16 @@ import org.springframework.web.context.WebApplicationContext;
  *
  *
  * @author lfoxton
- * @version
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/learning")
 public class LearningController extends WikiPageController {
-
     private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
     @Autowired
-    @Qualifier("wikiService")
     private IWikiService wikiService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 

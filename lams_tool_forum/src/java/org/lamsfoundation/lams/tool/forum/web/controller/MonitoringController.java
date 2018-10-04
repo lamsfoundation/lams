@@ -94,7 +94,6 @@ public class MonitoringController {
     private static Logger log = Logger.getLogger(MonitoringController.class);
 
     @Autowired
-    @Qualifier("forumService")
     private IForumService forumService;
 
     @Autowired

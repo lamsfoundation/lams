@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -49,7 +48,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
@@ -57,14 +55,14 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/clone")
 public class CloneLessonsController {
-
     private static final Logger log = Logger.getLogger(CloneLessonsController.class);
-    private static IUserManagementService userManagementService;
-    private static ILessonService lessonService;
-    private static IMonitoringService monitoringService;
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private IMonitoringService monitoringService;
 
     @RequestMapping(path = "/start")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws UserAccessDeniedException {
@@ -75,9 +73,6 @@ public class CloneLessonsController {
 
 	List<String> errors = new ArrayList<>();
 	try {
-	    CloneLessonsController.userManagementService = AdminServiceProxy
-		    .getService(applicationContext.getServletContext());
-
 	    String method = WebUtil.readStrParam(request, "method", true);
 	    if (StringUtils.equals(method, "getGroups")) {
 		return getGroups(response);
@@ -100,7 +95,7 @@ public class CloneLessonsController {
 
 	// default action
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
-	request.setAttribute("org", CloneLessonsController.userManagementService.findById(Organisation.class, groupId));
+	request.setAttribute("org", userManagementService.findById(Organisation.class, groupId));
 
 	return "organisation/cloneStart";
     }
@@ -113,8 +108,8 @@ public class CloneLessonsController {
 	response.addHeader("Cache-Control", "no-cache");
 	response.addHeader("content-type", "text/html; charset=UTF-8");
 
-	List groups = CloneLessonsController.userManagementService
-		.getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
+	List groups = userManagementService.getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,
+		OrganisationState.ACTIVE);
 	for (Object o : groups) {
 	    Organisation org = (Organisation) o;
 	    response.getWriter()
@@ -141,7 +136,7 @@ public class CloneLessonsController {
 	    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
 
 	    response.getWriter().println("<option value=''></option>");
-	    List groups = CloneLessonsController.userManagementService.findByProperties(Organisation.class, properties);
+	    List groups = userManagementService.findByProperties(Organisation.class, properties);
 	    for (Object o : groups) {
 		Organisation org = (Organisation) o;
 		response.getWriter()
@@ -159,10 +154,7 @@ public class CloneLessonsController {
 	Integer sourceGroupId = WebUtil.readIntParam(request, "sourceGroupId", true);
 
 	if (sourceGroupId != null) {
-	    CloneLessonsController.lessonService = AdminServiceProxy
-		    .getLessonService(applicationContext.getServletContext());
-
-	    List<Lesson> lessons = CloneLessonsController.lessonService.getLessonsByGroup(sourceGroupId);
+	    List<Lesson> lessons = lessonService.getLessonsByGroup(sourceGroupId);
 	    request.setAttribute("lessons", lessons);
 	}
 
@@ -176,8 +168,7 @@ public class CloneLessonsController {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 
-	Vector monitors = CloneLessonsController.userManagementService.getUsersFromOrganisationByRole(groupId,
-		Role.MONITOR, true);
+	Vector monitors = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, true);
 	request.setAttribute("monitors", monitors);
 
 	response.addHeader("Cache-Control", "no-cache");
@@ -190,8 +181,7 @@ public class CloneLessonsController {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 
-	Vector learners = CloneLessonsController.userManagementService.getUsersFromOrganisationByRole(groupId,
-		Role.LEARNER, true);
+	Vector learners = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, true);
 	request.setAttribute("learners", learners);
 
 	response.addHeader("Cache-Control", "no-cache");
@@ -219,15 +209,11 @@ public class CloneLessonsController {
 	    learnerIds = learners.split(",");
 	}
 
-	CloneLessonsController.monitoringService = AdminServiceProxy
-		.getMonitoringService(applicationContext.getServletContext());
 	int result = 0;
-
-	Organisation group = (Organisation) CloneLessonsController.userManagementService.findById(Organisation.class,
-		groupId);
+	Organisation group = (Organisation) userManagementService.findById(Organisation.class, groupId);
 	if (group != null) {
-	    result = CloneLessonsController.monitoringService.cloneLessons(lessonIds, addAllStaff, addAllLearners,
-		    staffIds, learnerIds, group);
+	    result = monitoringService.cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds, learnerIds,
+		    group);
 	} else {
 	    throw new UserException("Couldn't find Organisation based on id=" + groupId);
 	}

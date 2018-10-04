@@ -54,7 +54,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -64,23 +63,18 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping(path = "/saveportrait", method = RequestMethod.POST)
 public class PortraitSaveController {
-
     private static Logger log = Logger.getLogger(PortraitSaveController.class);
+    private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
+    
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService service;
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("logEventService")
     private ILogEventService logEventService;
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
     @Autowired
-    WebApplicationContext applicationContext;
-    @Autowired
-    @Qualifier("centralToolContentHandler")
     private IToolContentHandler centralToolContentHandler;
-    private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
 
     /**
      * Upload portrait image.
@@ -95,7 +89,7 @@ public class PortraitSaveController {
 	String fileName = file.getOriginalFilename();
 	log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getSize());
 
-	User user = service.getUserByLogin(request.getRemoteUser());
+	User user = userManagementService.getUserByLogin(request.getRemoteUser());
 
 	// check if file is an image using the MIME content type
 	String mediaType = file.getContentType().split("/", 2)[0];
@@ -163,7 +157,7 @@ public class PortraitSaveController {
 	    centralToolContentHandler.deleteFile(user.getPortraitUuid());
 	}
 	user.setPortraitUuid(originalFileNode.getUuid());
-	service.saveUser(user);
+	userManagementService.saveUser(user);
 
 	return "forward:/index.do?redirect=portrait";
     }
@@ -182,7 +176,7 @@ public class PortraitSaveController {
 	}
 
 	String responseValue = "deleted";
-	User userToModify = (User) service.findById(User.class, userId);
+	User userToModify = (User) userManagementService.findById(User.class, userId);
 	if (userToModify != null && userToModify.getPortraitUuid() != null) {
 
 	    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -195,7 +189,7 @@ public class PortraitSaveController {
 	    try {
 		centralToolContentHandler.deleteFile(userToModify.getPortraitUuid());
 		userToModify.setPortraitUuid(null);
-		service.saveUser(userToModify);
+		userManagementService.saveUser(userToModify);
 	    } catch (Exception e) {
 		log.error("Unable to delete a portrait for user " + userId + ".", e);
 		return deleteResponse(response, "error");

@@ -81,7 +81,6 @@ public class NbLearnerController {
     static Logger logger = Logger.getLogger(NbLearnerController.class.getName());
 
     @Autowired
-    @Qualifier("nbService")
     private INoticeboardService nbService;
 
     @Autowired

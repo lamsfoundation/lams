@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.LtiConsumerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
@@ -17,13 +16,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Andrey Balan
@@ -31,34 +30,21 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/ltiConsumerManagement")
 public class LtiConsumerManagementController {
-
     private static Logger log = Logger.getLogger(LtiConsumerManagementController.class);
-    private IUserManagementService userManagementService;
-    private MessageService messageService;
-    private IIntegrationService integrationService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
-
-    private void initServices() {
-	if (userManagementService == null) {
-	    userManagementService = AdminServiceProxy.getService(applicationContext.getServletContext());
-	}
-	if (messageService == null) {
-	    messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	}
-	if (integrationService == null) {
-	    integrationService = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
-	}
-    }
+    private IIntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     /**
      * Shows all available LTI tool consumers
      */
     @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request) {
-	initServices();
-
 	List<ExtServer> ltiConsumers = integrationService.getAllToolConsumers();
 	Collections.sort(ltiConsumers);
 	request.setAttribute("ltiConsumers", ltiConsumers);
@@ -71,9 +57,6 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request) throws Exception {
-
-	initServices();
-
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 
 	// editing a tool consumer
@@ -96,9 +79,6 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
-
-	initServices();
-
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	boolean disable = WebUtil.readBooleanParam(request, "disable");
 	ExtServer ltiConsumer = integrationService.getExtServer(sid);
@@ -113,9 +93,6 @@ public class LtiConsumerManagementController {
      */
     @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
-
-	initServices();
-
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	userManagementService.deleteById(ExtServer.class, sid);
 
@@ -128,9 +105,6 @@ public class LtiConsumerManagementController {
     @RequestMapping(path = "/save", method = RequestMethod.POST)
     public String save(@ModelAttribute LtiConsumerForm ltiConsumerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	initServices();
-
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	if (StringUtils.trimToNull(ltiConsumerForm.getServerid()) == null) {

@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,26 +39,27 @@ import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
-import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class PopulateMarksServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(PopulateMarksServlet.class);
 
-    private static IScratchieService service;
+    @Autowired
+    private static IScratchieService scratchieService;
+    @Autowired
     private static ScratchieSessionDAO scratchieSessionDAO;
 
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
     @Override
-    public void init() throws ServletException {
-	PopulateMarksServlet.service = ScratchieServiceProxy.getScratchieService(getServletContext());
-
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	PopulateMarksServlet.scratchieSessionDAO = (ScratchieSessionDAO) ctx.getBean("scratchieSessionDao");
-
-	super.init();
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     /*
@@ -79,7 +81,7 @@ public class PopulateMarksServlet extends HttpServlet {
 	    if (toolContentId == null) {
 
 		for (int i = 1; i < 20000; i++) {
-		    ScratchieSession session = service.getScratchieSessionBySessionId(new Long(i));
+		    ScratchieSession session = scratchieService.getScratchieSessionBySessionId(new Long(i));
 
 		    if (session != null) {
 			sessions.add(session);
@@ -98,7 +100,7 @@ public class PopulateMarksServlet extends HttpServlet {
 
 		ScratchieUser leader = session.getGroupLeader();
 		if ((leader != null)) {
-		    service.recalculateMarkForSession(session.getSessionId(), true);
+		    scratchieService.recalculateMarkForSession(session.getSessionId(), true);
 		    log.debug("recalculateMarkForSession uid:" + session.getUid());
 		    out.println("recalculateMarkForSession uid:" + session.getUid());
 		}

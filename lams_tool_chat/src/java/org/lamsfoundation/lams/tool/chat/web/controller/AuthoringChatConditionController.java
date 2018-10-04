@@ -61,7 +61,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthoringChatConditionController {
 
     @Autowired
-    @Qualifier("chatService")
     private IChatService chatService;
 
     @Autowired

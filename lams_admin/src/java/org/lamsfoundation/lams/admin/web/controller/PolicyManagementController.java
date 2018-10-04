@@ -25,7 +25,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -45,14 +44,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("policyManagement")
 public class PolicyManagementController {
-
     private static Logger log = Logger.getLogger(PolicyManagementController.class);
 
     @Autowired
-    @Qualifier("policyService")
     private IPolicyService policyService;
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
 
     @RequestMapping("list")

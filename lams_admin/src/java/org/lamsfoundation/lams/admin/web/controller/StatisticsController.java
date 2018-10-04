@@ -26,17 +26,17 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.statistics.dto.GroupStatisticsDTO;
 import org.lamsfoundation.lams.statistics.dto.StatisticsDTO;
 import org.lamsfoundation.lams.statistics.service.IStatisticsService;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Gives the overall statistics for a LAMS server
@@ -47,10 +47,13 @@ import org.springframework.web.context.WebApplicationContext;
 @RequestMapping("/statistics")
 public class StatisticsController {
 
-    private static IStatisticsService statisticsService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IStatisticsService statisticsService;    
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request) throws Exception {
@@ -58,13 +61,8 @@ public class StatisticsController {
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "StatisticsAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
-	}
-
-	if (statisticsService == null) {
-	    statisticsService = AdminServiceProxy.getStatisticsService(applicationContext.getServletContext());
 	}
 
 	StatisticsDTO stats = statisticsService.getOverallStatistics();
@@ -84,13 +82,8 @@ public class StatisticsController {
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "StatisticsAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
-	}
-
-	if (statisticsService == null) {
-	    statisticsService = AdminServiceProxy.getStatisticsService(applicationContext.getServletContext());
 	}
 
 	GroupStatisticsDTO groupStats = statisticsService.getGroupStatisticsDTO(orgId);

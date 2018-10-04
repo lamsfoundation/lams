@@ -58,16 +58,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Ruslan Kazakov
- * @version 1.0.1
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
-
     private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     // Authoring SessionMap key names
@@ -76,9 +70,8 @@ public class AuthoringController {
     private static final String KEY_MODE = "mode";
 
     @Autowired
-    @Qualifier("mindmapService")
     private IMindmapService mindmapService;
-
+    
     @Autowired
     @Qualifier("mindmapMessageService")
     private MessageService messageService;

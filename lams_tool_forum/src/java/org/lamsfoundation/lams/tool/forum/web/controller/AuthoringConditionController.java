@@ -67,7 +67,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthoringConditionController {
 
     @Autowired
-    @Qualifier("forumService")
     private IForumService forumService;
 
     @Autowired

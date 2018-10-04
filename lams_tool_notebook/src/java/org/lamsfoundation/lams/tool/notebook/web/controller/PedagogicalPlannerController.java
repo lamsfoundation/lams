@@ -34,35 +34,20 @@ import org.lamsfoundation.lams.tool.notebook.web.forms.NotebookPedagogicalPlanne
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/pedagogicalPlanner")
 public class PedagogicalPlannerController {
-
     private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
-    @Qualifier("notebookService")
     private INotebookService notebookService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     protected String unspecified(NotebookPedagogicalPlannerForm pedagogicalPlannerForm, HttpServletRequest request) {
-//	if (notebookService == null) {
-//	    notebookService = NotebookServiceProxy.getNotebookService(this.getServlet().getServletContext());
-//	}
 	return initPedagogicalPlannerForm(pedagogicalPlannerForm, request);
     }
 

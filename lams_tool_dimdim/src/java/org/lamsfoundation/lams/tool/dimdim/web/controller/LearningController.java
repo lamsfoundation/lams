@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -42,8 +41,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LearningController {
 
     @Autowired
-    @Qualifier("lamsToolService")
-    private ILamsToolService toolService;
+    private ILamsToolService lamsToolService;
 
     @RequestMapping("")
     public String execute(HttpServletRequest request) {
@@ -51,7 +49,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	String finishURL = toolService.completeToolSession(toolSessionId, user.getUserID().longValue());
+	String finishURL = lamsToolService.completeToolSession(toolSessionId, user.getUserID().longValue());
 	return "redirect:" + finishURL;
     }
 }

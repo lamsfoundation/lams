@@ -28,18 +28,15 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Action class run when the learner finishes a lesson.
@@ -50,18 +47,13 @@ public class LessonCompleteActivityController {
     public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
 
     @Autowired
-    private static IntegrationService integrationService;
+    private IIntegrationService integrationService;
 
     @Autowired
-    @Qualifier("lessonService")
-    private static ILessonService lessonService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
+    private ILessonService lessonService;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
@@ -72,7 +64,7 @@ public class LessonCompleteActivityController {
     public String execute(HttpServletRequest request) throws UnsupportedEncodingException {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Lesson lesson = learnerProgress.getLesson();
-	Set<Lesson> releasedLessons = getLessonService().getReleasedSucceedingLessons(lesson.getLessonId(),
+	Set<Lesson> releasedLessons = lessonService.getReleasedSucceedingLessons(lesson.getLessonId(),
 		learnerProgress.getUser().getUserId());
 	if (!releasedLessons.isEmpty()) {
 	    StringBuilder releasedLessonNames = new StringBuilder();
@@ -84,7 +76,7 @@ public class LessonCompleteActivityController {
 	}
 
 	//checks for lessonFinishUrl parameter
-	String lessonFinishCallbackUrl = getIntegrationService().getLessonFinishCallbackUrl(learnerProgress.getUser(),
+	String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(learnerProgress.getUser(),
 		lesson);
 	if (lessonFinishCallbackUrl != null) {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
@@ -93,22 +85,5 @@ public class LessonCompleteActivityController {
 	request.setAttribute("gradebookOnComplete", lesson.getGradebookOnComplete());
 
 	return "lessonComplete";
-    }
-
-    private IntegrationService getIntegrationService() {
-	if (LessonCompleteActivityController.integrationService == null) {
-	    LessonCompleteActivityController.integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext())
-		    .getBean("integrationService");
-	}
-	return LessonCompleteActivityController.integrationService;
-    }
-
-    private ILessonService getLessonService() {
-	if (LessonCompleteActivityController.lessonService == null) {
-	    LessonCompleteActivityController.lessonService = (ILessonService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext()).getBean("lessonService");
-	}
-	return LessonCompleteActivityController.lessonService;
     }
 }

@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,12 +52,9 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 public class LoadToolActivityController {
-
     private static Logger log = Logger.getLogger(LoadToolActivityController.class);
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 

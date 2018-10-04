@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
@@ -41,26 +41,23 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author daveg
  */
 @Controller
 public class CompleteActivityController {
-
     private static Logger log = Logger.getLogger(CompleteActivityController.class);
 
     protected static String className = "CompleteActivity";
-    private static IntegrationService integrationService = null;
 
     @Autowired
-    @Qualifier("learnerService")
+    private IIntegrationService integrationService;
+    @Autowired
     private ILearnerFullService learnerService;
 
     @Autowired
@@ -99,7 +96,7 @@ public class CompleteActivityController {
 	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
 	// updated marks (as it won't happen at lessoncomplete.jsp page)
 	if (progress.isComplete()) {
-	    String lessonFinishCallbackUrl = getIntegrationService().getLessonFinishCallbackUrl(progress.getUser(),
+	    String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(progress.getUser(),
 		    progress.getLesson());
 	    if (lessonFinishCallbackUrl != null) {
 		request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
@@ -118,14 +115,5 @@ public class CompleteActivityController {
 	    return "error";
 	}
 	return forward;
-    }
-
-    private IntegrationService getIntegrationService() {
-	if (CompleteActivityController.integrationService == null) {
-	    CompleteActivityController.integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext())
-		    .getBean("integrationService");
-	}
-	return CompleteActivityController.integrationService;
     }
 }

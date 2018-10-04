@@ -64,7 +64,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -80,25 +79,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/home")
 public class HomeController {
-
     private static Logger log = Logger.getLogger(HomeController.class);
 
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("learningDesignService")
     private ILearningDesignService learningDesignService;
     @Autowired
     private IGroupUserDAO groupUserDAO;
     @Autowired
-    @Qualifier("workspaceManagementService")
     private IWorkspaceManagementService workspaceManagementService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
     WebApplicationContext applicationcontext;

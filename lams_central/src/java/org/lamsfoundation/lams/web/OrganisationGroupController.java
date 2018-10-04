@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -83,26 +82,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/OrganisationGroup")
 public class OrganisationGroupController {
-
     private static Logger log = Logger.getLogger(OrganisationGroupController.class);
 
+    private static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
+
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("integrationService")
     private IIntegrationService integrationService;
-
-    private static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
 
     /**
      * Shows course grouping list or redirects to groups if a grouping was already chosen.

@@ -81,7 +81,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.web.WorkspaceController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -99,28 +98,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
-
     private static Logger log = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringService monitoringService;
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
     private ILamsToolService toolService;
     @Autowired
-    @Qualifier("authoringService")
     private IAuthoringFullService authoringService;
     @Autowired
-    @Qualifier("learningDesignService")
     private ILearningDesignService learningDesignService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("integrationService")
     private IIntegrationService integrationService;
     @Autowired
     WebApplicationContext applicationContext;

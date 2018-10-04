@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.UserOrgForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -44,31 +43,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Jun-Dir Liew
- *
- * Created at 17:22:21 on 20/06/2006
- */
-
-/**
- *
- *
- *
- *
- *
  */
 @Controller
 public class UserOrgSaveController {
-
     private static Logger log = Logger.getLogger(UserOrgSaveController.class);
-    private static IUserManagementService service;
-    private List<Role> rolelist;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    private List<Role> rolelist;
 
     @RequestMapping(path = "/userorgsave")
     public String execute(@ModelAttribute UserOrgForm userOrgForm, HttpServletRequest request,
@@ -77,12 +62,11 @@ public class UserOrgSaveController {
 	Integer orgId = userOrgForm.getOrgId();
 	request.setAttribute("org", orgId);
 
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	if (rolelist == null) {
-	    rolelist = service.findAll(Role.class);
+	    rolelist = userManagementService.findAll(Role.class);
 	}
 
-	Organisation organisation = (Organisation) service.findById(Organisation.class, orgId);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	Set uos = organisation.getUserOrganisations();
 
 	String[] userIds = userOrgForm.getUserIds();
@@ -95,14 +79,14 @@ public class UserOrgSaveController {
 	    UserOrganisation uo = (UserOrganisation) iter.next();
 	    Integer userId = uo.getUser().getUserId();
 	    if (userIdList.indexOf(userId.toString()) < 0) {
-		User user = (User) service.findById(User.class, userId);
+		User user = (User) userManagementService.findById(User.class, userId);
 		Set userUos = user.getUserOrganisations();
 		userUos.remove(uo);
 		user.setUserOrganisations(userUos);
 		iter.remove();
 		log.debug("removed userId=" + userId + " from orgId=" + orgId);
 		// remove from subgroups
-		service.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
+		userManagementService.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
 	    }
 	}
 	// add UserOrganisations that are in form data
@@ -119,21 +103,21 @@ public class UserOrgSaveController {
 		}
 	    }
 	    if (!alreadyInOrg) {
-		User user = (User) service.findById(User.class, userId);
+		User user = (User) userManagementService.findById(User.class, userId);
 		UserOrganisation uo = new UserOrganisation(user, organisation);
 		newUserOrganisations.add(uo);
 	    }
 	}
 
 	organisation.setUserOrganisations(uos);
-	service.save(organisation);
+	userManagementService.save(organisation);
 
 	// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
 	if (newUserOrganisations.isEmpty()) {
 	    log.debug("no new users to add to orgId=" + orgId);
 	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {
-	    request.setAttribute("roles", service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
+	    request.setAttribute("roles", userManagementService.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
 		    organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);

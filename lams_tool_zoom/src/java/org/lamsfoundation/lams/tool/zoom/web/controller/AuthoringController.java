@@ -54,7 +54,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthoringController {
 
     @Autowired
-    @Qualifier("zoomService")
     private IZoomService zoomService;
 
     @Autowired

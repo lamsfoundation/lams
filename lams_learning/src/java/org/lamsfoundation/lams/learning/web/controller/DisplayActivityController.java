@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
@@ -52,18 +51,12 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 public class DisplayActivityController {
-
-    //---------------------------------------------------------------------
-    // Instance variables
-    //---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(DisplayActivityController.class);
 
     public static final String PARAM_INITIAL_DISPLAY = "initialDisplay";
 
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 

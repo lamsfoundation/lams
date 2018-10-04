@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.UserRolesForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -39,46 +38,34 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 public class UserRolesSaveController {
-
     private static Logger log = Logger.getLogger(UserRolesSaveController.class);
-    private static IUserManagementService service;
-    private static MessageService messageService;
-    private static List<Role> rolelist;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
+    
+    private static List<Role> rolelist;
 
     @RequestMapping(path = "/userrolessave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserRolesForm userRolesForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 	if (rolelist == null) {
-	    rolelist = service.findAll(Role.class);
+	    rolelist = userManagementService.findAll(Role.class);
 	    Collections.sort(rolelist);
 	}
 
@@ -89,8 +76,8 @@ public class UserRolesSaveController {
 	request.setAttribute("org", orgId);
 	
 	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
-	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
-	User user = (User) service.findById(User.class, userId);
+	Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
+	User user = (User) userManagementService.findById(User.class, userId);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
@@ -99,13 +86,13 @@ public class UserRolesSaveController {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("rolelist",
-		    service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
+		    userManagementService.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
 	    request.setAttribute("login", user.getLogin());
 	    request.setAttribute("fullName", user.getFullName());
 	    return "forward:/userroles.do";
 	}
 
-	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
+	userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
 
 	return "redirect:/usermanage.do?org=" + orgId;
     }

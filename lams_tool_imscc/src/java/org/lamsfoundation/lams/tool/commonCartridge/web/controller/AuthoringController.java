@@ -80,12 +80,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
+    private static Logger log = Logger.getLogger(AuthoringController.class);
     private static final String ITEM_TYPE = "itemType";
 
-    private static Logger log = Logger.getLogger(AuthoringController.class);
-
     @Autowired
-    @Qualifier("commonCartridgeService")
     private ICommonCartridgeService commonCartridgeService;
 
     @Autowired

@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.UserListDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -44,39 +43,27 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Jun-Dir Liew
- *
- * Created at 13:51:51 on 9/06/2006
- */
-
-/**
- *
- *
- *
- *
  */
 @Controller
 public class UserManageController {
-
     private static final Logger log = Logger.getLogger(UserManageController.class);
-    private static IUserManagementService service;
-    private static MessageService messageService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/usermanage")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-
+	
 	// get id of org to list users for
 	Integer orgId = WebUtil.readIntParam(request, "org", true);
 	if (orgId == null) {
@@ -88,7 +75,7 @@ public class UserManageController {
 	log.debug("orgId: " + orgId);
 
 	// get org name
-	Organisation organisation = (Organisation) service.findById(Organisation.class, orgId);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	if (organisation == null) {
 	    return forwardError(request, "error.org.invalid");
 	}
@@ -110,13 +97,13 @@ public class UserManageController {
 	Organisation orgOfCourseAdmin = (orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) ? pOrg
 		: organisation;
 	// check permission
-	Integer rootOrgId = service.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN) || (service.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))) {
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	if (request.isUserInRole(Role.SYSADMIN) || (userManagementService.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))) {
 	    userManageForm.setCourseAdminCanAddNewUsers(true);
 	    userManageForm.setCourseAdminCanBrowseAllUsers(true);
 	    request.setAttribute("canDeleteUser", true);
-	} else if ((service.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_ADMIN)
-		|| service.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_MANAGER))
+	} else if ((userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_ADMIN)
+		|| userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_MANAGER))
 		&& !orgId.equals(rootOrgId)) {
 	    userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 	    userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
@@ -127,7 +114,7 @@ public class UserManageController {
 
 	userManageForm.setOrgId(orgId);
 	userManageForm.setOrgName(orgName);
-	List<UserManageBean> userManageBeans = service.getUserManageBeans(orgId);
+	List<UserManageBean> userManageBeans = userManagementService.getUserManageBeans(orgId);
 	Collections.sort(userManageBeans);
 	userManageForm.setUserManageBeans(userManageBeans);
 	request.setAttribute("userManageForm", userManageForm);
@@ -149,13 +136,13 @@ public class UserManageController {
 	    roleCount.put(Role.GROUP_ADMIN, Role.ROLE_GROUP_ADMIN);
 	}
 	for (String role : roleCount.keySet()) {
-	    Integer count = service.getCountRoleForOrg(orgId, roleCount.get(role), null);
+	    Integer count = userManagementService.getCountRoleForOrg(orgId, roleCount.get(role), null);
 	    request.setAttribute(role.replace(' ', '_'), count);
 	}
 
 	// count users in the org
 	// TODO use hql that does a count instead of getting whole objects
-	Integer numUsers = Integer.valueOf(service.getUsersFromOrganisation(orgId).size());
+	Integer numUsers = Integer.valueOf(userManagementService.getUsersFromOrganisation(orgId).size());
 	args[0] = numUsers.toString();
 	request.setAttribute("numUsers", messageService.getMessage("label.users.in.group", args));
 

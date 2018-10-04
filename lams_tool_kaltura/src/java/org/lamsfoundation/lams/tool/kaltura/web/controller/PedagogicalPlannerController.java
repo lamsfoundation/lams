@@ -44,11 +44,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Andrey Balan
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/pedagogicalPlanner")
@@ -57,7 +52,6 @@ public class PedagogicalPlannerController {
     private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
-    @Qualifier("kalturaService")
     private IKalturaService kalturaService;
     
     @Autowired

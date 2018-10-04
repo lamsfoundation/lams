@@ -47,19 +47,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  *
  * @author Steve.Ni
- * @version $Revision$
- *
- *
- *
- *
  */
 @Controller
 public class ScheduledJobListController {
-
     private static final Logger log = Logger.getLogger(ScheduledJobListController.class);
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private Scheduler scheduler;
 
     /**
      * Get all waitting queue jobs scheduled in Quartz table and display job name, job start time and description. The
@@ -67,10 +61,6 @@ public class ScheduledJobListController {
      */
     @RequestMapping(path = "/joblist", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
-
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getWebApplicationContext(this.applicationContext.getServletContext());
-	Scheduler scheduler = (Scheduler) ctx.getBean("scheduler");
 	ArrayList<ScheduledJobDTO> jobList = new ArrayList<>();
 	try {
 	    Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(Scheduler.DEFAULT_GROUP));

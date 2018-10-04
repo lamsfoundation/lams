@@ -27,13 +27,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.integration.ExtServer;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
@@ -43,12 +41,11 @@ import org.springframework.web.context.WebApplicationContext;
 public class ServerListController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IIntegrationService integrationService;
 
     @RequestMapping(path = "/serverlist")
     public String execute(HttpServletRequest request) throws Exception {
-	List<ExtServer> extServers = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext())
-		.getAllExtServers();
+	List<ExtServer> extServers = integrationService.getAllExtServers();
 	Collections.sort(extServers);
 	request.setAttribute("servers", extServers);
 	return "serverlist";

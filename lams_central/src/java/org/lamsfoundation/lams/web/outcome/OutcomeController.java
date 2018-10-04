@@ -75,17 +75,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/outcome")
 public class OutcomeController {
-
     private static Logger log = Logger.getLogger(OutcomeController.class);
 
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("outcomeService")
     private IOutcomeService outcomeService;
     @Autowired
     @Qualifier("centralMessageService")

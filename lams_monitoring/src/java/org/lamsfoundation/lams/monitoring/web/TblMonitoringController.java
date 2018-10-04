@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -57,19 +56,14 @@ public class TblMonitoringController {
     private static Logger log = Logger.getLogger(TblMonitoringController.class);
 
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
     @Autowired
-    @Qualifier("lamsToolService")
-    private ILamsToolService toolService;
+    private ILamsToolService lamsToolService;
     @Autowired
-    @Qualifier("activityDAO")
     private IActivityDAO activityDAO;
     @Autowired
-    @Qualifier("gradebookService")
     private IGradebookService gradebookService;
 
     /**
@@ -122,7 +116,7 @@ public class TblMonitoringController {
 	}
 
 	Set<Long> leaderUserIds = leaderselectionToolActivityId == null ? new HashSet<>()
-		: toolService.getLeaderUserId(leaderselectionToolActivityId);
+		: lamsToolService.getLeaderUserId(leaderselectionToolActivityId);
 
 	GroupingActivity groupingActivity = getGroupingActivity(lesson);
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();

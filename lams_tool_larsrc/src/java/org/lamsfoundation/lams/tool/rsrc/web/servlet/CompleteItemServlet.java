@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +35,13 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
-import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  *
@@ -50,12 +52,17 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 public class CompleteItemServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(CompleteItemServlet.class);
 
-    private IResourceService service;
+    @Autowired
+    private IResourceService resourceService;
 
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
     @Override
-    public void init() throws ServletException {
-	service = ResourceServiceProxy.getResourceService(getServletContext());
-	super.init();
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     /**
@@ -85,7 +92,7 @@ public class CompleteItemServlet extends HttpServlet {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
-	service.setItemComplete(resourceItemUid, new Long(user.getUserID().intValue()), sessionId);
+	resourceService.setItemComplete(resourceItemUid, new Long(user.getUserID().intValue()), sessionId);
 
 	// set resource item complete tag
 	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);

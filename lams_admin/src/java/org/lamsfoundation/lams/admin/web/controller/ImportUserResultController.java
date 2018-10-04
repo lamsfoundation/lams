@@ -29,36 +29,30 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
- *
- *
- *
  */
 @Controller
 public class ImportUserResultController {
-
     private static Logger log = Logger.getLogger(ImportUserResultController.class);
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IImportService importService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/importuserresult")
     public String execute(HttpServletRequest request) throws Exception {
-
-	MessageService messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	IImportService importService = AdminServiceProxy.getImportService(applicationContext.getServletContext());
 	HttpSession ss = SessionManager.getSession();
 
 	List results = (List) ss.getAttribute(IImportService.IMPORT_RESULTS);

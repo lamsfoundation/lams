@@ -35,16 +35,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/signup")
 public class SignupController {
-
     private static Logger log = Logger.getLogger(SignupController.class);
+    
     @Autowired
-    @Qualifier("signupService")
     private ISignupService signupService;
     @Autowired
     @Qualifier("centralMessageService")
-    MessageService messageService;
+    private MessageService messageService;
     @Autowired
-    @Qualifier("timezoneService")
     private ITimezoneService timezoneService ;
 
     @RequestMapping("init")

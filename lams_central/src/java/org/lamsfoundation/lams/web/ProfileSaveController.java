@@ -52,11 +52,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class ProfileSaveController {
-
     private static Logger log = Logger.getLogger(ProfileSaveController.class);
+    
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService service;
+    private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
@@ -73,7 +72,7 @@ public class ProfileSaveController {
 	
 	request.setAttribute("submitted", true);
 
-	User requestor = service.getUserByLogin(request.getRemoteUser());
+	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 
 	// check requestor is same as user being edited
 	if (!requestor.getLogin().equals(userForm.getLogin())) {
@@ -131,14 +130,14 @@ public class ProfileSaveController {
 	} else {
 	    // update all fields
 	    BeanUtils.copyProperties(requestor, userForm);
-	    SupportedLocale locale = (SupportedLocale) service.findById(SupportedLocale.class, userForm.getLocaleId());
+	    SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class, userForm.getLocaleId());
 	    requestor.setLocale(locale);
 
-	    Theme cssTheme = (Theme) service.findById(Theme.class, userForm.getUserTheme());
+	    Theme cssTheme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
 	    requestor.setTheme(cssTheme);
 	}
 
-	service.saveUser(requestor);
+	userManagementService.saveUser(requestor);
 
 	// replace UserDTO in the shared session
 	HttpSession ss = SessionManager.getSession();

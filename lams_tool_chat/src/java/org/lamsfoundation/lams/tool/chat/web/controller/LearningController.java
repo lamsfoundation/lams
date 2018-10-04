@@ -68,7 +68,6 @@ public class LearningController {
     private static Logger log = Logger.getLogger(LearningController.class);
 
     @Autowired
-    @Qualifier("chatService")
     private IChatService chatService;
 
     @Autowired

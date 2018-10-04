@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -54,9 +55,11 @@ public class PasswordChangeController {
 
     @Autowired
     @Qualifier("centralMessageService")
-    MessageService messageService;
+    private MessageService messageService;
     @Autowired
-    WebApplicationContext applicationContext;
+    private ILogEventService logEventService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     /**
      * @param mapping
@@ -86,14 +89,9 @@ public class PasswordChangeController {
 
 		if ((loggedInUser == null) || !loggedInUser.equals(login)) {
 		    errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
+		    
 		} else {
-		    // WebApplicationContext ctx =
-		    // WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
-		    WebApplicationContext ctx = WebApplicationContextUtils
-			    .getWebApplicationContext(applicationContext.getServletContext());
-		    UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
-
-		    User user = service.getUserByLogin(login);
+		    User user = userManagementService.getUserByLogin(login);
 		    String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH
 			    ? HashUtil.sha1(oldPassword)
 			    : HashUtil.sha256(oldPassword, user.getSalt());
@@ -120,11 +118,9 @@ public class PasswordChangeController {
 			user.setSalt(salt);
 			user.setPassword(HashUtil.sha256(password, salt));
 			user.setChangePassword(false);
-			service.saveUser(user);
+			userManagementService.saveUser(user);
 
 			// make 'password changed' audit log entry
-			ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
-			MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
 			String[] args = new String[1];
 			args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 			String message = messageService.getMessage("audit.user.password.change", args);

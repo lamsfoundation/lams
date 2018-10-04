@@ -46,8 +46,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Marcin Cieslak
@@ -55,35 +53,33 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Controller
 @RequestMapping("/cleanupPreviewLessons")
 public class CleanupPreviewLessonsController {
-
     private static Logger log = Logger.getLogger(CleanupPreviewLessonsController.class);
 
-    private static IMonitoringService monitoringService;
-    private static ILessonService lessonService;
-    private static ISecurityService securityService;
-
+    @Autowired
+    private IMonitoringService monitoringService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private ISecurityService securityService;
     @Autowired
     @Qualifier("adminMessageService")
-    private MessageService adminMessageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
+    private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	
-	if (!getSecurityService().isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
+	if (!securityService.isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
 	    return null;
 	}
 
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupPreviewLessonsController");
-	    request.setAttribute("errorMessage", adminMessageService.getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
 	}
 
-	long[] lessonCount = getLessonService().getPreviewLessonCount();
+	long[] lessonCount = lessonService.getPreviewLessonCount();
 	request.setAttribute("previewCount", lessonCount[0]);
 	request.setAttribute("allLessonCount", lessonCount[1]);
 
@@ -95,14 +91,14 @@ public class CleanupPreviewLessonsController {
     public String deletePreviewLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userID = getUserID();
 	Integer limit = WebUtil.readIntParam(request, "limit", true);
-	List<Long> lessonIDs = getLessonService().getPreviewLessons(limit);
+	List<Long> lessonIDs = lessonService.getPreviewLessons(limit);
 	for (Long lessonID : lessonIDs) {
 	    log.info("Deleting preview lesson: " + lessonID);
 	    // role is checked in this method
-	    getMonitoringService().removeLessonPermanently(lessonID, userID);
+	    monitoringService.removeLessonPermanently(lessonID, userID);
 	}
 
-	long[] lessonCount = getLessonService().getPreviewLessonCount();
+	long[] lessonCount = lessonService.getPreviewLessonCount();
 	String responseJSON = JsonUtil.toString(lessonCount);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);
@@ -113,32 +109,5 @@ public class CleanupPreviewLessonsController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user == null ? null : user.getUserID();
-    }
-
-    private IMonitoringService getMonitoringService() {
-	if (monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-	return monitoringService;
-    }
-
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return lessonService;
-    }
-
-    private ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return securityService;
     }
 }

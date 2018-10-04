@@ -81,11 +81,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/monitoring")
 public class MonitoringController {
-
     public static Logger logger = Logger.getLogger(MonitoringController.class);
 
     @Autowired
-    @Qualifier("submitFilesService")
     private ISubmitFilesService submitFilesService;
 
     @Autowired

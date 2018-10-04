@@ -47,11 +47,9 @@ import org.lamsfoundation.lams.tool.noticeboard.web.form.NbMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * The buttons are a switch between tabs and will forward to a jsp and display
@@ -62,11 +60,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/monitoring")
 public class NbMonitoringController {
-
     static Logger logger = Logger.getLogger(NbMonitoringController.class.getName());
 
     @Autowired
-    @Qualifier("nbService")
     private INoticeboardService nbService;
 
     public final static String FORM = "NbMonitoringForm";

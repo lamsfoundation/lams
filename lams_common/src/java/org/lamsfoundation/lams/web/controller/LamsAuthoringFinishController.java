@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -69,10 +68,8 @@ public abstract class LamsAuthoringFinishController {
     private static final String RE_EDIT_URL = "reEditUrl";
 
     @Autowired
-    @Qualifier("logEventService")
     private ILogEventService logEventService;
     @Autowired
-    @Qualifier("lamsToolService")
     private ILamsToolService lamsToolService;
 
     /**

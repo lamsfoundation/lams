@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,7 +49,9 @@ public class KumaliveController {
 
     private static Logger log = Logger.getLogger(KumaliveController.class);
 
+    @Autowired
     private static IKumaliveService kumaliveService;
+    @Autowired
     private static ISecurityService securityService;
 
     @RequestMapping("/getRubrics")
@@ -62,7 +65,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisationId, currentUserId,
+	if (!securityService.hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
@@ -70,7 +73,7 @@ public class KumaliveController {
 	    return null;
 	}
 
-	List<KumaliveRubric> rubrics = KumaliveController.getKumaliveService().getRubrics(organisationId);
+	List<KumaliveRubric> rubrics = kumaliveService.getRubrics(organisationId);
 	ArrayNode rubricsJSON = JsonNodeFactory.instance.arrayNode();
 	for (KumaliveRubric rubric : rubrics) {
 	    rubricsJSON.add(rubric.getName());
@@ -91,7 +94,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisationId, currentUserId,
+	if (!securityService.hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
@@ -115,7 +118,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisationId, currentUserId,
+	if (!securityService.hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report organisation data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
@@ -128,7 +131,7 @@ public class KumaliveController {
 	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 	String sortColumn = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
 
-	ObjectNode resultJSON = KumaliveController.getKumaliveService().getReportOrganisationData(organisationId,
+	ObjectNode resultJSON = kumaliveService.getReportOrganisationData(organisationId,
 		sortColumn, !"DESC".equalsIgnoreCase(sortOrder), rowLimit, page);
 	response.setContentType("text/xml;charset=utf-8");
 	return resultJSON.toString();
@@ -141,7 +144,7 @@ public class KumaliveController {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	Long kumaliveId = WebUtil.readLongParam(request, "kumaliveId", false);
-	Kumalive kumalive = KumaliveController.getKumaliveService().getKumalive(kumaliveId);
+	Kumalive kumalive = kumaliveService.getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
 	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
 	    String warning = "Kumalives are disabled";
@@ -149,7 +152,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
+	if (!securityService.hasOrgRole(organisation.getOrganisationId(), currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive rubrics", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
@@ -175,7 +178,7 @@ public class KumaliveController {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	Long kumaliveId = WebUtil.readLongParam(request, "kumaliveId", false);
-	Kumalive kumalive = KumaliveController.getKumaliveService().getKumalive(kumaliveId);
+	Kumalive kumalive = kumaliveService.getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
 	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
 	    String warning = "Kumalives are disabled";
@@ -183,7 +186,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
+	if (!securityService.hasOrgRole(organisation.getOrganisationId(), currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report kumalive data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
@@ -194,7 +197,7 @@ public class KumaliveController {
 
 	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 
-	ObjectNode responseJSON = KumaliveController.getKumaliveService().getReportKumaliveData(kumaliveId,
+	ObjectNode responseJSON = kumaliveService.getReportKumaliveData(kumaliveId,
 		!"DESC".equalsIgnoreCase(sortOrder));
 	response.setContentType("text/json;charset=utf-8");
 	return responseJSON.toString();
@@ -207,7 +210,7 @@ public class KumaliveController {
 	Integer currentUserId = userDTO.getUserID();
 	Long kumaliveId = WebUtil.readLongParam(request, "kumaliveId", false);
 	Integer userId = WebUtil.readIntParam(request, "userId", false);
-	Kumalive kumalive = KumaliveController.getKumaliveService().getKumalive(kumaliveId);
+	Kumalive kumalive = kumaliveService.getKumalive(kumaliveId);
 	Organisation organisation = kumalive.getOrganisation();
 	if (!Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE)) {
 	    String warning = "Kumalives are disabled";
@@ -215,7 +218,7 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	    return null;
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisation.getOrganisationId(), currentUserId,
+	if (!securityService.hasOrgRole(organisation.getOrganisationId(), currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get report user data", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation "
 		    + organisation.getOrganisationId();
@@ -224,7 +227,7 @@ public class KumaliveController {
 	    return null;
 	}
 
-	ObjectNode responseJSON = KumaliveController.getKumaliveService().getReportUserData(kumaliveId, userId);
+	ObjectNode responseJSON = kumaliveService.getReportUserData(kumaliveId, userId);
 	response.setContentType("text/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -245,7 +248,7 @@ public class KumaliveController {
 		kumaliveIds.add(kumaliveIdJSON.asLong());
 	    }
 
-	    Kumalive kumalive = KumaliveController.getKumaliveService().getKumalive(kumaliveIds.get(0));
+	    Kumalive kumalive = kumaliveService.getKumalive(kumaliveIds.get(0));
 	    organisationId = kumalive.getOrganisation().getOrganisationId();
 	}
 
@@ -254,7 +257,7 @@ public class KumaliveController {
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisationId, currentUserId,
+	if (!securityService.hasOrgRole(organisationId, currentUserId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive export", false)) {
 	    String warning = "User " + currentUserId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
@@ -263,9 +266,9 @@ public class KumaliveController {
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = null;
 	if (kumaliveIds == null) {
-	    dataToExport = KumaliveController.getKumaliveService().exportKumalives(organisationId);
+	    dataToExport = kumaliveService.exportKumalives(organisationId);
 	} else {
-	    dataToExport = KumaliveController.getKumaliveService().exportKumalives(kumaliveIds);
+	    dataToExport = kumaliveService.exportKumalives(kumaliveIds);
 	}
 	String fileName = "kumalive_report.xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -294,7 +297,7 @@ public class KumaliveController {
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	}
-	if (!KumaliveController.getSecurityService().hasOrgRole(organisationId, userId,
+	if (!securityService.hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "kumalive get rubrics", false)) {
 	    String warning = "User " + userId + " is not a monitor of organisation " + organisationId;
 	    log.warn(warning);
@@ -302,30 +305,12 @@ public class KumaliveController {
 	}
 
 	ArrayNode rubricsJSON = JsonUtil.readArray(WebUtil.readStrParam(request, "rubrics"));
-	KumaliveController.getKumaliveService().saveRubrics(organisationId, rubricsJSON);
+	kumaliveService.saveRubrics(organisationId, rubricsJSON);
 
     }
 
     private UserDTO getUserDTO() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private static IKumaliveService getKumaliveService() {
-	if (kumaliveService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
-	    kumaliveService = (IKumaliveService) ctx.getBean("kumaliveService");
-	}
-	return kumaliveService;
-    }
-
-    private static ISecurityService getSecurityService() {
-	if (securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
-	    securityService = (ISecurityService) ctx.getBean("securityService");
-	}
-	return securityService;
     }
 }

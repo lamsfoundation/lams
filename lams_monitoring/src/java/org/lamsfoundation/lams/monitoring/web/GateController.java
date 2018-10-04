@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,19 +83,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/gate")
 public class GateController {
 
-    @Autowired
-    @Qualifier("monitoringService")
-    private IMonitoringFullService monitoringService;
-
-    @Autowired
-    @Qualifier("learnerService")
-    private ILearnerService learnerService;
-
-    @Autowired
-    @Qualifier("lessonService")
-    private ILessonService lessonService;
-
     private static final DateFormat SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
+
+    @Autowired
+    private IMonitoringFullService monitoringService;
+    @Autowired
+    private ILearnerService learnerService;
+    @Autowired
+    private ILessonService lessonService;
 
     // ---------------------------------------------------------------------
     // Method

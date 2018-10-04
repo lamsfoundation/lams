@@ -46,7 +46,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,11 +61,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController extends WikiPageController {
-
     private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("wikiService")
     private IWikiService wikiService;
 
     // Authoring SessionMap key names

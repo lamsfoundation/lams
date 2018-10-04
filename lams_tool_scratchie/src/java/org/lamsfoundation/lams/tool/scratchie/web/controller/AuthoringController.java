@@ -87,7 +87,6 @@ public class AuthoringController {
     private static Logger log = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("scratchieService")
     private IScratchieService scratchieService;
 
     @Autowired

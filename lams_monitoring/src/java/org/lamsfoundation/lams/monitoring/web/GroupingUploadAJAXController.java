@@ -94,21 +94,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/groupingUpload")
 public class GroupingUploadAJAXController {
-
     private static Logger log = Logger.getLogger(GroupingUploadAJAXController.class);
 
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
-
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
     @Qualifier("centralMessageService")

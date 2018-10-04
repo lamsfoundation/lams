@@ -82,11 +82,9 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-
     private static Logger log = Logger.getLogger(LearningController.class);
 
     @Autowired
-    @Qualifier("resourceService")
     private IResourceService resourceService;
 
     @Autowired

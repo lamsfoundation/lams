@@ -56,7 +56,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class McPedagogicalPlannerController {
 
     @Autowired
-    @Qualifier("mcService")
     private IMcService mcService;
 
     @Autowired

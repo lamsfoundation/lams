@@ -31,7 +31,6 @@ public class TblMonitoringController {
     private static Logger logger = Logger.getLogger(TblMonitoringController.class.getName());
 
     @Autowired
-    @Qualifier("mcService")
     private IMcService mcService;
 
     /**

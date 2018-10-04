@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
@@ -48,18 +47,12 @@ import org.springframework.web.context.WebApplicationContext;
  *
  * Normally this will display the first activity inside a sequence activity. If there are no activities within the
  * sequence activity then it will display an "empty" message.
- *
- *
- *
  */
 @Controller
 public class SequenceActivityController {
-
     private static Logger log = Logger.getLogger(SequenceActivityController.class);
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 

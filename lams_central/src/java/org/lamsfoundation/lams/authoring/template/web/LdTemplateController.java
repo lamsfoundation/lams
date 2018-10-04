@@ -36,8 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.http.HttpException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.Option;
@@ -58,7 +56,6 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -87,18 +84,13 @@ public abstract class LdTemplateController {
 
     public static final String PARENT_ACTIVITY_TYPE = "parentActivityType"; // used to work out transitions - not used by the authoring module
 
-    private final HttpClient httpClient = new DefaultHttpClient();
-
     @Autowired
-    @Qualifier("lamsCoreToolService")
     protected ILamsCoreToolService lamsCoreToolService;
     @Autowired
-    @Qualifier("workspaceManagementService")
     protected IWorkspaceManagementService workspaceManagementService;
     @Autowired
-    protected IAuthoringFullService authoringFullService;
+    protected IAuthoringFullService authoringService;
     @Autowired
-    @Qualifier("toolDAO")
     protected IToolDAO toolDAO;
 
     protected static final String CONTENT_TYPE_JSON = "application/json;charset=utf-8";
@@ -313,7 +305,7 @@ public abstract class LdTemplateController {
     private String createTitle(String templateCode, String userEnteredString, Integer workspaceFolderID) {
 	String title = WebUtil.removeHTMLtags(userEnteredString);
 	title = title.replaceAll("[@%<>/^/*/$]", "");
-	title = authoringFullService.getUniqueNameForLearningDesign(title, workspaceFolderID);
+	title = authoringService.getUniqueNameForLearningDesign(title, workspaceFolderID);
 	if (title.length() > 220) {
 	    title.substring(0, 220);
 	}
@@ -353,7 +345,7 @@ public abstract class LdTemplateController {
 
 	LearningDesign learningDesign = null;
 	try {
-	    learningDesign = authoringFullService.saveLearningDesignDetails(ldJSON);
+	    learningDesign = authoringService.saveLearningDesignDetails(ldJSON);
 	} catch (Exception e) {
 	    LdTemplateController.log.error("Unable to learning design with details " + ldJSON, e);
 	    throw new HttpException("Unable to learning design with details " + ldJSON);
@@ -628,7 +620,7 @@ public abstract class LdTemplateController {
 
 	try {
 	    Tool tool = getTool(toolSignature);
-	    Long toolContentID = authoringFullService.insertToolContentID(tool.getToolId());
+	    Long toolContentID = authoringService.insertToolContentID(tool.getToolId());
 
 	    // Tools' services implement an interface for processing REST requests
 	    ToolRestManager toolRestService = (ToolRestManager) lamsCoreToolService.findToolService(tool);

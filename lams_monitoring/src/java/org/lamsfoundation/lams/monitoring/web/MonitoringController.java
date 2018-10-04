@@ -113,46 +113,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/monitoring")
 public class MonitoringController {
-
-    @Autowired
-    private WebApplicationContext applicationContext;
-
     private static Logger log = Logger.getLogger(MonitoringController.class);
 
-    // ---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    // ---------------------------------------------------------------------
     private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
 
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
+    
     @Autowired
-    @Qualifier("logEventService")
     private ILogEventService logEventService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
     @Autowired
-    @Qualifier("lamsToolService")
-    private ILamsToolService toolService;
+    private ILamsToolService lamsToolService;
     @Autowired
     @Qualifier("monitoringMessageService")
     private MessageService messageService;
     @Autowired
-    @Qualifier("authoringService")
     private IAuthoringService authoringService;
 
     private Integer getUserId() {
@@ -1280,7 +1266,7 @@ public class MonitoringController {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
 			.equals(toolActivity.getTool().getToolSignature())) {
-		    leaders.addAll(toolService.getLeaderUserId(activity.getActivityId()));
+		    leaders.addAll(lamsToolService.getLeaderUserId(activity.getActivityId()));
 		}
 	    }
 	}

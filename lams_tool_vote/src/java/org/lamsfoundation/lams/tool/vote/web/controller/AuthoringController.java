@@ -67,7 +67,6 @@ public class AuthoringController implements VoteAppConstants {
     private static Logger logger = Logger.getLogger(AuthoringController.class.getName());
 
     @Autowired
-    @Qualifier("voteService")
     private IVoteService voteService;
 
     @Autowired

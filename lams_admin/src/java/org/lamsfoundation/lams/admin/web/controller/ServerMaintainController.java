@@ -25,23 +25,19 @@ package org.lamsfoundation.lams.admin.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
- * <p>
- * <a href="ServerMaintainAction.java.html"><i>View Source</i><a>
- * </p>
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @Controller
@@ -49,15 +45,19 @@ import org.springframework.web.context.WebApplicationContext;
 public class ServerMaintainController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IIntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
 	
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
-	    ExtServer map = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext())
-		    .getExtServer(sid);
+	    ExtServer map = integrationService.getExtServer(sid);
 	    BeanUtils.copyProperties(extServerForm, map);
 	}
 	return "servermaintain";
@@ -65,28 +65,26 @@ public class ServerMaintainController {
 
     @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
-	IIntegrationService service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	ExtServer map = service.getExtServer(sid);
+	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(true);
-	service.saveExtServer(map);
+	integrationService.saveExtServer(map);
 	return "forward:/serverlist.do";
     }
 
     @RequestMapping(path = "/enable")
     public String enable(HttpServletRequest request) throws Exception {
-	IIntegrationService service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	ExtServer map = service.getExtServer(sid);
+	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
-	service.saveExtServer(map);
+	integrationService.saveExtServer(map);
 	return "forward:/serverlist.do";
     }
 
     @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	AdminServiceProxy.getService(applicationContext.getServletContext()).deleteById(ExtServer.class, sid);
+	userManagementService.deleteById(ExtServer.class, sid);
 	return "forward:/serverlist.do";
     }
 

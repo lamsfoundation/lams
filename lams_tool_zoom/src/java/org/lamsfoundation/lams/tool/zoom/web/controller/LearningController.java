@@ -63,7 +63,6 @@ public class LearningController {
     private static final Logger logger = Logger.getLogger(LearningController.class);
 
     @Autowired
-    @Qualifier("zoomService")
     private IZoomService zoomService;
 
     @Autowired

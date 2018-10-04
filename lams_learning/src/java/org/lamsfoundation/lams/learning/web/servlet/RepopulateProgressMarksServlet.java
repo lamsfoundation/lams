@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @SuppressWarnings("serial")
@@ -60,16 +63,21 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(RepopulateProgressMarksServlet.class);
 
-    private static ILogEventService logEventService;
-    private static ILessonService lessonService;
-    private static ILearnerFullService learnerService;
+    @Autowired
+    private ILogEventService logEventService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private ILearnerFullService learnerService;
 
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
     @Override
-    public void init() throws ServletException {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	RepopulateProgressMarksServlet.logEventService = (ILogEventService) ctx.getBean("logEventService");
-	RepopulateProgressMarksServlet.lessonService = (ILessonService) ctx.getBean("lessonService");
-	RepopulateProgressMarksServlet.learnerService = (ILearnerFullService) ctx.getBean("learnerService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Override

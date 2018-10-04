@@ -28,7 +28,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.util.Configuration;
@@ -40,43 +39,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * ConfigAction
  *
  * @author Mitchell Seaton
  */
-/**
- *
- *
- *
- *
- *
- */
 @Controller
 public class ConfigController {
-
-    private static Configuration configurationService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
-
+    private Configuration configurationService;
     @Autowired
     @Qualifier("adminMessageService")
-    private MessageService adminMessageService;
-
-    private Configuration getConfiguration() {
-	if (configurationService == null) {
-	    configurationService = AdminServiceProxy.getConfiguration(applicationContext.getServletContext());
-	}
-	return configurationService;
-    }
+    private MessageService messageService;
 
     @RequestMapping(path = "/config")
     public String unspecified(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
 
-	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+	request.setAttribute("config", configurationService.arrangeItems(Configuration.ITEMS_NON_LDAP));
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
 	Map<String, String> smtpAuthTypes = new LinkedHashMap<String, String>();
 	smtpAuthTypes.put("none", "None");
@@ -96,7 +77,7 @@ public class ConfigController {
 	String errorForward = "config/editconfig";
 
 	for (int i = 0; i < keys.length; i++) {
-	    ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
+	    ConfigurationItem item = configurationService.getConfigItemByKey(keys[i]);
 
 	    if (item != null) {
 		// return to ldap page if that's where we came from
@@ -107,7 +88,7 @@ public class ConfigController {
 		if (item.getRequired()) {
 		    if (!(values[i] != null && values[i].length() > 0)) {
 			request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
-			request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+			request.setAttribute("config", configurationService.arrangeItems(Configuration.ITEMS_NON_LDAP));
 			return errorForward;
 		    }
 		}
@@ -117,14 +98,14 @@ public class ConfigController {
 			Long.parseLong(values[i]);
 		    } catch (NumberFormatException e) {
 			request.setAttribute("error", getNumericError(item.getDescriptionKey()));
-			request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+			request.setAttribute("config", configurationService.arrangeItems(Configuration.ITEMS_NON_LDAP));
 			return errorForward;
 		    }
 		}
 		Configuration.updateItem(keys[i], values[i]);
 	    }
 	}
-	getConfiguration().persistUpdate();
+	configurationService.persistUpdate();
 
 	Configuration.refreshCache();
 
@@ -133,14 +114,14 @@ public class ConfigController {
 
     private String getRequiredError(String arg) {
 	String[] args = new String[1];
-	args[0] = adminMessageService.getMessage(arg);
-	return adminMessageService.getMessage("error.required", args);
+	args[0] = messageService.getMessage(arg);
+	return messageService.getMessage("error.required", args);
     }
 
     private String getNumericError(String arg) {
 	String[] args = new String[1];
-	args[0] = adminMessageService.getMessage(arg);
-	return adminMessageService.getMessage("error.numeric", args);
+	args[0] = messageService.getMessage(arg);
+	return messageService.getMessage("error.numeric", args);
     }
 
 }

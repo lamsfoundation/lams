@@ -49,18 +49,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Manpreet Minhas
- *
- *
  */
 @Controller
 @RequestMapping("/workspace")
 public class WorkspaceController {
-
     protected Logger log = Logger.getLogger(WorkspaceController.class.getName());
-
-    @Autowired
-    @Qualifier("IWorkspaceManagementService")
-    private IWorkspaceManagementService workspaceManagementService;
 
     public static final String RESOURCE_ID = "resourceID";
     public static final String RESOURCE_TYPE = "resourceType";
@@ -70,14 +63,15 @@ public class WorkspaceController {
      * ORG_FOLDER_ID) and the user's private folder. See the method for more details.
      */
     public static final Integer BOOTSTRAP_FOLDER_ID = new Integer(-1);
-
     /**
      * Special value for folderID on getFolderContents(). Triggers getting the organisation folders that are available
      * to a user. See the method for more details.
      */
     public static final Integer ORG_FOLDER_ID = new Integer(-2);
-
     public static final Integer ROOT_ORG_FOLDER_ID = new Integer(1);
+
+    @Autowired
+    private IWorkspaceManagementService workspaceManagementService;
 
     private Integer getUserId() {
 	// return new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));

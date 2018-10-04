@@ -59,7 +59,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -69,34 +68,24 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
+ * Handles the general requests for content in gradebook
+ * 
  * @author lfoxton
- *
- *         Handles the general requests for content in gradebook
  */
 @Controller
 @RequestMapping("/gradebook")
 public class GradebookController {
-
     private static Logger logger = Logger.getLogger(GradebookController.class);
 
     @Autowired
-    @Qualifier("gradebookService")
     private IGradebookFullService gradebookService;
-
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userService;
-
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
-
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
-
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
 
     @RequestMapping("")
@@ -379,7 +368,7 @@ public class GradebookController {
 		    //calculate totalUsers
 		    totalUsers = lesson.getAllLearners().size();
 		    if (groupId != null) {
-			Group group = (Group) userService.findById(Group.class, groupId);
+			Group group = (Group) userManagementService.findById(Group.class, groupId);
 			if (group != null) {
 			    totalUsers = group.getUsers().size();
 			}
@@ -400,7 +389,7 @@ public class GradebookController {
 		return null;
 	    }
 
-	    Organisation org = (Organisation) userService.findById(Organisation.class, organisationID);
+	    Organisation org = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	    gradebookUserDTOs = gradebookService.getGBUserRowsForOrganisation(org, page - 1, rowLimit, sortOrder,
 		    searchString);
 	    totalUsers = gradebookService.getCountUsersByOrganisation(organisationID, searchString);
@@ -451,7 +440,7 @@ public class GradebookController {
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 	Integer courseID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	Organisation organisation = (Organisation) userService.findById(Organisation.class, courseID);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, courseID);
 
 	// in case of toolbar searching (which uses different parameters than a single field searching) get those
 	// parameters
@@ -478,7 +467,7 @@ public class GradebookController {
 	User viewer = getRealUser();
 	if (view == GBGridView.MON_USER) {
 	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
-	    user = (User) userService.findById(User.class, userID);
+	    user = (User) userManagementService.findById(User.class, userID);
 	} else {
 	    user = getRealUser();
 	}
@@ -563,7 +552,7 @@ public class GradebookController {
 	}
 
 	Lesson lesson = lessonService.getLesson(lessonID);
-	User learner = (User) userService.findById(User.class, userID);
+	User learner = (User) userManagementService.findById(User.class, userID);
 
 	if ((lesson != null) && (learner != null)) {
 	    GradebookUserLesson lessonMark = gradebookService.getGradebookUserLesson(lessonID, userID);
@@ -672,7 +661,7 @@ public class GradebookController {
     private User getRealUser() {
 	UserDTO userDTO = getUser();
 	if (userDTO != null) {
-	    return userService.getUserByLogin(userDTO.getLogin());
+	    return userManagementService.getUserByLogin(userDTO.getLogin());
 	} else {
 	    return null;
 	}

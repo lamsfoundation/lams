@@ -86,7 +86,6 @@ public class LearnerController implements SbmtConstants {
     public static Logger logger = Logger.getLogger(LearnerController.class);
 
     @Autowired
-    @Qualifier("submitFilesService")
     private ISubmitFilesService submitFilesService;
 
     @Autowired

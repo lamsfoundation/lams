@@ -27,7 +27,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ThemeForm;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
@@ -35,13 +34,12 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Actions for maintaining and altering system themes
@@ -52,11 +50,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @RequestMapping("/themeManagement")
 public class ThemeManagementController {
 
-    private static IThemeService themeService;
-    private static Configuration configurationService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IThemeService themeService;
+    @Autowired
+    private Configuration configurationService;
+    
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping("/start")
     public String unspecified(@ModelAttribute ThemeForm themeForm, HttpServletRequest request) throws Exception {
@@ -64,18 +65,12 @@ public class ThemeManagementController {
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "ThemeManagementAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
 
-	if (ThemeManagementController.themeService == null) {
-	    ThemeManagementController.themeService = AdminServiceProxy
-		    .getThemeService(applicationContext.getServletContext());
-	}
-
 	// Get all the themes
-	List<Theme> themes = ThemeManagementController.themeService.getAllThemes();
+	List<Theme> themes = themeService.getAllThemes();
 
 	// Flag the default and un-editable themes
 	String currentCSSTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
@@ -95,23 +90,23 @@ public class ThemeManagementController {
 	// Update the theme
 	Theme theme = null;
 	if ((themeForm.getId() != null) && (themeForm.getId() != 0)) {
-	    theme = ThemeManagementController.themeService.getTheme(themeForm.getId());
+	    theme = themeService.getTheme(themeForm.getId());
 	} else {
 	    theme = new Theme();
 	}
 	updateThemeFromForm(theme, themeForm);
-	ThemeManagementController.themeService.saveOrUpdateTheme(theme);
+	themeService.saveOrUpdateTheme(theme);
 
 	// Set the theme as default, or disable it as default.
 	// Disabling restores the system default
 	if ((themeForm.getCurrentDefaultTheme() != null) && (themeForm.getCurrentDefaultTheme() == true)) {
 	    Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, themeForm.getName());
-	    getConfiguration().persistUpdate();
+	    configurationService.persistUpdate();
 	} else {
 	    String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
 	    if (themeForm.getName().equals(currentTheme)) {
 		Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, CSSThemeUtil.DEFAULT_HTML_THEME);
-		getConfiguration().persistUpdate();
+		configurationService.persistUpdate();
 	    }
 	}
 	themeForm.clear();
@@ -124,13 +119,13 @@ public class ThemeManagementController {
 
 	// Remove the theme
 	if (themeForm.getId() != null) {
-	    ThemeManagementController.themeService.removeTheme(themeForm.getId());
+	    themeService.removeTheme(themeForm.getId());
 	}
 
 	String currentTheme = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
 	if (themeForm.getName().equals(currentTheme)) {
 	    Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, CSSThemeUtil.DEFAULT_HTML_THEME);
-	    getConfiguration().persistUpdate();
+	    configurationService.persistUpdate();
 	}
 
 	themeForm.clear();
@@ -142,7 +137,7 @@ public class ThemeManagementController {
 
 	if (themeForm.getName() != null) {
 	    Configuration.updateItem(ConfigurationKeys.DEFAULT_THEME, themeForm.getName());
-	    getConfiguration().persistUpdate();
+	    configurationService.persistUpdate();
 	}
 	themeForm.clear();
 	return unspecified(themeForm, request);
@@ -154,15 +149,5 @@ public class ThemeManagementController {
 	theme.setImageDirectory(form.getImageDirectory());
 	// theme.setType(Integer.parseInt(form.getType())); no longer in form see LDEV-3674
 	return theme;
-    }
-
-    private Configuration getConfiguration() {
-	if (ThemeManagementController.configurationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    ThemeManagementController.configurationService = (Configuration) ctx.getBean("configurationService");
-
-	}
-	return ThemeManagementController.configurationService;
     }
 }

@@ -26,20 +26,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/signupManagement")
 public class SignupManagementController {
-
     private static Logger log = Logger.getLogger(SignupManagementController.class);
 
     @Autowired
-    @Qualifier("signupService")
     private ISignupService signupService = null;
-    
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService = null;
-    
     @Autowired
     @Qualifier("adminMessageService")
-    private MessageService adminMessageService;
+    private MessageService messageService;
 
     @RequestMapping("/start")
     public String execute(HttpServletRequest request) {
@@ -93,10 +88,10 @@ public class SignupManagementController {
 
 	    // validate
 	    if (!StringUtils.equals(signupForm.getCourseKey(), signupForm.getConfirmCourseKey())) {
-		errorMap.add("courseKey", adminMessageService.getMessage("error.course.keys.unequal"));
+		errorMap.add("courseKey", messageService.getMessage("error.course.keys.unequal"));
 	    }
 	    if (signupService.contextExists(signupForm.getSignupOrganisationId(), signupForm.getContext())) {
-		errorMap.add("context", adminMessageService.getMessage("error.context.exists"));
+		errorMap.add("context", messageService.getMessage("error.context.exists"));
 	    }
 
 	    if (!errorMap.isEmpty()) {

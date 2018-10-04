@@ -43,7 +43,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class LearningController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ILearnerService learnerService;
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request) throws Exception {
@@ -51,9 +51,6 @@ public class LearningController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
 	String finishURL = learnerService.completeToolSession(toolSessionId, user.getUserID().longValue());
 	return "index";
     }

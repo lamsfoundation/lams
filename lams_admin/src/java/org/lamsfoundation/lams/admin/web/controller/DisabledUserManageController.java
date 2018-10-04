@@ -28,48 +28,35 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
- *
- *
- *
- *
  */
 @Controller
 public class DisabledUserManageController {
-
     private static final Logger log = Logger.getLogger(DisabledUserManageController.class);
 
     @Autowired
-    private WebApplicationContext applicationContext;
-
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("adminMessageService")
     private MessageService adminMessageService;
 
     @RequestMapping("/disabledmanage")
     public String execute(HttpServletRequest request) throws Exception {
-
-	IUserManagementService service = AdminServiceProxy.getService(applicationContext.getServletContext());
-
-	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    request.setAttribute("errorName", "DisabledUserManageAction");
 	    request.setAttribute("errorMessage", adminMessageService.getMessage("error.need.sysadmin"));
 	    return "error";
 	}
 
-	List users = service.findByProperty(User.class, "disabledFlag", true);
+	List<User> users = userManagementService.findByProperty(User.class, "disabledFlag", true);
 	log.debug("got " + users.size() + " disabled users");
 	request.setAttribute("users", users);
 

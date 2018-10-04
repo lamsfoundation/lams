@@ -56,7 +56,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MarkController {
 
     @Autowired
-    @Qualifier("submitFilesService")
     private ISubmitFilesService submitFilesService;
 
     @Autowired

@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaStatsDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
@@ -64,12 +63,10 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -82,14 +79,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/monitoring")
 public class QaMonitoringController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(QaMonitoringController.class.getName());
 
     @Autowired
     private IQaService qaService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
-
-    private static Logger logger = Logger.getLogger(QaMonitoringController.class.getName());
 
     @RequestMapping("/")
     public String unspecified() throws IOException, ServletException, ToolException {
@@ -306,10 +299,6 @@ public class QaMonitoringController implements QaAppConstants {
 	return null;
     }
 
-    private IQaService getQAService() {
-	return QaServiceProxy.getQaService(applicationContext.getServletContext());
-    }
-
     /**
      * Get Paged Reflections
      *
@@ -334,7 +323,6 @@ public class QaMonitoringController implements QaAppConstants {
 	}
 
 	//return user list according to the given sessionID
-	IQaService qaService = getQAService();
 	List<Object[]> users = qaService.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting,
 		searchString);
 

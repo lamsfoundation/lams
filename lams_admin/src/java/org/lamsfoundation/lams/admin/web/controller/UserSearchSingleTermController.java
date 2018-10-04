@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -42,27 +41,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
- *
- *
- *
- *
  */
 @Controller
 public class UserSearchSingleTermController {
 
-    private static IUserManagementService service;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
 
     @RequestMapping(path = "/user/searchsingle", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 
-	UserSearchSingleTermController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	String term = WebUtil.readStrParam(request, "term", true);
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 
@@ -70,7 +61,7 @@ public class UserSearchSingleTermController {
 	    List users = new ArrayList();
 	    if (orgId != null) {
 		// filter results according to user's roles
-		Organisation org = (Organisation) UserSearchSingleTermController.service.findById(Organisation.class,
+		Organisation org = (Organisation) userManagementService.findById(Organisation.class,
 			orgId);
 		Organisation group;
 		if (org != null) {
@@ -85,19 +76,17 @@ public class UserSearchSingleTermController {
 				group = org;
 			    }
 			    // get search results, filtered according to orgId
-			    if (request.isUserInRole(Role.SYSADMIN)
-				    || UserSearchSingleTermController.service.isUserGlobalGroupAdmin()) {
-				users = UserSearchSingleTermController.service.findUsers(term, orgId);
-			    } else if (UserSearchSingleTermController.service.isUserInRole(userId,
-				    group.getOrganisationId(), Role.GROUP_ADMIN)
-				    || UserSearchSingleTermController.service.isUserInRole(userId,
-					    group.getOrganisationId(), Role.GROUP_MANAGER)) {
+			    if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin()) {
+				users = userManagementService.findUsers(term, orgId);
+			    } else if (userManagementService.isUserInRole(userId, group.getOrganisationId(),
+				    Role.GROUP_ADMIN)
+				    || userManagementService.isUserInRole(userId, group.getOrganisationId(),
+					    Role.GROUP_MANAGER)) {
 				if (group.getCourseAdminCanBrowseAllUsers()) {
-				    users = UserSearchSingleTermController.service.findUsers(term, orgId);
+				    users = userManagementService.findUsers(term, orgId);
 				} else if (org.getOrganisationType().getOrganisationTypeId()
 					.equals(OrganisationType.CLASS_TYPE)) {
-				    users = UserSearchSingleTermController.service.findUsers(term,
-					    group.getOrganisationId(), orgId);
+				    users = userManagementService.findUsers(term, group.getOrganisationId(), orgId);
 				}
 			    }
 			}
@@ -105,7 +94,7 @@ public class UserSearchSingleTermController {
 		}
 	    } else {
 		// if there's no orgId param, search all users
-		users = UserSearchSingleTermController.service.findUsers(term);
+		users = userManagementService.findUsers(term);
 	    }
 	    request.setAttribute("users", users);
 	}

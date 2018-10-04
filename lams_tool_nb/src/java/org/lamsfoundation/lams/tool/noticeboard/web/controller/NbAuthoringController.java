@@ -74,7 +74,6 @@ public class NbAuthoringController {
     public final static String FORM = "NbAuthoringForm";
 
     @Autowired
-    @Qualifier("nbService")
     private INoticeboardService nbService;
 
     @Autowired

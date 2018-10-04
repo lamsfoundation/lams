@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,21 +71,13 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/grouping")
 public class GroupingController {
-
-    /** Input parameter. Boolean value */
-    public static final String PARAM_FORCE_GROUPING = "force";
-
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(GroupingController.class);
 
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
     private WebApplicationContext applicationContext;
+    
     // ---------------------------------------------------------------------
     // Class level constants - Session Attributes
     // ---------------------------------------------------------------------
@@ -96,10 +87,9 @@ public class GroupingController {
     public static final String TITLE = "title";
     public static final String MAX_LEARNERS_PER_GROUP = "maxLearnersPerGroup";
     public static final String VIEW_STUDENTS_BEFORE_SELECTION = "viewStudentsBeforeSelection";
+    /** Input parameter. Boolean value */
+    public static final String PARAM_FORCE_GROUPING = "force";
 
-    // ---------------------------------------------------------------------
-    // Struts Dispatch Method
-    // ---------------------------------------------------------------------
     /**
      * Perform the grouping for the users who are currently running the lesson. If force is set to true, then we should
      * be in preview mode, and we want to override the chosen grouping to make it group straight away.

@@ -50,10 +50,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * An abstract class used for wiki actions common to monitor, learner and author
@@ -67,11 +64,7 @@ public abstract class WikiPageController {
     private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("wikiService")
     private IWikiService wikiService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     protected abstract WikiUser getCurrentUser(Long toolSessionId);
 

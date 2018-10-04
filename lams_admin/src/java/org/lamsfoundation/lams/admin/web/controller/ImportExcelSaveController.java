@@ -36,34 +36,24 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 public class ImportExcelSaveController {
 
+    @Autowired
+    private IImportService importService;
+    
     @Autowired
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/importexcelsave", method = RequestMethod.POST)
     public String execute(@ModelAttribute ImportExcelForm importExcelForm, HttpServletRequest request)
 	    throws Exception {
-
-	IImportService importService = AdminServiceProxy.getImportService(applicationContext.getServletContext());
 	MultipartFile file = importExcelForm.getFile();
 
 	// validation
@@ -74,15 +64,15 @@ public class ImportExcelSaveController {
 	String sessionId = SessionManager.getSession().getId();
 	SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
 	// use a new thread only if number of users is > threshold
-	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
-	    List results = importService.parseSpreadsheet(file, sessionId);
-	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
-	    return "forward:/importuserresult.do";
-	} else {
+//	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
+//	    List results = importService.parseSpreadsheet(file, sessionId);
+//	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
+//	    return "forward:/importuserresult.do";
+//	} else {
 	    Thread t = new Thread(new ImportExcelThread(sessionId));
 	    t.start();
 	    return "import/status";
-	}
+//	}
     }
 
     private class ImportExcelThread implements Runnable {
@@ -94,7 +84,9 @@ public class ImportExcelSaveController {
 
 	@Override
 	public void run() {
-	    IImportService importService = AdminServiceProxy.getImportService(applicationContext.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
+	    IImportService importService = (IImportService) wac.getBean("importService");
 	    try {
 		MultipartFile file = (MultipartFile) SessionManager.getSession(sessionId)
 			.getAttribute(IImportService.IMPORT_FILE);

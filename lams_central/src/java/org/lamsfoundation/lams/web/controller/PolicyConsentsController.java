@@ -27,11 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("policyConsents")
 public class PolicyConsentsController {
     @Autowired
-    @Qualifier("policyService")
-    private IPolicyService policyService = null;
+    private IPolicyService policyService;
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userManagementService = null;
+    private IUserManagementService userManagementService;
 
     @RequestMapping("")
     public String execute(HttpServletRequest request) throws Exception {

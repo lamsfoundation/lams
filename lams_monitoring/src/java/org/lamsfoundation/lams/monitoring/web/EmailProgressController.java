@@ -55,7 +55,6 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -70,20 +69,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/emailProgress")
 public class EmailProgressController {
+    private static Logger log = Logger.getLogger(EmailNotificationsController.class);
+    
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
     @Autowired
-    @Qualifier("eventNotificationService")
     private IEventNotificationService eventNotificationService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("scheduler")
     private Scheduler scheduler;
-
-    private static Logger log = Logger.getLogger(EmailNotificationsController.class);
 
     // ---------------------------------------------------------------------
     // Class level constants

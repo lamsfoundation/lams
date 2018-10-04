@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,11 +42,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Marcin Cieslak
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/pedagogicalPlanner")
@@ -56,7 +50,6 @@ public class PedagogicalPlannerController {
     private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
-    @Qualifier("wikiService")
     private IWikiService wikiService;
 
     @RequestMapping("/initPedagogicalPlannerForm")

@@ -96,7 +96,6 @@ public class LearningController {
     private static final boolean MODE_OPTIONAL = false;
 
     @Autowired
-    @Qualifier("forumService")
     private IForumService forumService;
 
     @Autowired

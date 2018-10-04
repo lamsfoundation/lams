@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -34,32 +33,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 public class ImportGroupsController {
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IImportService importService;
 
     @RequestMapping(path = "/importgroups")
-    public String execute(@ModelAttribute("importForm") ImportExcelForm importForm, HttpServletRequest request) throws Exception {
-
-	IImportService importService = AdminServiceProxy.getImportService(applicationContext.getServletContext());
+    public String execute(@ModelAttribute("importForm") ImportExcelForm importForm, HttpServletRequest request)
+	    throws Exception {
 	importForm.setOrgId(0);
 	MultipartFile file = importForm.getFile();
 

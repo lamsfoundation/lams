@@ -37,7 +37,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -45,16 +44,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * The action servlet that provides the support for the Sequence activities. At present, this is only a basic view
  * screen that lists the user's in the sequence.
  *
- *
- *
- *
  * @author Fiona Malikoff
  */
 @Controller
 public class SequenceController {
 
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
 
     public static final String VIEW_SEQUENCE = "viewSequence";

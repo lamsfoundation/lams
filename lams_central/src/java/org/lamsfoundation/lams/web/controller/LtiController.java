@@ -30,7 +30,6 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
-import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
@@ -49,7 +48,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -70,25 +68,16 @@ public class LtiController {
     private static Logger log = Logger.getLogger(LtiController.class);
 
     @Autowired
-    @Qualifier("integrationService")
     private IIntegrationService integrationService;
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringService monitoringService;
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("learningDesignService")
-    private ILearningDesignService learningDesignService;
-    @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("workspaceManagementService")
     private IWorkspaceManagementService workspaceManagementService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
 
     /**

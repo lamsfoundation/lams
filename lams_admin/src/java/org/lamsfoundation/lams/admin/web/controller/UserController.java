@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.UserOrgRoleDTO;
 import org.lamsfoundation.lams.admin.web.form.UserForm;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -61,10 +60,10 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Jun-Dir Liew
@@ -72,44 +71,31 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-
     private static Logger log = Logger.getLogger(UserController.class);
-    private IUserManagementService service;
+    
+    @Autowired
+    private ILogEventService logEventService;
+    @Autowired
+    @Qualifier("adminMessageService")
     private MessageService messageService;
-    private static IThemeService themeService;
-    private static ITimezoneService timezoneService;
+    @Autowired
+    private IThemeService themeService;
+    @Autowired
+    private ITimezoneService timezoneService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
-    @Autowired
-    private WebApplicationContext applicationContext;
-
-    private void initServices() {
-	if (service == null) {
-	    service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	}
-	if (messageService == null) {
-	    messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	}
-	if (UserController.themeService == null) {
-	    UserController.themeService = AdminServiceProxy.getThemeService(applicationContext.getServletContext());
-	}
-	if (UserController.timezoneService == null) {
-	    UserController.timezoneService = AdminServiceProxy
-		    .getTimezoneService(applicationContext.getServletContext());
-	}
-    }
-
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
-
-	initServices();
-	if (UserController.locales == null) {
-	    UserController.locales = service.findAll(SupportedLocale.class);
-	    Collections.sort(UserController.locales);
+	if (locales == null) {
+	    locales = userManagementService.findAll(SupportedLocale.class);
+	    Collections.sort(locales);
 	}
-	if (UserController.authenticationMethods == null) {
-	    UserController.authenticationMethods = service.findAll(AuthenticationMethod.class);
+	if (authenticationMethods == null) {
+	    authenticationMethods = userManagementService.findAll(AuthenticationMethod.class);
 	}
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
@@ -119,11 +105,11 @@ public class UserController {
 	userForm.setUserId(userId);
 
 	// Get all the css themess
-	List<Theme> themes = UserController.themeService.getAllThemes();
+	List<Theme> themes = themeService.getAllThemes();
 	request.setAttribute("themes", themes);
 
 	// Select the default themes by default
-	Theme defaultTheme = UserController.themeService.getDefaultTheme();
+	Theme defaultTheme = themeService.getDefaultTheme();
 	for (Theme theme : themes) {
 	    if (theme.getThemeId().equals(defaultTheme.getThemeId())) {
 		userForm.setUserTheme(theme.getThemeId());
@@ -133,18 +119,18 @@ public class UserController {
 
 	// test requestor's permission
 	Organisation org = null;
-	Boolean canEdit = service.isUserGlobalGroupAdmin();
+	Boolean canEdit = userManagementService.isUserGlobalGroupAdmin();
 	if (orgId != null) {
-	    org = (Organisation) service.findById(Organisation.class, orgId);
+	    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (!canEdit) {
 		OrganisationType orgType = org.getOrganisationType();
 		Integer orgIdOfCourse = orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)
 			? org.getParentOrganisation().getOrganisationId()
 			: orgId;
-		User requestor = service.getUserByLogin(request.getRemoteUser());
-		if (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
-			|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
-		    Organisation course = (Organisation) service.findById(Organisation.class, orgIdOfCourse);
+		User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
+		if (userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
+			|| userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
+		    Organisation course = (Organisation) userManagementService.findById(Organisation.class, orgIdOfCourse);
 		    canEdit = course.getCourseAdminCanAddNewUsers();
 		}
 	    }
@@ -158,8 +144,8 @@ public class UserController {
 
 	// editing a user
 	if ((userId != null) && (userId != 0)) {
-	    User user = (User) service.findById(User.class, userId);
-	    UserController.log.debug("got userid to edit: " + userId);
+	    User user = (User) userManagementService.findById(User.class, userId);
+	    log.debug("got userid to edit: " + userId);
 	    BeanUtils.copyProperties(userForm, user);
 	    userForm.setPassword(null);
 	    SupportedLocale locale = user.getLocale();
@@ -183,7 +169,7 @@ public class UserController {
 	    }
 	    // if still null, use the default
 	    if (userSelectedTheme == null) {
-		userSelectedTheme = UserController.themeService.getDefaultTheme().getThemeId();
+		userSelectedTheme = themeService.getDefaultTheme().getThemeId();
 	    }
 	    userForm.setUserTheme(userSelectedTheme);
 	    userForm.setInitialPortraitId(user.getPortraitUuid());
@@ -197,7 +183,7 @@ public class UserController {
 		String country = LanguageUtil.getDefaultCountry();
 		userForm.setCountry(country);
 	    } catch (Exception e) {
-		UserController.log.debug(e);
+		log.debug(e);
 	    }
 
 	    Timezone serverTimezone = timezoneService.getServerTimezone();
@@ -211,7 +197,7 @@ public class UserController {
 	}
 
 	// Get all available time zones
-	List<Timezone> availableTimeZones = UserController.timezoneService.getDefaultTimezones();
+	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
 	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneDTOComparator());
 	for (Timezone availableTimeZone : availableTimeZones) {
 	    String timezoneId = availableTimeZone.getTimezoneId();
@@ -226,24 +212,23 @@ public class UserController {
 	if (org != null) {
 	    request.setAttribute("orgName", org.getName());
 	    Organisation parentOrg = org.getParentOrganisation();
-	    if ((parentOrg != null) && !parentOrg.equals(service.getRootOrganisation())) {
+	    if ((parentOrg != null) && !parentOrg.equals(userManagementService.getRootOrganisation())) {
 		request.setAttribute("pOrgId", parentOrg.getOrganisationId());
 		request.setAttribute("parentName", parentOrg.getName());
 	    }
 	}
 
-	request.setAttribute("locales", UserController.locales);
+	request.setAttribute("locales", locales);
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
-	request.setAttribute("authenticationMethods", UserController.authenticationMethods);
+	request.setAttribute("authenticationMethods", authenticationMethods);
 
 	return "user";
     }
 
     // display user's global roles, if any
     private UserOrgRoleDTO getGlobalRoles(User user) {
-	initServices();
-	UserOrganisation uo = service.getUserOrganisation(user.getUserId(),
-		service.getRootOrganisation().getOrganisationId());
+	UserOrganisation uo = userManagementService.getUserOrganisation(user.getUserId(),
+		userManagementService.getRootOrganisation().getOrganisationId());
 	if (uo == null) {
 	    return null;
 	}
@@ -261,10 +246,8 @@ public class UserController {
     // display user's organisations and roles in them
     @SuppressWarnings("unchecked")
     private List<UserOrgRoleDTO> getUserOrgRoles(User user) {
-
-	initServices();
 	List<UserOrgRoleDTO> uorDTOs = new ArrayList<>();
-	List<UserOrganisation> uos = service.getUserOrganisationsForUserByTypeAndStatus(user.getLogin(),
+	List<UserOrganisation> uos = userManagementService.getUserOrganisationsForUserByTypeAndStatus(user.getLogin(),
 		OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
 	for (UserOrganisation uo : uos) {
 	    UserOrgRoleDTO uorDTO = new UserOrgRoleDTO();
@@ -276,7 +259,7 @@ public class UserController {
 	    uorDTO.setOrgName(uo.getOrganisation().getName());
 	    uorDTO.setRoles(roles);
 	    List<UserOrgRoleDTO> childDTOs = new ArrayList<>();
-	    List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(
+	    List<UserOrganisation> childuos = userManagementService.getUserOrganisationsForUserByTypeAndStatusAndParent(
 		    user.getLogin(), OrganisationType.CLASS_TYPE, OrganisationState.ACTIVE,
 		    uo.getOrganisation().getOrganisationId());
 	    for (UserOrganisation childuo : childuos) {
@@ -300,10 +283,7 @@ public class UserController {
     // determine whether to disable or delete user based on their lams data
     @RequestMapping(path = "/remove")
     public String remove(HttpServletRequest request) throws Exception {
-
-	initServices();
-
-	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -311,9 +291,9 @@ public class UserController {
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
-	User user = (User) service.findById(User.class, userId);
+	User user = (User) userManagementService.findById(User.class, userId);
 
-	Boolean hasData = service.userHasData(user);
+	Boolean hasData = userManagementService.userHasData(user);
 
 	request.setAttribute("method", (hasData ? "disable" : "delete"));
 	request.setAttribute("orgId", orgId);
@@ -323,10 +303,7 @@ public class UserController {
 
     @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
-
-	initServices();
-
-	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -335,11 +312,10 @@ public class UserController {
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
-	service.disableUser(userId);
+	userManagementService.disableUser(userId);
 	String[] args = new String[1];
 	args[0] = userId.toString();
 	String message = messageService.getMessage("audit.user.disable", args);
-	ILogEventService logEventService = AdminServiceProxy.getLogEventService(applicationContext.getServletContext());
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
@@ -352,10 +328,7 @@ public class UserController {
 
     @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
-
-	initServices();
-
-	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -365,7 +338,7 @@ public class UserController {
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId");
 	try {
-	    service.removeUser(userId);
+	    userManagementService.removeUser(userId);
 	} catch (Exception e) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", e.getMessage());
@@ -374,7 +347,6 @@ public class UserController {
 	String[] args = new String[1];
 	args[0] = userId.toString();
 	String message = messageService.getMessage("audit.user.delete", args);
-	ILogEventService logEventService = AdminServiceProxy.getLogEventService(applicationContext.getServletContext());
 	logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, sysadmin != null ? sysadmin.getUserID() : null, userId,
 		null, null, message);
 	if ((orgId == null) || (orgId == 0)) {
@@ -388,21 +360,18 @@ public class UserController {
     // called from disabled users screen
     @RequestMapping(path = "/enable")
     public String enable(HttpServletRequest request) throws Exception {
-
-	initServices();
-
-	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
 
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
-	User user = (User) service.findById(User.class, userId);
+	User user = (User) userManagementService.findById(User.class, userId);
 
-	UserController.log.debug("enabling user: " + userId);
+	log.debug("enabling user: " + userId);
 	user.setDisabledFlag(false);
-	service.saveUser(user);
+	userManagementService.saveUser(user);
 
 	return "forward:/disabledmanage.do";
     }

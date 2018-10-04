@@ -92,7 +92,6 @@ public class LearningController {
     private static final String REQUEST_JSON_PARENT_NODE_ID = "parentId"; // Expected to be long
 
     @Autowired
-    @Qualifier("mindmapService")
     private IMindmapService mindmapService;
 
     @Autowired

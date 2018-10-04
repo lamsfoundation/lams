@@ -27,14 +27,14 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.admin.AdminConstants;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
@@ -43,16 +43,14 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 public class SysAdminStartController {
 
-    private static IUserManagementService service;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/sysadminstart")
     public String execute(HttpServletRequest request) throws Exception {
-
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
-
 	ArrayList<Object[]> groupedLinks = new ArrayList<>();
 
 	if (request.isUserInRole(Role.SYSADMIN)) {
@@ -84,7 +82,7 @@ public class SysAdminStartController {
 	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_COURSE_LINKS, links });
 
-	} else if (service.isUserGlobalGroupAdmin()) {
+	} else if (userManagementService.isUserGlobalGroupAdmin()) {
 	    ArrayList<LinkBean> links = new ArrayList<>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
 	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
@@ -94,8 +92,7 @@ public class SysAdminStartController {
 
 	} else {
 	    request.setAttribute("errorName", "SysAdminStartAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
 

@@ -57,16 +57,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- */
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
-
     private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("pixlrService")
     private IPixlrService pixlrService;
 
     @Autowired

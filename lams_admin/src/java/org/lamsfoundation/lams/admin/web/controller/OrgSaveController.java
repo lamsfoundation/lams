@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.OrganisationForm;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
@@ -45,47 +44,34 @@ import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="OrgSaveAction.java.html"><i>View Source</i></a>
- *          </p>
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- *         Created at 16:42:53 on 2006-6-7
  */
-
 @Controller
 public class OrgSaveController {
 
     private static Logger log = Logger.getLogger(OrgSaveController.class);
-    private static IUserManagementService service;
-    private MessageService messageService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ILogEventService logEventService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/orgsave")
     public String execute(@ModelAttribute OrganisationForm organisationForm, BindingResult bindingResult,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-	if (service == null) {
-	    service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	}
-	if (messageService == null) {
-	    messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	}
 
 	Integer orgId = organisationForm.getOrgId();
 	Organisation org;
@@ -102,12 +88,12 @@ public class OrgSaveController {
 	if (errorMap.isEmpty()) {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    OrganisationState state = (OrganisationState) service.findById(OrganisationState.class,
+	    OrganisationState state = (OrganisationState) userManagementService.findById(OrganisationState.class,
 		    organisationForm.getStateId());
 
 	    if (orgId != null) {
-		if (service.canEditGroup(user.getUserID(), orgId)) {
-		    org = (Organisation) service.findById(Organisation.class, orgId);
+		if (userManagementService.canEditGroup(user.getUserID(), orgId)) {
+		    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 		    // set archived date only when it first changes to become archived
 		    if (state.getOrganisationStateId().equals(OrganisationState.ARCHIVED) && !org.getOrganisationState()
 			    .getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
@@ -124,16 +110,16 @@ public class OrgSaveController {
 		org = new Organisation();
 		BeanUtils.copyProperties(org, organisationForm);
 		org.setParentOrganisation(
-			(Organisation) service.findById(Organisation.class, organisationForm.getParentId()));
+			(Organisation) userManagementService.findById(Organisation.class, organisationForm.getParentId()));
 		org.setOrganisationType(
-			(OrganisationType) service.findById(OrganisationType.class, organisationForm.getTypeId()));
+			(OrganisationType) userManagementService.findById(OrganisationType.class, organisationForm.getTypeId()));
 		writeAuditLog(user, org, organisationForm, org.getOrganisationState());
 	    }
 	    org.setOrganisationState(state);
 	    if (log.isDebugEnabled()) {
 		log.debug("orgId: " + org.getOrganisationId() + " create date: " + org.getCreateDate());
 	    }
-	    org = service.saveOrganisation(org, user.getUserID());
+	    org = userManagementService.saveOrganisation(org, user.getUserID());
 
 	    request.setAttribute("org", organisationForm.getParentId());
 	    return "forward:/orgmanage.do";
@@ -144,11 +130,6 @@ public class OrgSaveController {
     }
 
     private void writeAuditLog(UserDTO user, Organisation org, OrganisationForm orgForm, OrganisationState newState) {
-
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
-	MessageService messageService = (MessageService) ctx.getBean("adminMessageService");
 
 	String message;
 

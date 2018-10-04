@@ -29,7 +29,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.TimezoneForm;
 import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
@@ -40,35 +39,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Implements time zone manager.
  *
  * @author Andrey Balan
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/timezonemanagement")
 public class TimezoneManagementController {
 
-    private static ITimezoneService timezoneService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ITimezoneService timezoneService;
 
     /**
      * Displays list of all JRE available timezones.
      */
     @RequestMapping("/start")
     public String unspecified(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request) throws Exception {
-
-	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());
 	List<Timezone> defaultTimezones = timezoneService.getDefaultTimezones();
 
 	ArrayList<TimezoneDTO> timezoneDtos = new ArrayList<>();
@@ -108,9 +96,6 @@ public class TimezoneManagementController {
     @RequestMapping(path = "/serverTimezoneManagement")
     public String serverTimezoneManagement(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
 	    throws Exception {
-
-	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());
-
 	ArrayList<TimezoneDTO> timezoneDtos = new ArrayList<>();
 	for (String availableTimezoneId : TimeZone.getAvailableIDs()) {
 	    TimeZone timeZone = TimeZone.getTimeZone(availableTimezoneId);
@@ -130,8 +115,6 @@ public class TimezoneManagementController {
     @RequestMapping(path = "/changeServerTimezone")
     public String changeServerTimezone(@ModelAttribute TimezoneForm timezoneForm, HttpServletRequest request)
 	    throws Exception {
-	timezoneService = AdminServiceProxy.getTimezoneService(applicationContext.getServletContext());
-
 	String timeZoneId = WebUtil.readStrParam(request, "timeZoneId");
 	timezoneService.setServerTimezone(timeZoneId);
 

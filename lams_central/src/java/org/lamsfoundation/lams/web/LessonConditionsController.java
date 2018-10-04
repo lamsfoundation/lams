@@ -65,9 +65,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * This Action takes care of operations on lesson conditional release based on preceding lesson completion.
  *
  * @author Marcin Cieslak
- *
- *
- *
  */
 @Controller
 @RequestMapping("/lessonConditions")
@@ -84,20 +81,16 @@ public class LessonConditionsController {
     private static final String PARAM_INDIVIDUAL_FINISH = "lessonIndividualFinish";
 
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringService monitoringService;
     @Autowired
-    @Qualifier("groupUserDAO")
     private IGroupUserDAO groupUserDAO;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
     @Qualifier("centralMessageService")
-    private MessageService messageservice;
+    private MessageService messageService;
 
     /**
      * Prepares data for thickbox displayed on Index page.
@@ -300,7 +293,7 @@ public class LessonConditionsController {
 	} catch (Exception e) {
 	    LessonConditionsController.logger.error(e);
 	    errorMap.add("GLOBAL",
-		    messageservice.getMessage("error.conditions.box.finish.date", new Object[] { e.getMessage() }));
+		    messageService.getMessage("error.conditions.box.finish.date", new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {

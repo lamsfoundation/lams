@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,7 +75,6 @@ public class MonitoringController implements VoteAppConstants {
     private static Logger logger = Logger.getLogger(MonitoringController.class.getName());
 
     @Autowired
-    @Qualifier("voteService")
     private IVoteService voteService;
 
     @RequestMapping(path = "/hideOpenVote")

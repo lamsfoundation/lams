@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,17 +37,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class PortraitController {
-
     private static Logger log = Logger.getLogger(PortraitController.class);
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService service;
+    private IUserManagementService userManagementService;
 
     @RequestMapping("/portrait")
     public String execute(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request)
 	    throws Exception {
 
-	Long portraitUuid = service.getUserByLogin(request.getRemoteUser()).getPortraitUuid();
+	Long portraitUuid = userManagementService.getUserByLogin(request.getRemoteUser()).getPortraitUuid();
 	log.debug("using portraitUuid=" + portraitUuid);
 	// if no portrait has been uploaded, set the uuid to 0
 	portraitForm.setPortraitUuid(portraitUuid == null ? 0 : portraitUuid);

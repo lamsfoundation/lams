@@ -29,7 +29,6 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -44,7 +43,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
@@ -52,40 +50,21 @@ import org.springframework.web.context.WebApplicationContext;
  * Saves roles for users that were just added.
  * Uses session scope because using request scope doesn't copy the form data
  * into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
- *
- */
-
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @SessionAttributes("userOrgRoleForm")
 public class UserOrgRoleSaveController {
-
     private static Logger log = Logger.getLogger(UserOrgRoleSaveController.class);
-    private static IUserManagementService service;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
-
+    private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("adminMessageService")
-    private MessageService adminMessageService;
+    private MessageService messageService;
 
     @RequestMapping(path = "/userorgrolesave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, HttpServletRequest request)
 	    throws Exception {
-
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
-
 	ArrayList userBeans = userOrgRoleForm.getUserBeans();
 	log.debug("userBeans is null? " + userBeans == null);
 	Integer orgId = userOrgRoleForm.getOrgId();
@@ -98,18 +77,18 @@ public class UserOrgRoleSaveController {
 	// for subgroups, if user is not a member of the parent group then add to that as well.
 	for (int i = 0; i < userBeans.size(); i++) {
 	    UserBean bean = (UserBean) userBeans.get(i);
-	    User user = (User) service.findById(User.class, bean.getUserId());
+	    User user = (User) userManagementService.findById(User.class, bean.getUserId());
 	    log.debug("userId: " + bean.getUserId());
 	    String[] roleIds = bean.getRoleIds();
 	    if (roleIds.length == 0) {
 		// TODO forward to userorgrole.do, not userorg.do
 		MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-		errorMap.add("roles", adminMessageService.getMessage("error.roles.empty"));
+		errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 		request.setAttribute("errorMap", errorMap);
 		request.setAttribute("orgId", orgId);
 		return "forward:/userorg.do";
 	    }
-	    service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
+	    userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
 	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic
 	    // is done in service.setRolesForUserOrganisation()
 	    //if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {

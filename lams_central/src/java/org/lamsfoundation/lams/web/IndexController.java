@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -67,18 +66,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/index")
 public class IndexController {
-
+    private static Logger log = Logger.getLogger(IndexController.class);
     private static final String PATH_LAMS_PLANNER_WAR = "lams-planner.war";
 
-    private static Logger log = Logger.getLogger(IndexController.class);
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("integrationService")
     private IIntegrationService integrationService;
     @Autowired
-    @Qualifier("policyService")
     private IPolicyService policyService;
 
     @RequestMapping("")

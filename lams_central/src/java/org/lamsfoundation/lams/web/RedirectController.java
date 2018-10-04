@@ -41,40 +41,33 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
+ * This action is used for notification emails. It is designed to enable direct linking to either monitor or
+ * learner so that links can be sent in the email. This must be done through LAMS central so it correctly
+ * redirects the user to the login page (if they have no session) before returning them to the correct location.
+ *
+ * This action takes one parameter "h" which is a Base64 hash of a comma-separated value (relativeUrlPath,
+ * toolSessionID, accessMode) where: relativeUrlPath = Relative path to resource eg /tool/lawiki10/learner.do
+ * toolSessionID = A valid tool session ID for the lesson accessMode = l or t (learner or teacher)
+ *
+ * The parameters are hashed to prevent people from identifying the url, and attempting to access content to
+ * which they are unauthorised, see LDEV-1978
+ *
+ * The toolSessionID and accessMode are used to determine the permissions of this user so it someone forwards
+ * the email to an unauthorised user, they still cannot access the link unless they are part of the correct
+ * group. These checks may become unneccessary on the completion of LDEV-1978
+ *
+ * Note that parameter names have been made as short as possible here to attempt to shorten the entire link
+ * required, and hopefully prevent email clients cutting them off and making a newline which sometimes breaks
+ * links.
+ * 
  * @author lfoxton
- *
- *         This action is used for notification emails. It is designed to enable direct linking to either monitor or
- *         learner so that links can be sent in the email. This must be done through LAMS central so it correctly
- *         redirects the user to the login page (if they have no session) before returning them to the correct location.
- *
- *         This action takes one parameter "h" which is a Base64 hash of a comma-separated value (relativeUrlPath,
- *         toolSessionID, accessMode) where: relativeUrlPath = Relative path to resource eg /tool/lawiki10/learner.do
- *         toolSessionID = A valid tool session ID for the lesson accessMode = l or t (learner or teacher)
- *
- *         The parameters are hashed to prevent people from identifying the url, and attempting to access content to
- *         which they are unauthorised, see LDEV-1978
- *
- *         The toolSessionID and accessMode are used to determine the permissions of this user so it someone forwards
- *         the email to an unauthorised user, they still cannot access the link unless they are part of the correct
- *         group. These checks may become unneccessary on the completion of LDEV-1978
- *
- *         Note that parameter names have been made as short as possible here to attempt to shorten the entire link
- *         required, and hopefully prevent email clients cutting them off and making a newline which sometimes breaks
- *         links.
- *
- *
- *
- *
- *
  */
 @Controller
 public class RedirectController {
-
     private static Logger log = Logger.getLogger(RedirectController.class);
 
     public static final String PARAM_HASH = "h";
@@ -83,11 +76,9 @@ public class RedirectController {
     public static final String ACCESS_MODE_LEARNER = "l";
 
     @Autowired
-    @Qualifier("lamsToolService")
     private ILamsToolService lamsToolService;
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userService;
+    private IUserManagementService userManagementService;
 
     @RequestMapping("/r")
     public String execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -175,7 +166,7 @@ public class RedirectController {
     }
 
     private User getRealUser(UserDTO dto) {
-	return userService.getUserByLogin(dto.getLogin());
+	return userManagementService.getUserByLogin(dto.getLogin());
     }
 
     private ToolSession getToolSession(Long toolSessionID) {

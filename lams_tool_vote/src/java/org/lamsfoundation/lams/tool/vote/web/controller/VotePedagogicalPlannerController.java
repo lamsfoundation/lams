@@ -43,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/pedagogicalPlanner")
 public class VotePedagogicalPlannerController {
     @Autowired
-    @Qualifier("voteService")
     private IVoteService voteService;
 
     @Autowired

@@ -32,7 +32,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.LogEventType;
 import org.lamsfoundation.lams.logevent.dto.LogEventTypeDTO;
@@ -43,12 +42,10 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -60,13 +57,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/logevent")
 public class LogEventController {
-
-    private static ILogEventService logEventService;
-    private MessageService messageService;
     private static SimpleDateFormat START_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd");
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ILogEventService logEventService;
+    
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String unspecified(HttpServletRequest request) throws Exception {
@@ -74,15 +72,8 @@ public class LogEventController {
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "EventLogAdmin");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
-	}
-
-	logEventService = getLogEventService();
-
-	if (messageService == null) {
-	    messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 	}
 
 	// get the log type data and return display for user selection. Also get the start and stop dates from the log.
@@ -113,12 +104,9 @@ public class LogEventController {
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "EventLogAdmin");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
 	}
-
-	logEventService = getLogEventService();
 
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
@@ -198,15 +186,6 @@ public class LogEventController {
 	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	return responsedata.toString();
-    }
-
-    private ILogEventService getLogEventService() throws ServletException {
-	if (logEventService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
-	    logEventService = (ILogEventService) ctx.getBean("logEventService");
-	}
-	return logEventService;
     }
 
 }

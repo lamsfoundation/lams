@@ -45,28 +45,17 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
-
     private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("notebookService")
     private INotebookService notebookService;
 
     // Authoring SessionMap key names

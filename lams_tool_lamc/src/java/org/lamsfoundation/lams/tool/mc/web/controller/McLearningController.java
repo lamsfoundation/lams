@@ -86,7 +86,6 @@ public class McLearningController {
     private static Logger logger = Logger.getLogger(McLearningController.class.getName());
 
     @Autowired
-    @Qualifier("mcService")
     private IMcService mcService;
 
     @Autowired

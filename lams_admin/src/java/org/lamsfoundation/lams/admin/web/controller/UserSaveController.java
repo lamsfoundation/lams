@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.UserForm;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.themes.Theme;
@@ -47,13 +46,13 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Jun-Dir Liew
@@ -62,24 +61,23 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/usersave")
 public class UserSaveController {
-
     private static Logger log = Logger.getLogger(UserSaveController.class);
-    private static IUserManagementService service;
-    private static MessageService messageService;
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ISecurityService securityService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/saveUserDetails", method = RequestMethod.POST)
     public String saveUserDetails(@ModelAttribute UserForm userForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	UserSaveController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	// action input
 	Integer orgId = userForm.getOrgId();
 	Integer userId = userForm.getUserId();
-	ISecurityService securityService = AdminServiceProxy.getSecurityService(applicationContext.getServletContext());
 	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
 	// check if logged in User is Sysadmin
@@ -89,14 +87,14 @@ public class UserSaveController {
 	}
 	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-	UserSaveController.log.debug("orgId: " + orgId);
+	log.debug("orgId: " + orgId);
 	Boolean edit = false;
-	SupportedLocale locale = (SupportedLocale) UserSaveController.service.findById(SupportedLocale.class,
+	SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class,
 		userForm.getLocaleId());
-	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveController.service
+	AuthenticationMethod authenticationMethod = (AuthenticationMethod) userManagementService
 		.findById(AuthenticationMethod.class, userForm.getAuthenticationMethodId());
-	UserSaveController.log.debug("locale: " + locale);
-	UserSaveController.log.debug("authenticationMethod:" + authenticationMethod);
+	log.debug("locale: " + locale);
+	log.debug("authenticationMethod:" + authenticationMethod);
 
 	if (request.getAttribute("CANCEL") != null) {
 	    if ((orgId == null) || (orgId == 0)) {
@@ -108,7 +106,7 @@ public class UserSaveController {
 	User user = null;
 	if (userId != null) {
 	    edit = true;
-	    user = (User) UserSaveController.service.findById(User.class, userId);
+	    user = (User) userManagementService.findById(User.class, userId);
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -120,7 +118,7 @@ public class UserSaveController {
 	    errorMap.add("login", messageService.getMessage("error.username.invalid.characters"));
 	} else {
 	    userForm.setLogin(login);
-	    User existingUser = UserSaveController.service.getUserByLogin(login);
+	    User existingUser = userManagementService.getUserByLogin(login);
 	    if (existingUser != null) {
 		if ((user != null) && StringUtils.equals(user.getLogin(), login)) {
 		    // login exists - it's the user's current login
@@ -157,17 +155,17 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    if (edit) { // edit user
-		UserSaveController.log.debug("editing userId: " + userId);
+		log.debug("editing userId: " + userId);
 		// hash the new password if necessary, and audit the fact
 		userForm.setPassword(user.getPassword());
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
 
-		Theme cssTheme = (Theme) UserSaveController.service.findById(Theme.class, userForm.getUserTheme());
+		Theme cssTheme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
 		user.setTheme(cssTheme);
 
-		UserSaveController.service.saveUser(user);
+		userManagementService.saveUser(user);
 	    } else { // create user
 
 		//password validation
@@ -190,28 +188,28 @@ public class UserSaveController {
 		    BeanUtils.copyProperties(user, userForm);
 		    user.setSalt(salt);
 		    user.setPassword(passwordHash);
-		    UserSaveController.log.debug("creating user... new login: " + user.getLogin());
+		    log.debug("creating user... new login: " + user.getLogin());
 		    if (errorMap.isEmpty()) {
 			// TODO set theme according to user input
 			// instead of server default.
-			user.setTheme(UserSaveController.service.getDefaultTheme());
+			user.setTheme(userManagementService.getDefaultTheme());
 			user.setDisabledFlag(false);
 			user.setCreateDate(new Date());
-			user.setAuthenticationMethod((AuthenticationMethod) UserSaveController.service
+			user.setAuthenticationMethod((AuthenticationMethod) userManagementService
 				.findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
 				.get(0));
 			user.setUserId(null);
 			user.setLocale(locale);
 
-			Theme theme = (Theme) UserSaveController.service.findById(Theme.class, userForm.getUserTheme());
+			Theme theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
 			user.setTheme(theme);
 
-			UserSaveController.service.saveUser(user);
+			userManagementService.saveUser(user);
 
 			// make 'create user' audit log entry
-			UserSaveController.service.logUserCreated(user, sysadmin);
+			userManagementService.logUserCreated(user, sysadmin);
 
-			UserSaveController.log.debug("user: " + user.toString());
+			log.debug("user: " + user.toString());
 		    }
 		}
 	    }
@@ -240,10 +238,8 @@ public class UserSaveController {
     public String changePass(@ModelAttribute UserForm userForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	UserSaveController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 	userForm.setUserId(userId);
-	ISecurityService securityService = AdminServiceProxy.getSecurityService(applicationContext.getServletContext());
 	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
 	// check if logged in User is Sysadmin
@@ -269,12 +265,12 @@ public class UserSaveController {
 	}
 
 	if (errorMap.isEmpty()) {
-	    User user = (User) UserSaveController.service.findById(User.class, userId);
+	    User user = (User) userManagementService.findById(User.class, userId);
 	    String salt = HashUtil.salt();
 	    String passwordHash = HashUtil.sha256(password, salt);
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
-	    UserSaveController.service.saveUser(user);
+	    userManagementService.saveUser(user);
 	    return "forward:/user/edit.do";
 	}
 	request.setAttribute("errorMap", errorMap);

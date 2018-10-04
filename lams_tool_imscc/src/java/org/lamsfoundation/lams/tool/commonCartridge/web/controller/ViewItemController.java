@@ -55,8 +55,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @Controller
 public class ViewItemController {
@@ -64,10 +62,10 @@ public class ViewItemController {
     private static final Logger log = Logger.getLogger(ViewItemController.class);
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    @Qualifier("commonCartridgeMessageService")
+    private MessageService messageService;
 
     @Autowired
-    @Qualifier("commonCartridgeService")
     private ICommonCartridgeService commonCartridgeService;;
 
     /**
@@ -209,10 +207,6 @@ public class ViewItemController {
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	CommonCartridgeItem item = getCommonCartridgeItem(request, sessionMap, mode);
-
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	MessageService messageService = (MessageService) wac.getBean("commonCartridgeMessageService");
 
 	// Get the post data for the placement
 	String returnValues = LamsBasicLTIUtil.postLaunchHTML(commonCartridgeService, messageService, item);

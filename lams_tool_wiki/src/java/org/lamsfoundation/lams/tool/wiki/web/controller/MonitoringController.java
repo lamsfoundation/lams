@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -74,11 +73,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/monitoring")
 public class MonitoringController extends WikiPageController {
-
     private static Logger log = Logger.getLogger(MonitoringController.class);
 
     @Autowired
-    @Qualifier("wikiService")
     private IWikiService wikiService;
 
     /**

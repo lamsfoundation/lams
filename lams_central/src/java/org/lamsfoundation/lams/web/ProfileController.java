@@ -75,34 +75,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
-
     private static Logger log = Logger.getLogger(ProfileController.class);
 
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService service;
-
-    private static List<SupportedLocale> locales;
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
     @Autowired
-    @Qualifier("themeService")
     private IThemeService themeService;
     @Autowired
-    @Qualifier("timezoneService")
     private ITimezoneService timezoneService;
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
     @Autowired
-    @Qualifier("policyService")
     private IPolicyService policyService;
+    
+    private static List<SupportedLocale> locales;
 
     @RequestMapping("/view")
     public String view(HttpServletRequest request) throws Exception {
 
-	User requestor = service.getUserByLogin(request.getRemoteUser());
+	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFirstName()
 		+ " " + requestor.getLastName();
 	String email = requestor.getEmail();
@@ -118,14 +112,14 @@ public class ProfileController {
     public String lessons(HttpServletRequest request) throws Exception {
 
 	// list all active lessons for this learner (single sql query)
-	User requestor = service.getUserByLogin(request.getRemoteUser());
+	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	LessonDTO[] lessons = learnerService.getActiveLessonsFor(requestor.getUserId());
 
 	// make org-sorted beans out of the lessons
 	HashMap<Integer, IndexOrgBean> orgBeansMap = new HashMap<>();
 	for (LessonDTO lesson : lessons) {
 	    Integer orgId = lesson.getOrganisationID();
-	    Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+	    Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
 	    IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(),
 		    "javascript:openLearner(" + lesson.getLessonID() + ")");
@@ -176,7 +170,7 @@ public class ProfileController {
 	// sort lessons inside each org bean
 	for (Object o : beans) {
 	    IndexOrgBean bean = (IndexOrgBean) o;
-	    Organisation org = (Organisation) service.findById(Organisation.class, bean.getId());
+	    Organisation org = (Organisation) userManagementService.findById(Organisation.class, bean.getId());
 
 	    // put lesson beans into id-indexed map
 	    HashMap<Long, IndexLessonBean> map = new HashMap<>();
@@ -238,7 +232,7 @@ public class ProfileController {
 	    ;
 	}
 
-	User requestor = service.getUserByLogin(request.getRemoteUser());
+	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	BeanUtils.copyProperties(userForm, requestor);
 	SupportedLocale locale = requestor.getLocale();
 	if (locale == null) {
@@ -246,7 +240,7 @@ public class ProfileController {
 	}
 	userForm.setLocaleId(locale.getLocaleId());
 	if (locales == null) {
-	    locales = service.findAll(SupportedLocale.class);
+	    locales = userManagementService.findAll(SupportedLocale.class);
 	}
 	request.setAttribute("locales", locales);
 	request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));

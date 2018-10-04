@@ -29,7 +29,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.OrgManageForm;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -38,20 +37,17 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -59,25 +55,22 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * <p>
- * <a href="OrgManageAction.java.html"><i>View Source</i></a>
- * </p>
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @Controller
 public class OrgManageController {
 
-    private static IUserManagementService userManagementService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ISecurityService securityService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/orgmanage")
     public String unspecified(@ModelAttribute OrgManageForm orgManageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	initServices();
-
 	// Get organisation whose child organisations we will populate the OrgManageForm with
 	Integer orgId = WebUtil.readIntParam(request, "org", true);
 
@@ -91,7 +84,6 @@ public class OrgManageController {
 
 	// get logged in user's id
 	Integer userId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
-	ISecurityService securityService = AdminServiceProxy.getSecurityService(applicationContext.getServletContext());
 
 	Organisation org = null;
 	boolean isRootOrganisation = false;
@@ -117,7 +109,6 @@ public class OrgManageController {
 	int numUsers = org == rootOrganisation ? userManagementService.getCountUsers()
 		: userManagementService.getUsersFromOrganisation(orgId).size();
 	String key = org == rootOrganisation ? "label.users.in.system" : "label.users.in.group";
-	MessageService messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 	request.setAttribute("numUsers", messageService.getMessage(key, new String[] { String.valueOf(numUsers) }));
 
 	// Set OrgManageForm
@@ -165,8 +156,6 @@ public class OrgManageController {
     @RequestMapping("/orgmanage/getOrgs")
     @ResponseBody
     public String getOrgs(HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
-	initServices();
-
 	Integer parentOrgId = WebUtil.readIntParam(request, "parentOrgId");
 	Integer stateId = WebUtil.readIntParam(request, "stateId");
 	Integer typeIdParam = WebUtil.readIntParam(request, "type");
@@ -228,13 +217,5 @@ public class OrgManageController {
 	responseJSON.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
-    }
-
-    private void initServices() {
-	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(applicationContext.getServletContext());
-	    userManagementService = (UserManagementService) ctx.getBean("userManagementService");
-	}
     }
 }

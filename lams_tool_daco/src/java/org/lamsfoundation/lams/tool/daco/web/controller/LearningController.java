@@ -80,8 +80,6 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  *
  * @author Marcin Cieslak
- *
- * @version $Revision$
  */
 @Controller
 @RequestMapping("/learning")
@@ -93,7 +91,6 @@ public class LearningController {
     private WebApplicationContext applicationContext;
 
     @Autowired
-    @Qualifier("dacoService")
     private IDacoService dacoService;
 
     @Autowired

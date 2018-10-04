@@ -85,7 +85,6 @@ public class LearningController {
     private static Logger log = Logger.getLogger(LearningController.class);
 
     @Autowired
-    @Qualifier("kalturaService")
     private IKalturaService kalturaService;
 
     @Autowired

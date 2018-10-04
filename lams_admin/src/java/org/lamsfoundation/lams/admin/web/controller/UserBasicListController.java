@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -42,27 +41,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
- *
- *
- *
- *
  */
 @Controller
 public class UserBasicListController {
 
-    private static IUserManagementService service;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
 
     @RequestMapping(path = "/user/basiclist", method = RequestMethod.POST)
     public String execute(HttpServletRequest request) throws Exception {
 
-	UserBasicListController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	HttpSession session = SessionManager.getSession();
 	if (session != null) {
 	    UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
@@ -74,12 +65,12 @@ public class UserBasicListController {
 		if (orgId != null) {
 		    if (!StringUtils.equals(potential, "1")) {
 			// list users in org
-			List users = UserBasicListController.service.getUsersFromOrganisation(orgId);
+			List users = userManagementService.getUsersFromOrganisation(orgId);
 			request.setAttribute("users", users);
 		    } else {
 			// get all potential users of this org instead... filters results according to user's roles
 			// get group
-			Organisation org = (Organisation) UserBasicListController.service.findById(Organisation.class,
+			Organisation org = (Organisation) userManagementService.findById(Organisation.class,
 				orgId);
 			Organisation group;
 			if (org != null) {
@@ -90,19 +81,17 @@ public class UserBasicListController {
 			    }
 			    // get users
 			    List users = new ArrayList();
-			    if (request.isUserInRole(Role.SYSADMIN)
-				    || UserBasicListController.service.isUserGlobalGroupAdmin()) {
-				users = UserBasicListController.service.getAllUsers(org.getOrganisationId());
-			    } else if (UserBasicListController.service.isUserInRole(userId, group.getOrganisationId(),
+			    if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin()) {
+				users = userManagementService.getAllUsers(org.getOrganisationId());
+			    } else if (userManagementService.isUserInRole(userId, group.getOrganisationId(),
 				    Role.GROUP_ADMIN)
-				    || UserBasicListController.service.isUserInRole(userId, group.getOrganisationId(),
+				    || userManagementService.isUserInRole(userId, group.getOrganisationId(),
 					    Role.GROUP_MANAGER)) {
 				if (group.getCourseAdminCanBrowseAllUsers()) {
-				    users = UserBasicListController.service.getAllUsers(org.getOrganisationId());
+				    users = userManagementService.getAllUsers(org.getOrganisationId());
 				} else if (org.getOrganisationType().getOrganisationTypeId()
 					.equals(OrganisationType.CLASS_TYPE)) {
-				    users = UserBasicListController.service.findUsers(null, group.getOrganisationId(),
-					    orgId);
+				    users = userManagementService.findUsers(null, group.getOrganisationId(), orgId);
 				}
 			    }
 			    request.setAttribute("users", users);

@@ -31,17 +31,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -50,26 +49,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author jliew
- *
- *
- *
- *
  */
 @Controller
 public class UserSearchController {
-
     private static Logger log = Logger.getLogger(UserSearchController.class);
-    private static IUserManagementService service;
-    private static MessageService messageService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping("/usersearch")
     public String unspecified(HttpServletRequest request) throws Exception {
-	initServices();
-
-	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    log.debug("user not sysadmin or global group admin");
 
 	    request.setAttribute("errorName", "UserSearchAction authorisation");
@@ -87,8 +80,6 @@ public class UserSearchController {
     @ResponseBody
     public String getPagedUsers(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
-	initServices();
-
 	// the organisation type of the children
 	String searchString = WebUtil.readStrParam(request, "fcol[1]", true);
 
@@ -124,10 +115,10 @@ public class UserSearchController {
 	    sortOrder = isSort5.equals(0) ? "ASC" : "DESC";
 	}
 
-	List<UserDTO> userDtos = service.getAllUsers(page, size, sortBy, sortOrder, searchString);
+	List<UserDTO> userDtos = userManagementService.getAllUsers(page, size, sortBy, sortOrder, searchString);
 
 	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
-	responcedata.put("total_rows", service.getCountUsers(searchString));
+	responcedata.put("total_rows", userManagementService.getCountUsers(searchString));
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	for (UserDTO userDto : userDtos) {
@@ -148,15 +139,6 @@ public class UserSearchController {
 	responcedata.set("rows", rows);
 	res.setContentType("application/json;charset=utf-8");
 	return responcedata.toString();
-    }
-
-    private void initServices() {
-	if (service == null) {
-	    service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	}
-	if (messageService == null) {
-	    messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	}
     }
 
 }

@@ -42,15 +42,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/pedagogicalPlanner")
 public class PedagogicalPlannerController {
@@ -58,7 +49,6 @@ public class PedagogicalPlannerController {
     private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
-    @Qualifier("chatService")
     private IChatService chatService;
 
     @Autowired

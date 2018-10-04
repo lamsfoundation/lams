@@ -87,15 +87,11 @@ public class AuthoringController {
     private static Logger log = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("forumService")
     private IForumService forumService;
 
     @Autowired
     @Qualifier("forumMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     // ******************************************************************************************************************
     // Forum Author functions

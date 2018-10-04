@@ -51,7 +51,6 @@ public class MonitoringController {
     private static final Logger logger = Logger.getLogger(MonitoringController.class);
 
     @Autowired
-    @Qualifier("zoomService")
     private IZoomService zoomService;
 
     @Autowired

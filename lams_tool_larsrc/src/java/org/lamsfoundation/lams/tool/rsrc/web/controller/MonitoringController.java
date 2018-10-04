@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.HtmlUtils;
@@ -68,7 +67,6 @@ public class MonitoringController {
     public static Logger log = Logger.getLogger(MonitoringController.class);
 
     @Autowired
-    @Qualifier("resourceService")
     private IResourceService resourceService;
 
     @RequestMapping("/summary")

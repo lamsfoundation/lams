@@ -31,7 +31,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.NotebookForm;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -40,14 +39,13 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author M Seaton
@@ -56,15 +54,11 @@ import org.springframework.web.context.WebApplicationContext;
 @RequestMapping("/notebook")
 public class NotebookController {
     @Autowired
-    @Qualifier("coreNotebookService")
-    private ICoreNotebookService notebookService;
-
+    private ICoreNotebookService coreNotebookService;
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
 
     /**
      * View all notebook entries
@@ -84,7 +78,7 @@ public class NotebookController {
 
 	// get all notebook entries for the learner
 
-	TreeMap<Long, List<NotebookEntry>> entries = notebookService.getEntryByLesson(learnerID,
+	TreeMap<Long, List<NotebookEntry>> entries = coreNotebookService.getEntryByLesson(learnerID,
 		CoreNotebookConstants.SCRATCH_PAD);
 
 	request.getSession().setAttribute("entries", entries.values());
@@ -103,8 +97,7 @@ public class NotebookController {
 
 	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-	User user = (User) LearnerServiceProxy.getUserManagementService(applicationContext.getServletContext())
-		.findById(User.class, userID);
+	User user = (User) userManagementService.findById(User.class, userID);
 
 	// lesson service
 	Long lessonID = notebookForm.getLessonID();
@@ -156,7 +149,7 @@ public class NotebookController {
 	    return null;
 	}
 
-	return notebookService.getEntry(lessonID, CoreNotebookConstants.SCRATCH_PAD, CoreNotebookConstants.JOURNAL_SIG);
+	return coreNotebookService.getEntry(lessonID, CoreNotebookConstants.SCRATCH_PAD, CoreNotebookConstants.JOURNAL_SIG);
 
     }
 
@@ -171,12 +164,11 @@ public class NotebookController {
 	Long currentLessonID = notebookForm.getCurrentLessonID();
 	String mode = WebUtil.readStrParam(request, "mode", true);
 
-	NotebookEntry entry = notebookService.getEntry(uid);
+	NotebookEntry entry = coreNotebookService.getEntry(uid);
 
 	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-	User user = (User) LearnerServiceProxy.getUserManagementService(applicationContext.getServletContext())
-		.findById(User.class, userID);
+	User user = (User) userManagementService.findById(User.class, userID);
 
 	if (entry.getUser() != null && !entry.getUser().getUserId().equals(user.getUserId())) {
 	    // wants to look at someone else's entry - check they are a teacher
@@ -220,7 +212,7 @@ public class NotebookController {
 	String signature = notebookForm.getSignature();
 	Integer userID = LearningWebUtil.getUserId();
 
-	notebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature, userID, title, entry);
+	coreNotebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature, userID, title, entry);
 
 	boolean skipViewAll = WebUtil.readBooleanParam(request, "skipViewAll", false);
 	return skipViewAll ? null : viewAll(notebookForm, request);
@@ -239,7 +231,7 @@ public class NotebookController {
 	String signature = notebookForm.getSignature();
 
 	// get existing entry to edit
-	NotebookEntry entryObj = notebookService.getEntry(uid);
+	NotebookEntry entryObj = coreNotebookService.getEntry(uid);
 
 	// check entry is being edited by it's owner
 	Integer userID = LearningWebUtil.getUserId();
@@ -252,7 +244,7 @@ public class NotebookController {
 	entryObj.setEntry(entry);
 	entryObj.setExternalSignature(signature);
 
-	notebookService.updateEntry(entryObj);
+	coreNotebookService.updateEntry(entryObj);
 
 	return viewAll(notebookForm, request);
 

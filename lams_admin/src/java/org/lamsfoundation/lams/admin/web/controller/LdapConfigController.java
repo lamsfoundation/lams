@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
@@ -41,60 +40,28 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/ldap")
 public class LdapConfigController {
-
     private static Logger log = Logger.getLogger(LdapConfigController.class);
-    private static IUserManagementService service;
-    private static LdapService ldapService;
-    private static MessageService messageService;
-    private static Configuration configurationService;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
-
-    private IUserManagementService getService() {
-	if (service == null) {
-	    service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	}
-	return service;
-    }
-
-    private LdapService getLdapService() {
-	if (ldapService == null) {
-	    ldapService = AdminServiceProxy.getLdapService(applicationContext.getServletContext());
-	}
-	return ldapService;
-    }
-
-    private MessageService getMessageService() {
-	if (messageService == null) {
-	    messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	}
-	return messageService;
-    }
-
-    private Configuration getConfiguration() {
-	if (configurationService == null) {
-	    configurationService = AdminServiceProxy.getConfiguration(applicationContext.getServletContext());
-	}
-	return configurationService;
-    }
+    private Configuration configurationService;
+    @Autowired
+    private LdapService ldapService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String execute(@ModelAttribute ConfigForm configForm, HttpServletRequest request) throws Exception {
@@ -112,7 +79,7 @@ public class LdapConfigController {
 	    }
 	}
 
-	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_ONLY_LDAP));
+	request.setAttribute("config", configurationService.arrangeItems(Configuration.ITEMS_ONLY_LDAP));
 
 	int numLdapUsers = getNumLdapUsers();
 	request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
@@ -127,7 +94,7 @@ public class LdapConfigController {
 	Thread t = new Thread(new LdapSyncThread(sessionId));
 	t.start();
 
-	request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
+	request.setAttribute("wait", messageService.getMessage("msg.ldap.synchronise.wait"));
 
 	return "ldap";
     }
@@ -135,7 +102,7 @@ public class LdapConfigController {
     @RequestMapping(path = "/waiting")
     public String waiting(HttpServletRequest request) throws Exception {
 
-	request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
+	request.setAttribute("wait", messageService.getMessage("msg.ldap.synchronise.wait"));
 
 	return "ldap";
     }
@@ -157,12 +124,12 @@ public class LdapConfigController {
 	    request.setAttribute("numLdapUsersUpdated", getNumUpdatedUsersMsg(dto.getNumUsersUpdated()));
 	    request.setAttribute("numLdapUsersDisabled", getNumDisabledUsersMsg(dto.getNumUsersDisabled()));
 	    request.setAttribute("messages", dto.getMessages());
-	    request.setAttribute("done", getMessageService().getMessage("msg.done"));
+	    request.setAttribute("done", messageService.getMessage("msg.done"));
 	} else {
 	    ArrayList<String> list = new ArrayList<>();
 	    list.add((String) o);
 	    request.setAttribute("messages", list);
-	    request.setAttribute("done", getMessageService().getMessage("msg.done"));
+	    request.setAttribute("done", messageService.getMessage("msg.done"));
 	}
 
 	// remove session variable that flags bulk update as done
@@ -172,38 +139,38 @@ public class LdapConfigController {
     }
 
     private int getNumLdapUsers() {
-	Integer count = getService().getCountUsers(AuthenticationMethod.LDAP);
+	Integer count = userManagementService.getCountUsers(AuthenticationMethod.LDAP);
 	return (count != null ? count.intValue() : -1);
     }
 
     private String getNumLdapUsersMsg(int numLdapUsers) {
 	String[] args = new String[1];
 	args[0] = String.valueOf(numLdapUsers);
-	return getMessageService().getMessage("msg.num.ldap.users", args);
+	return messageService.getMessage("msg.num.ldap.users", args);
     }
 
     private String getNumSearchResultsUsersMsg(int searchResults) {
 	String[] args = new String[1];
 	args[0] = String.valueOf(searchResults);
-	return getMessageService().getMessage("msg.num.search.results.users", args);
+	return messageService.getMessage("msg.num.search.results.users", args);
     }
 
     private String getNumCreatedUsersMsg(int created) {
 	String[] args = new String[1];
 	args[0] = String.valueOf(created);
-	return getMessageService().getMessage("msg.num.created.users", args);
+	return messageService.getMessage("msg.num.created.users", args);
     }
 
     private String getNumUpdatedUsersMsg(int updated) {
 	String[] args = new String[1];
 	args[0] = String.valueOf(updated);
-	return getMessageService().getMessage("msg.num.updated.users", args);
+	return messageService.getMessage("msg.num.updated.users", args);
     }
 
     private String getNumDisabledUsersMsg(int disabled) {
 	String[] args = new String[1];
 	args[0] = String.valueOf(disabled);
-	return getMessageService().getMessage("msg.num.disabled.users", args);
+	return messageService.getMessage("msg.num.disabled.users", args);
     }
 
     private class LdapSyncThread implements Runnable {
@@ -220,7 +187,7 @@ public class LdapConfigController {
 	    this.log.info("=== Beginning LDAP user sync ===");
 	    long start = System.currentTimeMillis();
 	    try {
-		BulkUpdateResultDTO dto = getLdapService().bulkUpdate();
+		BulkUpdateResultDTO dto = ldapService.bulkUpdate();
 		long end = System.currentTimeMillis();
 		this.log.info("=== Finished LDAP user sync ===");
 		this.log.info("Bulk update took " + (end - start) / 1000 + " seconds.");

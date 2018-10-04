@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.UserBean;
 import org.lamsfoundation.lams.admin.web.form.UserOrgRoleForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -41,12 +40,10 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author jliew
@@ -54,31 +51,17 @@ import org.springframework.web.context.WebApplicationContext;
  * Called when a user has added users to an organisation.
  *
  */
-
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- */
 @Controller
 public class UserOrgRoleController {
-
     private static Logger log = Logger.getLogger(UserOrgRoleController.class);
-    private static IUserManagementService service;
-
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
 
     @RequestMapping(path = "/userorgrole")
     public String execute(@ModelAttribute UserOrgRoleForm userOrgRoleForm, BindingResult result,
 	    HttpServletRequest request, HttpSession session) throws Exception {
 
-	service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	// make sure we don't have left overs from any previous attempt
 	userOrgRoleForm.setUserBeans(new ArrayList());
 
@@ -88,14 +71,14 @@ public class UserOrgRoleController {
 	Collections.sort(roles);
 	request.setAttribute("roles", roles);
 
-	Organisation organisation = (Organisation) service.findById(Organisation.class,
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		(Integer) request.getAttribute("orgId"));
 	userOrgRoleForm.setOrgId(organisation.getOrganisationId());
 
 	// display breadcrumb links
 	request.setAttribute("orgName", organisation.getName());
 	Organisation parentOrg = organisation.getParentOrganisation();
-	if (parentOrg != null && !parentOrg.equals(service.getRootOrganisation())) {
+	if (parentOrg != null && !parentOrg.equals(userManagementService.getRootOrganisation())) {
 	    request.setAttribute("pOrgId", parentOrg.getOrganisationId());
 	    request.setAttribute("pOrgName", parentOrg.getName());
 	}
@@ -110,7 +93,7 @@ public class UserOrgRoleController {
 	    // flag users that will be added to parent group if necessary
 	    userBean.setMemberOfParent(true);
 	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-		if (service.getUserOrganisation(user.getUserId(),
+		if (userManagementService.getUserOrganisation(user.getUserId(),
 			organisation.getParentOrganisation().getOrganisationId()) == null) {
 		    userBean.setMemberOfParent(false);
 		}

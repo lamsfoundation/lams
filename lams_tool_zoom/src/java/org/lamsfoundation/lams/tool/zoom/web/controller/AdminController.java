@@ -50,7 +50,6 @@ public class AdminController {
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
     @Autowired
-    @Qualifier("zoomService")
     private IZoomService zoomService;
 
     @Autowired

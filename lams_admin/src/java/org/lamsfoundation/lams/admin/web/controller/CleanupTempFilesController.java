@@ -44,24 +44,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 @RequestMapping("/cleanup")
 public class CleanupTempFilesController {
-
     private static Logger log = Logger.getLogger(CleanupTempFilesController.class);
 
     @Autowired
     @Qualifier("adminMessageService")
-    private MessageService adminMessageService;
+    private MessageService messageService;
 
     @RequestMapping(path = "/start")
     public String execute(@ModelAttribute CleanupForm cleanupForm, HttpServletRequest request) throws Exception {
@@ -69,7 +60,7 @@ public class CleanupTempFilesController {
 	// check user is sysadmin
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "CleanupTempFilesAction");
-	    request.setAttribute("errorMessage", adminMessageService.getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
 	}
 
@@ -88,9 +79,9 @@ public class CleanupTempFilesController {
 		int filesDeleted = FileUtil.cleanupOldFiles(FileUtil.getOldTempFiles(numDays));
 		String args[] = new String[1];
 		args[0] = new Integer(filesDeleted).toString();
-		request.setAttribute("filesDeleted", adminMessageService.getMessage("msg.cleanup.files.deleted", args));
+		request.setAttribute("filesDeleted", messageService.getMessage("msg.cleanup.files.deleted", args));
 	    } else {
-		errorMap.add("numDays", adminMessageService.getMessage("error.non.negative.number.required"));
+		errorMap.add("numDays", messageService.getMessage("error.non.negative.number.required"));
 	    }
 	} else {
 	    // recommended number of days to leave temp files

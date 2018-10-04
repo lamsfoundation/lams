@@ -57,7 +57,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -67,32 +66,23 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
+ * Handles the monitor interfaces for gradebook.
+ * This is where marking for an activity/lesson takes place
+ * 
  * @author lfoxton
- *
- *         Handles the monitor interfaces for gradebook
- *
- *         This is where marking for an activity/lesson takes place
  */
 @Controller
 @RequestMapping("/gradebookMonitoring")
 public class GradebookMonitoringController {
-
     private static Logger log = Logger.getLogger(GradebookMonitoringController.class);
 
     @Autowired
-    @Qualifier("gradebookService")
     private IGradebookFullService gradebookService;
-
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userService;
-
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
-
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
 
     @RequestMapping("")
@@ -152,7 +142,7 @@ public class GradebookMonitoringController {
 		return null;
 	    }
 
-	    Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationID);
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	    request.setAttribute("organisationID", organisationID);
 	    request.setAttribute("organisationName", organisation.getName());
 
@@ -183,7 +173,7 @@ public class GradebookMonitoringController {
 	}
 
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
-	User learner = (User) userService.findById(User.class, userID);
+	User learner = (User) userManagementService.findById(User.class, userID);
 	if (learner == null) {
 	    GradebookMonitoringController.log
 		    .error("User with ID " + userID + " could not be found to update his lesson gradebook");
@@ -245,7 +235,7 @@ public class GradebookMonitoringController {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong activity");
 	}
 
-	User learner = (User) userService.findById(User.class, userID);
+	User learner = (User) userManagementService.findById(User.class, userID);
 	if (learner == null) {
 	    GradebookMonitoringController.log
 		    .error("User with ID " + userID + " could not be found to update his activity gradebook");
@@ -351,7 +341,7 @@ public class GradebookMonitoringController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	}
 
-	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationID);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	if (GradebookMonitoringController.log.isDebugEnabled()) {
 	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet course: " + organisationID);
 	}
@@ -391,7 +381,7 @@ public class GradebookMonitoringController {
 
 	boolean simplified = WebUtil.readBooleanParam(request, "simplified", false);
 
-	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationID);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
 	if (GradebookMonitoringController.log.isDebugEnabled()) {
 	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds)

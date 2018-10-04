@@ -61,7 +61,6 @@ public class MonitoringController {
     private static String noEntryText = null; // access via getNoEntryText()
 
     @Autowired
-    @Qualifier("notebookService")
     private INotebookService notebookService;
 
     @Autowired

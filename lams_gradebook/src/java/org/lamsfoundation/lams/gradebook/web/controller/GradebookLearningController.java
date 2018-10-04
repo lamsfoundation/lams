@@ -36,29 +36,23 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
+ * Handles the learner interfaces for gradebook.
+ * This is where marking for an activity/lesson takes place
+ * 
  * @author lfoxton
- *
- *         Handles the learner interfaces for gradebook
- *
- *         This is where marking for an activity/lesson takes place
  */
 @Controller
 @RequestMapping("/gradebookLearning")
 public class GradebookLearningController {
-
     private static Logger logger = Logger.getLogger(GradebookLearningController.class);
 
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userService;
-
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
 
     @RequestMapping("")
@@ -87,7 +81,7 @@ public class GradebookLearningController {
 			.debug("Getting learner gradebook for organisation: " + oranisationID);
 	    }
 
-	    Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, oranisationID);
 	    request.setAttribute("organisationID", oranisationID);
 	    request.setAttribute("organisationName", organisation.getName());
 	    request.setAttribute("fullName", user.getFirstName() + " " + user.getLastName());

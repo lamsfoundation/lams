@@ -82,7 +82,6 @@ public class AuthoringController {
     private static Logger log = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("dacoService")
     private IDacoService dacoService;
 
     @Autowired

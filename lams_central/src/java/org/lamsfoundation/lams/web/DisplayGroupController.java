@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -67,19 +66,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/displayGroup")
 public class DisplayGroupController {
     @Autowired
-    @Qualifier("userManagementService")
-    private IUserManagementService userService;
+    private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("lessonService")
     private LessonService lessonService;
     @Autowired
-    @Qualifier("learningDesignService")
     private ILearningDesignService learningDesignService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
 
     @RequestMapping("")
@@ -90,7 +84,7 @@ public class DisplayGroupController {
 
 	Organisation org = null;
 	if (orgId != null) {
-	    org = (Organisation) userService.findById(Organisation.class, orgId);
+	    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	}
 
 	if (org != null) {
@@ -103,7 +97,7 @@ public class DisplayGroupController {
 	    }
 
 	    List<Integer> roles = new ArrayList<>();
-	    List<UserOrganisationRole> userOrganisationRoles = userService.getUserOrganisationRoles(orgId,
+	    List<UserOrganisationRole> userOrganisationRoles = userManagementService.getUserOrganisationRoles(orgId,
 		    request.getRemoteUser());
 	    for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
 		Integer roleId = userOrganisationRole.getRole().getRoleId();
@@ -120,7 +114,7 @@ public class DisplayGroupController {
 	    }
 
 	    //set whether organisation is favorite
-	    boolean isFavorite = userService.isOrganisationFavorite(orgId, user.getUserId());
+	    boolean isFavorite = userManagementService.isOrganisationFavorite(orgId, user.getUserId());
 	    iob.setFavorite(isFavorite);
 	}
 
@@ -257,7 +251,7 @@ public class DisplayGroupController {
 	    for (Organisation organisation : children) {
 		if (OrganisationState.ACTIVE.equals(organisation.getOrganisationState().getOrganisationStateId())) {
 		    List<Integer> classRoles = new ArrayList<>();
-		    List<UserOrganisationRole> userOrganisationRoles = userService
+		    List<UserOrganisationRole> userOrganisationRoles = userManagementService
 			    .getUserOrganisationRoles(organisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
 		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isSysAdmin
@@ -363,6 +357,6 @@ public class DisplayGroupController {
     }
 
     private User getUser(String login) {
-	return (User) userService.findByProperty(User.class, "login", login).get(0);
+	return (User) userManagementService.findByProperty(User.class, "login", login).get(0);
     }
 }

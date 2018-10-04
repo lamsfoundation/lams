@@ -39,10 +39,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.AdminConstants;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.OrgPasswordChangeForm;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -56,12 +57,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -70,18 +71,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/orgPasswordChange")
 public class OrgPasswordChangeController {
-
     private static Logger log = Logger.getLogger(OrgPasswordChangeController.class);
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IEventNotificationService eventNotificationService;
+    @Autowired
+    private IIntegrationService integrationService;
+    @Autowired
+    private ISecurityService securityService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping("/start")
     public String unspecified(@ModelAttribute OrgPasswordChangeForm orgPasswordChangeForm, HttpServletRequest request) {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	orgPasswordChangeForm.setOrganisationID(organisationID);
-	IUserManagementService userManagementService = AdminServiceProxy
-		.getService(applicationContext.getServletContext());
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	orgPasswordChangeForm.setOrgName(organisation.getName());
 	orgPasswordChangeForm.setStaffChange(true);
@@ -108,8 +115,7 @@ public class OrgPasswordChangeController {
 
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
-	if (!AdminServiceProxy.getSecurityService(applicationContext.getServletContext()).isSysadmin(currentUserId,
-		"get grid users for org password change", false)) {
+	if (!securityService.isSysadmin(currentUserId, "get grid users for org password change", false)) {
 	    String warning = "User " + currentUserId + " is not a sysadmin";
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -173,8 +179,7 @@ public class OrgPasswordChangeController {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
 	// security check
-	if (!AdminServiceProxy.getSecurityService(applicationContext.getServletContext()).isSysadmin(currentUserId,
-		"org password change", false)) {
+	if (!securityService.isSysadmin(currentUserId, "org password change", false)) {
 	    String warning = "User " + currentUserId + " is not a sysadmin";
 	    log.warn(warning);
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
@@ -223,9 +228,8 @@ public class OrgPasswordChangeController {
     }
 
     private void notifyOnPasswordChange(Collection<Integer> userIDs, String password) {
-	MessageService messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
-	AdminServiceProxy.getEventNotificationService(applicationContext.getServletContext()).sendMessage(null,
-		userIDs.toArray(new Integer[] {}), IEventNotificationService.DELIVERY_METHOD_MAIL,
+	eventNotificationService.sendMessage(null, userIDs.toArray(new Integer[] {}),
+		IEventNotificationService.DELIVERY_METHOD_MAIL,
 		messageService.getMessage("admin.org.password.change.email.subject"),
 		messageService.getMessage("admin.org.password.change.email.body", new String[] { password }), false);
     }
@@ -240,8 +244,6 @@ public class OrgPasswordChangeController {
 	    throw new IllegalArgumentException("Both included and excluded users arrays must not be passed together");
 	}
 	Set<Integer> changedUserIDs = new TreeSet<>();
-	IUserManagementService userManagementService = AdminServiceProxy
-		.getService(applicationContext.getServletContext());
 	UserDTO currentUserDTO = getUserDTO();
 	User currentUser = (User) userManagementService.findById(User.class, currentUserDTO.getUserID());
 	for (User user : users) {
@@ -293,8 +295,6 @@ public class OrgPasswordChangeController {
      */
     @SuppressWarnings("unchecked")
     private List<User> getUsersByRole(Integer organisationID, boolean isStaff) {
-	IUserManagementService userManagementService = AdminServiceProxy
-		.getService(applicationContext.getServletContext());
 	Set<User> staff = new HashSet<>();
 	staff.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.AUTHOR, true));
 	staff.addAll(userManagementService.getUsersFromOrganisationByRole(organisationID, Role.MONITOR, true));
@@ -314,8 +314,6 @@ public class OrgPasswordChangeController {
      * Gets sorted users for grids
      */
     private List<UserDTO> getUsersByRole(Integer organisationID, boolean isStaff, String sortBy, String sortOrder) {
-	IUserManagementService userManagementService = AdminServiceProxy
-		.getService(applicationContext.getServletContext());
 	List<UserDTO> staff = userManagementService.getAllUsers(organisationID,
 		new String[] { Role.AUTHOR, Role.MONITOR }, null, null, sortBy, sortOrder, null);
 

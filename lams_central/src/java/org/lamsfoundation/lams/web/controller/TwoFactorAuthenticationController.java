@@ -26,12 +26,10 @@ package org.lamsfoundation.lams.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -44,14 +42,10 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 public class TwoFactorAuthenticationController {
 
     @Autowired
-    WebApplicationContext applicationContext;
+    private IUserManagementService userManagementService;
 
     @RequestMapping("/twoFactorAuthentication")
     public String execute(HttpServletRequest request) throws Exception {
-
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getWebApplicationContext(applicationContext.getServletContext());
-	UserManagementService userManagementService = (UserManagementService) ctx.getBean("userManagementService");
 
 	// check if user needs to get his shared two-factor authorization secret
 	User loggedInUser = userManagementService.getUserByLogin(request.getRemoteUser());

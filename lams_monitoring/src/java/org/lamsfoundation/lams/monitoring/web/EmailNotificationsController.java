@@ -81,7 +81,6 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -112,28 +111,20 @@ public class EmailNotificationsController {
     private static final String JOB_PREFIX_NAME = "emailScheduleMessageJob:";
 
     @Autowired
-    @Qualifier("eventNotificationService")
     private IEventNotificationService eventNotificationService;
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("logEventService")
     private ILogEventService logEventService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
     @Autowired
-    @Qualifier("scheduler")
     private Scheduler scheduler;
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
 
     /**

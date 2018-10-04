@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -87,16 +88,14 @@ public class NotificationServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    /**
-     * Initialization of the servlet. <br>
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
      */
     @Override
-    public void init() throws ServletException {
-	integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-
-	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("eventNotificationService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     private void getNotifications(Integer userId, HttpServletRequest request, HttpServletResponse response)

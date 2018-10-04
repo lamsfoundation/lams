@@ -50,8 +50,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- */
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
@@ -59,7 +57,6 @@ public class AuthoringController {
     private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     @Autowired
-    @Qualifier("chatService")
     private IChatService chatService;
 
     @Autowired

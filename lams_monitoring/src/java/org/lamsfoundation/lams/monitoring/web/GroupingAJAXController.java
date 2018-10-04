@@ -60,7 +60,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -80,18 +79,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/grouping")
 public class GroupingAJAXController {
+    private static Logger log = Logger.getLogger(GroupingAJAXController.class);
 
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringFullService monitoringService;
     @Autowired
-    @Qualifier("securityService")
     private ISecurityService securityService;
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
-
-    private static Logger log = Logger.getLogger(GroupingAJAXController.class);
 
     // ---------------------------------------------------------------------
 

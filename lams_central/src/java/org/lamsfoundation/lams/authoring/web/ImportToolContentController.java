@@ -55,6 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/authoring/importToolContent")
 public class ImportToolContentController {
+    private Logger log = Logger.getLogger(ImportToolContentController.class);
 
     public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
     public static final String USER_SERVICE_BEAN_NAME = "userManagementService";
@@ -68,16 +69,11 @@ public class ImportToolContentController {
     private static final String KEY_MSG_IMPORT_FILE_NOT_FOUND = "msg.import.file.not.found";
     private static final String KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON = "msg.import.failed.unknown.reason";
 
-    private Logger log = Logger.getLogger(ImportToolContentController.class);
-
     @Autowired
-    @Qualifier("userManagementService")
     IUserManagementService userManagementService;
     @Autowired
-    @Qualifier("exportToolContentService")
     IExportToolContentService exportToolContentService;
     @Autowired
-    @Qualifier("authoringMessageService")
     MessageService authoringMessageService;
 
     @RequestMapping("/import")

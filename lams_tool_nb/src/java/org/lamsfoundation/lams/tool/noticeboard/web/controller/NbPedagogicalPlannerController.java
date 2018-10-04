@@ -32,29 +32,17 @@ import org.lamsfoundation.lams.tool.noticeboard.web.form.NbPedagogicalPlannerFor
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- *
- */
 @Controller
 @RequestMapping("/pedagogicalPlanner")
 public class NbPedagogicalPlannerController {
-
     private static Logger logger = Logger.getLogger(NbPedagogicalPlannerController.class);
 
     @Autowired
-    @Qualifier("nbService")
     private INoticeboardService nbService;
 
     protected String unspecified(@ModelAttribute NbPedagogicalPlannerForm plannerForm, HttpServletRequest request) {

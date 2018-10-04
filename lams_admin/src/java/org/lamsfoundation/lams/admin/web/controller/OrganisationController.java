@@ -33,9 +33,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.OrganisationForm;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -47,12 +48,12 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Fei Yang
@@ -60,20 +61,22 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/organisation")
 public class OrganisationController {
-
-    private static IUserManagementService service;
-    private static MessageService messageService;
-    private static List status;
-
     private static Logger log = Logger.getLogger(OrganisationController.class);
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IMonitoringService monitoringService;
+    @Autowired
+    private ISecurityService securityService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
+    
+    private static List status;
 
     @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request) throws Exception {
-
-	OrganisationController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	initLocalesAndStatus();
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 
@@ -83,10 +86,10 @@ public class OrganisationController {
 	    if (userDto != null) {
 		Integer userId = userDto.getUserID();
 		// sysadmin, global group admin, group manager, group admin can edit group
-		if (OrganisationController.service.canEditGroup(userId, orgId)) {
+		if (userManagementService.canEditGroup(userId, orgId)) {
 		    // edit existing organisation
 		    if (orgId != null) {
-			Organisation org = (Organisation) OrganisationController.service.findById(Organisation.class,
+			Organisation org = (Organisation) userManagementService.findById(Organisation.class,
 				orgId);
 			BeanUtils.copyProperties(organisationForm, org);
 			organisationForm.setParentId(org.getParentOrganisation().getOrganisationId());
@@ -106,9 +109,9 @@ public class OrganisationController {
 			}
 			request.setAttribute("courseToDeleteLessons", courseToDeleteLessons);
 		    }
-		    request.getSession().setAttribute("status", OrganisationController.status);
-		    if (OrganisationController.service.isUserSysAdmin()
-			    || OrganisationController.service.isUserGlobalGroupAdmin()) {
+		    request.getSession().setAttribute("status", status);
+		    if (userManagementService.isUserSysAdmin()
+			    || userManagementService.isUserGlobalGroupAdmin()) {
 			return "organisation/createOrEdit";
 		    } else {
 			return "organisation/courseAdminEdit";
@@ -123,10 +126,9 @@ public class OrganisationController {
     @RequestMapping(path = "/create")
     public String create(@ModelAttribute OrganisationForm organisationForm, HttpServletRequest request)
 	    throws Exception {
-	OrganisationController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
 	initLocalesAndStatus();
 
-	if (!(request.isUserInRole(Role.SYSADMIN) || OrganisationController.service.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
 	    // only sysadmins and global group admins can create groups
 	    if (((organisationForm.getTypeId() != null)
 		    && organisationForm.getTypeId().equals(OrganisationType.COURSE_TYPE))
@@ -139,11 +141,11 @@ public class OrganisationController {
 	organisationForm.setOrgId(null);
 	Integer parentId = WebUtil.readIntParam(request, "parentId", true);
 	if (parentId != null) {
-	    Organisation parentOrg = (Organisation) OrganisationController.service.findById(Organisation.class,
+	    Organisation parentOrg = (Organisation) userManagementService.findById(Organisation.class,
 		    parentId);
 	    organisationForm.setParentName(parentOrg.getName());
 	}
-	request.getSession().setAttribute("status", OrganisationController.status);
+	request.getSession().setAttribute("status", status);
 	return "organisation/createOrEdit";
     }
 
@@ -154,8 +156,7 @@ public class OrganisationController {
     @ResponseBody
     public String getOrganisationIdByName(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String organisationName = WebUtil.readStrParam(request, "name");
-	OrganisationController.service = AdminServiceProxy.getService(applicationContext.getServletContext());
-	List<Organisation> organisations = service.findByProperty(Organisation.class, "name", organisationName);
+	List<Organisation> organisations = userManagementService.findByProperty(Organisation.class, "name", organisationName);
 	if (!organisations.isEmpty()) {
 	    response.setContentType("text/plain;charset=utf-8");
 	    response.getWriter().print(organisations.get(0).getOrganisationId());
@@ -165,22 +166,19 @@ public class OrganisationController {
 
     @RequestMapping(path = "/deleteAllLessonsInit", method = RequestMethod.POST)
     public String deleteAllLessonsInit(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!AdminServiceProxy.getSecurityService(applicationContext.getServletContext()).isSysadmin(getUserID(),
-		"display cleanup preview lessons", false)) {
+	if (!securityService.isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
 	    return null;
 	}
 
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute("errorName", "OrganisationAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy
-		    .getMessageService(applicationContext.getServletContext()).getMessage("error.need.sysadmin"));
+	    request.setAttribute("errorMessage", messageService.getMessage("error.need.sysadmin"));
 	    return "error";
 	}
 
 	Integer organisationId = WebUtil.readIntParam(request, "orgId");
-	Organisation organisation = (Organisation) AdminServiceProxy.getService(applicationContext.getServletContext())
-		.findById(Organisation.class, organisationId);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	int lessonCount = organisation.getLessons().size();
 	request.setAttribute("lessonCount", lessonCount);
 	request.setAttribute("courseName", organisation.getName());
@@ -193,13 +191,11 @@ public class OrganisationController {
 	Integer userID = getUserID();
 	Integer limit = WebUtil.readIntParam(request, "limit", true);
 	Integer organisationId = WebUtil.readIntParam(request, "orgId");
-	Organisation organisation = (Organisation) AdminServiceProxy.getService(applicationContext.getServletContext())
-		.findById(Organisation.class, organisationId);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	for (Lesson lesson : (Set<Lesson>) organisation.getLessons()) {
 	    log.info("Deleting lesson: " + lesson.getLessonId());
 	    // role is checked in this method
-	    AdminServiceProxy.getMonitoringService(applicationContext.getServletContext())
-		    .removeLessonPermanently(lesson.getLessonId(), userID);
+	    monitoringService.removeLessonPermanently(lesson.getLessonId(), userID);
 	    if (limit != null) {
 		limit--;
 		if (limit == 0) {
@@ -208,8 +204,7 @@ public class OrganisationController {
 	    }
 	}
 
-	organisation = (Organisation) AdminServiceProxy.getService(applicationContext.getServletContext())
-		.findById(Organisation.class, organisationId);
+	organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(organisation.getLessons().size());
 	return null;
@@ -217,10 +212,8 @@ public class OrganisationController {
 
     @RequestMapping("/error")
     public String error(HttpServletRequest request) {
-	OrganisationController.messageService = AdminServiceProxy
-		.getMessageService(applicationContext.getServletContext());
 	request.setAttribute("errorName", "OrganisationAction");
-	request.setAttribute("errorMessage", OrganisationController.messageService.getMessage("error.authorisation"));
+	request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	return "error";
     }
 
@@ -232,8 +225,8 @@ public class OrganisationController {
 
     @SuppressWarnings("unchecked")
     private void initLocalesAndStatus() {
-	if ((OrganisationController.status == null) && (OrganisationController.service != null)) {
-	    OrganisationController.status = OrganisationController.service.findAll(OrganisationState.class);
+	if ((status == null) && (userManagementService != null)) {
+	    status = userManagementService.findAll(OrganisationState.class);
 	}
     }
 }

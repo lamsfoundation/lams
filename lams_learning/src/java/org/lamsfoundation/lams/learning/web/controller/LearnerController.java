@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -72,7 +74,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- *
  * <p>
  * The action servlet that interacts with learner to start a lams learner module, join a user to the lesson and allows a
  * user to exit a lesson.
@@ -87,41 +88,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * features to solve duplicate submission problem.
  *
  * @author Jacky Fang
- * @since 3/03/2005
- * @version 1.1
  */
 @Controller
 @RequestMapping("/learner")
 public class LearnerController {
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(LearnerController.class);
 
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
-    @Qualifier("userManagementService")
     private IUserManagementService userManagementService;
-
     @Autowired
-    @Qualifier("gradebookService")
     private IGradebookService gradebookService;
-
     @Autowired
-    @Qualifier("monitoringService")
     private IMonitoringService monitoringService;
-
     @Autowired
-    @Qualifier("lessonService")
     private ILessonService lessonService;
-
+    @Autowired
+    private ILamsToolService lamsToolService;
     @Autowired
     @Qualifier("learningMessageService")
     private MessageService messageService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -133,10 +120,6 @@ public class LearnerController {
     private static final String[] LEARNER_MESSAGE_KEYS = new String[] { "message.learner.progress.restart.confirm",
 	    "message.lesson.restart.button", "label.learner.progress.notebook", "button.exit",
 	    "label.learner.progress.support", "label.my.progress" };
-
-    // ---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    // ---------------------------------------------------------------------
 
     @RequestMapping("/redirectToURL")
     @ResponseBody
@@ -185,8 +168,7 @@ public class LearnerController {
 
 	    // security check
 	    Lesson lesson = learnerService.getLesson(lessonID);
-	    User user = (User) LearnerServiceProxy.getUserManagementService(applicationContext.getServletContext())
-		    .findById(User.class, learner);
+	    User user = (User) userManagementService.findById(User.class, learner);
 	    if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().getLearners().contains(user)) {
 		request.setAttribute("messageKey",
 			"User " + user.getLogin() + " is not a learner in the requested lesson.");
@@ -295,8 +277,7 @@ public class LearnerController {
 	if (lessonId == null) {
 	    // depending on when this is called, there may only be a toolSessionId known, not the lessonId.
 	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(applicationContext.getServletContext())
-		    .getToolSession(toolSessionId);
+	    ToolSession toolSession = lamsToolService.getToolSession(toolSessionId);
 	    lessonId = toolSession.getLesson().getLessonId();
 	}
 
@@ -434,13 +415,10 @@ public class LearnerController {
 
     private ObjectNode getProgressBarMessages() {
 	ObjectNode progressBarMessages = JsonNodeFactory.instance.objectNode();
-	MessageService messageService = LearnerServiceProxy
-		.getMonitoringMessageService(applicationContext.getServletContext());
 	for (String key : MONITOR_MESSAGE_KEYS) {
 	    String value = messageService.getMessage(key);
 	    progressBarMessages.put(key, value);
 	}
-	messageService = LearnerServiceProxy.getMessageService(applicationContext.getServletContext());
 	for (String key : LEARNER_MESSAGE_KEYS) {
 	    String value = messageService.getMessage(key);
 	    progressBarMessages.put(key, value);
@@ -464,8 +442,7 @@ public class LearnerController {
 
 	} else {
 	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(applicationContext.getServletContext())
-		    .getToolSession(toolSessionId);
+	    ToolSession toolSession = lamsToolService.getToolSession(toolSessionId);
 	    lesson = toolSession.getLesson();
 	}
 

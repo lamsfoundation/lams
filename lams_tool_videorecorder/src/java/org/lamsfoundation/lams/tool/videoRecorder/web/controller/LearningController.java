@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LearningController {
 
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerService learnerService;
 
     @RequestMapping("")

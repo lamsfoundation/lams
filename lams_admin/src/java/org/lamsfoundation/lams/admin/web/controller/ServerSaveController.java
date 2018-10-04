@@ -29,45 +29,37 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ExtServerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
- * <p>
- * <a href="ServerSaveAction.java.html"><i>View Source</i><a>
- * </p>
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @Controller
 public class ServerSaveController {
 
-    private static IIntegrationService service;
-    private static IUserManagementService userService;
-    private static MessageService messageService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IIntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    @Qualifier("adminMessageService")
+    private MessageService messageService;
 
     @RequestMapping(path = "/serversave")
     public String execute(@ModelAttribute ExtServerForm extServerForm, BindingResult bindingResult,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-	service = AdminServiceProxy.getIntegrationService(applicationContext.getServletContext());
-	userService = AdminServiceProxy.getService(applicationContext.getServletContext());
-	messageService = AdminServiceProxy.getMessageService(applicationContext.getServletContext());
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
@@ -94,7 +86,7 @@ public class ServerSaveController {
 	
 	Integer sid = extServerForm.getSid();
 	if (errorMap.isEmpty()) {//check duplication
-	    List listServer = userService.findByProperty(ExtServer.class, "serverid",
+	    List listServer = userManagementService.findByProperty(ExtServer.class, "serverid",
 		    extServerForm.getServerid());
 	    if (listServer != null && listServer.size() > 0) {
 		if (sid.equals(-1)) {//new map
@@ -109,7 +101,7 @@ public class ServerSaveController {
 		}
 	    }
 
-	    List<ExtServer> listPrefix = userService.findByProperty(ExtServer.class, "prefix",
+	    List<ExtServer> listPrefix = userManagementService.findByProperty(ExtServer.class, "prefix",
 		    extServerForm.getPrefix());
 	    if (listPrefix != null && listPrefix.size() > 0) {
 		if (sid.equals(0)) {//new map
@@ -133,10 +125,10 @@ public class ServerSaveController {
 		map.setSid(null);
 		map.setServerTypeId(ExtServer.INTEGRATION_SERVER_TYPE);
 	    } else {
-		map = service.getExtServer(sid);
+		map = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(map, extServerForm);
 	    }
-	    service.saveExtServer(map);
+	    integrationService.saveExtServer(map);
 	    return "forward:/serverlist.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);

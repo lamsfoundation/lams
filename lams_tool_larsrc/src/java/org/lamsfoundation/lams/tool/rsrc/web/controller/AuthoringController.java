@@ -88,17 +88,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
+    private static Logger log = Logger.getLogger(AuthoringController.class);
+    
     private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
     private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
     private static final String ITEM_TYPE = "itemType";
 
-    private static Logger log = Logger.getLogger(AuthoringController.class);
-
     @Autowired
-    @Qualifier("resourceService")
     private IResourceService resourceService;
-
     @Autowired
     @Qualifier("resourceMessageService")
     private MessageService messageService;

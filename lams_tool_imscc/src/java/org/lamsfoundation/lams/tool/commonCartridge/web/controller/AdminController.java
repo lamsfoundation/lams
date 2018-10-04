@@ -29,7 +29,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigI
 import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeService;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.AdminForm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -44,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     @Autowired
-    @Qualifier("commonCartridgeService")
     private ICommonCartridgeService commonCartridgeService;
 
     @RequestMapping("/start")

@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,17 +72,13 @@ import org.springframework.web.context.WebApplicationContext;
  * </p>
  *
  * @author Jacky Fang
- * @since 2005-4-7
- * @version 1.1
  */
 @Controller
 @RequestMapping("/gate")
 public class GateController {
 
     @Autowired
-    @Qualifier("learnerService")
     private ILearnerFullService learnerService;
-
     @Autowired
     private WebApplicationContext applicationContext;
     // ---------------------------------------------------------------------

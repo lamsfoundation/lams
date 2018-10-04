@@ -43,37 +43,33 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- *
- *
- *
  */
 @Controller
 public class LoginAsController {
-
+    
     @Autowired
-    WebApplicationContext applicationContext;
+    @Qualifier("centralMessageService")
+    private MessageService messageService;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private ILogEventService logEventService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     @RequestMapping("/loginas")
     public String execute(HttpServletRequest request) throws Exception {
-
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
-	IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementService");
-	MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
-	IntegrationService integrationService = (IntegrationService) ctx.getBean("integrationService");
-
 	String login = WebUtil.readStrParam(request, "login", false);
 
-	if (service.isUserSysAdmin()) {
+	if (userManagementService.isUserSysAdmin()) {
 	    if ((login != null) && (login.trim().length() > 0)) {
-		User user = service.getUserByLogin(login);
+		User user = userManagementService.getUserByLogin(login);
 		if (user != null) {
 
 		    // If the user is an integration learner and ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS if off do not let syadmin log in
@@ -82,7 +78,7 @@ public class LoginAsController {
 			    .getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
 		    if (!allowDirectAccessIntegrationLearner) {
 			boolean isIntegrationUser = integrationService.isIntegrationUser(user.getUserId());
-			if (isIntegrationUser && isOnlyLearner(service, user.getUserId())) {
+			if (isIntegrationUser && isOnlyLearner(user.getUserId())) {
 			    request.setAttribute("errorName", "Login As");
 			    request.setAttribute("errorMessage",
 				    messageService.getMessage("error.cannot.login.as.with.not.allow.direct.access"));
@@ -92,7 +88,6 @@ public class LoginAsController {
 
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-		    ILogEventService logEventService = (ILogEventService) ctx.getBean("logEventService");
 		    String[] args = new String[] { sysadmin.getLogin() + " (" + sysadmin.getUserID() + ")", login };
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null,
@@ -118,8 +113,8 @@ public class LoginAsController {
 	return "forward:/admin/usersearch.do";
     }
 
-    private boolean isOnlyLearner(IUserManagementService service, Integer userId) {
-	Map<Integer, Set<Integer>> orgRoleSets = service.getRolesForUser(userId);
+    private boolean isOnlyLearner(Integer userId) {
+	Map<Integer, Set<Integer>> orgRoleSets = userManagementService.getRolesForUser(userId);
 	for (Set<Integer> orgRoleSet : orgRoleSets.values()) {
 	    for (Integer role : orgRoleSet) {
 		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR)
