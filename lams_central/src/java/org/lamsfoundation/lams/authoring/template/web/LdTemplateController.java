@@ -96,6 +96,7 @@ public abstract class LdTemplateController {
     @Qualifier("workspaceManagementService")
     protected IWorkspaceManagementService workspaceManagementService;
     @Autowired
+    @Qualifier("authoringService")
     protected IAuthoringFullService authoringFullService;
     @Autowired
     @Qualifier("toolDAO")
@@ -148,7 +149,8 @@ public abstract class LdTemplateController {
 
     @RequestMapping("")
     @ResponseBody
-    public final String unspecified(HttpServletRequest request, HttpServletResponse response, HttpSession httpSession) throws Exception {
+    public final String unspecified(HttpServletRequest request, HttpServletResponse response, HttpSession httpSession)
+	    throws Exception {
 	ObjectNode responseJSON = null;
 	try {
 	    responseJSON = createLearningDesign(request, httpSession);
@@ -190,7 +192,8 @@ public abstract class LdTemplateController {
 	return "authoring/template/tbl/tbl";
     }
 
-    protected abstract ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession) throws Exception;
+    protected abstract ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession)
+	    throws Exception;
 
     /**
      * Creates transitions between activities in the order they were created.
@@ -325,7 +328,7 @@ public abstract class LdTemplateController {
      *
      * @throws IOException
      * @
-     *       @throws
+     * @throws
      *       HttpException
      */
     protected ObjectNode saveLearningDesign(String templateCode, String userEnteredTitleString,

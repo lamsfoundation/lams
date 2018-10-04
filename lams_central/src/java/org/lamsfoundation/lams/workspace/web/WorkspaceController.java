@@ -59,7 +59,7 @@ public class WorkspaceController {
     protected Logger log = Logger.getLogger(WorkspaceController.class.getName());
 
     @Autowired
-    @Qualifier("IWorkspaceManagementService")
+    @Qualifier("workspaceManagementService")
     private IWorkspaceManagementService workspaceManagementService;
 
     public static final String RESOURCE_ID = "resourceID";
