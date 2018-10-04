@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2013 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -12,31 +12,29 @@
 package com.thoughtworks.xstream.converters.basic;
 
 /**
- * Converts a long primitive or {@link Long} wrapper to a string.
+ * Converts a long primitive or java.lang.Long wrapper to a String.
  * 
  * @author Joe Walnes
  */
 public class LongConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(long.class) || type.equals(Long.class);
     }
 
-    @Override
-    public Object fromString(final String str) {
-        final int len = str.length();
+    public Object fromString(String str) {
+        int len = str.length();
         if (len == 0) {
             throw new NumberFormatException("For input string: \"\"");
         }
         if (len < 17) {
             return Long.decode(str);
         }
-        final char c0 = str.charAt(0);
+        char c0 = str.charAt(0);
         if (c0 != '0' && c0 != '#') {
             return Long.decode(str);
         }
-        final char c1 = str.charAt(1);
+        char c1 = str.charAt(1);
         final long high;
         final long low;
         if (c0 == '#' && len == 17) {

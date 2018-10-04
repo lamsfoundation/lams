@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,11 +10,12 @@
  */
 package com.thoughtworks.xstream.io.xml;
 
-import org.xmlpull.mxp1.MXParser;
-import org.xmlpull.v1.XmlPullParser;
 
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.naming.NameCoder;
+
+import org.xmlpull.mxp1.MXParser;
+import org.xmlpull.v1.XmlPullParser;
 
 
 /**
@@ -40,11 +41,13 @@ public class Xpp3Driver extends AbstractXppDriver {
      * @param nameCoder the replacer for XML friendly names
      * @since 1.4
      */
-    public Xpp3Driver(final NameCoder nameCoder) {
+    public Xpp3Driver(NameCoder nameCoder) {
         super(nameCoder);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     protected XmlPullParser createParser() {
         return new MXParser();
     }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -17,27 +17,24 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-
 /**
- * Converts a char[] as a single string.
- * 
+ * Converts a char[] to XML, storing the contents as a single
+ * String.
+ *
  * @author Joe Walnes
  */
 public class CharArrayConverter implements Converter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.isArray() && type.getComponentType().equals(char.class);
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
-        char[] chars = (char[])source;
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        char[] chars = (char[]) source;
         writer.setValue(new String(chars));
     }
 
-    @Override
-    public char[] unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         return reader.getValue().toCharArray();
     }
 }

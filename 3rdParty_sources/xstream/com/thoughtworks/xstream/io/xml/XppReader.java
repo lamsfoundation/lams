@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -21,10 +21,9 @@ import com.thoughtworks.xstream.converters.ErrorWriter;
 import com.thoughtworks.xstream.io.StreamException;
 import com.thoughtworks.xstream.io.naming.NameCoder;
 
-
 /**
  * XStream reader that pulls directly from the stream using the XmlPullParser API.
- * 
+ *
  * @author Joe Walnes
  * @author J&ouml;rg Schaible
  */
@@ -40,7 +39,7 @@ public class XppReader extends AbstractPullReader {
      * @param parser the XPP parser to use
      * @since 1.4
      */
-    public XppReader(final Reader reader, final XmlPullParser parser) {
+    public XppReader(Reader reader, XmlPullParser parser) {
         this(reader, parser, new XmlFriendlyNameCoder());
     }
 
@@ -52,129 +51,114 @@ public class XppReader extends AbstractPullReader {
      * @param nameCoder the coder for XML friendly tag and attribute names
      * @since 1.4
      */
-    public XppReader(final Reader reader, final XmlPullParser parser, final NameCoder nameCoder) {
+    public XppReader(Reader reader, XmlPullParser parser, NameCoder nameCoder) {
         super(nameCoder);
         this.parser = parser;
         this.reader = reader;
         try {
             parser.setInput(this.reader);
-        } catch (final XmlPullParserException e) {
+        } catch (XmlPullParserException e) {
             throw new StreamException(e);
         }
         moveDown();
     }
 
     /**
-     * @deprecated As of 1.4, use {@link #XppReader(Reader, XmlPullParser)} instead
+     * @deprecated As of 1.4, use {@link #XppReader(Reader, XmlPullParser)}  instead
      */
-    @Deprecated
-    public XppReader(final Reader reader) {
+    public XppReader(Reader reader) {
         this(reader, new XmlFriendlyReplacer());
     }
 
     /**
      * @since 1.2
-     * @deprecated As of 1.4, use {@link #XppReader(Reader, XmlPullParser, NameCoder)} instead
+     * @deprecated As of 1.4, use {@link #XppReader(Reader, XmlPullParser, NameCoder)}  instead
      */
-    @Deprecated
-    public XppReader(final Reader reader, final XmlFriendlyReplacer replacer) {
+    public XppReader(Reader reader, XmlFriendlyReplacer replacer) {
         super(replacer);
         try {
             parser = createParser();
             this.reader = reader;
             parser.setInput(this.reader);
             moveDown();
-        } catch (final XmlPullParserException e) {
+        } catch (XmlPullParserException e) {
             throw new StreamException(e);
         }
     }
-
+    
     /**
      * To use another implementation of org.xmlpull.v1.XmlPullParser, override this method.
-     * 
-     * @deprecated As of 1.4, use {@link #XppReader(Reader, XmlPullParser)} instead
+     * @deprecated As of 1.4, use {@link #XppReader(Reader, XmlPullParser)}  instead
      */
-    @Deprecated
     protected XmlPullParser createParser() {
         Exception exception = null;
         try {
-            return (XmlPullParser)Class
-                .forName("org.xmlpull.mxp1.MXParser", true, XmlPullParser.class.getClassLoader())
-                .newInstance();
-        } catch (final InstantiationException e) {
+            return (XmlPullParser)Class.forName("org.xmlpull.mxp1.MXParser", true, XmlPullParser.class.getClassLoader()).newInstance();
+        } catch (InstantiationException e) {
             exception = e;
-        } catch (final IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             exception = e;
-        } catch (final ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             exception = e;
         }
         throw new StreamException("Cannot create Xpp3 parser instance.", exception);
     }
 
-    @Override
     protected int pullNextEvent() {
         try {
-            switch (parser.next()) {
-            case XmlPullParser.START_DOCUMENT:
-            case XmlPullParser.START_TAG:
-                return START_NODE;
-            case XmlPullParser.END_DOCUMENT:
-            case XmlPullParser.END_TAG:
-                return END_NODE;
-            case XmlPullParser.TEXT:
-                return TEXT;
-            case XmlPullParser.COMMENT:
-                return COMMENT;
-            default:
-                return OTHER;
+            switch(parser.next()) {
+                case XmlPullParser.START_DOCUMENT:
+                case XmlPullParser.START_TAG:
+                    return START_NODE;
+                case XmlPullParser.END_DOCUMENT:
+                case XmlPullParser.END_TAG:
+                    return END_NODE;
+                case XmlPullParser.TEXT:
+                    return TEXT;
+                case XmlPullParser.COMMENT:
+                    return COMMENT;
+                default:
+                    return OTHER;
             }
-        } catch (final XmlPullParserException e) {
+        } catch (XmlPullParserException e) {
             throw new StreamException(e);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
     protected String pullElementName() {
         return parser.getName();
     }
 
-    @Override
     protected String pullText() {
         return parser.getText();
     }
 
-    @Override
-    public String getAttribute(final String name) {
+    public String getAttribute(String name) {
         return parser.getAttributeValue(null, encodeAttribute(name));
     }
 
-    @Override
-    public String getAttribute(final int index) {
+    public String getAttribute(int index) {
         return parser.getAttributeValue(index);
     }
 
-    @Override
     public int getAttributeCount() {
         return parser.getAttributeCount();
     }
 
-    @Override
-    public String getAttributeName(final int index) {
+    public String getAttributeName(int index) {
         return decodeAttribute(parser.getAttributeName(index));
     }
 
-    @Override
-    public void appendErrors(final ErrorWriter errorWriter) {
+    public void appendErrors(ErrorWriter errorWriter) {
         errorWriter.add("line number", String.valueOf(parser.getLineNumber()));
     }
 
-    @Override
     public void close() {
         try {
             reader.close();
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }

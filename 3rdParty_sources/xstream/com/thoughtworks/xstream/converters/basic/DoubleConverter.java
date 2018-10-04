@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -12,19 +12,18 @@
 package com.thoughtworks.xstream.converters.basic;
 
 /**
- * Converts a double primitive or {@link Double} wrapper to a string.
- * 
+ * Converts a double primitive or java.lang.Double wrapper to
+ * a String.
+ *
  * @author Joe Walnes
  */
 public class DoubleConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(double.class) || type.equals(Double.class);
     }
 
-    @Override
-    public Object fromString(final String str) {
+    public Object fromString(String str) {
         return Double.valueOf(str);
     }
 

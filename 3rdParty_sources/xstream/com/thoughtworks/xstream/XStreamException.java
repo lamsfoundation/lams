@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008, 2013 XStream Committers.
+ * Copyright (C) 2007, 2008, 2016 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,6 +10,8 @@
  */
 package com.thoughtworks.xstream;
 
+import com.thoughtworks.xstream.core.BaseException;
+
 
 /**
  * Base exception for all thrown exceptions with XStream.
@@ -18,7 +20,7 @@ package com.thoughtworks.xstream;
  * @author J&ouml;rg Schaible
  * @since 1.3
  */
-public class XStreamException extends RuntimeException {
+public class XStreamException extends BaseException {
 
     /**
      * Default constructor.
@@ -58,6 +60,6 @@ public class XStreamException extends RuntimeException {
      * @since 1.3
      */
     public XStreamException(String message, Throwable cause) {
-        super(message + (cause == null ? "" : " : " + cause.getMessage()), cause);
+        super(message, cause);
     }
 }

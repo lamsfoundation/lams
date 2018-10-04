@@ -59,6 +59,6 @@ Undertow servlet 1.4.0
 
 xmltooling 1.4.0
 
-XStream 1.5.0
+XStream 1.4.10
 
 websocket api_1.1_spec-1.1.1.Final

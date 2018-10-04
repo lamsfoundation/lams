@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2013 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -21,8 +21,8 @@ import com.thoughtworks.xstream.io.naming.NoNameCoder;
 
 
 /**
- * A simple writer that outputs JSON in a pretty-printed indented stream. Arrays, Lists and Sets rely on you NOT using
- * XStream.addImplicitCollection(..).
+ * A simple writer that outputs JSON in a pretty-printed indented stream. Arrays, Lists and Sets
+ * rely on you NOT using XStream.addImplicitCollection(..).
  * 
  * @author Paul Hammant
  * @author J&ouml;rg Schaible
@@ -38,17 +38,16 @@ public class JsonWriter extends AbstractJsonWriter {
     /**
      * @deprecated As of 1.4 use {@link JsonWriter#JsonWriter(Writer, Format) instead}
      */
-    @Deprecated
-    public JsonWriter(final Writer writer, final char[] lineIndenter, final String newLine) {
-        this(writer, 0, new Format(lineIndenter, newLine.toCharArray(), Format.SPACE_AFTER_LABEL
-            | Format.COMPACT_EMPTY_ELEMENT));
+    public JsonWriter(Writer writer, char[] lineIndenter, String newLine) {
+        this(writer, 0, new Format(
+            lineIndenter, newLine.toCharArray(), Format.SPACE_AFTER_LABEL
+                | Format.COMPACT_EMPTY_ELEMENT));
     }
 
     /**
      * @deprecated As of 1.4 use {@link JsonWriter#JsonWriter(Writer, Format) instead}
      */
-    @Deprecated
-    public JsonWriter(final Writer writer, final char[] lineIndenter) {
+    public JsonWriter(Writer writer, char[] lineIndenter) {
         this(writer, 0, new Format(lineIndenter, new char[]{'\n'}, Format.SPACE_AFTER_LABEL
             | Format.COMPACT_EMPTY_ELEMENT));
     }
@@ -56,34 +55,35 @@ public class JsonWriter extends AbstractJsonWriter {
     /**
      * @deprecated As of 1.4 use {@link JsonWriter#JsonWriter(Writer, Format) instead}
      */
-    @Deprecated
-    public JsonWriter(final Writer writer, final String lineIndenter, final String newLine) {
-        this(writer, 0, new Format(lineIndenter.toCharArray(), newLine.toCharArray(), Format.SPACE_AFTER_LABEL
-            | Format.COMPACT_EMPTY_ELEMENT));
+    public JsonWriter(Writer writer, String lineIndenter, String newLine) {
+        this(writer, 0, new Format(
+            lineIndenter.toCharArray(), newLine.toCharArray(), Format.SPACE_AFTER_LABEL
+                | Format.COMPACT_EMPTY_ELEMENT));
     }
 
     /**
      * @deprecated As of 1.4 use {@link JsonWriter#JsonWriter(Writer, Format) instead}
      */
-    @Deprecated
-    public JsonWriter(final Writer writer, final String lineIndenter) {
-        this(writer, 0, new Format(lineIndenter.toCharArray(), new char[]{'\n'}, Format.SPACE_AFTER_LABEL
-            | Format.COMPACT_EMPTY_ELEMENT));
+    public JsonWriter(Writer writer, String lineIndenter) {
+        this(writer, 0, new Format(
+            lineIndenter.toCharArray(), new char[]{'\n'}, Format.SPACE_AFTER_LABEL
+                | Format.COMPACT_EMPTY_ELEMENT));
     }
 
-    public JsonWriter(final Writer writer) {
-        this(writer, 0, new Format(new char[]{' ', ' '}, new char[]{'\n'}, Format.SPACE_AFTER_LABEL
-            | Format.COMPACT_EMPTY_ELEMENT));
+    public JsonWriter(Writer writer) {
+        this(writer, 0, new Format(
+            new char[]{' ', ' '}, new char[]{'\n'}, Format.SPACE_AFTER_LABEL
+                | Format.COMPACT_EMPTY_ELEMENT));
     }
 
     /**
      * @since 1.3.1
      * @deprecated As of 1.4 use {@link JsonWriter#JsonWriter(Writer, int, Format) instead}
      */
-    @Deprecated
-    public JsonWriter(final Writer writer, final char[] lineIndenter, final String newLine, final int mode) {
-        this(writer, mode, new Format(lineIndenter, newLine.toCharArray(), Format.SPACE_AFTER_LABEL
-            | Format.COMPACT_EMPTY_ELEMENT));
+    public JsonWriter(Writer writer, char[] lineIndenter, String newLine, int mode) {
+        this(writer, mode, new Format(
+            lineIndenter, newLine.toCharArray(), Format.SPACE_AFTER_LABEL
+                | Format.COMPACT_EMPTY_ELEMENT));
     }
 
     /**
@@ -94,7 +94,7 @@ public class JsonWriter extends AbstractJsonWriter {
      * @since 1.3.1
      * @see #JsonWriter(Writer, int, Format)
      */
-    public JsonWriter(final Writer writer, final int mode) {
+    public JsonWriter(Writer writer, int mode) {
         this(writer, mode, new Format());
     }
 
@@ -106,20 +106,22 @@ public class JsonWriter extends AbstractJsonWriter {
      * @since 1.4
      * @see #JsonWriter(Writer, int, Format)
      */
-    public JsonWriter(final Writer writer, final Format format) {
+    public JsonWriter(Writer writer, Format format) {
         this(writer, 0, format);
     }
 
     /**
-     * Create a JsonWriter where the writer mode can be chosen and the format definition is provided.
+     * Create a JsonWriter where the writer mode can be chosen and the format definition is
+     * provided.
      * <p>
      * Following constants can be used as bit mask for the mode:
      * </p>
      * <ul>
      * <li>{@link #DROP_ROOT_MODE}: drop the root node</li>
-     * <li>{@link #STRICT_MODE}: do not throw {@link ConversionException}, if writer should generate invalid JSON</li>
-     * <li>{@link #EXPLICIT_MODE}: ensure that all available data is explicitly written even if addition objects must be
-     * added</li>
+     * <li>{@link #STRICT_MODE}: do not throw {@link ConversionException}, if writer should
+     * generate invalid JSON</li>
+     * <li>{@link #EXPLICIT_MODE}: ensure that all available data is explicitly written even if
+     * addition objects must be added</li>
      * </ul>
      * 
      * @param writer the {@link Writer} where the JSON is written to
@@ -127,7 +129,7 @@ public class JsonWriter extends AbstractJsonWriter {
      * @param format the JSON format definition
      * @since 1.4
      */
-    public JsonWriter(final Writer writer, final int mode, final Format format) {
+    public JsonWriter(Writer writer, int mode, Format format) {
         this(writer, mode, format, 1024);
     }
 
@@ -141,29 +143,28 @@ public class JsonWriter extends AbstractJsonWriter {
      * @see JsonWriter#JsonWriter(Writer, int, Format)
      * @since 1.4
      */
-    public JsonWriter(final Writer writer, final int mode, final Format format, final int bufferSize) {
+    public JsonWriter(Writer writer, int mode, Format format, int bufferSize) {
         super(mode, format.getNameCoder());
         this.writer = new QuickWriter(writer, bufferSize);
         this.format = format;
         depth = (mode & DROP_ROOT_MODE) == 0 ? -1 : 0;
     }
 
-    @Override
     public void flush() {
         writer.flush();
     }
 
-    @Override
     public void close() {
         writer.close();
     }
 
-    @Override
     public HierarchicalStreamWriter underlyingWriter() {
         return this;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     protected void startObject() {
         if (newLineProposed) {
             writeNewLine();
@@ -172,8 +173,10 @@ public class JsonWriter extends AbstractJsonWriter {
         startNewLine();
     }
 
-    @Override
-    protected void addLabel(final String name) {
+    /**
+     * {@inheritDoc}
+     */
+    protected void addLabel(String name) {
         if (newLineProposed) {
             writeNewLine();
         }
@@ -185,8 +188,10 @@ public class JsonWriter extends AbstractJsonWriter {
         }
     }
 
-    @Override
-    protected void addValue(final String value, final Type type) {
+    /**
+     * {@inheritDoc}
+     */
+    protected void addValue(String value, Type type) {
         if (newLineProposed) {
             writeNewLine();
         }
@@ -199,7 +204,9 @@ public class JsonWriter extends AbstractJsonWriter {
         }
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     protected void startArray() {
         if (newLineProposed) {
             writeNewLine();
@@ -208,33 +215,39 @@ public class JsonWriter extends AbstractJsonWriter {
         startNewLine();
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     protected void nextElement() {
         writer.write(",");
         writeNewLine();
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     protected void endArray() {
         endNewLine();
         writer.write("]");
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     protected void endObject() {
         endNewLine();
         writer.write("}");
     }
 
     private void startNewLine() {
-        if (++depth > 0) {
+        if ( ++depth > 0) {
             newLineProposed = true;
         }
     }
 
     private void endNewLine() {
         if (depth-- > 0) {
-            if ((format.mode() & Format.COMPACT_EMPTY_ELEMENT) != 0 && newLineProposed) {
+            if (((format.mode() & Format.COMPACT_EMPTY_ELEMENT) != 0) && newLineProposed) {
                 newLineProposed = false;
             } else {
                 writeNewLine();
@@ -251,43 +264,43 @@ public class JsonWriter extends AbstractJsonWriter {
         newLineProposed = false;
     }
 
-    private void writeText(final String text) {
-        final int length = text.length();
-        for (int i = 0; i < length; i++) {
-            final char c = text.charAt(i);
+    private void writeText(String text) {
+        int length = text.length();
+        for (int i = 0; i < length; i++ ) {
+            char c = text.charAt(i);
             switch (c) {
             case '"':
-                writer.write("\\\"");
+                this.writer.write("\\\"");
                 break;
             case '\\':
-                writer.write("\\\\");
+                this.writer.write("\\\\");
                 break;
             // turn this off - it is no CTRL char anyway
             // case '/':
             // this.writer.write("\\/");
             // break;
             case '\b':
-                writer.write("\\b");
+                this.writer.write("\\b");
                 break;
             case '\f':
-                writer.write("\\f");
+                this.writer.write("\\f");
                 break;
             case '\n':
-                writer.write("\\n");
+                this.writer.write("\\n");
                 break;
             case '\r':
-                writer.write("\\r");
+                this.writer.write("\\r");
                 break;
             case '\t':
-                writer.write("\\t");
+                this.writer.write("\\t");
                 break;
             default:
                 if (c > 0x1f) {
-                    writer.write(c);
+                    this.writer.write(c);
                 } else {
-                    writer.write("\\u");
-                    final String hex = "000" + Integer.toHexString(c);
-                    writer.write(hex.substring(hex.length() - 4));
+                    this.writer.write("\\u");
+                    String hex = "000" + Integer.toHexString(c);
+                    this.writer.write(hex.substring(hex.length() - 4));
                 }
             }
         }
@@ -304,20 +317,22 @@ public class JsonWriter extends AbstractJsonWriter {
         public static int SPACE_AFTER_LABEL = 1;
         public static int COMPACT_EMPTY_ELEMENT = 2;
 
-        private final char[] lineIndenter;
-        private final char[] newLine;
+        private char[] lineIndenter;
+        private char[] newLine;
         private final int mode;
         private final NameCoder nameCoder;
 
         /**
-         * Create a new default Formatter. The formatter uses two spaces, normal line feed character, adds a space after
-         * the label and will try to compact the output.
+         * Create a new default Formatter. The formatter uses two spaces, normal line feed
+         * character, adds a space after the label and will try to compact the output.
          * 
          * @since 1.4.2
          */
         public Format() {
-            this(new char[]{' ', ' '}, new char[]{'\n'}, Format.SPACE_AFTER_LABEL | Format.COMPACT_EMPTY_ELEMENT);
+            this(new char[]{' ', ' '}, new char[]{'\n'}, Format.SPACE_AFTER_LABEL
+                | Format.COMPACT_EMPTY_ELEMENT);
         }
+
 
         /**
          * Create a new Formatter.
@@ -327,7 +342,7 @@ public class JsonWriter extends AbstractJsonWriter {
          * @param mode the flags for the format modes
          * @since 1.4
          */
-        public Format(final char[] lineIndenter, final char[] newLine, final int mode) {
+        public Format(char[] lineIndenter, char[] newLine, int mode) {
             this(lineIndenter, newLine, mode, new NoNameCoder());
         }
 
@@ -340,7 +355,7 @@ public class JsonWriter extends AbstractJsonWriter {
          * @param nameCoder the name encoder and decoder
          * @since 1.4.2
          */
-        public Format(final char[] lineIndenter, final char[] newLine, final int mode, final NameCoder nameCoder) {
+        public Format(char[] lineIndenter, char[] newLine, int mode, NameCoder nameCoder) {
             this.lineIndenter = lineIndenter;
             this.newLine = newLine;
             this.mode = mode;
@@ -354,7 +369,7 @@ public class JsonWriter extends AbstractJsonWriter {
          * @since 1.4
          */
         public char[] getLineIndenter() {
-            return lineIndenter;
+            return this.lineIndenter;
         }
 
         /**
@@ -364,7 +379,7 @@ public class JsonWriter extends AbstractJsonWriter {
          * @since 1.4
          */
         public char[] getNewLine() {
-            return newLine;
+            return this.newLine;
         }
 
         /**
@@ -374,8 +389,9 @@ public class JsonWriter extends AbstractJsonWriter {
          * @since 1.4
          */
         public int mode() {
-            return mode;
+            return this.mode;
         }
+
 
         /**
          * Retrieve the NameCoder.

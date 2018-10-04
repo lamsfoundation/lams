@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,9 +11,6 @@
  */
 package com.thoughtworks.xstream.converters.extended;
 
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -21,29 +18,27 @@ import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
- * Converts a {@link GregorianCalendar}.
- * <p>
- * Note that although it currently only contains one field, it nests it inside a child element, to allow for other
- * fields to be stored in the future.
- * </p>
- * 
+ * Converts a java.util.GregorianCalendar to XML. Note that although it currently only contains one field, it nests
+ * it inside a child element, to allow for other fields to be stored in the future.
+ *
  * @author Joe Walnes
  * @author J&ouml;rg Schaible
  */
 public class GregorianCalendarConverter implements Converter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(GregorianCalendar.class);
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
-        final GregorianCalendar calendar = (GregorianCalendar)source;
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        GregorianCalendar calendar = (GregorianCalendar) source;
         ExtendedHierarchicalStreamWriterHelper.startNode(writer, "time", long.class);
-        final long timeInMillis = calendar.getTimeInMillis();
+        long timeInMillis = calendar.getTime().getTime(); // calendar.getTimeInMillis() not available under JDK 1.3
         writer.setValue(String.valueOf(timeInMillis));
         writer.endNode();
         ExtendedHierarchicalStreamWriterHelper.startNode(writer, "timezone", String.class);
@@ -51,10 +46,9 @@ public class GregorianCalendarConverter implements Converter {
         writer.endNode();
     }
 
-    @Override
-    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         reader.moveDown();
-        final long timeInMillis = Long.parseLong(reader.getValue());
+        long timeInMillis = Long.parseLong(reader.getValue());
         reader.moveUp();
         final String timeZone;
         if (reader.hasMoreChildren()) {
@@ -65,9 +59,9 @@ public class GregorianCalendarConverter implements Converter {
             timeZone = TimeZone.getDefault().getID();
         }
 
-        final GregorianCalendar result = new GregorianCalendar();
+        GregorianCalendar result = new GregorianCalendar();
         result.setTimeZone(TimeZone.getTimeZone(timeZone));
-        result.setTimeInMillis(timeInMillis);
+        result.setTime(new Date(timeInMillis)); // calendar.setTimeInMillis() not available under JDK 1.3
 
         return result;
     }

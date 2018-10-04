@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2011, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2011, 2013, 2014, 2016, 2017 XStream Committers.
  * All rights reserved.
  *
  * Created on 08. January 2014 by Joerg Schaible, factored out from SunUnsafeReflectionProvider
@@ -8,6 +8,9 @@
 package com.thoughtworks.xstream.converters.reflection;
 
 import java.lang.reflect.Field;
+
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.converters.ErrorWritingException;
 
 import sun.misc.Unsafe;
 
@@ -38,16 +41,16 @@ public class SunLimitedUnsafeReflectionProvider extends PureJavaReflectionProvid
         Unsafe u = null;
         Exception ex = null;
         try {
-            final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
             unsafeField.setAccessible(true);
             u = (Unsafe)unsafeField.get(null);
-        } catch (final SecurityException e) {
+        } catch (SecurityException e) {
             ex = e;
-        } catch (final NoSuchFieldException e) {
+        } catch (NoSuchFieldException e) {
             ex = e;
-        } catch (final IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             ex = e;
-        } catch (final IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             ex = e;
         }
         exception = ex;
@@ -64,28 +67,35 @@ public class SunLimitedUnsafeReflectionProvider extends PureJavaReflectionProvid
     /**
      * @since 1.4.7
      */
-    public SunLimitedUnsafeReflectionProvider(final FieldDictionary fieldDictionary) {
+    public SunLimitedUnsafeReflectionProvider(FieldDictionary fieldDictionary) {
         super(fieldDictionary);
     }
 
-    @Override
-    public Object newInstance(final Class<?> type) {
+    public Object newInstance(Class type) {
         if (exception != null) {
-            throw new ObjectAccessException("Cannot construct " + type.getName(), exception);
+            ObjectAccessException ex = new ObjectAccessException("Cannot construct type", exception);
+            ex.add("construction-type", type.getName());
+            throw ex;
         }
-        try {
-            return unsafe.allocateInstance(type);
-        } catch (final SecurityException e) {
-            throw new ObjectAccessException("Cannot construct " + type.getName(), e);
-        } catch (final InstantiationException e) {
-            throw new ObjectAccessException("Cannot construct " + type.getName(), e);
-        } catch (final IllegalArgumentException e) {
-            throw new ObjectAccessException("Cannot construct " + type.getName(), e);
+        ErrorWritingException ex = null;
+        if (type == void.class || type == Void.class) {
+            ex = new ConversionException("Type void cannot have an instance");
+        } else {
+            try {
+                return unsafe.allocateInstance(type);
+            } catch (final SecurityException e) {
+                ex = new ObjectAccessException("Cannot construct type", e);
+            } catch (final InstantiationException e) {
+                ex = new ConversionException("Cannot construct type", e);
+            } catch (final IllegalArgumentException e) {
+                ex = new ObjectAccessException("Cannot construct type", e);
+            }
         }
+        ex.add("construction-type", type.getName());
+        throw ex;
     }
 
-    @Override
-    protected void validateFieldAccess(final Field field) {
+    protected void validateFieldAccess(Field field) {
         // (overriden) don't mind final fields.
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -16,7 +16,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 
 /**
- * A generic interface for all {@link HierarchicalStreamWriter} implementations generating a DOM.
+ * A generic interface for all {@link HierarchicalStreamWriter} implementations generating a
+ * DOM.
  * 
  * @author J&ouml;rg Schaible
  * @since 1.2.1
@@ -24,16 +25,16 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public interface DocumentWriter extends HierarchicalStreamWriter {
 
     /**
-     * Retrieve a {@link List} with the top elements.
-     * <p>
-     * In the standard use case this list will only contain a single element. Additional elements can only occur, if
-     * {@link HierarchicalStreamWriter#startNode(String)} of the implementing {@link HierarchicalStreamWriter} was
-     * called multiple times with an empty node stack. Such a situation occurs calling
-     * {@link com.thoughtworks.xstream.XStream#marshal(Object, HierarchicalStreamWriter)} multiple times directly.
-     * </p>
+     * Retrieve a {@link List} with the top elements. In the standard use case this list will
+     * only contain a single element. Additional elements can only occur, if
+     * {@link HierarchicalStreamWriter#startNode(String)} of the implementing
+     * {@link HierarchicalStreamWriter} was called multiple times with an empty node stack. Such
+     * a situation occurs calling
+     * {@link com.thoughtworks.xstream.XStream#marshal(Object, HierarchicalStreamWriter)}
+     * multiple times directly.
      * 
      * @return a {@link List} with top nodes
      * @since 1.2.1
      */
-    List<Object> getTopLevelNodes();
+    List getTopLevelNodes();
 }

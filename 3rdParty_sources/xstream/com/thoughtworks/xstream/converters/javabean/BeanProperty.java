@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -15,51 +15,52 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 
-
 /**
  * Provide access to a bean property.
  * 
  * @author <a href="mailto:andrea.aime@aliceposta.it">Andrea Aime</a>
  * @deprecated As of 1.3.1, no longer in use
  */
-@Deprecated
 public class BeanProperty {
 
     /** the target class */
-    private final Class<?> memberClass;
+    private Class memberClass;
 
     /** the property name */
-    private final String propertyName;
+    private String propertyName;
 
     /** the property type */
-    private final Class<?> type;
+    private Class type;
 
     /** the getter */
     protected Method getter;
 
     /** the setter */
     private Method setter;
+    
+    private static final Object[] EMPTY_ARGS = new Object[0];
 
     /**
-     * Creates a new {@link BeanProperty}that gets the specified property from the specified class.
+     * Creates a new {@link BeanProperty}that gets the specified property from
+     * the specified class.
      */
-    public BeanProperty(final Class<?> memberClass, final String propertyName, final Class<?> propertyType) {
+    public BeanProperty(Class memberClass, String propertyName, Class propertyType) {
         this.memberClass = memberClass;
         this.propertyName = propertyName;
-        type = propertyType;
+        this.type = propertyType;
     }
 
     /**
      * Gets the base class that this getter accesses.
      */
-    public Class<?> getBeanClass() {
+    public Class getBeanClass() {
         return memberClass;
     }
 
     /**
      * Returns the property type
      */
-    public Class<?> getType() {
+    public Class getType() {
         return type;
     }
 
@@ -74,49 +75,46 @@ public class BeanProperty {
      * Gets whether this property can get get.
      */
     public boolean isReadable() {
-        return getter != null;
+        return (getter != null);
     }
 
     /**
      * Gets whether this property can be set.
      */
     public boolean isWritable() {
-        return setter != null;
+        return (setter != null);
     }
 
     /**
      * Gets the value of this property for the specified Object.
-     * 
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public Object get(final Object member) throws IllegalArgumentException, IllegalAccessException {
-        if (!isReadable()) {
-            throw new IllegalStateException("Property " + propertyName + " of " + memberClass + " not readable");
-        }
+    public Object get(Object member) throws IllegalArgumentException, IllegalAccessException {
+        if (!isReadable())
+            throw new IllegalStateException("Property " + propertyName + " of " + memberClass
+                    + " not readable");
 
         try {
-            return getter.invoke(member);
-        } catch (final InvocationTargetException e) {
+            return getter.invoke(member, EMPTY_ARGS);
+        } catch (InvocationTargetException e) {
             throw new UndeclaredThrowableException(e.getTargetException());
         }
     }
 
     /**
      * Sets the value of this property for the specified Object.
-     * 
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public Object set(final Object member, final Object newValue)
-            throws IllegalArgumentException, IllegalAccessException {
-        if (!isWritable()) {
-            throw new IllegalStateException("Property " + propertyName + " of " + memberClass + " not writable");
-        }
+    public Object set(Object member, Object newValue) throws IllegalArgumentException, IllegalAccessException {
+        if (!isWritable())
+            throw new IllegalStateException("Property " + propertyName + " of " + memberClass
+                    + " not writable");
 
         try {
-            return setter.invoke(member, newValue);
-        } catch (final InvocationTargetException e) {
+            return setter.invoke(member, new Object[] { newValue });
+        } catch (InvocationTargetException e) {
             throw new UndeclaredThrowableException(e.getTargetException());
         }
     }
@@ -124,15 +122,15 @@ public class BeanProperty {
     /**
      * @param method
      */
-    public void setGetterMethod(final Method method) {
-        getter = method;
+    public void setGetterMethod(Method method) {
+        this.getter = method;
 
     }
 
     /**
      * @param method
      */
-    public void setSetterMethod(final Method method) {
-        setter = method;
+    public void setSetterMethod(Method method) {
+        this.setter = method;
     }
 }

@@ -18,17 +18,14 @@ public class InterfaceTypePermission implements TypePermission {
      */
     public static final TypePermission INTERFACES = new InterfaceTypePermission();
 
-    @Override
-    public boolean allows(Class<?> type) {
+    public boolean allows(Class type) {
         return type != null && type.isInterface();
     }
 
-    @Override
     public int hashCode() {
         return 31;
     }
 
-    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == InterfaceTypePermission.class;
     }

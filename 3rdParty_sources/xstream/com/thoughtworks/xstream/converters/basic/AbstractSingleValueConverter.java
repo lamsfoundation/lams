@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2013 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -12,13 +12,11 @@ package com.thoughtworks.xstream.converters.basic;
 
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 
-
 /**
- * Base abstract implementation of {@link SingleValueConverter}.
- * <p>
- * Subclasses should implement methods canConvert(Class) and fromString(String) for the conversion.
- * </p>
- * 
+ * Base abstract implementation of  {@link com.thoughtworks.xstream.converters.SingleValueConverter}.
+ *
+ * <p>Subclasses should implement methods canConvert(Class) and fromString(String) for the conversion.</p>
+ *
  * @author Joe Walnes
  * @author J&ouml;rg Schaible
  * @author Mauro Talevi
@@ -26,15 +24,12 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
  */
 public abstract class AbstractSingleValueConverter implements SingleValueConverter {
 
-    @Override
-    public abstract boolean canConvert(Class<?> type);
+    public abstract boolean canConvert(Class type);
 
-    @Override
-    public String toString(final Object obj) {
+    public String toString(Object obj) {
         return obj == null ? null : obj.toString();
     }
 
-    @Override
     public abstract Object fromString(String str);
 
 }

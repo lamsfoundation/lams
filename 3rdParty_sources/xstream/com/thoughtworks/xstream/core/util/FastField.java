@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2010, 2014 XStream Committers.
+ * Copyright (C) 2008, 2010 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -14,25 +14,24 @@ public final class FastField {
     private final String name;
     private final String declaringClass;
 
-    public FastField(final String definedIn, final String name) {
+    public FastField(String definedIn, String name) {
         this.name = name;
-        declaringClass = definedIn;
+        this.declaringClass = definedIn;
     }
 
-    public FastField(final Class<?> definedIn, final String name) {
+    public FastField(Class definedIn, String name) {
         this(definedIn == null ? null : definedIn.getName(), name);
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public String getDeclaringClass() {
-        return declaringClass;
+        return this.declaringClass;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -41,22 +40,20 @@ public final class FastField {
         }
         if (obj instanceof FastField) {
             final FastField field = (FastField)obj;
-            if (declaringClass == null && field.declaringClass != null
-                    || declaringClass != null && field.declaringClass == null) {
+            if ((declaringClass == null && field.declaringClass != null)
+                || (declaringClass != null && field.declaringClass == null)) {
                 return false;
             }
             return name.equals(field.getName())
-                    && (declaringClass == null || declaringClass.equals(field.getDeclaringClass()));
+                && (declaringClass == null || declaringClass.equals(field.getDeclaringClass()));
         }
         return false;
     }
 
-    @Override
     public int hashCode() {
         return name.hashCode() ^ (declaringClass == null ? 0 : declaringClass.hashCode());
     }
 
-    @Override
     public String toString() {
         return (declaringClass == null ? "" : declaringClass + ".") + name;
     }

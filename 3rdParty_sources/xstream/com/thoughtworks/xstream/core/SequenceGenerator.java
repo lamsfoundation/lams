@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -15,12 +15,11 @@ public class SequenceGenerator implements ReferenceByIdMarshaller.IDGenerator {
 
     private int counter;
 
-    public SequenceGenerator(final int startsAt) {
-        counter = startsAt;
+    public SequenceGenerator(int startsAt) {
+        this.counter = startsAt;
     }
 
-    @Override
-    public String next(final Object item) {
+    public String next(Object item) {
         return String.valueOf(counter++);
     }
 

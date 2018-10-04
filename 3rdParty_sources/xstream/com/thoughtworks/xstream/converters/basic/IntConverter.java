@@ -12,23 +12,22 @@
 package com.thoughtworks.xstream.converters.basic;
 
 /**
- * Converts an int primitive or {@link Integer} wrapper to a string.
- * 
+ * Converts an int primitive or java.lang.Integer wrapper to
+ * a String.
+ *
  * @author Joe Walnes
  */
 public class IntConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(int.class) || type.equals(Integer.class);
     }
 
-    @Override
-    public Object fromString(final String str) {
-        final long value = Long.decode(str).longValue();
-        if (value < Integer.MIN_VALUE || value > 0xFFFFFFFFl) {
-            throw new NumberFormatException("For input string: \"" + str + '"');
-        }
+    public Object fromString(String str) {
+    	long value = Long.decode(str).longValue();
+    	if(value < Integer.MIN_VALUE || value > 0xFFFFFFFFl) {
+    		throw new NumberFormatException("For input string: \"" + str + '"');
+    	}
         return new Integer((int)value);
     }
 

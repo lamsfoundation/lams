@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -25,82 +25,70 @@ import java.util.TreeSet;
  * @author Joe Walnes
  * @author Guilherme Silveira
  */
-public class PrioritizedList<E> implements Iterable<E> {
+public class PrioritizedList {
 
-    private final Set<PrioritizedItem<E>> set = new TreeSet<PrioritizedItem<E>>();
+    private final Set set = new TreeSet();
+
     private int lowestPriority = Integer.MAX_VALUE;
+
     private int lastId = 0;
 
-    public void add(final E item, final int priority) {
+    public void add(Object item, int priority) {
         if (this.lowestPriority > priority) {
             this.lowestPriority = priority;
         }
-        this.set.add(new PrioritizedItem<E>(item, priority, ++lastId));
+        this.set.add(new PrioritizedItem(item, priority, ++lastId));
     }
 
-    @Override
-    public Iterator<E> iterator() {
-        return new PrioritizedItemIterator<E>(this.set.iterator());
+    public Iterator iterator() {
+        return new PrioritizedItemIterator(this.set.iterator());
     }
 
-    private static class PrioritizedItem<V> implements Comparable<PrioritizedItem<V>> {
+    private static class PrioritizedItem implements Comparable {
 
-        final V value;
+        final Object value;
         final int priority;
         final int id;
 
-        public PrioritizedItem(final V value, final int priority, final int id) {
+        public PrioritizedItem(Object value, int priority, int id) {
             this.value = value;
             this.priority = priority;
             this.id = id;
         }
 
-        @Override
-        public int compareTo(final PrioritizedItem<V> other) {
+        public int compareTo(Object o) {
+            PrioritizedItem other = (PrioritizedItem)o;
             if (this.priority != other.priority) {
-                return other.priority - this.priority;
+                return (other.priority - this.priority);
             }
-            return other.id - this.id;
+            return (other.id - this.id);
         }
 
-        @Override
-        public int hashCode() {
-            return Integer.valueOf(id).hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (!(obj instanceof PrioritizedItem)) {
-                return false;
-            }
-            @SuppressWarnings("unchecked")
-            final PrioritizedItem<V> other = (PrioritizedItem<V>)obj;
-            return this.id == other.id;
+        public boolean equals(Object obj) {
+            return this.id == ((PrioritizedItem)obj).id;
         }
 
     }
 
-    private static class PrioritizedItemIterator<V> implements Iterator<V> {
+    private static class PrioritizedItemIterator implements Iterator {
 
-        private final Iterator<PrioritizedItem<V>> iterator;
+        private Iterator iterator;
 
-        public PrioritizedItemIterator(final Iterator<PrioritizedItem<V>> iterator) {
+        public PrioritizedItemIterator(Iterator iterator) {
             this.iterator = iterator;
         }
 
-        @Override
         public void remove() {
+            // call iterator.remove()?
             throw new UnsupportedOperationException();
         }
 
-        @Override
         public boolean hasNext() {
             return iterator.hasNext();
         }
 
-        @Override
-        public V next() {
-            return iterator.next().value;
+        public Object next() {
+            return ((PrioritizedItem)iterator.next()).value;
         }
 
     }

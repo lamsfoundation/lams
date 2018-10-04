@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2014 XStream Committers.
+ * Copyright (C) 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -18,18 +18,18 @@ package com.thoughtworks.xstream.converters.reflection;
  */
 public class FieldKey {
     final private String fieldName;
-    final private Class<?> declaringClass;
+    final private Class declaringClass;
     final private int depth;
     final private int order;
 
-    public FieldKey(final String fieldName, final Class<?> declaringClass, final int order) {
+    public FieldKey(String fieldName, Class declaringClass, int order) {
         if (fieldName == null || declaringClass == null) {
             throw new IllegalArgumentException("fieldName or declaringClass is null");
         }
         this.fieldName = fieldName;
         this.declaringClass = declaringClass;
         this.order = order;
-        Class<?> c = declaringClass;
+        Class c = declaringClass;
         int i = 0;
         while (c.getSuperclass() != null) {
             i++;
@@ -39,51 +39,42 @@ public class FieldKey {
     }
 
     public String getFieldName() {
-        return fieldName;
+        return this.fieldName;
     }
 
-    public Class<?> getDeclaringClass() {
-        return declaringClass;
+    public Class getDeclaringClass() {
+        return this.declaringClass;
     }
 
     public int getDepth() {
-        return depth;
+        return this.depth;
     }
 
     public int getOrder() {
-        return order;
+        return this.order;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof FieldKey)) {
-            return false;
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FieldKey)) return false;
 
         final FieldKey fieldKey = (FieldKey)o;
 
-        if (!declaringClass.equals(fieldKey.declaringClass)) {
+        if (!declaringClass.equals(fieldKey.declaringClass)) 
             return false;
-        }
-        if (!fieldName.equals(fieldKey.fieldName)) {
+        if (!fieldName.equals(fieldKey.fieldName)) 
             return false;
-        }
 
         return true;
     }
 
-    @Override
     public int hashCode() {
         int result;
         result = fieldName.hashCode();
-        result = 29 * result + declaringClass.hashCode();
+        result = 29 * result +declaringClass.hashCode();
         return result;
     }
 
-    @Override
     public String toString() {
         return "FieldKey{"
             + "order="

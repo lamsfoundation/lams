@@ -11,9 +11,11 @@
  */
 package com.thoughtworks.xstream.converters.basic;
 
+
 /**
- * Converts a boolean primitive or {@link Boolean} wrapper to a string.
- * 
+ * Converts a boolean primitive or java.lang.Boolean wrapper to
+ * a String.
+ *
  * @author Joe Walnes
  * @author David Blevins
  */
@@ -40,19 +42,16 @@ public class BooleanConverter extends AbstractSingleValueConverter {
     }
 
     /**
-     * @deprecated As of upcoming use {@link #canConvert(Class)}
+     * @deprecated As of 1.4.8 use {@link #canConvert(Class)}
      */
-    @Deprecated
-    public boolean shouldConvert(final Class<?> type, final Object value) {
+    public boolean shouldConvert(final Class type, final Object value) {
         return true;
     }
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(final Class type) {
         return type.equals(boolean.class) || type.equals(Boolean.class);
     }
 
-    @Override
     public Object fromString(final String str) {
         if (caseSensitive) {
             return positive.equals(str) ? Boolean.TRUE : Boolean.FALSE;
@@ -61,9 +60,8 @@ public class BooleanConverter extends AbstractSingleValueConverter {
         }
     }
 
-    @Override
     public String toString(final Object obj) {
-        final Boolean value = (Boolean)obj;
+        final Boolean value = (Boolean) obj;
         return obj == null ? null : value.booleanValue() ? positive : negative;
     }
 }

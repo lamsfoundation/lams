@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2014 XStream Committers.
+ * Copyright (C) 2008 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,7 +11,6 @@
 package com.thoughtworks.xstream.persistence;
 
 import java.util.Iterator;
-import java.util.Map;
 
 
 /**
@@ -20,16 +19,16 @@ import java.util.Map;
  * @author Guilherme Silveira
  * @since 1.3.1
  */
-public interface PersistenceStrategy<K,V> {
+public interface PersistenceStrategy {
 
-    Iterator<Map.Entry<K, V>> iterator();
+    Iterator iterator();
 
     int size();
 
-    V get(Object key);
+    Object get(Object key);
 
-    V put(K key, V value);
+    Object put(Object key, Object value);
 
-    V remove(Object key);
+    Object remove(Object key);
 
 }

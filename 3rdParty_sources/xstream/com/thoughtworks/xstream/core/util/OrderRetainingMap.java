@@ -16,39 +16,38 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
 /**
- * @deprecated As of upcoming use {@link java.util.LinkedHashMap}
+ * @deprecated As of 1.4.8 use {@link java.util.LinkedHashMap}
  */
-@Deprecated
-public class OrderRetainingMap<K, V> extends HashMap<K, V> {
+public class OrderRetainingMap extends HashMap {
 
-    private final ArraySet<K> keyOrder = new ArraySet<K>();
-    private final List<V> valueOrder = new ArrayList<V>();
+    private ArraySet keyOrder = new ArraySet();
+    private List valueOrder = new ArrayList();
 
     public OrderRetainingMap() {
         super();
     }
 
-    public OrderRetainingMap(final Map<K, V> m) {
+    public OrderRetainingMap(Map m) {
         super();
         putAll(m);
     }
 
-    @Override
-    public void putAll(final Map<? extends K, ? extends V> m) {
-        for (final Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+    public void putAll(Map m) {
+        for(Iterator iter = m.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
             put(entry.getKey(), entry.getValue());
         }
     }
 
-    @Override
-    public V put(final K key, final V value) {
-        final int idx = keyOrder.lastIndexOf(key);
+    public Object put(Object key, Object value) {
+        int idx = keyOrder.lastIndexOf(key);
         if (idx < 0) {
             keyOrder.add(key);
             valueOrder.add(value);
@@ -58,9 +57,8 @@ public class OrderRetainingMap<K, V> extends HashMap<K, V> {
         return super.put(key, value);
     }
 
-    @Override
-    public V remove(final Object key) {
-        final int idx = keyOrder.lastIndexOf(key);
+    public Object remove(Object key) {
+        int idx = keyOrder.lastIndexOf(key);
         if (idx != 0) {
             keyOrder.remove(idx);
             valueOrder.remove(idx);
@@ -68,34 +66,31 @@ public class OrderRetainingMap<K, V> extends HashMap<K, V> {
         return super.remove(key);
     }
 
-    @Override
     public void clear() {
         keyOrder.clear();
         valueOrder.clear();
         super.clear();
     }
 
-    @Override
-    public Collection<V> values() {
+    public Collection values() {
         return Collections.unmodifiableList(valueOrder);
     }
 
-    @Override
-    public Set<K> keySet() {
+    public Set keySet() {
         return Collections.unmodifiableSet(keyOrder);
     }
 
-    @Override
-    public Set<Map.Entry<K, V>> entrySet() {
-        @SuppressWarnings("unchecked")
-        final Map.Entry<K, V>[] entries = new Map.Entry[size()];
-        for (final Map.Entry<K, V> entry : super.entrySet()) {
+    public Set entrySet() {
+        Map.Entry[] entries = new Map.Entry[size()];
+        for (Iterator iter = super.entrySet().iterator(); iter.hasNext();) {
+            Map.Entry entry = (Map.Entry)iter.next();
             entries[keyOrder.indexOf(entry.getKey())] = entry;
         }
-        final Set<Map.Entry<K, V>> set = new ArraySet<Map.Entry<K, V>>();
+        Set set = new ArraySet();
         set.addAll(Arrays.asList(entries));
         return Collections.unmodifiableSet(set);
     }
 
-    private static class ArraySet<K> extends ArrayList<K> implements Set<K> {}
+    private static class ArraySet extends ArrayList implements Set {
+    }
 }

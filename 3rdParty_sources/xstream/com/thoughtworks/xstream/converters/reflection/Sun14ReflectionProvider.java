@@ -18,26 +18,23 @@ package com.thoughtworks.xstream.converters.reflection;
  * 
  * @author Joe Walnes
  * @author Brian Slesinsky
- * @deprecated As of upcoming use {@link SunUnsafeReflectionProvider}
+ * @deprecated As of 1.4.7 use {@link SunUnsafeReflectionProvider}
  */
-@Deprecated
 public class Sun14ReflectionProvider extends SunUnsafeReflectionProvider {
     /**
-     * @deprecated As of upcoming use {@link SunUnsafeReflectionProvider#SunUnsafeReflectionProvider()}
+     * @deprecated As of 1.4.7 use {@link SunUnsafeReflectionProvider#SunUnsafeReflectionProvider()}
      */
-    @Deprecated
     public Sun14ReflectionProvider() {
         super();
     }
 
     /**
-     * @deprecated As of upcoming use {@link SunUnsafeReflectionProvider#SunUnsafeReflectionProvider(FieldDictionary)}
+     * @deprecated As of 1.4.7 use {@link SunUnsafeReflectionProvider#SunUnsafeReflectionProvider(FieldDictionary)}
      */
-    @Deprecated
-    public Sun14ReflectionProvider(final FieldDictionary dic) {
+    public Sun14ReflectionProvider(FieldDictionary dic) {
         super(dic);
     }
-
+    
     private Object readResolve() {
         init();
         return this;

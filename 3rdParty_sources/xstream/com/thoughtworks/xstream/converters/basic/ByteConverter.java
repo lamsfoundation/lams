@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -12,24 +12,22 @@
 package com.thoughtworks.xstream.converters.basic;
 
 /**
- * Converts a byte primitive or {@link Byte} wrapper to
- * a string.
+ * Converts a byte primitive or java.lang.Byte wrapper to
+ * a String.
  *
  * @author Joe Walnes
  */
 public class ByteConverter extends AbstractSingleValueConverter {
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return type.equals(byte.class) || type.equals(Byte.class);
     }
 
-    @Override
-    public Object fromString(final String str) {
-        final int value = Integer.decode(str).intValue();
-        if(value < Byte.MIN_VALUE || value > 0xFF) {
-            throw new NumberFormatException("For input string: \"" + str + '"');
-        }
+    public Object fromString(String str) {
+    	int value = Integer.decode(str).intValue();
+    	if(value < Byte.MIN_VALUE || value > 0xFF) {
+    		throw new NumberFormatException("For input string: \"" + str + '"');
+    	}
         return new Byte((byte)value);
     }
 

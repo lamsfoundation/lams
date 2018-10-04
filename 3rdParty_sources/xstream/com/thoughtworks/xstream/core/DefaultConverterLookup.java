@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2013, 2016, 2017 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,17 +11,18 @@
  */
 package com.thoughtworks.xstream.core;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.ConverterRegistry;
 import com.thoughtworks.xstream.core.util.PrioritizedList;
+import com.thoughtworks.xstream.mapper.Mapper;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * The default implementation of converters lookup.
@@ -32,42 +33,75 @@ import com.thoughtworks.xstream.core.util.PrioritizedList;
  */
 public class DefaultConverterLookup implements ConverterLookup, ConverterRegistry, Caching {
 
-    private final PrioritizedList<Converter> converters = new PrioritizedList<Converter>();
-    private transient Map<Class<?>, Converter> typeToConverterMap;
+    private final PrioritizedList converters = new PrioritizedList();
+    private transient Map typeToConverterMap;
 
     public DefaultConverterLookup() {
-        readResolve();
+    	readResolve();
     }
 
-    @Override
-    public Converter lookupConverterForType(final Class<?> type) {
-        final Converter cachedConverter = typeToConverterMap.get(type);
+    /**
+     * @deprecated As of 1.3, use {@link #DefaultConverterLookup()}
+     */
+    public DefaultConverterLookup(Mapper mapper) {
+    }
+
+    public Converter lookupConverterForType(Class type) {
+        Converter cachedConverter = (Converter) typeToConverterMap.get(type);
         if (cachedConverter != null) {
             return cachedConverter;
         }
-        for (final Converter converter : converters) {
-            if (converter.canConvert(type)) {
-                return converter;
+
+        final Map errors = new LinkedHashMap();
+        Iterator iterator = converters.iterator();
+        while (iterator.hasNext()) {
+            Converter converter = (Converter) iterator.next();
+            try {
+                if (converter.canConvert(type)) {
+                    typeToConverterMap.put(type, converter);
+                    return converter;
+                }
+            } catch (final RuntimeException e) {
+                errors.put(converter.getClass().getName(), e.getMessage());
+            } catch (final LinkageError e) {
+                errors.put(converter.getClass().getName(), e.getMessage());
             }
         }
-        throw new ConversionException("No converter specified for " + type);
-    }
 
-    @Override
-    public void registerConverter(final Converter converter, final int priority) {
+        final ConversionException exception = new ConversionException(errors.isEmpty()
+            ? "No converter specified"
+            : "No converter available");
+        exception.add("type", type.getName());
+        iterator = errors.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry entry = (Map.Entry)iterator.next();
+            exception.add("converter", entry.getKey().toString());
+            exception.add("message", entry.getValue().toString());
+        }
+        throw exception;
+    }
+    
+    public void registerConverter(Converter converter, int priority) {
         converters.add(converter, priority);
-        for (final Iterator<Class<?>> iter = typeToConverterMap.keySet().iterator(); iter.hasNext();) {
-            final Class<?> type = iter.next();
-            if (converter.canConvert(type)) {
-                iter.remove();
+        for (Iterator iter = typeToConverterMap.keySet().iterator(); iter.hasNext();) {
+            Class type = (Class) iter.next();
+            try {
+                if (converter.canConvert(type)) {
+                    iter.remove();
+                }
+            } catch (final RuntimeException e) {
+                // ignore
+            } catch (final LinkageError e) {
+                // ignore
             }
         }
     }
-
-    @Override
+    
     public void flushCache() {
         typeToConverterMap.clear();
-        for (final Converter converter : converters) {
+        Iterator iterator = converters.iterator();
+        while (iterator.hasNext()) {
+            Converter converter = (Converter) iterator.next();
             if (converter instanceof Caching) {
                 ((Caching)converter).flushCache();
             }
@@ -75,8 +109,7 @@ public class DefaultConverterLookup implements ConverterLookup, ConverterRegistr
     }
 
     private Object readResolve() {
-        // TODO: Use ConcurrentMap
-        typeToConverterMap = Collections.synchronizedMap(new WeakHashMap<Class<?>, Converter>());
+        typeToConverterMap = Collections.synchronizedMap(new WeakHashMap());
         return this;
     }
 }

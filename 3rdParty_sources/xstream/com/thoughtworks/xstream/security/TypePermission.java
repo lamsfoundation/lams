@@ -21,5 +21,5 @@ public interface TypePermission {
      * @throws ForbiddenClassException if provided type is explicitly forbidden
      * @since 1.4.7
      */
-    boolean allows(Class<?> type);
+    boolean allows(Class type);
 }

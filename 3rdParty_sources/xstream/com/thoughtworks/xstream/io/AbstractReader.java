@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -17,14 +17,15 @@ import com.thoughtworks.xstream.io.naming.NoNameCoder;
 
 /**
  * Abstract base class for all HierarchicalStreamReader implementations. Implementations of
- * {@link HierarchicalStreamReader} should rather be derived from this class then implementing the interface directly.
+ * {@link HierarchicalStreamReader} should rather be derived from this class then implementing
+ * the interface directly.
  * 
  * @author J&ouml;rg Schaible
  * @since 1.4
  */
 public abstract class AbstractReader implements ExtendedHierarchicalStreamReader {
 
-    private final NameCoder nameCoder;
+    private NameCoder nameCoder;
 
     /**
      * Creates an AbstractReader with a NameCoder that does nothing.
@@ -41,11 +42,13 @@ public abstract class AbstractReader implements ExtendedHierarchicalStreamReader
      * @param nameCoder the name coder used to read names from the incoming format
      * @since 1.4
      */
-    protected AbstractReader(final NameCoder nameCoder) {
-        this.nameCoder = Cloneables.cloneIfPossible(nameCoder);
+    protected AbstractReader(NameCoder nameCoder) {
+        this.nameCoder = (NameCoder)Cloneables.cloneIfPossible(nameCoder);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public HierarchicalStreamReader underlyingReader() {
         return this;
     }
@@ -57,7 +60,7 @@ public abstract class AbstractReader implements ExtendedHierarchicalStreamReader
      * @return the original name
      * @since 1.4
      */
-    public String decodeNode(final String name) {
+    public String decodeNode(String name) {
         return nameCoder.decodeNode(name);
     }
 
@@ -68,7 +71,7 @@ public abstract class AbstractReader implements ExtendedHierarchicalStreamReader
      * @return the original name
      * @since 1.4
      */
-    public String decodeAttribute(final String name) {
+    public String decodeAttribute(String name) {
         return nameCoder.decodeAttribute(name);
     }
 
@@ -79,7 +82,7 @@ public abstract class AbstractReader implements ExtendedHierarchicalStreamReader
      * @return the name in the target format
      * @since 1.4
      */
-    protected String encodeNode(final String name) {
+    protected String encodeNode(String name) {
         return nameCoder.encodeNode(name);
     }
 
@@ -90,11 +93,10 @@ public abstract class AbstractReader implements ExtendedHierarchicalStreamReader
      * @return the name in the target format
      * @since 1.4
      */
-    protected String encodeAttribute(final String name) {
+    protected String encodeAttribute(String name) {
         return nameCoder.encodeAttribute(name);
     }
 
-    @Override
     public String peekNextChild() {
         throw new UnsupportedOperationException("peekNextChild");
     }

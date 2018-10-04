@@ -20,8 +20,7 @@ public class NullPermission implements TypePermission {
      */
     public static final TypePermission NULL = new NullPermission();
 
-    @Override
-    public boolean allows(Class<?> type) {
+    public boolean allows(Class type) {
         return type == null || type == Mapper.Null.class;
     }
 }

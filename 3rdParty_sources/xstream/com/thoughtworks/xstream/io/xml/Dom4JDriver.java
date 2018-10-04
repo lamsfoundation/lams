@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2014, 2015 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -26,12 +26,12 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.StreamException;
 import com.thoughtworks.xstream.io.naming.NameCoder;
-
 
 public class Dom4JDriver extends AbstractXmlDriver {
 
@@ -45,19 +45,19 @@ public class Dom4JDriver extends AbstractXmlDriver {
     /**
      * @since 1.4
      */
-    public Dom4JDriver(final NameCoder nameCoder) {
+    public Dom4JDriver(NameCoder nameCoder) {
         this(new DocumentFactory(), OutputFormat.createPrettyPrint(), nameCoder);
         outputFormat.setTrimText(false);
     }
 
-    public Dom4JDriver(final DocumentFactory documentFactory, final OutputFormat outputFormat) {
+    public Dom4JDriver(DocumentFactory documentFactory, OutputFormat outputFormat) {
         this(documentFactory, outputFormat, new XmlFriendlyNameCoder());
     }
 
     /**
      * @since 1.4
      */
-    public Dom4JDriver(final DocumentFactory documentFactory, final OutputFormat outputFormat, final NameCoder nameCoder) {
+    public Dom4JDriver(DocumentFactory documentFactory, OutputFormat outputFormat, NameCoder nameCoder) {
         super(nameCoder);
         this.documentFactory = documentFactory;
         this.outputFormat = outputFormat;
@@ -67,17 +67,16 @@ public class Dom4JDriver extends AbstractXmlDriver {
      * @since 1.2
      * @deprecated As of 1.4, use {@link Dom4JDriver#Dom4JDriver(DocumentFactory, OutputFormat, NameCoder)} instead.
      */
-    @Deprecated
-    public Dom4JDriver(
-            final DocumentFactory documentFactory, final OutputFormat outputFormat, final XmlFriendlyReplacer replacer) {
+    public Dom4JDriver(DocumentFactory documentFactory, OutputFormat outputFormat, XmlFriendlyReplacer replacer) {
         this(documentFactory, outputFormat, (NameCoder)replacer);
     }
+
 
     public DocumentFactory getDocumentFactory() {
         return documentFactory;
     }
 
-    public void setDocumentFactory(final DocumentFactory documentFactory) {
+    public void setDocumentFactory(DocumentFactory documentFactory) {
         this.documentFactory = documentFactory;
     }
 
@@ -85,42 +84,24 @@ public class Dom4JDriver extends AbstractXmlDriver {
         return outputFormat;
     }
 
-    public void setOutputFormat(final OutputFormat outputFormat) {
+    public void setOutputFormat(OutputFormat outputFormat) {
         this.outputFormat = outputFormat;
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final Reader text) {
+    public HierarchicalStreamReader createReader(Reader text) {
         try {
-            final SAXReader reader = new SAXReader();
-            final Document document = reader.read(text);
+            final Document document = createReader().read(text);
             return new Dom4JReader(document, getNameCoder());
-        } catch (final DocumentException e) {
+        } catch (DocumentException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final InputStream in) {
+    public HierarchicalStreamReader createReader(InputStream in) {
         try {
-            final SAXReader reader = new SAXReader();
-            final Document document = reader.read(in);
+            final Document document = createReader().read(in);
             return new Dom4JReader(document, getNameCoder());
-        } catch (final DocumentException e) {
-            throw new StreamException(e);
-        }
-    }
-
-    /**
-     * @since 1.4
-     */
-    @Override
-    public HierarchicalStreamReader createReader(final URL in) {
-        try {
-            final SAXReader reader = new SAXReader();
-            final Document document = reader.read(in);
-            return new Dom4JReader(document, getNameCoder());
-        } catch (final DocumentException e) {
+        } catch (DocumentException e) {
             throw new StreamException(e);
         }
     }
@@ -128,33 +109,57 @@ public class Dom4JDriver extends AbstractXmlDriver {
     /**
      * @since 1.4
      */
-    @Override
-    public HierarchicalStreamReader createReader(final File in) {
+    public HierarchicalStreamReader createReader(URL in) {
         try {
-            final SAXReader reader = new SAXReader();
-            final Document document = reader.read(in);
+            final Document document = createReader().read(in);
             return new Dom4JReader(document, getNameCoder());
-        } catch (final DocumentException e) {
+        } catch (DocumentException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
+    /**
+     * @since 1.4
+     */
+    public HierarchicalStreamReader createReader(File in) {
+        try {
+            final Document document = createReader().read(in);
+            return new Dom4JReader(document, getNameCoder());
+        } catch (DocumentException e) {
+            throw new StreamException(e);
+        }
+    }
+
     public HierarchicalStreamWriter createWriter(final Writer out) {
         final HierarchicalStreamWriter[] writer = new HierarchicalStreamWriter[1];
-        final FilterWriter filter = new FilterWriter(out) {
-            @Override
+        final FilterWriter filter = new FilterWriter(out){
             public void close() {
                 writer[0].close();
             }
         };
-        writer[0] = new Dom4JXmlWriter(new XMLWriter(filter, outputFormat), getNameCoder());
+        writer[0] = new Dom4JXmlWriter(new XMLWriter(filter,  outputFormat), getNameCoder());
         return writer[0];
     }
 
-    @Override
     public HierarchicalStreamWriter createWriter(final OutputStream out) {
         final Writer writer = new OutputStreamWriter(out);
         return createWriter(writer);
+    }
+
+    /**
+     * Create and initialize the SAX reader.
+     * 
+     * @return the SAX reader instance.
+     * @throws DocumentException if DOCTYPE processing cannot be disabled
+     * @since 1.4.9
+     */
+    protected SAXReader createReader() throws DocumentException {
+        final SAXReader reader = new SAXReader();
+        try {
+            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        } catch (SAXException e) {
+            throw new DocumentException("Cannot disable DOCTYPE processing", e);
+        }
+        return reader;
     }
 }
