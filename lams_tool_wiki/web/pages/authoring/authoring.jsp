@@ -24,7 +24,16 @@
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 		
 		<script type="text/javascript">
-			$(document).ready(function() {$("time.timeago").timeago();});
+			$(document).ready(function() {
+				$("#saveButton").attr('href','javascript:doSubmit_Form_Only_Custom();');
+				$("time.timeago").timeago();
+			});
+			
+			<%-- Ensure the wikibody has been  any javascript references may trigger Chrome security --%>
+			<%-- The wikibody text is updated via the updateContent call --%>
+		    function doSubmit_Form_Only_Custom() {
+				replaceJavascriptTokenAndSubmit("authoringForm") 
+		    }
 		</script>
 
 		
