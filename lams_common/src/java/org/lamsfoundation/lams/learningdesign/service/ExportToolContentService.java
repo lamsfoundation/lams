@@ -302,7 +302,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     private class FileConverter implements Converter {
 	private Converter defaultConverter;
-	private List<ValueInfo> fileNodes = new ArrayList<ValueInfo>();
+	private List<ValueInfo> fileNodes = new ArrayList<>();
 
 	public FileConverter(XStream xstream) {
 	    this.defaultConverter = new ReflectionConverter(xstream.getMapper(), xstream.getReflectionProvider());
@@ -313,7 +313,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	@Override
-	public boolean canConvert(Class<?> type) {
+	public boolean canConvert(Class type) {
 	    for (NameInfo info : fileHandleClassList) {
 		if (info.className.equals(type.getName())) {
 		    log.debug("XStream will handle [" + info.className + "] as file node class.");
@@ -387,7 +387,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Default contructor method.
      */
     public ExportToolContentService() {
-	fileHandleClassList = new ArrayList<NameInfo>();
+	fileHandleClassList = new ArrayList<>();
     }
 
     /**
@@ -416,7 +416,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	     * learning design DTO is ready to be written into XML, but we need to find out which groupings and
 	     * branching mappings are not supposed to be included into the structure (LDEV-1825)
 	     */
-	    Set<Long> groupingsToSkip = new TreeSet<Long>();
+	    Set<Long> groupingsToSkip = new TreeSet<>();
 
 	    // iterator all activities in this learning design and export
 	    // their content to given folder.
@@ -634,7 +634,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	Object[] ldResults = new Object[3];
 	Long ldId = null;
-	List<String> ldErrorMsgs = new ArrayList<String>();
+	List<String> ldErrorMsgs = new ArrayList<>();
 	String filename = designFile.getName();
 	String extension = (filename != null) && (filename.length() >= 4) ? filename.substring(filename.length() - 4)
 		: "";
@@ -692,8 +692,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    log.debug("Learning design xml deserialize to LearingDesignDTO success.");
 
 	    // begin tool import
-	    Map<Long, ToolContent> toolMapper = new HashMap<Long, ToolContent>();
-	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
+	    Map<Long, ToolContent> toolMapper = new HashMap<>();
+	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 	    // LDs with version 3.0.2 have already correct paths
 	    boolean rewriteResourcePaths = !VersionUtil.isSameOrLaterVersion("3.0.2", importedFileVersion);
@@ -1031,7 +1031,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	File toolFile = new File(toolFilePath);
 	Path path = toolFile.toPath();
 	List<String> oldLines = Files.readAllLines(path);
-	List<String> newLines = new LinkedList<String>();
+	List<String> newLines = new LinkedList<>();
 	for (String oldLine : oldLines) {
 	    String newLine = oldLine.replaceAll(oldPath, newPath);
 	    newLines.add(newLine);
@@ -1082,7 +1082,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	Object filter = filterClass.newInstance();
 	Method[] methods = filterClass.getDeclaredMethods();
-	Map<Float, Method> methodNeeds = new TreeMap<Float, Method>();
+	Map<Float, Method> methodNeeds = new TreeMap<>();
 	for (Method method : methods) {
 	    String name = method.getName();
 	    if (name.startsWith(filterMethodPrefix)) {
@@ -1160,8 +1160,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	// grouping object list
 	List<GroupingDTO> groupingDtoList = dto.getGroupings();
-	Map<Long, Grouping> groupingMapper = new HashMap<Long, Grouping>();
-	Map<Integer, Group> groupByUIIDMapper = new HashMap<Integer, Group>();
+	Map<Long, Grouping> groupingMapper = new HashMap<>();
+	Map<Integer, Group> groupByUIIDMapper = new HashMap<>();
 	for (GroupingDTO groupingDto : groupingDtoList) {
 	    Grouping grouping = getGrouping(groupingDto, groupByUIIDMapper);
 	    groupingMapper.put(grouping.getGroupingId(), grouping);
@@ -1185,8 +1185,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 	Set<Activity> actList = new TreeSet<Activity>(new ActivityOrderComparator());
-	Map<Long, Activity> activityMapper = new HashMap<Long, Activity>();
-	Map<Integer, Activity> activityByUIIDMapper = new HashMap<Integer, Activity>();
+	Map<Long, Activity> activityMapper = new HashMap<>();
+	Map<Integer, Activity> activityByUIIDMapper = new HashMap<>();
 
 	// as we create the activities, we need to record any "default
 	// activities" for the sequence activity
@@ -1195,7 +1195,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// been created yet and if we leave it till later and then find all the
 	// activities we are
 	// going through the activity set over and over again for no reason.
-	Map<Integer, ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<Integer, ComplexActivity>();
+	Map<Integer, ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<>();
 
 	for (AuthoringActivityDTO actDto : actDtoList) {
 	    Activity act = getActivity(actDto, groupingMapper, toolMapper, defaultActivityToParentActivityMapping);
@@ -1366,7 +1366,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	// transition object list
 	List<TransitionDTO> transDtoList = dto.getTransitions();
-	Set<Transition> transList = new HashSet<Transition>();
+	Set<Transition> transList = new HashSet<>();
 	for (TransitionDTO transDto : transDtoList) {
 	    // Any transitions relating with this tool will be removed!
 	    Long fromId = transDto.getFromActivityID();
@@ -1384,7 +1384,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	// Once the learning design is saved, we can import the competences
-	Set<Competence> competenceList = new HashSet<Competence>();
+	Set<Competence> competenceList = new HashSet<>();
 	if (dto.getCompetences() != null) {
 	    for (CompetenceDTO competenceDTO : dto.getCompetences()) {
 		Competence competence = new Competence();
@@ -1397,7 +1397,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// branch mappings - maps groups to branches, map conditions to branches
 	List<BranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
 	if (entryDtoList != null) {
-	    Set<BranchActivityEntry> entryList = new HashSet<BranchActivityEntry>();
+	    Set<BranchActivityEntry> entryList = new HashSet<>();
 	    for (BranchActivityEntryDTO entryDto : entryDtoList) {
 		BranchActivityEntry entry = getBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
 		entryList.add(entry);
@@ -1431,7 +1431,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	// Once we have the competences saved, we can save the competence mappings
-	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>();
+	Set<CompetenceMapping> allCompetenceMappings = new HashSet<>();
 	for (AuthoringActivityDTO actDto : actDtoList) {
 	    if (removedActMap.containsKey(actDto.getActivityID())) {
 		continue;
@@ -1466,8 +1466,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * @return
      */
     private List<AuthoringActivityDTO> getSortedParentList(List<AuthoringActivityDTO> activities) {
-	List<AuthoringActivityDTO> result = new ArrayList<AuthoringActivityDTO>();
-	List<Long> actIdList = new ArrayList<Long>();
+	List<AuthoringActivityDTO> result = new ArrayList<>();
+	List<Long> actIdList = new ArrayList<>();
 
 	// NOTICE: this code can not handle all nodes have their parents, ie,
 	// there is at least one node parent is

@@ -11,7 +11,6 @@
         <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
         <archive path="/lams_build/lib/fckeditor/fckeditor-java-core-2.6.jar" source="/3rdParty_sources/ckeditor"/>
         <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
-        <archive path="/lams_build/lib/xstream/xstream-1.5.0-SNAPSHOT.jar" source="/3rdParty_sources/xstream"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.3.jar" source="/3rdParty_sources/quartz"/>
         <archive path="/lams_build/lib/apache-poi/xmlbeans-2.6.0.jar"/>
         <archive path="/lams_build/lib/apache-poi/poi-3.17.jar" source="/3rdParty_sources/poi"/>
@@ -33,5 +32,6 @@
         <archive path="/lams_build/lib/spring/spring-webmvc-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
+        <archive path="/lams_build/lib/xstream/xstream-1.4.10.jar" source="/3rdParty_sources/xstream"/>
     </library>
 </eclipse-userlibraries>
