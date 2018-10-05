@@ -64,15 +64,15 @@ public class ImportExcelSaveController {
 	String sessionId = SessionManager.getSession().getId();
 	SessionManager.getSession().setAttribute(IImportService.IMPORT_FILE, file);
 	// use a new thread only if number of users is > threshold
-//	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
-//	    List results = importService.parseSpreadsheet(file, sessionId);
-//	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
-//	    return "forward:/importuserresult.do";
-//	} else {
+	if (importService.getNumRows(file) < IImportService.THRESHOLD) {
+	    List results = importService.parseSpreadsheet(file, sessionId);
+	    SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
+	    return "forward:/importuserresult.do";
+	} else {
 	    Thread t = new Thread(new ImportExcelThread(sessionId));
 	    t.start();
 	    return "import/status";
-//	}
+	}
     }
 
     private class ImportExcelThread implements Runnable {
