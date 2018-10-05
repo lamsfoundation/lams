@@ -103,98 +103,16 @@ public class AuthoringController {
      */
     @RequestMapping("/authoring")
     public String initPage(@ModelAttribute ForumForm forumForm, HttpServletRequest request) {
-	// initial Session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	forumForm.setSessionMapID(sessionMap.getSessionID());
-	forumForm.setContentFolderID(contentFolderID);
-	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-
-	// get back the topic list and display them on page
-	forumService = forumService;
-
-	List<MessageDTO> topics = null;
-	Forum forum = null;
-	try {
-	    forum = forumService.getForumByContentId(contentId);
-	    // if forum does not exist, try to use default content instead.
-	    if (forum == null) {
-		forum = forumService.getDefaultContent(contentId);
-		if (forum.getMessages() != null) {
-		    List<Message> list = new ArrayList<>();
-		    // sorted by create date
-		    Iterator iter = forum.getMessages().iterator();
-		    while (iter.hasNext()) {
-			Message topic = (Message) iter.next();
-			// contentFolderID != -1 means it is sysadmin: LDEV-906
-			if (topic.getCreatedBy() == null && !StringUtils.equals(contentFolderID, "-1")) {
-			    // get login user (author)
-			    HttpSession ss = SessionManager.getSession();
-			    // get back login user DTO
-			    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			    ForumUser fuser = new ForumUser(user, null);
-			    topic.setCreatedBy(fuser);
-			}
-			list.add(topic);
-		    }
-		    topics = MessageDTO.getMessageDTO(list);
-		} else {
-		    topics = null;
-		}
-	    } else {
-		topics = forumService.getAuthoredTopics(forum.getUid());
-		// failure tolerance: if current contentID is defaultID, the createBy will be null.
-		// contentFolderID != -1 means it is sysadmin: LDEV-906
-		if (!StringUtils.equals(contentFolderID, "-1")) {
-		    for (MessageDTO messageDTO : topics) {
-			if (StringUtils.isBlank(messageDTO.getAuthor())) {
-			    // get login user (author)
-			    HttpSession ss = SessionManager.getSession();
-			    // get back login user DTO
-			    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			    ForumUser fuser = new ForumUser(user, null);
-			    messageDTO.setAuthor(fuser.getFirstName() + " " + fuser.getLastName());
-			}
-		    }
-		}
-	    }
-
-	    // tear down PO to normal object using clone() method
-	    forumForm.setForum((Forum) forum.clone());
-
-	    sessionMap.put(ForumConstants.AUTHORING_FORUM, forum);
-	} catch (Exception e) {
-	    AuthoringController.log.error(e);
-	    return "error";
-	}
-
-	// init it to avoid null exception in following handling
-	if (topics == null) {
-	    topics = new ArrayList<>();
-	}
-
-	Set topicSet = new TreeSet<>(new MessageDtoComparator());
-	topicSet.addAll(topics);
-	sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topicSet);
-
-	// init condition set
-	SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
-	conditionSet.clear();
-	conditionSet.addAll(forum.getConditions());
-
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-
-	return "jsps/authoring/authoring";
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR);
+	return readDatabaseData(forumForm, request);
     }
 
     @RequestMapping("/defineLater")
     public String defineLater(@ModelAttribute ForumForm forumForm, HttpServletRequest request) {
 
 	// update define later flag to true
+	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+	    
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Forum forum = forumService.getForumByContentId(contentId);
 
@@ -206,19 +124,26 @@ public class AuthoringController {
 	    forumService.auditLogStartEditingActivityInMonitor(contentId);
 	}
 
+	return readDatabaseData(forumForm, request);
+    }
+    
+    /**
+     * Common method for "start" and "defineLater"
+     */
+    private String readDatabaseData(ForumForm forumForm, HttpServletRequest request) {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	forumForm.setSessionMapID(sessionMap.getSessionID());
 	forumForm.setContentFolderID(contentFolderID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
 	// get back the topic list and display them on page
-	forumService = forumService;
-
 	List<MessageDTO> topics = null;
+	Forum forum = null;
 	try {
 	    forum = forumService.getForumByContentId(contentId);
 	    // if forum does not exist, try to use default content instead.
@@ -227,9 +152,9 @@ public class AuthoringController {
 		if (forum.getMessages() != null) {
 		    List<Message> list = new ArrayList<>();
 		    // sorted by create date
-		    Iterator iter = forum.getMessages().iterator();
+		    Iterator<Message> iter = forum.getMessages().iterator();
 		    while (iter.hasNext()) {
-			Message topic = (Message) iter.next();
+			Message topic = iter.next();
 			// contentFolderID != -1 means it is sysadmin: LDEV-906
 			if (topic.getCreatedBy() == null && !StringUtils.equals(contentFolderID, "-1")) {
 			    // get login user (author)
@@ -277,7 +202,7 @@ public class AuthoringController {
 	    topics = new ArrayList<>();
 	}
 
-	Set topicSet = new TreeSet<>(new MessageDtoComparator());
+	Set<MessageDTO> topicSet = new TreeSet<>(new MessageDtoComparator());
 	topicSet.addAll(topics);
 	sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topicSet);
 
@@ -286,7 +211,8 @@ public class AuthoringController {
 	conditionSet.clear();
 	conditionSet.addAll(forum.getConditions());
 
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return "jsps/authoring/authoring";
     }
@@ -320,8 +246,6 @@ public class AuthoringController {
 	Forum forum = forumForm.getForum();
 	// get back tool content ID
 	forum.setContentId(forumForm.getToolContentID());
-
-	forumService = forumService;
 
 	// *******************************Handle user*******************
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -496,7 +420,6 @@ public class AuthoringController {
 	Set attSet = null;
 	if (messageForm.getAttachmentFile() != null
 		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-	    forumService = forumService;
 	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 	    // only allow one attachment, so replace whatever
 	    attSet = new HashSet();
@@ -634,7 +557,6 @@ public class AuthoringController {
 	    // update attachment
 	    if (messageForm.getAttachmentFile() != null
 		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-		forumService = forumService;
 		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 		// only allow one attachment, so replace whatever
 		Set attSet = new HashSet();
@@ -816,10 +738,6 @@ public class AuthoringController {
 	    AuthoringController.log.error(e.toString());
 	}
 	return errorMap;
-    }
-
-    private float convertToMeg(int numBytes) {
-	return numBytes != 0 ? numBytes / 1024 / 1024 : 0;
     }
 
     /**

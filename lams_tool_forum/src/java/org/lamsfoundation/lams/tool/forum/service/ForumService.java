@@ -553,14 +553,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getAuthoredTopics(Long forumUid) {
-	List list = messageDao.getTopicsFromAuthor(forumUid);
+    public List<MessageDTO> getAuthoredTopics(Long forumUid) {
+	List<Message> list = messageDao.getTopicsFromAuthor(forumUid);
 
 	TreeMap<Date, Message> map = new TreeMap<>(new DateComparator());
 	// get all the topics skipping ones with a tool session (we may be editing in monitor) and sort by create date
-	Iterator iter = list.iterator();
+	Iterator<Message> iter = list.iterator();
 	while (iter.hasNext()) {
-	    Message topic = (Message) iter.next();
+	    Message topic = iter.next();
 	    if (topic.getToolSession() == null) {
 		map.put(topic.getCreated(), topic);
 	    }

@@ -218,7 +218,7 @@ public interface IForumService {
      *
      * @return List of MessageDTO
      */
-    List getAuthoredTopics(Long forumId);
+    List<MessageDTO> getAuthoredTopics(Long forumId);
 
     /**
      * This method will look up root topic ID by any level topicID.
