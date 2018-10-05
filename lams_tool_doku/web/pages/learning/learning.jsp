@@ -207,7 +207,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div class='panel panel-default 
 				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			

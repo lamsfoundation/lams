@@ -69,9 +69,7 @@
 				
 				<%@include file="fileinfo.jsp"%>
 				
-				<logic:messagesPresent>
-					<%@include file="/common/messages.jsp"%>
-				</logic:messagesPresent>
+				<lams:errors/>
 			
 			<dl class="dl-horizontal">		
 				<dt>

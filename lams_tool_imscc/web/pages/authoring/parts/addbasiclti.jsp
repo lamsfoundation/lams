@@ -20,7 +20,7 @@
 		<c:set var="title"><fmt:message key="label.authoring.basic.add.basiclti.tool" /></c:set>
 		<lams:Page title="${title}" type="learner">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
 			<form:hidden path="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="1" />

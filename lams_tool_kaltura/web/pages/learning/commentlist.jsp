@@ -7,7 +7,7 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isGroupMonitoring" value="${sessionMap.isGroupMonitoring}" />
 
-<%@ include file="/common/messages.jsp"%>
+<lams:errors/>
 
 <div class="table-responsive">
 	<table id="comments-table" class="table table-hover table-condensed">

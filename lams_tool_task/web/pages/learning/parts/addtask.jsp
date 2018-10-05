@@ -35,7 +35,7 @@
 		<h5>
 			<fmt:message key="label.learning.new.task.details" />
 		</h5>
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div class="form-group">
 			<label for="taskTitle">

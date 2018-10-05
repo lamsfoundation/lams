@@ -104,7 +104,7 @@
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<br>
 		
 		<%@ include file="results/attemptsummary.jsp"%>

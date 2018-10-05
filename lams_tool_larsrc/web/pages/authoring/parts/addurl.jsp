@@ -43,7 +43,7 @@
 			</div>
 			<div class="panel-body">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 	
 			<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm">
 				<form:hidden path="sessionMapID" />

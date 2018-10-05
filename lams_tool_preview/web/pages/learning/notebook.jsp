@@ -29,7 +29,7 @@
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<p>
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>

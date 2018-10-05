@@ -40,7 +40,7 @@
 		</lams:Tabs> 
 		
 		<lams:TabBodyArea>
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 	
 		     <lams:TabBodys>
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />

@@ -19,7 +19,7 @@
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="itemIndex" />
 			<form:hidden path="itemType" value="3" />
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<div class="form-group">
 				<label for="question.description"><fmt:message key="label.question" /></label>

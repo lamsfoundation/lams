@@ -14,7 +14,7 @@
 	 <form:form modelAttribute="surveyConditionForm">
 	 </form:form>
 	<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="surveyConditionForm" id="surveyConditionForm" focus="displayName" >
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<form:hidden path="orderId" />
 		
 		<div class="form-group">

@@ -31,7 +31,7 @@
 			
 		<div class="panel-body">
 	
-			<%@ include file="/common/messages.jsp"%>	
+			<lams:errors/>	
 			<form:hidden path="sessionMapID" id="sessionMapID"/>
 	
 			<div class="form-group">

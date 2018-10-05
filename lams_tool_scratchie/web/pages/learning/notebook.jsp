@@ -28,7 +28,7 @@
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<div class="panel">
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />

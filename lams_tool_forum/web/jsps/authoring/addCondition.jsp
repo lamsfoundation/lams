@@ -18,7 +18,7 @@
 	<div class="panel-body">	
 	
 		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="forumConditionForm" id="forumConditionForm" focus="displayName" >
 			<form:hidden path="orderId" />
 			

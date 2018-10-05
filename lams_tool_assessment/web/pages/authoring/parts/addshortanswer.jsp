@@ -105,7 +105,7 @@
 		</div>
 
 		<div class="panel-body">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		    <div class="error">
 		    	<lams:Alert id="errorMessages" type="danger" close="false" >
 					<span></span>

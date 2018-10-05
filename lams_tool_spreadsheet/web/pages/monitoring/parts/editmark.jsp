@@ -16,7 +16,7 @@
 	<lams:Page type="learner" title="${title}" formID="markForm">
 	
 		<!-- Basic Info Form-->
- 		<%@ include file="/common/messages.jsp"%>
+ 		<lams:errors/>
 
 		<p><fmt:message key="label.reviewitem.spreadsheet.sent.by" />&nbsp;<strong>${markForm.userName}</strong></p>
 		

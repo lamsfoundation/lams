@@ -353,7 +353,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<lams:Alert id="score" type="info" close="false">
 			<fmt:message key="label.you.ve.got">

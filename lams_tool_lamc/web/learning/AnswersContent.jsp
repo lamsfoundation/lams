@@ -153,7 +153,7 @@
 				<form:hidden path="userOverPassMark" />
 				<form:hidden path="passMarkApplicable" />
 
-				<%@ include file="/common/messages.jsp"%>
+				<lams:errors/>
 
 				<c:if test="${isLeadershipEnabled}">
 					<h4>

@@ -261,7 +261,7 @@
 			</div>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div id="questionListArea">
 			<%@ include file="questionlist.jsp"%>

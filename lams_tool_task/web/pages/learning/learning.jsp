@@ -116,7 +116,7 @@
 
 		<!--Task Information-->
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<c:if test="${not empty taskList.submissionDeadline}">
 			<lams:Alert id="submissionDeadline" type="info" close="true">

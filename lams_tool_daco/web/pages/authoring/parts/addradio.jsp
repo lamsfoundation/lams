@@ -28,7 +28,7 @@
 <div class="panel-body">
 
 <!-- Add question form-->
-<%@ include file="/common/messages.jsp"%>
+<lams:errors/>
 <form:form action="saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
 	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="7" />

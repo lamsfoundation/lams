@@ -14,7 +14,7 @@
 	</script>
 </lams:head>
 <body style="width: 550px">
-	<%@ include file="/common/messages.jsp"%>
+	<lams:errors/>
 	<h4 class="space-left"><fmt:message key="label.authoring.basic.instructions" /></h4>
 	
 	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="plannerForm" id="plannerForm" method="post">

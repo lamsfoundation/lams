@@ -26,7 +26,7 @@
 			
 		<div class="panel-body">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<form:form action="saveOrUpdateItem.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm" focus="title" >
 	

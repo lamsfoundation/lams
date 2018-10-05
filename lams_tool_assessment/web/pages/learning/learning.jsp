@@ -527,7 +527,7 @@
 			</button>
 		</div>
 		
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<br>
 		
 		<div class="form-group">

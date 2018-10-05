@@ -70,7 +70,7 @@
   	</script>
 </lams:head>
 <body id="body">
-	<%@ include file="/common/messages.jsp"%>
+	<lams:errors/>
 	
 	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" id="plannerForm" modelAttribute="plannerForm" method="post">
 	

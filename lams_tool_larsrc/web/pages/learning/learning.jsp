@@ -165,7 +165,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<!--  Instructions -->
 		<div class="panel">

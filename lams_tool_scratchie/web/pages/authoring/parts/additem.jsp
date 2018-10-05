@@ -218,7 +218,7 @@
 				</div>
 			<div class="panel-body panel-${type}-body">
 	
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
 			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
 				<form:hidden path="sessionMapID" />

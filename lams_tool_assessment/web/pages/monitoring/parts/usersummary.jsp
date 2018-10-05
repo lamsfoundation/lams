@@ -153,7 +153,7 @@
 		</div>
 			
 		<div class="panel-body">	
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
 			<table class="table table-condensed">
 				<tr>

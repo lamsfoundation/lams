@@ -30,7 +30,7 @@
 		<form:hidden path="sessionMapID" />
 
 		<div id="content">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<p>
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>

@@ -25,7 +25,7 @@
 	<lams:Page title="${title}" type="learner">
 		<input type="hidden" value="${sessionMapID}" name="sessionMapID"> 
 		
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<table class="table" id="itemTable">
 			

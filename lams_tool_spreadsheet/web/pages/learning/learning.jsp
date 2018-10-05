@@ -58,7 +58,7 @@
 		</c:if>
 		
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		
 		<p>
 			<c:out value="${spreadsheet.instructions}" escapeXml="false"/>

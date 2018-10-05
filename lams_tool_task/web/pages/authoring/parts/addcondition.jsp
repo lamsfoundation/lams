@@ -22,7 +22,7 @@
 			<!-- Basic Info Form-->
 			<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="taskListConditionForm" id="taskListConditionForm" focus="name"
 			 onSubmit="javascript:return false;" >
-				<%@ include file="/common/messages.jsp"%>
+				<lams:errors/>
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="sequenceId" />
 	

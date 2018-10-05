@@ -27,7 +27,7 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</div>
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<form:textarea rows="5" id="focused" path="entryText" cssClass="form-control" />
 

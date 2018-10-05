@@ -151,7 +151,7 @@
 			</c:if>
 			<!-- End announcements and advanced settings -->
 		
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		
 			<!-- main UI -->
 			<%@ include file="/jsps/learning/message/topiclist.jsp"%>

@@ -170,7 +170,7 @@
 		</c:if>
 		<!-- End notices and announcements -->
 
-		<%@include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->

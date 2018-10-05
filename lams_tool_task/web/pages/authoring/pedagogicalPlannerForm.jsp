@@ -52,7 +52,7 @@
   	</script>
 </lams:head>
 <body id="body">
-	<%@ include file="/common/messages.jsp"%>
+	<lams:errors/>
 	<h4 class="space-left"><fmt:message key="planner.item.title"/></h4>
 	<form:form  action="saveOrUpdatePedagogicalPlannerForm.do"  modelAttribute="plannerForm" id="pedagogicalPlannerForm" method="post">
 		<form:hidden path="toolContentID" id="toolContentID" />

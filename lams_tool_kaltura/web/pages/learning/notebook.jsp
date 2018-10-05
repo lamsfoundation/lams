@@ -43,7 +43,7 @@
 		
 			<lams:Page type="learner" title="${kaltura.title}">
 		
-				<%@ include file="/common/messages.jsp"%>
+				<lams:errors/>
 		
 				<div class="panel">
 					<lams:out value="${kaltura.reflectInstructions}" escapeHtml="true"/>

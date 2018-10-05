@@ -44,7 +44,7 @@
   	</script>
 </lams:head>
 <body id="body">
-	<%@ include file="/common/messages.jsp"%>
+	<lams:errors/>
 	<form:form enctype="multipart/form-data" modelAttribute="pedagogicalPlannerForm" action="/lams/tool/lascrt11/authoring/saveOrUpdatePedagogicalPlannerForm.do" id="pedagogicalPlannerForm" method="post">
 		<form:hidden path="toolContentID" id="toolContentID" />
 		<form:hidden path="valid" id="valid" />

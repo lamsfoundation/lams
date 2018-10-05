@@ -27,7 +27,7 @@
 	</lams:Alert>
 </c:if>
 
-<%@ include file="/common/messages.jsp"%>
+<lams:errors/>
 <%-- The status of the last add/edit operation. --%>
 <c:if test="${recordOperationSuccess=='add'}">
 	<lams:Alert id="addrecordsuccess" type="info" close="true">

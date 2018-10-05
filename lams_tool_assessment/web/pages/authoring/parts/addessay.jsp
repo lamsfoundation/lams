@@ -112,7 +112,7 @@
 		</div>
 			
 		<div class="panel-body">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
 			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
 				<form:hidden path="sessionMapID" />

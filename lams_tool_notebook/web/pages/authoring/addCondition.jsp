@@ -15,7 +15,7 @@
 		 </form:form>		
 		<form:form action="authoringCondition/saveOrUpdateCondition.do" method="post"
 			modelAttribute="notebookConditionForm" id="notebookConditionForm" focus="displayName">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			<form:hidden path="orderId" />
 
 			<div class="form-group">

@@ -66,7 +66,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div class="table-responsive">
 			<table class="table table-hover table-condensed">

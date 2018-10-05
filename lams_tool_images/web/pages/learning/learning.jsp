@@ -192,7 +192,7 @@
 			
 		</c:if>
 		
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		
 		<%--Main image---------------------------------------------------%>
 		

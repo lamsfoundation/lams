@@ -28,7 +28,7 @@
 		<form:hidden path="sessionId" />
 		<form:hidden path="sessionMapID" />
 		
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<p>
 				<lams:out value="${daco.reflectInstructions}" escapeHtml="true" />

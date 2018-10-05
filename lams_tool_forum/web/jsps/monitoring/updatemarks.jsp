@@ -40,7 +40,7 @@
 					<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 				</c:if>
 			</p>
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		
 			<div class="form-group">
 				<label for="mark"><fmt:message key="lable.topic.title.mark" />*</label>

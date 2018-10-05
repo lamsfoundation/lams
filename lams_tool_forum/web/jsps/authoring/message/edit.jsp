@@ -14,7 +14,7 @@
 		<div class="panel-body">
 	
 		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<form:form action="updateTopic.do" focus="message.subject" enctype="multipart/form-data" id="topicFormId" modelAttribute="topicFormId" onsubmit="return validate();">
 			
 			<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">

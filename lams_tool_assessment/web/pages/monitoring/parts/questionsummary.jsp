@@ -158,7 +158,7 @@
 		</div>
 			
 		<div class="panel-body">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
                 
             <c:out value="${questionSummary.question.question}" escapeXml="false"/>
 

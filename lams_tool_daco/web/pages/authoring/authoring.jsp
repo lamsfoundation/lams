@@ -40,7 +40,7 @@
 		</lams:Tabs>	
 	
 	 	<lams:TabBodyArea>
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			<form:hidden path="daco.contentId" />
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />

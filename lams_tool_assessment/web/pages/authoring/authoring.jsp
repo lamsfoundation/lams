@@ -63,7 +63,7 @@
 			</lams:Tabs>	
 		
 		 	<lams:TabBodyArea>
-		 		<%@ include file="/common/messages.jsp"%>
+		 		<lams:errors/>
 		 		
 				<!--  Set up tabs  -->
 		 		<lams:TabBodys>

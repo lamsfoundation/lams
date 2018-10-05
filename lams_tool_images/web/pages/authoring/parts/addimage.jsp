@@ -27,7 +27,7 @@
 		</div>
 			
 		<div class="panel-body">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="imageIndex" />
 	

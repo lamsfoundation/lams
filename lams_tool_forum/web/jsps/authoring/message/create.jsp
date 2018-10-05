@@ -16,7 +16,7 @@
 		<div class="panel-body">
 	
 		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<form:form action="createTopic.do" modelAttribute="topicFormId" id="topicFormId" focus="message.subject" enctype="multipart/form-data">
 			<form:hidden path="sessionMapID" />

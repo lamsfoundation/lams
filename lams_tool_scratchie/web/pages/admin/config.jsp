@@ -15,7 +15,7 @@
 			
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 			
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		
 			<c:if test="${savedSuccess}">
 				<lams:Alert type="info" id="admin-success" close="false">

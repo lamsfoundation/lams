@@ -67,7 +67,7 @@
 <body id="body">
 	<h4 class="space-left"><fmt:message key="label.questions"/></h4>
 	<form:form action="lams/tool/laqa11/pedagogicalPlanner/saveOrUpdatePedagogicalPlannerForm.do" modelAttribute="pedagogicalPlannerForm" id="pedagogicalPlannerForm" method="post">
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<form:hidden path="toolContentID" id="toolContentID" />
 		<form:hidden path="valid" id="valid" />
 		<form:hidden path="callID" id="callID" />

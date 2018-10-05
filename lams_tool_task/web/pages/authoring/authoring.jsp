@@ -82,7 +82,7 @@
 			</lams:Tabs>
 			
 			<lams:TabBodyArea>
-				<%@ include file="/common/messages.jsp"%>
+				<lams:errors/>
 		
 				<lams:TabBodys>
 					<!-- tab content 1 (Basic) -->
