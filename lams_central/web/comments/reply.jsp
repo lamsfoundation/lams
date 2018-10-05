@@ -26,7 +26,6 @@
 	});
 
 	function replyFormSubmit() {
-		
 		var btnName = "replyCommentSubmitButton";
 		if ( isDisabled(btnName) ) {
 			return false;
@@ -35,34 +34,31 @@
 		disableButton(btnName);
 		
 		var theForm = $(replyForm);
-		if (validateBodyText($('#replyFormBody').val(),
-<%=CommentConstants.MAX_BODY_LENGTH%>
-	,
+		if (validateBodyText($('#replyFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>,
 				"<fmt:message key="label.comment.body.validation" />")) {
 
-			$
-					.ajax({ // create an AJAX call...
-						data : theForm.serialize(),
-						processData : false, // tell jQuery not to process the data
-						contentType : false, // tell jQuery not to set contentType
-						type : theForm.attr('method'), // GET or POST
-						url : theForm.attr('action'), // the file to call  
-					})
-					.done(
-							function(response) {
-
-								var commentUid = response.commentUid;
-								if (commentUid) {
-									// make sure the old reply form is gone, so if something goes wrong 
-									// the user won't try to submit it again
-									$('#reply').remove();
-								}
-								reloadThread(
-										response,
-										'<lams:LAMSURL />',
-										'<fmt:message key="error.cannot.redisplay.please.refresh"/>',
-										'<fmt:message key="error.please.refresh"/>');
-							});
+			$.ajax({ // create an AJAX call...
+				data : theForm.serialize(),
+				processData : false, // tell jQuery not to process the data
+				contentType : false, // tell jQuery not to set contentType
+				type : theForm.attr('method'), // GET or POST
+				url : theForm.attr('action'), // the file to call  
+			})
+			.done(function(response) {
+				var commentUid = response.commentUid;
+				if (commentUid) {
+					// make sure the old reply form is gone, so if something goes wrong 
+					// the user won't try to submit it again
+					$('#reply').remove();
+				}
+				
+				reloadThread(
+					response,
+					'<lams:LAMSURL />',
+					'<fmt:message key="error.cannot.redisplay.please.refresh"/>',
+					'<fmt:message key="error.please.refresh"/>'
+				);
+			});
 		} // end validateBodyText
 		else {
 			enableButton(btnName);

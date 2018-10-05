@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -79,13 +78,6 @@ public class CommentController {
     /**
      * Display the comments for a given external id (usually tool session id). The session comments will be
      * arranged by Tree structure and loaded thread by thread (with paging).
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/init")
@@ -161,7 +153,9 @@ public class CommentController {
 	Comment rootComment = commentService.createOrGetRoot(externalId, externalSecondaryId, externalType,
 		externalSignature, user);
 	sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
-	return viewTopicImpl(request, sessionMap, pageSize, sortBy, true);
+	
+	prepareViewTopicData(request, sessionMap, pageSize, sortBy, true);
+	return "comments/comments";
     }
 
     private void throwException(String msg, String loginName, Long externalId, Integer externalType,
@@ -198,15 +192,9 @@ public class CommentController {
      * Display the comments for a given external id (usually tool session id). The session comments will be
      * arranged by Tree structure and loaded thread by thread (with paging). This may set a new value of sort by, so
      * make sure the session is updated.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping("/viewTopic")
+    @SuppressWarnings("unchecked")
     private String viewTopic(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, CommentConstants.ATTR_SESSION_MAP_ID);
@@ -218,12 +206,12 @@ public class CommentController {
 	if (sortBy != null) {
 	    sessionMap.put(CommentConstants.ATTR_SORT_BY, sortBy);
 	}
-	return viewTopicImpl(request, sessionMap, pageSize, sortBy, sticky);
-
+	
+	prepareViewTopicData(request, sessionMap, pageSize, sortBy, sticky);
+	return (sticky ? "comments/allviewwrapper" : "comments/topicviewwrapper");
     }
 
-    @RequestMapping("/viewTopicImpl")
-    private String viewTopicImpl(HttpServletRequest request, SessionMap<String, Object> sessionMap, Integer pageSize,
+    private void prepareViewTopicData(HttpServletRequest request, SessionMap<String, Object> sessionMap, Integer pageSize,
 	    Integer sortBy, boolean includeSticky) {
 
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
@@ -259,8 +247,6 @@ public class CommentController {
 
 	// transfer SessionMapID as well
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-	return (includeSticky ? "comments/allviewwrapper" : "comments/topicviewwrapper");
     }
 
     @SuppressWarnings("unchecked")
@@ -414,7 +400,6 @@ public class CommentController {
 
 	Long parentId = WebUtil.readLongParam(request, CommentConstants.ATTR_PARENT_COMMENT_ID);
 	String commentText = WebUtil.readStrParam(request, CommentConstants.ATTR_BODY, true);
-
 	if (commentText != null) {
 	    commentText = commentText.trim();
 	}
@@ -423,9 +408,9 @@ public class CommentController {
 		false);
 
 	ObjectNode responseJSON;
-
 	if (!validateText(commentText)) {
 	    responseJSON = getFailedValidationJSON();
+	    
 	} else {
 
 	    User user = getCurrentUser(request);
@@ -446,11 +431,10 @@ public class CommentController {
 	    responseJSON.put(CommentConstants.ATTR_THREAD_ID, newComment.getThreadComment().getUid());
 	    responseJSON.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    responseJSON.put(CommentConstants.ATTR_PARENT_COMMENT_ID, newComment.getParent().getUid());
-
 	}
 
 	response.setContentType("application/json;charset=utf-8");
-	return null;
+	return responseJSON.toString();
     }
 
     private boolean validateText(String commentText) {
@@ -494,8 +478,8 @@ public class CommentController {
      *
      * @throws ServletException
      */
-    @ResponseBody
     @RequestMapping("/updateTopicInline")
+    @ResponseBody
     public String updateTopicInline(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 
@@ -542,7 +526,6 @@ public class CommentController {
 	    ObjectNode.put(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    ObjectNode.put(CommentConstants.ATTR_THREAD_ID, updatedComment.getThreadComment().getUid());
 	    ObjectNode.put(CommentConstants.ATTR_PARENT_COMMENT_ID, updatedComment.getParent().getUid());
-
 	}
 
 	response.setContentType("application/json;charset=utf-8");
@@ -550,9 +533,28 @@ public class CommentController {
     }
 
     /**
+     * Stores user's like.
+     */
+    @RequestMapping(path = ("/like"), method = RequestMethod.POST)
+    @ResponseBody
+    private String like(HttpServletRequest request, HttpServletResponse response, boolean isLike)
+	    throws InterruptedException, IOException, ServletException {
+	return updateLikeCount(request, response, true);
+    }
+
+    /**
+     * Stores user's dislike.
+     */
+    @RequestMapping(path = ("/dislike"), method = RequestMethod.POST)
+    @ResponseBody
+    private String dislike(HttpServletRequest request, HttpServletResponse response, boolean isLike)
+	    throws InterruptedException, IOException, ServletException {
+	return updateLikeCount(request, response, false);
+    }
+
+    /**
      * Update the likes/dislikes
      */
-    @RequestMapping(path = ("/updateLikeCount"), method = RequestMethod.POST)
     private String updateLikeCount(HttpServletRequest request, HttpServletResponse response, boolean isLike)
 	    throws InterruptedException, IOException, ServletException {
 
@@ -580,8 +582,8 @@ public class CommentController {
     /**
      * Update hide flag
      */
+    @RequestMapping("/hide")
     @ResponseBody
-    @RequestMapping("/hideComment")
     private String hideComment(HttpServletRequest request, HttpServletResponse response, boolean isLike)
 	    throws InterruptedException, IOException, ServletException {
 
@@ -614,8 +616,8 @@ public class CommentController {
      *
      * @throws ServletException
      */
-    @ResponseBody
     @RequestMapping("/makeSticky")
+    @ResponseBody
     public String makeSticky(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 

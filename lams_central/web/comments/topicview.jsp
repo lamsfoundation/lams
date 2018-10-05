@@ -100,7 +100,7 @@
 
 	function updateLike(commentUid, url, incValue) {
 		$.ajax({ // create an AJAX call...
-		    type: 'GET', 
+		    type: 'POST', 
 		    url: url
 		})
 	    .done(function (response) {
@@ -117,9 +117,11 @@
 	}
 		
 	function likeEntry(commentUid) {
-		updateLike(commentUid,
+		updateLike(
+			commentUid,
 			'<lams:LAMSURL />comments/like.do?sessionMapID=${sessionMapID}&commentUid='+commentUid,
-			1);		
+			1
+		);		
 		$( '#msglikebutton'+commentUid ).removeClass( 'fa-thumbs-up fa-faded' ).addClass( 'fa-thumbs-o-up' );
 		$( '#msglikebutton'+commentUid ).prop( 'onclick', null );
 		<c:if test='${sessionMap.likeAndDislike}'> 
@@ -129,9 +131,11 @@
 
 	<c:if test='${sessionMap.likeAndDislike}'> 
 	function dislikeEntry(commentUid) {
-		updateLike(commentUid, 
+		updateLike(
+			commentUid, 
 			'<lams:LAMSURL />comments/dislike.do?sessionMapID=${sessionMapID}&commentUid='+commentUid,
-			 -1);		
+			-1
+		);		
 		$( '#msgdislikebutton'+commentUid ).removeClass( 'fa-thumbs-down fa-faded' ).addClass( 'fa-thumbs-o-down' );
 		$( '#msgdislikebutton'+commentUid ).prop( 'onclick', null );
 		$( '#msglikebutton'+commentUid ).css( "display", "none" );
