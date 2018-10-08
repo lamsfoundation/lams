@@ -80,7 +80,7 @@
 					</div>
 				</c:if>
 
-				<form action="/lams/j_security_check.do" method="POST"  role="form" class="form-horizontal" name="loginForm" id="loginForm">
+				<form action="/lams/j_security_check" method="POST"  role="form" class="form-horizontal" name="loginForm" id="loginForm">
 					<input type="hidden" name="j_username" value="${login}" /> 
 					<input type="hidden" name="j_password" value="${password}" /> 
 					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
