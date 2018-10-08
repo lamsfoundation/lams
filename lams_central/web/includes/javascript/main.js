@@ -352,7 +352,7 @@ function showOrgGroupingDialog(orgID, activityID) {
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL + 'OrganisationGroup/viewGroupings.do?organisationID=' + orgID
+			$('iframe', this).attr('src', LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID
 												   + (activityID ? '&activityID=' + activityID : ''));
 		}
 	}, true);

@@ -462,7 +462,7 @@ function saveGroups(){
 	$.ajax({
 		async : false,
 		cache : false,
-		url : LAMS_URL + 'OrganisationGroup/save.do',
+		url : LAMS_URL + 'organisationGroup/save.do',
 		data : {
 			'organisationID' : grouping.organisationId,
 			'grouping' : JSON.stringify(newGrouping)

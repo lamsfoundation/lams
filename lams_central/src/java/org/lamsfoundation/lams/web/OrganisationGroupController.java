@@ -80,7 +80,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
-@RequestMapping("/OrganisationGroup")
+@RequestMapping("/organisationGroup")
 public class OrganisationGroupController {
     private static Logger log = Logger.getLogger(OrganisationGroupController.class);
 
@@ -377,10 +377,7 @@ public class OrganisationGroupController {
 	// deserialize grouping
 	ObjectNode orgGroupingJSON = new ObjectMapper().readValue(request.getParameter("grouping"), ObjectNode.class);
 	// check if already exists
-	Long orgGroupingId = orgGroupingJSON.get("groupingId").asLong();
-	if (orgGroupingId == 0L) {
-	    orgGroupingId = null;
-	}
+	Long orgGroupingId = JsonUtil.optLong(orgGroupingJSON, "groupingId");
 
 	// iterate over groups
 	List<OrganisationGroup> orgGroups = new LinkedList<>();
@@ -401,7 +398,7 @@ public class OrganisationGroupController {
 
 		OrganisationGroup orgGroup = new OrganisationGroup();
 		Long orgGroupId = JsonUtil.optLong(orgGroupJSON, "groupId");
-		if (orgGroupId > 0) {
+		if (orgGroupId != null) {
 		    orgGroup.setGroupId(orgGroupId);
 		    orgGroup.setGroupingId(orgGroupingId);
 		}
@@ -498,7 +495,7 @@ public class OrganisationGroupController {
      * Stores course groups to branching groups mapping.
      */
     @ResponseBody
-    @RequestMapping(path = "/save", method = RequestMethod.POST)
+    @RequestMapping(path = "/saveGroupMappings", method = RequestMethod.POST)
     public void saveGroupMappings(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	ArrayNode groupMapping = JsonUtil.readArray(request.getParameter("mapping"));
 	for (JsonNode entryNode : groupMapping) {
@@ -553,7 +550,7 @@ public class OrganisationGroupController {
      */
     private ArrayNode getOrgGroupsDetails(Set<OrganisationGroup> groups, Collection<User> learners) {
 
-	final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
+	final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<>() {
 	    @Override
 	    public int compare(OrganisationGroup o1, OrganisationGroup o2) {
 		String grp1Name = o1 != null ? o1.getName() : "";
