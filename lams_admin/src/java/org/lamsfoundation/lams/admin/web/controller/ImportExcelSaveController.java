@@ -22,11 +22,12 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 public class ImportExcelSaveController {
+    private static Logger log = Logger.getLogger(ImportExcelSaveController.class);
 
     @Autowired
     private IImportService importService;
@@ -93,6 +95,7 @@ public class ImportExcelSaveController {
 		List results = importService.parseSpreadsheet(file, sessionId);
 		SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
 	    } catch (Exception e) {
+		log.warn("Exception in ImportExcelThread: ", e);
 	    }
 	}
     }
