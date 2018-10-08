@@ -68,7 +68,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * Handles the monitor interfaces for gradebook.
  * This is where marking for an activity/lesson takes place
- * 
+ *
  * @author lfoxton
  */
 @Controller
@@ -142,7 +142,8 @@ public class GradebookMonitoringController {
 		return null;
 	    }
 
-	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
+		    organisationID);
 	    request.setAttribute("organisationID", organisationID);
 	    request.setAttribute("organisationName", organisation.getName());
 
@@ -247,11 +248,11 @@ public class GradebookMonitoringController {
 	Lesson lesson = lessonService.getLesson(lessonID);
 	if ((markStr != null) && !markStr.equals("")) {
 	    Double mark = Double.parseDouble(markStr);
-	    gradebookService.updateUserLessonGradebookMark(lesson, learner, mark);
+	    gradebookService.updateGradebookUserActivityMark(lesson, learner, activity, mark, true, true);
 	}
 
 	if (feedback != null) {
-	    gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
+	    gradebookService.updateGradebookUserActivityFeedback(activity, learner, feedback);
 	}
 
     }
