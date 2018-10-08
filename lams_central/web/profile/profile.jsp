@@ -88,7 +88,7 @@
 							</span>
 						</a>&nbsp;&nbsp;
 
-						<a class="btn btn-sm btn-default offset5" href="policyConsents.do" role="button">
+						<a class="btn btn-sm btn-default offset5" href="profile/policyConsents.do" role="button">
 							<i class="fa fa-fw fa-calendar-check-o"></i> 
 							<span class="hidden-xs">
 								<fmt:message key="label.policies.consents" />
