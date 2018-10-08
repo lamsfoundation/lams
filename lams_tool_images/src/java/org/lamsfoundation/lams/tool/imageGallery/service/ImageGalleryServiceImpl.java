@@ -974,15 +974,18 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    }
 	}
 
-	ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(userId.longValue(), toolContentId);
-	if (user != null) {
-	    NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ImageGalleryConstants.TOOL_SIGNATURE, userId);
-	    if (entry != null) {
-		imageGalleryDao.removeObject(NotebookEntry.class, entry.getUid());
-	    }
+	for (ImageGallerySession session : imageGallerySessionDao.getByContentId(toolContentId)) {
+	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndSessionID(userId.longValue(),
+		    session.getSessionId());
+	    if (user != null) {
+		NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ImageGalleryConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    imageGalleryDao.removeObject(NotebookEntry.class, entry.getUid());
+		}
 
-	    imageGalleryUserDao.removeObject(ImageGalleryUser.class, user.getUid());
+		imageGalleryUserDao.removeObject(ImageGalleryUser.class, user.getUid());
+	    }
 	}
 
     }
