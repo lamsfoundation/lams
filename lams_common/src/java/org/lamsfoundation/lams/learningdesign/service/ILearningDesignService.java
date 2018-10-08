@@ -99,4 +99,21 @@ public interface ILearningDesignService {
 	    throws ImportToolContentException;
 
     String internationaliseActivityTitle(Long learningLibraryID);
+    
+    /**
+     * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
+     * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
+     * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
+     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the 
+     * Import code can use it.
+     *
+     *
+     * @param originalLearningDesign
+     * @param workspaceFolder
+     * @param copyType
+     * @return
+     */
+    String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
+
+
 }

@@ -45,19 +45,6 @@ public interface IAuthoringService {
     LearningDesign copyLearningDesign(LearningDesign originalLearningDesign, Integer copyType, User user,
 	    WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName, String customCSV);
 
-    /**
-     * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
-     * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
-     * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
-     * quite intensive as it gets all the learning designs in a folder.
-     *
-     * @param originalLearningDesign
-     * @param workspaceFolder
-     * @param copyType
-     * @return
-     */
-    String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
-
     Grouping getGroupingById(Long groupingID);
 
     /**

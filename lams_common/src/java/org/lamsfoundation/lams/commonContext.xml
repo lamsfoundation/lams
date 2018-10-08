@@ -239,6 +239,8 @@
 	</bean>
 	
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
+		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>

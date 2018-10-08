@@ -39,7 +39,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -160,11 +159,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
     private Logger log = Logger.getLogger(ExportToolContentService.class);
 
-    public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
-
-    public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
-
-    // export tool content zip file prefix
+     // export tool content zip file prefix
     public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
 
     public static final String EXPORT_LDCONTENT_ZIP_PREFIX = "lams_ldcontent_";
@@ -207,9 +202,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     // message keys
     private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
 
-    private static MessageService messageService;
+    private MessageService messageService;
+    private ILearningDesignService learningDesignService;
 
     private ApplicationContext applicationContext;
+        
 
     // save list of all tool file node class information. One tool may have
     // over one file node, such as
@@ -408,8 +405,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    // get learning desing and serialize it to XML file. Update the
 	    // version to reflect the version now, rather than the version when it was saved.
-	    ILearningDesignService service = getLearningDesignService();
-	    LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId, "");
+	    LearningDesignDTO ldDto = learningDesignService.getLearningDesignDTO(learningDesignId, "");
 	    ldDto.setVersion(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 
 	    /*
@@ -706,7 +702,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ldDto.setDescription(ldDto.getDescription().replaceAll(oldResourcePath, newResourcePath));
 	    }
 	    for (AuthoringActivityDTO activity : activities) {
-		getLearningDesignService().fillLearningLibraryID(activity, activities);
+		learningDesignService.fillLearningLibraryID(activity, activities);
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		    continue;
@@ -722,7 +718,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		// can not find a matching tool
 		if (newTool == null) {
 		    log.warn("An activity can not found matching tool [" + activity.getToolSignature() + "].");
-		    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_TOOL_NOT_FOUND,
+		    toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_TOOL_NOT_FOUND,
 			    new Object[] { activity.getToolSignature() }));
 
 		    // remove this activity from LD
@@ -771,7 +767,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    }
 		    log.debug("Tool content import success.");
 		} catch (Exception e) {
-		    String error = getMessageService().getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
+		    String error = messageService.getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
 			    new Object[] { newTool.getToolDisplayName(), e.toString() });
 		    log.error(error, e);
 		    toolsErrorMsgs.add(error);
@@ -783,7 +779,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    // all activities can not imported, ignore this LD
 	    if (removedActMap.size() == activities.size()) {
-		toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_NO_VALID_TOOL));
+		toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_NO_VALID_TOOL));
 		return -1L;
 	    }
 
@@ -846,13 +842,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		log.warn(
 			"Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"
 				+ title + "\'. Version in import file " + versionString);
-		toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
+		toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 			new Object[] { versionString, currentVersionString }));
 	    }
 	} catch (Exception e) {
 	    log.warn("Unable to properly determine current version from an import file. Design name \'" + title
 		    + "\'. Version in import file " + versionString);
-	    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
+	    toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 		    new Object[] { versionString, currentVersionString }));
 	}
 
@@ -910,8 +906,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     private void badFileType(List<String> ldErrorMsgs, String filename, String errDescription) {
 	log.error("Uploaded file not an expected type. Filename was " + filename + " " + errDescription);
-	MessageService msgService = getMessageService();
-	String msg = msgService.getMessage(ExportToolContentService.KEY_MSG_IMPORT_FILE_FORMAT);
+	String msg = messageService.getMessage(ExportToolContentService.KEY_MSG_IMPORT_FILE_FORMAT);
 	ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
     }
 
@@ -1134,20 +1129,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	} catch (IOException e) {
 	    log.warn("Export error file write error:", e);
 	}
-    }
-
-    private ILearningDesignService getLearningDesignService() {
-	return (ILearningDesignService) applicationContext
-		.getBean(ExportToolContentService.LEARNING_DESIGN_SERVICE_BEAN_NAME);
-    }
-
-    private MessageService getMessageService() {
-	if (ExportToolContentService.messageService != null) {
-	    return ExportToolContentService.messageService;
-	}
-
-	return ExportToolContentService.messageService = (MessageService) applicationContext
-		.getBean(ExportToolContentService.MESSAGE_SERVICE_BEAN_NAME);
     }
 
     private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException {
@@ -1408,7 +1389,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		competenceList);
 
 	// validate learning design
-	Vector listOfValidationErrorDTOs = getLearningDesignService().validateLearningDesign(ld);
+	Vector listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(ld);
 	if (listOfValidationErrorDTOs.size() > 0) {
 	    ld.setValidDesign(false);
 	    log.error(listOfValidationErrorDTOs);
@@ -1425,7 +1406,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// add suffix if configuration is not set or is set to true
 	String addSuffix = Configuration.get(ConfigurationKeys.SUFFIX_IMPORTED_LD);
 	if ((addSuffix == null) || Boolean.valueOf(addSuffix)) {
-	    ld.setTitle(ExportToolContentService.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
+	    String title = ld.getTitle();
+	    if (title == null || title.trim().length() == 0)
+		title = "unknown";
+	    ld.setTitle(learningDesignService.getUniqueNameForLearningDesign(ld.getTitle(), folder.getWorkspaceFolderId()));
 	    learningDesignDAO.update(ld);
 	    // persist
 	}
@@ -1949,52 +1933,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setEndYcoord(actDto.getEndYCoord());
     }
 
-    private static String generateUniqueLDTitle(WorkspaceFolder folder, String titleFromFile,
-	    ILearningDesignDAO learningDesignDAO) {
-
-	String newTitle = titleFromFile;
-	if ((newTitle == null) || (newTitle.length() == 0)) {
-	    newTitle = "unknown";
-	}
-
-	if (folder != null) {
-	    boolean dupName;
-	    List<LearningDesign> ldList = learningDesignDAO
-		    .getAllLearningDesignsInFolder(folder.getWorkspaceFolderId());
-	    int idx = 1;
-
-	    //contruct middle part of name by timestamp
-	    Calendar calendar = Calendar.getInstance();
-	    int mth = calendar.get(Calendar.MONTH) + 1;
-	    String mthStr = new Integer(mth).toString();
-	    if (mth < 10) {
-		mthStr = "0" + mthStr;
-	    }
-	    int day = calendar.get(Calendar.DAY_OF_MONTH);
-	    String dayStr = new Integer(day).toString();
-	    if (day < 10) {
-		dayStr = "0" + dayStr;
-	    }
-	    String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
-	    while (true) {
-		dupName = false;
-		for (LearningDesign eld : ldList) {
-		    if (StringUtils.equals(eld.getTitle(), newTitle)) {
-			dupName = true;
-			break;
-		    }
-		}
-		if (!dupName) {
-		    break;
-		}
-		newTitle = titleFromFile + "_" + nameMid + "_" + idx;
-		idx++;
-	    }
-	}
-
-	return newTitle;
-    }
-
     /**
      * Convert content folder ID to real path inside secure dir or on server
      */
@@ -2077,5 +2015,21 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
 	this.systemToolDAO = systemToolDAO;
+    }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+
+    public ILearningDesignService getLearningDesignService() {
+        return learningDesignService;
+    }
+
+    public void setLearningDesignService(ILearningDesignService learningDesignService) {
+        this.learningDesignService = learningDesignService;
     }
 }

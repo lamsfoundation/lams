@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learningdesign.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -492,4 +493,51 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 	return FileUtil.getFullPath(thumbnailDir.getAbsolutePath(), thumbnailFileName);
     }
+    
+    /**
+     * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
+     * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
+     * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
+     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the 
+     * Import code can use it.
+     *
+     * @param originalLearningDesign
+     * @param workspaceFolder
+     * @param copyType
+     * @return
+     */
+    @Override
+    public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId) {
+
+	String newName = originalTitle;
+	if (workspaceFolderId != null) {
+	    List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId,
+		    originalTitle);
+
+	    if ( ldTitleList.size() == 0 ) {
+		return originalTitle;
+	    }
+	    
+	    Calendar calendar = Calendar.getInstance();
+	    int mth = calendar.get(Calendar.MONTH) + 1;
+	    String mthStr = new Integer(mth).toString();
+	    if (mth < 10) {
+		mthStr = "0" + mthStr;
+	    }
+	    int day = calendar.get(Calendar.DAY_OF_MONTH);
+	    String dayStr = new Integer(day).toString();
+	    if (day < 10) {
+		dayStr = "0" + dayStr;
+	    }
+	    String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
+
+	    int idx = 1;
+	    while (ldTitleList.contains(newName)) {
+		newName = originalTitle + "_" + nameMid + "_" + idx;
+		idx++;
+	    }
+	}
+	return newName;
+    }
+
 }

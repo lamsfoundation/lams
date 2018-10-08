@@ -413,7 +413,7 @@ GeneralInitLib = {
 
 			$.ajax({
 				cache : false,
-				url : copiedResource.isCut ? 'LAMS_URL + "workspace/moveResource.do' : 'LAMS_URL + "workspace/copyResource.do',
+				url : copiedResource.isCut ? LAMS_URL + "workspace/moveResource.do" : LAMS_URL + "workspace/copyResource.do",
 				dataType : 'text',
 				data : {
 					'targetFolderID' : folderNode.data.folderID,

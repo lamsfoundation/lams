@@ -296,9 +296,9 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Create a unique title for this learning design, within the right length for the database. The title will
-     * be <ConvertedUserEnteredString>_<TEMPLATE_CODE>_UniqueDate, where the userEnteredString is capitalised and
-     * whitespace is removed.
+     * Create a title for this learning design, within the right length for the database. The userEnteredString is 
+     * capitalised and whitespace is removed. The call to saveLearningDesign will make it unique by appending a date
+     * if needed.
      *
      * @param sequenceTitle
      * @param workspaceFolderID
@@ -307,7 +307,6 @@ public abstract class LdTemplateController {
     private String createTitle(String templateCode, String userEnteredString, Integer workspaceFolderID) {
 	String title = WebUtil.removeHTMLtags(userEnteredString);
 	title = title.replaceAll("[@%<>/^/*/$]", "");
-	title = authoringService.getUniqueNameForLearningDesign(title, workspaceFolderID);
 	if (title.length() > 220) {
 	    title.substring(0, 220);
 	}
