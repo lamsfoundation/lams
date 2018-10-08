@@ -18,7 +18,7 @@
 	<lams:Page type="admin" title="${title}">
 		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-		<p><fmt:message key="${successful}"/></p>
+		<p>${successful}</p>
 		<p>
 		<c:forEach items="${results}" var="messages" varStatus="index">
 			<c:if test="${not empty messages}">
