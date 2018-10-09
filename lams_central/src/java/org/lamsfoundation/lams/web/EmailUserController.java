@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.EmailValidator;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -61,7 +61,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class EmailUserController {
     private static Logger log = Logger.getLogger(EmailUserController.class);
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired

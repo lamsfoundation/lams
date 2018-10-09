@@ -20,7 +20,6 @@
 		<resource-root path="commons-validator-1.6.jar" />
 	</resources>
 	<dependencies>
-		<module name="org.apache.oro" />
 		<module name="org.apache.commons.logging" />
 		<module name="org.apache.commons.collections" />
 		<module name="org.apache.commons.digester" />

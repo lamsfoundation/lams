@@ -7,7 +7,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.EmailValidator;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -45,8 +45,10 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    throws InvalidParameterException {
 	return send(fromUserId, toUserId, subject, message, isHtmlFormat, null);
     }
-    protected String send(Integer fromUserId, Integer toUserId, String subject, String message, boolean isHtmlFormat, String attachmentFilename)
-	    throws InvalidParameterException {
+
+    @Override
+    protected String send(Integer fromUserId, Integer toUserId, String subject, String message, boolean isHtmlFormat,
+	    String attachmentFilename) throws InvalidParameterException {
 	try {
 	    User toUser = (User) DeliveryMethodMail.userManagementService.findById(User.class, toUserId);
 	    if (toUser == null) {
