@@ -7,7 +7,7 @@
 	<target name="build-db" depends="_clean-dirs"
 		description="Rebuilds LAMS database.">
 		
-		<echo>Rebuilding LAMS database ${db.url.init.build} ${db.username} ${db.password}</echo>
+		<echo>Rebuilding LAMS database</echo>
 		<tstamp/>
 		<copy todir="${basedir}/build/sql" overwrite="true" verbose="true">
 			<fileset dir="${db.scripts}/">
