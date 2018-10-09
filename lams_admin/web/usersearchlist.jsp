@@ -107,7 +107,7 @@
 								rows += 	'&nbsp;';
 	
 								if (${(useInternalSMTPServer || not empty smtpServer)} && orgData["email"] != null && orgData["email"] != "") {
-								rows += 	'[<a href="<lams:LAMSURL/>emailUser/composeMail.do?returnUrl=admin/usersearch.do&userID=' + orgData["userId"] + '">';
+								rows += 	'[<a href="<lams:LAMSURL/>emailUser/composeMail.do?returnUrl=/lams/admin/usersearch.do&userID=' + orgData["userId"] + '">';
 								rows += 		'<fmt:message key="label.email"/>';
 								rows += 	'</a>]';
 								}
