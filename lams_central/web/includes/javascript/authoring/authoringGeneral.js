@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -587,7 +587,7 @@ GeneralInitLib = {
 			var nodeData = null;
 			if (folderNode && folderNode.children) {
 				$.each(folderNode.children, function(){
-					if (this.label == title) {
+					if (this.data.label == title) {
 						this.highlight();
 						nodeData = this.data;
 						return false;
