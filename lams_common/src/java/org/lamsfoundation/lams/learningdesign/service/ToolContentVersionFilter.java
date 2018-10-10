@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -208,9 +209,21 @@ public class ToolContentVersionFilter {
 		    if (oldNode.getNodeName().equals(renamed.oldFieldname)) {
 			Element newElement = root.getOwnerDocument().createElement(renamed.newFieldname);
 			if (oldNode.hasChildNodes()) {
+			    
+			    //copy attributes
+			    if (oldNode.getAttributes() != null) {
+				NamedNodeMap attributes = oldNode.getAttributes();
+				for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
+				    Node clonedAttribute = attributes.item(attrIndex).cloneNode(true);
+				    newElement.getAttributes().setNamedItem(clonedAttribute);
+				}
+			    }
+			    
+			    //copy child nodes
 			    NodeList children = oldNode.getChildNodes();
 			    for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
-				newElement.appendChild(children.item(childIndex).cloneNode(true));
+				Node clonedChildNode = children.item(childIndex).cloneNode(true);
+				newElement.appendChild(clonedChildNode);
 			    }
 			} else {
 			    newElement.setTextContent(oldNode.getTextContent());
