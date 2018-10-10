@@ -36,7 +36,7 @@ public class ActivityMappingStrategy implements Serializable {
 
     private static Logger log = Logger.getLogger(ActivityMappingStrategy.class);
 
-    private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.do";
+    private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.jsp";
 
     /**
      * Returns the struts action used to display the specified activity.

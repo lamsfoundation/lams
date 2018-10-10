@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -1747,7 +1747,7 @@ GeneralLib = {
 					'title'			   : ld.title,
 					'maxUIID'		   : 0,
 					'readOnly'		   : ld.readOnly,
-					'canModify'		   : ld.copyTypeID == 1
+					'canModify'		   : ld.copyTypeID == 1 || ld.editOverrideLock
 				};
 				
 				if (!isReadOnlyMode) {
