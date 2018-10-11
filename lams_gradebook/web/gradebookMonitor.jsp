@@ -157,7 +157,7 @@
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, width: 150, formatter:userNameFormatter},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
-				  {name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, title: true, align:"center",
+				  {name:'timeTaken',index:'timeTaken', sortable:true, editable: false, search:false, width:50, title: true, align:"center",
 						cellattr: function(rowID, val, rawObject, cm, rdata) {
 							if (rdata.startDate != "-") {
 								return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
