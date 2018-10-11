@@ -27,16 +27,18 @@
 		.burning-question-container {
 			padding: 0 15px;
 		}
-		#user-confidence-levels {
-			margin-left: 20px;
+		.answer-description {
+			margin-right: 20px;
 		}
 		.answer-with-confidence-level-portrait {
 			display: flex;
+			flex-wrap: wrap;
    			align-items: center;
 		}
 		.c100.small {
 			font-size: 41px;
 			margin-right: 5px;
+			margin-bottom: 23px;
 		}
 		.confidence-level-percentage {
 			font-size: 13px;

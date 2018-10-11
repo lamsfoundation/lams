@@ -44,10 +44,12 @@
 				<td 
 					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
 				>
-					<c:out value="${answer.description}" escapeXml="false" />
+					<div class="answer-description">
+						<c:out value="${answer.description}" escapeXml="false" />
+					</div>
 					
 					<c:if test="${scratchie.confidenceLevelsActivityUiid != null}">
-						<div id="user-confidence-levels">
+						<div>
 							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}" varStatus="status">
 							
 								<div class="c100 p${confidenceLevelDto.level}0 small">
