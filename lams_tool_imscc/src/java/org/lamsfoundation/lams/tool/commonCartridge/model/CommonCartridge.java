@@ -57,8 +57,6 @@ public class CommonCartridge implements Cloneable {
 
     private int miniViewCommonCartridgeNumber;
 
-    private boolean lockWhenFinished;
-
     private boolean defineLater;
 
     private boolean contentInUse;
@@ -257,24 +255,6 @@ public class CommonCartridge implements Cloneable {
      */
     public void setTitle(String title) {
 	this.title = title;
-    }
-
-    /**
-     * @return Returns the lockWhenFinish.
-     *
-     *
-     *
-     */
-    public boolean getLockWhenFinished() {
-	return lockWhenFinished;
-    }
-
-    /**
-     * @param lockWhenFinished
-     *            Set to true to lock the commonCartridge for finished users.
-     */
-    public void setLockWhenFinished(boolean lockWhenFinished) {
-	this.lockWhenFinished = lockWhenFinished;
     }
 
     /**

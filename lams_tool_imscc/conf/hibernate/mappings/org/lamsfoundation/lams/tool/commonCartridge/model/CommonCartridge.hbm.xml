@@ -61,14 +61,6 @@
         />
 
         <property
-            name="lockWhenFinished"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="lock_on_finished"
-        />
-
-        <property
             name="instructions"
             type="text"
             update="true"

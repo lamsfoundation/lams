@@ -14,10 +14,9 @@
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="commonCartridge" value="${sessionMap.commonCartridge}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
 	<script type="text/javascript">
-		function checkNew(checkFinishedLock) {
+		function checkNew() {
 		    var reqIDVar = new Date();
 			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
 		    return false;
@@ -46,19 +45,6 @@
 		<div class="panel">
 			<c:out value="${commonCartridge.instructions}" escapeXml="false"/>
 		</div>
-
-		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<lams:Alert type="danger" id="lock-on-finish" close="false">
-				<c:choose>
-					<c:when test="${sessionMap.userFinished}">
-						<fmt:message key="message.activityLocked" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="message.warnLockOnFinish" />
-					</c:otherwise>
-				</c:choose>
-			</lams:Alert>
-		</c:if>
 		
 		<c:if test="${commonCartridge.miniViewCommonCartridgeNumber > 0}">
 			<lams:Alert type="warning" id="lock-on-finish" close="false">

@@ -42,13 +42,6 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">
-	<label for="lock-when-finished">
-		<form:checkbox path="commonCartridge.lockWhenFinished" id="lock-when-finished"/>
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</div>
-
-<div class="checkbox">
 	<label for="reflect-on-activity">
 		<form:checkbox path="commonCartridge.reflectOnActivity" id="reflect-on-activity"/>
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />

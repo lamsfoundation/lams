@@ -123,10 +123,6 @@ public class LearningController {
 	List<CommonCartridgeItem> items = new ArrayList<>();
 	items.addAll(commonCartridge.getCommonCartridgeItems());
 
-	// check whehter finish lock is on/off
-	boolean lock = commonCartridge.getLockWhenFinished() && commonCartridgeUser != null
-		&& commonCartridgeUser.isSessionFinished();
-
 	// check whether there is only one commonCartridge item and run auto flag is true or not.
 	boolean runAuto = false;
 	Long runAutoItemUid = null;
@@ -158,8 +154,6 @@ public class LearningController {
 	// basic information
 	sessionMap.put(CommonCartridgeConstants.ATTR_TITLE, commonCartridge.getTitle());
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_INSTRUCTION, commonCartridge.getInstructions());
-	sessionMap.put(CommonCartridgeConstants.ATTR_FINISH_LOCK, lock);
-	sessionMap.put(CommonCartridgeConstants.ATTR_LOCK_ON_FINISH, commonCartridge.getLockWhenFinished());
 	sessionMap.put(CommonCartridgeConstants.ATTR_USER_FINISHED,
 		commonCartridgeUser != null && commonCartridgeUser.isSessionFinished());
 

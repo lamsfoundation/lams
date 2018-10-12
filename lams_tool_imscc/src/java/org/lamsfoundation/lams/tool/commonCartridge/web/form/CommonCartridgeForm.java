@@ -33,8 +33,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
  *
  * CommonCartridge Form.
  *
- *
- *
  * User: Dapeng.Ni
  */
 public class CommonCartridgeForm {
@@ -70,7 +68,6 @@ public class CommonCartridgeForm {
 	// if it is start page, all data read out from database or current session
 	// so need not reset checkbox to refresh value!
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    commonCartridge.setLockWhenFinished(false);
 	    commonCartridge.setDefineLater(false);
 	    commonCartridge.setRunAuto(false);
 	    commonCartridge.setReflectOnActivity(false);
