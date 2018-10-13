@@ -125,6 +125,8 @@ public class ResourceConstants {
     public static final String ATTR_IS_URL_ITEM_TYPE = "isUrlItemType";
     
     public static final String ATTR_ALLOW_COMMENTS = "allowComments";
+    
+    public static final String ATTR_COMPLETED_SUFFICIENT_TO_FINISH = "hasCompletedMinNumber";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

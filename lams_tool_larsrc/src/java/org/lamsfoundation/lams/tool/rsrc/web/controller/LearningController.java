@@ -158,16 +158,20 @@ public class LearningController {
 	// check whether there is only one resource item and run auto flag is true or not.
 	boolean runAuto = false;
 	Long runAutoItemUid = null;
-	int itemsNumber = 0;
-	if (resource.getResourceItems() != null) {
-	    itemsNumber = resource.getResourceItems().size();
-	    if (resource.isRunAuto() && (itemsNumber == 1)) {
-		ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
+	if (resource.isRunAuto() && items != null ) {
+	    int itemsNumber = 0;
+	    for (ResourceItem item : items) {
 		// only visible item can be run auto.
 		if (!item.isHide()) {
-		    runAuto = true;
+		    itemsNumber++;
 		    runAutoItemUid = item.getUid();
 		}
+	    }
+	    // can't autorun if there is more than one!
+	    if ( itemsNumber == 1 ) {
+		runAuto = true;
+	    } else {
+		runAutoItemUid = null;
 	    }
 	}
 
@@ -247,6 +251,15 @@ public class LearningController {
 	if (resourceUser != null) {
 	    resourceService.retrieveComplete(resourceItemList, resourceUser);
 	}
+	int numItemsCompleted = 0;
+	for ( ResourceItem item: resourceItemList ) {
+	    if (item.isComplete()) {
+		numItemsCompleted++;
+	    }
+	}
+	sessionMap.put(ResourceConstants.ATTR_COMPLETED_SUFFICIENT_TO_FINISH,
+		numItemsCompleted >= resource.getMiniViewResourceNumber());
+
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 
 	if (runAuto) {
