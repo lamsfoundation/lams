@@ -329,6 +329,7 @@ public class HomeController {
 	File imageFile = new File(imagePath);
 	if (!imageFile.canRead()) {
 	    res.sendError(HttpServletResponse.SC_NOT_FOUND);
+	    return;
 	}
 
 	boolean download = WebUtil.readBooleanParam(req, "download", false);

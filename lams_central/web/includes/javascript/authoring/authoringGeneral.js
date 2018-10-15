@@ -2262,6 +2262,8 @@ GeneralLib = {
 					$('#newButton, #openButton').parent().remove();
 					$('#importSequenceButton, #previewButton').remove();
 					$('#saveButton').parent().children('.dropdown-toggle, .dropdown-menu').remove();
+					debugger;
+					$('#saveButton').text(LABELS.LIVE_EDIT_SAVE);
 					$('#cancelLiveEditButton').show();
 				}
 				
@@ -2932,6 +2934,7 @@ GeneralLib = {
 			return false;
 		}
 		
+		debugger;
 		// check if we are in SVG recreation mode (Monitoring, Add Lesson)
 		// and we need to update activities' coordinates on the back end
 		if (isReadOnlyMode && layout.wasArranged) {
