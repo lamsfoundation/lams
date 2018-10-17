@@ -15,11 +15,6 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.3.6.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
-		<attributes>
-			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry exported="true" kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.9.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry exported="true" kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.9.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
 	<classpathentry exported="true" kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.6.Final.jar"/>

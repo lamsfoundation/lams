@@ -455,6 +455,16 @@
 		
 		
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/hibernate/5.0.10" overwrite="true" verbose="true">
+			<fileset dir="lib/hibernate">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/hibernate/5.0.10/module.xml"
+			  file="lib/hibernate/hibernate.module.xml" overwrite="true" verbose="true" />
+			
+			
+			
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-collections4-*.jar" />
