@@ -152,9 +152,9 @@ public class Configuration implements InitializingBean {
 		    Trigger existingTrigger = scheduler.getTrigger(triggerKey);
 		    // check if trigger exists and interval has not changed
 		    if (existingTrigger != null) {
-			Integer storedRefreshCacheInterval = existingTrigger.getJobDataMap()
-				.containsKey("refreshCacheInterval")
-					? existingTrigger.getJobDataMap().getInt("refreshCacheInterval") : null;
+			Integer storedRefreshCacheInterval = existingTrigger.getJobDataMap().containsKey(
+				"refreshCacheInterval") ? existingTrigger.getJobDataMap().getInt("refreshCacheInterval")
+					: null;
 			if (refreshCacheInterval.equals(storedRefreshCacheInterval)) {
 			    // nothing to do, exit
 			    return;
@@ -206,6 +206,13 @@ public class Configuration implements InitializingBean {
 	new Thread("LAMSConfigurationServerStateCheckThread") {
 	    @Override
 	    public void run() {
+		// In WildFly 14 the Configuration bean can get created by one of LAMS EAR modules, for example Image Gallery.
+		// This module's classloader does not have access to java.sql.Connection.
+		// It should ask its parent for this class, but context class loaders are not obliged to do it and
+		// apparently WildFly module classloaders do not do it.
+		// We need to manually reset a classloader for this thread.
+		Thread.currentThread()
+			.setContextClassLoader(Thread.currentThread().getContextClassLoader().getParent());
 		boolean check = true;
 		do {
 		    try (ModelControllerClient client = ModelControllerClient.Factory.create("localhost", 9990)) {
