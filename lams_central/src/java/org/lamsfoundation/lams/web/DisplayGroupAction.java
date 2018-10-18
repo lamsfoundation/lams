@@ -214,6 +214,12 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
+	if (roles.contains(Role.ROLE_AUTHOR) && orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
+	    moreLinks.add(
+		    new IndexLinkBean("index.outcome.manage", "javascript:showOutcomeDialog(" + organisationId + ")",
+			    "fa fa-fw fa-check-circle-o", "index.outcome.manage.tooltip"));
+	}
+
 	if (Configuration.getAsBoolean(ConfigurationKeys.ALLOW_KUMALIVE) && org.getEnableKumalive()
 		&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)
 			|| roles.contains(Role.ROLE_LEARNER))) {

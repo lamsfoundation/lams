@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+	<class name="org.lamsfoundation.lams.outcome.OutcomeResult" table="lams_outcome_result">
+
+		<id name="resultId" type="java.lang.Long" column="result_id">
+			<generator class="native" />
+		</id>
+		
+		<property name="value" type="java.lang.Integer" column="value" />
+
+		<property name="createDateTime" type="java.sql.Timestamp"
+			column="create_date_time" not-null="true" length="19">
+		</property>
+		
+		<!-- Associations -->
+		<many-to-one name="mapping" 
+			class="org.lamsfoundation.lams.outcome.OutcomeMapping"
+			>
+			<column name="mapping_id" />
+		</many-to-one>
+		
+		<many-to-one name="user"
+			class="org.lamsfoundation.lams.usermanagement.User"
+			not-null="true">
+			<column name="user_id" />
+		</many-to-one>
+		
+		<many-to-one name="createBy"
+			class="org.lamsfoundation.lams.usermanagement.User"
+			not-null="false">
+			<column name="create_by" />
+		</many-to-one>
+	</class>
+</hibernate-mapping>

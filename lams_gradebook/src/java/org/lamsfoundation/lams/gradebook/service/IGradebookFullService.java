@@ -23,11 +23,11 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
@@ -62,8 +62,10 @@ public interface IGradebookFullService extends IGradebookService {
      * @param
      * @param learner
      * @return
+     * @throws JSONException
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone);
+    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone)
+	    throws JSONException;
 
     /**
      * Gets the GBActivityDTO list for an activity, which provides the marks for all users in an activity
@@ -134,6 +136,7 @@ public interface IGradebookFullService extends IGradebookService {
      *
      * @param activity
      */
+    @Override
     void recalculateGradebookMarksForActivity(Activity activity);
 
     /**
@@ -144,6 +147,7 @@ public interface IGradebookFullService extends IGradebookService {
      * @param lessonId
      * @throws Exception
      */
+    @Override
     void recalculateTotalMarksForLesson(Long lessonId) throws Exception;
 
     /**
@@ -257,6 +261,7 @@ public interface IGradebookFullService extends IGradebookService {
      */
     Activity getActivityById(Long activityID);
 
+    @Override
     void removeLearnerFromLesson(Long lessonId, Integer learnerId);
 
     /**

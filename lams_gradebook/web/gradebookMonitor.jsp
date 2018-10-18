@@ -14,6 +14,8 @@
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="chart"/>
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
@@ -23,12 +25,12 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
  	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />gradebook/includes/javascript/blockexportbutton.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/x-editable.js"></script>
 	
 	<script type="text/javascript">
 	
 		var marksReleased = ${marksReleased};
 		var graphLoaded = false;
-		var lessonDatesHidden = true;
 
 		function toggleMarkChart() {
 			// the two methods showMarkChart and hideMarkChart are used in the Monitoring tour
@@ -115,29 +117,6 @@
 				document.getElementById("padlockLocked").style.display="inline";
 			}
 		}
-		
-		// Show/hide the dates for the start and end of the lesson. 
-		function toggleLessonDates() {
-			lessonDatesHidden = !lessonDatesHidden;
-			processLessonDateFields( lessonDatesHidden ) 
-		}
-		
-		function processLessonDateFields( hide ) {
-
-            if ( hide ) {
-				jQuery("#userView").jqGrid('hideCol','startDate');
-				jQuery("#userView").jqGrid('hideCol','finishDate');
-				document.getElementById("datesShown").style.display="none";
-				document.getElementById("datesNotShown").style.display="inline";
-            } else { 
-				jQuery("#userView").jqGrid('showCol','startDate');
-				jQuery("#userView").jqGrid('showCol','finishDate');
-				document.getElementById("datesShown").style.display="inline";
-				document.getElementById("datesNotShown").style.display="none";
-            }
-
-            resizeJqgrid(jQuery("#userView"));
- 		}
 
 		jQuery(document).ready(function(){
   
@@ -155,8 +134,8 @@
 			    height: "100%",
 			    width: jqgridWidth,
 				shrinkToFit: false,
-				cmTemplate: { title: false },
 			    cellEdit: true,
+			    cmTemplate: { title: false },
 			    viewrecords: true,
 			    sortorder: "asc", 
 			    sortname: "rowName", 
@@ -177,11 +156,17 @@
 			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, formatter:userNameFormatter},
-			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
-			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
-			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:false, search:false, width:85, align:"left"},
-			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:false, search:false, width:85, align:"left"},
+			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true, width: 150, formatter:userNameFormatter},
+			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
+				  {name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, title: true, align:"center",
+						cellattr: function(rowID, val, rawObject, cm, rdata) {
+							if (rdata.startDate != "-") {
+								return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+							}
+				    	}
+			      },
+				  {name:'startDate',index:'startDate', width:0, hidden: true},
+				  {name:'finishDate',index:'finishDate', width:0, hidden: true},
 			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
 			      {name:'portraitId', index:'portraitId', width:0, hidden: true},
@@ -221,18 +206,30 @@
 						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+						     	"<fmt:message key="gradebook.columntitle.outcome"/>",
 						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 						       	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-								{name:'rowName',  index:'rowName', sortable:false, editable: false},
-								{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
-							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+								{name:'rowName',  index:'rowName', sortable:false, editable: false, width: 140},
+								{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, title : true, align:"center",
+									cellattr: function(rowID, val, rawObject, cm, rdata) {
+										if (rdata.startDate != "-") {
+											return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+										}
+							    	}
+						    	},
+							    {name:'startDate',index:'startDate', width:0, hidden: true},
+							    {name:'finishDate',index:'finishDate', width:0, hidden: true},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
-								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
+								{name:'outcome', index:'outcome', sortable:false, editable: false,
+									cellattr: function(rowID, val, rawObject, cm, rdata) {
+							    	    return 'style="text-align:' + (rdata.outcome.startsWith('[') ? 'left"' : 'center"');
+							    	}
+						    	},
+								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:49, align:"center" }
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -284,7 +281,6 @@
 					    	 	}
 					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
-						     	
 						     	var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     	if (cellname == "mark") {
 							     	
@@ -308,23 +304,91 @@
 						     },
 							 gridComplete: function(){
 							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
+
+							 	// if there are outcomes mapped to this activity, make them editable
+							 	var subgrid = $(this);
+							 	$('tr[role="row"]', subgrid).each(function(){
+								 	// find out row ID
+								 	var row = $(this),
+								 		id = row.attr('id');
+							 		// first row does not have ID
+								 	if (id) {
+									 	// content is JSON code sent from server
+								 		var content = $(subgrid).jqGrid('getCell', id, 'outcome');
+										if (content && content.startsWith('[')) {
+											var outcomes = JSON.parse(content),
+												outcomeValues = {},
+												result = '';
+											// go through each JSON item
+											$.each(outcomes, function() {
+												// assign values 0..n to ordered value names
+												var editablePossibleValues = this.possibleValues.map(function(value, index){
+													return {
+														value : index,
+														text  : value
+													}
+												});
+												// add a marker for unsetting result
+												editablePossibleValues.unshift({
+													value : -1,
+													text  : '<fmt:message key="outcome.result.not.set"/>'
+												});
+												outcomeValues[this.mappingId] = editablePossibleValues;
+												// build HTML code for x-editable
+												result += '<span title="' + this.code + '">' + this.name + 
+														': <a href="#" class="outcome" mappingId="' + this.mappingId + '"></a></span><br />';
+											});
+											// set HTML to the cell
+											$(subgrid).jqGrid('setCell', id, 'outcome', result);
+
+											// enable editable for each outcome
+											$('.outcome', row).each(function() {
+												var editable = $(this),
+													mappingId = editable.attr('mappingId');
+												editable.editable({
+												    type: 'select',
+												    emptytext : '<fmt:message key="outcome.result.error"/>',
+												    pk : mappingId,
+												    // a trick to send extra param to the server
+												    name : userID,
+												    url : '<lams:LAMSURL/>outcome.do?method=outcomeSetResult',
+												    mode : 'inline',
+												    showbuttons : false,
+												    source : outcomeValues[mappingId],
+												    // sending -1 removes the result
+												    value : typeof this.value == 'undefined' ? -1 : this.value,
+												    success: function(response, newValue) {
+													    if (response != "OK"){
+														    // it will set the value to empty and display emptytext, i.e. "ERROR!"
+														    return {'newValue' : null}
+														}
+													}
+												});
+												// prevent onSelectCell jqGrid event from firing and focusing out from the cell
+												editable.parent().on('click','.editable-container', function(e) {
+													e.stopPropagation();
+												});
+											});
+										}
+							 		}
+								 });
 							 },
 							 subGrid : hasArchivedMarks,
 							 subGridRowExpanded: function(subgrid_id, row_id) {
 							    var subgrid_table_id = subgrid_id + "_t",
-						    		nameParts = subgrid_id.split("_"),
-						   	    	activityID = nameParts[3],
-						   	    	userID = nameParts[1];
+							   	    rowData = jQuery("#" + subgrid_id.substring(0, subgrid_id.lastIndexOf('_'))).getRowData(row_id),
+							   	    activityID = rowData["id"].split("_")[0];
 								jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 								jQuery("#"+subgrid_table_id).jqGrid({
 										 guiStyle: "bootstrap",
 										 iconSet: 'fontAwesome',
 										 autoencode:false,
+										 autowidth: true,
 									     datatype: "xml",
 									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
 										      + activityID + "&view=monUserView&userID=" + userID,
 									     height: "100%",
-									     autowidth:true,
+									     cmTemplate: { title: false },
 									     cellEdit:false,
 									     pager: false,
 									     colNames: [
@@ -338,14 +402,20 @@
 									     	"<fmt:message key="gradebook.columntitle.mark"/>"
 									     ],
 									     colModel: [
-									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
-											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-											{name:'timeTaken',index:'timeTaken', sortable:false, editable: false, width:80, align:"center"},
-										    {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
-										    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
-											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
-											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
-											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
+									       	{name:'id', index:'id',  sortable:false, editable: false ,width:140, align:"right"},
+											{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
+											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, title : true, align:"center",
+												cellattr: function(rowID, val, rawObject, cm, rdata) {
+													if (rdata.startDate != "-") {
+														return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+													}
+										    	}
+									    	},
+										    {name:'startDate',index:'startDate', width:0, hidden: true},
+										    {name:'finishDate',index:'finishDate', width:0, hidden: true},
+											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:0, hidden:true},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, align:"center" },
+											{name:'mark', index:'mark', sortable:false, editable: false, width:49, align:"center" }
 									     ],
 									     loadError: function(xhr,st,err) {
 									    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -357,8 +427,6 @@
 					},
 					gridComplete: function(){
 				   	 	initializePortraitPopover('<lams:LAMSURL/>');
-						// Load dates shown but hide straight away as all columns needed initially so that subgrid is displayed properly LDEV-4289
-						processLessonDateFields( lessonDatesHidden );
 					}
 				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 				jQuery("#userView").jqGrid('filterToolbar');
@@ -444,9 +512,13 @@
 						     	{name:'marksAvailable',index:'marksAvailable', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false, formatter:userNameFormatterActivity},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
-						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, search:false, width:80, align:"center"},
-							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:51, align:"center",
+									cellattr: function(rowID, val, rawObject, cm, rdata) {
+							    	    return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+							    	}
+						    	},
+							    {name:'startDate',index:'startDate', width:0, hidden: true},
+							    {name:'finishDate',index:'finishDate', width:0, hidden: true},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
 						     	{name:'portraitId', index:'portraitId', width:0, hidden: true},
@@ -602,7 +674,7 @@
 		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		        })
 
-		        	function userNameFormatter (cellvalue, options, rowObject) {
+		        function userNameFormatter (cellvalue, options, rowObject) {
 					return definePortraitPopover(rowObject[8].innerHTML, rowObject.id, cellvalue, cellvalue, true);
 				}
 
@@ -641,23 +713,6 @@
 		<c:set var="btnclass" value="btn btn-sm btn-default"/>
 	</c:otherwise>
 	</c:choose>
-		
-	<c:set var="tourDatesCode">
-		<div id="tour-dates">
- 		<div id="datesNotShown">
- 			<a class="${btnclass}" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates"/>" >
- 			<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
-			<fmt:message key="gradebook.monitor.show.dates" /></a>
-			</span>
-		</div>
-		<div id="datesShown" style="display:none">
-			<a class="${btnclass}" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates"/>" >
- 			<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
-			<fmt:message key="gradebook.monitor.hide.dates" /></a>
-			</span>
-		</div>
-		</div>
-	</c:set>
 		
 	<c:set var="lockLabelClass">${isInTabs?"lockLabel":""}</c:set>
 	<c:set var="padlockCode">
@@ -737,7 +792,6 @@
 		<div class="gbTopButtonsContainer pull-right">
 			${chartButtonCode}
 			${weightButtonCode}
-			${tourDatesCode}
 			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
 				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
 			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
@@ -788,7 +842,6 @@
 		<c:if test="${isInTabs}">
 	 		${chartButtonCode}
 	 		${weightButtonCode}
-			${tourDatesCode}
 		</c:if>
 		
 		</div> <!-- Closes buttons -->

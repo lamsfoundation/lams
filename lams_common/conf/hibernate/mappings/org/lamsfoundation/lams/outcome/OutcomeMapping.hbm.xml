@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+	<class name="org.lamsfoundation.lams.outcome.OutcomeMapping" table="lams_outcome_mapping">
+
+		<id name="mappingId" type="java.lang.Long" column="mapping_id">
+			<generator class="native" />
+		</id>
+		
+		<property name="lessonId" type="java.lang.Long" column="lesson_id" />
+		<property name="toolContentId" type="java.lang.Long" column="tool_content_id" />
+		<property name="itemId" type="java.lang.Long" column="item_id" />
+		
+		<!-- Associations -->
+		<many-to-one name="outcome" 
+			class="org.lamsfoundation.lams.outcome.Outcome"
+			not-null="true">
+			<column name="outcome_id" />
+		</many-to-one>
+	</class>
+</hibernate-mapping>

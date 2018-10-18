@@ -17,6 +17,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <lams:css/>
+<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

@@ -1,0 +1,19 @@
+/* Overwrite gliphicon class used by x-editable.js*/
+.glyphicon{
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-ok:before { 
+	content: "\f00c"; 
+}
+.glyphicon-remove:before { 
+	content: "\f00d"; 
+}
+/* Overwrite properties set in x-editable.css*/
+.editable-click, a.editable-click, a.editable-click:hover {
+    border-bottom: none;
+}

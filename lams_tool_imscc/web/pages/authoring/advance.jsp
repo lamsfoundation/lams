@@ -38,6 +38,8 @@
 
 </lams:SimplePanel>
 
+<lams:OutcomeAuthor toolContentId="${formBean.commonCartridge.contentId}" />
+
 <lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">
