@@ -768,8 +768,10 @@
 		/>
 	</target>
 	
-
-	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 10.1; do not run twice!">
+	
+	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 14.0.1; do not run twice!">
+		<fail message="This has not been implemented yet" />
+		
 		<delete includeemptydirs="true" verbose="true" failonerror="false">
 			<!-- Domain version of server. Standalone is used. -->
 			<fileset dir="${server.home}/domain/" />
