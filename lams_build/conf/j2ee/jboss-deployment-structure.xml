@@ -26,7 +26,7 @@
       <module name="org.apache.commons.io" export="true" />
       <module name="org.apache.commons.lang" export="true" />
       <module name="org.apache.commons.codec" export="true" />
-      <module name="org.apache.commons.pool" export="true" />
+     <!--  <module name="org.apache.commons.pool" export="true" />  WildFly 14 does not provide this library. It seems not neccessary anymore, though.-->
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.validator" export="true" />
       <module name="org.apache.httpcomponents" export="true" />
