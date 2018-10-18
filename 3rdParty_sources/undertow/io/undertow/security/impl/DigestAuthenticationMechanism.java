@@ -42,12 +42,13 @@ import io.undertow.util.AttachmentKey;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import io.undertow.util.HexConverter;
+import io.undertow.util.StatusCodes;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,8 @@ import java.util.Set;
  */
 public class DigestAuthenticationMechanism implements AuthenticationMechanism {
 
+    public static final AuthenticationMechanismFactory FACTORY = new Factory();
+
     private static final String DEFAULT_NAME = "DIGEST";
     private static final String DIGEST_PREFIX = DIGEST + " ";
     private static final int PREFIX_LENGTH = DIGEST_PREFIX.length();
@@ -73,7 +76,7 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
     private static final Set<DigestAuthorizationToken> MANDATORY_REQUEST_TOKENS;
 
     static {
-        Set<DigestAuthorizationToken> mandatoryTokens = new HashSet<>();
+        Set<DigestAuthorizationToken> mandatoryTokens = EnumSet.noneOf(DigestAuthorizationToken.class);
         mandatoryTokens.add(DigestAuthorizationToken.USERNAME);
         mandatoryTokens.add(DigestAuthorizationToken.REALM);
         mandatoryTokens.add(DigestAuthorizationToken.NONCE);
@@ -179,11 +182,11 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
         return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
     }
 
-    public AuthenticationMechanismOutcome handleDigestHeader(HttpServerExchange exchange, final SecurityContext securityContext) {
+    private AuthenticationMechanismOutcome handleDigestHeader(HttpServerExchange exchange, final SecurityContext securityContext) {
         DigestContext context = exchange.getAttachment(DigestContext.ATTACHMENT_KEY);
         Map<DigestAuthorizationToken, String> parsedHeader = context.getParsedHeader();
         // Step 1 - Verify the set of tokens received to ensure valid values.
-        Set<DigestAuthorizationToken> mandatoryTokens = new HashSet<>(MANDATORY_REQUEST_TOKENS);
+        Set<DigestAuthorizationToken> mandatoryTokens = EnumSet.copyOf(MANDATORY_REQUEST_TOKENS);
         if (!supportedAlgorithms.contains(DigestAlgorithm.MD5)) {
             // If we don't support MD5 then the client must choose an algorithm as we can not fall back to MD5.
             mandatoryTokens.add(DigestAuthorizationToken.ALGORITHM);
@@ -229,7 +232,31 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
             return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
         }
 
-        // TODO - Validate the URI
+        if(parsedHeader.containsKey(DigestAuthorizationToken.DIGEST_URI)) {
+            String uri = parsedHeader.get(DigestAuthorizationToken.DIGEST_URI);
+            String requestURI = exchange.getRequestURI();
+            if(!exchange.getQueryString().isEmpty()) {
+                requestURI = requestURI + "?" + exchange.getQueryString();
+            }
+            if(!uri.equals(requestURI)) {
+                //it is possible we were given an absolute URI
+                //we reconstruct the URI from the host header to make sure they match up
+                //I am not sure if this is overly strict, however I think it is better
+                //to be safe than sorry
+                requestURI = exchange.getRequestURL();
+                if(!exchange.getQueryString().isEmpty()) {
+                    requestURI = requestURI + "?" + exchange.getQueryString();
+                }
+                if(!uri.equals(requestURI)) {
+                    //just end the auth process
+                    exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                    exchange.endExchange();
+                    return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+                }
+            }
+        } else {
+            return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+        }
 
         if (parsedHeader.containsKey(DigestAuthorizationToken.OPAQUE)) {
             if (!OPAQUE_VALUE.equals(parsedHeader.get(DigestAuthorizationToken.OPAQUE))) {
@@ -621,14 +648,13 @@ public class DigestAuthenticationMechanism implements AuthenticationMechanism {
 
     public static final class Factory implements AuthenticationMechanismFactory {
 
-        private final IdentityManager identityManager;
+        @Deprecated
+        public Factory(IdentityManager identityManager) {}
 
-        public Factory(IdentityManager identityManager) {
-            this.identityManager = identityManager;
-        }
+        public Factory() {}
 
         @Override
-        public AuthenticationMechanism create(String mechanismName, FormParserFactory formParserFactory, Map<String, String> properties) {
+        public AuthenticationMechanism create(String mechanismName,IdentityManager identityManager, FormParserFactory formParserFactory, Map<String, String> properties) {
             return new DigestAuthenticationMechanism(properties.get(REALM), properties.get(CONTEXT_PATH), mechanismName, identityManager);
         }
     }

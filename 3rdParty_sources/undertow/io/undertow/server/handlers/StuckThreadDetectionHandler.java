@@ -22,6 +22,7 @@ import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.builder.HandlerBuilder;
+import io.undertow.util.WorkerUtils;
 import org.xnio.XnioExecutor;
 import org.xnio.XnioIoThread;
 
@@ -78,8 +79,7 @@ public class StuckThreadDetectionHandler implements HttpHandler {
     private final Runnable stuckThreadTask = new Runnable() {
         @Override
         public void run() {
-            timerKey = null;
-            long thresholdInMillis = threshold * 1000;
+            long thresholdInMillis = threshold * 1000L;
 
             // Check monitored threads, being careful that the request might have
             // completed by the time we examine it
@@ -102,7 +102,7 @@ public class StuckThreadDetectionHandler implements HttpHandler {
                 if(activeThreads.isEmpty()) {
                     timerKey = null;
                 } else {
-                    timerKey = ((XnioIoThread)Thread.currentThread()).executeAfter(stuckThreadTask, 1, TimeUnit.SECONDS);
+                    timerKey = WorkerUtils.executeAfter(((XnioIoThread)Thread.currentThread()), stuckThreadTask, 1, TimeUnit.SECONDS);
                 }
             }
         }

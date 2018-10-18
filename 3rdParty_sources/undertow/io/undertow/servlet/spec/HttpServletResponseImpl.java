@@ -20,6 +20,7 @@ package io.undertow.servlet.spec;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -40,15 +42,20 @@ import javax.servlet.http.HttpSession;
 
 import io.undertow.UndertowLogger;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.protocol.http.HttpAttachments;
 import io.undertow.servlet.UndertowServletMessages;
 import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.util.CanonicalPathUtils;
 import io.undertow.util.DateUtils;
+import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import io.undertow.util.Protocols;
 import io.undertow.util.RedirectBuilder;
 import io.undertow.util.StatusCodes;
+
+import static io.undertow.util.URLUtils.isAbsoluteUrl;
 
 
 /**
@@ -76,6 +83,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
     private boolean charsetSet = false; //if a content type has been set either implicitly or implicitly
     private String contentType;
     private String charset;
+    private Supplier<Map<String, String>> trailerSupplier;
 
     public HttpServletResponseImpl(final HttpServerExchange exchange, final ServletContextImpl servletContext) {
         this.exchange = exchange;
@@ -183,7 +191,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         resetBuffer();
         setStatus(StatusCodes.FOUND);
         String realPath;
-        if (location.contains("://")) {//absolute url
+        if (isAbsoluteUrl(location)) {//absolute url
             exchange.getResponseHeaders().put(Headers.LOCATION, location);
         } else {
             if (location.startsWith("/")) {
@@ -317,7 +325,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
     @Override
     public String getCharacterEncoding() {
         if (charset == null) {
-            return servletContext.getDeployment().getDeploymentInfo().getDefaultEncoding();
+            return servletContext.getDeployment().getDefaultResponseCharset().name();
         }
         return charset;
     }
@@ -386,11 +394,7 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     @Override
     public void setContentLength(final int len) {
-        if (insideInclude || responseStarted()) {
-            return;
-        }
-        exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, Integer.toString(len));
-        this.contentLength = (long) len;
+        setContentLengthLong((long) len);
     }
 
     @Override
@@ -398,7 +402,11 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
         if (insideInclude || responseStarted()) {
             return;
         }
-        exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, Long.toString(len));
+        if(len >= 0) {
+            exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, Long.toString(len));
+        } else {
+            exchange.getResponseHeaders().remove(Headers.CONTENT_LENGTH);
+        }
         this.contentLength = len;
     }
 
@@ -494,7 +502,13 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
             servletOutputStream.resetBuffer();
         }
         if (writer != null) {
-            writer = new PrintWriter(servletOutputStream, false);
+            final ServletPrintWriter servletPrintWriter;
+            try {
+                servletPrintWriter = new ServletPrintWriter(servletOutputStream, getCharacterEncoding());
+            writer = ServletPrintWriterDelegate.newInstance(servletPrintWriter);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e); //should never happen
+            }
         }
     }
 
@@ -761,5 +775,33 @@ public final class HttpServletResponseImpl implements HttpServletResponse {
 
     public boolean isTreatAsCommitted() {
         return treatAsCommitted;
+    }
+
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        if(exchange.isResponseStarted()) {
+            throw UndertowServletMessages.MESSAGES.responseAlreadyCommited();
+        }
+        if(exchange.getProtocol() == Protocols.HTTP_1_0) {
+            throw UndertowServletMessages.MESSAGES.trailersNotSupported("HTTP/1.0 request");
+        } else if(exchange.getProtocol() == Protocols.HTTP_1_1) {
+            if(exchange.getResponseHeaders().contains(Headers.CONTENT_LENGTH)) {
+                throw UndertowServletMessages.MESSAGES.trailersNotSupported("not chunked");
+            }
+        }
+        this.trailerSupplier = supplier;
+        exchange.putAttachment(HttpAttachments.RESPONSE_TRAILER_SUPPLIER, () -> {
+            HeaderMap trailers = new HeaderMap();
+            Map<String, String> map = supplier.get();
+            for(Map.Entry<String, String> e : map.entrySet()) {
+                trailers.put(new HttpString(e.getKey()), e.getValue());
+            }
+            return trailers;
+        });
+    }
+
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return trailerSupplier;
     }
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.databind.util.Converter;
 
 /**
@@ -37,6 +38,9 @@ public class StdDelegatingDeserializer<T>
 {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Converter that was used for creating {@link #_delegateDeserializer}.
+     */
     protected final Converter<Object,T> _converter;
 
     /**
@@ -92,9 +96,7 @@ public class StdDelegatingDeserializer<T>
     protected StdDelegatingDeserializer<T> withDelegate(Converter<Object,T> converter,
             JavaType delegateType, JsonDeserializer<?> delegateDeserializer)
     {
-        if (getClass() != StdDelegatingDeserializer.class) {
-            throw new IllegalStateException("Sub-class "+getClass().getName()+" must override 'withDelegate'");
-        }
+        ClassUtil.verifyMustOverride(StdDelegatingDeserializer.class, this, "withDelegate");
         return new StdDelegatingDeserializer<T>(converter, delegateType, delegateDeserializer);
     }
 
@@ -104,6 +106,8 @@ public class StdDelegatingDeserializer<T>
     /**********************************************************
      */
 
+    // Note: unlikely to get called since most likely instances explicitly constructed;
+    // if so, caller must ensure delegating deserializer is properly resolve()d.
     @Override
     public void resolve(DeserializationContext ctxt)
         throws JsonMappingException
@@ -117,7 +121,7 @@ public class StdDelegatingDeserializer<T>
     public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
         throws JsonMappingException
     {
-        // First: if already got serializer to delegate to, contextualize it:
+        // First: if already got deserializer to delegate to, contextualize it:
         if (_delegateDeserializer != null) {
             JsonDeserializer<?> deser = ctxt.handleSecondaryContextualization(_delegateDeserializer,
                     property, _delegateType);
@@ -146,6 +150,11 @@ public class StdDelegatingDeserializer<T>
     @Override
     public Class<?> handledType() {
         return _delegateDeserializer.handledType();
+    }
+
+    @Override // since 2.9
+    public Boolean supportsUpdate(DeserializationConfig config) {
+        return _delegateDeserializer.supportsUpdate(config);
     }
 
     /*
@@ -211,7 +220,7 @@ public class StdDelegatingDeserializer<T>
         throws IOException
     {
         throw new UnsupportedOperationException(String.format
-                ("Can not update object of type %s (using deserializer for type %s)"
+                ("Cannot update object of type %s (using deserializer for type %s)"
                         +intoValue.getClass().getName(), _delegateType));
     }
     

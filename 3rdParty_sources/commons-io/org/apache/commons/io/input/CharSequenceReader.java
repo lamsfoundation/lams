@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import java.io.Reader;
 import java.io.Serializable;
 
@@ -25,11 +27,12 @@ import java.io.Serializable;
  * <p>
  * <strong>Note:</strong> Supports {@link #mark(int)} and {@link #reset()}.
  *
- *
+ * @version $Id: CharSequenceReader.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 public class CharSequenceReader extends Reader implements Serializable {
 
+    private static final long serialVersionUID = 3724187752191401220L;
     private final CharSequence charSequence;
     private int idx;
     private int mark;
@@ -39,7 +42,7 @@ public class CharSequenceReader extends Reader implements Serializable {
      *
      * @param charSequence The character sequence, may be {@code null}
      */
-    public CharSequenceReader(CharSequence charSequence) {
+    public CharSequenceReader(final CharSequence charSequence) {
         this.charSequence = charSequence != null ? charSequence : "";
     }
 
@@ -58,7 +61,7 @@ public class CharSequenceReader extends Reader implements Serializable {
      * @param readAheadLimit ignored
      */
     @Override
-    public void mark(int readAheadLimit) {
+    public void mark(final int readAheadLimit) {
         mark = idx;
     }
 
@@ -81,7 +84,7 @@ public class CharSequenceReader extends Reader implements Serializable {
     @Override
     public int read() {
         if (idx >= charSequence.length()) {
-            return -1;
+            return EOF;
         } else {
             return charSequence.charAt(idx++);
         }
@@ -97,9 +100,9 @@ public class CharSequenceReader extends Reader implements Serializable {
      * no more
      */
     @Override
-    public int read(char[] array, int offset, int length) {
+    public int read(final char[] array, final int offset, final int length) {
         if (idx >= charSequence.length()) {
-            return -1;
+            return EOF;
         }
         if (array == null) {
             throw new NullPointerException("Character array is missing");
@@ -110,8 +113,8 @@ public class CharSequenceReader extends Reader implements Serializable {
         }
         int count = 0;
         for (int i = 0; i < length; i++) {
-            int c = read();
-            if (c == -1) {
+            final int c = read();
+            if (c == EOF) {
                 return count;
             }
             array[offset + i] = (char)c;
@@ -136,16 +139,16 @@ public class CharSequenceReader extends Reader implements Serializable {
      * @return The actual number of characters skipped
      */
     @Override
-    public long skip(long n) {
+    public long skip(final long n) {
         if (n < 0) {
             throw new IllegalArgumentException(
                     "Number of characters to skip is less than zero: " + n);
         }
         if (idx >= charSequence.length()) {
-            return -1;
+            return EOF;
         }
-        int dest = (int)Math.min(charSequence.length(), idx + n);
-        int count = dest - idx;
+        final int dest = (int)Math.min(charSequence.length(), idx + n);
+        final int count = dest - idx;
         idx = dest;
         return count;
     }

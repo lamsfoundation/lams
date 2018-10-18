@@ -44,7 +44,7 @@ public class JsonWriteContext extends JsonStreamContext
      */
 
     /**
-     * Name of the field of which value is to be parsed; only
+     * Name of the field of which value is to be written; only
      * used for OBJECT contexts
      */
     protected String _currentName;
@@ -55,8 +55,8 @@ public class JsonWriteContext extends JsonStreamContext
     protected Object _currentValue;
 
     /**
-     * Marker used to indicate that we just received a name, and
-     * now expect a value
+     * Marker used to indicate that we just wrote a name, and
+     * now expect a value to write
      */
     protected boolean _gotName;
 
@@ -135,6 +135,8 @@ public class JsonWriteContext extends JsonStreamContext
 
     @Override public final JsonWriteContext getParent() { return _parent; }
     @Override public final String getCurrentName() { return _currentName; }
+    // @since 2.9
+    @Override public boolean hasCurrentName() { return _currentName != null; }
 
     /**
      * Method that can be used to both clear the accumulated references
@@ -162,7 +164,7 @@ public class JsonWriteContext extends JsonStreamContext
      * @return Index of the field entry (0-based)
      */
     public int writeFieldName(String name) throws JsonProcessingException {
-        if (_gotName) {
+        if ((_type != TYPE_OBJECT) || _gotName) {
             return STATUS_EXPECT_VALUE;
         }
         _gotName = true;
@@ -201,41 +203,5 @@ public class JsonWriteContext extends JsonStreamContext
         // No commas within root context, but need space
         ++_index;
         return (_index == 0) ? STATUS_OK_AS_IS : STATUS_OK_AFTER_SPACE;
-    }
-
-    // // // Internally used abstract methods
-
-    protected void appendDesc(StringBuilder sb) {
-        if (_type == TYPE_OBJECT) {
-            sb.append('{');
-            if (_currentName != null) {
-                sb.append('"');
-                // !!! TODO: Name chars should be escaped?
-                sb.append(_currentName);
-                sb.append('"');
-            } else {
-                sb.append('?');
-            }
-            sb.append('}');
-        } else if (_type == TYPE_ARRAY) {
-            sb.append('[');
-            sb.append(getCurrentIndex());
-            sb.append(']');
-        } else {
-            // nah, ROOT:
-            sb.append("/");
-        }
-    }
-
-    // // // Overridden standard methods
-
-    /**
-     * Overridden to provide developer writeable "JsonPath" representation
-     * of the context.
-     */
-    @Override public String toString() {
-        StringBuilder sb = new StringBuilder(64);
-        appendDesc(sb);
-        return sb.toString();
     }
 }

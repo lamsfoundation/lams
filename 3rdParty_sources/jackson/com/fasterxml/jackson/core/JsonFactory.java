@@ -12,9 +12,11 @@ import com.fasterxml.jackson.core.format.InputAccessor;
 import com.fasterxml.jackson.core.format.MatchStrength;
 import com.fasterxml.jackson.core.io.*;
 import com.fasterxml.jackson.core.json.*;
+import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
 import com.fasterxml.jackson.core.sym.ByteQuadsCanonicalizer;
 import com.fasterxml.jackson.core.sym.CharsToNameCanonicalizer;
 import com.fasterxml.jackson.core.util.BufferRecycler;
+import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 
 /**
@@ -111,18 +113,20 @@ public class JsonFactory
          * {@link ThreadLocal} (see
          * <a href="https://github.com/FasterXML/jackson-core/issues/189">Issue #189</a>
          * for a possible case)
+         *<p>
+         * This setting is enabled by default.
          *
          * @since 2.6
          */
         USE_THREAD_LOCAL_FOR_BUFFER_RECYCLING(true)
-        
+
         ;
 
         /**
          * Whether feature is enabled or disabled by default.
          */
         private final boolean _defaultState;
-        
+
         /**
          * Method that calculates bit set (flags) of all features that
          * are enabled by default.
@@ -178,14 +182,6 @@ public class JsonFactory
     /* Buffer, symbol table management
     /**********************************************************
      */
-
-    /**
-     * This <code>ThreadLocal</code> contains a {@link java.lang.ref.SoftReference}
-     * to a {@link BufferRecycler} used to provide a low-cost
-     * buffer recycling between reader and writer instances.
-     */
-    final protected static ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef
-        = new ThreadLocal<SoftReference<BufferRecycler>>();
 
     /**
      * Each factory comes equipped with a shared root symbol table.
@@ -405,6 +401,20 @@ public class JsonFactory
     public boolean canUseCharArrays() { return true; }
 
     /**
+     * Introspection method that can be used to check whether this
+     * factory can create non-blocking parsers: parsers that do not
+     * use blocking I/O abstractions but instead use a
+     * {@link com.fasterxml.jackson.core.async.NonBlockingInputFeeder}.
+     *
+     * @since 2.9
+     */
+    public boolean canParseAsync() {
+        // 31-May-2017, tatu: Jackson 2.9 does support async parsing for JSON,
+        //   but not all other formats, so need to do this:
+        return _isJSONFactory();
+    }
+
+    /**
      * Method for accessing kind of {@link FormatFeature} that a parser
      * {@link JsonParser} produced by this factory would accept, if any;
      * <code>null</code> returned if none.
@@ -442,6 +452,9 @@ public class JsonFactory
      * @since 2.1
      */
     public boolean canUseSchema(FormatSchema schema) {
+        if (schema == null){
+            return false;
+        }
         String ourFormat = getFormatName();
         return (ourFormat != null) && ourFormat.equals(schema.getSchemaType());
     }
@@ -723,7 +736,7 @@ public class JsonFactory
 
     /*
     /**********************************************************
-    /* Parser factories (new ones, as per [Issue-25])
+    /* Parser factories, traditional (blocking) I/O sources
     /**********************************************************
      */
 
@@ -875,7 +888,7 @@ public class JsonFactory
     public JsonParser createParser(String content) throws IOException, JsonParseException {
         final int strLen = content.length();
         // Actually, let's use this for medium-sized content, up to 64kB chunk (32kb char)
-        if (_inputDecorator != null || strLen > 0x8000 || !canUseCharArrays()) {
+        if ((_inputDecorator != null) || (strLen > 0x8000) || !canUseCharArrays()) {
             // easier to just wrap in a Reader than extend InputDecorator; or, if content
             // is too long for us to copy it over
             return createParser(new StringReader(content));
@@ -908,6 +921,48 @@ public class JsonFactory
         return _createParser(content, offset, len, _createContext(content, true),
                 // important: buffer is NOT recyclable, as it's from caller
                 false);
+    }
+
+    /**
+     * Optional method for constructing parser for reading contents from specified {@link DataInput}
+     * instance.
+     *<p>
+     * If this factory does not support {@link DataInput} as source,
+     * will throw {@link UnsupportedOperationException}
+     *
+     * @since 2.8
+     */
+    public JsonParser createParser(DataInput in) throws IOException {
+        IOContext ctxt = _createContext(in, false);
+        return _createParser(_decorate(in, ctxt), ctxt);
+    }
+
+    /*
+    /**********************************************************
+    /* Parser factories, non-blocking (async) sources
+    /**********************************************************
+     */
+
+    /**
+     * Optional method for constructing parser for non-blocking parsing
+     * via {@link com.fasterxml.jackson.core.async.ByteArrayFeeder}
+     * interface (accessed using {@link JsonParser#getNonBlockingInputFeeder()}
+     * from constructed instance).
+     *<p>
+     * If this factory does not support non-blocking parsing (either at all,
+     * or from byte array),
+     * will throw {@link UnsupportedOperationException}
+     *
+     * @since 2.9
+     */
+    public JsonParser createNonBlockingByteArrayParser() throws IOException
+    {
+        // 17-May-2017, tatu: Need to take care not to accidentally create JSON parser
+        //   for non-JSON input:
+        _requireJSONFactory("Non-blocking source not (yet?) support for this format (%s)");
+        IOContext ctxt = _createContext(null, false);
+        ByteQuadsCanonicalizer can = _byteSymbolCanonicalizer.makeChild(_factoryFeatures);
+        return new NonBlockingJsonParser(ctxt, _parserFeatures, can);
     }
 
     /*
@@ -1148,6 +1203,28 @@ public class JsonFactory
         return _createGenerator(_decorate(w, ctxt), ctxt);
     }    
 
+    /**
+     * Method for constructing generator for writing content using specified
+     * {@link DataOutput} instance.
+     * 
+     * @since 2.8
+     */
+    public JsonGenerator createGenerator(DataOutput out, JsonEncoding enc) throws IOException {
+        return createGenerator(_createDataOutputWrapper(out), enc);
+    }
+
+    /**
+     * Convenience method for constructing generator that uses default
+     * encoding of the format (UTF-8 for JSON and most other data formats).
+     *<p>
+     * Note: there are formats that use fixed encoding (like most binary data formats).
+     * 
+     * @since 2.8
+     */
+    public JsonGenerator createGenerator(DataOutput out) throws IOException {
+        return createGenerator(_createDataOutputWrapper(out), JsonEncoding.UTF8);
+    }
+
     /*
     /**********************************************************
     /* Generator factories, old (pre-2.2)
@@ -1286,6 +1363,24 @@ public class JsonFactory
                 _objectCodec, _byteSymbolCanonicalizer, _rootCharSymbols, _factoryFeatures);
     }
 
+    /**
+     * Optional factory method, expected to be overridden
+     *
+     * @since 2.8
+     */
+    protected JsonParser _createParser(DataInput input, IOContext ctxt) throws IOException
+    {
+        // 13-May-2016, tatu: Need to take care not to accidentally create JSON parser for
+        //   non-JSON input.
+        _requireJSONFactory("InputData source not (yet?) support for this format (%s)");
+        // Also: while we can't do full bootstrapping (due to read-ahead limitations), should
+        // at least handle possible UTF-8 BOM
+        int firstByte = ByteSourceJsonBootstrapper.skipUTF8BOM(input);
+        ByteQuadsCanonicalizer can = _byteSymbolCanonicalizer.makeChild(_factoryFeatures);
+        return new UTF8DataInputJsonParser(ctxt, _parserFeatures, input,
+                _objectCodec, can, firstByte);
+    }
+
     /*
     /**********************************************************
     /* Factory methods used by factory for creating generator instances,
@@ -1368,7 +1463,7 @@ public class JsonFactory
         }
         return in;
     }
-    
+
     /**
      * @since 2.4
      */
@@ -1382,6 +1477,19 @@ public class JsonFactory
         return in;
     }
 
+    /**
+     * @since 2.8
+     */
+    protected final DataInput _decorate(DataInput in, IOContext ctxt) throws IOException {
+        if (_inputDecorator != null) {
+            DataInput in2 = _inputDecorator.decorate(ctxt, in);
+            if (in2 != null) {
+                return in2;
+            }
+        }
+        return in;
+    }
+    
     /**
      * @since 2.4
      */
@@ -1422,24 +1530,14 @@ public class JsonFactory
      */
     public BufferRecycler _getBufferRecycler()
     {
-        BufferRecycler br;
-
         /* 23-Apr-2015, tatu: Let's allow disabling of buffer recycling
          *   scheme, for cases where it is considered harmful (possibly
          *   on Android, for example)
          */
-        if (isEnabled(Feature.USE_THREAD_LOCAL_FOR_BUFFER_RECYCLING)) {
-            SoftReference<BufferRecycler> ref = _recyclerRef.get();
-            br = (ref == null) ? null : ref.get();
-    
-            if (br == null) {
-                br = new BufferRecycler();
-                _recyclerRef.set(new SoftReference<BufferRecycler>(br));
-            }
-        } else {
-            br = new BufferRecycler();
+        if (Feature.USE_THREAD_LOCAL_FOR_BUFFER_RECYCLING.enabledIn(_factoryFeatures)) {
+            return BufferRecyclers.getBufferRecycler();
         }
-        return br;
+        return new BufferRecycler();
     }
 
     /**
@@ -1448,6 +1546,13 @@ public class JsonFactory
      */
     protected IOContext _createContext(Object srcRef, boolean resourceManaged) {
         return new IOContext(_getBufferRecycler(), srcRef, resourceManaged);
+    }
+
+    /**
+     * @since 2.8
+     */
+    protected OutputStream _createDataOutputWrapper(DataOutput out) {
+        return new DataOutputAsStream(out);
     }
 
     /**
@@ -1465,7 +1570,7 @@ public class JsonFactory
              */
             String host = url.getHost();
             if (host == null || host.length() == 0) {
-                // [Issue#48]: Let's try to avoid probs with URL encoded stuff
+                // [core#48]: Let's try to avoid probs with URL encoded stuff
                 String path = url.getPath();
                 if (path.indexOf('%') < 0) {
                     return new FileInputStream(url.getPath());
@@ -1475,5 +1580,35 @@ public class JsonFactory
             }
         }
         return url.openStream();
+    }
+
+    /*
+    /**********************************************************
+    /* Internal helper methods
+    /**********************************************************
+     */
+
+    /**
+     * Helper method called to work around the problem of this class both defining
+     * general API for constructing parsers+generators AND implementing the API
+     * for JSON handling. Problem here is that when adding new functionality
+     * via factory methods, it is not possible to leave these methods abstract
+     * (because we are implementing them for JSON); but there is risk that
+     * sub-classes do not override them all (plus older version can not implement).
+     * So a work-around is to add a check to ensure that factory is still one
+     * used for JSON; and if not, make base implementation of a factory method fail.
+     *
+     * @since 2.9
+     */
+    private final void _requireJSONFactory(String msg) {
+        if (!_isJSONFactory()) {
+            throw new UnsupportedOperationException(String.format(msg, getFormatName()));
+        }
+    }
+
+    private final boolean _isJSONFactory() {
+        // NOTE: since we only really care about whether this is standard JSON-backed factory,
+        // or its sub-class / delegated to one, no need to check for equality, identity is enough
+        return getFormatName() == FORMAT_NAME_JSON;
     }
 }

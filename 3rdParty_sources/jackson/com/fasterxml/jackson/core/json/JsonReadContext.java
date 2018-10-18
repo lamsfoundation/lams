@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.core.json;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.io.CharTypes;
 
 /**
  * Extension of {@link JsonStreamContext}, which implements
@@ -77,8 +76,8 @@ public final class JsonReadContext extends JsonStreamContext
     }
 
     /*
-    public void trackDups(JsonParser jp) {
-        _dups = DupDetector.rootDetector(jp);
+    public void trackDups(JsonParser p) {
+        _dups = DupDetector.rootDetector(p);
     }
     */
 
@@ -96,7 +95,7 @@ public final class JsonReadContext extends JsonStreamContext
     public void setCurrentValue(Object v) {
         _currentValue = v;
     }
-    
+
     /*
     /**********************************************************
     /* Factory methods
@@ -110,7 +109,7 @@ public final class JsonReadContext extends JsonStreamContext
     public static JsonReadContext createRootContext(DupDetector dups) {
         return new JsonReadContext(null, dups, TYPE_ROOT, 1, 0);
     }
-    
+
     public JsonReadContext createChildArrayContext(int lineNr, int colNr) {
         JsonReadContext ctxt = _child;
         if (ctxt == null) {
@@ -135,12 +134,29 @@ public final class JsonReadContext extends JsonStreamContext
 
     /*
     /**********************************************************
-    /* Abstract method implementation
+    /* Abstract method implementations, overrides
     /**********************************************************
      */
 
     @Override public String getCurrentName() { return _currentName; }
+
+    // @since 2.9
+    @Override public boolean hasCurrentName() { return _currentName != null; }
+
     @Override public JsonReadContext getParent() { return _parent; }
+
+    @Override
+    public JsonLocation getStartLocation(Object srcRef) {
+        // We don't keep track of offsets at this level (only reader does)
+        long totalChars = -1L;
+        return new JsonLocation(srcRef, totalChars, _lineNr, _columnNr);
+    }
+
+    /*
+    /**********************************************************
+    /* Extended API
+    /**********************************************************
+     */
 
     /**
      * Method that can be used to both clear the accumulated references
@@ -156,22 +172,6 @@ public final class JsonReadContext extends JsonStreamContext
         _currentValue = null;
         // could also clear the current name, but seems cheap enough to leave?
         return _parent;
-    }
-
-    /*
-    /**********************************************************
-    /* Extended API
-    /**********************************************************
-     */
-
-    /**
-     * @return Location pointing to the point where the context
-     *   start marker was found
-     */
-    public JsonLocation getStartLocation(Object srcRef) {
-        // We don't keep track of offsets at this level (only reader does)
-        long totalChars = -1L;
-        return new JsonLocation(srcRef, totalChars, _lineNr, _columnNr);
     }
 
     public DupDetector getDupDetector() {
@@ -201,45 +201,8 @@ public final class JsonReadContext extends JsonStreamContext
     private void _checkDup(DupDetector dd, String name) throws JsonProcessingException {
         if (dd.isDup(name)) {
             Object src = dd.getSource();
-            throw new JsonParseException(((src instanceof JsonGenerator) ? ((JsonParser) src) : null),
+            throw new JsonParseException(((src instanceof JsonParser) ? ((JsonParser) src) : null),
                     "Duplicate field '"+name+"'");
         }
-    }
-
-    /*
-    /**********************************************************
-    /* Overridden standard methods
-    /**********************************************************
-     */
-
-    /**
-     * Overridden to provide developer readable "JsonPath" representation
-     * of the context.
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(64);
-        switch (_type) {
-        case TYPE_ROOT:
-            sb.append("/");
-            break;
-        case TYPE_ARRAY:
-            sb.append('[');
-            sb.append(getCurrentIndex());
-            sb.append(']');
-            break;
-        case TYPE_OBJECT:
-            sb.append('{');
-            if (_currentName != null) {
-                sb.append('"');
-                CharTypes.appendQuoted(sb, _currentName);
-                sb.append('"');
-            } else {
-                sb.append('?');
-            }
-            sb.append('}');
-            break;
-        }
-        return sb.toString();
     }
 }

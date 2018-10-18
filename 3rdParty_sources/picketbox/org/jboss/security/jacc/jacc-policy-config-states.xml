@@ -1,0 +1,29 @@
+<?xml version='1.0'?>
+<state-machine description="JACC PolicyConfiguration States">
+   <state name="open">
+      <transition name="inService" target="open" />
+      <transition name="getContextID" target="open" />
+      <transition name="getPolicyConfiguration" target="open" />
+      <transition name="addToRole" target="open" />
+      <transition name="removeRole" target="open" />
+      <transition name="addToExcludedPolicy" target="open" />
+      <transition name="removeExcludedPolicy" target="open" />
+      <transition name="addToUncheckedPolicy" target="open" />
+      <transition name="removeUncheckedPolicy" target="open" />
+      <transition name="linkConfiguration" target="open" />
+      <transition name="commit" target="inService" />
+      <transition name="delete" target="deleted" />
+   </state>
+   <state name="inService">
+      <transition name="getPolicyConfiguration" target="open" />
+      <transition name="getContextID" target="inService" />
+      <transition name="inService" target="inService" />
+      <transition name="delete" target="deleted" />
+   </state>
+   <state name="deleted" isStartState="true">
+      <transition name="getPolicyConfiguration" target="open" />
+      <transition name="delete" target="deleted" />      
+      <transition name="inService" target="deleted" />
+      <transition name="getContextID" target="deleted" />
+   </state>
+</state-machine>

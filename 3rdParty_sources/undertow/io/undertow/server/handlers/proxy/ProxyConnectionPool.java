@@ -28,6 +28,7 @@ import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.CopyOnWriteMap;
 import io.undertow.util.Headers;
+import io.undertow.util.WorkerUtils;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
@@ -41,7 +42,9 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -159,7 +162,12 @@ public class ProxyConnectionPool implements Closeable {
         for (HostThreadData data : hostThreadData.values()) {
             final ConnectionHolder holder = data.availableConnections.poll();
             if (holder != null) {
-                IoUtils.safeClose(holder.clientConnection);
+                holder.clientConnection.getIoThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        IoUtils.safeClose(holder.clientConnection);
+                    }
+                });
             }
         }
     }
@@ -228,7 +236,7 @@ public class ProxyConnectionPool implements Closeable {
                     connectionHolder.timeout = currentTime + timeToLive;
                     if(hostData.availableConnections.size() > coreCachedConnections) {
                         if (hostData.nextTimeout <= 0) {
-                            hostData.timeoutKey = connection.getIoThread().executeAfter(hostData.timeoutTask, timeToLive, TimeUnit.MILLISECONDS);
+                            hostData.timeoutKey = WorkerUtils.executeAfter(connection.getIoThread(), hostData.timeoutTask, timeToLive, TimeUnit.MILLISECONDS);
                             hostData.nextTimeout = connectionHolder.timeout;
                         }
                     }
@@ -312,16 +320,21 @@ public class ProxyConnectionPool implements Closeable {
     }
 
     private void connectionReady(final ConnectionHolder result, final ProxyCallback<ProxyConnection> callback, final HttpServerExchange exchange, final boolean exclusive) {
-        exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
-            @Override
-            public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
-                if (!exclusive) {
-                    returnConnection(result);
+        try {
+            exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
+                @Override
+                public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
+                    if (!exclusive) {
+                        returnConnection(result);
+                    }
+                    nextListener.proceed();
                 }
-                nextListener.proceed();
-            }
-        });
-
+            });
+        } catch (Exception e) {
+            returnConnection(result);
+            callback.failed(exchange);
+            return;
+        }
         callback.completed(exchange, new ProxyConnection(result.clientConnection, uri.getPath() == null ? "/" : uri.getPath()));
     }
 
@@ -354,7 +367,7 @@ public class ProxyConnectionPool implements Closeable {
         final int retry = connectionPoolManager.getProblemServerRetry();
         // only schedule a retry task if the node is not available
         if (retry > 0 && !connectionPoolManager.isAvailable()) {
-            exchange.getIoThread().executeAfter(new Runnable() {
+            WorkerUtils.executeAfter(exchange.getIoThread(), new Runnable() {
                 @Override
                 public void run() {
                     if (closed) {
@@ -406,7 +419,7 @@ public class ProxyConnectionPool implements Closeable {
         int idleConnections = data.availableConnections.size();
         for (;;) {
             ConnectionHolder holder;
-            if (idleConnections > 0 && idleConnections >= coreCachedConnections && (holder = data.availableConnections.peek()) != null) {
+            if (idleConnections > 0 && idleConnections > coreCachedConnections && (holder = data.availableConnections.peek()) != null) {
                 if (!holder.clientConnection.isOpen()) {
                     // Already closed connections decrease the available connections
                     idleConnections--;
@@ -423,7 +436,7 @@ public class ProxyConnectionPool implements Closeable {
                     // Schedule a timeout task
                     final long remaining = holder.timeout - currentTime + 1;
                     data.nextTimeout = holder.timeout;
-                    data.timeoutKey = holder.clientConnection.getIoThread().executeAfter(data.timeoutTask, remaining, TimeUnit.MILLISECONDS);
+                    data.timeoutKey = WorkerUtils.executeAfter(holder.clientConnection.getIoThread(), data.timeoutTask, remaining, TimeUnit.MILLISECONDS);
                     return;
                 }
             } else {
@@ -522,11 +535,38 @@ public class ProxyConnectionPool implements Closeable {
             if (timeout > 0) {
                 long time = System.currentTimeMillis();
                 holder = new CallbackHolder(proxyTarget, callback, exchange, time + timeUnit.toMillis(timeout));
-                holder.setTimeoutKey(exchange.getIoThread().executeAfter(holder, timeout, timeUnit));
+                holder.setTimeoutKey(WorkerUtils.executeAfter(exchange.getIoThread(), holder, timeout, timeUnit));
             } else {
                 holder = new CallbackHolder(proxyTarget, callback, exchange, -1);
             }
             data.awaitingConnections.add(holder);
+        }
+    }
+
+    /**
+     * Should only be used for tests.
+     *
+     */
+    void closeCurrentConnections() {
+        final CountDownLatch latch = new CountDownLatch(hostThreadData.size());
+        for(final Map.Entry<XnioIoThread, HostThreadData> data : hostThreadData.entrySet()) {
+            data.getKey().execute(new Runnable() {
+                @Override
+                public void run() {
+                    ConnectionHolder d = data.getValue().availableConnections.poll();
+                    while (d != null) {
+                        IoUtils.safeClose(d.clientConnection);
+                        d = data.getValue().availableConnections.poll();
+                    }
+                    data.getValue().connections = 0;
+                    latch.countDown();
+                }
+            });
+        }
+        try {
+            latch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -592,7 +632,7 @@ public class ProxyConnectionPool implements Closeable {
         }
 
         private boolean isCancelled() {
-            return cancelled;
+            return cancelled || exchange.isResponseStarted();
         }
 
         private void setTimeoutKey(XnioExecutor.Key timeoutKey) {

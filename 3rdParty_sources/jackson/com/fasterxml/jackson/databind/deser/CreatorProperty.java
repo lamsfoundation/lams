@@ -4,18 +4,21 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.util.Annotations;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * This concrete sub-class implements property that is passed
  * via Creator (constructor or static factory method).
  * It is not a full-featured implementation in that its set method
- * should never be called -- instead, value must separately passed.
+ * should usually not be called for primary mutation -- instead, value must separately passed --
+ * but some aspects are still needed (specifically, injection).
  *<p>
  * Note on injectable values: unlike with other mutators, where
  * deserializer and injecting are separate, here we treat the two as related
@@ -41,12 +44,7 @@ public class CreatorProperty
     protected final Object _injectableValueId;
 
     /**
-     * @since 2.1
-     */
-    protected final int _creatorIndex;
-
-    /**
-     * In special cases, when implementing "updateValue", we can not use
+     * In special cases, when implementing "updateValue", we cannot use
      * constructors or factory methods, but have to fall back on using a
      * setter (or mutable field property). If so, this refers to that fallback
      * accessor.
@@ -57,6 +55,22 @@ public class CreatorProperty
      * @since 2.3
      */
     protected SettableBeanProperty _fallbackSetter;
+
+    /**
+     * @since 2.1
+     */
+    protected final int _creatorIndex;
+
+    /**
+     * Marker flag that may have to be set during construction, to indicate that
+     * although property may have been constructed and added as a placeholder,
+     * it represents something that should be ignored during deserialization.
+     * This mostly concerns Creator properties which may not be easily deleted
+     * during processing.
+     *
+     * @since 2.9.4
+     */
+    protected boolean _ignorable;
 
     /**
      * @param name Name of the logical property
@@ -91,52 +105,88 @@ public class CreatorProperty
     protected CreatorProperty(CreatorProperty src, PropertyName newName) {
         super(src, newName);
         _annotated = src._annotated;
-        _creatorIndex = src._creatorIndex;
         _injectableValueId = src._injectableValueId;
         _fallbackSetter = src._fallbackSetter;
+        _creatorIndex = src._creatorIndex;
+        _ignorable = src._ignorable;
     }
 
-    protected CreatorProperty(CreatorProperty src, JsonDeserializer<?> deser) {
-        super(src, deser);
+    protected CreatorProperty(CreatorProperty src, JsonDeserializer<?> deser,
+            NullValueProvider nva) {
+        super(src, deser, nva);
         _annotated = src._annotated;
-        _creatorIndex = src._creatorIndex;
         _injectableValueId = src._injectableValueId;
         _fallbackSetter = src._fallbackSetter;
+        _creatorIndex = src._creatorIndex;
+        _ignorable = src._ignorable;
     }
 
     @Override
-    public CreatorProperty withName(PropertyName newName) {
+    public SettableBeanProperty withName(PropertyName newName) {
         return new CreatorProperty(this, newName);
     }
     
     @Override
-    public CreatorProperty withValueDeserializer(JsonDeserializer<?> deser) {
-        return new CreatorProperty(this, deser);
+    public SettableBeanProperty withValueDeserializer(JsonDeserializer<?> deser) {
+        if (_valueDeserializer == deser) {
+            return this;
+        }
+        return new CreatorProperty(this, deser, _nullProvider);
+    }
+
+    @Override
+    public SettableBeanProperty withNullProvider(NullValueProvider nva) {
+        return new CreatorProperty(this, _valueDeserializer, nva);
+    }
+    
+    @Override
+    public void fixAccess(DeserializationConfig config) {
+        if (_fallbackSetter != null) {
+            _fallbackSetter.fixAccess(config);
+        }
     }
 
     /**
      * NOTE: one exception to immutability, due to problems with CreatorProperty instances
      * being shared between Bean, separate PropertyBasedCreator
      * 
-     * @since 2.6.0
+     * @since 2.6
      */
     public void setFallbackSetter(SettableBeanProperty fallbackSetter) {
         _fallbackSetter = fallbackSetter;
     }
+
+    @Override
+    public void markAsIgnorable() {
+        _ignorable = true;
+    }
+
+    @Override
+    public boolean isIgnorable() {
+        return _ignorable;
+    }
+
+    /*
+    /**********************************************************
+    /* Injection support
+    /**********************************************************
+     */
 
     /**
      * Method that can be called to locate value to be injected for this
      * property, if it is configured for this.
      */
     public Object findInjectableValue(DeserializationContext context, Object beanInstance)
+        throws JsonMappingException
     {
         if (_injectableValueId == null) {
-            throw new IllegalStateException("Property '"+getName()
-                    +"' (type "+getClass().getName()+") has no injectable value id configured");
+            context.reportBadDefinition(ClassUtil.classOf(beanInstance),
+                    String.format("Property '%s' (type %s) has no injectable value id configured",
+                    getName(), getClass().getName()));
         }
         return context.findInjectableValue(_injectableValueId, this, beanInstance);
     }
-    
+
     /**
      * Method to find value to inject, and inject it to this property.
      */
@@ -145,7 +195,7 @@ public class CreatorProperty
     {
         set(beanInstance, findInjectableValue(context, beanInstance));
     }
-    
+
     /*
     /**********************************************************
     /* BeanProperty impl
@@ -173,41 +223,32 @@ public class CreatorProperty
      */
 
     @Override
-    public void deserializeAndSet(JsonParser jp, DeserializationContext ctxt,
-                                  Object instance)
-        throws IOException, JsonProcessingException
+    public void deserializeAndSet(JsonParser p, DeserializationContext ctxt,
+            Object instance) throws IOException
     {
-        set(instance, deserialize(jp, ctxt));
+        _verifySetter();
+        _fallbackSetter.set(instance, deserialize(p, ctxt));
     }
 
     @Override
-    public Object deserializeSetAndReturn(JsonParser jp,
-    		DeserializationContext ctxt, Object instance)
-        throws IOException, JsonProcessingException
+    public Object deserializeSetAndReturn(JsonParser p,
+            DeserializationContext ctxt, Object instance) throws IOException
     {
-        return setAndReturn(instance, deserialize(jp, ctxt));
+        _verifySetter();
+        return _fallbackSetter.setAndReturn(instance, deserialize(p, ctxt));
     }
     
     @Override
     public void set(Object instance, Object value) throws IOException
     {
-        /* Hmmmh. Should we return quietly (NOP), or error?
-         * Perhaps better to throw an exception, since it's generally an error.
-         */
-        if (_fallbackSetter == null) {
-            throw new IllegalStateException("No fallback setter/field defined: can not use creator property for "
-                    +getClass().getName());
-        }
+        _verifySetter();
         _fallbackSetter.set(instance, value);
     }
 
     @Override
     public Object setAndReturn(Object instance, Object value) throws IOException
     {
-        if (_fallbackSetter == null) {
-            throw new IllegalStateException("No fallback setter/field defined: can not use creator property for "
-                    +getClass().getName());
-        }
+        _verifySetter();
         return _fallbackSetter.setAndReturn(instance, value);
     }
     
@@ -218,4 +259,24 @@ public class CreatorProperty
 
     @Override
     public String toString() { return "[creator property, name '"+getName()+"'; inject id '"+_injectableValueId+"']"; }
+
+    // since 2.9
+    private final void _verifySetter() throws IOException {
+        if (_fallbackSetter == null) {
+            _reportMissingSetter(null, null);
+        }
+    }
+
+    // since 2.9
+    private void _reportMissingSetter(JsonParser p, DeserializationContext ctxt) throws IOException
+    {
+        final String msg = "No fallback setter/field defined for creator property '"+getName()+"'";
+        // Hmmmh. Should we return quietly (NOP), or error?
+        // Perhaps better to throw an exception, since it's generally an error.
+        if (ctxt != null ) {
+            ctxt.reportBadDefinition(getType(), msg);
+        } else {
+            throw InvalidDefinitionException.from(p, msg, getType());
+        }
+    }
 }

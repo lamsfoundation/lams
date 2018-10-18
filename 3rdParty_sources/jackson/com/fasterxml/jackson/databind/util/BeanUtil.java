@@ -1,5 +1,11 @@
 package com.fasterxml.jackson.databind.util;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 
 /**
@@ -77,6 +83,7 @@ public class BeanUtil
     /**
      * @since 2.5
      */
+    @Deprecated // since 2.9, not used any more
     public static String okNameForSetter(AnnotatedMethod am, boolean stdNaming) {
         String name = okNameForMutator(am, "set", stdNaming);
         if ((name != null) 
@@ -103,33 +110,52 @@ public class BeanUtil
 
     /*
     /**********************************************************
-    /* Handling property names, deprecated methods
+    /* Value defaulting helpers
     /**********************************************************
      */
+    
+    /**
+     * Accessor used to find out "default value" to use for comparing values to
+     * serialize, to determine whether to exclude value from serialization with
+     * inclusion type of {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_DEFAULT}.
+     *<p>
+     * Default logic is such that for primitives and wrapper types for primitives, expected
+     * defaults (0 for `int` and `java.lang.Integer`) are returned; for Strings, empty String,
+     * and for structured (Maps, Collections, arrays) and reference types, criteria
+     * {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_DEFAULT}
+     * is used.
+     *
+     * @since 2.7
+     */
+    public static Object getDefaultValue(JavaType type)
+    {
+        // 06-Nov-2015, tatu: Returning null is fine for Object types; but need special
+        //   handling for primitives since they are never passed as nulls.
+        Class<?> cls = type.getRawClass();
 
-    @Deprecated // since 2.5
-    public static String okNameForGetter(AnnotatedMethod am) {
-        return okNameForGetter(am, false);
-    }
-
-    @Deprecated // since 2.5
-    public static String okNameForRegularGetter(AnnotatedMethod am, String name) {
-        return okNameForRegularGetter(am, name, false);
-    }
-
-    @Deprecated // since 2.5
-    public static String okNameForIsGetter(AnnotatedMethod am, String name) {
-        return okNameForIsGetter(am, name, false);
-    }
-
-    @Deprecated // since 2.5
-    public static String okNameForSetter(AnnotatedMethod am) {
-        return okNameForSetter(am, false);
-    }
-
-    @Deprecated // since 2.5
-    public static String okNameForMutator(AnnotatedMethod am, String prefix) {
-        return okNameForMutator(am, prefix, false);
+        // 30-Sep-2016, tatu: Also works for Wrappers, so both `Integer.TYPE` and `Integer.class`
+        //    would return `Integer.TYPE`
+        Class<?> prim = ClassUtil.primitiveType(cls);
+        if (prim != null) {
+            return ClassUtil.defaultValue(prim);
+        }
+        if (type.isContainerType() || type.isReferenceType()) {
+            return JsonInclude.Include.NON_EMPTY;
+        }
+        if (cls == String.class) {
+            return "";
+        }
+        // 09-Mar-2016, tatu: Not sure how far this path we want to go but for now
+        //   let's add `java.util.Date` and `java.util.Calendar`, as per [databind#1550]
+        if (type.isTypeOrSubTypeOf(Date.class)) {
+            return new Date(0L);
+        }
+        if (type.isTypeOrSubTypeOf(Calendar.class)) {
+            Calendar c = new GregorianCalendar();
+            c.setTimeInMillis(0L);
+            return c;
+        }
+        return null;
     }
 
     /*
@@ -139,8 +165,8 @@ public class BeanUtil
      */
 
     /**
-     * This method was added to address [JACKSON-53]: need to weed out
-     * CGLib-injected "getCallbacks". 
+     * This method was added to address the need to weed out
+     * CGLib-injected "getCallbacks" method. 
      * At this point caller has detected a potential getter method
      * with name "getCallbacks" and we need to determine if it is
      * indeed injectect by Cglib. We do this by verifying that the
@@ -150,25 +176,21 @@ public class BeanUtil
     {
         Class<?> rt = am.getRawType();
         // Ok, first: must return an array type
-        if (rt == null || !rt.isArray()) {
-            return false;
-        }
-        /* And that type needs to be "net.sf.cglib.proxy.Callback".
-         * Theoretically could just be a type that implements it, but
-         * for now let's keep things simple, fix if need be.
-         */
-        Class<?> compType = rt.getComponentType();
-        // Actually, let's just verify it's a "net.sf.cglib.*" class/interface
-        String pkgName = ClassUtil.getPackageName(compType);
-        if (pkgName != null) {
-            if (pkgName.contains(".cglib")) {
-                if (pkgName.startsWith("net.sf.cglib")
-                    // also, as per [JACKSON-177]
-                    || pkgName.startsWith("org.hibernate.repackage.cglib")
-                    // and [core#674]
-                    || pkgName.startsWith("org.springframework.cglib")
-                        ) {
-                    return true;
+        if (rt.isArray()) {
+            /* And that type needs to be "net.sf.cglib.proxy.Callback".
+             * Theoretically could just be a type that implements it, but
+             * for now let's keep things simple, fix if need be.
+             */
+            Class<?> compType = rt.getComponentType();
+            // Actually, let's just verify it's a "net.sf.cglib.*" class/interface
+            String pkgName = ClassUtil.getPackageName(compType);
+            if (pkgName != null) {
+                if (pkgName.contains(".cglib")) {
+                    return pkgName.startsWith("net.sf.cglib")
+                        // also, as per [JACKSON-177]
+                        || pkgName.startsWith("org.hibernate.repackage.cglib")
+                        // and [core#674]
+                        || pkgName.startsWith("org.springframework.cglib");
                 }
             }
         }
@@ -177,32 +199,22 @@ public class BeanUtil
 
     /**
      * Similar to {@link #isCglibGetCallbacks}, need to suppress
-     * a cyclic reference to resolve [JACKSON-103]
+     * a cyclic reference.
      */
     protected static boolean isGroovyMetaClassSetter(AnnotatedMethod am)
     {
         Class<?> argType = am.getRawParameterType(0);
         String pkgName = ClassUtil.getPackageName(argType);
-        if (pkgName != null && pkgName.startsWith("groovy.lang")) {
-            return true;
-        }
-        return false;
+        return (pkgName != null) && pkgName.startsWith("groovy.lang");
     }
 
     /**
-     * Another helper method to deal with rest of [JACKSON-103]
+     * Another helper method to deal with Groovy's problematic metadata accessors
      */
     protected static boolean isGroovyMetaClassGetter(AnnotatedMethod am)
     {
-        Class<?> rt = am.getRawType();
-        if (rt == null || rt.isArray()) {
-            return false;
-        }
-        String pkgName = ClassUtil.getPackageName(rt);
-        if (pkgName != null && pkgName.startsWith("groovy.lang")) {
-            return true;
-        }
-        return false;
+        String pkgName = ClassUtil.getPackageName(am.getRawType());
+        return (pkgName != null) && pkgName.startsWith("groovy.lang");
     }
 
     /*

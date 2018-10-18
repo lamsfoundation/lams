@@ -59,81 +59,101 @@ public class RequestBufferingHandler implements HttpHandler {
             int readBuffers = 0;
             final PooledByteBuffer[] bufferedData = new PooledByteBuffer[maxBuffers];
             PooledByteBuffer buffer = exchange.getConnection().getByteBufferPool().allocate();
-            do {
-                int r;
-                ByteBuffer b = buffer.getBuffer();
-                r = channel.read(b);
-                if (r == -1) { //TODO: listener read
-                    if (b.position() == 0) {
-                        buffer.close();
-                    } else {
-                        b.flip();
-                        bufferedData[readBuffers] = buffer;
-                    }
-                    break;
-                } else if(r == 0) {
-                    final PooledByteBuffer finalBuffer = buffer;
-                    final int finalReadBuffers = readBuffers;
-                    channel.getReadSetter().set(new ChannelListener<StreamSourceChannel>() {
+            try {
+                do {
+                    int r;
+                    ByteBuffer b = buffer.getBuffer();
+                    r = channel.read(b);
+                    if (r == -1) {
+                        if (b.position() == 0) {
+                            buffer.close();
+                        } else {
+                            b.flip();
+                            bufferedData[readBuffers] = buffer;
+                        }
+                        break;
+                    } else if (r == 0) {
+                        final PooledByteBuffer finalBuffer = buffer;
+                        final int finalReadBuffers = readBuffers;
+                        channel.getReadSetter().set(new ChannelListener<StreamSourceChannel>() {
 
-                        PooledByteBuffer buffer = finalBuffer;
-                        int readBuffers = finalReadBuffers;
-                        @Override
-                        public void handleEvent(StreamSourceChannel channel) {
-                            try {
-                                do {
-                                    int r;
-                                    ByteBuffer b = buffer.getBuffer();
-                                    r = channel.read(b);
-                                    if (r == -1) { //TODO: listener read
-                                        if (b.position() == 0) {
-                                            buffer.close();
-                                        } else {
-                                            b.flip();
-                                            bufferedData[readBuffers] = buffer;
-                                        }
-                                        Connectors.ungetRequestBytes(exchange, bufferedData);
-                                        Connectors.resetRequestChannel(exchange);
-                                        Connectors.executeRootHandler(next, exchange);
-                                        channel.getReadSetter().set(null);
-                                        return;
-                                    } else if (r == 0) {
-                                        return;
-                                    } else if (!b.hasRemaining()) {
-                                        b.flip();
-                                        bufferedData[readBuffers++] = buffer;
-                                        if (readBuffers == maxBuffers) {
+                            PooledByteBuffer buffer = finalBuffer;
+                            int readBuffers = finalReadBuffers;
+
+                            @Override
+                            public void handleEvent(StreamSourceChannel channel) {
+                                try {
+                                    do {
+                                        int r;
+                                        ByteBuffer b = buffer.getBuffer();
+                                        r = channel.read(b);
+                                        if (r == -1) {
+                                            if (b.position() == 0) {
+                                                buffer.close();
+                                            } else {
+                                                b.flip();
+                                                bufferedData[readBuffers] = buffer;
+                                            }
                                             Connectors.ungetRequestBytes(exchange, bufferedData);
                                             Connectors.resetRequestChannel(exchange);
-                                            Connectors.executeRootHandler(next, exchange);
                                             channel.getReadSetter().set(null);
+                                            channel.suspendReads();
+                                            Connectors.executeRootHandler(next, exchange);
                                             return;
+                                        } else if (r == 0) {
+                                            return;
+                                        } else if (!b.hasRemaining()) {
+                                            b.flip();
+                                            bufferedData[readBuffers++] = buffer;
+                                            if (readBuffers == maxBuffers) {
+                                                Connectors.ungetRequestBytes(exchange, bufferedData);
+                                                Connectors.resetRequestChannel(exchange);
+                                                channel.getReadSetter().set(null);
+                                                channel.suspendReads();
+                                                Connectors.executeRootHandler(next, exchange);
+                                                return;
+                                            }
+                                            buffer = exchange.getConnection().getByteBufferPool().allocate();
                                         }
-                                        buffer = exchange.getConnection().getByteBufferPool().allocate();
+                                    } while (true);
+                                } catch (Throwable t) {
+                                    if (t instanceof IOException) {
+                                        UndertowLogger.REQUEST_IO_LOGGER.ioException((IOException) t);
+                                    } else {
+                                        UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
                                     }
-                                } while (true);
-                            } catch (IOException e) {
-                                UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
-                                for(int i = 0; i < bufferedData.length; ++i) {
-                                    IoUtils.safeClose(bufferedData[i]);
+                                    for (int i = 0; i < bufferedData.length; ++i) {
+                                        IoUtils.safeClose(bufferedData[i]);
+                                    }
+                                    if (buffer != null && buffer.isOpen()) {
+                                        IoUtils.safeClose(buffer);
+                                    }
+                                    exchange.endExchange();
                                 }
-                                exchange.endExchange();
                             }
+                        });
+                        channel.resumeReads();
+                        return;
+                    } else if (!b.hasRemaining()) {
+                        b.flip();
+                        bufferedData[readBuffers++] = buffer;
+                        if (readBuffers == maxBuffers) {
+                            break;
                         }
-                    });
-                    channel.resumeReads();
-                    return;
-                } else if (!b.hasRemaining()) {
-                    b.flip();
-                    bufferedData[readBuffers++] = buffer;
-                    if(readBuffers == maxBuffers) {
-                        break;
+                        buffer = exchange.getConnection().getByteBufferPool().allocate();
                     }
-                    buffer = exchange.getConnection().getByteBufferPool().allocate();
+                } while (true);
+                Connectors.ungetRequestBytes(exchange, bufferedData);
+                Connectors.resetRequestChannel(exchange);
+            } catch (Exception | Error e) {
+                for (int i = 0; i < bufferedData.length; ++i) {
+                    IoUtils.safeClose(bufferedData[i]);
                 }
-            } while (true);
-            Connectors.ungetRequestBytes(exchange, bufferedData);
-            Connectors.resetRequestChannel(exchange);
+                if (buffer != null && buffer.isOpen()) {
+                    IoUtils.safeClose(buffer);
+                }
+                throw e;
+            }
         }
         next.handleRequest(exchange);
     }

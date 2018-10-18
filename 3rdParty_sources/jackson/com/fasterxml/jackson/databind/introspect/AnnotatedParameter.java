@@ -3,11 +3,12 @@ package com.fasterxml.jackson.databind.introspect;
 import java.lang.reflect.*;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Object that represents method parameters, mostly so that associated
  * annotations can be processed conveniently. Note that many of accessors
- * can not return meaningful values since parameters do not have stand-alone
+ * cannot return meaningful values since parameters do not have stand-alone
  * JDK objects associated; so access should mostly be limited to checking
  * annotation values which are properly aggregated and included.
  */
@@ -30,17 +31,18 @@ public final class AnnotatedParameter
      * Index of the parameter within argument list
      */
     protected final int _index;
-    
+
     /*
     /**********************************************************
     /* Life-cycle
     /**********************************************************
      */
 
-    public AnnotatedParameter(AnnotatedWithParams owner, JavaType type,  AnnotationMap annotations,
-            int index)
+    public AnnotatedParameter(AnnotatedWithParams owner, JavaType type,
+            TypeResolutionContext typeContext,
+            AnnotationMap annotations, int index)
     {
-        super((owner == null) ? null : owner.getTypeContext(), annotations);
+        super(typeContext, annotations);
         _owner = owner;
         _type = type;
         _index = index;
@@ -88,7 +90,13 @@ public final class AnnotatedParameter
 
     @Override
     public JavaType getType() {
-        return _typeContext.resolveType(_type);
+        return _type;
+    }
+
+    @Deprecated
+    @Override
+    public Type getGenericType() {
+        return _owner.getGenericParameterType(_index);
     }
 
     /*
@@ -161,7 +169,9 @@ public final class AnnotatedParameter
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (o == null || o.getClass() != getClass()) return false;
+        if (!ClassUtil.hasClass(o, getClass())) {
+            return false;
+        }
         AnnotatedParameter other = (AnnotatedParameter) o;
         return other._owner.equals(_owner) && (other._index == _index);
     }

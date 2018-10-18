@@ -26,7 +26,7 @@ import java.io.File;
  * otherwise your class will infinitely loop.
  *
  * @since 1.0
- *
+ * @version $Id: AbstractFileFilter.java 1415850 2012-11-30 20:51:39Z ggregory $
  */
 public abstract class AbstractFileFilter implements IOFileFilter {
 
@@ -36,7 +36,7 @@ public abstract class AbstractFileFilter implements IOFileFilter {
      * @param file  the File to check
      * @return true if this file matches the test
      */
-    public boolean accept(File file) {
+    public boolean accept(final File file) {
         return accept(file.getParentFile(), file.getName());
     }
 
@@ -47,7 +47,7 @@ public abstract class AbstractFileFilter implements IOFileFilter {
      * @param name  the filename within the directory to check
      * @return true if this file matches the test
      */
-    public boolean accept(File dir, String name) {
+    public boolean accept(final File dir, final String name) {
         return accept(new File(dir, name));
     }
 

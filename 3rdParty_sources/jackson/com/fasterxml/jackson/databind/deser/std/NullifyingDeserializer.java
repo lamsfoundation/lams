@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 /**
  * Bogus deserializer that will simply skip all content there is to map
  * and returns Java null reference.
- * 
+ *
  * @since 2.2
  */
 public class NullifyingDeserializer
@@ -26,7 +26,12 @@ public class NullifyingDeserializer
     /* Deserializer API
     /**********************************************************
      */
-    
+
+    @Override // since 2.9
+    public Boolean supportsUpdate(DeserializationConfig config) {
+        return Boolean.FALSE;
+    }
+
     @Override
     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {

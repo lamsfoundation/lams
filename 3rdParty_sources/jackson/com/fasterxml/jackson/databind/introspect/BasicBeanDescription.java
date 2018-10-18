@@ -4,8 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
@@ -22,12 +24,12 @@ import com.fasterxml.jackson.databind.util.Converter;
  * use cases for that, nor is such usage tested or supported.
  * Separation from API is mostly to isolate some implementation details
  * here and keep API simple.
- *<p>
- * Note that since 2.6 this class has been a thin shell around
- * {@link POJOPropertiesCollector}, which handles most of actual work.
  */
 public class BasicBeanDescription extends BeanDescription
 {
+    // since 2.9
+    private final static Class<?>[] NO_VIEWS = new Class<?>[0];
+
     /*
     /**********************************************************
     /* General configuration
@@ -44,17 +46,27 @@ public class BasicBeanDescription extends BeanDescription
     final protected MapperConfig<?> _config;
 
     final protected AnnotationIntrospector _annotationIntrospector;
+
+    /*
+    /**********************************************************
+    /* Information about type itself
+    /**********************************************************
+     */
     
     /**
      * Information collected about the class introspected.
      */
     final protected AnnotatedClass _classInfo;
-    
+
     /**
-     * We may need type bindings for the bean type. If so, we'll
-     * construct it lazily
+     * @since 2.9
      */
-    protected TypeBindings _bindings;
+    protected Class<?>[] _defaultViews;
+
+    /**
+     * @since 2.9
+     */
+    protected boolean _defaultViewsResolved;
 
     /*
     /**********************************************************
@@ -71,7 +83,7 @@ public class BasicBeanDescription extends BeanDescription
      * Details of Object Id to include, if any
      */
     protected ObjectIdInfo _objectIdInfo;
-    
+
     /*
     /**********************************************************
     /* Life-cycle
@@ -84,7 +96,12 @@ public class BasicBeanDescription extends BeanDescription
         super(type);
         _propCollector = coll;
         _config = coll.getConfig();
-        _annotationIntrospector = (_config == null) ? null : _config.getAnnotationIntrospector();
+        // NOTE: null config only for some pre-constructed types
+        if (_config == null) {
+            _annotationIntrospector = null;
+        } else {
+            _annotationIntrospector = _config.getAnnotationIntrospector();
+        }
         _classInfo = classDef;
     }
 
@@ -98,7 +115,12 @@ public class BasicBeanDescription extends BeanDescription
         super(type);
         _propCollector = null;
         _config = config;
-        _annotationIntrospector = (_config == null) ? null : _config.getAnnotationIntrospector();
+        // NOTE: null config only for some pre-constructed types
+        if (_config == null) {
+            _annotationIntrospector = null;
+        } else {
+            _annotationIntrospector = _config.getAnnotationIntrospector();
+        }
         _classInfo = classDef;
         _properties = props;
     }
@@ -218,11 +240,18 @@ public class BasicBeanDescription extends BeanDescription
     }
 
     @Override
+    @Deprecated // since 2.9
     public AnnotatedMethod findJsonValueMethod() {
         return (_propCollector == null) ? null
                 : _propCollector.getJsonValueMethod();
     }
 
+    @Override // since 2.9
+    public AnnotatedMember findJsonValueAccessor() {
+        return (_propCollector == null) ? null
+                : _propCollector.getJsonValueAccessor();
+    }
+ 
     @Override
     public Set<String> getIgnoredPropertyNames() {
         Set<String> ign = (_propCollector == null) ? null
@@ -250,6 +279,7 @@ public class BasicBeanDescription extends BeanDescription
     }
 
     @Override
+    @Deprecated // since 2.8
     public JavaType resolveType(java.lang.reflect.Type jdkType) {
         if (jdkType == null) {
             return null;
@@ -263,25 +293,39 @@ public class BasicBeanDescription extends BeanDescription
     }
 
     @Override
-    public AnnotatedMethod findAnySetter() throws IllegalArgumentException
+    public AnnotatedMember findAnySetterAccessor() throws IllegalArgumentException
     {
-        AnnotatedMethod anySetter = (_propCollector == null) ? null
-                : _propCollector.getAnySetterMethod();
-        if (anySetter != null) {
-            /* Also, let's be somewhat strict on how field name is to be
-             * passed; String, Object make sense, others not
-             * so much.
-             */
-            /* !!! 18-May-2009, tatu: how about enums? Can add support if
-             *  requested; easy enough for devs to add support within
-             *  method.
-             */
-            Class<?> type = anySetter.getRawParameterType(0);
-            if (type != String.class && type != Object.class) {
-                throw new IllegalArgumentException("Invalid 'any-setter' annotation on method "+anySetter.getName()+"(): first argument not of type String or Object, but "+type.getName());
+        if (_propCollector != null) {
+            AnnotatedMethod anyMethod = _propCollector.getAnySetterMethod();
+            if (anyMethod != null) {
+                // Also, let's be somewhat strict on how field name is to be
+                // passed; String, Object make sense, others not so much.
+    
+                /* !!! 18-May-2009, tatu: how about enums? Can add support if
+                 *  requested; easy enough for devs to add support within method.
+                 */
+                Class<?> type = anyMethod.getRawParameterType(0);
+                if ((type != String.class) && (type != Object.class)) {
+                    throw new IllegalArgumentException(String.format(
+"Invalid 'any-setter' annotation on method '%s()': first argument not of type String or Object, but %s",
+anyMethod.getName(), type.getName()));
+                }
+                return anyMethod;
+            }
+            AnnotatedMember anyField = _propCollector.getAnySetterField();
+            if (anyField != null) {
+                // For now let's require a Map; in future can add support for other
+                // types like perhaps Iterable<Map.Entry>?
+                Class<?> type = anyField.getRawType();
+                if (!Map.class.isAssignableFrom(type)) {
+                    throw new IllegalArgumentException(String.format(
+"Invalid 'any-setter' annotation on field '%s': type is not instance of java.util.Map",
+anyField.getName()));
+                }
+                return anyField;
             }
         }
-        return anySetter;
+        return null;
     }
 
     @Override
@@ -313,8 +357,8 @@ public class BasicBeanDescription extends BeanDescription
             while (t.getCause() != null) {
                 t = t.getCause();
             }
-            if (t instanceof Error) throw (Error) t;
-            if (t instanceof RuntimeException) throw (RuntimeException) t;
+            ClassUtil.throwIfError(t);
+            ClassUtil.throwIfRTE(t);
             throw new IllegalArgumentException("Failed to instantiate bean of type "+_classInfo.getAnnotated().getName()+": ("+t.getClass().getName()+") "+t.getMessage(), t);
         }
     }
@@ -339,15 +383,47 @@ public class BasicBeanDescription extends BeanDescription
     @Override
     public JsonFormat.Value findExpectedFormat(JsonFormat.Value defValue)
     {
+        // 15-Apr-2016, tatu: Let's check both per-type defaults and annotations; per-type
+        //   defaults having higher precedence, so start with that
         if (_annotationIntrospector != null) {
             JsonFormat.Value v = _annotationIntrospector.findFormat(_classInfo);
             if (v != null) {
-                return v;
+                if (defValue == null) {
+                    defValue = v;
+                } else {
+                    defValue = defValue.withOverrides(v);
+                }
+            }
+        }
+        JsonFormat.Value v = _config.getDefaultPropertyFormat(_classInfo.getRawType());
+        if (v != null) {
+            if (defValue == null) {
+                defValue = v;
+            } else {
+                defValue = defValue.withOverrides(v);
             }
         }
         return defValue;
     }
-    
+
+    @Override // since 2.9
+    public Class<?>[] findDefaultViews()
+    {
+        if (!_defaultViewsResolved) {
+            _defaultViewsResolved = true;
+            Class<?>[] def = (_annotationIntrospector == null) ? null
+                    : _annotationIntrospector.findViews(_classInfo);
+            // one more twist: if default inclusion disabled, need to force empty set of views
+            if (def == null) {
+                if (!_config.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION)) {
+                    def = NO_VIEWS;
+                }
+            }
+            _defaultViews = def;
+        }
+        return _defaultViews;
+    }
+
     /*
     /**********************************************************
     /* Introspection for serialization
@@ -374,7 +450,7 @@ public class BasicBeanDescription extends BeanDescription
         if (_annotationIntrospector != null) {
             JsonInclude.Value incl = _annotationIntrospector.findPropertyInclusion(_classInfo);
             if (incl != null) {
-                return defValue.withOverrides(incl);
+                return (defValue == null) ? incl : defValue.withOverrides(incl);
             }
         }
         return defValue;
@@ -404,37 +480,41 @@ public class BasicBeanDescription extends BeanDescription
     }
 
     @Override
-    public Map<String,AnnotatedMember> findBackReferenceProperties()
+    public List<BeanPropertyDefinition> findBackReferences()
     {
-        HashMap<String,AnnotatedMember> result = null;
-//        boolean hasIgnored = (_ignoredPropertyNames != null);
-
+        List<BeanPropertyDefinition> result = null;
+        HashSet<String> names = null;
         for (BeanPropertyDefinition property : _properties()) {
-            /* 23-Sep-2014, tatu: As per [Databind#426], we _should_ try to avoid
-             *   calling accessor, as it triggers exception from seeming conflict.
-             *   But the problem is that _ignoredPropertyNames here only contains
-             *   ones ignored on per-property annotations, but NOT class annotations...
-             *   so commented out part does not work, alas
-             */
-            /*
-            if (hasIgnored && _ignoredPropertyNames.contains(property.getName())) {
+            AnnotationIntrospector.ReferenceProperty refDef = property.findReferenceType();
+            if ((refDef == null) || !refDef.isBackReference()) {
                 continue;
             }
-            */
-            AnnotatedMember am = property.getMutator();
-            if (am == null) {
-                continue;
-            }
-            AnnotationIntrospector.ReferenceProperty refDef = _annotationIntrospector.findReferenceType(am);
-            if (refDef != null && refDef.isBackReference()) {
-                if (result == null) {
-                    result = new HashMap<String,AnnotatedMember>();
-                }
-                String refName = refDef.getName();
-                if (result.put(refName, am) != null) {
+            final String refName = refDef.getName();
+            if (result == null) {
+                result = new ArrayList<BeanPropertyDefinition>();
+                names = new HashSet<>();
+                names.add(refName);
+            } else {
+                if (!names.add(refName)) {
                     throw new IllegalArgumentException("Multiple back-reference properties with name '"+refName+"'");
                 }
             }
+            result.add(property);
+        }
+        return result;
+    }
+
+    @Deprecated // since 2.9
+    @Override
+    public Map<String,AnnotatedMember> findBackReferenceProperties()
+    {
+        List<BeanPropertyDefinition> props = findBackReferences();
+        if (props == null) {
+            return null;
+        }
+        Map<String,AnnotatedMember> result = new HashMap<>();
+        for (BeanPropertyDefinition prop : props) {
+            result.put(prop.getName(), prop.getMutator());
         }
         return result;
     }
@@ -449,15 +529,21 @@ public class BasicBeanDescription extends BeanDescription
     public List<AnnotatedMethod> getFactoryMethods()
     {
         // must filter out anything that clearly is not a factory method
-        List<AnnotatedMethod> candidates = _classInfo.getStaticMethods();
+        List<AnnotatedMethod> candidates = _classInfo.getFactoryMethods();
         if (candidates.isEmpty()) {
             return candidates;
         }
-        ArrayList<AnnotatedMethod> result = new ArrayList<AnnotatedMethod>();
+        List<AnnotatedMethod> result = null;
         for (AnnotatedMethod am : candidates) {
             if (isFactoryMethod(am)) {
+                if (result == null) {
+                    result = new ArrayList<AnnotatedMethod>();
+                }
                 result.add(am);
             }
+        }
+        if (result == null) {
+            return Collections.emptyList();
         }
         return result;
     }
@@ -486,8 +572,9 @@ public class BasicBeanDescription extends BeanDescription
     public Method findFactoryMethod(Class<?>... expArgTypes)
     {
         // So, of all single-arg static methods:
-        for (AnnotatedMethod am : _classInfo.getStaticMethods()) {
-            if (isFactoryMethod(am)) {
+        for (AnnotatedMethod am : _classInfo.getFactoryMethods()) {
+            // 24-Oct-2016, tatu: Better ensure it only takes 1 arg, no matter what
+            if (isFactoryMethod(am) && am.getParameterCount() == 1) {
                 // And must take one of expected arg types (or supertype)
                 Class<?> actualArgType = am.getRawParameterType(0);
                 for (Class<?> expArgType : expArgTypes) {
@@ -503,29 +590,30 @@ public class BasicBeanDescription extends BeanDescription
 
     protected boolean isFactoryMethod(AnnotatedMethod am)
     {
-        /* First: return type must be compatible with the introspected class
-         * (i.e. allowed to be sub-class, although usually is the same
-         * class)
-         */
+        // First: return type must be compatible with the introspected class
+        // (i.e. allowed to be sub-class, although usually is the same class)
         Class<?> rt = am.getRawReturnType();
         if (!getBeanClass().isAssignableFrom(rt)) {
             return false;
         }
-
         /* Also: must be a recognized factory method, meaning:
          * (a) marked with @JsonCreator annotation, or
          * (b) "valueOf" (at this point, need not be public)
          */
-        if (_annotationIntrospector.hasCreatorAnnotation(am)) {
+        JsonCreator.Mode mode = _annotationIntrospector.findCreatorAnnotation(_config, am);
+        if ((mode != null) && (mode != JsonCreator.Mode.DISABLED)) {
             return true;
         }
         final String name = am.getName();
+        // 24-Oct-2016, tatu: As per [databind#1429] must ensure takes exactly one arg
         if ("valueOf".equals(name)) {
-            return true;
+            if (am.getParameterCount() == 1) {
+                return true;
+            }
         }
-        // [Issue#208] Also accept "fromString()", if takes String or CharSequence
+        // [databind#208] Also accept "fromString()", if takes String or CharSequence
         if ("fromString".equals(name)) {
-            if (1 == am.getParameterCount()) {
+            if (am.getParameterCount() == 1) {
                 Class<?> cls = am.getRawParameterType(0);
                 if (cls == String.class || CharSequence.class.isAssignableFrom(cls)) {
                     return true;
@@ -536,50 +624,9 @@ public class BasicBeanDescription extends BeanDescription
     }
 
     /**
-     * @deprecated Since 2.4, use <code>findCreatorParameterNames()</code> instead.
+     * @deprecated since 2.8
      */
-    @Deprecated
-    public List<String> findCreatorPropertyNames()
-    {
-        List<PropertyName> params = findCreatorParameterNames();
-        if (params.isEmpty()) {
-    		    return Collections.emptyList();
-        }
-        List<String> result = new ArrayList<String>(params.size());
-        for (PropertyName name : params) {
-    		    result.add(name.getSimpleName());
-        }
-        return result;
-    }
-    
-    /**
-     * @deprecated Since 2.5, does not seem to be used at all.
-     */
-    @Deprecated
-    public List<PropertyName> findCreatorParameterNames()
-    {
-        for (int i = 0; i < 2; ++i) {
-            List<? extends AnnotatedWithParams> l = (i == 0)
-                ? getConstructors() : getFactoryMethods();
-            for (AnnotatedWithParams creator : l) {
-                int argCount = creator.getParameterCount();
-                if (argCount < 1) continue;
-                PropertyName name = _findCreatorPropertyName(creator.getParameter(0));
-                if (name == null || name.isEmpty()) {
-                    continue;
-                }
-                List<PropertyName> names = new ArrayList<PropertyName>();
-                names.add(name);
-                for (int p = 1; p < argCount; ++p) {
-                    name = _findCreatorPropertyName(creator.getParameter(p));
-                    names.add(name);
-                }
-                return names;
-            }
-        }
-        return Collections.emptyList();
-    }
-
+    @Deprecated // since 2.8, not used at least since 2.7
     protected PropertyName _findCreatorPropertyName(AnnotatedParameter param)
     {
         PropertyName name = _annotationIntrospector.findNameForDeserialization(param);
@@ -671,7 +718,7 @@ public class BasicBeanDescription extends BeanDescription
      */
     
     @SuppressWarnings("unchecked")
-    public Converter<Object,Object> _createConverter(Object converterDef)
+    protected Converter<Object,Object> _createConverter(Object converterDef)
     {
         if (converterDef == null) {
             return null;

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -23,7 +25,7 @@ import java.io.InputStream;
  * Data written to this stream is forwarded to a stream that has been associated
  * with this thread.
  *
- *
+ * @version $Id: DemuxInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
  */
 public class DemuxInputStream
     extends InputStream
@@ -36,9 +38,9 @@ public class DemuxInputStream
      * @param input the stream to bind
      * @return the InputStream that was previously active
      */
-    public InputStream bindStream( InputStream input )
+    public InputStream bindStream( final InputStream input )
     {
-        InputStream oldValue = m_streams.get();
+        final InputStream oldValue = m_streams.get();
         m_streams.set( input );
         return oldValue;
     }
@@ -52,7 +54,7 @@ public class DemuxInputStream
     public void close()
         throws IOException
     {
-        InputStream input = m_streams.get();
+        final InputStream input = m_streams.get();
         if( null != input )
         {
             input.close();
@@ -69,14 +71,14 @@ public class DemuxInputStream
     public int read()
         throws IOException
     {
-        InputStream input = m_streams.get();
+        final InputStream input = m_streams.get();
         if( null != input )
         {
             return input.read();
         }
         else
         {
-            return -1;
+            return EOF;
         }
     }
 }

@@ -18,14 +18,14 @@
 
 package io.undertow.util;
 
+import io.undertow.UndertowMessages;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.undertow.UndertowMessages;
 
 
 /**
@@ -45,15 +45,17 @@ public class PathTemplate implements Comparable<PathTemplate> {
     private final String templateString;
     private final boolean template;
     private final String base;
-    private final List<Part> parts;
+    final List<Part> parts;
     private final Set<String> parameterNames;
+    private final boolean trailingSlash;
 
-    private PathTemplate(String templateString, final boolean template, final String base, final List<Part> parts, Set<String> parameterNames) {
+    private PathTemplate(String templateString, final boolean template, final String base, final List<Part> parts, Set<String> parameterNames, boolean trailingSlash) {
         this.templateString = templateString;
         this.template = template;
         this.base = base;
         this.parts = parts;
         this.parameterNames = Collections.unmodifiableSet(parameterNames);
+        this.trailingSlash = trailingSlash;
     }
 
     public static PathTemplate create(final String inputPath) {
@@ -87,6 +89,10 @@ public class PathTemplate implements Comparable<PathTemplate> {
                 case 0: {
                     if (c == '/') {
                         state = 1;
+                    } else if (c == '*') {
+                        base = path.substring(0, i + 1);
+                        stringStart = i;
+                        state = 5;
                     } else {
                         state = 0;
                     }
@@ -97,6 +103,10 @@ public class PathTemplate implements Comparable<PathTemplate> {
                         base = path.substring(0, i);
                         stringStart = i + 1;
                         state = 2;
+                    } else if (c == '*') {
+                        base = path.substring(0, i + 1);
+                        stringStart = i;
+                        state = 5;
                     } else if (c != '/') {
                         state = 0;
                     }
@@ -140,15 +150,21 @@ public class PathTemplate implements Comparable<PathTemplate> {
                 }
             }
         }
-
+        boolean trailingSlash = false;
         switch (state) {
-            case 0:
-            case 1: {
+            case 1:
+                trailingSlash = true;
+                //fall through
+            case 0: {
                 base = path;
                 break;
             }
             case 2: {
                 throw UndertowMessages.MESSAGES.couldNotParseUriTemplate(path, path.length());
+            }
+            case 4: {
+                trailingSlash = true;
+                break;
             }
             case 5: {
                 Part part = new Part(false, path.substring(stringStart));
@@ -162,7 +178,7 @@ public class PathTemplate implements Comparable<PathTemplate> {
                 templates.add(part.part);
             }
         }
-        return new PathTemplate(path, state > 1, base, parts, templates);
+        return new PathTemplate(path, state > 1 && !base.contains("*"), base, parts, templates, trailingSlash);
     }
 
     /**
@@ -195,6 +211,14 @@ public class PathTemplate implements Comparable<PathTemplate> {
         int baseLength = base.length();
         if (!template) {
             return path.length() == baseLength;
+        }
+        if(trailingSlash) {
+            //the template has a trailing slash
+            //we verify this first as it is cheap
+            //and it simplifies the matching algorithm below
+            if(path.charAt(path.length() -1 ) != '/') {
+                return false;
+            }
         }
 
         int currentPartPosition = 0;
@@ -239,6 +263,27 @@ public class PathTemplate implements Comparable<PathTemplate> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PathTemplate)) return false;
+
+        PathTemplate that = (PathTemplate) o;
+
+        return this.compareTo(that) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getTemplateString() != null ? getTemplateString().hashCode() : 0;
+        result = 31 * result + (template ? 1 : 0);
+        result = 31 * result + (getBase() != null ? getBase().hashCode() : 0);
+        result = 31 * result + (parts != null ? parts.hashCode() : 0);
+        result = 31 * result + (getParameterNames() != null ? getParameterNames().hashCode() : 0);
+        return result;
     }
 
     @Override

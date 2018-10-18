@@ -19,6 +19,8 @@
 package io.undertow.conduits;
 
 import io.undertow.UndertowMessages;
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.protocol.http.HttpAttachments;
@@ -28,14 +30,13 @@ import io.undertow.util.AttachmentKey;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.PooledAdaptor;
 import org.xnio.IoUtils;
-import io.undertow.connector.ByteBufferPool;
-import io.undertow.connector.PooledByteBuffer;
 import org.xnio.channels.StreamSinkChannel;
 import org.xnio.conduits.AbstractStreamSourceConduit;
 import org.xnio.conduits.ConduitReadableByteChannel;
 import org.xnio.conduits.PushBackStreamSourceConduit;
 import org.xnio.conduits.StreamSourceConduit;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -57,13 +58,15 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
     private final BufferWrapper bufferWrapper;
     private final ConduitListener<? super ChunkedStreamSourceConduit> finishListener;
     private final HttpServerExchange exchange;
+    private final Closeable closeable;
 
     private boolean closed;
+    private boolean finishListenerInvoked;
 
     private long remainingAllowed;
     private final ChunkReader chunkReader;
 
-    public ChunkedStreamSourceConduit(final StreamSourceConduit next, final PushBackStreamSourceConduit channel, final ByteBufferPool pool, final ConduitListener<? super ChunkedStreamSourceConduit> finishListener, Attachable attachable) {
+    public ChunkedStreamSourceConduit(final StreamSourceConduit next, final PushBackStreamSourceConduit channel, final ByteBufferPool pool, final ConduitListener<? super ChunkedStreamSourceConduit> finishListener, Attachable attachable, Closeable closeable) {
         this(next, new BufferWrapper() {
             @Override
             public PooledByteBuffer allocate() {
@@ -74,7 +77,7 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
             public void pushBack(PooledByteBuffer pooled) {
                 channel.pushBack(new PooledAdaptor(pooled));
             }
-        }, finishListener, attachable, null);
+        }, finishListener, attachable, null, closeable);
     }
 
     public ChunkedStreamSourceConduit(final StreamSourceConduit next, final HttpServerExchange exchange, final ConduitListener<? super ChunkedStreamSourceConduit> finishListener) {
@@ -88,23 +91,24 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
             public void pushBack(PooledByteBuffer pooled) {
                 ((HttpServerConnection) exchange.getConnection()).ungetRequestBytes(pooled);
             }
-        }, finishListener, exchange, exchange);
+        }, finishListener, exchange, exchange, exchange.getConnection());
     }
 
-    protected ChunkedStreamSourceConduit(final StreamSourceConduit next, final BufferWrapper bufferWrapper, final ConduitListener<? super ChunkedStreamSourceConduit> finishListener, final Attachable attachable, final HttpServerExchange exchange) {
+    protected ChunkedStreamSourceConduit(final StreamSourceConduit next, final BufferWrapper bufferWrapper, final ConduitListener<? super ChunkedStreamSourceConduit> finishListener, final Attachable attachable, final HttpServerExchange exchange, final Closeable closeable) {
         super(next);
         this.bufferWrapper = bufferWrapper;
         this.finishListener = finishListener;
         this.remainingAllowed = Long.MIN_VALUE;
-        this.chunkReader = new ChunkReader<>(attachable, HttpAttachments.REQUEST_TRAILERS, finishListener, this);
+        this.chunkReader = new ChunkReader<>(attachable, HttpAttachments.REQUEST_TRAILERS, this);
         this.exchange = exchange;
+        this.closeable = closeable;
     }
 
     public long transferTo(final long position, final long count, final FileChannel target) throws IOException {
         try {
             return target.transferFrom(new ConduitReadableByteChannel(this), position, count);
-        } catch (IOException | RuntimeException e) {
-            IoUtils.safeClose(exchange.getConnection());
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(closeable);
             throw e;
         }
     }
@@ -132,15 +136,17 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
         }
     }
 
+    @Override
     public long transferTo(final long count, final ByteBuffer throughBuffer, final StreamSinkChannel target) throws IOException {
         try {
             return IoUtils.transfer(new ConduitReadableByteChannel(this), count, throughBuffer, target);
-        } catch (IOException | RuntimeException e) {
-            IoUtils.safeClose(exchange.getConnection());
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(closeable);
             throw e;
         }
     }
 
+    @Override
     public long read(final ByteBuffer[] dsts, final int offset, final int length) throws IOException {
         for (int i = offset; i < length; ++i) {
             if (dsts[i].hasRemaining()) {
@@ -159,11 +165,16 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
         }
     }
 
+    @Override
     public int read(final ByteBuffer dst) throws IOException {
+        boolean invokeFinishListener = false;
         try {
             long chunkRemaining = chunkReader.getChunkRemaining();
             //we have read the last chunk, we just return EOF
             if (chunkRemaining == -1) {
+                if(!finishListenerInvoked) {
+                    invokeFinishListener = true;
+                }
                 return -1;
             }
             if (closed) {
@@ -185,6 +196,12 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
                 if (chunkRemaining == 0) {
                     chunkRemaining = chunkReader.readChunk(buf);
                     if (chunkRemaining <= 0) {
+                        if(buf.hasRemaining()) {
+                            free = false;
+                        }
+                        if(!finishListenerInvoked && chunkRemaining < 0) {
+                            invokeFinishListener = true;
+                        }
                         return (int) chunkRemaining;
                     }
                 }
@@ -264,9 +281,14 @@ public class ChunkedStreamSourceConduit extends AbstractStreamSourceConduit<Stre
                     pooled.close();
                 }
             }
-        } catch (IOException | RuntimeException e) {
-            IoUtils.safeClose(exchange.getConnection());
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(closeable);
             throw e;
+        } finally {
+            if(invokeFinishListener) {
+                finishListenerInvoked = true;
+                finishListener.handleEvent(this);
+            }
         }
 
     }

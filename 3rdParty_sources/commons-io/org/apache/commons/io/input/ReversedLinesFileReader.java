@@ -23,7 +23,6 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.commons.io.Charsets;
 
@@ -58,9 +57,25 @@ public class ReversedLinesFileReader implements Closeable {
      * @param file
      *            the file to be read
      * @throws IOException  if an I/O error occurs
+     * @deprecated 2.5 use {@link #ReversedLinesFileReader(File, Charset)} instead
      */
+    @Deprecated
     public ReversedLinesFileReader(final File file) throws IOException {
-        this(file, 4096, Charset.defaultCharset().toString());
+        this(file, 4096, Charset.defaultCharset());
+    }
+
+    /**
+     * Creates a ReversedLinesFileReader with default block size of 4KB and the
+     * specified encoding.
+     *
+     * @param file
+     *            the file to be read
+     * @param charset the encoding to use
+     * @throws IOException  if an I/O error occurs
+     * @since 2.5
+     */
+    public ReversedLinesFileReader(final File file, final Charset charset) throws IOException {
+        this(file, 4096, charset);
     }
 
     /**
@@ -76,10 +91,47 @@ public class ReversedLinesFileReader implements Closeable {
      * @throws IOException  if an I/O error occurs
      * @since 2.3
      */
+    @SuppressWarnings("deprecation") // unavoidable until Java 7
     public ReversedLinesFileReader(final File file, final int blockSize, final Charset encoding) throws IOException {
         this.blockSize = blockSize;
         this.encoding = encoding;
 
+        // --- check & prepare encoding ---
+        final Charset charset = Charsets.toCharset(encoding);
+        final CharsetEncoder charsetEncoder = charset.newEncoder();
+        final float maxBytesPerChar = charsetEncoder.maxBytesPerChar();
+        if (maxBytesPerChar == 1f) {
+            // all one byte encodings are no problem
+            byteDecrement = 1;
+        } else if (charset == Charsets.UTF_8) {
+            // UTF-8 works fine out of the box, for multibyte sequences a second UTF-8 byte can never be a newline byte
+            // http://en.wikipedia.org/wiki/UTF-8
+            byteDecrement = 1;
+        } else if(charset == Charset.forName("Shift_JIS") || // Same as for UTF-8
+                // http://www.herongyang.com/Unicode/JIS-Shift-JIS-Encoding.html
+                charset == Charset.forName("windows-31j") || // Windows code page 932 (Japanese)
+                charset == Charset.forName("x-windows-949") || // Windows code page 949 (Korean)
+                charset == Charset.forName("gbk") || // Windows code page 936 (Simplified Chinese)
+                charset == Charset.forName("x-windows-950")) { // Windows code page 950 (Traditional Chinese)
+            byteDecrement = 1;
+        } else if (charset == Charsets.UTF_16BE || charset == Charsets.UTF_16LE) {
+            // UTF-16 new line sequences are not allowed as second tuple of four byte sequences,
+            // however byte order has to be specified
+            byteDecrement = 2;
+        } else if (charset == Charsets.UTF_16) {
+            throw new UnsupportedEncodingException("For UTF-16, you need to specify the byte order (use UTF-16BE or " +
+                    "UTF-16LE)");
+        } else {
+            throw new UnsupportedEncodingException("Encoding " + encoding + " is not supported yet (feel free to " +
+                    "submit a patch)");
+        }
+
+        // NOTE: The new line sequences are matched in the order given, so it is important that \r\n is BEFORE \n
+        newLineSequences = new byte[][] { "\r\n".getBytes(encoding), "\n".getBytes(encoding), "\r".getBytes(encoding) };
+
+        avoidNewlineSplitBufferSize = newLineSequences[0].length;
+
+        // Open file
         randomAccessFile = new RandomAccessFile(file, "r");
         totalByteLength = randomAccessFile.length();
         int lastBlockLength = (int) (totalByteLength % blockSize);
@@ -93,36 +145,6 @@ public class ReversedLinesFileReader implements Closeable {
         }
         currentFilePart = new FilePart(totalBlockCount, lastBlockLength, null);
 
-        // --- check & prepare encoding ---
-        Charset charset = Charsets.toCharset(encoding);
-        CharsetEncoder charsetEncoder = charset.newEncoder();
-        float maxBytesPerChar = charsetEncoder.maxBytesPerChar();
-        if(maxBytesPerChar==1f) {
-            // all one byte encodings are no problem
-            byteDecrement = 1;
-        } else if(charset == Charset.forName("UTF-8")) {
-            // UTF-8 works fine out of the box, for multibyte sequences a second UTF-8 byte can never be a newline byte
-            // http://en.wikipedia.org/wiki/UTF-8
-            byteDecrement = 1;
-        } else if(charset == Charset.forName("Shift_JIS")) {
-            // Same as for UTF-8
-            // http://www.herongyang.com/Unicode/JIS-Shift-JIS-Encoding.html
-            byteDecrement = 1;
-        } else if(charset == Charset.forName("UTF-16BE") || charset == Charset.forName("UTF-16LE")) {
-            // UTF-16 new line sequences are not allowed as second tuple of four byte sequences,
-            // however byte order has to be specified
-            byteDecrement = 2;
-        } else if(charset == Charset.forName("UTF-16")) {
-            throw new UnsupportedEncodingException(
-                    "For UTF-16, you need to specify the byte order (use UTF-16BE or UTF-16LE)");
-        } else {
-            throw new UnsupportedEncodingException(
-                    "Encoding "+encoding+" is not supported yet (feel free to submit a patch)");
-        }
-        // NOTE: The new line sequences are matched in the order given, so it is important that \r\n is BEFORE \n
-        newLineSequences = new byte[][] { "\r\n".getBytes(encoding), "\n".getBytes(encoding), "\r".getBytes(encoding) };
-
-        avoidNewlineSplitBufferSize = newLineSequences[0].length;
     }
 
     /**
@@ -136,9 +158,8 @@ public class ReversedLinesFileReader implements Closeable {
      * @param encoding
      *            the encoding of the file
      * @throws IOException  if an I/O error occurs
-     * @throws UnsupportedCharsetException
-     *             thrown instead of {@link UnsupportedEncodingException} in version 2.2 if the encoding is not
-     *             supported.
+     * @throws java.nio.charset.UnsupportedCharsetException thrown instead of {@link UnsupportedEncodingException} in
+     * version 2.2 if the encoding is not supported.
      */
     public ReversedLinesFileReader(final File file, final int blockSize, final String encoding) throws IOException {
         this(file, blockSize, Charsets.toCharset(encoding));
@@ -163,7 +184,7 @@ public class ReversedLinesFileReader implements Closeable {
             }
         }
 
-        // aligned behaviour wiht BufferedReader that doesn't return a last, emtpy line
+        // aligned behaviour with BufferedReader that doesn't return a last, empty line
         if("".equals(line) && !trailingNewlineOfFileSkipped) {
             trailingNewlineOfFileSkipped = true;
             line = readLine();
@@ -199,7 +220,7 @@ public class ReversedLinesFileReader implements Closeable {
          */
         private FilePart(final long no, final int length, final byte[] leftOverOfLastFilePart) throws IOException {
             this.no = no;
-            int dataLength = length + (leftOverOfLastFilePart != null ? leftOverOfLastFilePart.length : 0);
+            final int dataLength = length + (leftOverOfLastFilePart != null ? leftOverOfLastFilePart.length : 0);
             this.data = new byte[dataLength];
             final long off = (no - 1) * blockSize;
 
@@ -255,7 +276,7 @@ public class ReversedLinesFileReader implements Closeable {
             String line = null;
             int newLineMatchByteCount;
 
-            boolean isLastFilePart = no == 1;
+            final boolean isLastFilePart = no == 1;
 
             int i = currentLastBytePos;
             while (i > -1) {
@@ -270,12 +291,12 @@ public class ReversedLinesFileReader implements Closeable {
                 // --- check for newline ---
                 if ((newLineMatchByteCount = getNewLineMatchByteCount(data, i)) > 0 /* found newline */) {
                     final int lineStart = i + 1;
-                    int lineLengthBytes = currentLastBytePos - lineStart + 1;
+                    final int lineLengthBytes = currentLastBytePos - lineStart + 1;
 
                     if (lineLengthBytes < 0) {
                         throw new IllegalStateException("Unexpected negative line length="+lineLengthBytes);
                     }
-                    byte[] lineData = new byte[lineLengthBytes];
+                    final byte[] lineData = new byte[lineLengthBytes];
                     System.arraycopy(data, lineStart, lineData, 0, lineLengthBytes);
 
                     line = new String(lineData, encoding);
@@ -308,7 +329,7 @@ public class ReversedLinesFileReader implements Closeable {
          * Creates the buffer containing any left over bytes.
          */
         private void createLeftOver() {
-            int lineLengthBytes = currentLastBytePos + 1;
+            final int lineLengthBytes = currentLastBytePos + 1;
             if (lineLengthBytes > 0) {
                 // create left over for next block
                 leftOver = new byte[lineLengthBytes];
@@ -326,11 +347,11 @@ public class ReversedLinesFileReader implements Closeable {
          * @param i start offset in buffer
          * @return length of newline sequence or 0 if none found
          */
-        private int getNewLineMatchByteCount(byte[] data, int i) {
-            for (byte[] newLineSequence : newLineSequences) {
+        private int getNewLineMatchByteCount(final byte[] data, final int i) {
+            for (final byte[] newLineSequence : newLineSequences) {
                 boolean match = true;
                 for (int j = newLineSequence.length - 1; j >= 0; j--) {
-                    int k = i + j - (newLineSequence.length - 1);
+                    final int k = i + j - (newLineSequence.length - 1);
                     match &= k >= 0 && data[k] == newLineSequence[j];
                 }
                 if (match) {

@@ -94,9 +94,9 @@ public interface UndertowServletMessages {
 
     @Message(id = 10016, value = "Not a multi part request")
     ServletException notAMultiPartRequest();
-
-    @Message(id = 10017, value = "Request was neither the original request object or a ServletRequestWrapper")
-    IllegalArgumentException requestNoOfCorrectType();
+//
+//    @Message(id = 10017, value = "Request was neither the original request object or a ServletRequestWrapper")
+//    IllegalArgumentException requestNoOfCorrectType();
 
     @Message(id = 10018, value = "Async not started")
     IllegalStateException asyncNotStarted();
@@ -154,9 +154,9 @@ public interface UndertowServletMessages {
 
     @Message(id = 10036, value = "Listener has already been set")
     IllegalStateException listenerAlreadySet();
-
-    @Message(id = 10037, value = "When stream is in async mode a write can only be made from the listener callback")
-    IllegalStateException writeCanOnlyBeMadeFromListenerCallback();
+//
+//    @Message(id = 10037, value = "When stream is in async mode a write can only be made from the listener callback")
+//    IllegalStateException writeCanOnlyBeMadeFromListenerCallback();
 
     @Message(id = 10038, value = "No web socket handler was provided to the web socket servlet")
     ServletException noWebSocketHandler();
@@ -211,4 +211,22 @@ public interface UndertowServletMessages {
 
     @Message(id = 10055, value = "Listener is not started")
     IllegalStateException listenerIsNotStarted();
+
+    @Message(id = 10056, value = "path was not set")
+    IllegalStateException pathWasNotSet();
+
+    @Message(id = 10057, value = "multipart config was not present on Servlet")
+    IllegalStateException multipartConfigNotPresent();
+
+    @Message(id = 10058, value = "Servlet name cannot be null")
+    IllegalArgumentException servletNameNull();
+
+    @Message(id = 10059, value = "Param %s cannot be null")
+    NullPointerException paramCannotBeNullNPE(String name);
+
+    @Message(id = 10060, value = "Trailers not supported for this request due to %s")
+    IllegalStateException trailersNotSupported(String reason);
+
+    @Message(id = 10061, value = "Invalid method for push request %s")
+    IllegalArgumentException invalidMethodForPushRequest(String method);
 }

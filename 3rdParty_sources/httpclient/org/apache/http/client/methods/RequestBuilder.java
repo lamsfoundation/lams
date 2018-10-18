@@ -284,7 +284,7 @@ public class RequestBuilder {
                     if (!formParams.isEmpty()) {
                         parameters = formParams;
                     }
-                } catch (IOException ignore) {
+                } catch (final IOException ignore) {
                 }
             } else {
                 entity = originalEntity;
@@ -293,26 +293,9 @@ public class RequestBuilder {
 
         final URI originalUri;
         if (request instanceof HttpUriRequest) {
-            originalUri = ((HttpUriRequest) request).getURI();
+            uri = ((HttpUriRequest) request).getURI();
         } else {
-            originalUri = URI.create(request.getRequestLine().getUri());
-        }
-
-        final URIBuilder uriBuilder = new URIBuilder(originalUri);
-        if (parameters == null) {
-            final List<NameValuePair> queryParams = uriBuilder.getQueryParams();
-            if (!queryParams.isEmpty()) {
-                parameters = queryParams;
-                uriBuilder.clearParameters();
-            } else {
-                parameters = null;
-            }
-        }
-        try {
-            uri = uriBuilder.build();
-        } catch (URISyntaxException ex) {
-            // Should never happen
-            uri = originalUri;
+            uri = URI.create(request.getRequestLine().getUri());
         }
 
         if (request instanceof Configurable) {
@@ -480,7 +463,7 @@ public class RequestBuilder {
         if (parameters != null && !parameters.isEmpty()) {
             if (entityCopy == null && (HttpPost.METHOD_NAME.equalsIgnoreCase(method)
                     || HttpPut.METHOD_NAME.equalsIgnoreCase(method))) {
-                entityCopy = new UrlEncodedFormEntity(parameters, HTTP.DEF_CONTENT_CHARSET);
+                entityCopy = new UrlEncodedFormEntity(parameters, charset != null ? charset : HTTP.DEF_CONTENT_CHARSET);
             } else {
                 try {
                     uriNotNull = new URIBuilder(uriNotNull)

@@ -65,7 +65,7 @@ public class CoreXMLDeserializers extends Deserializers.Base
      * javax.xml types {@link QName}, {@link Duration} and {@link XMLGregorianCalendar}.
      * Combined into a single class to eliminate bunch of one-off implementation
      * classes, to reduce resulting jar size (mostly).
-     * 
+     *
      * @since 2.4
      */
     public static class Std extends FromStringDeserializer<Object>
@@ -80,36 +80,56 @@ public class CoreXMLDeserializers extends Deserializers.Base
         }
 
         @Override
-        public Object deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException
+        public Object deserialize(JsonParser p, DeserializationContext ctxt)
+            throws IOException
         {
-            // For most types, use super impl; but not for GregorianCalendar
+            // For most types, use super impl; but GregorianCalendar also allows
+            // integer value (timestamp), which needs separate handling
             if (_kind == TYPE_G_CALENDAR) {
-                Date d = _parseDate(jp, ctxt);
-                if (d == null) {
-                    return null;
+                if (p.hasToken(JsonToken.VALUE_NUMBER_INT)) {
+                    return _gregorianFromDate(ctxt, _parseDate(p, ctxt));
                 }
-                GregorianCalendar calendar = new GregorianCalendar();
-                calendar.setTime(d);
-                TimeZone tz = ctxt.getTimeZone();
-                if (tz != null) {
-                    calendar.setTimeZone(tz);
-                }
-                return _dataTypeFactory.newXMLGregorianCalendar(calendar);
             }
-            return super.deserialize(jp, ctxt);
+            return super.deserialize(p, ctxt);
         }
 
         @Override
-        protected Object _deserialize(String value, DeserializationContext ctxt) throws IllegalArgumentException
+        protected Object _deserialize(String value, DeserializationContext ctxt)
+            throws IOException
         {
             switch (_kind) {
             case TYPE_DURATION:
                 return _dataTypeFactory.newDuration(value);
             case TYPE_QNAME:
                 return QName.valueOf(value);
+            case TYPE_G_CALENDAR:
+                Date d;
+                try {
+                    d = _parseDate(value, ctxt);
+                }
+                catch (JsonMappingException e) {
+                    // try to parse from native XML Schema 1.0 lexical representation String,
+                    // which includes time-only formats not handled by parseXMLGregorianCalendarFromJacksonFormat(...)
+                    return _dataTypeFactory.newXMLGregorianCalendar(value);
+                }
+                return _gregorianFromDate(ctxt, d);
             }
             throw new IllegalStateException();
+        }
+
+        protected XMLGregorianCalendar _gregorianFromDate(DeserializationContext ctxt,
+                Date d)
+        {
+            if (d == null) {
+                return null;
+            }
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTime(d);
+            TimeZone tz = ctxt.getTimeZone();
+            if (tz != null) {
+                calendar.setTimeZone(tz);
+            }
+            return _dataTypeFactory.newXMLGregorianCalendar(calendar);
         }
     }
 }

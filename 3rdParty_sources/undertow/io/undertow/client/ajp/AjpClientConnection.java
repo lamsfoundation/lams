@@ -29,12 +29,15 @@ import static org.xnio.IoUtils.safeClose;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedChannelException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.undertow.client.ClientStatistics;
+import org.jboss.logging.Logger;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
@@ -68,17 +71,24 @@ import io.undertow.util.Protocols;
 class AjpClientConnection extends AbstractAttachable implements Closeable, ClientConnection {
 
     public final ChannelListener<AjpClientRequestClientStreamSinkChannel> requestFinishListener = new ChannelListener<AjpClientRequestClientStreamSinkChannel>() {
+
         @Override
         public void handleEvent(AjpClientRequestClientStreamSinkChannel channel) {
-            currentRequest.terminateRequest();
+            if(currentRequest != null) {
+                currentRequest.terminateRequest();
+            }
         }
     };
     public final ChannelListener<AjpClientResponseStreamSourceChannel> responseFinishedListener = new ChannelListener<AjpClientResponseStreamSourceChannel>() {
         @Override
         public void handleEvent(AjpClientResponseStreamSourceChannel channel) {
-            currentRequest.terminateResponse();
+            if(currentRequest != null) {
+                currentRequest.terminateResponse();
+            }
         }
     };
+
+    private static final Logger log = Logger.getLogger(AjpClientConnection.class);
 
     private final Deque<AjpClientExchange> pendingQueue = new ArrayDeque<>();
     private AjpClientExchange currentRequest;
@@ -108,9 +118,20 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
         connection.addCloseTask(new ChannelListener<AjpClientChannel>() {
             @Override
             public void handleEvent(AjpClientChannel channel) {
+                log.debugf("connection to %s closed", getPeerAddress());
+                AjpClientConnection.this.state |= CLOSED;
                 ChannelListeners.invokeChannelListener(AjpClientConnection.this, closeSetter.get());
                 for(ChannelListener<ClientConnection> listener : closeListeners) {
                     listener.handleEvent(AjpClientConnection.this);
+                }
+                AjpClientExchange pending = pendingQueue.poll();
+                while (pending != null) {
+                    pending.setFailed(new ClosedChannelException());
+                    pending = pendingQueue.poll();
+                }
+                if(currentRequest != null) {
+                    currentRequest.setFailed(new ClosedChannelException());
+                    currentRequest = null;
                 }
             }
         });
@@ -224,6 +245,17 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
         }
     }
 
+    @Override
+    public boolean isPingSupported() {
+        return true;
+    }
+
+    @Override
+    public void sendPing(PingListener listener, long timeout, TimeUnit timeUnit) {
+        connection.sendPing(listener, timeout, timeUnit);
+
+    }
+
     private void initiateRequest(AjpClientExchange AjpClientExchange) {
         currentRequest = AjpClientExchange;
         ClientRequest request = AjpClientExchange.getRequest();
@@ -262,8 +294,8 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
                 if (!sinkChannel.flush()) {
                     handleFailedFlush(sinkChannel);
                 }
-            } catch (IOException e) {
-                handleError(e);
+            } catch (Throwable t) {
+                handleError((t instanceof IOException) ? (IOException) t : new IOException(t));
             }
         }
     }
@@ -288,6 +320,7 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
     }
 
     public void close() throws IOException {
+        log.debugf("close called on connection to %s", getPeerAddress());
         if (anyAreSet(state, CLOSED)) {
             return;
         }
@@ -326,6 +359,18 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
             try {
                 AbstractAjpClientStreamSourceChannel result = channel.receive();
                 if(result == null) {
+                    if(!channel.isOpen()) {
+                        //we execute this in a runnable
+                        //as there may be close/data frames that need to be processed
+                        getIoThread().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(currentRequest != null) {
+                                    currentRequest.setFailed(new ClosedChannelException());
+                                }
+                            }
+                        });
+                    }
                     return;
                 }
 
@@ -344,7 +389,7 @@ class AjpClientConnection extends AbstractAttachable implements Closeable, Clien
                     Channels.drain(result, Long.MAX_VALUE);
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 UndertowLogger.CLIENT_LOGGER.exceptionProcessingRequest(e);
                 safeClose(connection);
                 if(currentRequest != null) {

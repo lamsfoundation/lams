@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.*;
 
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -24,8 +23,6 @@ import com.fasterxml.jackson.databind.util.EnumValues;
  *<p>
  * Based on {@link StdScalarSerializer} since the JSON value is
  * scalar (String).
- * 
- * @author tatu
  */
 @JacksonStdImpl
 public class EnumSerializer
@@ -55,14 +52,6 @@ public class EnumSerializer
     /* Construction, initialization
     /**********************************************************
      */
-    
-    /**
-     * @deprecated Since 2.1
-     */
-    @Deprecated
-    public EnumSerializer(EnumValues v) {
-        this(v, null);
-    }
 
     public EnumSerializer(EnumValues v, Boolean serializeAsIndex)
     {
@@ -70,7 +59,7 @@ public class EnumSerializer
         _values = v;
         _serializeAsIndex = serializeAsIndex;
     }
-    
+
     /**
      * Factory method used by {@link com.fasterxml.jackson.databind.ser.BasicSerializerFactory}
      * for constructing serializer instance of Enum types.
@@ -81,12 +70,12 @@ public class EnumSerializer
     public static EnumSerializer construct(Class<?> enumClass, SerializationConfig config,
             BeanDescription beanDesc, JsonFormat.Value format)
     {
-        /* 08-Apr-2015, tatu: As per [databind#749], we can not statically determine
+        /* 08-Apr-2015, tatu: As per [databind#749], we cannot statically determine
          *   between name() and toString(), need to construct `EnumValues` with names,
          *   handle toString() case dynamically (for example)
          */
         EnumValues v = EnumValues.constructFromName(config, (Class<Enum<?>>) enumClass);
-        Boolean serializeAsIndex = _isShapeWrittenUsingIndex(enumClass, format, true);
+        Boolean serializeAsIndex = _isShapeWrittenUsingIndex(enumClass, format, true, null);
         return new EnumSerializer(v, serializeAsIndex);
     }
 
@@ -96,15 +85,17 @@ public class EnumSerializer
      * choice here, however.
      */
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) throws JsonMappingException
+    public JsonSerializer<?> createContextual(SerializerProvider serializers,
+            BeanProperty property) throws JsonMappingException
     {
-        if (property != null) {
-            JsonFormat.Value format = prov.getAnnotationIntrospector().findFormat((Annotated) property.getMember());
-            if (format != null) {
-                Boolean serializeAsIndex = _isShapeWrittenUsingIndex(property.getType().getRawClass(), format, false);
-                if (serializeAsIndex != _serializeAsIndex) {
-                    return new EnumSerializer(_values, serializeAsIndex);
-                }
+        JsonFormat.Value format = findFormatOverrides(serializers,
+                property, handledType());
+        if (format != null) {
+            Class<?> type = handledType();
+            Boolean serializeAsIndex = _isShapeWrittenUsingIndex(type,
+                    format, false, _serializeAsIndex);
+            if (serializeAsIndex != _serializeAsIndex) {
+                return new EnumSerializer(_values, serializeAsIndex);
             }
         }
         return this;
@@ -140,11 +131,16 @@ public class EnumSerializer
         }
         gen.writeString(_values.serializedValueFor(en));
     }
-    
+
+    /*
+    /**********************************************************
+    /* Schema support
+    /**********************************************************
+     */
+
     @Override
     public JsonNode getSchema(SerializerProvider provider, Type typeHint)
     {
-        // [JACKSON-684]: serialize as index?
         if (_serializeAsIndex(provider)) {
             return createSchemaNode("integer", true);
         }
@@ -205,28 +201,32 @@ public class EnumSerializer
     }
 
     /**
-     * Helper method called to check whether 
+     * Helper method called to check whether serialization should be done using
+     * index (number) or not.
      */
     protected static Boolean _isShapeWrittenUsingIndex(Class<?> enumClass,
-            JsonFormat.Value format, boolean fromClass)
+            JsonFormat.Value format, boolean fromClass,
+            Boolean defaultValue)
     {
         JsonFormat.Shape shape = (format == null) ? null : format.getShape();
         if (shape == null) {
-            return null;
+            return defaultValue;
         }
-        if (shape == Shape.ANY || shape == Shape.SCALAR) { // i.e. "default", check dynamically
-            return null;
+        // i.e. "default", check dynamically
+        if (shape == Shape.ANY || shape == Shape.SCALAR) {
+            return defaultValue;
         }
-        if (shape == Shape.STRING) {
+        // 19-May-2016, tatu: also consider "natural" shape
+        if (shape == Shape.STRING || shape == Shape.NATURAL) {
             return Boolean.FALSE;
         }
         // 01-Oct-2014, tatu: For convenience, consider "as-array" to also mean 'yes, use index')
         if (shape.isNumeric() || (shape == Shape.ARRAY)) {
             return Boolean.TRUE;
         }
-        throw new IllegalArgumentException("Unsupported serialization shape ("+shape+") for Enum "+enumClass.getName()
-                    +", not supported as "
-                    + (fromClass? "class" : "property")
-                    +" annotation");
+        // 07-Mar-2017, tatu: Also means `OBJECT` not available as property annotation...
+        throw new IllegalArgumentException(String.format(
+                "Unsupported serialization shape (%s) for Enum %s, not supported as %s annotation",
+                    shape, enumClass.getName(), (fromClass? "class" : "property")));
     }
 }

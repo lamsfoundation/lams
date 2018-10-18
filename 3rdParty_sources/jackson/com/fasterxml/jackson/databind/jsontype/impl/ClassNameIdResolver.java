@@ -1,10 +1,10 @@
 package com.fasterxml.jackson.databind.jsontype.impl;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.DatabindContext;
-import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 
@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.util.ClassUtil;
 public class ClassNameIdResolver
     extends TypeIdResolverBase
 {
+    private final static String JAVA_UTIL_PKG = "java.util.";
+
     public ClassNameIdResolver(JavaType baseType, TypeFactory typeFactory) {
         super(baseType, typeFactory);
     }
@@ -26,56 +28,42 @@ public class ClassNameIdResolver
     public void registerSubtype(Class<?> type, String name) {
         // not used with class name - based resolvers
     }
-    
+
     @Override
     public String idFromValue(Object value) {
-        return _idFrom(value, value.getClass());
+        return _idFrom(value, value.getClass(), _typeFactory);
     }
 
     @Override
     public String idFromValueAndType(Object value, Class<?> type) {
-        return _idFrom(value, type);
-    }
-
-    @Deprecated // since 2.3
-    @Override
-    public JavaType typeFromId(String id) {
-        return _typeFromId(id, _typeFactory);
+        return _idFrom(value, type, _typeFactory);
     }
 
     @Override
-    public JavaType typeFromId(DatabindContext context, String id) {
-        return _typeFromId(id, context.getTypeFactory());
+    public JavaType typeFromId(DatabindContext context, String id) throws IOException {
+        return _typeFromId(id, context);
     }
 
-    protected JavaType _typeFromId(String id, TypeFactory typeFactory)
+    protected JavaType _typeFromId(String id, DatabindContext ctxt) throws IOException
     {
-        /* 30-Jan-2010, tatu: Most ids are basic class names; so let's first
-         *    check if any generics info is added; and only then ask factory
-         *    to do translation when necessary
-         */
-        if (id.indexOf('<') > 0) {
-            JavaType t = typeFactory.constructFromCanonical(id);
-            // note: may want to try combining with specialization (esp for EnumMap)?
-            return t;
+        JavaType t = ctxt.resolveSubType(_baseType, id);
+        if (t == null) {
+            if (ctxt instanceof DeserializationContext) {
+                // First: we may have problem handlers that can deal with it?
+                return ((DeserializationContext) ctxt).handleUnknownTypeId(_baseType, id, this, "no such class found");
+            }
+            // ... meaning that we really should never get here.
         }
-        try {
-            Class<?> cls =  typeFactory.findClass(id);
-            return typeFactory.constructSpecializedType(_baseType, cls);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Invalid type id '"+id+"' (for id type 'Id.class'): no such class found");
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid type id '"+id+"' (for id type 'Id.class'): "+e.getMessage(), e);
-        }
+        return t;
     }
-    
+
     /*
     /**********************************************************
     /* Internal methods
     /**********************************************************
      */
-    
-    protected final String _idFrom(Object value, Class<?> cls)
+
+    protected String _idFrom(Object value, Class<?> cls, TypeFactory typeFactory)
     {
         // Need to ensure that "enum subtypes" work too
         if (Enum.class.isAssignableFrom(cls)) {
@@ -84,8 +72,8 @@ public class ClassNameIdResolver
             }
         }
         String str = cls.getName();
-        if (str.startsWith("java.util")) {
-            // 25-Jan-2009, tatu: There are some internal classes that we can not access as is.
+        if (str.startsWith(JAVA_UTIL_PKG)) {
+            // 25-Jan-2009, tatu: There are some internal classes that we cannot access as is.
             //     We need better mechanism; for now this has to do...
 
             // Enum sets and maps are problematic since we MUST know type of
@@ -94,27 +82,17 @@ public class ClassNameIdResolver
             if (value instanceof EnumSet<?>) { // Regular- and JumboEnumSet...
                 Class<?> enumClass = ClassUtil.findEnumType((EnumSet<?>) value);
                 // not optimal: but EnumSet is not a customizable type so this is sort of ok
-               str = _typeFactory.constructCollectionType(EnumSet.class, enumClass).toCanonical();
+               str = typeFactory.constructCollectionType(EnumSet.class, enumClass).toCanonical();
             } else if (value instanceof EnumMap<?,?>) {
                 Class<?> enumClass = ClassUtil.findEnumType((EnumMap<?,?>) value);
                 Class<?> valueClass = Object.class;
                 // not optimal: but EnumMap is not a customizable type so this is sort of ok
-                str = _typeFactory.constructMapType(EnumMap.class, enumClass, valueClass).toCanonical();
-            } else {
-                String end = str.substring(9);
-                if ((end.startsWith(".Arrays$") || end.startsWith(".Collections$"))
-                       && str.indexOf("List") >= 0) {
-                    /* 17-Feb-2010, tatus: Another such case: result of
-                     *    Arrays.asList() is named like so in Sun JDK...
-                     *   Let's just plain old ArrayList in its place
-                     * NOTE: chances are there are plenty of similar cases
-                     * for other wrappers... (immutable, singleton, synced etc)
-                     */
-                    str = "java.util.ArrayList";
-                }
+                str = typeFactory.constructMapType(EnumMap.class, enumClass, valueClass).toCanonical();
             }
+            // 10-Jan-2018, tatu: Up until 2.9.4 we used to have other conversions for `Collections.xxx()`
+            //    and `Arrays.asList(...)`; but it was changed to be handled on receiving end instead
         } else if (str.indexOf('$') >= 0) {
-            /* Other special handling may be needed for inner classes, [JACKSON-584].
+            /* Other special handling may be needed for inner classes,
              * The best way to handle would be to find 'hidden' constructor; pass parent
              * value etc (which is actually done for non-anonymous static classes!),
              * but that is just not possible due to various things. So, we will instead
@@ -123,10 +101,8 @@ public class ClassNameIdResolver
              */
             Class<?> outer = ClassUtil.getOuterClass(cls);
             if (outer != null) {
-                /* one more check: let's actually not worry if the declared
-                 * static type is non-static as well; if so, deserializer does
-                 * have a chance at figuring it all out.
-                 */
+                // one more check: let's actually not worry if the declared static type is
+                // non-static as well; if so, deserializer does have a chance at figuring it all out.
                 Class<?> staticType = _baseType.getRawClass();
                 if (ClassUtil.getOuterClass(staticType) == null) {
                     // Is this always correct? Seems like it should be...

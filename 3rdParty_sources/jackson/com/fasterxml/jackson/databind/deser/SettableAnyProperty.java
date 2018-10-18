@@ -1,12 +1,16 @@
 package com.fasterxml.jackson.databind.deser;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId.Referring;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Class that represents a "wildcard" set method which can be used
@@ -30,21 +34,29 @@ public class SettableAnyProperty
     /**
      * Annotated variant is needed for JDK serialization only
      */
-    final protected AnnotatedMethod _setter;
+    final protected AnnotatedMember _setter;
 
+    final boolean _setterIsField;
+    
     protected final JavaType _type;
 
     protected JsonDeserializer<Object> _valueDeserializer;
 
     protected final TypeDeserializer _valueTypeDeserializer;
-    
+
+    /**
+     * @since 2.9
+     */
+    protected final KeyDeserializer _keyDeserializer;
+
     /*
     /**********************************************************
     /* Life-cycle
     /**********************************************************
      */
 
-    public SettableAnyProperty(BeanProperty property, AnnotatedMethod setter, JavaType type,
+    public SettableAnyProperty(BeanProperty property, AnnotatedMember setter, JavaType type,
+            KeyDeserializer keyDeser,
             JsonDeserializer<Object> valueDeser, TypeDeserializer typeDeser)
     {
         _property = property;
@@ -52,25 +64,27 @@ public class SettableAnyProperty
         _type = type;
         _valueDeserializer = valueDeser;
         _valueTypeDeserializer = typeDeser;
+        _keyDeserializer = keyDeser;
+        _setterIsField = setter instanceof AnnotatedField;
+    }
+
+    @Deprecated // since 2.9
+    public SettableAnyProperty(BeanProperty property, AnnotatedMember setter, JavaType type,
+            JsonDeserializer<Object> valueDeser, TypeDeserializer typeDeser)
+    {
+        this(property, setter, type, null, valueDeser, typeDeser);
     }
 
     public SettableAnyProperty withValueDeserializer(JsonDeserializer<Object> deser) {
         return new SettableAnyProperty(_property, _setter, _type,
-                deser, _valueTypeDeserializer);
+                _keyDeserializer, deser, _valueTypeDeserializer);
     }
 
-    /**
-     * Constructor used for JDK Serialization when reading persisted object
-     */
-    protected SettableAnyProperty(SettableAnyProperty src)
-    {
-        _property = src._property;
-        _setter = src._setter;
-        _type = src._type;
-        _valueDeserializer = src._valueDeserializer;
-        _valueTypeDeserializer = src._valueTypeDeserializer;
+    public void fixAccess(DeserializationConfig config) {
+        _setter.fixAccess(
+                config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
     }
-    
+
     /*
     /**********************************************************
     /* JDK serialization handling
@@ -115,7 +129,9 @@ public class SettableAnyProperty
         throws IOException
     {
         try {
-            set(instance, propName, deserialize(p, ctxt));
+            Object key = (_keyDeserializer == null) ? propName
+                    : _keyDeserializer.deserializeKey(propName, ctxt);
+            set(instance, key, deserialize(p, ctxt));
         } catch (UnresolvedForwardReference reference) {
             if (!(_valueDeserializer.getObjectIdReader() != null)) {
                 throw JsonMappingException.from(p, "Unresolved forward reference but no identity info.", reference);
@@ -130,7 +146,7 @@ public class SettableAnyProperty
     {
         JsonToken t = p.getCurrentToken();
         if (t == JsonToken.VALUE_NULL) {
-            return null;
+            return _valueDeserializer.getNullValue(ctxt);
         }
         if (_valueTypeDeserializer != null) {
             return _valueDeserializer.deserializeWithType(p, ctxt, _valueTypeDeserializer);
@@ -138,11 +154,27 @@ public class SettableAnyProperty
         return _valueDeserializer.deserialize(p, ctxt);
     }
 
-    public void set(Object instance, String propName, Object value) throws IOException
+    @SuppressWarnings("unchecked")
+    public void set(Object instance, Object propName, Object value) throws IOException
     {
         try {
-            // note: can not use 'setValue()' due to taking 2 args
-            _setter.getAnnotated().invoke(instance, propName, value);
+            // if annotation in the field (only map is supported now)
+            if (_setterIsField) {
+                AnnotatedField field = (AnnotatedField) _setter;
+                Map<Object,Object> val = (Map<Object,Object>) field.getValue(instance);
+                /* 01-Jun-2016, tatu: At this point it is not quite clear what to do if
+                 *    field is `null` -- we cannot necessarily count on zero-args
+                 *    constructor except for a small set of types, so for now just
+                 *    ignore if null. May need to figure out something better in future.
+                 */
+                if (val != null) {
+                    // add the property key and value
+                    val.put(propName, value);
+                }
+            } else {
+                // note: cannot use 'setValue()' due to taking 2 args
+                ((AnnotatedMethod) _setter).callOnWith(instance, propName, value);
+            }
         } catch (Exception e) {
             _throwAsIOE(e, propName, value);
         }
@@ -159,11 +191,11 @@ public class SettableAnyProperty
      * @param propName Name of property (from Json input) to set
      * @param value Value of the property
      */
-    protected void _throwAsIOE(Exception e, String propName, Object value)
+    protected void _throwAsIOE(Exception e, Object propName, Object value)
         throws IOException
     {
         if (e instanceof IllegalArgumentException) {
-            String actType = (value == null) ? "[NULL]" : value.getClass().getName();
+            String actType = ClassUtil.classNameOf(value);
             StringBuilder msg = new StringBuilder("Problem deserializing \"any\" property '").append(propName);
             msg.append("' of class "+getClassName()+" (expected type: ").append(_type);
             msg.append("; actual type: ").append(actType).append(")");
@@ -175,17 +207,10 @@ public class SettableAnyProperty
             }
             throw new JsonMappingException(null, msg.toString(), e);
         }
-        if (e instanceof IOException) {
-            throw (IOException) e;
-        }
-        if (e instanceof RuntimeException) {
-            throw (RuntimeException) e;
-        }
+        ClassUtil.throwIfIOE(e);
+        ClassUtil.throwIfRTE(e);
         // let's wrap the innermost problem
-        Throwable t = e;
-        while (t.getCause() != null) {
-            t = t.getCause();
-        }
+        Throwable t = ClassUtil.getRootCause(e);
         throw new JsonMappingException(null, t.getMessage(), t);
     }
 

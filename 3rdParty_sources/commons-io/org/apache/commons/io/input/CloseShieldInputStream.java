@@ -25,7 +25,7 @@ import java.io.InputStream;
  * passed to a component that wants to explicitly close the stream even if
  * more input would still be available to other components.
  *
- *
+ * @version $Id: CloseShieldInputStream.java 1415850 2012-11-30 20:51:39Z ggregory $
  * @since 1.4
  */
 public class CloseShieldInputStream extends ProxyInputStream {
@@ -36,7 +36,7 @@ public class CloseShieldInputStream extends ProxyInputStream {
      *
      * @param in underlying input stream
      */
-    public CloseShieldInputStream(InputStream in) {
+    public CloseShieldInputStream(final InputStream in) {
         super(in);
     }
 

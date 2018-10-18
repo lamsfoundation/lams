@@ -1,16 +1,20 @@
 package com.fasterxml.jackson.databind.deser;
 
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.cfg.DeserializerFactoryConfig;
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
+import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
 import com.fasterxml.jackson.databind.deser.impl.CreatorCollector;
+import com.fasterxml.jackson.databind.deser.impl.JavaUtilCollectionsDeserializers;
 import com.fasterxml.jackson.databind.deser.std.*;
 import com.fasterxml.jackson.databind.ext.OptionalHandlerFactory;
 import com.fasterxml.jackson.databind.introspect.*;
@@ -37,7 +41,7 @@ public abstract class BasicDeserializerFactory
 {
     private final static Class<?> CLASS_OBJECT = Object.class;
     private final static Class<?> CLASS_STRING = String.class;
-    private final static Class<?> CLASS_CHAR_BUFFER = CharSequence.class;
+    private final static Class<?> CLASS_CHAR_SEQUENCE = CharSequence.class;
     private final static Class<?> CLASS_ITERABLE = Iterable.class;
     private final static Class<?> CLASS_MAP_ENTRY = Map.Entry.class;
 
@@ -210,14 +214,14 @@ public abstract class BasicDeserializerFactory
         if (_factoryConfig.hasAbstractTypeResolvers()) {
             for (AbstractTypeResolver resolver : _factoryConfig.abstractTypeResolvers()) {
                 JavaType concrete = resolver.findTypeMapping(config, type);
-                if (concrete != null && concrete.getRawClass() != currClass) {
+                if (ClassUtil.rawClass(concrete) != currClass) {
                     return concrete;
                 }
             }
         }
         return null;
     }
-    
+
     /*
     /**********************************************************
     /* JsonDeserializerFactory impl (partial): ValueInstantiators
@@ -237,35 +241,35 @@ public abstract class BasicDeserializerFactory
         final DeserializationConfig config = ctxt.getConfig();
 
         ValueInstantiator instantiator = null;
-        // [JACKSON-633] Check @JsonValueInstantiator before anything else
+        // Check @JsonValueInstantiator before anything else
         AnnotatedClass ac = beanDesc.getClassInfo();
         Object instDef = ctxt.getAnnotationIntrospector().findValueInstantiator(ac);
         if (instDef != null) {
             instantiator = _valueInstantiatorInstance(config, ac, instDef);
         }
         if (instantiator == null) {
-            /* Second: see if some of standard Jackson/JDK types might provide value
-             * instantiators.
-             */
+            // Second: see if some of standard Jackson/JDK types might provide value
+            // instantiators.
             instantiator = _findStdValueInstantiator(config, beanDesc);
             if (instantiator == null) {
                 instantiator = _constructDefaultValueInstantiator(ctxt, beanDesc);
             }
         }
-        
+
         // finally: anyone want to modify ValueInstantiator?
         if (_factoryConfig.hasValueInstantiators()) {
             for (ValueInstantiators insts : _factoryConfig.valueInstantiators()) {
                 instantiator = insts.findValueInstantiator(config, beanDesc, instantiator);
                 // let's do sanity check; easier to spot buggy handlers
                 if (instantiator == null) {
-                    throw JsonMappingException.from(ctxt.getParser(),
-                            "Broken registered ValueInstantiators (of type "+insts.getClass().getName()+"): returned null ValueInstantiator");
+                    ctxt.reportBadTypeDefinition(beanDesc,
+						"Broken registered ValueInstantiators (of type %s): returned null ValueInstantiator",
+						insts.getClass().getName());
                 }
             }
         }
 
-        // Sanity check: does the chosen instantatior have incomplete creators?
+        // Sanity check: does the chosen ValueInstantiator have incomplete creators?
         if (instantiator.getIncompleteParameter() != null) {
             final AnnotatedParameter nonAnnotatedParam = instantiator.getIncompleteParameter();
             final AnnotatedWithParams ctor = nonAnnotatedParam.getOwner();
@@ -279,8 +283,22 @@ public abstract class BasicDeserializerFactory
             BeanDescription beanDesc)
         throws JsonMappingException
     {
-        if (beanDesc.getBeanClass() == JsonLocation.class) {
+        Class<?> raw = beanDesc.getBeanClass();
+        if (raw == JsonLocation.class) {
             return new JsonLocationInstantiator();
+        }
+        // [databind#1868]: empty List/Set/Map
+        if (Collection.class.isAssignableFrom(raw)) {
+            if (Collections.EMPTY_SET.getClass() == raw) {
+                return new ConstantValueInstantiator(Collections.EMPTY_SET);
+            }
+            if (Collections.EMPTY_LIST.getClass() == raw) {
+                return new ConstantValueInstantiator(Collections.EMPTY_LIST);
+            }
+        } else if (Map.class.isAssignableFrom(raw)) {
+            if (Collections.EMPTY_MAP.getClass() == raw) {
+                return new ConstantValueInstantiator(Collections.EMPTY_MAP);
+            }
         }
         return null;
     }
@@ -293,13 +311,13 @@ public abstract class BasicDeserializerFactory
             BeanDescription beanDesc)
         throws JsonMappingException
     {
-        CreatorCollector creators =  new CreatorCollector(beanDesc, ctxt.getConfig());
+        CreatorCollector creators = new CreatorCollector(beanDesc, ctxt.getConfig());
         AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
         
         // need to construct suitable visibility checker:
         final DeserializationConfig config = ctxt.getConfig();
-        VisibilityChecker<?> vchecker = config.getDefaultVisibilityChecker();
-        vchecker = intr.findAutoDetectVisibility(beanDesc.getClassInfo(), vchecker);
+        VisibilityChecker<?> vchecker = config.getDefaultVisibilityChecker(beanDesc.getBeanClass(),
+                beanDesc.getClassInfo());
 
         /* 24-Sep-2014, tatu: Tricky part first; need to merge resolved property information
          *  (which has creator parameters sprinkled around) with actual creator
@@ -311,10 +329,8 @@ public abstract class BasicDeserializerFactory
          */
         Map<AnnotatedWithParams,BeanPropertyDefinition[]> creatorDefs = _findCreatorsFromProperties(ctxt,
                 beanDesc);
-
-        /* Important: first add factory methods; then constructors, so
-         * latter can override former!
-         */
+        // Important: first add factory methods; then constructors, so
+        // latter can override former!
         _addDeserializerFactoryMethods(ctxt, beanDesc, vchecker, intr, creators, creatorDefs);
         // constructors only usable on concrete types:
         if (beanDesc.getType().isConcrete()) {
@@ -343,8 +359,9 @@ public abstract class BasicDeserializerFactory
                     result.put(owner, defs);
                 } else {
                     if (defs[index] != null) {
-                        throw new IllegalStateException("Conflict: parameter #"+index+" of "+owner
-                                +" bound to more than one property; "+defs[index]+" vs "+propDef);
+                        ctxt.reportBadTypeDefinition(beanDesc,
+"Conflict: parameter #%d of %s bound to more than one property; %s vs %s",
+index, owner, defs[index], propDef);
                     }
                 }
                 defs[index] = propDef;
@@ -390,49 +407,95 @@ public abstract class BasicDeserializerFactory
                 config.canOverrideAccessModifiers());
     }
 
-    protected void _addDeserializerConstructors
-        (DeserializationContext ctxt, BeanDescription beanDesc, VisibilityChecker<?> vchecker,
+    /*
+    /**********************************************************
+    /* Creator introspection
+    /**********************************************************
+     */
+
+    protected void _addDeserializerConstructors(DeserializationContext ctxt,
+            BeanDescription beanDesc, VisibilityChecker<?> vchecker,
          AnnotationIntrospector intr, CreatorCollector creators,
          Map<AnnotatedWithParams,BeanPropertyDefinition[]> creatorParams)
         throws JsonMappingException
     {
+        // 25-Jan-2017, tatu: As per [databind#1501], [databind#1502], [databind#1503], best
+        //     for now to skip attempts at using anything but no-args constructor (see
+        //     `InnerClassProperty` construction for that)
+        final boolean isNonStaticInnerClass = beanDesc.isNonStaticInnerClass();
+        if (isNonStaticInnerClass) {
+            // TODO: look for `@JsonCreator` annotated ones, throw explicit exception?
+            return;
+        }
+
         // First things first: the "default constructor" (zero-arg
         // constructor; whether implicit or explicit) is NOT included
         // in list of constructors, so needs to be handled separately.
         AnnotatedConstructor defaultCtor = beanDesc.findDefaultConstructor();
         if (defaultCtor != null) {
-            if (!creators.hasDefaultCreator() || intr.hasCreatorAnnotation(defaultCtor)) {
+            if (!creators.hasDefaultCreator() || _hasCreatorAnnotation(ctxt, defaultCtor)) {
                 creators.setDefaultCreator(defaultCtor);
             }
         }
-
-        // may need to keep track for [#725]
-        List<AnnotatedConstructor> implicitCtors = null;
+        // 21-Sep-2017, tatu: First let's handle explicitly annotated ones
+        List<CreatorCandidate> nonAnnotated = new LinkedList<>();
+        int explCount = 0;
         for (AnnotatedConstructor ctor : beanDesc.getConstructors()) {
-            final boolean isCreator = intr.hasCreatorAnnotation(ctor);
-            BeanPropertyDefinition[] propDefs = creatorParams.get(ctor);
-            final int argCount = ctor.getParameterCount();
+            JsonCreator.Mode creatorMode = intr.findCreatorAnnotation(ctxt.getConfig(), ctor);
+            if (Mode.DISABLED == creatorMode) {
+                continue;
+            }
+            if (creatorMode == null) {
+                // let's check Visibility here, to avoid further processing for non-visible?
+                if (vchecker.isCreatorVisible(ctor)) {
+                    nonAnnotated.add(CreatorCandidate.construct(intr, ctor, creatorParams.get(ctor)));
+                }
+                continue;
+            }
+            switch (creatorMode) {
+            case DELEGATING:
+                _addExplicitDelegatingCreator(ctxt, beanDesc, creators,
+                        CreatorCandidate.construct(intr, ctor, null));
+                break;
+            case PROPERTIES:
+                _addExplicitPropertyCreator(ctxt, beanDesc, creators,
+                        CreatorCandidate.construct(intr, ctor, creatorParams.get(ctor)));
+                break;
+            default:
+                _addExplicitAnyCreator(ctxt, beanDesc, creators,
+                        CreatorCandidate.construct(intr, ctor, creatorParams.get(ctor)));
+                break;
+            }
+            ++explCount;
+        }
+        // And only if and when those handled, consider potentially visible ones
+        if (explCount > 0) { // TODO: split method into two since we could have expl factories
+            return;
+        }
+        List<AnnotatedWithParams> implicitCtors = null;
+        for (CreatorCandidate candidate : nonAnnotated) {
+            final int argCount = candidate.paramCount();
+            final AnnotatedWithParams ctor = candidate.creator();
 
             // some single-arg factory methods (String, number) are auto-detected
             if (argCount == 1) {
-                BeanPropertyDefinition argDef = (propDefs == null) ? null : propDefs[0];
-                boolean useProps = _checkIfCreatorPropertyBased(intr, ctor, argDef);
+                BeanPropertyDefinition propDef = candidate.propertyDef(0);
+                boolean useProps = _checkIfCreatorPropertyBased(intr, ctor, propDef);
 
                 if (useProps) {
                     SettableBeanProperty[] properties = new SettableBeanProperty[1];
-                    PropertyName name = (argDef == null) ? null : argDef.getFullName();
-                    AnnotatedParameter arg = ctor.getParameter(0);
-                    properties[0] = constructCreatorProperty(ctxt, beanDesc, name, 0, arg,
-                            intr.findInjectableValueId(arg));
-                    creators.addPropertyCreator(ctor, isCreator, properties);
+                    PropertyName name = candidate.paramName(0);
+                    properties[0] = constructCreatorProperty(ctxt, beanDesc, name, 0,
+                            candidate.parameter(0), candidate.injection(0));
+                    creators.addPropertyCreator(ctor, false, properties);
                 } else {
-                    /*boolean added = */ _handleSingleArgumentConstructor(ctxt, beanDesc, vchecker, intr, creators,
-                            ctor, isCreator,
+                    /*boolean added = */ _handleSingleArgumentCreator(creators,
+                            ctor, false,
                             vchecker.isCreatorVisible(ctor));
                     // one more thing: sever link to creator property, to avoid possible later
                     // problems with "unresolved" constructor property
-                    if (argDef != null) {
-                        ((POJOPropertyBuilder) argDef).removeConstructors();
+                    if (propDef != null) {
+                        ((POJOPropertyBuilder) propDef).removeConstructors();
                     }
                 }
                 // regardless, fully handled
@@ -443,7 +506,7 @@ public abstract class BasicDeserializerFactory
             // 14-Mar-2015, tatu (2.6): Or, as per [#725], implicit names will also
             //   do, with some constraints. But that will require bit post processing...
 
-            AnnotatedParameter nonAnnotatedParam = null;
+            int nonAnnotatedParamIndex = -1;
             SettableBeanProperty[] properties = new SettableBeanProperty[argCount];
             int explicitNameCount = 0;
             int implicitWithCreatorCount = 0;
@@ -451,8 +514,8 @@ public abstract class BasicDeserializerFactory
 
             for (int i = 0; i < argCount; ++i) {
                 final AnnotatedParameter param = ctor.getParameter(i);
-                BeanPropertyDefinition propDef = (propDefs == null) ? null : propDefs[i];
-                Object injectId = intr.findInjectableValueId(param);
+                BeanPropertyDefinition propDef = candidate.propertyDef(i);
+                JacksonInject.Value injectId = intr.findInjectableValue(param);
                 final PropertyName name = (propDef == null) ? null : propDef.getFullName();
 
                 if (propDef != null && propDef.isExplicitlyNamed()) {
@@ -467,53 +530,61 @@ public abstract class BasicDeserializerFactory
                 }
                 NameTransformer unwrapper = intr.findUnwrappingNameTransformer(param);
                 if (unwrapper != null) {
+                    _reportUnwrappedCreatorProperty(ctxt, beanDesc, param);
+                    /*
                     properties[i] = constructCreatorProperty(ctxt, beanDesc, UNWRAPPED_CREATOR_PARAM_NAME, i, param, null);
                     ++explicitNameCount;
+                    */
                     continue;
                 }
                 // One more thing: implicit names are ok iff ctor has creator annotation
+                /*
                 if (isCreator && (name != null && !name.isEmpty())) {
                     ++implicitWithCreatorCount;
                     properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectId);
                     continue;
                 }
-                if (nonAnnotatedParam == null) {
-                    nonAnnotatedParam = param;
+                */
+                if (nonAnnotatedParamIndex < 0) {
+                    nonAnnotatedParamIndex = i;
                 }
             }
 
             final int namedCount = explicitNameCount + implicitWithCreatorCount;
             // Ok: if named or injectable, we have more work to do
-            if (isCreator || (explicitNameCount > 0) || (injectCount > 0)) {
+            if ((explicitNameCount > 0) || (injectCount > 0)) {
                 // simple case; everything covered:
                 if ((namedCount + injectCount) == argCount) {
-                    creators.addPropertyCreator(ctor, isCreator, properties);
+                    creators.addPropertyCreator(ctor, false, properties);
                     continue;
                 }
                 if ((explicitNameCount == 0) && ((injectCount + 1) == argCount)) {
                     // Secondary: all but one injectable, one un-annotated (un-named)
-                    creators.addDelegatingCreator(ctor, isCreator, properties);
+                    creators.addDelegatingCreator(ctor, false, properties, 0);
                     continue;
                 }
                 // otherwise, epic fail?
                 // 16-Mar-2015, tatu: due to [#725], need to be more permissive. For now let's
                 //    only report problem if there's no implicit name
-                PropertyName impl = _findImplicitParamName(nonAnnotatedParam, intr);
+                PropertyName impl = candidate.findImplicitParamName(nonAnnotatedParamIndex);
                 if (impl == null || impl.isEmpty()) {
                     // Let's consider non-static inner class as a special case...
-                    int ix = nonAnnotatedParam.getIndex();
-                    if ((ix == 0) && ClassUtil.isNonStaticInnerClass(ctor.getDeclaringClass())) {
+                    // 25-Jan-2017, tatu: Non-static inner classes skipped altogether, now
+                    /*
+                    if ((nonAnnotatedParamIndex == 0) && isNonStaticInnerClass) {
                         throw new IllegalArgumentException("Non-static inner classes like "
-                                +ctor.getDeclaringClass().getName()+" can not use @JsonCreator for constructors");
+                                +ctor.getDeclaringClass().getName()+" cannot use @JsonCreator for constructors");
                     }
-                    throw new IllegalArgumentException("Argument #"+ix
-                            +" of constructor "+ctor+" has no property name annotation; must have name when multiple-parameter constructor annotated as Creator");
+                    */
+                    ctxt.reportBadTypeDefinition(beanDesc,
+"Argument #%d of constructor %s has no property name annotation; must have name when multiple-parameter constructor annotated as Creator",
+nonAnnotatedParamIndex, ctor);
                 }
             }
             // [#725]: as a fallback, all-implicit names may work as well
             if (!creators.hasDefaultCreator()) {
                 if (implicitCtors == null) {
-                    implicitCtors = new LinkedList<AnnotatedConstructor>();
+                    implicitCtors = new LinkedList<>();
                 }
                 implicitCtors.add(ctor);
             }
@@ -527,12 +598,180 @@ public abstract class BasicDeserializerFactory
         }
     }
 
-    protected void _checkImplicitlyNamedConstructors(DeserializationContext ctxt,
+    /**
+     * Helper method called when there is the explicit "is-creator" with mode of "delegating"
+     *
+     * @since 2.9.2
+     */
+    protected void _addExplicitDelegatingCreator(DeserializationContext ctxt,
+            BeanDescription beanDesc, CreatorCollector creators,
+            CreatorCandidate candidate)
+        throws JsonMappingException
+    {
+        // Somewhat simple: find injectable values, if any, ensure there is one
+        // and just one delegated argument; report violations if any
+
+        int ix = -1;
+        final int argCount = candidate.paramCount();
+        SettableBeanProperty[] properties = new SettableBeanProperty[argCount];
+        for (int i = 0; i < argCount; ++i) {
+            AnnotatedParameter param = candidate.parameter(i);
+            JacksonInject.Value injectId = candidate.injection(i);
+            if (injectId != null) {
+                properties[i] = constructCreatorProperty(ctxt, beanDesc, null, i, param, injectId);
+                continue;
+            }
+            if (ix < 0) {
+                ix = i;
+                continue;
+            }
+            // Illegal to have more than one value to delegate to
+            ctxt.reportBadTypeDefinition(beanDesc,
+                    "More than one argument (#%d and #%d) left as delegating for Creator %s: only one allowed",
+                    ix, i, candidate);
+        }
+        // Also, let's require that one Delegating argument does eixt
+        if (ix < 0) {
+            ctxt.reportBadTypeDefinition(beanDesc,
+                    "No argument left as delegating for Creator %s: exactly one required", candidate);
+        }
+        // 17-Jan-2018, tatu: as per [databind#1853] need to ensure we will distinguish
+        //   "well-known" single-arg variants (String, int/long, boolean) from "generic" delegating...
+        if (argCount == 1) {
+            _handleSingleArgumentCreator(creators, candidate.creator(), true, true);
+            // one more thing: sever link to creator property, to avoid possible later
+            // problems with "unresolved" constructor property
+            BeanPropertyDefinition paramDef = candidate.propertyDef(0);
+            if (paramDef != null) {
+                ((POJOPropertyBuilder) paramDef).removeConstructors();
+            }
+            return;
+        }
+        creators.addDelegatingCreator(candidate.creator(), true, properties, ix);
+    }
+
+    /**
+     * Helper method called when there is the explicit "is-creator" with mode of "properties-based"
+     *
+     * @since 2.9.2
+     */
+    protected void _addExplicitPropertyCreator(DeserializationContext ctxt,
+            BeanDescription beanDesc, CreatorCollector creators,
+            CreatorCandidate candidate)
+        throws JsonMappingException
+    {
+        final int paramCount = candidate.paramCount();
+        SettableBeanProperty[] properties = new SettableBeanProperty[paramCount];
+
+        for (int i = 0; i < paramCount; ++i) {
+            JacksonInject.Value injectId = candidate.injection(i);
+            AnnotatedParameter param = candidate.parameter(i);
+            PropertyName name = candidate.paramName(i);
+            if (name == null) {
+                // 21-Sep-2017, tatu: Looks like we want to block accidental use of Unwrapped,
+                //   as that will not work with Creators well at all
+                NameTransformer unwrapper = ctxt.getAnnotationIntrospector().findUnwrappingNameTransformer(param);
+                if (unwrapper != null) {
+                    _reportUnwrappedCreatorProperty(ctxt, beanDesc, param);
+                    /*
+                    properties[i] = constructCreatorProperty(ctxt, beanDesc, UNWRAPPED_CREATOR_PARAM_NAME, i, param, null);
+                    ++explicitNameCount;
+                    */
+                }
+                name = candidate.findImplicitParamName(i);
+                // Must be injectable or have name; without either won't work
+                if ((name == null) && (injectId == null)) {
+                    ctxt.reportBadTypeDefinition(beanDesc,
+"Argument #%d has no property name, is not Injectable: can not use as Creator %s", i, candidate);
+                }
+            }
+            properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectId);
+        }
+        creators.addPropertyCreator(candidate.creator(), true, properties);
+    }
+
+    /**
+     * Helper method called when there is the explicit "is-creator", but no mode declaration.
+     *
+     * @since 2.9.2
+     */
+    protected void _addExplicitAnyCreator(DeserializationContext ctxt,
+            BeanDescription beanDesc, CreatorCollector creators,
+            CreatorCandidate candidate)
+        throws JsonMappingException
+    {
+        // Looks like there's bit of magic regarding 1-parameter creators; others simpler:
+        if (1 != candidate.paramCount()) {
+            // Ok: for delegates, we want one and exactly one parameter without
+            // injection AND without name
+            int oneNotInjected = candidate.findOnlyParamWithoutInjection();
+            if (oneNotInjected >= 0) {
+                // getting close; but most not have name
+                if (candidate.paramName(oneNotInjected) == null) {
+                    _addExplicitDelegatingCreator(ctxt, beanDesc, creators, candidate);
+                    return;
+                }
+            }
+            _addExplicitPropertyCreator(ctxt, beanDesc, creators, candidate);
+            return;
+        }
+        AnnotatedParameter param = candidate.parameter(0);
+        JacksonInject.Value injectId = candidate.injection(0);
+        PropertyName paramName = candidate.explicitParamName(0);
+        BeanPropertyDefinition paramDef = candidate.propertyDef(0);
+
+        // If there's injection or explicit name, should be properties-based
+        boolean useProps = (paramName != null) || (injectId != null);
+        if (!useProps && (paramDef != null)) {
+            // One more thing: if implicit name matches property with a getter
+            // or field, we'll consider it property-based as well
+            paramName = candidate.findImplicitParamName(0);
+            useProps = (paramName != null) && paramDef.couldSerialize();
+        }
+        if (useProps) {
+            SettableBeanProperty[] properties = new SettableBeanProperty[] {
+                    constructCreatorProperty(ctxt, beanDesc, paramName, 0, param, injectId)
+            };
+            creators.addPropertyCreator(candidate.creator(), true, properties);
+            return;
+        }
+        _handleSingleArgumentCreator(creators, candidate.creator(), true, true);
+
+        // one more thing: sever link to creator property, to avoid possible later
+        // problems with "unresolved" constructor property
+        if (paramDef != null) {
+            ((POJOPropertyBuilder) paramDef).removeConstructors();
+        }
+    }
+
+    private boolean _checkIfCreatorPropertyBased(AnnotationIntrospector intr,
+            AnnotatedWithParams creator, BeanPropertyDefinition propDef)
+    {
+        // If explicit name, or inject id, property-based
+        if (((propDef != null) && propDef.isExplicitlyNamed())
+                || (intr.findInjectableValue(creator.getParameter(0)) != null)) {
+            return true;
+        }
+        if (propDef != null) {
+            // One more thing: if implicit name matches property with a getter
+            // or field, we'll consider it property-based as well
+            String implName = propDef.getName();
+            if (implName != null && !implName.isEmpty()) {
+                if (propDef.couldSerialize()) {
+                    return true;
+                }
+            }
+        }
+        // in absence of everything else, default to delegating
+        return false;
+    }
+
+    private void _checkImplicitlyNamedConstructors(DeserializationContext ctxt,
             BeanDescription beanDesc, VisibilityChecker<?> vchecker,
             AnnotationIntrospector intr, CreatorCollector creators,
-            List<AnnotatedConstructor> implicitCtors) throws JsonMappingException
+            List<AnnotatedWithParams> implicitCtors) throws JsonMappingException
     {
-        AnnotatedConstructor found = null;
+        AnnotatedWithParams found = null;
         SettableBeanProperty[] foundProps = null;
 
         // Further checks: (a) must have names for all parameters, (b) only one visible
@@ -540,7 +779,7 @@ public abstract class BasicDeserializerFactory
         // `@JsonCreator` (or equivalent) annotation, we need to do bit more re-inspection...
 
         main_loop:
-        for (AnnotatedConstructor ctor : implicitCtors) {
+        for (AnnotatedWithParams ctor : implicitCtors) {
             if (!vchecker.isCreatorVisible(ctor)) {
                 continue;
             }
@@ -558,7 +797,7 @@ public abstract class BasicDeserializerFactory
                 properties[i] = constructCreatorProperty(ctxt, beanDesc, name, param.getIndex(),
                         param, /*injectId*/ null);
             }
-            if (found != null) { // only one allowed
+            if (found != null) { // only one allowed; but multiple not an error
                 found = null;
                 break;
             }
@@ -581,45 +820,160 @@ public abstract class BasicDeserializerFactory
         }
     }
 
-    protected boolean _checkIfCreatorPropertyBased(AnnotationIntrospector intr,
-            AnnotatedWithParams creator, BeanPropertyDefinition propDef)
+    protected void _addDeserializerFactoryMethods
+        (DeserializationContext ctxt, BeanDescription beanDesc, VisibilityChecker<?> vchecker,
+         AnnotationIntrospector intr, CreatorCollector creators,
+         Map<AnnotatedWithParams,BeanPropertyDefinition[]> creatorParams)
+        throws JsonMappingException
     {
-        JsonCreator.Mode mode = intr.findCreatorBinding(creator);
+        List<CreatorCandidate> nonAnnotated = new LinkedList<>();
+        int explCount = 0;
 
-        if (mode == JsonCreator.Mode.PROPERTIES) {
-            return true;
+        // 21-Sep-2017, tatu: First let's handle explicitly annotated ones
+        for (AnnotatedMethod factory : beanDesc.getFactoryMethods()) {
+            JsonCreator.Mode creatorMode = intr.findCreatorAnnotation(ctxt.getConfig(), factory);
+            final int argCount = factory.getParameterCount();
+            if (creatorMode == null) {
+                // Only potentially accept 1-argument factory methods
+                if ((argCount == 1) && vchecker.isCreatorVisible(factory)) {
+                    nonAnnotated.add(CreatorCandidate.construct(intr, factory, null));
+                }
+                continue;
+            }
+            if (creatorMode == Mode.DISABLED) {
+                continue;
+            }
+            
+            // zero-arg method factory methods fine, as long as explicit
+            if (argCount == 0) {
+                creators.setDefaultCreator(factory);
+                continue;
+            }
+
+            switch (creatorMode) {
+            case DELEGATING:
+                _addExplicitDelegatingCreator(ctxt, beanDesc, creators,
+                        CreatorCandidate.construct(intr, factory, null));
+                break;
+            case PROPERTIES:
+                _addExplicitPropertyCreator(ctxt, beanDesc, creators,
+                        CreatorCandidate.construct(intr, factory, creatorParams.get(factory)));
+                break;
+            case DEFAULT:
+            default:
+                _addExplicitAnyCreator(ctxt, beanDesc, creators,
+                        CreatorCandidate.construct(intr, factory, creatorParams.get(factory)));
+                break;
+            }
+            ++explCount;
         }
-        if (mode == JsonCreator.Mode.DELEGATING) {
-            return false;
+        // And only if and when those handled, consider potentially visible ones
+        if (explCount > 0) { // TODO: split method into two since we could have expl factories
+            return;
         }
-        // If explicit name, or inject id, property-based
-        if (((propDef != null) && propDef.isExplicitlyNamed())
-                || (intr.findInjectableValueId(creator.getParameter(0)) != null)) {
-            return true;
-        }
-        if (propDef != null) {
-            // One more thing: if implicit name matches property with a getter
-            // or field, we'll consider it property-based as well
-            String implName = propDef.getName();
-            if (implName != null && !implName.isEmpty()) {
-                if (propDef.couldSerialize()) {
-                    return true;
+        // And then implicitly found
+        for (CreatorCandidate candidate : nonAnnotated) {
+            final int argCount = candidate.paramCount();
+            AnnotatedWithParams factory = candidate.creator();
+            final BeanPropertyDefinition[] propDefs = creatorParams.get(factory);
+            // some single-arg factory methods (String, number) are auto-detected
+            if (argCount != 1) {
+                continue; // 2 and more args? Must be explicit, handled earlier
+            }
+            BeanPropertyDefinition argDef = candidate.propertyDef(0);
+            boolean useProps = _checkIfCreatorPropertyBased(intr, factory, argDef);
+            if (!useProps) { // not property based but delegating
+                /*boolean added=*/ _handleSingleArgumentCreator(creators,
+                        factory, false, vchecker.isCreatorVisible(factory));
+                // 23-Sep-2016, tatu: [databind#1383]: Need to also sever link to avoid possible
+                //    later problems with "unresolved" constructor property
+                if (argDef != null) {
+                    ((POJOPropertyBuilder) argDef).removeConstructors();
+                }
+                continue;
+            }
+            AnnotatedParameter nonAnnotatedParam = null;            
+            SettableBeanProperty[] properties = new SettableBeanProperty[argCount];
+            int implicitNameCount = 0;
+            int explicitNameCount = 0;
+            int injectCount = 0;
+            
+            for (int i = 0; i < argCount; ++i) {
+                final AnnotatedParameter param = factory.getParameter(i);
+                BeanPropertyDefinition propDef = (propDefs == null) ? null : propDefs[i];
+                JacksonInject.Value injectable = intr.findInjectableValue(param);
+                final PropertyName name = (propDef == null) ? null : propDef.getFullName();
+
+                if (propDef != null && propDef.isExplicitlyNamed()) {
+                    ++explicitNameCount;
+                    properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectable);
+                    continue;
+                }
+                if (injectable != null) {
+                    ++injectCount;
+                    properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectable);
+                    continue;
+                }
+                NameTransformer unwrapper = intr.findUnwrappingNameTransformer(param);
+                if (unwrapper != null) {
+                    _reportUnwrappedCreatorProperty(ctxt, beanDesc, param);
+                    /*
+                    properties[i] = constructCreatorProperty(ctxt, beanDesc, UNWRAPPED_CREATOR_PARAM_NAME, i, param, null);
+                    ++implicitNameCount;
+                    */
+                    continue;
+                }
+                // One more thing: implicit names are ok iff ctor has creator annotation
+                /*
+                if (isCreator) {
+                    if (name != null && !name.isEmpty()) {
+                        ++implicitNameCount;
+                        properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectable);
+                        continue;
+                    }
+                }
+                */
+                /* 25-Sep-2014, tatu: Actually, we may end up "losing" naming due to higher-priority constructor
+                 *  (see TestCreators#testConstructorCreator() test). And just to avoid running into that problem,
+                 *  let's add one more work around
+                 */
+                /*
+                PropertyName name2 = _findExplicitParamName(param, intr);
+                if (name2 != null && !name2.isEmpty()) {
+                    // Hmmh. Ok, fine. So what are we to do with it... ?
+                    // For now... skip. May need to revisit this, should this become problematic
+                    continue main_loop;
+                }
+                */
+                if (nonAnnotatedParam == null) {
+                    nonAnnotatedParam = param;
+                }
+            }
+            final int namedCount = explicitNameCount + implicitNameCount;
+            
+            // Ok: if named or injectable, we have more work to do
+            if (explicitNameCount > 0 || injectCount > 0) {
+                // simple case; everything covered:
+                if ((namedCount + injectCount) == argCount) {
+                    creators.addPropertyCreator(factory, false, properties);
+                } else if ((explicitNameCount == 0) && ((injectCount + 1) == argCount)) {
+                    // secondary: all but one injectable, one un-annotated (un-named)
+                    creators.addDelegatingCreator(factory, false, properties, 0);
+                } else { // otherwise, epic fail
+                    ctxt.reportBadTypeDefinition(beanDesc,
+"Argument #%d of factory method %s has no property name annotation; must have name when multiple-parameter constructor annotated as Creator",
+                    nonAnnotatedParam.getIndex(), factory);
                 }
             }
         }
-        // in absence of everything else, default to delegating
-        return false;
     }
-    
-    protected boolean _handleSingleArgumentConstructor(DeserializationContext ctxt,
-            BeanDescription beanDesc, VisibilityChecker<?> vchecker,
-            AnnotationIntrospector intr, CreatorCollector creators,
-            AnnotatedConstructor ctor, boolean isCreator, boolean isVisible)
-        throws JsonMappingException
+
+    protected boolean _handleSingleArgumentCreator(CreatorCollector creators,
+            AnnotatedWithParams ctor, boolean isCreator, boolean isVisible)
     {
         // otherwise either 'simple' number, String, or general delegate:
         Class<?> type = ctor.getRawParameterType(0);
-        if (type == String.class || type == CharSequence.class) {
+        if (type == String.class || type == CLASS_CHAR_SEQUENCE) {
             if (isCreator || isVisible) {
                 creators.addStringCreator(ctor, isCreator);
             }
@@ -651,162 +1005,21 @@ public abstract class BasicDeserializerFactory
         }
         // Delegating Creator ok iff it has @JsonCreator (etc)
         if (isCreator) {
-            creators.addDelegatingCreator(ctor, isCreator, null);
+            creators.addDelegatingCreator(ctor, isCreator, null, 0);
             return true;
         }
         return false;
     }
 
-    protected void _addDeserializerFactoryMethods
-        (DeserializationContext ctxt, BeanDescription beanDesc, VisibilityChecker<?> vchecker,
-         AnnotationIntrospector intr, CreatorCollector creators,
-         Map<AnnotatedWithParams,BeanPropertyDefinition[]> creatorParams)
+    // 01-Dec-2016, tatu: As per [databind#265] we cannot yet support passing
+    //   of unwrapped values through creator properties, so fail fast
+    protected void _reportUnwrappedCreatorProperty(DeserializationContext ctxt,
+            BeanDescription beanDesc, AnnotatedParameter param)
         throws JsonMappingException
     {
-        final DeserializationConfig config = ctxt.getConfig();
-        for (AnnotatedMethod factory : beanDesc.getFactoryMethods()) {
-            final boolean isCreator = intr.hasCreatorAnnotation(factory);
-            final int argCount = factory.getParameterCount();
-            // zero-arg methods must be annotated; if so, are "default creators" [JACKSON-850]
-            if (argCount == 0) {
-                if (isCreator) {
-                    creators.setDefaultCreator(factory);
-                }
-                continue;
-            }
-
-            final BeanPropertyDefinition[] propDefs = creatorParams.get(factory);
-            // some single-arg factory methods (String, number) are auto-detected
-            if (argCount == 1) {
-                BeanPropertyDefinition argDef = (propDefs == null) ? null : propDefs[0];
-                boolean useProps = _checkIfCreatorPropertyBased(intr, factory, argDef);
-                if (!useProps) { // not property based but delegating
-                    /*boolean added=*/ _handleSingleArgumentFactory(config, beanDesc, vchecker, intr, creators,
-                            factory, isCreator);
-                    // otherwise just ignored
-                    continue;
-                }
-                // fall through if there's name
-            } else {
-                // more than 2 args, must have @JsonCreator
-                if (!isCreator) {
-                    continue;
-                }
-            }
-            // 1 or more args; all params must have name annotations
-            AnnotatedParameter nonAnnotatedParam = null;            
-            SettableBeanProperty[] properties = new SettableBeanProperty[argCount];
-            int implicitNameCount = 0;
-            int explicitNameCount = 0;
-            int injectCount = 0;
-            
-            for (int i = 0; i < argCount; ++i) {
-                final AnnotatedParameter param = factory.getParameter(i);
-                BeanPropertyDefinition propDef = (propDefs == null) ? null : propDefs[i];
-                Object injectId = intr.findInjectableValueId(param);
-                final PropertyName name = (propDef == null) ? null : propDef.getFullName();
-
-                if (propDef != null && propDef.isExplicitlyNamed()) {
-                    ++explicitNameCount;
-                    properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectId);
-                    continue;
-                }
-                if (injectId != null) {
-                    ++injectCount;
-                    properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectId);
-                    continue;
-                }
-                NameTransformer unwrapper = intr.findUnwrappingNameTransformer(param);
-                if (unwrapper != null) {
-                    properties[i] = constructCreatorProperty(ctxt, beanDesc, UNWRAPPED_CREATOR_PARAM_NAME, i, param, null);
-                    ++implicitNameCount;
-                    continue;
-                }
-                // One more thing: implicit names are ok iff ctor has creator annotation
-                if (isCreator) {
-                    if (name != null && !name.isEmpty()) {
-                        ++implicitNameCount;
-                        properties[i] = constructCreatorProperty(ctxt, beanDesc, name, i, param, injectId);
-                        continue;
-                    }
-                }
-                /* 25-Sep-2014, tatu: Actually, we may end up "losing" naming due to higher-priority constructor
-                 *  (see TestCreators#testConstructorCreator() test). And just to avoid running into that problem,
-                 *  let's add one more work around
-                 */
-                /*
-                PropertyName name2 = _findExplicitParamName(param, intr);
-                if (name2 != null && !name2.isEmpty()) {
-                    // Hmmh. Ok, fine. So what are we to do with it... ?
-                    // For now... skip. May need to revisit this, should this become problematic
-                    continue main_loop;
-                }
-                */
-                if (nonAnnotatedParam == null) {
-                    nonAnnotatedParam = param;
-                }
-            }
-            final int namedCount = explicitNameCount + implicitNameCount;
-            
-            // Ok: if named or injectable, we have more work to do
-            if (isCreator || explicitNameCount > 0 || injectCount > 0) {
-                // simple case; everything covered:
-                if ((namedCount + injectCount) == argCount) {
-                    creators.addPropertyCreator(factory, isCreator, properties);
-                } else if ((explicitNameCount == 0) && ((injectCount + 1) == argCount)) {
-                    // [712] secondary: all but one injectable, one un-annotated (un-named)
-                    creators.addDelegatingCreator(factory, isCreator, properties);
-                } else { // otherwise, epic fail
-                    throw new IllegalArgumentException("Argument #"+nonAnnotatedParam.getIndex()
-                            +" of factory method "+factory+" has no property name annotation; must have name when multiple-parameter constructor annotated as Creator");
-                }
-            }
-        }
-    }
-
-    protected boolean _handleSingleArgumentFactory(DeserializationConfig config,
-            BeanDescription beanDesc, VisibilityChecker<?> vchecker,
-            AnnotationIntrospector intr, CreatorCollector creators,
-            AnnotatedMethod factory, boolean isCreator)
-        throws JsonMappingException
-    {
-        Class<?> type = factory.getRawParameterType(0);
-        
-        if (type == String.class || type == CharSequence.class) {
-            if (isCreator || vchecker.isCreatorVisible(factory)) {
-                creators.addStringCreator(factory, isCreator);
-            }
-            return true;
-        }
-        if (type == int.class || type == Integer.class) {
-            if (isCreator || vchecker.isCreatorVisible(factory)) {
-                creators.addIntCreator(factory, isCreator);
-            }
-            return true;
-        }
-        if (type == long.class || type == Long.class) {
-            if (isCreator || vchecker.isCreatorVisible(factory)) {
-                creators.addLongCreator(factory, isCreator);
-            }
-            return true;
-        }
-        if (type == double.class || type == Double.class) {
-            if (isCreator || vchecker.isCreatorVisible(factory)) {
-                creators.addDoubleCreator(factory, isCreator);
-            }
-            return true;
-        }
-        if (type == boolean.class || type == Boolean.class) {
-            if (isCreator || vchecker.isCreatorVisible(factory)) {
-                creators.addBooleanCreator(factory, isCreator);
-            }
-            return true;
-        }
-        if (isCreator) {
-            creators.addDelegatingCreator(factory, isCreator, null);
-            return true;
-        }
-        return false;
+        ctxt.reportBadDefinition(beanDesc.getType(), String.format(
+                "Cannot define Creator parameter %d as `@JsonUnwrapped`: combination not yet supported",
+                param.getIndex()));
     }
 
     /**
@@ -817,7 +1030,7 @@ public abstract class BasicDeserializerFactory
     protected SettableBeanProperty constructCreatorProperty(DeserializationContext ctxt,
             BeanDescription beanDesc, PropertyName name, int index,
             AnnotatedParameter param,
-            Object injectableValueId)
+            JacksonInject.Value injectable)
         throws JsonMappingException
     {
         final DeserializationConfig config = ctxt.getConfig();
@@ -828,29 +1041,15 @@ public abstract class BasicDeserializerFactory
                 metadata = PropertyMetadata.STD_REQUIRED_OR_OPTIONAL;
             } else {
                 Boolean b = intr.hasRequiredMarker(param);
-                boolean req = (b != null && b.booleanValue());
                 String desc = intr.findPropertyDescription(param);
                 Integer idx = intr.findPropertyIndex(param);
                 String def = intr.findPropertyDefaultValue(param);
-                metadata = PropertyMetadata.construct(req, desc, idx, def);
+                metadata = PropertyMetadata.construct(b, desc, idx, def);
             }
         }
-        // 15-Oct-2015, tatu: Not 100% if context needed; removing it does not make any
-        //    existing unit tests fail. Still seems like the right thing to do.
-        JavaType t0 = beanDesc.resolveType(param.getParameterType());
-        BeanProperty.Std property = new BeanProperty.Std(name, t0,
-                intr.findWrapperName(param),
-                beanDesc.getClassAnnotations(), param, metadata);
-        JavaType type = resolveType(ctxt, beanDesc, t0, param);
-        if (type != t0) {
-            property = property.withType(type);
-        }
-        // Is there an annotation that specifies exact deserializer?
-        JsonDeserializer<?> deser = findDeserializerFromAnnotation(ctxt, param);
-
-        // If yes, we are mostly done:
-        type = modifyTypeByAnnotation(ctxt, param, type);
-
+        JavaType type = resolveMemberAndTypeAnnotations(ctxt, param, param.getType());
+        BeanProperty.Std property = new BeanProperty.Std(name, type,
+                intr.findWrapperName(param), param, metadata);
         // Type deserializer: either comes from property (and already resolved)
         TypeDeserializer typeDeser = (TypeDeserializer) type.getTypeHandler();
         // or if not, based on type being referenced:
@@ -859,18 +1058,25 @@ public abstract class BasicDeserializerFactory
         }
         // Note: contextualization of typeDeser _should_ occur in constructor of CreatorProperty
         // so it is not called directly here
+
+        Object injectableValueId = (injectable == null) ? null : injectable.getId();
+        
         SettableBeanProperty prop = new CreatorProperty(name, type, property.getWrapperName(),
                 typeDeser, beanDesc.getClassAnnotations(), param, index, injectableValueId,
                 metadata);
+        JsonDeserializer<?> deser = findDeserializerFromAnnotation(ctxt, param);
+        if (deser == null) {
+            deser = type.getValueHandler();
+        }
         if (deser != null) {
-            // As per [Issue#462] need to ensure we contextualize deserializer before passing it on
+            // As per [databind#462] need to ensure we contextualize deserializer before passing it on
             deser = ctxt.handlePrimaryContextualization(deser, prop, type);
             prop = prop.withValueDeserializer(deser);
         }
         return prop;
     }
 
-    protected PropertyName _findParamName(AnnotatedParameter param, AnnotationIntrospector intr)
+    private PropertyName _findParamName(AnnotatedParameter param, AnnotationIntrospector intr)
     {
         if (param != null && intr != null) {
             PropertyName name = intr.findNameForDeserialization(param);
@@ -886,34 +1092,6 @@ public abstract class BasicDeserializerFactory
             }
         }
         return null;
-    }
-
-    protected PropertyName _findImplicitParamName(AnnotatedParameter param, AnnotationIntrospector intr)
-    {
-        String str = intr.findImplicitPropertyName(param);
-        if (str != null && !str.isEmpty()) {
-            return PropertyName.construct(str);
-        }
-        return null;
-    }
-
-    @Deprecated // in 2.6, remove from 2.7
-    protected PropertyName _findExplicitParamName(AnnotatedParameter param, AnnotationIntrospector intr)
-    {
-        if (param != null && intr != null) {
-            return intr.findNameForDeserialization(param);
-        }
-        return null;
-    }
-
-    @Deprecated // in 2.6, remove from 2.7
-    protected boolean _hasExplicitParamName(AnnotatedParameter param, AnnotationIntrospector intr)
-    {
-        if (param != null && intr != null) {
-            PropertyName n = intr.findNameForDeserialization(param);
-            return (n != null) && n.hasSimpleName();
-        }
-        return false;
     }
 
     /*
@@ -946,7 +1124,8 @@ public abstract class BasicDeserializerFactory
                 Class<?> raw = elemType.getRawClass();
                 if (elemType.isPrimitive()) {
                     return PrimitiveArrayDeserializers.forType(raw);
-                } else if (raw == String.class) {
+                }
+                if (raw == String.class) {
                     return StringArrayDeserializer.instance;
                 }
             }
@@ -1011,7 +1190,7 @@ public abstract class BasicDeserializerFactory
                 if (implType == null) {
                     // [databind#292]: Actually, may be fine, but only if polymorphich deser enabled
                     if (type.getTypeHandler() == null) {
-                        throw new IllegalArgumentException("Can not find a deserializer for non-concrete Collection type "+type);
+                        throw new IllegalArgumentException("Cannot find a deserializer for non-concrete Collection type "+type);
                     }
                     deser = AbstractDeserializer.constructForNonPOJO(beanDesc);
                 } else {
@@ -1024,12 +1203,17 @@ public abstract class BasicDeserializerFactory
                 ValueInstantiator inst = findValueInstantiator(ctxt, beanDesc);
                 if (!inst.canCreateUsingDefault()) {
                     // [databind#161]: No default constructor for ArrayBlockingQueue...
-                    if (type.getRawClass() == ArrayBlockingQueue.class) {
+                    if (type.hasRawClass(ArrayBlockingQueue.class)) {
                         return new ArrayBlockingQueueDeserializer(type, contentDeser, contentTypeDeser, inst);
+                    }
+                    // 10-Jan-2017, tatu: `java.util.Collections` types need help:
+                    deser = JavaUtilCollectionsDeserializers.findForCollection(ctxt, type);
+                    if (deser != null) {
+                        return deser;
                     }
                 }
                 // Can use more optimal deserializer if content type is String, so:
-                if (contentType.getRawClass() == String.class) {
+                if (contentType.hasRawClass(String.class)) {
                     // no value type deserializer because Strings are one of natural/native types:
                     deser = new StringCollectionDeserializer(type, contentDeser, inst);
                 } else {
@@ -1104,16 +1288,16 @@ public abstract class BasicDeserializerFactory
         // First: is there annotation-specified deserializer for values?
         @SuppressWarnings("unchecked")
         JsonDeserializer<Object> contentDeser = (JsonDeserializer<Object>) contentType.getValueHandler();
-        
+
         // Ok: need a key deserializer (null indicates 'default' here)
         KeyDeserializer keyDes = (KeyDeserializer) keyType.getValueHandler();
-        // Then optional type info (1.5); either attached to type, or resolved separately:
+        // Then optional type info; either attached to type, or resolved separately:
         TypeDeserializer contentTypeDeser = contentType.getTypeHandler();
         // but if not, may still be possible to find:
         if (contentTypeDeser == null) {
             contentTypeDeser = findTypeDeserializer(config, contentType);
         }
-        
+
         // 23-Nov-2010, tatu: Custom deserializer?
         JsonDeserializer<?> deser = _findCustomMapDeserializer(type, config, beanDesc,
                 keyDes, contentTypeDeser, contentDeser);
@@ -1122,11 +1306,21 @@ public abstract class BasicDeserializerFactory
             // Value handling is identical for all, but EnumMap requires special handling for keys
             Class<?> mapClass = type.getRawClass();
             if (EnumMap.class.isAssignableFrom(mapClass)) {
+                ValueInstantiator inst;
+
+                // 06-Mar-2017, tatu: Should only need to check ValueInstantiator for
+                //    custom sub-classes, see [databind#1544]
+                if (mapClass == EnumMap.class) {
+                    inst = null;
+                } else {
+                    inst = findValueInstantiator(ctxt, beanDesc);
+                }
                 Class<?> kt = keyType.getRawClass();
                 if (kt == null || !kt.isEnum()) {
-                    throw new IllegalArgumentException("Can not construct EnumMap; generic (key) type not available");
+                    throw new IllegalArgumentException("Cannot construct EnumMap; generic (key) type not available");
                 }
-                deser = new EnumMapDeserializer(type, null, contentDeser, contentTypeDeser);
+                deser = new EnumMapDeserializer(type, inst, null,
+                        contentDeser, contentTypeDeser, null);
             }
 
             // Otherwise, generic handler works ok.
@@ -1150,23 +1344,35 @@ public abstract class BasicDeserializerFactory
                         // But if so, also need to re-check creators...
                         beanDesc = config.introspectForCreation(type);
                     } else {
-                        // [Issue#292]: Actually, may be fine, but only if polymorphich deser enabled
+                        // [databind#292]: Actually, may be fine, but only if polymorphic deser enabled
                         if (type.getTypeHandler() == null) {
-                            throw new IllegalArgumentException("Can not find a deserializer for non-concrete Map type "+type);
+                            throw new IllegalArgumentException("Cannot find a deserializer for non-concrete Map type "+type);
                         }
                         deser = AbstractDeserializer.constructForNonPOJO(beanDesc);
+                    }
+                } else {
+                    // 10-Jan-2017, tatu: `java.util.Collections` types need help:
+                    deser = JavaUtilCollectionsDeserializers.findForMap(ctxt, type);
+                    if (deser != null) {
+                        return deser;
                     }
                 }
                 if (deser == null) {
                     ValueInstantiator inst = findValueInstantiator(ctxt, beanDesc);
+                    // 01-May-2016, tatu: Which base type to use here gets tricky, since
+                    //   most often it ought to be `Map` or `EnumMap`, but due to abstract
+                    //   mapping it will more likely be concrete type like `HashMap`.
+                    //   So, for time being, just pass `Map.class`
                     MapDeserializer md = new MapDeserializer(type, inst, keyDes, contentDeser, contentTypeDeser);
-                    AnnotationIntrospector ai = config.getAnnotationIntrospector();
-                    md.setIgnorableProperties(ai.findPropertiesToIgnore(beanDesc.getClassInfo(), false));
+                    JsonIgnoreProperties.Value ignorals = config.getDefaultPropertyIgnorals(Map.class,
+                            beanDesc.getClassInfo());
+                    Set<String> ignored = (ignorals == null) ? null
+                            : ignorals.findIgnoredForDeserialization();
+                    md.setIgnorableProperties(ignored);
                     deser = md;
                 }
             }
         }
-        // and then new with 2.2: ability to post-process it too (Issue#120)
         if (_factoryConfig.hasDeserializerModifiers()) {
             for (BeanDeserializerModifier mod : _factoryConfig.deserializerModifiers()) {
                 deser = mod.modifyMapDeserializer(config, type, beanDesc, deser);
@@ -1233,27 +1439,32 @@ public abstract class BasicDeserializerFactory
         final Class<?> enumClass = type.getRawClass();
         // 23-Nov-2010, tatu: Custom deserializer?
         JsonDeserializer<?> deser = _findCustomEnumDeserializer(enumClass, config, beanDesc);
+
         if (deser == null) {
+            ValueInstantiator valueInstantiator = _constructDefaultValueInstantiator(ctxt, beanDesc);
+            SettableBeanProperty[] creatorProps = (valueInstantiator == null) ? null
+                    : valueInstantiator.getFromObjectArguments(ctxt.getConfig());
             // May have @JsonCreator for static factory method:
             for (AnnotatedMethod factory : beanDesc.getFactoryMethods()) {
-                if (ctxt.getAnnotationIntrospector().hasCreatorAnnotation(factory)) {
-                    int argCount = factory.getParameterCount();
-                    if (argCount == 1) {
-                        Class<?> returnType = factory.getRawReturnType();
-                        // usually should be class, but may be just plain Enum<?> (for Enum.valueOf()?)
-                        if (returnType.isAssignableFrom(enumClass)) {
-                            deser = EnumDeserializer.deserializerForCreator(config, enumClass, factory);
-                            break;
-                        }
+                if (_hasCreatorAnnotation(ctxt, factory)) {
+                    if (factory.getParameterCount() == 0) { // [databind#960]
+                        deser = EnumDeserializer.deserializerForNoArgsCreator(config, enumClass, factory);
+                        break;
                     }
-                    throw new IllegalArgumentException("Unsuitable method ("+factory+") decorated with @JsonCreator (for Enum type "
-                            +enumClass.getName()+")");
+                    Class<?> returnType = factory.getRawReturnType();
+                    // usually should be class, but may be just plain Enum<?> (for Enum.valueOf()?)
+                    if (returnType.isAssignableFrom(enumClass)) {
+                        deser = EnumDeserializer.deserializerForCreator(config, enumClass, factory, valueInstantiator, creatorProps);
+                        break;
+                    }
                 }
             }
+           
             // Need to consider @JsonValue if one found
             if (deser == null) {
                 deser = new EnumDeserializer(constructEnumResolver(enumClass,
-                        config, beanDesc.findJsonValueMethod()));
+                        config, beanDesc.findJsonValueAccessor()),
+                        config.isEnabled(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS));
             }
         }
 
@@ -1301,10 +1512,19 @@ public abstract class BasicDeserializerFactory
 
         if (deser == null) {
             // Just one referential type as of JDK 1.7 / Java 7: AtomicReference (Java 8 adds Optional)
-            if (AtomicReference.class.isAssignableFrom(type.getRawClass())) {
-                // 19-Apr-2016, tatu: By default we'd get something that expect to see an
-                //   AtomicReference... but what we need is something else, so...
-                return new AtomicReferenceDeserializer(contentType, contentTypeDeser, contentDeser);
+            if (type.isTypeOrSubTypeOf(AtomicReference.class)) {
+                Class<?> rawType = type.getRawClass();
+                ValueInstantiator inst;
+                if (rawType == AtomicReference.class) {
+                    inst = null;
+                } else {
+                    /* 23-Oct-2016, tatu: Note that subtypes are probably not supportable
+                     *    without either forcing merging (to avoid having to create instance)
+                     *    or something else...
+                     */
+                    inst = findValueInstantiator(ctxt, beanDesc);
+                }
+                return new AtomicReferenceDeserializer(type, inst, contentTypeDeser, contentDeser);
             }
         }
         if (deser != null) {
@@ -1350,7 +1570,7 @@ public abstract class BasicDeserializerFactory
         // (note: check for abstract type is not 100% mandatory, more of an optimization)
         if ((b.getDefaultImpl() == null) && baseType.isAbstract()) {
             JavaType defaultType = mapAbstractType(config, baseType);
-            if (defaultType != null && defaultType.getRawClass() != baseType.getRawClass()) {
+            if ((defaultType != null) && !defaultType.hasRawClass(baseType.getRawClass())) {
                 b = b.defaultImpl(defaultType.getRawClass());
             }
         }
@@ -1394,12 +1614,12 @@ public abstract class BasicDeserializerFactory
         // the only non-standard thing is this:
         if (deser == null) {
             if (type.isEnumType()) {
-                return _createEnumKeyDeserializer(ctxt, type);
+                deser = _createEnumKeyDeserializer(ctxt, type);
+            } else {
+                deser = StdKeyDeserializers.findStringBasedKeyDeserializer(config, type);
             }
-            deser = StdKeyDeserializers.findStringBasedKeyDeserializer(config, type);
         }
-        
-        // and then new with 2.2: ability to post-process it too (Issue#120)
+        // and then post-processing
         if (deser != null) {
             if (_factoryConfig.hasDeserializerModifiers()) {
                 for (BeanDeserializerModifier mod : _factoryConfig.deserializerModifiers()) {
@@ -1433,11 +1653,10 @@ public abstract class BasicDeserializerFactory
                 return StdKeyDeserializers.constructDelegatingKeyDeserializer(config, type, valueDesForKey);
             }
         }
-        EnumResolver enumRes = constructEnumResolver(enumClass, config, beanDesc.findJsonValueMethod());
+        EnumResolver enumRes = constructEnumResolver(enumClass, config, beanDesc.findJsonValueAccessor());
         // May have @JsonCreator for static factory method:
-        final AnnotationIntrospector ai = config.getAnnotationIntrospector();
         for (AnnotatedMethod factory : beanDesc.getFactoryMethods()) {
-            if (ai.hasCreatorAnnotation(factory)) {
+            if (_hasCreatorAnnotation(ctxt, factory)) {
                 int argCount = factory.getParameterCount();
                 if (argCount == 1) {
                     Class<?> returnType = factory.getRawReturnType();
@@ -1458,7 +1677,7 @@ public abstract class BasicDeserializerFactory
                         +enumClass.getName()+")");
             }
         }
-        // [JACKSON-749] Also, need to consider @JsonValue, if one found
+        // Also, need to consider @JsonValue, if one found
         return StdKeyDeserializers.constructEnumKeyDeserializer(enumRes);
     }
 
@@ -1551,11 +1770,11 @@ public abstract class BasicDeserializerFactory
             }
             return new UntypedObjectDeserializer(lt, mt);
         }
-        if (rawType == CLASS_STRING || rawType == CLASS_CHAR_BUFFER) {
+        if (rawType == CLASS_STRING || rawType == CLASS_CHAR_SEQUENCE) {
             return StringDeserializer.instance;
         }
         if (rawType == CLASS_ITERABLE) {
-            // [Issue#199]: Can and should 'upgrade' to a Collection type:
+            // [databind#199]: Can and should 'upgrade' to a Collection type:
             TypeFactory tf = ctxt.getTypeFactory();
             JavaType[] tps = tf.findTypeParameters(type, CLASS_ITERABLE);
             JavaType elemType = (tps == null || tps.length != 1) ? TypeFactory.unknownType() : tps[0];
@@ -1565,14 +1784,8 @@ public abstract class BasicDeserializerFactory
         }
         if (rawType == CLASS_MAP_ENTRY) {
             // 28-Apr-2015, tatu: TypeFactory does it all for us already so
-            JavaType kt = type.containedType(0);
-            if (kt == null) {
-                kt = TypeFactory.unknownType();
-            }
-            JavaType vt = type.containedType(1);
-            if (vt == null) {
-                vt = TypeFactory.unknownType();
-            }
+            JavaType kt = type.containedTypeOrUnknown(0);
+            JavaType vt = type.containedTypeOrUnknown(1);
             TypeDeserializer vts = (TypeDeserializer) vt.getTypeHandler();
             if (vts == null) {
                 vts = findTypeDeserializer(ctxt.getConfig(), vt);
@@ -1754,18 +1967,24 @@ public abstract class BasicDeserializerFactory
     
     /**
      * Helper method called to check if a class or method
-     * has annotation that tells which class to use for deserialization.
+     * has annotation that tells which class to use for deserialization; and if
+     * so, to instantiate, that deserializer to use.
+     * Note that deserializer will NOT yet be contextualized so caller needs to
+     * take care to call contextualization appropriately.
      * Returns null if no such annotation found.
      */
     protected JsonDeserializer<Object> findDeserializerFromAnnotation(DeserializationContext ctxt,
             Annotated ann)
         throws JsonMappingException
     {
-        Object deserDef = ctxt.getAnnotationIntrospector().findDeserializer(ann);
-        if (deserDef == null) {
-            return null;
+        AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+        if (intr != null) {
+            Object deserDef = intr.findDeserializer(ann);
+            if (deserDef != null) {
+                return ctxt.deserializerInstance(ann, deserDef);
+            }
         }
-        return ctxt.deserializerInstance(ann, deserDef);
+        return null;
     }
 
     /**
@@ -1774,35 +1993,140 @@ public abstract class BasicDeserializerFactory
      * Returns null if no such annotation found.
      */
     protected KeyDeserializer findKeyDeserializerFromAnnotation(DeserializationContext ctxt,
-                                                                      Annotated ann)
+            Annotated ann)
             throws JsonMappingException
     {
-        Object deserDef = ctxt.getAnnotationIntrospector().findKeyDeserializer(ann);
-        if (deserDef == null) {
-            return null;
+        AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+        if (intr != null) {
+            Object deserDef = intr.findKeyDeserializer(ann);
+            if (deserDef != null) {
+                return ctxt.keyDeserializerInstance(ann, deserDef);
+            }
         }
-        return ctxt.keyDeserializerInstance(ann, deserDef);
+        return null;
     }
 
     /**
+     * @since 2.9
+     */
+    protected JsonDeserializer<Object> findContentDeserializerFromAnnotation(DeserializationContext ctxt,
+            Annotated ann)
+        throws JsonMappingException
+    {
+        AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+        if (intr != null) {
+            Object deserDef = intr.findContentDeserializer(ann);
+            if (deserDef != null) {
+                return ctxt.deserializerInstance(ann, deserDef);
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Helper method used to resolve additional type-related annotation information
+     * like type overrides, or handler (serializer, deserializer) overrides,
+     * so that from declared field, property or constructor parameter type
+     * is used as the base and modified based on annotations, if any.
+     * 
+     * @since 2.8 Combines functionality of <code>modifyTypeByAnnotation</code>
+     *     and <code>resolveType</code>
+     */
+    protected JavaType resolveMemberAndTypeAnnotations(DeserializationContext ctxt,
+            AnnotatedMember member, JavaType type)
+        throws JsonMappingException
+    {
+        AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+        if (intr == null) {
+            return type;
+        }
+
+        // First things first: see if we can find annotations on declared
+        // type
+
+        if (type.isMapLikeType()) {
+            JavaType keyType = type.getKeyType();
+            if (keyType != null) {
+                Object kdDef = intr.findKeyDeserializer(member);
+                KeyDeserializer kd = ctxt.keyDeserializerInstance(member, kdDef);
+                if (kd != null) {
+                    type = ((MapLikeType) type).withKeyValueHandler(kd);
+                    keyType = type.getKeyType(); // just in case it's used below
+                }
+            }
+        }
+
+        if (type.hasContentType()) { // that is, is either container- or reference-type
+            Object cdDef = intr.findContentDeserializer(member);
+            JsonDeserializer<?> cd = ctxt.deserializerInstance(member, cdDef);
+            if (cd != null) {
+                type = type.withContentValueHandler(cd);
+            }
+            TypeDeserializer contentTypeDeser = findPropertyContentTypeDeserializer(
+                    ctxt.getConfig(), type, (AnnotatedMember) member);            	
+            if (contentTypeDeser != null) {
+                type = type.withContentTypeHandler(contentTypeDeser);
+            }
+        }
+        TypeDeserializer valueTypeDeser = findPropertyTypeDeserializer(ctxt.getConfig(),
+                    type, (AnnotatedMember) member);
+        if (valueTypeDeser != null) {
+            type = type.withTypeHandler(valueTypeDeser);
+        }
+
+        // Second part: find actual type-override annotations on member, if any
+
+        // 18-Jun-2016, tatu: Should we re-do checks for annotations on refined
+        //   subtypes as well? Code pre-2.8 did not do this, but if we get bug
+        //   reports may need to consider
+        type = intr.refineDeserializationType(ctxt.getConfig(), member, type);
+        return type;
+    }
+
+    protected EnumResolver constructEnumResolver(Class<?> enumClass,
+            DeserializationConfig config, AnnotatedMember jsonValueAccessor)
+    {
+        if (jsonValueAccessor != null) {
+            if (config.canOverrideAccessModifiers()) {
+                ClassUtil.checkAndFixAccess(jsonValueAccessor.getMember(),
+                        config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
+            }
+            return EnumResolver.constructUnsafeUsingMethod(enumClass,
+                    jsonValueAccessor, config.getAnnotationIntrospector());
+        }
+        // 14-Mar-2016, tatu: We used to check `DeserializationFeature.READ_ENUMS_USING_TO_STRING`
+        //   here, but that won't do: it must be dynamically changeable...
+        return EnumResolver.constructUnsafe(enumClass, config.getAnnotationIntrospector());
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected boolean _hasCreatorAnnotation(DeserializationContext ctxt,
+            Annotated ann) {
+        AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+        if (intr != null) {
+            JsonCreator.Mode mode = intr.findCreatorAnnotation(ctxt.getConfig(), ann);
+            return (mode != null) && (mode != JsonCreator.Mode.DISABLED); 
+        }
+        return false;
+    }
+    
+    /*
+    /**********************************************************
+    /* Deprecated helper methods
+    /**********************************************************
+     */
+    
+    /**
      * Method called to see if given method has annotations that indicate
      * a more specific type than what the argument specifies.
-     * If annotations are present, they must specify compatible Class;
-     * instance of which can be assigned using the method. This means
-     * that the Class has to be raw class of type, or its sub-class
-     * (or, implementing class if original Class instance is an interface).
      *
-     * @param a Method or field that the type is associated with
-     * @param type Type of field, or the setter argument
-     *
-     * @return Original type if no annotations are present; or a more
-     *   specific type derived from it if type annotation(s) was found
-     *
-     * @throws JsonMappingException if invalid annotation is found
+     * @deprecated Since 2.8; call {@link #resolveMemberAndTypeAnnotations} instead
      */
-    @SuppressWarnings({ "unchecked" })
-    protected <T extends JavaType> T modifyTypeByAnnotation(DeserializationContext ctxt,
-            Annotated a, T type)
+    @Deprecated
+    protected JavaType modifyTypeByAnnotation(DeserializationContext ctxt,
+            Annotated a, JavaType type)
         throws JsonMappingException
     {
         AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
@@ -1811,6 +2135,7 @@ public abstract class BasicDeserializerFactory
         }
 
         // First, deserializers for key/value types?
+        /*
         if (type.isMapLikeType()) {
             JavaType keyType = type.getKeyType();
             // 21-Mar-2011, tatu: ... and associated deserializer too (unless already assigned)
@@ -1836,90 +2161,26 @@ public abstract class BasicDeserializerFactory
                 }
             }
         }
+        */
         // then: type refinement(s)?
-        type = (T) intr.refineDeserializationType(ctxt.getConfig(), a, type);
-        return type;
+        return intr.refineDeserializationType(ctxt.getConfig(), a, type);
     }
 
     /**
-     * Helper method used to resolve method return types and field
-     * types. The main trick here is that the containing bean may
-     * have type variable binding information (when deserializing
-     * using generic type passed as type reference), which is
-     * needed in some cases.
+     * @deprecated since 2.8 call {@link #resolveMemberAndTypeAnnotations} instead.
      */
+    @Deprecated // since 2.8
     protected JavaType resolveType(DeserializationContext ctxt,
             BeanDescription beanDesc, JavaType type, AnnotatedMember member)
         throws JsonMappingException
     {
-        AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
-        if (intr == null) {
-            return type;
-        }
-        
-        // Also need to handle keyUsing, contentUsing
-
-        if (type.isMapLikeType()) {
-            JavaType keyType = type.getKeyType();
-            if (keyType != null) {
-                Object kdDef = intr.findKeyDeserializer(member);
-                KeyDeserializer kd = ctxt.keyDeserializerInstance(member, kdDef);
-                if (kd != null) {
-                    type = ((MapLikeType) type).withKeyValueHandler(kd);
-                    keyType = type.getKeyType(); // just in case it's used below
-                }
-            }
-        }
-
-        if (type.isContainerType() || type.isReferenceType()) {
-            Object cdDef = intr.findContentDeserializer(member);
-            JsonDeserializer<?> cd = ctxt.deserializerInstance(member, cdDef);
-            if (cd != null) {
-                type = type.withContentValueHandler(cd);
-            }
-            /* 04-Feb-2010, tatu: Need to figure out JAXB annotations that indicate type
-             *    information to use for polymorphic members; and specifically types for
-             *    collection values (contents).
-             *    ... but only applies to members (fields, methods), not classes
-             */
-            if (member instanceof AnnotatedMember) {
-            	TypeDeserializer contentTypeDeser = findPropertyContentTypeDeserializer(
-            	        ctxt.getConfig(), type, (AnnotatedMember) member);            	
-            	if (contentTypeDeser != null) {
-            	    type = type.withContentTypeHandler(contentTypeDeser);
-            	}
-            }
-        }
-        TypeDeserializer valueTypeDeser;
-
-        if (member instanceof AnnotatedMember) { // JAXB allows per-property annotations
-            valueTypeDeser = findPropertyTypeDeserializer(ctxt.getConfig(),
-                    type, (AnnotatedMember) member);
-        } else { // classes just have Jackson annotations
-            // probably only occurs if 'property' is null anyway
-            valueTypeDeser = findTypeDeserializer(ctxt.getConfig(), type);
-        }
-        if (valueTypeDeser != null) {
-            type = type.withTypeHandler(valueTypeDeser);
-        }
-        return type;
-    }
-    
-    protected EnumResolver constructEnumResolver(Class<?> enumClass,
-            DeserializationConfig config, AnnotatedMethod jsonValueMethod)
-    {
-        if (jsonValueMethod != null) {
-            Method accessor = jsonValueMethod.getAnnotated();
-            if (config.canOverrideAccessModifiers()) {
-                ClassUtil.checkAndFixAccess(accessor, config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
-            }
-            return EnumResolver.constructUnsafeUsingMethod(enumClass, accessor);
-        }
-        // 14-Mar-2016, tatu: We used to check `DeserializationFeature.READ_ENUMS_USING_TO_STRING`
-        //   here, but that won't do: it must be dynamically changeable...
-        return EnumResolver.constructUnsafe(enumClass, config.getAnnotationIntrospector());
+        return resolveMemberAndTypeAnnotations(ctxt, member, type);
     }
 
+    /**
+     * @deprecated since 2.8 call <code>findJsonValueMethod</code> on {@link BeanDescription} instead
+     */
+    @Deprecated // not used, possibly remove as early as 2.9
     protected AnnotatedMethod _findJsonValueFor(DeserializationConfig config, JavaType enumType)
     {
         if (enumType == null) {

@@ -29,6 +29,7 @@ import io.undertow.client.ContinueNotification;
 import io.undertow.client.PushCallback;
 import io.undertow.util.AbstractAttachable;
 import io.undertow.util.Headers;
+import org.jboss.logging.Logger;
 import org.xnio.channels.StreamSinkChannel;
 import org.xnio.channels.StreamSourceChannel;
 
@@ -41,6 +42,8 @@ import static org.xnio.Bits.anyAreSet;
  */
 class HttpClientExchange extends AbstractAttachable implements ClientExchange {
 
+    private static final Logger log = Logger.getLogger(HttpClientExchange.class.getName());
+
     private final ClientRequest request;
     private final boolean requiresContinue;
     private final HttpClientConnection clientConnection;
@@ -52,6 +55,7 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
     private ClientResponse response;
     private ClientResponse continueResponse;
     private IOException failedReason;
+    private HttpRequestConduit requestConduit;
 
     private int state = 0;
     private static final int REQUEST_TERMINATED = 1;
@@ -72,10 +76,15 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
         this.requiresContinue = reqContinue;
     }
 
+    public void setRequestConduit(HttpRequestConduit requestConduit) {
+        this.requestConduit = requestConduit;
+    }
+
     void terminateRequest() {
         if(anyAreSet(state, REQUEST_TERMINATED)) {
             return;
         }
+        log.debugf("request terminated for request to %s %s", clientConnection.getPeerAddress(), getRequest().getPath());
         state |= REQUEST_TERMINATED;
         clientConnection.requestDataSent();
         if (anyAreSet(state, RESPONSE_TERMINATED)) {
@@ -91,6 +100,7 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
         if(anyAreSet(state, RESPONSE_TERMINATED)) {
             return;
         }
+        log.debugf("response terminated for request to %s %s", clientConnection.getPeerAddress(), getRequest().getPath());
         state |= RESPONSE_TERMINATED;
         if (anyAreSet(state, REQUEST_TERMINATED)) {
             clientConnection.exchangeDone();
@@ -147,6 +157,9 @@ class HttpClientExchange extends AbstractAttachable implements ClientExchange {
         if (responseCallback != null) {
             responseCallback.failed(e);
             responseCallback = null;
+        }
+        if(requestConduit != null) {
+            requestConduit.freeBuffers();
         }
     }
 

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.jsonschema.SchemaAware;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.databind.util.Converter;
 
 import java.io.IOException;
@@ -83,9 +84,7 @@ public class StdDelegatingSerializer
     protected StdDelegatingSerializer withDelegate(Converter<Object,?> converter,
             JavaType delegateType, JsonSerializer<?> delegateSerializer)
     {
-        if (getClass() != StdDelegatingSerializer.class) {
-            throw new IllegalStateException("Sub-class "+getClass().getName()+" must override 'withDelegate'");
-        }
+        ClassUtil.verifyMustOverride(StdDelegatingSerializer.class, this, "withDelegate");
         return new StdDelegatingSerializer(converter, delegateType, delegateSerializer);
     }
     
@@ -116,9 +115,8 @@ public class StdDelegatingSerializer
             if (delegateType == null) {
                 delegateType = _converter.getOutputType(provider.getTypeFactory());
             }
-            /* 02-Apr-2015, tatu: For "dynamic case", where type is only specified as
-             *    java.lang.Object (or missing generic), [databind#731]
-             */
+            // 02-Apr-2015, tatu: For "dynamic case", where type is only specified as
+            //    java.lang.Object (or missing generic), [databind#731]
             if (!delegateType.isJavaLangObject()) {
                 delSer = provider.findValueSerializer(delegateType);
             }
@@ -186,15 +184,12 @@ public class StdDelegatingSerializer
     }
 
     @Override
-    @Deprecated // since 2.5
-    public boolean isEmpty(Object value) {
-        return isEmpty(null, value);
-    }
-
-    @Override
     public boolean isEmpty(SerializerProvider prov, Object value)
     {
         Object delegateValue = convertValue(value);
+        if (delegateValue == null) {
+            return true;
+        }
         if (_delegateSerializer == null) { // best we can do for now, too costly to look up
             return (value == null);
         }

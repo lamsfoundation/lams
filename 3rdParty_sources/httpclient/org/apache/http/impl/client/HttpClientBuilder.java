@@ -74,6 +74,7 @@ import org.apache.http.config.Lookup;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.conn.DnsResolver;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.SchemePortResolver;
 import org.apache.http.conn.routing.HttpRoutePlanner;
@@ -86,7 +87,6 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.conn.util.PublicSuffixMatcher;
 import org.apache.http.conn.util.PublicSuffixMatcherLoader;
 import org.apache.http.cookie.CookieSpecProvider;
-import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.auth.BasicSchemeFactory;
 import org.apache.http.impl.auth.DigestSchemeFactory;
@@ -169,6 +169,7 @@ public class HttpClientBuilder {
     private AuthenticationStrategy proxyAuthStrategy;
     private UserTokenHandler userTokenHandler;
     private HttpProcessor httpprocessor;
+    private DnsResolver dnsResolver;
 
     private LinkedList<HttpRequestInterceptor> requestFirst;
     private LinkedList<HttpRequestInterceptor> requestLast;
@@ -612,6 +613,16 @@ public class HttpClientBuilder {
     }
 
     /**
+     * Assigns {@link DnsResolver} instance.
+     * <p>
+     * Please note this value can be overridden by the {@link #setConnectionManager(HttpClientConnectionManager)} method.
+     */
+    public final HttpClientBuilder setDnsResolver(final DnsResolver dnsResolver) {
+        this.dnsResolver = dnsResolver;
+        return this;
+    }
+
+    /**
      * Assigns {@link HttpRequestRetryHandler} instance.
      * <p>
      * Please note this value can be overridden by the {@link #disableAutomaticRetries()}
@@ -966,7 +977,7 @@ public class HttpClientBuilder {
                         .build(),
                     null,
                     null,
-                    null,
+                    dnsResolver,
                     connTimeToLive,
                     connTimeToLiveTimeUnit != null ? connTimeToLiveTimeUnit : TimeUnit.MILLISECONDS);
             if (defaultSocketConfig != null) {
@@ -997,12 +1008,12 @@ public class HttpClientBuilder {
             if (systemProperties) {
                 final String s = System.getProperty("http.keepAlive", "true");
                 if ("true".equalsIgnoreCase(s)) {
-                    reuseStrategyCopy = DefaultConnectionReuseStrategy.INSTANCE;
+                    reuseStrategyCopy = DefaultClientConnectionReuseStrategy.INSTANCE;
                 } else {
                     reuseStrategyCopy = NoConnectionReuseStrategy.INSTANCE;
                 }
             } else {
-                reuseStrategyCopy = DefaultConnectionReuseStrategy.INSTANCE;
+                reuseStrategyCopy = DefaultClientConnectionReuseStrategy.INSTANCE;
             }
         }
         ConnectionKeepAliveStrategy keepAliveStrategyCopy = this.keepAliveStrategy;
@@ -1091,7 +1102,7 @@ public class HttpClientBuilder {
             if (!contentCompressionDisabled) {
                 if (contentDecoderMap != null) {
                     final RegistryBuilder<InputStreamFactory> b2 = RegistryBuilder.create();
-                    for (Map.Entry<String, InputStreamFactory> entry: contentDecoderMap.entrySet()) {
+                    for (final Map.Entry<String, InputStreamFactory> entry: contentDecoderMap.entrySet()) {
                         b2.register(entry.getKey(), entry.getValue());
                     }
                     b.add(new ResponseContentEncoding(b2.build()));

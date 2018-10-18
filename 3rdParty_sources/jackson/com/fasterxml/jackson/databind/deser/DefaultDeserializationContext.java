@@ -6,8 +6,9 @@ import java.util.Map.Entry;
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.annotation.ObjectIdResolver;
 import com.fasterxml.jackson.annotation.ObjectIdGenerator.IdKey;
-import com.fasterxml.jackson.annotation.SimpleObjectIdResolver;
+
 import com.fasterxml.jackson.core.JsonParser;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
@@ -37,7 +38,7 @@ public abstract class DefaultDeserializationContext
     /**
      * Constructor that will pass specified deserializer factory and
      * cache: cache may be null (in which case default implementation
-     * will be used), factory can not be null
+     * will be used), factory cannot be null
      */
     protected DefaultDeserializationContext(DeserializerFactory df, DeserializerCache cache) {
         super(df, cache);
@@ -138,12 +139,6 @@ public abstract class DefaultDeserializationContext
      */
     protected ReadableObjectId createReadableObjectId(IdKey key) {
         return new ReadableObjectId(key);
-    }
-
-    @Deprecated // since 2.4
-    @Override
-    public ReadableObjectId findObjectId(Object id, ObjectIdGenerator<?> gen) {
-        return findObjectId(id, gen, new SimpleObjectIdResolver());
     }
 
     @Override
@@ -336,16 +331,14 @@ public abstract class DefaultDeserializationContext
 
         @Override
         public DefaultDeserializationContext copy() {
-            if (getClass() != Impl.class) {
-                return super.copy();
-            }
+            ClassUtil.verifyMustOverride(Impl.class, this, "copy");
            return new Impl(this);
         }
         
         @Override
         public DefaultDeserializationContext createInstance(DeserializationConfig config,
-                JsonParser jp, InjectableValues values) {
-            return new Impl(this, config, jp, values);
+                JsonParser p, InjectableValues values) {
+            return new Impl(this, config, p, values);
         }
 
         @Override

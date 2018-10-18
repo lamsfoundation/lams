@@ -35,6 +35,7 @@ import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import io.undertow.util.Protocols;
 import io.undertow.util.URLUtils;
+import io.undertow.util.BadRequestException;
 import org.xnio.OptionMap;
 
 import static io.undertow.util.Headers.ACCEPT_CHARSET_STRING;
@@ -164,6 +165,10 @@ public abstract class HttpRequestParser {
     private final boolean allowEncodedSlash;
     private final boolean decode;
     private final String charset;
+    private final int maxCachedHeaderSize;
+    private final boolean allowUnescapedCharactersInUrl;
+
+    private static final boolean[] ALLOWED_TARGET_CHARACTER = new boolean[256];
 
     static {
         try {
@@ -172,14 +177,38 @@ public abstract class HttpRequestParser {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+        for(int i = 0; i < 256; ++i) {
+            if(i < 32 || i > 126) {
+                ALLOWED_TARGET_CHARACTER[i] = false;
+            } else {
+                switch ((char)i) {
+                    case '\"':
+                    case '#':
+                    case '<':
+                    case '>':
+                    case '\\':
+                    case '^':
+                    case '`':
+                    case '{':
+                    case '|':
+                    case '}':
+                        ALLOWED_TARGET_CHARACTER[i] = false;
+                        break;
+                    default:
+                        ALLOWED_TARGET_CHARACTER[i] = true;
+                }
+            }
+        }
     }
 
     public HttpRequestParser(OptionMap options) {
-        maxParameters = options.get(UndertowOptions.MAX_PARAMETERS, 1000);
-        maxHeaders = options.get(UndertowOptions.MAX_HEADERS, 200);
+        maxParameters = options.get(UndertowOptions.MAX_PARAMETERS, UndertowOptions.DEFAULT_MAX_PARAMETERS);
+        maxHeaders = options.get(UndertowOptions.MAX_HEADERS, UndertowOptions.DEFAULT_MAX_HEADERS);
         allowEncodedSlash = options.get(UndertowOptions.ALLOW_ENCODED_SLASH, false);
         decode = options.get(UndertowOptions.DECODE_URL, true);
         charset = options.get(UndertowOptions.URL_CHARSET, StandardCharsets.UTF_8.name());
+        maxCachedHeaderSize = options.get(UndertowOptions.MAX_CACHED_HEADER_SIZE, UndertowOptions.DEFAULT_MAX_CACHED_HEADER_SIZE);
+        this.allowUnescapedCharactersInUrl = options.get(UndertowOptions.ALLOW_UNESCAPED_CHARACTERS_IN_URL, false);
     }
 
     public static final HttpRequestParser instance(final OptionMap options) {
@@ -194,7 +223,7 @@ public abstract class HttpRequestParser {
     }
 
 
-    public void handle(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder) {
+    public void handle(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder) throws BadRequestException {
         if (currentState.state == ParseState.VERB) {
             //fast path, we assume that it will parse fully so we avoid all the if statements
 
@@ -210,7 +239,11 @@ public abstract class HttpRequestParser {
                 builder.setRequestMethod(Methods.GET);
                 currentState.state = ParseState.PATH;
             } else {
-                handleHttpVerb(buffer, currentState, builder);
+                try {
+                    handleHttpVerb(buffer, currentState, builder);
+                } catch (IllegalArgumentException e) {
+                    throw new BadRequestException(e);
+                }
             }
             handlePath(buffer, currentState, builder);
             boolean failed = false;
@@ -261,7 +294,7 @@ public abstract class HttpRequestParser {
         handleStateful(buffer, currentState, builder);
     }
 
-    private void handleStateful(ByteBuffer buffer, ParseState currentState, HttpServerExchange builder) {
+    private void handleStateful(ByteBuffer buffer, ParseState currentState, HttpServerExchange builder) throws BadRequestException {
         if (currentState.state == ParseState.PATH) {
             handlePath(buffer, currentState, builder);
             if (!buffer.hasRemaining()) {
@@ -312,11 +345,11 @@ public abstract class HttpRequestParser {
     }
 
 
-    abstract void handleHttpVerb(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder);
+    abstract void handleHttpVerb(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder) throws BadRequestException;
 
-    abstract void handleHttpVersion(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder);
+    abstract void handleHttpVersion(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder) throws BadRequestException;
 
-    abstract void handleHeader(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder);
+    abstract void handleHeader(ByteBuffer buffer, final ParseState currentState, final HttpServerExchange builder) throws BadRequestException;
 
     /**
      * The parse states for parsing the path.
@@ -337,7 +370,7 @@ public abstract class HttpRequestParser {
      * @return The number of bytes remaining
      */
     @SuppressWarnings("unused")
-    final void handlePath(ByteBuffer buffer, ParseState state, HttpServerExchange exchange) {
+    final void handlePath(ByteBuffer buffer, ParseState state, HttpServerExchange exchange) throws BadRequestException {
         StringBuilder stringBuilder = state.stringBuilder;
         int parseState = state.parseState;
         int canonicalPathStart = state.pos;
@@ -345,6 +378,9 @@ public abstract class HttpRequestParser {
 
         while (buffer.hasRemaining()) {
             char next = (char) (buffer.get() & 0xFF);
+            if(!allowUnescapedCharactersInUrl && !ALLOWED_TARGET_CHARACTER[next]) {
+                throw new BadRequestException(UndertowMessages.MESSAGES.invalidCharacterInRequestTarget(next));
+            }
             if (next == ' ' || next == '\t') {
                 if (stringBuilder.length() != 0) {
                     final String path = stringBuilder.toString();
@@ -353,7 +389,7 @@ public abstract class HttpRequestParser {
                         exchange.setRelativePath("/");
                         exchange.setRequestURI(path);
                     } else if (parseState < HOST_DONE) {
-                        String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash);
+                        String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash, false);
                         exchange.setRequestPath(decodedPath);
                         exchange.setRelativePath(decodedPath);
                         exchange.setRequestURI(path);
@@ -411,7 +447,7 @@ public abstract class HttpRequestParser {
             exchange.setRelativePath("/");
             exchange.setRequestURI(path);
         } else if (parseState < HOST_DONE) {
-            String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash);
+            String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash, false);
             exchange.setRequestPath(decodedPath);
             exchange.setRelativePath(decodedPath);
             exchange.setRequestURI(path);
@@ -428,14 +464,14 @@ public abstract class HttpRequestParser {
         state.urlDecodeRequired = false;
     }
 
-    private void beginQueryParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange, StringBuilder stringBuilder, int parseState, int canonicalPathStart, boolean urlDecodeRequired) {
+    private void beginQueryParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange, StringBuilder stringBuilder, int parseState, int canonicalPathStart, boolean urlDecodeRequired) throws BadRequestException {
         final String path = stringBuilder.toString();
         if (parseState == SECOND_SLASH) {
             exchange.setRequestPath("/");
             exchange.setRelativePath("/");
             exchange.setRequestURI(path);
         } else if (parseState < HOST_DONE) {
-            String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash);
+            String decodedPath = decode(path, urlDecodeRequired, state, allowEncodedSlash, false);
             exchange.setRequestPath(decodedPath);
             exchange.setRelativePath(decodedPath);
             exchange.setRequestURI(path, false);
@@ -451,7 +487,7 @@ public abstract class HttpRequestParser {
     }
 
     private void handleFullUrl(ParseState state, HttpServerExchange exchange, int canonicalPathStart, boolean urlDecodeRequired, String path) {
-        String thePath = decode(path.substring(canonicalPathStart), urlDecodeRequired, state, allowEncodedSlash);
+        String thePath = decode(path.substring(canonicalPathStart), urlDecodeRequired, state, allowEncodedSlash, false);
         exchange.setRequestPath(thePath);
         exchange.setRelativePath(thePath);
         exchange.setRequestURI(path, true);
@@ -467,7 +503,7 @@ public abstract class HttpRequestParser {
      * @return The number of bytes remaining
      */
     @SuppressWarnings("unused")
-    final void handleQueryParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange) {
+    final void handleQueryParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange) throws BadRequestException {
         StringBuilder stringBuilder = state.stringBuilder;
         int queryParamPos = state.pos;
         int mapCount = state.mapCount;
@@ -483,15 +519,18 @@ public abstract class HttpRequestParser {
 
         while (buffer.hasRemaining()) {
             char next = (char) (buffer.get() & 0xFF);
+            if(!allowUnescapedCharactersInUrl && !ALLOWED_TARGET_CHARACTER[next]) {
+                throw new BadRequestException(UndertowMessages.MESSAGES.invalidCharacterInRequestTarget(next));
+            }
             if (next == ' ' || next == '\t') {
                 final String queryString = stringBuilder.toString();
                 exchange.setQueryString(queryString);
                 if (nextQueryParam == null) {
                     if (queryParamPos != stringBuilder.length()) {
-                        exchange.addQueryParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true), "");
+                        exchange.addQueryParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true), "");
                     }
                 } else {
-                    exchange.addQueryParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true));
+                    exchange.addQueryParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true));
                 }
                 state.state = ParseState.VERSION;
                 state.stringBuilder.setLength(0);
@@ -506,23 +545,23 @@ public abstract class HttpRequestParser {
                 if (decode && (next == '+' || next == '%' || next > 127)) { //+ is only a whitespace substitute in the query part of the URL
                     urlDecodeRequired = true;
                 } else if (next == '=' && nextQueryParam == null) {
-                    nextQueryParam = decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true);
+                    nextQueryParam = decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true);
                     urlDecodeRequired = false;
                     queryParamPos = stringBuilder.length() + 1;
                 } else if (next == '&' && nextQueryParam == null) {
-                    if (mapCount++ > maxParameters) {
+                    if (++mapCount >= maxParameters) {
                         throw UndertowMessages.MESSAGES.tooManyQueryParameters(maxParameters);
                     }
                     if (queryParamPos != stringBuilder.length()) {
-                        exchange.addQueryParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true), "");
+                        exchange.addQueryParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true), "");
                     }
                     urlDecodeRequired = false;
                     queryParamPos = stringBuilder.length() + 1;
                 } else if (next == '&') {
-                    if (mapCount++ > maxParameters) {
+                    if (++mapCount >= maxParameters) {
                         throw UndertowMessages.MESSAGES.tooManyQueryParameters(maxParameters);
                     }
-                    exchange.addQueryParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true));
+                    exchange.addQueryParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true));
                     urlDecodeRequired = false;
                     queryParamPos = stringBuilder.length() + 1;
                     nextQueryParam = null;
@@ -535,19 +574,19 @@ public abstract class HttpRequestParser {
         state.pos = queryParamPos;
         state.nextQueryParam = nextQueryParam;
         state.urlDecodeRequired = urlDecodeRequired;
-        state.mapCount = 0;
+        state.mapCount = mapCount;
     }
 
-    private String decode(final String value, boolean urlDecodeRequired, ParseState state, final boolean allowEncodedSlash) {
+    private String decode(final String value, boolean urlDecodeRequired, ParseState state, final boolean allowEncodedSlash, final boolean formEncoded) {
         if (urlDecodeRequired) {
-            return URLUtils.decode(value, charset, allowEncodedSlash, state.decodeBuffer);
+            return URLUtils.decode(value, charset, allowEncodedSlash, formEncoded, state.decodeBuffer);
         } else {
             return value;
         }
     }
 
 
-    final void handlePathParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange) {
+    final void handlePathParameters(ByteBuffer buffer, ParseState state, HttpServerExchange exchange) throws BadRequestException {
         StringBuilder stringBuilder = state.stringBuilder;
         int queryParamPos = state.pos;
         int mapCount = state.mapCount;
@@ -563,13 +602,16 @@ public abstract class HttpRequestParser {
 
         while (buffer.hasRemaining()) {
             char next = (char) (buffer.get() & 0xFF);
+            if(!allowUnescapedCharactersInUrl && !ALLOWED_TARGET_CHARACTER[next]) {
+                throw new BadRequestException(UndertowMessages.MESSAGES.invalidCharacterInRequestTarget(next));
+            }
             if (next == ' ' || next == '\t' || next == '?') {
                 if (nextQueryParam == null) {
                     if (queryParamPos != stringBuilder.length()) {
-                        exchange.addPathParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true), "");
+                        exchange.addPathParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true), "");
                     }
                 } else {
-                    exchange.addPathParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true));
+                    exchange.addPathParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true));
                 }
                 exchange.setRequestURI(exchange.getRequestURI() + ';' + stringBuilder.toString(), state.parseState > HOST_DONE);
                 state.stringBuilder.setLength(0);
@@ -591,22 +633,22 @@ public abstract class HttpRequestParser {
                     urlDecodeRequired = true;
                 }
                 if (next == '=' && nextQueryParam == null) {
-                    nextQueryParam = decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true);
+                    nextQueryParam = decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true);
                     urlDecodeRequired = false;
                     queryParamPos = stringBuilder.length() + 1;
                 } else if (next == '&' && nextQueryParam == null) {
-                    if (mapCount++ > maxParameters) {
+                    if (++mapCount >= maxParameters) {
                         throw UndertowMessages.MESSAGES.tooManyQueryParameters(maxParameters);
                     }
-                    exchange.addPathParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true), "");
+                    exchange.addPathParam(decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true), "");
                     urlDecodeRequired = false;
                     queryParamPos = stringBuilder.length() + 1;
                 } else if (next == '&') {
-                    if (mapCount++ > maxParameters) {
+                    if (++mapCount >= maxParameters) {
                         throw UndertowMessages.MESSAGES.tooManyQueryParameters(maxParameters);
                     }
 
-                    exchange.addPathParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true));
+                    exchange.addPathParam(nextQueryParam, decode(stringBuilder.substring(queryParamPos), urlDecodeRequired, state, true, true));
                     urlDecodeRequired = false;
                     queryParamPos = stringBuilder.length() + 1;
                     nextQueryParam = null;
@@ -618,7 +660,7 @@ public abstract class HttpRequestParser {
         }
         state.pos = queryParamPos;
         state.nextQueryParam = nextQueryParam;
-        state.mapCount = 0;
+        state.mapCount = mapCount;
         state.urlDecodeRequired = urlDecodeRequired;
     }
 
@@ -641,11 +683,11 @@ public abstract class HttpRequestParser {
      * @return The number of bytes remaining
      */
     @SuppressWarnings("unused")
-    final void handleHeaderValue(ByteBuffer buffer, ParseState state, HttpServerExchange builder) {
+    final void handleHeaderValue(ByteBuffer buffer, ParseState state, HttpServerExchange builder) throws BadRequestException {
         HttpString headerName = state.nextHeader;
         StringBuilder stringBuilder = state.stringBuilder;
-        HashMap<HttpString, String> headerValuesCache = state.headerValuesCache;
-        if (stringBuilder.length() == 0) {
+        CacheMap<HttpString, String> headerValuesCache = state.headerValuesCache;
+        if (headerName != null && stringBuilder.length() == 0 && headerValuesCache != null) {
             String existing = headerValuesCache.get(headerName);
             if (existing != null) {
                 if (handleCachedHeader(existing, buffer, state, builder)) {
@@ -657,7 +699,7 @@ public abstract class HttpRequestParser {
         handleHeaderValueCacheMiss(buffer, state, builder, headerName, headerValuesCache, stringBuilder);
     }
 
-    private void handleHeaderValueCacheMiss(ByteBuffer buffer, ParseState state, HttpServerExchange builder, HttpString headerName, HashMap<HttpString, String> headerValuesCache, StringBuilder stringBuilder) {
+    private void handleHeaderValueCacheMiss(ByteBuffer buffer, ParseState state, HttpServerExchange builder, HttpString headerName, CacheMap<HttpString, String> headerValuesCache, StringBuilder stringBuilder) throws BadRequestException {
 
         int parseState = state.parseState;
         while (buffer.hasRemaining() && parseState == NORMAL) {
@@ -716,14 +758,12 @@ public abstract class HttpRequestParser {
                         String headerValue = stringBuilder.toString();
 
 
-                        if (state.mapCount++ > maxHeaders) {
-                            throw UndertowMessages.MESSAGES.tooManyHeaders(maxHeaders);
+                        if (++state.mapCount > maxHeaders) {
+                            throw new BadRequestException(UndertowMessages.MESSAGES.tooManyHeaders(maxHeaders));
                         }
                         //TODO: we need to decode this according to RFC-2047 if we have seen a =? symbol
                         builder.getRequestHeaders().add(headerName, headerValue);
-                        if(headerValuesCache.size() < maxHeaders) {
-                            //we have a limit on how many we can cache
-                            //to prevent memory filling and hash collision attacks
+                        if(headerValuesCache != null && headerName.length() + headerValue.length() < maxCachedHeaderSize) {
                             headerValuesCache.put(headerName, headerValue);
                         }
 
@@ -754,7 +794,7 @@ public abstract class HttpRequestParser {
         state.parseState = parseState;
     }
 
-    protected boolean handleCachedHeader(String existing, ByteBuffer buffer, ParseState state, HttpServerExchange builder) {
+    protected boolean handleCachedHeader(String existing, ByteBuffer buffer, ParseState state, HttpServerExchange builder) throws BadRequestException {
         int pos = buffer.position();
         while (pos < buffer.limit() && buffer.get(pos) == ' ') {
             pos++;
@@ -782,8 +822,8 @@ public abstract class HttpRequestParser {
             return false;
         }
         buffer.position(pos + i);
-        if (state.mapCount++ > maxHeaders) {
-            throw UndertowMessages.MESSAGES.tooManyHeaders(maxHeaders);
+        if (++state.mapCount > maxHeaders) {
+            throw new BadRequestException(UndertowMessages.MESSAGES.tooManyHeaders(maxHeaders));
         }
         //TODO: we need to decode this according to RFC-2047 if we have seen a =? symbol
         builder.getRequestHeaders().add(state.nextHeader, existing);
@@ -795,7 +835,7 @@ public abstract class HttpRequestParser {
         return true;
     }
 
-    protected void handleAfterVersion(ByteBuffer buffer, ParseState state) {
+    protected void handleAfterVersion(ByteBuffer buffer, ParseState state) throws BadRequestException {
         boolean newLine = state.leftOver == '\n';
         while (buffer.hasRemaining()) {
             final byte next = buffer.get();

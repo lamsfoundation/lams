@@ -29,21 +29,23 @@ import java.util.Comparator;
  * {@link #DIRECTORY_COMPARATOR} singleton instance:
  * <pre>
  *       List&lt;File&gt; list = ...
- *       DirectoryFileComparator.DIRECTORY_COMPARATOR.sort(list);
+ *       ((AbstractFileComparator) DirectoryFileComparator.DIRECTORY_COMPARATOR).sort(list);
  * </pre>
  * <p>
  * Example of doing a <i>reverse</i> sort of an array of files/directories using the
  * {@link #DIRECTORY_REVERSE} singleton instance:
  * <pre>
  *       File[] array = ...
- *       DirectoryFileComparator.DIRECTORY_REVERSE.sort(array);
+ *       ((AbstractFileComparator) DirectoryFileComparator.DIRECTORY_REVERSE).sort(array);
  * </pre>
  * <p>
  *
- *
+ * @version $Id: DirectoryFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 2.0
  */
 public class DirectoryFileComparator extends AbstractFileComparator implements Serializable {
+
+    private static final long serialVersionUID = 296132640160964395L;
 
     /** Singleton default comparator instance */
     public static final Comparator<File> DIRECTORY_COMPARATOR = new DirectoryFileComparator();
@@ -59,7 +61,7 @@ public class DirectoryFileComparator extends AbstractFileComparator implements S
      * @return the result of calling file1's
      * {@link File#compareTo(File)} with file2 as the parameter.
      */
-    public int compare(File file1, File file2) {
+    public int compare(final File file1, final File file2) {
         return getType(file1) - getType(file2);
     }
 
@@ -69,7 +71,7 @@ public class DirectoryFileComparator extends AbstractFileComparator implements S
      * @param file The file
      * @return 1 for directories and 2 for files
      */
-    private int getType(File file) {
+    private int getType(final File file) {
         if (file.isDirectory()) {
             return 1;
         } else {

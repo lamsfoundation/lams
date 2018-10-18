@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.databind.deser.std;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.sql.Timestamp;
 import java.text.*;
 import java.util.*;
@@ -10,14 +11,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 /**
@@ -62,7 +59,7 @@ public class DateDeserializers
         }
         return null;
     }
-    
+
     /*
     /**********************************************************
     /* Intermediate class for Date-based ones
@@ -83,7 +80,7 @@ public class DateDeserializers
          * Let's also keep format String for reference, to use for error messages
          */
         protected final String _formatString;
-        
+
         protected DateBasedDeserializer(Class<?> clz) {
             super(clz);
             _customFormat = null;
@@ -100,53 +97,87 @@ public class DateDeserializers
         protected abstract DateBasedDeserializer<T> withDateFormat(DateFormat df, String formatStr);
 
         @Override
-        public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
+        public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
+                BeanProperty property)
            throws JsonMappingException
         {
-            if (property != null) {
-                JsonFormat.Value format = ctxt.getAnnotationIntrospector().findFormat((Annotated) property.getMember());
-                if (format != null) {
-                    TimeZone tz = format.getTimeZone();
-                    // First: fully custom pattern?
-                    if (format.hasPattern()) {
-                        final String pattern = format.getPattern();
+            final JsonFormat.Value format = findFormatOverrides(ctxt, property,
+                    handledType());
+
+            if (format != null) {
+                TimeZone tz = format.getTimeZone();
+                final Boolean lenient = format.getLenient();
+
+                // First: fully custom pattern?
+                if (format.hasPattern()) {
+                    final String pattern = format.getPattern();
+                    final Locale loc = format.hasLocale() ? format.getLocale() : ctxt.getLocale();
+                    SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+                    if (tz == null) {
+                        tz = ctxt.getTimeZone();
+                    }
+                    df.setTimeZone(tz);
+                    if (lenient != null) {
+                        df.setLenient(lenient);
+                    }
+                    return withDateFormat(df, pattern);
+                }
+                // But if not, can still override timezone
+                if (tz != null) {
+                    DateFormat df = ctxt.getConfig().getDateFormat();
+                    // one shortcut: with our custom format, can simplify handling a bit
+                    if (df.getClass() == StdDateFormat.class) {
                         final Locale loc = format.hasLocale() ? format.getLocale() : ctxt.getLocale();
-                        SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
-                        if (tz == null) {
-                            tz = ctxt.getTimeZone();
+                        StdDateFormat std = (StdDateFormat) df;
+                        std = std.withTimeZone(tz);
+                        std = std.withLocale(loc);
+                        if (lenient != null) {
+                            std = std.withLenient(lenient);
                         }
+                        df = std;
+                    } else {
+                        // otherwise need to clone, re-set timezone:
+                        df = (DateFormat) df.clone();
                         df.setTimeZone(tz);
-                        return withDateFormat(df, pattern);
-                    }
-                    // But if not, can still override timezone
-                    if (tz != null) {
-                        DateFormat df = ctxt.getConfig().getDateFormat();
-                        // one shortcut: with our custom format, can simplify handling a bit
-                        if (df.getClass() == StdDateFormat.class) {
-                            final Locale loc = format.hasLocale() ? format.getLocale() : ctxt.getLocale();
-                            StdDateFormat std = (StdDateFormat) df;
-                            std = std.withTimeZone(tz);
-                            std = std.withLocale(loc);
-                            df = std;
-                        } else {
-                            // otherwise need to clone, re-set timezone:
-                            df = (DateFormat) df.clone();
-                            df.setTimeZone(tz);
+                        if (lenient != null) {
+                            df.setLenient(lenient);
                         }
-                        return withDateFormat(df, _formatString);
                     }
+                    return withDateFormat(df, _formatString);
+                }
+                // or maybe even just leniency?
+                if (lenient != null) {
+                    DateFormat df = ctxt.getConfig().getDateFormat();
+                    String pattern = _formatString;
+                    // one shortcut: with our custom format, can simplify handling a bit
+                    if (df.getClass() == StdDateFormat.class) {
+                        StdDateFormat std = (StdDateFormat) df;
+                        std = std.withLenient(lenient);
+                        df = std;
+                        pattern = std.toPattern();
+                    } else {
+                        // otherwise need to clone,
+                        df = (DateFormat) df.clone();
+                        df.setLenient(lenient);
+                        if (df instanceof SimpleDateFormat) {
+                            ((SimpleDateFormat) df).toPattern();
+                        }
+                    }
+                    if (pattern == null) {
+                        pattern = "[unknown]";
+                    }
+                    return withDateFormat(df, pattern);
                 }
             }
             return this;
         }
-        
+
         @Override
         protected java.util.Date _parseDate(JsonParser p, DeserializationContext ctxt)
             throws IOException
         {
             if (_customFormat != null) {
-                JsonToken t = p.getCurrentToken();
-                if (t == JsonToken.VALUE_STRING) {
+                if (p.hasToken(JsonToken.VALUE_STRING)) {
                     String str = p.getText().trim();
                     if (str.length() == 0) {
                         return (Date) getEmptyValue(ctxt);
@@ -155,21 +186,10 @@ public class DateDeserializers
                         try {
                             return _customFormat.parse(str);
                         } catch (ParseException e) {
-                            throw new IllegalArgumentException("Failed to parse Date value '"+str
-                                    +"' (format: \""+_formatString+"\"): "+e.getMessage());
+                            return (java.util.Date) ctxt.handleWeirdStringValue(handledType(), str,
+                                    "expected format \"%s\"", _formatString);
                         }
                     }
-                }
-                // [databind#381]
-                if (t == JsonToken.START_ARRAY && ctxt.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
-                    p.nextToken();
-                    final Date parsed = _parseDate(p, ctxt);
-                    t = p.nextToken();
-                    if (t != JsonToken.END_ARRAY) {
-                        throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, 
-                                "Attempted to unwrap single value array for single 'java.util.Date' value but there was more than a single value in the array");
-                    }            
-                    return parsed;            
                 }
             }
             return super._parseDate(p, ctxt);
@@ -181,36 +201,39 @@ public class DateDeserializers
     /* Deserializer implementations for Date types
     /**********************************************************
      */
-    
+
     @JacksonStdImpl
     public static class CalendarDeserializer extends DateBasedDeserializer<Calendar>
     {
         /**
          * We may know actual expected type; if so, it will be
          * used for instantiation.
+         *
+         * @since 2.9
          */
-        protected final Class<? extends Calendar> _calendarClass;
-        
+        protected final Constructor<Calendar> _defaultCtor;
+
         public CalendarDeserializer() {
             super(Calendar.class);
-            _calendarClass = null;
+            _defaultCtor = null;
         }
 
+        @SuppressWarnings("unchecked")
         public CalendarDeserializer(Class<? extends Calendar> cc) {
             super(cc);
-            _calendarClass = cc;
+            _defaultCtor = (Constructor<Calendar>) ClassUtil.findConstructor(cc, false);
         }
 
         public CalendarDeserializer(CalendarDeserializer src, DateFormat df, String formatString) {
             super(src, df, formatString);
-            _calendarClass = src._calendarClass;
+            _defaultCtor = src._defaultCtor;
         }
 
         @Override
         protected CalendarDeserializer withDateFormat(DateFormat df, String formatString) {
             return new CalendarDeserializer(this, df, formatString);
         }
-        
+
         @Override
         public Calendar deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
         {
@@ -218,11 +241,11 @@ public class DateDeserializers
             if (d == null) {
                 return null;
             }
-            if (_calendarClass == null) {
+            if (_defaultCtor == null) {
                 return ctxt.constructCalendar(d);
             }
             try {
-                Calendar c = _calendarClass.newInstance();            
+                Calendar c = _defaultCtor.newInstance();            
                 c.setTimeInMillis(d.getTime());
                 TimeZone tz = ctxt.getTimeZone();
                 if (tz != null) {
@@ -230,7 +253,7 @@ public class DateDeserializers
                 }
                 return c;
             } catch (Exception e) {
-                throw ctxt.instantiationException(_calendarClass, e);
+                return (Calendar) ctxt.handleInstantiationProblem(handledType(), d, e);
             }
         }
     }
@@ -242,6 +265,7 @@ public class DateDeserializers
      * {@link DeserializationContext#parseDate} that this basic
      * deserializer calls.
      */
+    @JacksonStdImpl
     public static class DateDeserializer extends DateBasedDeserializer<Date>
     {
         public final static DateDeserializer instance = new DateDeserializer();
@@ -257,8 +281,8 @@ public class DateDeserializers
         }
         
         @Override
-        public java.util.Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-            return _parseDate(jp, ctxt);
+        public java.util.Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            return _parseDate(p, ctxt);
         }
     }
 
@@ -280,8 +304,8 @@ public class DateDeserializers
         }
         
         @Override
-        public java.sql.Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-            Date d = _parseDate(jp, ctxt);
+        public java.sql.Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            Date d = _parseDate(p, ctxt);
             return (d == null) ? null : new java.sql.Date(d.getTime());
         }
     }
@@ -306,9 +330,10 @@ public class DateDeserializers
         }
         
         @Override
-        public java.sql.Timestamp deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+        public java.sql.Timestamp deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
         {
-            return new Timestamp(_parseDate(jp, ctxt).getTime());
+            Date d = _parseDate(p, ctxt);
+            return (d == null) ? null : new Timestamp(d.getTime());
         }
     }
 }

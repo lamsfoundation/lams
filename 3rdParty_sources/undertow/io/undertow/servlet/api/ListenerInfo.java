@@ -33,17 +33,28 @@ public class ListenerInfo {
 
     private final Class<? extends EventListener> listenerClass;
     private volatile InstanceFactory<? extends EventListener> instanceFactory;
+    private final boolean programatic;
 
     public ListenerInfo(final Class<? extends EventListener> listenerClass, final InstanceFactory<? extends EventListener> instanceFactory) {
+        this(listenerClass, instanceFactory, false);
+    }
+
+    public ListenerInfo(final Class<? extends EventListener> listenerClass, final InstanceFactory<? extends EventListener> instanceFactory, boolean programatic) {
         this.listenerClass = listenerClass;
         this.instanceFactory = instanceFactory;
+        this.programatic = programatic;
         if(!ApplicationListeners.isListenerClass(listenerClass)) {
             throw UndertowServletMessages.MESSAGES.listenerMustImplementListenerClass(listenerClass);
         }
     }
 
     public ListenerInfo(final Class<? extends EventListener> listenerClass) {
+        this(listenerClass, false);
+    }
+
+    public ListenerInfo(final Class<? extends EventListener> listenerClass, boolean programatic) {
         this.listenerClass = listenerClass;
+        this.programatic = programatic;
 
         try {
             final Constructor<EventListener> ctor = (Constructor<EventListener>) listenerClass.getDeclaredConstructor();
@@ -62,7 +73,11 @@ public class ListenerInfo {
         this.instanceFactory = instanceFactory;
     }
 
-    public Class<?> getListenerClass() {
+    public boolean isProgramatic() {
+        return programatic;
+    }
+
+    public Class<? extends EventListener> getListenerClass() {
         return listenerClass;
     }
 

@@ -4,13 +4,10 @@ import java.text.DateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
@@ -53,17 +50,6 @@ public final class BaseSettings
      * Introspector used for accessing annotation value based configuration.
      */
     protected final AnnotationIntrospector _annotationIntrospector;
-
-    /**
-     * Object used for determining whether specific property elements
-     * (method, constructors, fields) can be auto-detected based on
-     * their visibility (access modifiers). Can be changed to allow
-     * different minimum visibility levels for auto-detection. Note
-     * that this is the global handler; individual types (classes)
-     * can further override active checker used (using
-     * {@link JsonAutoDetect} annotation)
-     */
-    protected final VisibilityChecker<?> _visibilityChecker;
 
     /**
      * Custom property naming strategy in use, if any.
@@ -121,7 +107,8 @@ public final class BaseSettings
     /**
      * Default {@link java.util.TimeZone} used with serialization formats,
      * if (and only if!) explicitly set by use; otherwise `null` to indicate
-     * "use default", which currently (Jackson 2.6) means "GMT"
+     * "use default", which means "UTC" (from Jackson 2.7); earlier versions
+     * (up to 2.6) used "GMT".
      *<p>
      * Note that if a new value is set, timezone is also assigned to
      * {@link #_dateFormat} of this object.
@@ -144,13 +131,12 @@ public final class BaseSettings
      */
 
     public BaseSettings(ClassIntrospector ci, AnnotationIntrospector ai,
-            VisibilityChecker<?> vc, PropertyNamingStrategy pns, TypeFactory tf,
+            PropertyNamingStrategy pns, TypeFactory tf,
             TypeResolverBuilder<?> typer, DateFormat dateFormat, HandlerInstantiator hi,
             Locale locale, TimeZone tz, Base64Variant defaultBase64)
     {
         _classIntrospector = ci;
         _annotationIntrospector = ai;
-        _visibilityChecker = vc;
         _propertyNamingStrategy = pns;
         _typeFactory = tf;
         _typeResolverBuilder = typer;
@@ -171,7 +157,7 @@ public final class BaseSettings
         if (_classIntrospector == ci) {
             return this;
         }
-        return new BaseSettings(ci, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+        return new BaseSettings(ci, _annotationIntrospector, _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -180,7 +166,7 @@ public final class BaseSettings
         if (_annotationIntrospector == ai) {
             return this;
         }
-        return new BaseSettings(_classIntrospector, ai, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+        return new BaseSettings(_classIntrospector, ai, _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -192,16 +178,8 @@ public final class BaseSettings
     public BaseSettings withAppendedAnnotationIntrospector(AnnotationIntrospector ai) {
         return withAnnotationIntrospector(AnnotationIntrospectorPair.create(_annotationIntrospector, ai));
     }
-    
-    public BaseSettings withVisibilityChecker(VisibilityChecker<?> vc) {
-        if (_visibilityChecker == vc) {
-            return this;
-        }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, vc, _propertyNamingStrategy, _typeFactory,
-                _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
-                _timeZone, _defaultBase64);
-    }
 
+    /*
     public BaseSettings withVisibility(PropertyAccessor forMethod, JsonAutoDetect.Visibility visibility) {
         return new BaseSettings(_classIntrospector, _annotationIntrospector,
                 _visibilityChecker.withVisibility(forMethod, visibility),
@@ -209,12 +187,13 @@ public final class BaseSettings
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
+    */
     
     public BaseSettings withPropertyNamingStrategy(PropertyNamingStrategy pns) {
         if (_propertyNamingStrategy == pns) {
             return this;
         }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, pns, _typeFactory,
+        return new BaseSettings(_classIntrospector, _annotationIntrospector, pns, _typeFactory,
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -223,7 +202,7 @@ public final class BaseSettings
         if (_typeFactory == tf) {
             return this;
         }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, tf,
+        return new BaseSettings(_classIntrospector, _annotationIntrospector, _propertyNamingStrategy, tf,
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -232,7 +211,7 @@ public final class BaseSettings
         if (_typeResolverBuilder == typer) {
             return this;
         }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+        return new BaseSettings(_classIntrospector, _annotationIntrospector, _propertyNamingStrategy, _typeFactory,
                 typer, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -246,7 +225,7 @@ public final class BaseSettings
         if ((df != null) && hasExplicitTimeZone()) {
             df = _force(df, _timeZone);
         }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+        return new BaseSettings(_classIntrospector, _annotationIntrospector, _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, df, _handlerInstantiator, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -255,7 +234,7 @@ public final class BaseSettings
         if (_handlerInstantiator == hi) {
             return this;
         }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+        return new BaseSettings(_classIntrospector, _annotationIntrospector, _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, _dateFormat, hi, _locale,
                 _timeZone, _defaultBase64);
     }
@@ -264,7 +243,7 @@ public final class BaseSettings
         if (_locale == l) {
             return this;
         }
-        return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+        return new BaseSettings(_classIntrospector, _annotationIntrospector, _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, l,
                 _timeZone, _defaultBase64);
     }
@@ -285,7 +264,7 @@ public final class BaseSettings
         
         DateFormat df = _force(_dateFormat, tz);
         return new BaseSettings(_classIntrospector, _annotationIntrospector,
-                _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+                _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, df, _handlerInstantiator, _locale,
                 tz, _defaultBase64);
     }
@@ -298,7 +277,7 @@ public final class BaseSettings
             return this;
         }
         return new BaseSettings(_classIntrospector, _annotationIntrospector,
-                _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+                _propertyNamingStrategy, _typeFactory,
                 _typeResolverBuilder, _dateFormat, _handlerInstantiator, _locale,
                 _timeZone, base64);
     }
@@ -315,10 +294,6 @@ public final class BaseSettings
     
     public AnnotationIntrospector getAnnotationIntrospector() {
         return _annotationIntrospector;
-    }
-
-    public VisibilityChecker<?> getVisibilityChecker() {
-        return _visibilityChecker;
     }
 
     public PropertyNamingStrategy getPropertyNamingStrategy() {

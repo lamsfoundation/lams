@@ -26,7 +26,7 @@ public class DefaultPrettyPrinter
      * @since 2.1
      */
     public final static SerializedString DEFAULT_ROOT_VALUE_SEPARATOR = new SerializedString(" ");
-    
+
     /**
      * Interface that defines objects that can produce indentation used
      * to separate object entries and array values. Indentation in this
@@ -35,7 +35,7 @@ public class DefaultPrettyPrinter
      */
     public interface Indenter
     {
-        void writeIndentation(JsonGenerator jg, int level) throws IOException;
+        void writeIndentation(JsonGenerator g, int level) throws IOException;
 
         /**
          * @return True if indenter is considered inline (does not add linefeeds),
@@ -43,7 +43,7 @@ public class DefaultPrettyPrinter
          */
         boolean isInline();
     }
-    
+
     // // // Config, indentation
 
     /**
@@ -63,7 +63,7 @@ public class DefaultPrettyPrinter
      * String printed between root-level values, if any.
      */
     protected final SerializableString _rootSeparator;
-    
+
     // // // Config, other white space configuration
 
     /**
@@ -80,6 +80,16 @@ public class DefaultPrettyPrinter
      * indentation to use.
      */
     protected transient int _nesting;
+
+    /**
+     * @since 2.9
+     */
+    protected Separators _separators;
+
+    /**
+     * @since 2.9
+     */
+    protected String _objectFieldValueSeparatorWithSpaces;
 
     /*
     /**********************************************************
@@ -116,6 +126,7 @@ public class DefaultPrettyPrinter
      */
     public DefaultPrettyPrinter(SerializableString rootSeparator) {
         _rootSeparator = rootSeparator;
+        withSeparators(DEFAULT_SEPARATORS);
     }
     
     public DefaultPrettyPrinter(DefaultPrettyPrinter base) {
@@ -129,6 +140,9 @@ public class DefaultPrettyPrinter
         _objectIndenter = base._objectIndenter;
         _spacesInObjectEntries = base._spacesInObjectEntries;
         _nesting = base._nesting;
+
+        _separators = base._separators;
+        _objectFieldValueSeparatorWithSpaces = base._objectFieldValueSeparatorWithSpaces;
 
         _rootSeparator = rootSeparator;
     }
@@ -148,7 +162,7 @@ public class DefaultPrettyPrinter
     public DefaultPrettyPrinter withRootSeparator(String rootSeparator) {
         return withRootSeparator((rootSeparator == null) ? null : new SerializedString(rootSeparator));
     }
-    
+
     public void indentArraysWith(Indenter i) {
         _arrayIndenter = (i == null) ? NopIndenter.instance : i;
     }
@@ -156,12 +170,6 @@ public class DefaultPrettyPrinter
     public void indentObjectsWith(Indenter i) {
         _objectIndenter = (i == null) ? NopIndenter.instance : i;
     }
-
-    /**
-     * @deprecated Since 2.3 use {@link #withSpacesInObjectEntries} and {@link #withoutSpacesInObjectEntries()}
-     */
-    @Deprecated
-    public void spacesInObjectEntries(boolean b) { _spacesInObjectEntries = b; }
 
     /**
      * @since 2.3
@@ -210,7 +218,7 @@ public class DefaultPrettyPrinter
      * that does not use spaces inside object entries; if 'this' instance already
      * does this, it is returned; if not, a new instance will be constructed
      * and returned.
-     * 
+     *
      * @since 2.3
      */
     public DefaultPrettyPrinter withoutSpacesInObjectEntries() {
@@ -226,18 +234,27 @@ public class DefaultPrettyPrinter
         pp._spacesInObjectEntries = state;
         return pp;
     }
-    
+
+    /**
+     * @since 2.9
+     */
+    public DefaultPrettyPrinter withSeparators(Separators separators) {
+        _separators = separators;
+        _objectFieldValueSeparatorWithSpaces = " " + separators.getObjectFieldValueSeparator() + " ";
+        return this;
+    }
+
     /*
     /**********************************************************
     /* Instantiatable impl
     /**********************************************************
      */
-    
+
     @Override
     public DefaultPrettyPrinter createInstance() {
         return new DefaultPrettyPrinter(this);
     }
-    
+
     /*
     /**********************************************************
     /* PrettyPrinter impl
@@ -245,26 +262,26 @@ public class DefaultPrettyPrinter
      */
 
     @Override
-    public void writeRootValueSeparator(JsonGenerator jg) throws IOException
+    public void writeRootValueSeparator(JsonGenerator g) throws IOException
     {
         if (_rootSeparator != null) {
-            jg.writeRaw(_rootSeparator);
+            g.writeRaw(_rootSeparator);
         }
     }
 
     @Override
-    public void writeStartObject(JsonGenerator jg) throws IOException
+    public void writeStartObject(JsonGenerator g) throws IOException
     {
-        jg.writeRaw('{');
+        g.writeRaw('{');
         if (!_objectIndenter.isInline()) {
             ++_nesting;
         }
     }
 
     @Override
-    public void beforeObjectEntries(JsonGenerator jg) throws IOException
+    public void beforeObjectEntries(JsonGenerator g) throws IOException
     {
-        _objectIndenter.writeIndentation(jg, _nesting);
+        _objectIndenter.writeIndentation(g, _nesting);
     }
 
     /**
@@ -277,12 +294,12 @@ public class DefaultPrettyPrinter
      * (white-space) decoration.
      */
     @Override
-    public void writeObjectFieldValueSeparator(JsonGenerator jg) throws IOException
+    public void writeObjectFieldValueSeparator(JsonGenerator g) throws IOException
     {
         if (_spacesInObjectEntries) {
-            jg.writeRaw(" : ");
+            g.writeRaw(_objectFieldValueSeparatorWithSpaces);
         } else {
-            jg.writeRaw(':');
+            g.writeRaw(_separators.getObjectFieldValueSeparator());
         }
     }
 
@@ -296,38 +313,38 @@ public class DefaultPrettyPrinter
      * (white-space) decoration.
      */
     @Override
-    public void writeObjectEntrySeparator(JsonGenerator jg) throws IOException
+    public void writeObjectEntrySeparator(JsonGenerator g) throws IOException
     {
-        jg.writeRaw(',');
-        _objectIndenter.writeIndentation(jg, _nesting);
+        g.writeRaw(_separators.getObjectEntrySeparator());
+        _objectIndenter.writeIndentation(g, _nesting);
     }
 
     @Override
-    public void writeEndObject(JsonGenerator jg, int nrOfEntries) throws IOException
+    public void writeEndObject(JsonGenerator g, int nrOfEntries) throws IOException
     {
         if (!_objectIndenter.isInline()) {
             --_nesting;
         }
         if (nrOfEntries > 0) {
-            _objectIndenter.writeIndentation(jg, _nesting);
+            _objectIndenter.writeIndentation(g, _nesting);
         } else {
-            jg.writeRaw(' ');
+            g.writeRaw(' ');
         }
-        jg.writeRaw('}');
+        g.writeRaw('}');
     }
 
     @Override
-    public void writeStartArray(JsonGenerator jg) throws IOException
+    public void writeStartArray(JsonGenerator g) throws IOException
     {
         if (!_arrayIndenter.isInline()) {
             ++_nesting;
         }
-        jg.writeRaw('[');
+        g.writeRaw('[');
     }
 
     @Override
-    public void beforeArrayValues(JsonGenerator jg) throws IOException {
-        _arrayIndenter.writeIndentation(jg, _nesting);
+    public void beforeArrayValues(JsonGenerator g) throws IOException {
+        _arrayIndenter.writeIndentation(g, _nesting);
     }
 
     /**
@@ -340,24 +357,24 @@ public class DefaultPrettyPrinter
      * (white-space) decoration.
      */
     @Override
-    public void writeArrayValueSeparator(JsonGenerator gen) throws IOException
+    public void writeArrayValueSeparator(JsonGenerator g) throws IOException
     {
-        gen.writeRaw(',');
-        _arrayIndenter.writeIndentation(gen, _nesting);
+        g.writeRaw(_separators.getArrayValueSeparator());
+        _arrayIndenter.writeIndentation(g, _nesting);
     }
 
     @Override
-    public void writeEndArray(JsonGenerator gen, int nrOfValues) throws IOException
+    public void writeEndArray(JsonGenerator g, int nrOfValues) throws IOException
     {
         if (!_arrayIndenter.isInline()) {
             --_nesting;
         }
         if (nrOfValues > 0) {
-            _arrayIndenter.writeIndentation(gen, _nesting);
+            _arrayIndenter.writeIndentation(g, _nesting);
         } else {
-            gen.writeRaw(' ');
+            g.writeRaw(' ');
         }
-        gen.writeRaw(']');
+        g.writeRaw(']');
     }
 
     /*
@@ -375,7 +392,7 @@ public class DefaultPrettyPrinter
         public static final NopIndenter instance = new NopIndenter();
 
         @Override
-        public void writeIndentation(JsonGenerator jg, int level) throws IOException { }
+        public void writeIndentation(JsonGenerator g, int level) throws IOException { }
 
         @Override
         public boolean isInline() { return true; }
@@ -388,13 +405,12 @@ public class DefaultPrettyPrinter
      */
     public static class FixedSpaceIndenter extends NopIndenter
     {
-        @SuppressWarnings("hiding")
         public static final FixedSpaceIndenter instance = new FixedSpaceIndenter();
 
         @Override
-        public void writeIndentation(JsonGenerator jg, int level) throws IOException
+        public void writeIndentation(JsonGenerator g, int level) throws IOException
         {
-            jg.writeRaw(' ');
+            g.writeRaw(' ');
         }
 
         @Override

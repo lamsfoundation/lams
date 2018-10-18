@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
  * with null values -- caller <b>must</b> handle null values, usually
  * by calling {@link SerializerProvider#findNullValueSerializer} to obtain
  * serializer to use.
- * This also means that custom serializers can not be directly used to change
+ * This also means that custom serializers cannot be directly used to change
  * the output to produce when serializing null values.
  *<p>
  * If serializer is an aggregate one -- meaning it delegates handling of some
@@ -120,7 +120,7 @@ public abstract class JsonSerializer<T>
      *   serializing Objects value contains, if any.
      */
     public abstract void serialize(T value, JsonGenerator gen, SerializerProvider serializers)
-        throws IOException, JsonProcessingException;
+        throws IOException;
 
     /**
      * Method that can be called to ask implementation to serialize
@@ -157,16 +157,17 @@ public abstract class JsonSerializer<T>
         if (clz == null) {
             clz = value.getClass();
         }
-        throw serializers.mappingException("Type id handling not implemented for type %s (by serializer of type %s)",
-                clz.getName(), getClass().getName());
+        serializers.reportBadDefinition(clz, String.format(
+                "Type id handling not implemented for type %s (by serializer of type %s)",
+                clz.getName(), getClass().getName()));
     }
-    
+
     /*
     /**********************************************************
     /* Other accessors
     /**********************************************************
      */
-    
+
     /**
      * Method for accessing type of Objects this serializer can handle.
      * Note that this information is not guaranteed to be exact -- it
@@ -187,10 +188,8 @@ public abstract class JsonSerializer<T>
      *<p>
      * Default implementation will consider only null values to be empty.
      * 
-     * @since 2.0
-     * 
      * @deprecated Since 2.5 Use {@link #isEmpty(SerializerProvider, Object)} instead;
-     *   will be removed from 2.8
+     *   will be removed from 3.0
      */
     @Deprecated
     public boolean isEmpty(T value) {
@@ -204,7 +203,7 @@ public abstract class JsonSerializer<T>
      *<p>
      * Default implementation will consider only null values to be empty.
      *<p>
-     * NOTE: replaces {@link #isEmpty(Object)}, deprecated in 2.5
+     * NOTE: replaces {@link #isEmpty(Object)}, which was deprecated in 2.5
      * 
      * @since 2.5
      */
@@ -274,7 +273,7 @@ public abstract class JsonSerializer<T>
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType type)
         throws JsonMappingException
     {
-        if (visitor != null) visitor.expectAnyFormat(type);
+        visitor.expectAnyFormat(type);
     }
 
     /*

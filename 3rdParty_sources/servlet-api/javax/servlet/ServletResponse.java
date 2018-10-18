@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -76,13 +76,19 @@ import java.util.Locale;
  * <code>ServletOutputStream</code> and manage the character sections
  * manually.
  *
- * <p>The charset for the MIME body response can be specified
- * explicitly using the {@link #setCharacterEncoding} and
- * {@link #setContentType} methods, or implicitly
- * using the {@link #setLocale} method.
- * Explicit specifications take precedence over
- * implicit specifications. If no charset is specified, ISO-8859-1 will be
- * used. The <code>setCharacterEncoding</code>,
+ * <p>The charset for the MIME body response can be specified explicitly
+ * using any of the following techniques: per request, per web-app (using
+ * {@link ServletContext#setRequestCharacterEncoding}, deployment descriptor),
+ * and per container (for all web applications deployed in that container, 
+ * using vendor specific configuration).
+ * If multiple of the preceding techniques have been employed, the priority is
+ * the order listed.
+ * For per request, the charset for the response can be specified explicitly
+ * using the {@link #setCharacterEncoding} and {@link #setContentType} methods,
+ * or implicitly using the {@link #setLocale} method.
+ * Explicit specifications take precedence over implicit specifications.
+ * If no charset is explicitly specified, ISO-8859-1 will be used.
+ * The <code>setCharacterEncoding</code>,
  * <code>setContentType</code>, or <code>setLocale</code> method must
  * be called before <code>getWriter</code> and before committing
  * the response for the character encoding to be used.
@@ -103,12 +109,17 @@ public interface ServletResponse {
     /**
      * Returns the name of the character encoding (MIME charset)
      * used for the body sent in this response.
-     * The character encoding may have been specified explicitly
-     * using the {@link #setCharacterEncoding} or
-     * {@link #setContentType} methods, or implicitly using the
-     * {@link #setLocale} method. Explicit specifications take
-     * precedence over implicit specifications. Calls made
-     * to these methods after <code>getWriter</code> has been
+     * The following methods for specifying the response character encoding are
+     * consulted, in decreasing order of priority: per request, perweb-app
+     * (using {@link ServletContext#setResponseCharacterEncoding}, deployment
+     * descriptor), and per container (for all web applications deployed in
+     * that container, using vendor specific configuration).
+     * The first one of these methods that yields a result is returned.
+     * Per-request, the charset for the response can be specified explicitly
+     * using the {@link setCharacterEncoding} and {@link setContentType}
+     * methods, or implicitly using the setLocale(java.util.Locale) method.
+     * Explicit specifications take precedence over implicit specifications.
+     * Calls made to these methods after <code>getWriter</code> has been
      * called or after the response has been committed have no
      * effect on the character encoding. If no character encoding
      * has been specified, <code>ISO-8859-1</code> is returned.
@@ -205,9 +216,10 @@ public interface ServletResponse {
     /**
      * Sets the character encoding (MIME charset) of the response
      * being sent to the client, for example, to UTF-8.
-     * If the character encoding has already been set by
-     * {@link #setContentType} or {@link #setLocale},
-     * this method overrides it.
+     * If the response character encoding has already been set by the
+     * {@link ServletContext#setResponseCharacterEncoding},
+     * deployment descriptor, or using the setContentType() or setLocale()
+     * methods, the value set in this method overrides any of those values.
      * Calling {@link #setContentType} with the <code>String</code>
      * of <code>text/html</code> and calling
      * this method with the <code>String</code> of <code>UTF-8</code>
@@ -342,6 +354,9 @@ public interface ServletResponse {
      * @see #getBufferSize
      * @see #isCommitted
      * @see #reset
+
+     * @throws IOException if the act of flushing the buffer cannot be
+     * completed.
      *
      */
     public void flushBuffer() throws IOException;
@@ -444,6 +459,8 @@ public interface ServletResponse {
      * <code>setLocale</code> after the response is committed
      * have no effect. If no locale has been specified,
      * the container's default locale is returned.
+     *
+     * @return the Locale for this response.
      * 
      * @see #setLocale
      */

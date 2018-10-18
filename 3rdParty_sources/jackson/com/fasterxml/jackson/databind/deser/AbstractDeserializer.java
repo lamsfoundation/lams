@@ -3,10 +3,18 @@ package com.fasterxml.jackson.databind.deser;
 import java.io.IOException;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.ObjectIdResolver;
+
 import com.fasterxml.jackson.core.*;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.impl.ObjectIdReader;
+import com.fasterxml.jackson.databind.deser.impl.PropertyBasedObjectIdGenerator;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.ObjectIdInfo;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
 /**
@@ -17,7 +25,8 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
  */
 public class AbstractDeserializer
     extends JsonDeserializer<Object>
-    implements java.io.Serializable
+    implements ContextualDeserializer, // since 2.9
+        java.io.Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -27,24 +36,47 @@ public class AbstractDeserializer
 
     protected final Map<String, SettableBeanProperty> _backRefProperties;
 
+    protected transient Map<String,SettableBeanProperty> _properties;
+
     // support for "native" types, which require special care:
     
     protected final boolean _acceptString;
     protected final boolean _acceptBoolean;
     protected final boolean _acceptInt;
     protected final boolean _acceptDouble;
-    
+
+    /*
+    /**********************************************************
+    /* Life cycle
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.9
+     *
+     * @param props Regular properties: currently only needed to support property-annotated
+     *    Object Id handling with property inclusion (needed for determining type of Object Id
+     *    to bind)
+     */
     public AbstractDeserializer(BeanDeserializerBuilder builder,
-            BeanDescription beanDesc, Map<String, SettableBeanProperty> backRefProps)
+            BeanDescription beanDesc, Map<String, SettableBeanProperty> backRefProps,
+            Map<String, SettableBeanProperty> props)
     {
         _baseType = beanDesc.getType();
         _objectIdReader = builder.getObjectIdReader();
         _backRefProperties = backRefProps;
+        _properties = props;
         Class<?> cls = _baseType.getRawClass();
         _acceptString = cls.isAssignableFrom(String.class);
         _acceptBoolean = (cls == Boolean.TYPE) || cls.isAssignableFrom(Boolean.class);
         _acceptInt = (cls == Integer.TYPE) || cls.isAssignableFrom(Integer.class);
         _acceptDouble = (cls == Double.TYPE) || cls.isAssignableFrom(Double.class);
+    }
+
+    @Deprecated // since 2.9
+    public AbstractDeserializer(BeanDeserializerBuilder builder,
+            BeanDescription beanDesc, Map<String, SettableBeanProperty> backRefProps) {
+        this(builder, beanDesc, backRefProps, null);
     }
 
     protected AbstractDeserializer(BeanDescription beanDesc)
@@ -58,7 +90,24 @@ public class AbstractDeserializer
         _acceptInt = (cls == Integer.TYPE) || cls.isAssignableFrom(Integer.class);
         _acceptDouble = (cls == Double.TYPE) || cls.isAssignableFrom(Double.class);
     }
-    
+
+    /**
+     * @since 2.9
+     */
+    protected AbstractDeserializer(AbstractDeserializer base,
+            ObjectIdReader objectIdReader, Map<String, SettableBeanProperty> props)
+    {
+        _baseType = base._baseType;
+        _backRefProperties = base._backRefProperties;
+        _acceptString = base._acceptString;
+        _acceptBoolean = base._acceptBoolean;
+        _acceptInt = base._acceptInt;
+        _acceptDouble = base._acceptDouble;
+
+        _objectIdReader = objectIdReader;
+        _properties = props;
+    }
+
     /**
      * Factory method used when constructing instances for non-POJO types, like
      * {@link java.util.Map}s.
@@ -68,7 +117,62 @@ public class AbstractDeserializer
     public static AbstractDeserializer constructForNonPOJO(BeanDescription beanDesc) {
         return new AbstractDeserializer(beanDesc);
     }
-    
+
+    @Override
+    public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
+            BeanProperty property) throws JsonMappingException
+    {
+        final AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+        if (property != null && intr != null) {
+            final AnnotatedMember accessor = property.getMember();
+            if (accessor != null) {
+                ObjectIdInfo objectIdInfo = intr.findObjectIdInfo(accessor);
+                if (objectIdInfo != null) { // some code duplication here as well (from BeanDeserializerFactory)
+                    JavaType idType;
+                    ObjectIdGenerator<?> idGen;
+                    SettableBeanProperty idProp = null;
+                    ObjectIdResolver resolver = ctxt.objectIdResolverInstance(accessor, objectIdInfo);
+
+                    // 2.1: allow modifications by "id ref" annotations as well:
+                    objectIdInfo = intr.findObjectReferenceInfo(accessor, objectIdInfo);
+                    Class<?> implClass = objectIdInfo.getGeneratorType();
+
+                    if (implClass == ObjectIdGenerators.PropertyGenerator.class) {
+                        PropertyName propName = objectIdInfo.getPropertyName();
+                        idProp = (_properties == null) ? null : _properties.get(propName.getSimpleName());
+                        if (idProp == null) {
+                            ctxt.reportBadDefinition(_baseType, String.format(
+                                    "Invalid Object Id definition for %s: cannot find property with name '%s'",
+                                    handledType().getName(), propName));
+                        }
+                        idType = idProp.getType();
+                        idGen = new PropertyBasedObjectIdGenerator(objectIdInfo.getScope());
+/*
+                         ctxt.reportBadDefinition(_baseType, String.format(
+/
+"Invalid Object Id definition for abstract type %s: cannot use `PropertyGenerator` on polymorphic types using property annotation",
+handledType().getName()));
+*/
+                    } else { // other types simpler
+                        resolver = ctxt.objectIdResolverInstance(accessor, objectIdInfo);
+                        JavaType type = ctxt.constructType(implClass);
+                        idType = ctxt.getTypeFactory().findTypeParameters(type, ObjectIdGenerator.class)[0];
+                        idGen = ctxt.objectIdGeneratorInstance(accessor, objectIdInfo);
+                    }
+                    JsonDeserializer<?> deser = ctxt.findRootValueDeserializer(idType);
+                    ObjectIdReader oir = ObjectIdReader.construct(idType, objectIdInfo.getPropertyName(),
+                             idGen, deser, idProp, resolver);
+                    return new AbstractDeserializer(this, oir, null);
+                }
+            }
+        }
+        if (_properties == null) {
+            return this;
+        }
+        // Need to ensure properties are dropped at this point, regardless
+        return new AbstractDeserializer(this, _objectIdReader, null);
+    }
+
     /*
     /**********************************************************
     /* Public accessors
@@ -82,7 +186,17 @@ public class AbstractDeserializer
     
     @Override
     public boolean isCachable() { return true; }
-    
+
+    @Override // since 2.9
+    public Boolean supportsUpdate(DeserializationConfig config) {
+        /* 23-Oct-2016, tatu: Not exactly sure what to do with this; polymorphic
+         *   type handling seems bit risky so for now claim it "may or may not be"
+         *   possible, which does allow explicit per-type/per-property merging attempts,
+         *   but avoids general-configuration merges
+         */
+        return null;
+    }
+
     /**
      * Overridden to return true for those instances that are
      * handling value for which Object Identity handling is enabled
@@ -130,10 +244,8 @@ public class AbstractDeserializer
                         && _objectIdReader.isValidReferencePropertyName(p.getCurrentName(), p)) {
                     return _deserializeFromObjectId(p, ctxt);
                 }
-            
             }
         }
-        
         // First: support "natural" values (which are always serialized without type info!)
         Object result = _deserializeIfNatural(p, ctxt);
         if (result != null) {
@@ -146,9 +258,12 @@ public class AbstractDeserializer
     public Object deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        // This method should never be called...
-        throw ctxt.instantiationException(_baseType.getRawClass(),
-                "abstract types either need to be mapped to concrete types, have custom deserializer, or be instantiated with additional type information");
+        // 16-Oct-2016, tatu: Let's pass non-null value instantiator so that we will
+        //    get proper exception type; needed to establish there are no creators
+        //    (since without ValueInstantiator this would not be known for certain)
+        ValueInstantiator bogus = new ValueInstantiator.Base(_baseType);
+        return ctxt.handleMissingInstantiator(_baseType.getRawClass(), bogus, p,
+                "abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information");
     }
 
     /*
@@ -156,7 +271,7 @@ public class AbstractDeserializer
     /* Internal methods
     /**********************************************************
      */
-    
+
     protected Object _deserializeIfNatural(JsonParser p, DeserializationContext ctxt) throws IOException
     {
         /* There is a chance we might be "natural" types

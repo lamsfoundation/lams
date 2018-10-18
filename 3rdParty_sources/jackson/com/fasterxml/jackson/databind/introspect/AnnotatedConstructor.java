@@ -19,7 +19,7 @@ public final class AnnotatedConstructor
      * @since 2.1
      */
     protected Serialization _serialization;
-    
+
     /*
     /**********************************************************
     /* Life-cycle
@@ -71,7 +71,7 @@ public final class AnnotatedConstructor
     public JavaType getType() {
         return _typeContext.resolveType(getRawType());
     }
-    
+
     @Override
     public Class<?> getRawType() {
         return _constructor.getDeclaringClass();
@@ -104,6 +104,16 @@ public final class AnnotatedConstructor
         return _typeContext.resolveType(types[index]);
     }
 
+    @Override
+    @Deprecated // since 2.7
+    public Type getGenericParameterType(int index) {
+        Type[] types = _constructor.getGenericParameterTypes();
+        if (index >= types.length) {
+            return null;
+        }
+        return types[index];
+    }
+    
     @Override
     public final Object call() throws Exception {
         return _constructor.newInstance();
@@ -166,10 +176,10 @@ public final class AnnotatedConstructor
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (o == null || o.getClass() != getClass()) return false;
-        return ((AnnotatedConstructor) o)._constructor == _constructor;
+        return ClassUtil.hasClass(o, getClass())
+                && (((AnnotatedConstructor) o)._constructor == _constructor);
     }
-    
+
     /*
     /**********************************************************
     /* JDK serialization handling

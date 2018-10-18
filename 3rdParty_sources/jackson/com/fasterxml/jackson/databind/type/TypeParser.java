@@ -3,6 +3,7 @@ package com.fasterxml.jackson.databind.type;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Simple recursive-descent parser for parsing canonical {@link JavaType}
@@ -28,8 +29,7 @@ public class TypeParser
 
     public JavaType parse(String canonical) throws IllegalArgumentException
     {
-        canonical = canonical.trim();
-        MyTokenizer tokens = new MyTokenizer(canonical);
+        MyTokenizer tokens = new MyTokenizer(canonical.trim());
         JavaType type = parseType(tokens);
         // must be end, now
         if (tokens.hasMoreTokens()) {
@@ -57,7 +57,7 @@ public class TypeParser
             // can be comma that separates types, or closing '>'
             tokens.pushBack(token);
         }
-        return _factory._fromClass(null, base, null);
+        return _factory._fromClass(null, base, TypeBindings.emptyBindings());
     }
 
     protected List<JavaType> parseTypes(MyTokenizer tokens)
@@ -81,28 +81,25 @@ public class TypeParser
         try {
             return _factory.findClass(className);
         } catch (Exception e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
-            throw _problem(tokens, "Can not locate class '"+className+"', problem: "+e.getMessage());
+            ClassUtil.throwIfRTE(e);
+            throw _problem(tokens, "Cannot locate class '"+className+"', problem: "+e.getMessage());
         }
     }
 
     protected IllegalArgumentException _problem(MyTokenizer tokens, String msg)
     {
-        return new IllegalArgumentException("Failed to parse type '"+tokens.getAllInput()
-                +"' (remaining: '"+tokens.getRemainingInput()+"'): "+msg);
+        return new IllegalArgumentException(String.format("Failed to parse type '%s' (remaining: '%s'): %s",
+                tokens.getAllInput(), tokens.getRemainingInput(), msg));
     }
 
-    final static class MyTokenizer
-        extends StringTokenizer
+    final static class MyTokenizer extends StringTokenizer
     {
         protected final String _input;
 
         protected int _index;
 
         protected String _pushbackToken;
-        
+
         public MyTokenizer(String str) {            
             super(str, "<,>", true);
             _input = str;
@@ -121,18 +118,19 @@ public class TypeParser
                 _pushbackToken = null;
             } else {
                 token = super.nextToken();
+                _index += token.length();
+                token = token.trim();
             }
-            _index += token.length();
             return token;
         }
 
         public void pushBack(String token) {
             _pushbackToken = token;
-            _index -= token.length();
+            // let's NOT change index for now, since token may have been trim()ed
         }
-        
+
         public String getAllInput() { return _input; }
-        public String getUsedInput() { return _input.substring(0, _index); }
+//        public String getUsedInput() { return _input.substring(0, _index); }
         public String getRemainingInput() { return _input.substring(_index); }
     }
 }

@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.databind.module;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,16 +25,26 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
  * override {@link #setupModule(SetupContext)} method, if they choose
  * to do so they MUST call <code>super.setupModule(context);</code>
  * to ensure that registration works as expected.
+ *<p>
+ * WARNING: when registering {@link JsonSerializer}s and {@link JsonDeserializer}s,
+ * only type erased {@code Class} is compared: this means that usually you should
+ * NOT use this implementation for registering structured types such as
+ * {@link java.util.Collection}s or {@link java.util.Map}s: this because parametric
+ * type information will not be considered and you may end up having "wrong" handler
+ * for your type.
+ * What you need to do, instead, is to implement {@link com.fasterxml.jackson.databind.deser.Deserializers} 
+ * and/or {@link com.fasterxml.jackson.databind.ser.Serializers} callbacks to match full type
+ * signatures (with {@link JavaType}).
  */
 public class SimpleModule
-    extends Module
+    extends com.fasterxml.jackson.databind.Module
     implements java.io.Serializable
 {
     private static final long serialVersionUID = 1L; // 2.5.0
 
     protected final String _name;
     protected final Version _version;
-    
+
     protected SimpleSerializers _serializers = null;
     protected SimpleDeserializers _deserializers = null;
 
@@ -251,21 +262,39 @@ public class SimpleModule
     
     /*
     /**********************************************************
-    /* Configuration methods
+    /* Configuration methods, adding serializers
     /**********************************************************
      */
-    
+
+    /**
+     * Method for adding serializer to handle type that the serializer claims to handle
+     * (see {@link JsonSerializer#handledType()}).
+     *<p>
+     * WARNING! Type matching only uses type-erased {@code Class} and should NOT
+     * be used when registering serializers for generic types like
+     * {@link java.util.Collection} and {@link java.util.Map}.
+     */
     public SimpleModule addSerializer(JsonSerializer<?> ser)
     {
+        _checkNotNull(ser, "serializer");
         if (_serializers == null) {
             _serializers = new SimpleSerializers();
         }
         _serializers.addSerializer(ser);
         return this;
     }
-    
+
+    /**
+     * Method for adding serializer to handle values of specific type.
+     *<p>
+     * WARNING! Type matching only uses type-erased {@code Class} and should NOT
+     * be used when registering serializers for generic types like
+     * {@link java.util.Collection} and {@link java.util.Map}.
+     */
     public <T> SimpleModule addSerializer(Class<? extends T> type, JsonSerializer<T> ser)
     {
+        _checkNotNull(type, "type to register serializer for");
+        _checkNotNull(ser, "serializer");
         if (_serializers == null) {
             _serializers = new SimpleSerializers();
         }
@@ -275,15 +304,32 @@ public class SimpleModule
 
     public <T> SimpleModule addKeySerializer(Class<? extends T> type, JsonSerializer<T> ser)
     {
+        _checkNotNull(type, "type to register key serializer for");
+        _checkNotNull(ser, "key serializer");
         if (_keySerializers == null) {
             _keySerializers = new SimpleSerializers();
         }
         _keySerializers.addSerializer(type, ser);
         return this;
     }
+
+    /*
+    /**********************************************************
+    /* Configuration methods, adding deserializers
+    /**********************************************************
+     */
     
+    /**
+     * Method for adding deserializer to handle specified type.
+     *<p>
+     * WARNING! Type matching only uses type-erased {@code Class} and should NOT
+     * be used when registering serializers for generic types like
+     * {@link java.util.Collection} and {@link java.util.Map}.
+     */
     public <T> SimpleModule addDeserializer(Class<T> type, JsonDeserializer<? extends T> deser)
     {
+        _checkNotNull(type, "type to register deserializer for");
+        _checkNotNull(deser, "deserializer");
         if (_deserializers == null) {
             _deserializers = new SimpleDeserializers();
         }
@@ -293,12 +339,20 @@ public class SimpleModule
 
     public SimpleModule addKeyDeserializer(Class<?> type, KeyDeserializer deser)
     {
+        _checkNotNull(type, "type to register key deserializer for");
+        _checkNotNull(deser, "key deserializer");
         if (_keyDeserializers == null) {
             _keyDeserializers = new SimpleKeyDeserializers();
         }
         _keyDeserializers.addDeserializer(type, deser);
         return this;
     }
+
+    /*
+    /**********************************************************
+    /* Configuration methods, type mapping
+    /**********************************************************
+     */
 
     /**
      * Lazily-constructed resolver used for storing mappings from
@@ -308,27 +362,13 @@ public class SimpleModule
     public <T> SimpleModule addAbstractTypeMapping(Class<T> superType,
             Class<? extends T> subType)
     {
+        _checkNotNull(superType, "abstract type to map");
+        _checkNotNull(subType, "concrete type to map to");
         if (_abstractTypes == null) {
             _abstractTypes = new SimpleAbstractTypeResolver();
         }
         // note: addMapping() will verify arguments
         _abstractTypes = _abstractTypes.addMapping(superType, subType);
-        return this;
-    }
-
-    /**
-     * Method for registering {@link ValueInstantiator} to use when deserializing
-     * instances of type <code>beanType</code>.
-     *<p>
-     * Instantiator is
-     * registered when module is registered for <code>ObjectMapper</code>.
-     */
-    public SimpleModule addValueInstantiator(Class<?> beanType, ValueInstantiator inst)
-    {
-        if (_valueInstantiators == null) {
-            _valueInstantiators = new SimpleValueInstantiators();
-        }
-        _valueInstantiators = _valueInstantiators.addValueInstantiator(beanType, inst);
         return this;
     }
 
@@ -340,9 +380,10 @@ public class SimpleModule
     public SimpleModule registerSubtypes(Class<?> ... subtypes)
     {
         if (_subtypes == null) {
-            _subtypes = new LinkedHashSet<NamedType>(Math.max(16, subtypes.length));
+            _subtypes = new LinkedHashSet<>();
         }
         for (Class<?> subtype : subtypes) {
+            _checkNotNull(subtype, "subtype to register");
             _subtypes.add(new NamedType(subtype));
         }
         return this;
@@ -356,14 +397,58 @@ public class SimpleModule
     public SimpleModule registerSubtypes(NamedType ... subtypes)
     {
         if (_subtypes == null) {
-            _subtypes = new LinkedHashSet<NamedType>(Math.max(16, subtypes.length));
+            _subtypes = new LinkedHashSet<>();
         }
         for (NamedType subtype : subtypes) {
+            _checkNotNull(subtype, "subtype to register");
             _subtypes.add(subtype);
         }
         return this;
     }
+
+    /**
+     * Method for adding set of subtypes (along with type name to use) to be registered with
+     * {@link ObjectMapper}
+     * this is an alternative to using annotations in super type to indicate subtypes.
+     *
+     * @since 2.9
+     */
+    public SimpleModule registerSubtypes(Collection<Class<?>> subtypes)
+    {
+        if (_subtypes == null) {
+            _subtypes = new LinkedHashSet<>();
+        }
+        for (Class<?> subtype : subtypes) {
+            _checkNotNull(subtype, "subtype to register");
+            _subtypes.add(new NamedType(subtype));
+        }
+        return this;
+    }
+
+    /*
+    /**********************************************************
+    /* Configuration methods, add other handlers
+    /**********************************************************
+     */
     
+    /**
+     * Method for registering {@link ValueInstantiator} to use when deserializing
+     * instances of type <code>beanType</code>.
+     *<p>
+     * Instantiator is
+     * registered when module is registered for <code>ObjectMapper</code>.
+     */
+    public SimpleModule addValueInstantiator(Class<?> beanType, ValueInstantiator inst)
+    {
+        _checkNotNull(beanType, "class to register value instantiator for");
+        _checkNotNull(inst, "value instantiator");
+        if (_valueInstantiators == null) {
+            _valueInstantiators = new SimpleValueInstantiators();
+        }
+        _valueInstantiators = _valueInstantiators.addValueInstantiator(beanType, inst);
+        return this;
+    }
+
     /**
      * Method for specifying that annotations define by <code>mixinClass</code>
      * should be "mixed in" with annotations that <code>targetType</code>
@@ -374,13 +459,15 @@ public class SimpleModule
      */
     public SimpleModule setMixInAnnotation(Class<?> targetType, Class<?> mixinClass)
     {
+        _checkNotNull(targetType, "target type");
+        _checkNotNull(mixinClass, "mixin class");
         if (_mixins == null) {
             _mixins = new HashMap<Class<?>, Class<?>>();
         }
         _mixins.put(targetType, mixinClass);
         return this;
     }
-    
+
     /*
     /**********************************************************
     /* Module impl
@@ -441,4 +528,21 @@ public class SimpleModule
 
     @Override
     public Version version() { return _version; }
+
+    /*
+    /**********************************************************
+    /* Helper methods
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.9
+     */
+    protected void _checkNotNull(Object thingy, String type)
+    {
+        if (thingy == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Cannot pass `null` as %s", type));
+        }
+    }
 }

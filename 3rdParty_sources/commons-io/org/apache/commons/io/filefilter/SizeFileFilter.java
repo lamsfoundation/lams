@@ -34,7 +34,7 @@ import java.io.Serializable;
  * }
  * </pre>
  *
- *
+ * @version $Id: SizeFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.2
  * @see FileFilterUtils#sizeFileFilter(long)
  * @see FileFilterUtils#sizeFileFilter(long, boolean)
@@ -42,6 +42,7 @@ import java.io.Serializable;
  */
 public class SizeFileFilter extends AbstractFileFilter implements Serializable {
 
+    private static final long serialVersionUID = 7388077430788600069L;
     /** The size threshold. */
     private final long size;
     /** Whether the files accepted will be larger or smaller. */
@@ -54,7 +55,7 @@ public class SizeFileFilter extends AbstractFileFilter implements Serializable {
      * @param size  the threshold size of the files
      * @throws IllegalArgumentException if the size is negative
      */
-    public SizeFileFilter(long size) {
+    public SizeFileFilter(final long size) {
         this(size, true);
     }
 
@@ -67,7 +68,7 @@ public class SizeFileFilter extends AbstractFileFilter implements Serializable {
      * otherwise smaller ones (but not equal to)
      * @throws IllegalArgumentException if the size is negative
      */
-    public SizeFileFilter(long size, boolean acceptLarger) {
+    public SizeFileFilter(final long size, final boolean acceptLarger) {
         if (size < 0) {
             throw new IllegalArgumentException("The size must be non-negative");
         }
@@ -88,8 +89,8 @@ public class SizeFileFilter extends AbstractFileFilter implements Serializable {
      * @return true if the filename matches
      */
     @Override
-    public boolean accept(File file) {
-        boolean smaller = file.length() < size;
+    public boolean accept(final File file) {
+        final boolean smaller = file.length() < size;
         return acceptLarger ? !smaller : smaller;
     }
 
@@ -100,7 +101,7 @@ public class SizeFileFilter extends AbstractFileFilter implements Serializable {
      */
     @Override
     public String toString() {
-        String condition = acceptLarger ? ">=" : "<";
+        final String condition = acceptLarger ? ">=" : "<";
         return super.toString() + "(" + condition + size + ")";
     }
 

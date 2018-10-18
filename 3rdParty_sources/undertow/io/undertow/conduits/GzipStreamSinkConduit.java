@@ -21,6 +21,7 @@ package io.undertow.conduits;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.ConduitFactory;
+import io.undertow.util.ObjectPool;
 import org.xnio.conduits.StreamSinkConduit;
 
 import java.util.zip.CRC32;
@@ -34,8 +35,8 @@ public class GzipStreamSinkConduit extends DeflatingStreamSinkConduit {
     /*
      * GZIP header magic number.
      */
-    private static final  int GZIP_MAGIC = 0x8b1f;
-    public static final byte[] HEADER = new byte[]{
+    private static final int GZIP_MAGIC = 0x8b1f;
+    private static final byte[] HEADER = new byte[]{
             (byte) GZIP_MAGIC,        // Magic number (short)
             (byte) (GZIP_MAGIC >> 8),  // Magic number (short)
             Deflater.DEFLATED,        // Compression method (CM)
@@ -54,7 +55,21 @@ public class GzipStreamSinkConduit extends DeflatingStreamSinkConduit {
     protected CRC32 crc = new CRC32();
 
     public GzipStreamSinkConduit(ConduitFactory<StreamSinkConduit> conduitFactory, HttpServerExchange exchange) {
-        super(conduitFactory, exchange, Deflater.DEFAULT_COMPRESSION);
+        this(conduitFactory, exchange, Deflater.DEFAULT_COMPRESSION);
+    }
+
+    public GzipStreamSinkConduit(
+            ConduitFactory<StreamSinkConduit> conduitFactory,
+            HttpServerExchange exchange,
+            int deflateLevel) {
+        this(conduitFactory, exchange, newInstanceDeflaterPool(deflateLevel));
+    }
+
+    public GzipStreamSinkConduit(
+            ConduitFactory<StreamSinkConduit> conduitFactory,
+            HttpServerExchange exchange,
+            ObjectPool deflaterPool) {
+        super(conduitFactory, exchange, deflaterPool);
         writeHeader();
         Connectors.updateResponseBytesSent(exchange, HEADER.length);
     }

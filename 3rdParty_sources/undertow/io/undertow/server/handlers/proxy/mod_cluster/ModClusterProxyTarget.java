@@ -24,7 +24,7 @@ import io.undertow.server.handlers.proxy.ProxyClient;
 /**
  * @author Emanuel Muckenhuber
  */
-public interface ModClusterProxyTarget extends ProxyClient.ProxyTarget {
+public interface ModClusterProxyTarget extends ProxyClient.ProxyTarget, ProxyClient.MaxRetriesProxyTarget {
 
     /**
      * Resolve the responsible context handling this request.
@@ -36,12 +36,16 @@ public interface ModClusterProxyTarget extends ProxyClient.ProxyTarget {
 
     class ExistingSessionTarget implements ModClusterProxyTarget {
 
+        private final String session;
         private final String jvmRoute;
         private final VirtualHost.HostEntry entry;
         private final boolean forceStickySession;
         private final ModClusterContainer container;
 
-        public ExistingSessionTarget(String jvmRoute, VirtualHost.HostEntry entry, ModClusterContainer container, boolean forceStickySession) {
+        private Context resolved;
+
+        public ExistingSessionTarget(String session, String jvmRoute, VirtualHost.HostEntry entry, ModClusterContainer container, boolean forceStickySession) {
+            this.session = session;
             this.jvmRoute = jvmRoute;
             this.entry = entry;
             this.container = container;
@@ -50,14 +54,37 @@ public interface ModClusterProxyTarget extends ProxyClient.ProxyTarget {
 
         @Override
         public Context resolveContext(HttpServerExchange exchange) {
+            if(resolved == null) {
+                resolveNode();
+            }
+            return resolved;
+        }
+
+        void resolveNode() {
             final Context context = entry.getContextForNode(jvmRoute);
             if (context != null && context.checkAvailable(true)) {
                 final Node node = context.getNode();
                 node.elected(); // Maybe move this to context#handleRequest
-                return context;
+                this.resolved = context;
+                return;
             }
             final String domain = context != null ? context.getNode().getNodeConfig().getDomain() : null;
-            return container.findFailoverNode(entry, domain, jvmRoute, forceStickySession);
+            this.resolved = container.findFailoverNode(entry, domain, session, jvmRoute, forceStickySession);
+        }
+
+        @Override
+        public int getMaxRetries() {
+            if(resolved == null) {
+                resolveNode();
+            }
+            if(resolved == null) {
+                return 0;
+            }
+            Balancer balancer = resolved.getNode().getBalancer();
+            if(balancer == null) {
+                return 0;
+            }
+            return balancer.getMaxRetries();
         }
     }
 
@@ -65,6 +92,7 @@ public interface ModClusterProxyTarget extends ProxyClient.ProxyTarget {
 
         private final VirtualHost.HostEntry entry;
         private final ModClusterContainer container;
+        private Context resolved;
 
         public BasicTarget(VirtualHost.HostEntry entry, ModClusterContainer container) {
             this.entry = entry;
@@ -72,8 +100,30 @@ public interface ModClusterProxyTarget extends ProxyClient.ProxyTarget {
         }
 
         @Override
+        public int getMaxRetries() {
+            if(resolved == null) {
+                resolveNode();
+            }
+            if(resolved == null) {
+                return 0;
+            }
+            Balancer balancer = resolved.getNode().getBalancer();
+            if(balancer == null) {
+                return 0;
+            }
+            return balancer.getMaxRetries();
+        }
+
+        @Override
         public Context resolveContext(HttpServerExchange exchange) {
-            return container.findNewNode(entry);
+            if(resolved == null) {
+                resolveNode();
+            }
+            return resolved;
+        }
+
+        private void resolveNode() {
+            this.resolved = container.findNewNode(entry);
         }
     }
 

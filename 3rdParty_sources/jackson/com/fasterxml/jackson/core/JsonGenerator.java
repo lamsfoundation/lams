@@ -4,8 +4,6 @@
  */
 package com.fasterxml.jackson.core;
 
-import static com.fasterxml.jackson.core.JsonTokenId.*;
-
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -15,7 +13,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.core.io.CharacterEscapes;
+import com.fasterxml.jackson.core.type.WritableTypeId;
+import com.fasterxml.jackson.core.type.WritableTypeId.Inclusion;
 import com.fasterxml.jackson.core.util.VersionUtil;
+
+import static com.fasterxml.jackson.core.JsonTokenId.*;
 
 /**
  * Base class that defines public API for writing JSON content.
@@ -347,7 +349,7 @@ public abstract class JsonGenerator
      *
      * @return This parser object, to allow chaining of calls
      *
-     * @deprecated Since 2.7, use {@link #overrideStdFeatures(int, int)} instead
+     * @deprecated Since 2.7, use {@link #overrideStdFeatures(int, int)} instead -- remove from 2.9
      */
     @Deprecated
     public abstract JsonGenerator setFeatureMask(int values);
@@ -698,6 +700,20 @@ public abstract class JsonGenerator
      */
     public boolean canOmitFields() { return true; }
 
+    /**
+     * Introspection method to call to check whether it is possible
+     * to write numbers using {@link #writeNumber(java.lang.String)}
+     * using possible custom format, or not. Typically textual formats
+     * allow this (and JSON specifically does), whereas binary formats
+     * do not allow this (except by writing them as Strings).
+     * Usual reason for calling this method is to check whether custom
+     * formatting of numbers may be applied by higher-level code (databinding)
+     * or not.
+     *
+     * @since 2.8
+     */
+    public boolean canWriteFormattedNumbers() { return false; }
+
     /*
     /**********************************************************
     /* Public API, write methods, structural
@@ -756,6 +772,26 @@ public abstract class JsonGenerator
     public abstract void writeStartObject() throws IOException;
 
     /**
+     * Method for writing starting marker of a JSON Object value
+     * (character '{'; plus possible white space decoration
+     * if pretty-printing is enabled), to represent Java given
+     * as the argument. Argument is offered as metadata, but more
+     * importantly it should be assigned as the "current value"
+     * for the Object content that gets constructed and initialized.
+     *<p>
+     * Object values can be written in any context where values
+     * are allowed: meaning everywhere except for when
+     * a field name is expected.
+     *
+     * @since 2.8.
+     */
+    public void writeStartObject(Object forValue) throws IOException
+    {
+        writeStartObject();
+        setCurrentValue(forValue);
+    }
+
+    /**
      * Method for writing closing marker of a JSON Object value
      * (character '}'; plus possible white space decoration
      * if pretty-printing is enabled).
@@ -791,6 +827,98 @@ public abstract class JsonGenerator
      */
     public abstract void writeFieldName(SerializableString name) throws IOException;
 
+    /**
+     * Alternative to {@link #writeFieldName(String)} that may be used
+     * in cases where property key is of numeric type; either where
+     * underlying format supports such notion (some binary formats do,
+     * unlike JSON), or for convenient conversion into String presentation.
+     * Default implementation will simply convert id into <code>String</code>
+     * and call {@link #writeFieldName(String)}.
+     *
+     * @since 2.8
+     */
+    public void writeFieldId(long id) throws IOException {
+        writeFieldName(Long.toString(id));
+    }
+
+    /*
+    /**********************************************************
+    /* Public API, write methods, scalar arrays (2.8)
+    /**********************************************************
+     */
+
+    /**
+     * Value write method that can be called to write a single
+     * array (sequence of {@link JsonToken#START_ARRAY}, zero or
+     * more {@link JsonToken#VALUE_NUMBER_INT}, {@link JsonToken#END_ARRAY})
+     *
+     * @since 2.8
+     *
+     * @param array Array that contains values to write
+     * @param offset Offset of the first element to write, within array
+     * @param length Number of elements in array to write, from `offset` to `offset + len - 1`
+     */
+    public void writeArray(int[] array, int offset, int length) throws IOException
+    {
+        if (array == null) {
+            throw new IllegalArgumentException("null array");
+        }
+        _verifyOffsets(array.length, offset, length);
+        writeStartArray();
+        for (int i = offset, end = offset+length; i < end; ++i) {
+            writeNumber(array[i]);
+        }
+        writeEndArray();
+    }
+
+    /**
+     * Value write method that can be called to write a single
+     * array (sequence of {@link JsonToken#START_ARRAY}, zero or
+     * more {@link JsonToken#VALUE_NUMBER_INT}, {@link JsonToken#END_ARRAY})
+     *
+     * @since 2.8
+     *
+     * @param array Array that contains values to write
+     * @param offset Offset of the first element to write, within array
+     * @param length Number of elements in array to write, from `offset` to `offset + len - 1`
+     */
+    public void writeArray(long[] array, int offset, int length) throws IOException
+    {
+        if (array == null) {
+            throw new IllegalArgumentException("null array");
+        }
+        _verifyOffsets(array.length, offset, length);
+        writeStartArray();
+        for (int i = offset, end = offset+length; i < end; ++i) {
+            writeNumber(array[i]);
+        }
+        writeEndArray();
+    }
+
+    /**
+     * Value write method that can be called to write a single
+     * array (sequence of {@link JsonToken#START_ARRAY}, zero or
+     * more {@link JsonToken#VALUE_NUMBER_FLOAT}, {@link JsonToken#END_ARRAY})
+     *
+     * @since 2.8
+     *
+     * @param array Array that contains values to write
+     * @param offset Offset of the first element to write, within array
+     * @param length Number of elements in array to write, from `offset` to `offset + len - 1`
+     */
+    public void writeArray(double[] array, int offset, int length) throws IOException
+    {
+        if (array == null) {
+            throw new IllegalArgumentException("null array");
+        }
+        _verifyOffsets(array.length, offset, length);
+        writeStartArray();
+        for (int i = offset, end = offset+length; i < end; ++i) {
+            writeNumber(array[i]);
+        }
+        writeEndArray();
+    }
+
     /*
     /**********************************************************
     /* Public API, write methods, text/String values
@@ -805,6 +933,23 @@ public abstract class JsonGenerator
      * escaped as required by JSON specification.
      */
     public abstract void writeString(String text) throws IOException;
+
+    /**
+     * Method for outputting a String value. Depending on context
+     * this means either array element, (object) field value or
+     * a stand alone String; but in all cases, String will be
+     * surrounded in double quotes, and contents will be properly
+     * escaped as required by JSON specification.
+     * If the reader is null, then write a null.
+     * If len is &lt; 0, then write all contents of the reader.
+     * Otherwise, write only len characters.
+     *
+     * @since 2.9
+     */
+    public void writeString(Reader reader, int len) throws IOException {
+        // Let's implement this as "unsupported" to make it easier to add new parser impls
+        _reportUnsupportedOperation();
+    }
 
     /**
      * Method for outputting a String value. Depending on context
@@ -1062,7 +1207,7 @@ public abstract class JsonGenerator
 
     /*
     /**********************************************************
-    /* Public API, write methods, other value types
+    /* Public API, write methods, numeric
     /**********************************************************
      */
 
@@ -1168,6 +1313,12 @@ public abstract class JsonGenerator
      */
     public abstract void writeNumber(String encodedValue) throws IOException;
 
+    /*
+    /**********************************************************
+    /* Public API, write methods, other value types
+    /**********************************************************
+     */
+    
     /**
      * Method for outputting literal JSON boolean value (one of
      * Strings 'true' and 'false').
@@ -1187,6 +1338,27 @@ public abstract class JsonGenerator
      */
     public abstract void writeNull() throws IOException;
 
+    /**
+     * Method that can be called on backends that support passing opaque datatypes of
+     * non-JSON formats
+     *
+     * @since 2.8
+     */
+    public void writeEmbeddedObject(Object object) throws IOException {
+        // 01-Sep-2016, tatu: As per [core#318], handle small number of cases
+        if (object == null) {
+            writeNull();
+            return;
+        }
+        if (object instanceof byte[]) {
+            writeBinary((byte[]) object);
+            return;
+        }
+        throw new JsonGenerationException("No native support for writing embedded objects of type "
+                +object.getClass().getName(),
+                this);
+    }
+    
     /*
     /**********************************************************
     /* Public API, write methods, Native Ids (type, object)
@@ -1234,6 +1406,118 @@ public abstract class JsonGenerator
      */
     public void writeTypeId(Object id) throws IOException {
         throw new JsonGenerationException("No native support for writing Type Ids", this);
+    }
+
+    /*
+     * Replacement method for {@link #writeTypeId(Object)} which is called
+     * regardless of whether format has native type ids. If it does have native
+     * type ids, those are to be used (if configuration allows this), if not,
+     * structural type id inclusion is to be used. For JSON, for example, no
+     * native type ids exist and structural inclusion is always used.
+     *<p>
+     * NOTE: databind may choose to skip calling this method for some special cases
+     * (and instead included type id via regular write methods and/or {@link #writeTypeId}
+     * -- this is discouraged, but not illegal, and may be necessary as a work-around
+     * in some cases.
+     *
+     * @since 2.9
+     */
+    public WritableTypeId writeTypePrefix(WritableTypeId typeIdDef) throws IOException
+    {
+        Object id = typeIdDef.id;
+
+        final JsonToken valueShape = typeIdDef.valueShape;
+        if (canWriteTypeId()) {
+            typeIdDef.wrapperWritten = false;
+            // just rely on native type output method (sub-classes likely to override)
+            writeTypeId(id);
+        } else {
+            // No native type id; write wrappers
+            // Normally we only support String type ids (non-String reserved for native type ids)
+            String idStr = (id instanceof String) ? (String) id : String.valueOf(id);
+            typeIdDef.wrapperWritten = true;
+
+            Inclusion incl = typeIdDef.include;
+            // first: can not output "as property" if value not Object; if so, must do "as array"
+            if ((valueShape != JsonToken.START_OBJECT)
+                    && incl.requiresObjectContext()) {
+                typeIdDef.include = incl = WritableTypeId.Inclusion.WRAPPER_ARRAY;
+            }
+            
+            switch (incl) {
+            case PARENT_PROPERTY:
+                // nothing to do here, as it has to be written in suffix...
+                break;
+            case PAYLOAD_PROPERTY:
+                // only output as native type id; otherwise caller must handle using some
+                // other mechanism, so...
+                break;
+            case METADATA_PROPERTY:
+                // must have Object context by now, so simply write as field name
+                // Note, too, that it's bit tricky, since we must print START_OBJECT that is part
+                // of value first -- and then NOT output it later on: hence return "early"
+                writeStartObject(typeIdDef.forValue);
+                writeStringField(typeIdDef.asProperty, idStr);
+                return typeIdDef;
+
+            case WRAPPER_OBJECT:
+                // NOTE: this is wrapper, not directly related to value to output, so don't pass
+                writeStartObject();
+                writeFieldName(idStr);
+                break;
+            case WRAPPER_ARRAY:
+            default: // should never occur but translate as "as-array"
+                writeStartArray(); // wrapper, not actual array object to write
+                writeString(idStr);
+            }
+        }
+        // and finally possible start marker for value itself:
+        if (valueShape == JsonToken.START_OBJECT) {
+            writeStartObject(typeIdDef.forValue);
+        } else if (valueShape == JsonToken.START_ARRAY) {
+            // should we now set the current object?
+            writeStartArray();
+        }
+        return typeIdDef;
+    }
+
+    /*
+     * @since 2.9
+     */
+    public WritableTypeId writeTypeSuffix(WritableTypeId typeIdDef) throws IOException
+    {
+        final JsonToken valueShape = typeIdDef.valueShape;
+        // First: does value need closing?
+        if (valueShape == JsonToken.START_OBJECT) {
+            writeEndObject();
+        } else if (valueShape == JsonToken.START_ARRAY) {
+            writeEndArray();
+        }
+
+        if (typeIdDef.wrapperWritten) {
+            switch (typeIdDef.include) {
+            case WRAPPER_ARRAY:
+                writeEndArray();
+                break;
+            case PARENT_PROPERTY:
+                // unusually, need to output AFTER value. And no real wrapper...
+                {
+                    Object id = typeIdDef.id;
+                    String idStr = (id instanceof String) ? (String) id : String.valueOf(id);
+                    writeStringField(typeIdDef.asProperty, idStr);
+                }
+                break;
+            case METADATA_PROPERTY:
+            case PAYLOAD_PROPERTY:
+                // no actual wrapper; included within Object itself
+                break;
+            case WRAPPER_OBJECT:
+            default: // should never occur but...
+                writeEndObject();
+                break;
+            }
+        }
+        return typeIdDef;
     }
 
     /*
@@ -1471,7 +1755,7 @@ public abstract class JsonGenerator
      */
     public void copyCurrentEvent(JsonParser p) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         // sanity check; what to do?
         if (t == null) {
             _reportError("No current event to copy");
@@ -1479,6 +1763,7 @@ public abstract class JsonGenerator
         switch (t.id()) {
         case ID_NOT_AVAILABLE:
             _reportError("No current event to copy");
+            break; // never gets here
         case ID_START_OBJECT:
             writeStartObject();
             break;
@@ -1574,7 +1859,7 @@ public abstract class JsonGenerator
      */
     public void copyCurrentStructure(JsonParser p) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == null) {
             _reportError("No current event to copy");
         }
@@ -1680,6 +1965,18 @@ public abstract class JsonGenerator
 
     protected void _reportUnsupportedOperation() {
         throw new UnsupportedOperationException("Operation not supported by generator of type "+getClass().getName());
+    }
+
+    /**
+     * @since 2.8
+     */
+    protected final void _verifyOffsets(int arrayLength, int offset, int length)
+    {
+        if ((offset < 0) || (offset + length) > arrayLength) {
+            throw new IllegalArgumentException(String.format(
+                    "invalid argument(s) (offset=%d, length=%d) for input array of %d element",
+                    offset, length, arrayLength));
+        }
     }
 
     /**

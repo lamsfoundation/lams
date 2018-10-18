@@ -28,64 +28,67 @@ import java.io.Writer;
  * For safe usage with multiple {@link Thread}s then
  * <code>java.io.StringWriter</code> should be used.
  *
- *
+ * @version $Id: StringBuilderWriter.java 1722253 2015-12-30 00:36:12Z ggregory $
  * @since 2.0
  */
 public class StringBuilderWriter extends Writer implements Serializable {
 
+    private static final long serialVersionUID = -146927496096066153L;
     private final StringBuilder builder;
 
     /**
-     * Construct a new {@link StringBuilder} instance with default capacity.
+     * Constructs a new {@link StringBuilder} instance with default capacity.
      */
     public StringBuilderWriter() {
         this.builder = new StringBuilder();
     }
 
     /**
-     * Construct a new {@link StringBuilder} instance with the specified capacity.
+     * Constructs a new {@link StringBuilder} instance with the specified capacity.
      *
      * @param capacity The initial capacity of the underlying {@link StringBuilder}
      */
-    public StringBuilderWriter(int capacity) {
+    public StringBuilderWriter(final int capacity) {
         this.builder = new StringBuilder(capacity);
     }
 
     /**
-     * Construct a new instance with the specified {@link StringBuilder}.
+     * Constructs a new instance with the specified {@link StringBuilder}.
+     * 
+     * <p>If {@code builder} is null a new instance with default capacity will be created.</p>
      *
-     * @param builder The String builder
+     * @param builder The String builder. May be null.
      */
-    public StringBuilderWriter(StringBuilder builder) {
+    public StringBuilderWriter(final StringBuilder builder) {
         this.builder = builder != null ? builder : new StringBuilder();
     }
 
     /**
-     * Append a single character to this Writer.
+     * Appends a single character to this Writer.
      *
      * @param value The character to append
      * @return This writer instance
      */
     @Override
-    public Writer append(char value) {
+    public Writer append(final char value) {
         builder.append(value);
         return this;
     }
 
     /**
-     * Append a character sequence to this Writer.
+     * Appends a character sequence to this Writer.
      *
      * @param value The character to append
      * @return This writer instance
      */
     @Override
-    public Writer append(CharSequence value) {
+    public Writer append(final CharSequence value) {
         builder.append(value);
         return this;
     }
 
     /**
-     * Append a portion of a character sequence to the {@link StringBuilder}.
+     * Appends a portion of a character sequence to the {@link StringBuilder}.
      *
      * @param value The character to append
      * @param start The index of the first character
@@ -93,7 +96,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
      * @return This writer instance
      */
     @Override
-    public Writer append(CharSequence value, int start, int end) {
+    public Writer append(final CharSequence value, final int start, final int end) {
         builder.append(value, start, end);
         return this;
     }
@@ -103,6 +106,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
      */
     @Override
     public void close() {
+        // no-op
     }
 
     /**
@@ -110,37 +114,38 @@ public class StringBuilderWriter extends Writer implements Serializable {
      */
     @Override
     public void flush() {
+        // no-op
     }
 
 
     /**
-     * Write a String to the {@link StringBuilder}.
+     * Writes a String to the {@link StringBuilder}.
      * 
      * @param value The value to write
      */
     @Override
-    public void write(String value) {
+    public void write(final String value) {
         if (value != null) {
             builder.append(value);
         }
     }
 
     /**
-     * Write a portion of a character array to the {@link StringBuilder}.
+     * Writes a portion of a character array to the {@link StringBuilder}.
      *
      * @param value The value to write
      * @param offset The index of the first character
      * @param length The number of characters to write
      */
     @Override
-    public void write(char[] value, int offset, int length) {
+    public void write(final char[] value, final int offset, final int length) {
         if (value != null) {
             builder.append(value, offset, length);
         }
     }
 
     /**
-     * Return the underlying builder.
+     * Returns the underlying builder.
      *
      * @return The underlying builder
      */

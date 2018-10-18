@@ -90,16 +90,7 @@ public abstract class ContainerSerializer<T>
     /**********************************************************
      */
 
-    /* Overridden as abstract, to force re-implementation; necessary for all
-     * collection types.
-     */
-    @Override
-    @Deprecated
-    public boolean isEmpty(T value) {
-        return isEmpty(null, value);
-    }
-
-    // since 2.5: should be declared abstract in future (2.6)
+// since 2.5: should be declared abstract in future (2.9?)
 //    @Override
 //    public abstract boolean isEmpty(SerializerProvider prov, T value);
 
@@ -111,6 +102,10 @@ public abstract class ContainerSerializer<T>
      * like "getElementCount()" method, this would not work well for
      * containers that do not keep track of size (like linked lists may
      * not).
+     *<p>
+     * Note, too, that as of now (2.9) this method is only called by serializer
+     * itself; and specifically is not used for non-array/collection types
+     * like <code>Map</code> or <code>Map.Entry</code> instances.
      */
     public abstract boolean hasSingleElement(T value);
 

@@ -18,6 +18,14 @@
 
 package io.undertow.server.handlers.proxy.mod_cluster;
 
+import io.undertow.io.Sender;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
+import io.undertow.util.Methods;
+import io.undertow.util.StatusCodes;
+
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -26,14 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import io.undertow.io.Sender;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
-import io.undertow.util.Methods;
-import io.undertow.util.StatusCodes;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The mod cluster manager web frontend.
@@ -83,6 +84,13 @@ class MCMPWebManager extends MCMPHandler {
         processRequest(exchange);
     }
 
+    protected boolean handlesMethod(HttpString method) {
+        if(Methods.GET.equals(method)) {
+            return true;
+        }
+        return super.handlesMethod(method);
+    }
+
     private void processRequest(HttpServerExchange exchange) throws IOException {
         Map<String, Deque<String>> params = exchange.getQueryParameters();
         boolean hasNonce = params.containsKey("nonce");
@@ -114,7 +122,7 @@ class MCMPWebManager extends MCMPHandler {
                             String srange = params.get("Range").getFirst();
                             final RequestData data = buildRequestData(exchange, params);
                             if (srange.equals("NODE")) {
-                                processNodeCommand(exchange, data, MCMPAction.DISABLE);
+                                processNodeCommand(exchange, data, MCMPAction.ENABLE);
                             }
                             if (srange.equals("DOMAIN")) {
                                 boolean domain = params.containsKey("Domain");
@@ -210,7 +218,7 @@ class MCMPWebManager extends MCMPHandler {
                     if (nodeConfig.isFlushPackets()) {
                         flushpackets = "Auto";
                     }
-                    buf.append(",Flushpackets: " + flushpackets + ",Flushwait: " + nodeConfig.getFlushwait() + ",Ping: " + nodeConfig.getPing() + " ,Smax: " + nodeConfig.getPing() + ",Ttl: " + nodeConfig.getTtl());
+                    buf.append(",Flushpackets: " + flushpackets + ",Flushwait: " + nodeConfig.getFlushwait() + ",Ping: " + nodeConfig.getPing() + " ,Smax: " + nodeConfig.getPing() + ",Ttl: " + TimeUnit.MILLISECONDS.toSeconds(nodeConfig.getTtl()));
                     printProxyStat(buf, node, reduceDisplay);
                 } else {
                     buf.append("<br/>\n");
@@ -273,7 +281,6 @@ class MCMPWebManager extends MCMPHandler {
 
     /* based on manager_info_hosts */
     private void printInfoHost(StringBuilder buf, String uri, boolean reduceDisplay, boolean allowCmd, final Node node) {
-        final String jvmRoute = node.getJvmRoute();
         for (Node.VHostMapping host : node.getVHosts()) {
             if (!reduceDisplay) {
                 buf.append("<h2> Virtual Host " + host.getId() + ":</h2>");
@@ -356,9 +363,9 @@ class MCMPWebManager extends MCMPHandler {
 
     static RequestData buildRequestData(final HttpServerExchange exchange, Map<String, Deque<String>> params) {
         final RequestData data = new RequestData();
-        for (final String key : params.keySet()) {
-            final HttpString name = new HttpString(key);
-            data.addValues(name, params.get(key));
+        for (final Map.Entry<String, Deque<String>> entry : params.entrySet()) {
+            final HttpString name = new HttpString(entry.getKey());
+            data.addValues(name, entry.getValue());
         }
         return data;
     }

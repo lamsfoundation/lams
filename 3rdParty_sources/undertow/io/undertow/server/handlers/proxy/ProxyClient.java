@@ -60,7 +60,11 @@ public interface ProxyClient {
     /**
      * An opaque interface that may contain information about the proxy target
      */
-    public interface ProxyTarget {
+    interface ProxyTarget {
 
+    }
+
+    interface MaxRetriesProxyTarget extends ProxyTarget {
+        int getMaxRetries();
     }
 }

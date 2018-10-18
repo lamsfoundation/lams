@@ -1,19 +1,19 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2008-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License.  You can
  * obtain a copy of the License at
- * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
- * or packager/legal/LICENSE.txt.  See the License for the specific
+ * https://oss.oracle.com/licenses/CDDL+GPL-1.1
+ * or LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at packager/legal/LICENSE.txt.
+ * file and include the License file at LICENSE.txt.
  *
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
@@ -81,6 +81,13 @@ public interface AsyncContext {
      * {@link #dispatch(String)} or {@link #dispatch(ServletContext,String)} 
      */
     static final String ASYNC_CONTEXT_PATH = "javax.servlet.async.context_path";
+
+    /**
+     * The name of the request attribute under which the original
+     * {@link javax.servlet.http.HttpServletMapping} is made available to the target of a
+     * {@link #dispatch(String)} or {@link #dispatch(ServletContext,String)} 
+     */
+    static final String ASYNC_MAPPING = "javax.servlet.async.mapping";
 
     /**
      * The name of the request attribute under which the original
@@ -167,7 +174,7 @@ public interface AsyncContext {
      * last dispatched by the container.
      *
      * <p>The following sequence illustrates how this will work:
-     * <code><pre>
+     * <pre>{@code
      * // REQUEST dispatch to /url/A
      * AsyncContext ac = request.startAsync();
      * ...
@@ -190,7 +197,7 @@ public interface AsyncContext {
      * ac = request.startAsync(request,response);
      * ...
      * ac.dispatch(); // ASYNC dispatch to /url/B
-     * </pre></code>
+     * }</pre>
      *
      * <p>This method returns immediately after passing the request
      * and response objects to a container managed thread, on which the
@@ -452,6 +459,7 @@ public interface AsyncContext {
 
      * <p>This method supports any annotations applicable to AsyncListener.
      *
+     * @param <T> the class of the object to instantiate
      * @param clazz the AsyncListener class to instantiate
      *
      * @return the new AsyncListener instance

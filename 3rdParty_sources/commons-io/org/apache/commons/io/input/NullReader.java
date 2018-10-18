@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
@@ -50,7 +52,7 @@ import java.io.Reader;
  *          return ... // return required value here
  *      }
  *      protected void processChars(char[] chars, int offset, int length) {
- *          for (int i = offset; i < length; i++) {
+ *          for (int i = offset; i &lt; length; i++) {
  *              chars[i] = ... // set array value here
  *          }
  *      }
@@ -58,7 +60,7 @@ import java.io.Reader;
  * </pre>
  *
  * @since 1.3
- *
+ * @version $Id: NullReader.java 1586350 2014-04-10 15:57:20Z ggregory $
  */
 public class NullReader extends Reader {
 
@@ -76,7 +78,7 @@ public class NullReader extends Reader {
      *
      * @param size The size of the reader to emulate.
      */
-    public NullReader(long size) {
+    public NullReader(final long size) {
        this(size, true, false);
     }
 
@@ -91,7 +93,7 @@ public class NullReader extends Reader {
      * will throw an {@link EOFException} or return -1 when the
      * end of file is reached.
      */
-    public NullReader(long size, boolean markSupported, boolean throwEofException) {
+    public NullReader(final long size, final boolean markSupported, final boolean throwEofException) {
        this.size = size;
        this.markSupported = markSupported;
        this.throwEofException = throwEofException;
@@ -136,7 +138,7 @@ public class NullReader extends Reader {
      * @throws UnsupportedOperationException if mark is not supported.
      */
     @Override
-    public synchronized void mark(int readlimit) {
+    public synchronized void mark(final int readlimit) {
         if (!markSupported) {
             throw new UnsupportedOperationException("Mark not supported");
         }
@@ -188,7 +190,7 @@ public class NullReader extends Reader {
      * @throws IOException if trying to read past the end of file.
      */
     @Override
-    public int read(char[] chars) throws IOException {
+    public int read(final char[] chars) throws IOException {
         return read(chars, 0, chars.length);
     }
 
@@ -206,7 +208,7 @@ public class NullReader extends Reader {
      * @throws IOException if trying to read past the end of file.
      */
     @Override
-    public int read(char[] chars, int offset, int length) throws IOException {
+    public int read(final char[] chars, final int offset, final int length) throws IOException {
         if (eof) {
             throw new IOException("Read after end of file");
         }
@@ -260,7 +262,7 @@ public class NullReader extends Reader {
      * @throws IOException if trying to read past the end of file.
      */
     @Override
-    public long skip(long numberOfChars) throws IOException {
+    public long skip(final long numberOfChars) throws IOException {
         if (eof) {
             throw new IOException("Skip after end of file");
         }
@@ -298,7 +300,7 @@ public class NullReader extends Reader {
      * @param offset The offset to start at.
      * @param length The number of characters.
      */
-    protected void processChars(char[] chars, int offset, int length) {
+    protected void processChars(final char[] chars, final int offset, final int length) {
         // do nothing - overridable by subclass
     }
 
@@ -315,7 +317,7 @@ public class NullReader extends Reader {
         if (throwEofException) {
             throw new EOFException();
         }
-        return -1;
+        return EOF;
     }
 
 }

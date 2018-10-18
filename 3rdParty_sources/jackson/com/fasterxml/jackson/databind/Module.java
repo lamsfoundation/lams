@@ -1,6 +1,9 @@
 package com.fasterxml.jackson.databind;
 
+import java.util.Collection;
+
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.deser.Deserializers;
@@ -143,6 +146,31 @@ public abstract class Module
         public boolean isEnabled(JsonParser.Feature f);
 
         public boolean isEnabled(JsonGenerator.Feature f);
+
+        /*
+        /**********************************************************
+        /* Mutant accessors
+        /**********************************************************
+         */
+
+        /**
+         * "Mutant accessor" for getting a mutable configuration override object for
+         * given type, needed to add or change per-type overrides applied
+         * to properties of given type.
+         * Usage is through returned object by colling "setter" methods, which
+         * directly modify override object and take effect directly.
+         * For example you can do
+         *<pre>
+         *   mapper.configOverride(java.util.Date.class)
+         *       .setFormat(JsonFormat.Value.forPattern("yyyy-MM-dd"));
+         *<pre>
+         * to change the default format to use for properties of type
+         * {@link java.util.Date} (possibly further overridden by per-property
+         * annotations)
+         *
+         * @since 2.8
+         */
+        public MutableConfigOverride configOverride(Class<?> type);
         
         /*
         /**********************************************************
@@ -271,6 +299,14 @@ public abstract class Module
          * they have), using specified type names.
          */
         public void registerSubtypes(NamedType... subtypes);
+
+        /**
+         * Method for registering specified classes as subtypes (of supertype(s)
+         * they have)
+         *
+         * @since 2.9
+         */
+        public void registerSubtypes(Collection<Class<?>> subtypes);
         
         /**
          * Method used for defining mix-in annotations to use for augmenting

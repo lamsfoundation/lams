@@ -18,6 +18,7 @@
 
 package io.undertow.protocols.http2;
 
+import static io.undertow.protocols.http2.Http2Channel.DATA_FLAG_END_STREAM;
 import static io.undertow.protocols.http2.Http2Channel.FRAME_TYPE_CONTINUATION;
 import static io.undertow.protocols.http2.Http2Channel.FRAME_TYPE_DATA;
 import static io.undertow.protocols.http2.Http2Channel.FRAME_TYPE_GOAWAY;
@@ -29,11 +30,13 @@ import static io.undertow.protocols.http2.Http2Channel.FRAME_TYPE_SETTINGS;
 import static io.undertow.protocols.http2.Http2Channel.FRAME_TYPE_WINDOW_UPDATE;
 import static io.undertow.protocols.http2.Http2Channel.HEADERS_FLAG_END_HEADERS;
 import static org.xnio.Bits.allAreClear;
+import static org.xnio.Bits.anyAreClear;
 import static org.xnio.Bits.anyAreSet;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.server.protocol.framed.AbstractFramedStreamSourceChannel;
 import io.undertow.server.protocol.framed.FrameHeaderData;
@@ -67,6 +70,9 @@ class Http2FrameHeaderParser implements FrameHeaderData {
             if (!parseFrameHeader(byteBuffer)) {
                 return false;
             }
+            if(continuationParser != null && type != FRAME_TYPE_CONTINUATION) {
+                throw new ConnectionErrorException(Http2Channel.ERROR_PROTOCOL_ERROR, UndertowMessages.MESSAGES.expectedContinuationFrame());
+            }
             switch (type) {
                 case FRAME_TYPE_DATA: {
                     if (streamId == 0) {
@@ -79,13 +85,16 @@ class Http2FrameHeaderParser implements FrameHeaderData {
                     if (streamId == 0) {
                         throw new ConnectionErrorException(Http2Channel.ERROR_PROTOCOL_ERROR, UndertowMessages.MESSAGES.streamIdMustNotBeZeroForFrameType(Http2Channel.FRAME_TYPE_HEADERS));
                     }
-                    parser = new Http2HeadersParser(length, http2Channel.getDecoder());
+                    parser = new Http2HeadersParser(length, http2Channel.getDecoder(), http2Channel.isClient(), http2Channel.getMaxHeaders(), streamId, http2Channel.getMaxHeaderListSize());
                     if(allAreClear(flags, Http2Channel.HEADERS_FLAG_END_HEADERS)) {
                         continuationParser = (Http2HeadersParser) parser;
                     }
                     break;
                 }
                 case FRAME_TYPE_RST_STREAM: {
+                    if(length != 4) {
+                        throw new ConnectionErrorException(Http2Channel.ERROR_FRAME_SIZE_ERROR, UndertowMessages.MESSAGES.incorrectFrameSize());
+                    }
                     parser = new Http2RstStreamParser(length);
                     break;
                 }
@@ -94,12 +103,16 @@ class Http2FrameHeaderParser implements FrameHeaderData {
                         http2Channel.sendGoAway(Http2Channel.ERROR_PROTOCOL_ERROR);
                         throw UndertowMessages.MESSAGES.http2ContinuationFrameNotExpected();
                     }
+                    if(continuationParser.getStreamId() != streamId) {
+                        http2Channel.sendGoAway(Http2Channel.ERROR_PROTOCOL_ERROR);
+                        throw UndertowMessages.MESSAGES.http2ContinuationFrameNotExpected();
+                    }
                     parser = continuationParser;
                     continuationParser.moreData(length);
                     break;
                 }
                 case FRAME_TYPE_PUSH_PROMISE: {
-                    parser = new Http2PushPromiseParser(length, http2Channel.getDecoder());
+                    parser = new Http2PushPromiseParser(length, http2Channel.getDecoder(), http2Channel.isClient(), http2Channel.getMaxHeaders(), streamId, http2Channel.getMaxHeaderListSize());
                     if(allAreClear(flags, Http2Channel.HEADERS_FLAG_END_HEADERS)) {
                         continuationParser = (Http2HeadersParser) parser;
                     }
@@ -123,6 +136,10 @@ class Http2FrameHeaderParser implements FrameHeaderData {
                     break;
                 }
                 case FRAME_TYPE_SETTINGS: {
+
+                    if(length % 6 != 0) {
+                        throw new ConnectionErrorException(Http2Channel.ERROR_FRAME_SIZE_ERROR, UndertowMessages.MESSAGES.incorrectFrameSize());
+                    }
                     if (streamId != 0) {
                         throw new ConnectionErrorException(Http2Channel.ERROR_PROTOCOL_ERROR, UndertowMessages.MESSAGES.streamIdMustBeZeroForFrameType(Http2Channel.FRAME_TYPE_SETTINGS));
                     }
@@ -130,10 +147,16 @@ class Http2FrameHeaderParser implements FrameHeaderData {
                     break;
                 }
                 case FRAME_TYPE_WINDOW_UPDATE: {
+                    if(length != 4) {
+                        throw new ConnectionErrorException(Http2Channel.ERROR_FRAME_SIZE_ERROR, UndertowMessages.MESSAGES.incorrectFrameSize());
+                    }
                     parser = new Http2WindowUpdateParser(length);
                     break;
                 }
                 case FRAME_TYPE_PRIORITY: {
+                    if(length != 5) {
+                        throw new ConnectionErrorException(Http2Channel.ERROR_FRAME_SIZE_ERROR, UndertowMessages.MESSAGES.incorrectFrameSize());
+                    }
                     if (streamId == 0) {
                         throw new ConnectionErrorException(Http2Channel.ERROR_PROTOCOL_ERROR, UndertowMessages.MESSAGES.streamIdMustNotBeZeroForFrameType(Http2Channel.FRAME_TYPE_PRIORITY));
                     }
@@ -141,7 +164,8 @@ class Http2FrameHeaderParser implements FrameHeaderData {
                     break;
                 }
                 default: {
-                    return true;
+                    parser = new Http2DiscardParser(length);
+                    break;
                 }
             }
         }
@@ -182,27 +206,55 @@ class Http2FrameHeaderParser implements FrameHeaderData {
         return length;
     }
 
+    int getActualLength() {
+        return length;
+    }
+
     @Override
     public AbstractFramedStreamSourceChannel<?, ?, ?> getExistingChannel() {
+        Http2StreamSourceChannel http2StreamSourceChannel;
         if (type == FRAME_TYPE_DATA ||
                 type == Http2Channel.FRAME_TYPE_CONTINUATION ||
-                type == Http2Channel.FRAME_TYPE_PRIORITY) {
+                type == Http2Channel.FRAME_TYPE_PRIORITY ) {
             if (anyAreSet(flags, Http2Channel.DATA_FLAG_END_STREAM)) {
-                return http2Channel.getIncomingStreams().remove(streamId);
+                http2StreamSourceChannel = http2Channel.removeStreamSource(streamId);
             } else if (type == FRAME_TYPE_CONTINUATION) {
-                Http2StreamSourceChannel channel = http2Channel.getIncomingStreams().get(streamId);
-                if(channel != null && channel.isHeadersEndStream() && anyAreSet(flags, Http2Channel.CONTINUATION_FLAG_END_HEADERS)) {
-                    http2Channel.getIncomingStreams().remove(streamId);
+                http2StreamSourceChannel = http2Channel.getIncomingStream(streamId);
+                if(http2StreamSourceChannel != null && http2StreamSourceChannel.isHeadersEndStream() && anyAreSet(flags, Http2Channel.CONTINUATION_FLAG_END_HEADERS)) {
+                    http2Channel.removeStreamSource(streamId);
                 }
-                return channel;
             } else {
-                return http2Channel.getIncomingStreams().get(streamId);
+                http2StreamSourceChannel = http2Channel.getIncomingStream(streamId);
             }
+            if(type == FRAME_TYPE_DATA && http2StreamSourceChannel != null) {
+                Http2DataFrameParser dataFrameParser = (Http2DataFrameParser) parser;
+                http2StreamSourceChannel.updateContentSize(getFrameLength() - dataFrameParser.getPadding(), anyAreSet(flags, DATA_FLAG_END_STREAM));
+            }
+            return http2StreamSourceChannel;
+        } else if(type == FRAME_TYPE_HEADERS) {
+            //headers can actually be a trailer
+
+            Http2StreamSourceChannel channel = http2Channel.getIncomingStream(streamId);
+            if(channel != null) {
+                if(anyAreClear(flags, Http2Channel.HEADERS_FLAG_END_STREAM)) {
+                    //this is a protocol error
+                    UndertowLogger.REQUEST_IO_LOGGER.debug("Received HTTP/2 trailers header without end stream set");
+                    http2Channel.sendGoAway(Http2Channel.ERROR_PROTOCOL_ERROR);
+                }
+                if (!channel.isHeadersEndStream() && anyAreSet(flags, Http2Channel.HEADERS_FLAG_END_HEADERS)) {
+                    http2Channel.removeStreamSource(streamId);
+                }
+            }
+            return channel;
         }
         return null;
     }
 
-    public Http2HeadersParser getContinuationParser() {
+    Http2PushBackParser getParser() {
+        return parser;
+    }
+
+    Http2HeadersParser getContinuationParser() {
         return continuationParser;
     }
 }

@@ -3,8 +3,12 @@ package com.fasterxml.jackson.databind.ser.std;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.databind.*;
@@ -29,20 +33,16 @@ public abstract class StdSerializer<T>
     extends JsonSerializer<T>
     implements JsonFormatVisitable, SchemaAware, java.io.Serializable
 {
-    /**
-     * Unique key we use to store a temporary lock, to prevent infinite recursion
-     * when resolving content converters (see [databind#357]).
-     *<p>
-     * NOTE: may need to revisit this if nested content converters are needed; if so,
-     * may need to create per-call lock object. But let's start with a simpler
-     * solution for now.
-     *
-     * @since 2.7
-     */
-    private final static Object CONVERTING_CONTENT_CONVERTER_LOCK = new Object();
-
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Key used for storing a lock object to prevent infinite recursion when
+     * constructing converting serializers.
+     *
+     * @since 2.9
+     */
+    private final static Object KEY_CONTENT_CONVERTER_LOCK = new Object();
+    
     /**
      * Nominal type supported, usually declared type of
      * property for which serializer is used.
@@ -137,7 +137,7 @@ public abstract class StdSerializer<T>
     {
         ObjectNode schema = (ObjectNode) getSchema(provider, typeHint);
         if (!isOptional) {
-    		    schema.put("required", !isOptional);
+            schema.put("required", !isOptional);
         }
         return schema;
     }
@@ -148,13 +148,9 @@ public abstract class StdSerializer<T>
     /**********************************************************
      */
 
-    protected ObjectNode createObjectNode() {
-        return JsonNodeFactory.instance.objectNode();
-    }
-    
     protected ObjectNode createSchemaNode(String type)
     {
-        ObjectNode schema = createObjectNode();
+        ObjectNode schema = JsonNodeFactory.instance.objectNode();
         schema.put("type", type);
         return schema;
     }
@@ -176,9 +172,7 @@ public abstract class StdSerializer<T>
      */
     protected void visitStringFormat(JsonFormatVisitorWrapper visitor, JavaType typeHint)
             throws JsonMappingException {
-        if (visitor != null) {
-            /*JsonStringFormatVisitor v2 =*/ visitor.expectStringFormat(typeHint);
-        }
+        /*JsonStringFormatVisitor v2 =*/ visitor.expectStringFormat(typeHint);
     }
 
     /**
@@ -192,11 +186,9 @@ public abstract class StdSerializer<T>
             JsonValueFormat format)
         throws JsonMappingException
     {
-        if (visitor != null) {
-            JsonStringFormatVisitor v2 = visitor.expectStringFormat(typeHint);
-            if (v2 != null) {
-                v2.format(format);
-            }
+        JsonStringFormatVisitor v2 = visitor.expectStringFormat(typeHint);
+        if (v2 != null) {
+            v2.format(format);
         }
     }
 
@@ -210,13 +202,9 @@ public abstract class StdSerializer<T>
             NumberType numberType)
         throws JsonMappingException
     {
-        if (visitor != null) {
-            JsonIntegerFormatVisitor v2 = visitor.expectIntegerFormat(typeHint);
-            if (v2 != null) {
-                if (numberType != null) {
-                    v2.numberType(numberType);
-                }
-            }
+        JsonIntegerFormatVisitor v2 = visitor.expectIntegerFormat(typeHint);
+        if (_neitherNull(v2, numberType)) {
+            v2.numberType(numberType);
         }
     }
 
@@ -231,15 +219,13 @@ public abstract class StdSerializer<T>
             NumberType numberType, JsonValueFormat format)
         throws JsonMappingException
     {
-        if (visitor != null) {
-            JsonIntegerFormatVisitor v2 = visitor.expectIntegerFormat(typeHint);
-            if (v2 != null) {
-                if (numberType != null) {
-                    v2.numberType(numberType);
-                }
-                if (format != null) {
-                    v2.format(format);
-                }
+        JsonIntegerFormatVisitor v2 = visitor.expectIntegerFormat(typeHint);
+        if (v2 != null) {
+            if (numberType != null) {
+                v2.numberType(numberType);
+            }
+            if (format != null) {
+                v2.format(format);
             }
         }
     }
@@ -254,11 +240,9 @@ public abstract class StdSerializer<T>
             NumberType numberType)
         throws JsonMappingException
     {
-        if (visitor != null) {
-            JsonNumberFormatVisitor v2 = visitor.expectNumberFormat(typeHint);
-            if (v2 != null) {
-                v2.numberType(numberType);
-            }
+        JsonNumberFormatVisitor v2 = visitor.expectNumberFormat(typeHint);
+        if (v2 != null) {
+            v2.numberType(numberType);
         }
     }
 
@@ -269,13 +253,9 @@ public abstract class StdSerializer<T>
             JsonSerializer<?> itemSerializer, JavaType itemType)
         throws JsonMappingException
     {
-        if (visitor != null) {
-            JsonArrayFormatVisitor v2 = visitor.expectArrayFormat(typeHint);
-            if (v2 != null) {
-                if (itemSerializer != null) {
-                    v2.itemsFormat(itemSerializer, itemType);
-                }
-            }
+        JsonArrayFormatVisitor v2 = visitor.expectArrayFormat(typeHint);
+        if (_neitherNull(v2, itemSerializer)) {
+            v2.itemsFormat(itemSerializer, itemType);
         }
     }
 
@@ -286,14 +266,12 @@ public abstract class StdSerializer<T>
             JsonFormatTypes itemType)
         throws JsonMappingException
     {
-        if (visitor != null) {
-            JsonArrayFormatVisitor v2 = visitor.expectArrayFormat(typeHint);
-            if (v2 != null) {
-                v2.itemsFormat(itemType);
-            }
+        JsonArrayFormatVisitor v2 = visitor.expectArrayFormat(typeHint);
+        if (v2 != null) {
+            v2.itemsFormat(itemType);
         }
     }
-    
+
     /*
     /**********************************************************
     /* Helper methods for exception handling
@@ -323,20 +301,16 @@ public abstract class StdSerializer<T>
         while (t instanceof InvocationTargetException && t.getCause() != null) {
             t = t.getCause();
         }
-        // Errors and "plain" IOExceptions to be passed as is
-        if (t instanceof Error) {
-            throw (Error) t;
-        }
+        // Errors and "plain" to be passed as is
+        ClassUtil.throwIfError(t);
         // Ditto for IOExceptions... except for mapping exceptions!
         boolean wrap = (provider == null) || provider.isEnabled(SerializationFeature.WRAP_EXCEPTIONS);
         if (t instanceof IOException) {
             if (!wrap || !(t instanceof JsonMappingException)) {
                 throw (IOException) t;
             }
-        } else if (!wrap) { // [JACKSON-407] -- allow disabling wrapping for unchecked exceptions
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
+        } else if (!wrap) {
+            ClassUtil.throwIfRTE(t);
         }
         // Need to add reference information
         throw JsonMappingException.wrapWithPath(t, bean, fieldName);
@@ -350,19 +324,15 @@ public abstract class StdSerializer<T>
             t = t.getCause();
         }
         // Errors are to be passed as is
-        if (t instanceof Error) {
-            throw (Error) t;
-        }
+        ClassUtil.throwIfError(t);
         // Ditto for IOExceptions... except for mapping exceptions!
         boolean wrap = (provider == null) || provider.isEnabled(SerializationFeature.WRAP_EXCEPTIONS);
         if (t instanceof IOException) {
             if (!wrap || !(t instanceof JsonMappingException)) {
                 throw (IOException) t;
             }
-        } else if (!wrap) { // [JACKSON-407] -- allow disabling wrapping for unchecked exceptions
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
+        } else if (!wrap) {
+            ClassUtil.throwIfRTE(t);
         }
         // Need to add reference information
         throw JsonMappingException.wrapWithPath(t, bean, index);
@@ -382,34 +352,50 @@ public abstract class StdSerializer<T>
      * @param existingSerializer (optional) configured content
      *    serializer if one already exists.
      * 
-     * @since 2.2
+     * @since 2.9
      */
+    protected JsonSerializer<?> findContextualConvertingSerializer(SerializerProvider provider,
+            BeanProperty property, JsonSerializer<?> existingSerializer)
+        throws JsonMappingException
+    {
+        // 08-Dec-2016, tatu: to fix [databind#357], need to prevent recursive calls for
+        //     same property
+        @SuppressWarnings("unchecked")
+        Map<Object,Object> conversions = (Map<Object,Object>) provider.getAttribute(KEY_CONTENT_CONVERTER_LOCK);
+        if (conversions != null) {
+            Object lock = conversions.get(property);
+            if (lock != null) {
+                return existingSerializer;
+            }
+        } else {
+            conversions = new IdentityHashMap<>();
+            provider.setAttribute(KEY_CONTENT_CONVERTER_LOCK, conversions);
+        }
+        conversions.put(property, Boolean.TRUE);
+        try {
+            JsonSerializer<?> ser = findConvertingContentSerializer(provider, property, existingSerializer);
+            if (ser != null) {
+                return provider.handleSecondaryContextualization(ser, property);
+            }
+        } finally {
+            conversions.remove(property);
+        }
+        return existingSerializer;
+    }
+
+    /**
+     * @deprecated Since 2.9 use {link {@link #findContextualConvertingSerializer} instead
+     */
+    @Deprecated
     protected JsonSerializer<?> findConvertingContentSerializer(SerializerProvider provider,
             BeanProperty prop, JsonSerializer<?> existingSerializer)
         throws JsonMappingException
     {
-        /* 19-Oct-2014, tatu: As per [databind#357], need to avoid infinite loop
-         *   when applying contextual content converter; this is not ideal way,
-         *   but should work for most cases.
-         */
-        Object ob = provider.getAttribute(CONVERTING_CONTENT_CONVERTER_LOCK);
-        if (ob != null) {
-            if (ob == Boolean.TRUE) { // just to ensure it's value we added.
-                return existingSerializer;
-            }
-        }
-
         final AnnotationIntrospector intr = provider.getAnnotationIntrospector();
-        if (intr != null && prop != null) {
+        if (_neitherNull(intr, prop)) {
             AnnotatedMember m = prop.getMember();
             if (m != null) {
-                provider.setAttribute(CONVERTING_CONTENT_CONVERTER_LOCK, Boolean.TRUE);
-                Object convDef;
-                try {
-                    convDef = intr.findSerializationContentConverter(m);
-                } finally {
-                    provider.setAttribute(CONVERTING_CONTENT_CONVERTER_LOCK, null);
-                }
+                Object convDef = intr.findSerializationContentConverter(m);
                 if (convDef != null) {
                     Converter<Object,Object> conv = provider.converterInstance(prop.getMember(), convDef);
                     JavaType delegateType = conv.getOutputType(provider.getTypeFactory());
@@ -437,12 +423,11 @@ public abstract class StdSerializer<T>
         FilterProvider filters = provider.getFilterProvider();
         // Not ok to miss the provider, if a filter is declared to be needed.
         if (filters == null) {
-            throw JsonMappingException.from(provider,
-                    "Can not resolve PropertyFilter with id '"+filterId+"'; no FilterProvider configured");
+            provider.reportBadDefinition(handledType(),
+                    "Cannot resolve PropertyFilter with id '"+filterId+"'; no FilterProvider configured");
         }
-        PropertyFilter filter = filters.findPropertyFilter(filterId, valueToFilter);
         // But whether unknown ids are ok just depends on filter provider; if we get null that's fine
-        return filter;
+        return filters.findPropertyFilter(filterId, valueToFilter);
     }
 
     /**
@@ -484,6 +469,19 @@ public abstract class StdSerializer<T>
     }
 
     /**
+     * @since 2.8
+     */
+    protected JsonInclude.Value findIncludeOverrides(SerializerProvider provider,
+            BeanProperty prop, Class<?> typeForDefaults)
+    {
+        if (prop != null) {
+            return prop.findPropertyInclusion(provider.getConfig(), typeForDefaults);
+        }
+        // even without property or AnnotationIntrospector, may have type-specific defaults
+        return provider.getDefaultPropertyInclusion(typeForDefaults);
+    }
+    
+    /**
      * Convenience method for finding out possibly configured content value serializer.
      *
      * @since 2.7.4
@@ -520,5 +518,19 @@ public abstract class StdSerializer<T>
      */
     protected boolean isDefaultSerializer(JsonSerializer<?> serializer) {
         return ClassUtil.isJacksonStdImpl(serializer);
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected final static boolean _neitherNull(Object a, Object b) {
+        return (a != null) && (b != null);
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected final static boolean _nonEmpty(Collection<?> c) {
+        return (c != null) && !c.isEmpty();
     }
 }

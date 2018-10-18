@@ -62,14 +62,22 @@ public class HpackDecoder {
     private int currentMemorySize = 0;
 
     /**
-     * The maximum allowed memory size
+     * The current memory size, as specified by the client
      */
-    private int maxMemorySize;
+    private int specifiedMemorySize;
+
+    /**
+     * The maximum allowed memory size, as specified by us. If the client tries to increase beyond this amount it is an error
+     */
+    private final int maxAllowedMemorySize;
+
+    private boolean first = true;
 
     private final StringBuilder stringBuilder = new StringBuilder();
 
-    public HpackDecoder(int maxMemorySize) {
-        this.maxMemorySize = maxMemorySize;
+    public HpackDecoder(int maxAllowedMemorySize) {
+        this.specifiedMemorySize = Math.min(Hpack.DEFAULT_TABLE_SIZE, maxAllowedMemorySize);
+        this.maxAllowedMemorySize = maxAllowedMemorySize;
         headerTable = new HeaderField[DEFAULT_RING_BUFFER_SIZE];
     }
 
@@ -89,6 +97,7 @@ public class HpackDecoder {
             int originalPos = buffer.position();
             byte b = buffer.get();
             if ((b & 0b10000000) != 0) {
+                first = false;
                 //if the first bit is set it is an indexed header field
                 buffer.position(buffer.position() - 1); //unget the byte
                 int index = Hpack.decodeInteger(buffer, 7); //prefix is 7
@@ -103,6 +112,7 @@ public class HpackDecoder {
                 }
                 handleIndex(index);
             } else if ((b & 0b01000000) != 0) {
+                first = false;
                 //Literal Header Field with Incremental Indexing
                 HttpString headerName = readHeaderName(buffer, 6);
                 if (headerName == null) {
@@ -123,6 +133,7 @@ public class HpackDecoder {
                 headerEmitter.emitHeader(headerName, headerValue, false);
                 addEntryToHeaderTable(new HeaderField(headerName, headerValue));
             } else if ((b & 0b11110000) == 0) {
+                first = false;
                 //Literal Header Field without Indexing
                 HttpString headerName = readHeaderName(buffer, 4);
                 if (headerName == null) {
@@ -142,6 +153,7 @@ public class HpackDecoder {
                 }
                 headerEmitter.emitHeader(headerName, headerValue, false);
             } else if ((b & 0b11110000) == 0b00010000) {
+                first = false;
                 //Literal Header Field never indexed
                 HttpString headerName = readHeaderName(buffer, 4);
                 if (headerName == null) {
@@ -158,13 +170,19 @@ public class HpackDecoder {
                 }
                 headerEmitter.emitHeader(headerName, headerValue, true);
             } else if ((b & 0b11100000) == 0b00100000) {
+                if(!first) {
+                    throw new HpackException();
+                }
                 //context update max table size change
                 if (!handleMaxMemorySizeChange(buffer, originalPos)) {
                     return;
                 }
             } else {
-                throw new RuntimeException("Not yet implemented");
+                throw UndertowMessages.MESSAGES.invalidHpackEncoding(b);
             }
+        }
+        if(!moreData) {
+            first = true;
         }
     }
 
@@ -175,12 +193,15 @@ public class HpackDecoder {
             buffer.position(originalPos);
             return false;
         }
-        maxMemorySize = size;
-        if (currentMemorySize > maxMemorySize) {
+        if(size > maxAllowedMemorySize) {
+            throw new HpackException(Http2Channel.ERROR_PROTOCOL_ERROR);
+        }
+        specifiedMemorySize = size;
+        if (currentMemorySize > specifiedMemorySize) {
             int newTableSlots = filledTableSlots;
             int tableLength = headerTable.length;
             int newSize = currentMemorySize;
-            while (newSize > maxMemorySize) {
+            while (newSize > specifiedMemorySize) {
                 int clearIndex = firstSlotPosition;
                 firstSlotPosition++;
                 if (firstSlotPosition == tableLength) {
@@ -283,25 +304,25 @@ public class HpackDecoder {
      * @param index The index from the hpack
      * @return the real index into the array
      */
-    int getRealIndex(int index) {
+    int getRealIndex(int index) throws HpackException {
         //the index is one based, but our table is zero based, hence -1
         //also because of our ring buffer setup the indexes are reversed
         //index = 1 is at position firstSlotPosition + filledSlots
-        return (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
+        int newIndex = (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
+        if(newIndex < 0) {
+            throw UndertowMessages.MESSAGES.invalidHpackIndex(index);
+        }
+        return newIndex;
     }
 
     private void addStaticTableEntry(int index) throws HpackException {
         //adds an entry from the static table.
-        //this must be an entry with a value as far as I can determine
         HeaderField entry = Hpack.STATIC_TABLE[index];
-        if (entry.value == null) {
-            throw new HpackException();
-        }
-        headerEmitter.emitHeader(entry.name, entry.value, false);
+        headerEmitter.emitHeader(entry.name, entry.value == null ? "" : entry.value, false);
     }
 
     private void addEntryToHeaderTable(HeaderField entry) {
-        if (entry.size > maxMemorySize) {
+        if (entry.size > specifiedMemorySize) {
             //it is to big to fit, so we just completely clear the table.
             while (filledTableSlots > 0) {
                 headerTable[firstSlotPosition] = null;
@@ -320,7 +341,7 @@ public class HpackDecoder {
         int index = (firstSlotPosition + filledTableSlots) % tableLength;
         headerTable[index] = entry;
         int newSize = currentMemorySize + entry.size;
-        while (newSize > maxMemorySize) {
+        while (newSize > specifiedMemorySize) {
             int clearIndex = firstSlotPosition;
             firstSlotPosition++;
             if (firstSlotPosition == tableLength) {
@@ -349,7 +370,7 @@ public class HpackDecoder {
 
     public interface HeaderEmitter {
 
-        void emitHeader(HttpString name, String value, boolean neverIndex);
+        void emitHeader(HttpString name, String value, boolean neverIndex) throws HpackException;
     }
 
 
@@ -379,7 +400,7 @@ public class HpackDecoder {
         return currentMemorySize;
     }
 
-    int getMaxMemorySize() {
-        return maxMemorySize;
+    int getSpecifiedMemorySize() {
+        return specifiedMemorySize;
     }
 }

@@ -18,6 +18,41 @@
 
 package io.undertow.server.handlers.proxy.mod_cluster;
 
+import io.undertow.UndertowLogger;
+import io.undertow.UndertowMessages;
+import io.undertow.Version;
+import io.undertow.io.Sender;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.form.FormData;
+import io.undertow.server.handlers.form.FormDataParser;
+import io.undertow.server.handlers.form.FormEncodedDataDefinition;
+import io.undertow.server.handlers.form.FormParserFactory;
+import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
+import io.undertow.util.StatusCodes;
+import org.xnio.OptionMap;
+import org.xnio.Options;
+import org.xnio.ssl.XnioSsl;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.ALIAS;
 import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.BALANCER;
 import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.CONTEXT;
@@ -40,40 +75,7 @@ import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.STICKY
 import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.TIMEOUT;
 import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.TTL;
 import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.TYPE;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import io.undertow.UndertowLogger;
-import io.undertow.UndertowMessages;
-import io.undertow.Version;
-import io.undertow.io.Sender;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormEncodedDataDefinition;
-import io.undertow.server.handlers.form.FormParserFactory;
-import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
-import io.undertow.util.StatusCodes;
-import org.xnio.OptionMap;
-import org.xnio.Options;
-import org.xnio.ssl.XnioSsl;
+import static io.undertow.server.handlers.proxy.mod_cluster.MCMPConstants.WAITWORKER;
 
 /**
  * The mod cluster management protocol http handler.
@@ -135,7 +137,7 @@ class MCMPHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         final HttpString method = exchange.getRequestMethod();
-        if(!HANDLED_METHODS.contains(method)) {
+        if(!handlesMethod(method)) {
             next.handleRequest(exchange);
             return;
         }
@@ -166,6 +168,10 @@ class MCMPHandler implements HttpHandler {
         }
     }
 
+    protected boolean handlesMethod(HttpString method) {
+        return HANDLED_METHODS.contains(method);
+    }
+
     /**
      * Handle a management+ request.
      *
@@ -175,6 +181,8 @@ class MCMPHandler implements HttpHandler {
      */
     protected void handleRequest(final HttpString method, HttpServerExchange exchange) throws Exception {
         final RequestData requestData = parseFormData(exchange);
+        boolean persistent = exchange.isPersistent();
+        exchange.setPersistent(false); //UNDERTOW-947 MCMP should not use persistent connections
         if (CONFIG.equals(method)) {
             processConfig(exchange, requestData);
         } else if (ENABLE_APP.equals(method)) {
@@ -194,6 +202,7 @@ class MCMPHandler implements HttpHandler {
         } else if (PING.equals(method)) {
             processPing(exchange, requestData);
         } else {
+            exchange.setPersistent(persistent);
             next.handleRequest(exchange);
         }
     }
@@ -203,9 +212,8 @@ class MCMPHandler implements HttpHandler {
      *
      * @param exchange the http server exchange
      * @param requestData the request data
-     * @throws IOException
      */
-    private void processConfig(final HttpServerExchange exchange, final RequestData requestData) throws IOException {
+    private void processConfig(final HttpServerExchange exchange, final RequestData requestData) {
 
         // Get the node builder
         List<String> hosts = null;
@@ -227,7 +235,7 @@ class MCMPHandler implements HttpHandler {
                 node.setBalancer(value);
                 balancer.setName(value);
             } else if (MAXATTEMPTS.equals(name)) {
-                balancer.setMaxattempts(Integer.valueOf(value));
+                balancer.setMaxRetries(Integer.parseInt(value));
             } else if (STICKYSESSION.equals(name)) {
                 if ("No".equalsIgnoreCase(value)) {
                     balancer.setStickySession(false);
@@ -263,21 +271,23 @@ class MCMPHandler implements HttpHandler {
                     node.setFlushPackets(true);
                 }
             } else if (FLUSH_WAIT.equals(name)) {
-                node.setFlushwait(Integer.valueOf(value));
+                node.setFlushwait(Integer.parseInt(value));
             } else if (MCMPConstants.PING.equals(name)) {
-                node.setPing(Integer.valueOf(value));
+                node.setPing(Integer.parseInt(value));
             } else if (SMAX.equals(name)) {
-                node.setSmax(Integer.valueOf(value));
+                node.setSmax(Integer.parseInt(value));
             } else if (TTL.equals(name)) {
-                node.setTtl(Integer.valueOf(value));
+                node.setTtl(TimeUnit.SECONDS.toMillis(Long.parseLong(value)));
             } else if (TIMEOUT.equals(name)) {
-                node.setTimeout(Integer.valueOf(value));
+                node.setTimeout(Integer.parseInt(value));
             } else if (CONTEXT.equals(name)) {
                 final String[] context = value.split(",");
                 contexts = Arrays.asList(context);
             } else if (ALIAS.equals(name)) {
                 final String[] alias = value.split(",");
                 hosts = Arrays.asList(alias);
+            } else if(WAITWORKER.equals(name)) {
+                node.setWaitWorker(Integer.parseInt(value));
             } else {
                 processError(TYPESYNTAX, SBADFLD + name + SBADFLD1, exchange);
                 return;
@@ -374,7 +384,7 @@ class MCMPHandler implements HttpHandler {
             processError(TYPESYNTAX, SMISFLD, exchange);
             return;
         }
-        final List<String> virtualHosts = aliases != null ? Arrays.asList(aliases.split(",")) : null;
+        final List<String> virtualHosts = Arrays.asList(aliases.split(","));
         if (virtualHosts == null || virtualHosts.isEmpty()) {
             processError(TYPESYNTAX, SCONBAD, exchange);
             return;
@@ -439,7 +449,7 @@ class MCMPHandler implements HttpHandler {
         }
 
         UndertowLogger.ROOT_LOGGER.receivedNodeLoad(jvmRoute, loadValue);
-        final int load = Integer.valueOf(loadValue);
+        final int load = Integer.parseInt(loadValue);
         if (load > 0 || load == -2) {
 
             final Node node = container.getNode(jvmRoute);
@@ -554,7 +564,7 @@ class MCMPHandler implements HttpHandler {
                     return;
                 }
                 // Check whether we can reach the host
-                checkHostUp(scheme, host, Integer.valueOf(port), exchange, new NodePingUtil.PingCallback() {
+                checkHostUp(scheme, host, Integer.parseInt(port), exchange, new NodePingUtil.PingCallback() {
                     @Override
                     public void completed() {
                         sendResponse(exchange, OK);
@@ -584,7 +594,7 @@ class MCMPHandler implements HttpHandler {
     /**
      * Process <tt>INFO</tt> request
      *
-     * @throws Exception
+     * @throws IOException
      */
     protected void processInfo(HttpServerExchange exchange) throws IOException {
         final String data = processInfoString();
@@ -627,7 +637,7 @@ class MCMPHandler implements HttpHandler {
      * Process <tt>DUMP</tt> request
      *
      * @param exchange
-     * @throws java.io.IOException
+     * @throws IOException
      */
     protected void processDump(HttpServerExchange exchange) throws IOException {
         final String data = processDumpString();
@@ -707,7 +717,7 @@ class MCMPHandler implements HttpHandler {
     /**
      * If the process is OK, then add 200 HTTP status and its "OK" phrase
      *
-     * @throws Exception
+     * @throws IOException
      */
     static void processOK(HttpServerExchange exchange) throws IOException {
         exchange.setStatusCode(StatusCodes.OK);

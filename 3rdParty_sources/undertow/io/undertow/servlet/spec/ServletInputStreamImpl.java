@@ -24,6 +24,7 @@ import static org.xnio.Bits.anyAreSet;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
@@ -59,10 +60,15 @@ public class ServletInputStreamImpl extends ServletInputStream {
     private static final int FLAG_CLOSED = 1 << 1;
     private static final int FLAG_FINISHED = 1 << 2;
     private static final int FLAG_ON_DATA_READ_CALLED = 1 << 3;
+    private static final int FLAG_CALL_ON_ALL_DATA_READ = 1 << 4;
+    private static final int FLAG_BEING_INVOKED_IN_IO_THREAD = 1 << 5;
+    private static final int FLAG_IS_READY_CALLED = 1 << 6;
 
-    private int state;
-    private AsyncContextImpl asyncContext;
-    private PooledByteBuffer pooled;
+    private volatile int state;
+    private volatile AsyncContextImpl asyncContext;
+    private volatile PooledByteBuffer pooled;
+
+    private static final AtomicIntegerFieldUpdater<ServletInputStreamImpl> stateUpdater = AtomicIntegerFieldUpdater.newUpdater(ServletInputStreamImpl.class, "state");
 
     public ServletInputStreamImpl(final HttpServletRequestImpl request) {
         this.request = request;
@@ -82,7 +88,25 @@ public class ServletInputStreamImpl extends ServletInputStream {
 
     @Override
     public boolean isReady() {
-        return anyAreSet(state, FLAG_READY) && !isFinished();
+        boolean finished = anyAreSet(state, FLAG_FINISHED);
+        if(finished) {
+            if (anyAreClear(state, FLAG_ON_DATA_READ_CALLED)) {
+                if(allAreClear(state, FLAG_BEING_INVOKED_IN_IO_THREAD)) {
+                    setFlags(FLAG_ON_DATA_READ_CALLED);
+                    request.getServletContext().invokeOnAllDataRead(request.getExchange(), listener);
+                } else {
+                    setFlags(FLAG_CALL_ON_ALL_DATA_READ);
+                }
+            }
+        }
+        boolean ready = anyAreSet(state, FLAG_READY) && !finished;
+        if(!ready && listener != null && !finished) {
+            channel.resumeReads();
+        }
+        if(ready) {
+            setFlags(FLAG_IS_READY_CALLED);
+        }
+        return ready;
     }
 
     @Override
@@ -108,7 +132,6 @@ public class ServletInputStreamImpl extends ServletInputStream {
                 channel.getIoThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        channel.resumeReads();
                         internalListener.handleEvent(channel);
                     }
                 });
@@ -137,9 +160,10 @@ public class ServletInputStreamImpl extends ServletInputStream {
             throw UndertowServletMessages.MESSAGES.streamIsClosed();
         }
         if (listener != null) {
-            if (anyAreClear(state, FLAG_READY)) {
+            if (anyAreClear(state, FLAG_READY | FLAG_IS_READY_CALLED) ) {
                 throw UndertowServletMessages.MESSAGES.streamNotReady();
             }
+            clearFlags(FLAG_IS_READY_CALLED);
         } else {
             readIntoBuffer();
         }
@@ -168,7 +192,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
             int res = Channels.readBlocking(channel, pooled.getBuffer());
             pooled.getBuffer().flip();
             if (res == -1) {
-                state |= FLAG_FINISHED;
+                setFlags(FLAG_FINISHED);
                 pooled.close();
                 pooled = null;
             }
@@ -187,32 +211,21 @@ public class ServletInputStreamImpl extends ServletInputStream {
                 }
                 pooled.getBuffer().flip();
                 if (res == -1) {
-                    state |= FLAG_FINISHED;
+                    setFlags(FLAG_FINISHED);
                     pooled.close();
                     pooled = null;
                 }
             } else {
-                if (anyAreClear(state, FLAG_READY)) {
-                    throw UndertowServletMessages.MESSAGES.streamNotReady();
-                }
                 int res = channel.read(pooled.getBuffer());
                 pooled.getBuffer().flip();
                 if (res == -1) {
-                    state |= FLAG_FINISHED;
+                    setFlags(FLAG_FINISHED);
                     pooled.close();
                     pooled = null;
                 } else if (res == 0) {
-                    state &= ~FLAG_READY;
+                    clearFlags(FLAG_READY);
                     pooled.close();
                     pooled = null;
-                    channel.getIoThread().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!channel.isReadResumed()) {
-                                channel.resumeReads();
-                            }
-                        }
-                    });
                 }
             }
         }
@@ -238,7 +251,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
         if (anyAreSet(state, FLAG_CLOSED)) {
             return;
         }
-        this.state = state | FLAG_CLOSED;
+        setFlags(FLAG_CLOSED);
         try {
             while (allAreClear(state, FLAG_FINISHED)) {
                 readIntoBuffer();
@@ -248,7 +261,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
                 }
             }
         } finally {
-            state |= FLAG_FINISHED;
+            setFlags(FLAG_FINISHED);
             if (pooled != null) {
                 pooled.close();
                 pooled = null;
@@ -260,52 +273,72 @@ public class ServletInputStreamImpl extends ServletInputStream {
     private class ServletInputStreamChannelListener implements ChannelListener<StreamSourceChannel> {
         @Override
         public void handleEvent(final StreamSourceChannel channel) {
-            if (asyncContext.isDispatched()) {
-                //this is no longer an async request
-                //we just return
-                //TODO: what do we do here? Revert back to blocking mode?
-                channel.suspendReads();
-                return;
-            }
-            if (anyAreSet(state, FLAG_FINISHED)) {
-                channel.suspendReads();
-                return;
-            }
-            state |= FLAG_READY;
             try {
+                if (asyncContext.isDispatched()) {
+                    //this is no longer an async request
+                    //we just return
+                    //TODO: what do we do here? Revert back to blocking mode?
+                    channel.suspendReads();
+                    return;
+                }
+                if (anyAreSet(state, FLAG_FINISHED)) {
+                    channel.suspendReads();
+                    return;
+                }
                 readIntoBufferNonBlocking();
                 if (pooled != null) {
-                    state |= FLAG_READY;
+                    channel.suspendReads();
+                    setFlags(FLAG_READY);
                     if (!anyAreSet(state, FLAG_FINISHED)) {
-                        request.getServletContext().invokeOnDataAvailable(request.getExchange(), listener);
-                        if (pooled != null) {
-                            //they did not consume all the data
-                            channel.suspendReads();
+                        setFlags(FLAG_BEING_INVOKED_IN_IO_THREAD);
+                        try {
+                            request.getServletContext().invokeOnDataAvailable(request.getExchange(), listener);
+                        } finally {
+                            clearFlags(FLAG_BEING_INVOKED_IN_IO_THREAD);
+                        }
+                        if(anyAreSet(state, FLAG_CALL_ON_ALL_DATA_READ) && allAreClear(state, FLAG_ON_DATA_READ_CALLED)) {
+                            setFlags(FLAG_ON_DATA_READ_CALLED);
+                            request.getServletContext().invokeOnAllDataRead(request.getExchange(), listener);
                         }
                     }
-                }
-            } catch (final Exception e) {
-                request.getServletContext().invokeRunnable(request.getExchange(), new Runnable() {
-                    @Override
-                    public void run() {
-                        listener.onError(e);
-                    }
-                });
-                IoUtils.safeClose(channel);
-            }
-            if (anyAreSet(state, FLAG_FINISHED)) {
-                if (anyAreClear(state, FLAG_ON_DATA_READ_CALLED)) {
-                    try {
-                        state |= FLAG_ON_DATA_READ_CALLED;
-                        channel.shutdownReads();
+                } else if(anyAreSet(state, FLAG_FINISHED)) {
+                    if (allAreClear(state, FLAG_ON_DATA_READ_CALLED)) {
+                        setFlags(FLAG_ON_DATA_READ_CALLED);
                         request.getServletContext().invokeOnAllDataRead(request.getExchange(), listener);
-                    } catch (IOException e) {
-                        listener.onError(e);
-                        IoUtils.safeClose(channel);
                     }
+                } else {
+                    channel.resumeReads();
+                }
+            } catch (final Throwable e) {
+                try {
+                    request.getServletContext().invokeRunnable(request.getExchange(), new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onError(e);
+                        }
+                    });
+                } finally {
+                    if (pooled != null) {
+                        pooled.close();
+                        pooled = null;
+                    }
+                    IoUtils.safeClose(channel);
                 }
             }
-
         }
+    }
+
+    private void setFlags(int flags) {
+        int old;
+        do {
+            old = state;
+        } while (!stateUpdater.compareAndSet(this, old, old | flags));
+    }
+
+    private void clearFlags(int flags) {
+        int old;
+        do {
+            old = state;
+        } while (!stateUpdater.compareAndSet(this, old, old & ~flags));
     }
 }

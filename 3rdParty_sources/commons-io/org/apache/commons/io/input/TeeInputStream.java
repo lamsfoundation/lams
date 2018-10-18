@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,7 +33,7 @@ import java.io.OutputStream;
  * called on this proxy. It is configurable whether the associated output
  * stream will also closed.
  *
- *
+ * @version $Id: TeeInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
  * @since 1.4
  */
 public class TeeInputStream extends ProxyInputStream {
@@ -56,7 +58,7 @@ public class TeeInputStream extends ProxyInputStream {
      * @param input input stream to be proxied
      * @param branch output stream that will receive a copy of all bytes read
      */
-    public TeeInputStream(InputStream input, OutputStream branch) {
+    public TeeInputStream(final InputStream input, final OutputStream branch) {
         this(input, branch, false);
     }
 
@@ -72,7 +74,7 @@ public class TeeInputStream extends ProxyInputStream {
      *                    stream is closed
      */
     public TeeInputStream(
-            InputStream input, OutputStream branch, boolean closeBranch) {
+            final InputStream input, final OutputStream branch, final boolean closeBranch) {
         super(input);
         this.branch = branch;
         this.closeBranch = closeBranch;
@@ -105,8 +107,8 @@ public class TeeInputStream extends ProxyInputStream {
      */
     @Override
     public int read() throws IOException {
-        int ch = super.read();
-        if (ch != -1) {
+        final int ch = super.read();
+        if (ch != EOF) {
             branch.write(ch);
         }
         return ch;
@@ -123,8 +125,8 @@ public class TeeInputStream extends ProxyInputStream {
      * @throws IOException if the stream could not be read (or written) 
      */
     @Override
-    public int read(byte[] bts, int st, int end) throws IOException {
-        int n = super.read(bts, st, end);
+    public int read(final byte[] bts, final int st, final int end) throws IOException {
+        final int n = super.read(bts, st, end);
         if (n != -1) {
             branch.write(bts, st, n);
         }
@@ -140,9 +142,9 @@ public class TeeInputStream extends ProxyInputStream {
      * @throws IOException if the stream could not be read (or written) 
      */
     @Override
-    public int read(byte[] bts) throws IOException {
-        int n = super.read(bts);
-        if (n != -1) {
+    public int read(final byte[] bts) throws IOException {
+        final int n = super.read(bts);
+        if (n != EOF) {
             branch.write(bts, 0, n);
         }
         return n;

@@ -1,13 +1,16 @@
 package com.fasterxml.jackson.databind.ser.std;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 
 /**
@@ -19,8 +22,6 @@ public abstract class StaticListSerializerBase<T extends Collection<?>>
     extends StdSerializer<T>
     implements ContextualSerializer
 {
-    protected final JsonSerializer<String> _serializer;
-
     /**
      * Setting for specific local override for "unwrap single element arrays":
      * true for enable unwrapping, false for preventing it, `null` for using
@@ -29,29 +30,26 @@ public abstract class StaticListSerializerBase<T extends Collection<?>>
      * @since 2.6
      */
     protected final Boolean _unwrapSingle;
-    
+
     protected StaticListSerializerBase(Class<?> cls) {
         super(cls, false);
-        _serializer = null;
         _unwrapSingle = null;
     }
 
     /**
-     * @since 2.6
+     * @since 2.9
      */
-    @SuppressWarnings("unchecked")
     protected StaticListSerializerBase(StaticListSerializerBase<?> src,
-            JsonSerializer<?> ser, Boolean unwrapSingle) {
+            Boolean unwrapSingle) {
         super(src);
-        _serializer = (JsonSerializer<String>) ser;
         _unwrapSingle = unwrapSingle;
     }
 
     /**
-     * @since 2.6
+     * @since 2.9
      */
     public abstract JsonSerializer<?> _withResolved(BeanProperty prop,
-            JsonSerializer<?> ser, Boolean unwrapSingle);
+            Boolean unwrapSingle);
 
     /*
     /**********************************************************
@@ -59,52 +57,45 @@ public abstract class StaticListSerializerBase<T extends Collection<?>>
     /**********************************************************
      */
 
+    @SuppressWarnings("unchecked")
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider provider, BeanProperty property)
-            throws JsonMappingException
+    public JsonSerializer<?> createContextual(SerializerProvider serializers,
+            BeanProperty property)
+        throws JsonMappingException
     {
         JsonSerializer<?> ser = null;
         Boolean unwrapSingle = null;
         
         if (property != null) {
-            final AnnotationIntrospector intr = provider.getAnnotationIntrospector();
+            final AnnotationIntrospector intr = serializers.getAnnotationIntrospector();
             AnnotatedMember m = property.getMember();
             if (m != null) {
                 Object serDef = intr.findContentSerializer(m);
                 if (serDef != null) {
-                    ser = provider.serializerInstance(m, serDef);
+                    ser = serializers.serializerInstance(m, serDef);
                 }
             }
-            JsonFormat.Value format = property.findPropertyFormat(provider.getConfig(), _handledType);
-            if (format != null) {
-                unwrapSingle = format.getFeature(JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
-            }
         }
-        if (ser == null) {
-            ser = _serializer;
+        JsonFormat.Value format = findFormatOverrides(serializers, property, handledType());
+        if (format != null) {
+            unwrapSingle = format.getFeature(JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
         }
         // [databind#124]: May have a content converter
-        ser = findConvertingContentSerializer(provider, property, ser);
+        ser = findContextualConvertingSerializer(serializers, property, ser);
         if (ser == null) {
-            ser = provider.findValueSerializer(String.class, property);
-        } else {
-            ser = provider.handleSecondaryContextualization(ser, property);
+            ser = serializers.findValueSerializer(String.class, property);
         }
         // Optimization: default serializer just writes String, so we can avoid a call:
         if (isDefaultSerializer(ser)) {
-            ser = null;
+            if (unwrapSingle == _unwrapSingle) {
+                return this;
+            }
+            return _withResolved(property, unwrapSingle);
         }
+        // otherwise...
         // note: will never have TypeSerializer, because Strings are "natural" type
-        if ((ser == _serializer) && (unwrapSingle == _unwrapSingle)) {
-            return this;
-        }
-        return _withResolved(property, ser, unwrapSingle);
-    }
-    
-    @Deprecated // since 2.5
-    @Override
-    public boolean isEmpty(T value) {
-        return isEmpty(null, value);
+        return new CollectionSerializer(serializers.constructType(String.class),
+                true, /*TypeSerializer*/ null, (JsonSerializer<Object>) ser);
     }
 
     @Override
@@ -116,7 +107,7 @@ public abstract class StaticListSerializerBase<T extends Collection<?>>
     public JsonNode getSchema(SerializerProvider provider, Type typeHint) {
         return createSchemaNode("array", true).set("items", contentSchema());
     }
-    
+
     @Override
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException {
         acceptContentVisitor(visitor.expectArrayFormat(typeHint));
@@ -129,7 +120,12 @@ public abstract class StaticListSerializerBase<T extends Collection<?>>
      */
 
     protected abstract JsonNode contentSchema();
-    
+
     protected abstract void acceptContentVisitor(JsonArrayFormatVisitor visitor)
         throws JsonMappingException;
+
+    // just to make sure it gets implemented:
+    @Override
+    public abstract void serializeWithType(T value, JsonGenerator g,
+            SerializerProvider provider, TypeSerializer typeSer) throws IOException;
 }

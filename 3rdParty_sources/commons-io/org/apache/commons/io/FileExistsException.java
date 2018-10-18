@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Indicates that a file already exists.
  * 
- *
+ * @version $Id: FileExistsException.java 1415850 2012-11-30 20:51:39Z ggregory $
  * @since 2.0
  */
 public class FileExistsException extends IOException {
@@ -44,7 +44,7 @@ public class FileExistsException extends IOException {
      *
      * @param message The error message
      */
-    public FileExistsException(String message) {
+    public FileExistsException(final String message) {
         super(message);
     }
 
@@ -53,7 +53,7 @@ public class FileExistsException extends IOException {
      *
      * @param file The file that exists
      */
-    public FileExistsException(File file) {
+    public FileExistsException(final File file) {
         super("File " + file + " exists");
     }
 

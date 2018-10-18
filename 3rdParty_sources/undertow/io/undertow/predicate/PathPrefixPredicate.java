@@ -29,7 +29,7 @@ import io.undertow.util.PathMatcher;
 /**
  * @author Stuart Douglas
  */
-class PathPrefixPredicate implements Predicate {
+public class PathPrefixPredicate implements Predicate {
 
     private final PathMatcher<Boolean> pathMatcher;
 
@@ -50,7 +50,7 @@ class PathPrefixPredicate implements Predicate {
         final String relativePath = value.getRelativePath();
         PathMatcher.PathMatch<Boolean> result = pathMatcher.match(relativePath);
 
-        boolean matches = result.getValue() == Boolean.TRUE;
+        boolean matches = Boolean.TRUE.equals(result.getValue());
         if(matches) {
             Map<String, Object> context = value.getAttachment(PREDICATE_CONTEXT);
             if(context == null) {

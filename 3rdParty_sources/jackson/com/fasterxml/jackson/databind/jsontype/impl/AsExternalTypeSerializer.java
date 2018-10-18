@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
  * Type serializer that preferably embeds type information as an "external"
  * type property; embedded in enclosing JSON object.
  * Note that this serializer should only be used when value is being output
- * at JSON Object context; otherwise it can not work reliably, and will have
+ * at JSON Object context; otherwise it cannot work reliably, and will have
  * to revert operation similar to {@link AsPropertyTypeSerializer}.
  *<p>
  * Note that implementation of serialization is bit cumbersome as we must
@@ -43,131 +43,38 @@ public class AsExternalTypeSerializer extends TypeSerializerBase
 
     /*
     /**********************************************************
-    /* Writing prefixes
+    /* Helper methods
     /**********************************************************
      */
-   
-    @Override
-    public void writeTypePrefixForObject(Object value, JsonGenerator gen) throws IOException {
-        _writeObjectPrefix(value, gen);
+
+    // nothing to wrap it with:
+    protected final void _writeScalarPrefix(Object value, JsonGenerator g) throws IOException { }
+
+    protected final void _writeObjectPrefix(Object value, JsonGenerator g) throws IOException {
+        g.writeStartObject();
     }
 
-    @Override
-    public void writeTypePrefixForObject(Object value, JsonGenerator gen, Class<?> type) throws IOException {
-        _writeObjectPrefix(value, gen);
+    protected final void _writeArrayPrefix(Object value, JsonGenerator g) throws IOException {
+        g.writeStartArray();
+    }
+   
+    protected final void _writeScalarSuffix(Object value, JsonGenerator g, String typeId) throws IOException {
+        if (typeId != null) {
+            g.writeStringField(_typePropertyName, typeId);
+        }
+    }
+   
+    protected final void _writeObjectSuffix(Object value, JsonGenerator g, String typeId) throws IOException {
+        g.writeEndObject();
+        if (typeId != null) {
+            g.writeStringField(_typePropertyName, typeId);
+        }
     }
 
-    @Override
-    public void writeTypePrefixForArray(Object value, JsonGenerator gen) throws IOException {
-        _writeArrayPrefix(value, gen);
+    protected final void _writeArraySuffix(Object value, JsonGenerator g, String typeId) throws IOException {
+        g.writeEndArray();
+        if (typeId != null) {
+            g.writeStringField(_typePropertyName, typeId);
+        }
     }
-
-    @Override
-    public void writeTypePrefixForArray(Object value, JsonGenerator gen, Class<?> type) throws IOException {
-        _writeArrayPrefix(value, gen);
-    }
-
-    @Override
-    public void writeTypePrefixForScalar(Object value, JsonGenerator gen) throws IOException {
-        _writeScalarPrefix(value, gen);
-    }
-
-    @Override
-    public void writeTypePrefixForScalar(Object value, JsonGenerator gen, Class<?> type) throws IOException {
-        _writeScalarPrefix(value, gen);
-    }
-
-    /*
-    /**********************************************************
-    /* Writing suffixes
-    /**********************************************************
-     */
-   
-   @Override
-   public void writeTypeSuffixForObject(Object value, JsonGenerator gen) throws IOException {
-       _writeObjectSuffix(value, gen, idFromValue(value));
-   }
-
-   @Override
-   public void writeTypeSuffixForArray(Object value, JsonGenerator gen) throws IOException {
-       _writeArraySuffix(value, gen, idFromValue(value));
-   }
-   
-   @Override
-   public void writeTypeSuffixForScalar(Object value, JsonGenerator gen) throws IOException {
-       _writeScalarSuffix(value, gen, idFromValue(value));
-   }
-
-   /*
-   /**********************************************************
-   /* Writing with custom type id
-   /**********************************************************
-    */
-
-   @Override
-   public void writeCustomTypePrefixForScalar(Object value, JsonGenerator gen, String typeId) throws IOException {
-       _writeScalarPrefix(value, gen);
-   }
-   
-   @Override
-   public void writeCustomTypePrefixForObject(Object value, JsonGenerator gen, String typeId) throws IOException {
-       _writeObjectPrefix(value, gen);
-   }
-   
-   @Override
-   public void writeCustomTypePrefixForArray(Object value, JsonGenerator gen, String typeId) throws IOException {
-       _writeArrayPrefix(value, gen);
-   }
-
-   @Override
-   public void writeCustomTypeSuffixForScalar(Object value, JsonGenerator gen, String typeId) throws IOException {
-       _writeScalarSuffix(value, gen, typeId);
-   }
-
-   @Override
-   public void writeCustomTypeSuffixForObject(Object value, JsonGenerator gen, String typeId) throws IOException {
-       _writeObjectSuffix(value, gen, typeId);
-   }
-
-   @Override
-   public void writeCustomTypeSuffixForArray(Object value, JsonGenerator gen, String typeId) throws IOException {
-       _writeArraySuffix(value, gen, typeId);
-   }
-
-   /*
-   /**********************************************************
-   /* Helper methods
-   /**********************************************************
-    */
-
-   // nothing to wrap it with:
-   protected final void _writeScalarPrefix(Object value, JsonGenerator gen) throws IOException { }
-
-   protected final void _writeObjectPrefix(Object value, JsonGenerator gen) throws IOException {
-       gen.writeStartObject();
-   }
-
-   protected final void _writeArrayPrefix(Object value, JsonGenerator gen) throws IOException {
-       gen.writeStartArray();
-   }
-   
-   protected final void _writeScalarSuffix(Object value, JsonGenerator gen, String typeId) throws IOException {
-       if (typeId != null) {
-           gen.writeStringField(_typePropertyName, typeId);
-       }
-   }
-   
-   protected final void _writeObjectSuffix(Object value, JsonGenerator gen, String typeId) throws IOException {
-       gen.writeEndObject();
-       if (typeId != null) {
-           gen.writeStringField(_typePropertyName, typeId);
-       }
-   }
-
-   protected final void _writeArraySuffix(Object value, JsonGenerator gen, String typeId) throws IOException {
-       gen.writeEndArray();
-       if (typeId != null) {
-           gen.writeStringField(_typePropertyName, typeId);
-       }
-   }
 }

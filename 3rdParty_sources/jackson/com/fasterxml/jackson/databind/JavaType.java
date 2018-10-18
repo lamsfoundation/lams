@@ -131,6 +131,26 @@ public abstract class JavaType
     public abstract JavaType withContentValueHandler(Object h);
 
     /**
+     * Mutant factory method that will try to copy handlers that the specified
+     * source type instance had, if any; this must be done recursively where
+     * necessary (as content types may be structured).
+     *
+     * @since 2.8.4
+     */
+    public JavaType withHandlersFrom(JavaType src) {
+        JavaType type = this;
+        Object h = src.getTypeHandler();
+        if (h != _typeHandler) {
+            type = type.withTypeHandler(h);
+        }
+        h = src.getValueHandler();
+        if (h != _valueHandler) {
+            type = type.withValueHandler(h);
+        }
+        return type;
+    }
+
+    /**
      * Mutant factory method that may be called on structured types
      * that have a so-called content type (element of arrays, value type
      * of Maps, referenced type of referential types),
@@ -191,15 +211,7 @@ public abstract class JavaType
         if (subclass == _class) { // can still optimize for simple case
             return this;
         }
-        JavaType result = _narrow(subclass);
-        // TODO: these checks should NOT actually be needed; above should suffice:
-        if (_valueHandler != result.<Object>getValueHandler()) {
-            result = result.withValueHandler(_valueHandler);
-        }
-        if (_typeHandler != result.<Object>getTypeHandler()) {
-            result = result.withTypeHandler(_typeHandler);
-        }
-        return result;
+        return  _narrow(subclass);
     }
 
     @Deprecated // since 2.7
@@ -223,10 +235,28 @@ public abstract class JavaType
     public final boolean hasRawClass(Class<?> clz) { return _class == clz; }
 
     /**
+     * Accessor that allows determining whether {@link #getContentType()} should
+     * return a non-null value (that is, there is a "content type") or not.
+     * True if {@link #isContainerType()} or {@link #isReferenceType()} return true.
+     *
+     * @since 2.8
+     */
+    public boolean hasContentType() {
+        return true;
+    }
+
+    /**
      * @since 2.6
      */
     public final boolean isTypeOrSubTypeOf(Class<?> clz) {
-        return (_class == clz) || (clz.isAssignableFrom(_class));
+        return (_class == clz) || clz.isAssignableFrom(_class);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public final boolean isTypeOrSuperTypeOf(Class<?> clz) {
+        return (_class == clz) || _class.isAssignableFrom(clz);
     }
 
     @Override
@@ -447,6 +477,18 @@ public abstract class JavaType
      */
     public boolean hasValueHandler() { return _valueHandler != null; }
 
+    /**
+     * Helper method that checks whether this type, or its (optional) key
+     * or content type has {@link #getValueHandler} or {@link #getTypeHandler()};
+     * that is, are there any non-standard handlers associated with this
+     * type object.
+     *
+     * @since 2.8
+     */
+    public boolean hasHandlers() {
+        return (_typeHandler != null) || (_valueHandler != null);
+    }
+    
     /*
     /**********************************************************
     /* Support for producing signatures

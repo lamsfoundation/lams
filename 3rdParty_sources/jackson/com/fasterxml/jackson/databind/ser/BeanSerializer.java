@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.databind.ser;
 
 import java.io.IOException;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.impl.BeanAsArraySerializer;
 import com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
 public class BeanSerializer
     extends BeanSerializerBase
 {
-    private static final long serialVersionUID = -3618164443537292758L;
+    private static final long serialVersionUID = 29; // as per jackson 2.9
 
     /*
     /**********************************************************
@@ -64,7 +64,7 @@ public class BeanSerializer
         super(src, objectIdWriter, filterId);
     }
     
-    protected BeanSerializer(BeanSerializerBase src, String[] toIgnore) {
+    protected BeanSerializer(BeanSerializerBase src, Set<String> toIgnore) {
         super(src, toIgnore);
     }
 
@@ -99,7 +99,7 @@ public class BeanSerializer
     }
 
     @Override
-    protected BeanSerializerBase withIgnorals(String[] toIgnore) {
+    protected BeanSerializerBase withIgnorals(Set<String> toIgnore) {
         return new BeanSerializer(this, toIgnore);
     }
 
@@ -112,7 +112,7 @@ public class BeanSerializer
     @Override
     protected BeanSerializerBase asArraySerializer()
     {
-        /* Can not:
+        /* Cannot:
          * 
          * - have Object Id (may be allowed in future)
          * - have "any getter"
@@ -148,9 +148,7 @@ public class BeanSerializer
             _serializeWithObjectId(bean, gen, provider, true);
             return;
         }
-        gen.writeStartObject();
-        // [databind#631]: Assign current value, to be accessible by custom serializers
-        gen.setCurrentValue(bean);
+        gen.writeStartObject(bean);
         if (_propertyFilterId != null) {
             serializeFieldsFiltered(bean, gen, provider);
         } else {
@@ -158,7 +156,7 @@ public class BeanSerializer
         }
         gen.writeEndObject();
     }
-    
+
     /*
     /**********************************************************
     /* Standard methods

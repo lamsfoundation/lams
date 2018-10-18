@@ -2,23 +2,25 @@ package com.fasterxml.jackson.databind.ser.std;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.databind.jsonschema.SchemaAware;
+import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Serializer class that can serialize Object that have a
@@ -38,12 +40,15 @@ public class JsonValueSerializer
     extends StdSerializer<Object>
     implements ContextualSerializer, JsonFormatVisitable, SchemaAware
 {
-    protected final Method _accessorMethod;
+    /**
+     * @since 2.9
+     */
+    protected final AnnotatedMember _accessor;
 
     protected final JsonSerializer<Object> _valueSerializer;
 
     protected final BeanProperty _property;
-    
+
     /**
      * This is a flag that is set in rare (?) cases where this serializer
      * is used for "natural" types (boolean, int, String, double); and where
@@ -58,22 +63,20 @@ public class JsonValueSerializer
     /**********************************************************
      */
 
-    // Added in 2.7.4 for forward-compatibility reasons; will be used by default in 2.8.0
-    public JsonValueSerializer(AnnotatedMethod valueMethod, JsonSerializer<?> ser) {
-        this(valueMethod.getAnnotated(), ser);
-    }
-    
     /**
      * @param ser Explicit serializer to use, if caller knows it (which
      *    occurs if and only if the "value method" was annotated with
      *    {@link com.fasterxml.jackson.databind.annotation.JsonSerialize#using}), otherwise
      *    null
+     *    
+     * @since 2.8 Earlier method took "raw" Method, but that does not work with access
+     *    to information we need
      */
     @SuppressWarnings("unchecked")
-    public JsonValueSerializer(Method valueMethod, JsonSerializer<?> ser)
+    public JsonValueSerializer(AnnotatedMember accessor, JsonSerializer<?> ser)
     {
-        super(valueMethod.getReturnType(), false);
-        _accessorMethod = valueMethod;
+        super(accessor.getType());
+        _accessor = accessor;
         _valueSerializer = (JsonSerializer<Object>) ser;
         _property = null;
         _forceTypeInformation = true; // gets reconsidered when we are contextualized
@@ -84,7 +87,7 @@ public class JsonValueSerializer
             JsonSerializer<?> ser, boolean forceTypeInfo)
     {
         super(_notNullClass(src.handledType()));
-        _accessorMethod = src._accessorMethod;
+        _accessor = src._accessor;
         _valueSerializer = (JsonSerializer<Object>) ser;
         _property = property;
         _forceTypeInformation = forceTypeInfo;
@@ -126,9 +129,8 @@ public class JsonValueSerializer
              * if not, we don't really know the actual type until we get the instance.
              */
             // 10-Mar-2010, tatu: Except if static typing is to be used
-            if (provider.isEnabled(MapperFeature.USE_STATIC_TYPING)
-                    || Modifier.isFinal(_accessorMethod.getReturnType().getModifiers())) {
-                JavaType t = provider.constructType(_accessorMethod.getGenericReturnType());
+            JavaType t = _accessor.getType();
+            if (provider.isEnabled(MapperFeature.USE_STATIC_TYPING) || t.isFinal()) {
                 // false -> no need to cache
                 /* 10-Mar-2010, tatu: Ideally we would actually separate out type
                  *   serializer from value serializer; but, alas, there's no access
@@ -158,12 +160,12 @@ public class JsonValueSerializer
      */
     
     @Override
-    public void serialize(Object bean, JsonGenerator jgen, SerializerProvider prov) throws IOException
+    public void serialize(Object bean, JsonGenerator gen, SerializerProvider prov) throws IOException
     {
         try {
-            Object value = _accessorMethod.invoke(bean);
+            Object value = _accessor.getValue(bean);
             if (value == null) {
-                prov.defaultSerializeNull(jgen);
+                prov.defaultSerializeNull(gen);
                 return;
             }
             JsonSerializer<Object> ser = _valueSerializer;
@@ -176,72 +178,48 @@ public class JsonValueSerializer
                 // let's cache it, may be needed soon again
                 ser = prov.findTypedValueSerializer(c, true, _property);
             }
-            ser.serialize(value, jgen, prov);
-        } catch (IOException ioe) {
-            throw ioe;
+            ser.serialize(value, gen, prov);
         } catch (Exception e) {
-            Throwable t = e;
-            // Need to unwrap this specific type, to see infinite recursion...
-            while (t instanceof InvocationTargetException && t.getCause() != null) {
-                t = t.getCause();
-            }
-            // Errors shouldn't be wrapped (and often can't, as well)
-            if (t instanceof Error) {
-                throw (Error) t;
-            }
-            // let's try to indicate the path best we can...
-            throw JsonMappingException.wrapWithPath(t, bean, _accessorMethod.getName() + "()");
+            wrapAndThrow(prov, e, bean, _accessor.getName() + "()");
         }
     }
 
     @Override
-    public void serializeWithType(Object bean, JsonGenerator jgen, SerializerProvider provider,
+    public void serializeWithType(Object bean, JsonGenerator gen, SerializerProvider provider,
             TypeSerializer typeSer0) throws IOException
     {
         // Regardless of other parts, first need to find value to serialize:
         Object value = null;
         try {
-            value = _accessorMethod.invoke(bean);
+            value = _accessor.getValue(bean);
             // and if we got null, can also just write it directly
             if (value == null) {
-                provider.defaultSerializeNull(jgen);
+                provider.defaultSerializeNull(gen);
                 return;
             }
             JsonSerializer<Object> ser = _valueSerializer;
-            if (ser == null) { // already got a serializer? fabulous, that be easy...
-//                ser = provider.findTypedValueSerializer(value.getClass(), true, _property);
+            if (ser == null) { // no serializer yet? Need to fetch
                 ser = provider.findValueSerializer(value.getClass(), _property);
             } else {
-                /* 09-Dec-2010, tatu: To work around natural type's refusal to add type info, we do
-                 *    this (note: type is for the wrapper type, not enclosed value!)
-                 */
+                // 09-Dec-2010, tatu: To work around natural type's refusal to add type info, we do
+                //    this (note: type is for the wrapper type, not enclosed value!)
                 if (_forceTypeInformation) {
-                    typeSer0.writeTypePrefixForScalar(bean, jgen);
-                    ser.serialize(value, jgen, provider);
-                    typeSer0.writeTypeSuffixForScalar(bean, jgen);
+                    // Confusing? Type id is for POJO and NOT for value returned by JsonValue accessor...
+                    WritableTypeId typeIdDef = typeSer0.writeTypePrefix(gen,
+                            typeSer0.typeId(bean, JsonToken.VALUE_STRING));
+                    ser.serialize(value, gen, provider);
+                    typeSer0.writeTypeSuffix(gen, typeIdDef);
+
                     return;
                 }
             }
-            /* 13-Feb-2013, tatu: Turns out that work-around should NOT be required
-             *   at all; it would not lead to correct behavior (as per #167).
-             */
-            // and then redirect type id lookups
-//            TypeSerializer typeSer = new TypeSerializerWrapper(typeSer0, bean);
-            ser.serializeWithType(value, jgen, provider, typeSer0);
-        } catch (IOException ioe) {
-            throw ioe;
+            // 28-Sep-2016, tatu: As per [databind#1385], we do need to do some juggling
+            //    to use different Object for type id (logical type) and actual serialization
+            //    (delegat type).
+            TypeSerializerRerouter rr = new TypeSerializerRerouter(typeSer0, bean);
+            ser.serializeWithType(value, gen, provider, rr);
         } catch (Exception e) {
-            Throwable t = e;
-            // Need to unwrap this specific type, to see infinite recursion...
-            while (t instanceof InvocationTargetException && t.getCause() != null) {
-                t = t.getCause();
-            }
-            // Errors shouldn't be wrapped (and often can't, as well)
-            if (t instanceof Error) {
-                throw (Error) t;
-            }
-            // let's try to indicate the path best we can...
-            throw JsonMappingException.wrapWithPath(t, bean, _accessorMethod.getName() + "()");
+            wrapAndThrow(provider, e, bean, _accessor.getName() + "()");
         }
     }
     
@@ -261,42 +239,35 @@ public class JsonValueSerializer
         throws JsonMappingException
     {
         /* 27-Apr-2015, tatu: First things first; for JSON Schema introspection,
-         *    Enums are special, and unfortunately we will need to add special
+         *    Enum types that use `@JsonValue` are special (but NOT necessarily
+         *    anything else that RETURNS an enum!)
+         *    So we will need to add special
          *    handling here (see https://github.com/FasterXML/jackson-module-jsonSchema/issues/57
          *    for details).
+         *    
+         *    Note that meaning of JsonValue, then, is very different for Enums. Sigh.
          */
-        Class<?> decl = (typeHint == null) ? null : typeHint.getRawClass();
-        if (decl == null) {
-            decl = _accessorMethod.getDeclaringClass();
-        }
-        if ((decl != null) && (decl.isEnum())) {
-            if (_acceptJsonFormatVisitorForEnum(visitor, typeHint, decl)) {
+        final JavaType type = _accessor.getType();
+        Class<?> declaring = _accessor.getDeclaringClass();
+        if ((declaring != null) && declaring.isEnum()) {
+            if (_acceptJsonFormatVisitorForEnum(visitor, typeHint, declaring)) {
                 return;
             }
         }
-        
         JsonSerializer<Object> ser = _valueSerializer;
         if (ser == null) {
-            if (typeHint == null) {
-                if (_property != null) {
-                    typeHint = _property.getType();
-                }
-                if (typeHint == null) {
-                    typeHint = visitor.getProvider().constructType(_handledType);
-                }
-            }
-            ser = visitor.getProvider().findTypedValueSerializer(typeHint, false, _property);
-            if (ser == null) {
+            ser = visitor.getProvider().findTypedValueSerializer(type, false, _property);
+            if (ser == null) { // can this ever occur?
                 visitor.expectAnyFormat(typeHint);
                 return;
             }
         }
-        ser.acceptJsonFormatVisitor(visitor, null); 
+        ser.acceptJsonFormatVisitor(visitor, type);
     }
 
     /**
      * Overridable helper method used for special case handling of schema information for
-     * Enums
+     * Enums.
      * 
      * @return True if method handled callbacks; false if not; in latter case caller will
      *   send default callbacks
@@ -313,24 +284,24 @@ public class JsonValueSerializer
             Set<String> enums = new LinkedHashSet<String>();
             for (Object en : enumType.getEnumConstants()) {
                 try {
-                    enums.add(String.valueOf(_accessorMethod.invoke(en)));
+                    // 21-Apr-2016, tatu: This is convoluted to the max, but essentially we
+                    //   call `@JsonValue`-annotated accessor method on all Enum members,
+                    //   so it all "works out". To some degree.
+                    enums.add(String.valueOf(_accessor.getValue(en)));
                 } catch (Exception e) {
                     Throwable t = e;
                     while (t instanceof InvocationTargetException && t.getCause() != null) {
                         t = t.getCause();
                     }
-                    if (t instanceof Error) {
-                        throw (Error) t;
-                    }
-                    throw JsonMappingException.wrapWithPath(t, en, _accessorMethod.getName() + "()");
+                    ClassUtil.throwIfError(t);
+                    throw JsonMappingException.wrapWithPath(t, en, _accessor.getName() + "()");
                 }
             }
             stringVisitor.enumTypes(enums);
         }
         return true;
-        
     }
-    
+
     protected boolean isNaturalTypeWithStdHandling(Class<?> rawType, JsonSerializer<?> ser)
     {
         // First: do we have a natural type being handled?
@@ -346,7 +317,7 @@ public class JsonValueSerializer
         }
         return isDefaultSerializer(ser);
     }
-    
+
     /*
     /**********************************************************
     /* Other methods
@@ -355,6 +326,165 @@ public class JsonValueSerializer
 
     @Override
     public String toString() {
-        return "(@JsonValue serializer for method " + _accessorMethod.getDeclaringClass() + "#" + _accessorMethod.getName() + ")";
+        return "(@JsonValue serializer for method " + _accessor.getDeclaringClass() + "#" + _accessor.getName() + ")";
+    }
+
+    /*
+    /**********************************************************
+    /* Helper class
+    /**********************************************************
+     */
+
+    /**
+     * Silly little wrapper class we need to re-route type serialization so that we can
+     * override Object to use for type id (logical type) even when asking serialization
+     * of something else (delegate type)
+     */
+    static class TypeSerializerRerouter
+        extends TypeSerializer
+    {
+        protected final TypeSerializer _typeSerializer;
+        protected final Object _forObject;
+
+        public TypeSerializerRerouter(TypeSerializer ts, Object ob) {
+            _typeSerializer = ts;
+            _forObject = ob;
+        }
+
+        @Override
+        public TypeSerializer forProperty(BeanProperty prop) { // should never get called
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public As getTypeInclusion() {
+            return _typeSerializer.getTypeInclusion();
+        }
+
+        @Override
+        public String getPropertyName() {
+            return _typeSerializer.getPropertyName();
+        }
+
+        @Override
+        public TypeIdResolver getTypeIdResolver() {
+            return _typeSerializer.getTypeIdResolver();
+        }
+
+        // // // New Write API, 2.9+
+        
+        @Override // since 2.9
+        public WritableTypeId writeTypePrefix(JsonGenerator g,
+                WritableTypeId typeId) throws IOException {
+            // 28-Jun-2017, tatu: Important! Need to "override" value
+            typeId.forValue = _forObject;
+            return _typeSerializer.writeTypePrefix(g, typeId);
+        }
+
+        @Override // since 2.9
+        public WritableTypeId writeTypeSuffix(JsonGenerator g,
+                WritableTypeId typeId) throws IOException {
+            // NOTE: already overwrote value object so:
+            return _typeSerializer.writeTypeSuffix(g, typeId);
+        }
+
+        // // // Old Write API, pre-2.9
+
+        @Override
+        @Deprecated
+        public void writeTypePrefixForScalar(Object value, JsonGenerator gen) throws IOException {
+            _typeSerializer.writeTypePrefixForScalar(_forObject, gen);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypePrefixForObject(Object value, JsonGenerator gen) throws IOException {
+            _typeSerializer.writeTypePrefixForObject(_forObject, gen);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypePrefixForArray(Object value, JsonGenerator gen) throws IOException {
+            _typeSerializer.writeTypePrefixForArray(_forObject, gen);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypeSuffixForScalar(Object value, JsonGenerator gen) throws IOException {
+            _typeSerializer.writeTypeSuffixForScalar(_forObject, gen);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypeSuffixForObject(Object value, JsonGenerator gen) throws IOException {
+            _typeSerializer.writeTypeSuffixForObject(_forObject, gen);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypeSuffixForArray(Object value, JsonGenerator gen) throws IOException {
+            _typeSerializer.writeTypeSuffixForArray(_forObject, gen);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypePrefixForScalar(Object value, JsonGenerator gen, Class<?> type) throws IOException {
+            _typeSerializer.writeTypePrefixForScalar(_forObject, gen, type);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypePrefixForObject(Object value, JsonGenerator gen, Class<?> type) throws IOException {
+            _typeSerializer.writeTypePrefixForObject(_forObject, gen, type);
+        }
+
+        @Override
+        @Deprecated
+        public void writeTypePrefixForArray(Object value, JsonGenerator gen, Class<?> type) throws IOException {
+            _typeSerializer.writeTypePrefixForArray(_forObject, gen, type);
+        }
+
+        /*
+        /**********************************************************
+        /* Deprecated methods (since 2.9)
+        /**********************************************************
+         */
+
+        @Override
+        @Deprecated
+        public void writeCustomTypePrefixForScalar(Object value, JsonGenerator gen, String typeId)
+                throws IOException {
+            _typeSerializer.writeCustomTypePrefixForScalar(_forObject, gen, typeId);
+        }
+
+        @Override
+        @Deprecated
+        public void writeCustomTypePrefixForObject(Object value, JsonGenerator gen, String typeId) throws IOException {
+            _typeSerializer.writeCustomTypePrefixForObject(_forObject, gen, typeId);
+        }
+
+        @Override
+        @Deprecated
+        public void writeCustomTypePrefixForArray(Object value, JsonGenerator gen, String typeId) throws IOException {
+            _typeSerializer.writeCustomTypePrefixForArray(_forObject, gen, typeId);
+        }
+
+        @Override
+        @Deprecated
+        public void writeCustomTypeSuffixForScalar(Object value, JsonGenerator gen, String typeId) throws IOException {
+            _typeSerializer.writeCustomTypeSuffixForScalar(_forObject, gen, typeId);
+        }
+
+        @Override
+        @Deprecated
+        public void writeCustomTypeSuffixForObject(Object value, JsonGenerator gen, String typeId) throws IOException {
+            _typeSerializer.writeCustomTypeSuffixForObject(_forObject, gen, typeId);
+        }
+
+        @Override
+        @Deprecated
+        public void writeCustomTypeSuffixForArray(Object value, JsonGenerator gen, String typeId) throws IOException {
+            _typeSerializer.writeCustomTypeSuffixForArray(_forObject, gen, typeId);
+        }
     }
 }

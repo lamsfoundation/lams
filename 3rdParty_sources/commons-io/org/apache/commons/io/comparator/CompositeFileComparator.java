@@ -33,17 +33,18 @@ import java.util.List;
  * <pre>
  *       CompositeFileComparator comparator =
  *                       new CompositeFileComparator(
- *                                   DirectoryFileComparator.DIRECTORY_COMPARATOR,
- *                                   NameFileComparator.NAME_COMPARATOR);
+ *                                 (AbstractFileComparator) DirectoryFileComparator.DIRECTORY_COMPARATOR,
+ *                                 (AbstractFileComparator) NameFileComparator.NAME_COMPARATOR);
  *       List&lt;File&gt; list = ...
  *       comparator.sort(list);
  * </pre>
  *
- *
+ * @version $Id: CompositeFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 2.0
  */
 public class CompositeFileComparator extends AbstractFileComparator implements Serializable {
 
+    private static final long serialVersionUID = -2224170307287243428L;
     private static final Comparator<?>[] NO_COMPARATORS = {};
     private final Comparator<File>[] delegates;
 
@@ -53,7 +54,7 @@ public class CompositeFileComparator extends AbstractFileComparator implements S
      * @param delegates The delegate file comparators
      */
     @SuppressWarnings("unchecked") // casts 1 & 2 must be OK because types are already correct
-    public CompositeFileComparator(Comparator<File>... delegates) {
+    public CompositeFileComparator(final Comparator<File>... delegates) {
         if (delegates == null) {
             this.delegates = (Comparator<File>[]) NO_COMPARATORS;//1
         } else {
@@ -68,12 +69,12 @@ public class CompositeFileComparator extends AbstractFileComparator implements S
      * @param delegates The delegate file comparators
      */
     @SuppressWarnings("unchecked") // casts 1 & 2 must be OK because types are already correct
-    public CompositeFileComparator(Iterable<Comparator<File>> delegates) {
+    public CompositeFileComparator(final Iterable<Comparator<File>> delegates) {
         if (delegates == null) {
             this.delegates = (Comparator<File>[]) NO_COMPARATORS; //1
         } else {
-            List<Comparator<File>> list = new ArrayList<Comparator<File>>();
-            for (Comparator<File> comparator : delegates) {
+            final List<Comparator<File>> list = new ArrayList<Comparator<File>>();
+            for (final Comparator<File> comparator : delegates) {
                 list.add(comparator);
             }
             this.delegates = (Comparator<File>[]) list.toArray(new Comparator<?>[list.size()]); //2
@@ -88,9 +89,9 @@ public class CompositeFileComparator extends AbstractFileComparator implements S
      * @return the first non-zero result returned from
      * the delegate comparators or zero.
      */
-    public int compare(File file1, File file2) {
+    public int compare(final File file1, final File file2) {
         int result = 0;
-        for (Comparator<File> delegate : delegates) {
+        for (final Comparator<File> delegate : delegates) {
             result = delegate.compare(file1, file2);
             if (result != 0) {
                 break;
@@ -106,7 +107,7 @@ public class CompositeFileComparator extends AbstractFileComparator implements S
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append(super.toString());
         builder.append('{');
         for (int i = 0; i < delegates.length; i++) {

@@ -43,22 +43,20 @@ public class UnrecognizedPropertyException
      *    if available), or if not, type itself
      * @param propertyName Name of unrecognized property
      * @param propertyIds (optional, null if not available) Set of properties that
-     *    type would recognize, if completely known: null if set can not be determined.
+     *    type would recognize, if completely known: null if set cannot be determined.
      */
     public static UnrecognizedPropertyException from(JsonParser p,
             Object fromObjectOrClass, String propertyName,
             Collection<Object> propertyIds)
     {
-        if (fromObjectOrClass == null) {
-            throw new IllegalArgumentException();
-        }
         Class<?> ref;
         if (fromObjectOrClass instanceof Class<?>) {
             ref = (Class<?>) fromObjectOrClass;
         } else {
             ref = fromObjectOrClass.getClass();
         }
-        String msg = "Unrecognized field \""+propertyName+"\" (class "+ref.getName()+"), not marked as ignorable";
+        String msg = String.format("Unrecognized field \"%s\" (class %s), not marked as ignorable",
+                propertyName, ref.getName());
         UnrecognizedPropertyException e = new UnrecognizedPropertyException(p, msg,
                 p.getCurrentLocation(), ref, propertyName, propertyIds);
         // but let's also ensure path includes this last (missing) segment

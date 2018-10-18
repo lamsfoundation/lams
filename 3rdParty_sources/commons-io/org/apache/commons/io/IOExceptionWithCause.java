@@ -20,12 +20,13 @@ package org.apache.commons.io;
 import java.io.IOException;
 
 /**
- * Subclasses IOException with the {@link Throwable} constructors missing before Java 6. If you are using Java 6,
- * consider this class deprecated and use {@link IOException}.
+ * Subclasses IOException with the {@link Throwable} constructors missing before Java 6.
  * 
- *
+ * @version $Id: IOExceptionWithCause.java 1643107 2014-12-03 13:05:23Z sebb $
  * @since 1.4
+ * @deprecated (since 2.5) use {@link IOException} instead
  */
+@Deprecated
 public class IOExceptionWithCause extends IOException {
 
     /**
@@ -45,9 +46,8 @@ public class IOExceptionWithCause extends IOException {
      * @param cause
      *            the cause (see {@link #getCause()}). A {@code null} value is allowed.
      */
-    public IOExceptionWithCause(String message, Throwable cause) {
-        super(message);
-        this.initCause(cause);
+    public IOExceptionWithCause(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
     /**
@@ -60,9 +60,8 @@ public class IOExceptionWithCause extends IOException {
      * @param cause
      *            the cause (see {@link #getCause()}). A {@code null} value is allowed.
      */
-    public IOExceptionWithCause(Throwable cause) {
-        super(cause == null ? null : cause.toString());
-        this.initCause(cause);
+    public IOExceptionWithCause(final Throwable cause) {
+        super(cause);
     }
 
 }

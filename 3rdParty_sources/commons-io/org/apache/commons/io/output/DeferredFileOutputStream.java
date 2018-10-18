@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import org.apache.commons.io.IOUtils;
  * you want to store it in memory (for speed), but if the file is large you want
  * to store it to file (to avoid memory issues).
  *
- *
+ * @version $Id: DeferredFileOutputStream.java 1686747 2015-06-21 18:44:49Z krosenvold $
  */
 public class DeferredFileOutputStream
     extends ThresholdingOutputStream
@@ -80,7 +80,7 @@ public class DeferredFileOutputStream
      */
     private final File directory;
 
-    
+
     /**
      * True when close() has been called successfully.
      */
@@ -96,7 +96,7 @@ public class DeferredFileOutputStream
      * @param threshold  The number of bytes at which to trigger an event.
      * @param outputFile The file to which data is saved beyond the threshold.
      */
-    public DeferredFileOutputStream(int threshold, File outputFile)
+    public DeferredFileOutputStream(final int threshold, final File outputFile)
     {
         this(threshold,  outputFile, null, null, null);
     }
@@ -113,7 +113,7 @@ public class DeferredFileOutputStream
      *
      * @since 1.4
      */
-    public DeferredFileOutputStream(int threshold, String prefix, String suffix, File directory)
+    public DeferredFileOutputStream(final int threshold, final String prefix, final String suffix, final File directory)
     {
         this(threshold, null, prefix, suffix, directory);
         if (prefix == null) {
@@ -124,14 +124,15 @@ public class DeferredFileOutputStream
     /**
      * Constructs an instance of this class which will trigger an event at the
      * specified threshold, and save data either to a file beyond that point.
-     * 
+     *
      * @param threshold  The number of bytes at which to trigger an event.
      * @param outputFile The file to which data is saved beyond the threshold.
      * @param prefix Prefix to use for the temporary file.
      * @param suffix Suffix to use for the temporary file.
      * @param directory Temporary file directory.
      */
-    private DeferredFileOutputStream(int threshold, File outputFile, String prefix, String suffix, File directory) {
+    private DeferredFileOutputStream(final int threshold, final File outputFile, final String prefix,
+                                     final String suffix, final File directory) {
         super(threshold);
         this.outputFile = outputFile;
 
@@ -175,8 +176,13 @@ public class DeferredFileOutputStream
         if (prefix != null) {
             outputFile = File.createTempFile(prefix, suffix, directory);
         }
-        FileOutputStream fos = new FileOutputStream(outputFile);
-        memoryOutputStream.writeTo(fos);
+        final FileOutputStream fos = new FileOutputStream(outputFile);
+        try {
+            memoryOutputStream.writeTo(fos);
+        } catch (IOException e){
+            fos.close();
+            throw e;
+        }
         currentOutputStream = fos;
         memoryOutputStream = null;
     }
@@ -234,8 +240,8 @@ public class DeferredFileOutputStream
     {
         return outputFile;
     }
-    
-        
+
+
     /**
      * Closes underlying output stream, and mark this as closed
      *
@@ -247,8 +253,8 @@ public class DeferredFileOutputStream
         super.close();
         closed = true;
     }
-    
-    
+
+
     /**
      * Writes the data from this output stream to the specified output stream,
      * after it has been closed.
@@ -256,7 +262,7 @@ public class DeferredFileOutputStream
      * @param out output stream to write to.
      * @exception IOException if this stream is not yet closed or an error occurs.
      */
-    public void writeTo(OutputStream out) throws IOException 
+    public void writeTo(final OutputStream out) throws IOException
     {
         // we may only need to check if this is closed if we are working with a file
         // but we should force the habit of closing wether we are working with
@@ -265,14 +271,14 @@ public class DeferredFileOutputStream
         {
             throw new IOException("Stream not closed");
         }
-        
+
         if(isInMemory())
         {
             memoryOutputStream.writeTo(out);
         }
         else
         {
-            FileInputStream fis = new FileInputStream(outputFile);
+            final FileInputStream fis = new FileInputStream(outputFile);
             try {
                 IOUtils.copy(fis, out);
             } finally {

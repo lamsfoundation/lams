@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Checked exception used to signal fatal problems with mapping of
@@ -44,14 +44,10 @@ public class JsonMappingException
      */
     public static class Reference implements Serializable
     {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L; // changes between 2.7 and 2.8
 
-        /**
-         * Object through which reference was resolved. Can be either
-         * actual instance (usually the case for serialization), or
-         * Class (usually the case for deserialization).
-         */
-        protected Object _from;
+        // transient since 2.8
+        protected transient Object _from;
 
         /**
          * Name of field (for beans) or key (for Maps) that is part
@@ -65,7 +61,7 @@ public class JsonMappingException
          * Index within a {@link Collection} instance that contained
          * the reference; used if index is relevant and available.
          * If either not applicable, or not available, -1 is used to
-         * denote "not known".
+         * denote "not known" (or not relevant).
          */
         protected int _index = -1;
 
@@ -75,9 +71,9 @@ public class JsonMappingException
          * non-serializable (and has to be dropped) but we still want to pass
          * actual description along.
          *
-         * @since 2.7.4
+         * @since 2.8
          */
-        protected String _asString;
+        protected String _desc;
 
         /**
          * Default constructor for deserialization/sub-classing purposes
@@ -89,7 +85,7 @@ public class JsonMappingException
         public Reference(Object from, String fieldName) {
             _from = from;
             if (fieldName == null) {
-                throw new NullPointerException("Can not pass null fieldName");
+                throw new NullPointerException("Cannot pass null fieldName");
             }
             _fieldName = fieldName;
         }
@@ -99,39 +95,54 @@ public class JsonMappingException
             _index = index;
         }
 
-        private Reference(Reference src, String asString, Object newFrom) {
-            _asString = asString;
-            _from = newFrom;
-            _fieldName = src._fieldName;
-            _index = src._index;
-        }
+        // Setters to let Jackson deserialize instances, but not to be called from outside
+        void setFieldName(String n) { _fieldName = n; }
+        void setIndex(int ix) { _index = ix; }
+        void setDescription(String d) { _desc = d; }
 
-        public void setFrom(Object o) { _from = o; }
-        public void setFieldName(String n) { _fieldName = n; }
-        public void setIndex(int ix) { _index = ix; }
-
+        /**
+         * Object through which reference was resolved. Can be either
+         * actual instance (usually the case for serialization), or
+         * Class (usually the case for deserialization).
+         *<p>
+         * Note that this value must be `transient` to allow serializability (as
+         * often such Object is NOT serializable; or, in case of `Class`, may
+         * not available at the point of deserialization). As such will return
+         * `null` if instance has been passed using JDK serialization.
+         */
+        @JsonIgnore
         public Object getFrom() { return _from; }
+
         public String getFieldName() { return _fieldName; }
         public int getIndex() { return _index; }
-
-        @Override public String toString() {
-            if (_asString == null) {
+        public String getDescription() {
+            if (_desc == null) {
                 StringBuilder sb = new StringBuilder();
 
                 if (_from == null) { // can this ever occur?
                     sb.append("UNKNOWN");
                 } else {
                     Class<?> cls = (_from instanceof Class<?>) ? (Class<?>)_from : _from.getClass();
-                    /* Hmmh. Although Class.getName() is mostly ok, it does look
-                     * butt-ugly for arrays. So let's use getSimpleName() instead;
-                     * but have to prepend package name too.
-                     */
+                    // Hmmh. Although Class.getName() is mostly ok, it does look
+                    // butt-ugly for arrays.
+                    // 06-Oct-2016, tatu: as per [databind#1403], `getSimpleName()` not so good
+                    //   as it drops enclosing class. So let's try bit different approach
+                    int arrays = 0;
+                    while (cls.isArray()) {
+                        cls = cls.getComponentType();
+                        ++arrays;
+                    }
+                    sb.append(cls.getName());
+                    while (--arrays >= 0) {
+                        sb.append("[]");
+                    }
+                    /* was:
                     String pkgName = ClassUtil.getPackageName(cls);
                     if (pkgName != null) {
                         sb.append(pkgName);
                         sb.append('.');
                     }
-                    sb.append(cls.getSimpleName());
+                    */
                 }
                 sb.append('[');
                 if (_fieldName != null) {
@@ -144,22 +155,26 @@ public class JsonMappingException
                     sb.append('?');
                 }
                 sb.append(']');
-                _asString = sb.toString();
+                _desc = sb.toString();
             }
-            return _asString;
+            return _desc;
+        }
+
+        @Override
+        public String toString() {
+            return getDescription();
         }
 
         /**
          * May need some cleaning here, given that `from` may or may not be serializable.
          *
-         * since 2.7.4
+         * since 2.8
          */
         Object writeReplace() {
-            // as per [databind#1195], reference may cause trouble, if non-serializable
-            // instance (either directly or transitively); and even use of Class would often
-            // be problematic. Because of this, clear up `_from` always, but ensure that
-            // description is preserved
-            return new Reference(this, toString(), null);
+            // as per [databind#1195], need to ensure description is not null, since
+            // `_from` is transient
+            getDescription();
+            return this;
         }
     }
 
@@ -294,11 +309,7 @@ public class JsonMappingException
      * @since 2.7
      */
     public static JsonMappingException from(SerializerProvider ctxt, String msg) {
-        /* 17-Aug-2015, tatu: As per [databind#903] this is bit problematic as
-         *   SerializerProvider instance does not currently hold on to generator...
-         */
-        JsonGenerator g = null;
-        return new JsonMappingException(g, msg);
+        return new JsonMappingException(ctxt.getGenerator(), msg);
     }
 
     /**
@@ -308,14 +319,16 @@ public class JsonMappingException
         /* 17-Aug-2015, tatu: As per [databind#903] this is bit problematic as
          *   SerializerProvider instance does not currently hold on to generator...
          */
-        JsonGenerator g = null;
-        return new JsonMappingException(g, msg, problem);
+        return new JsonMappingException(ctxt.getGenerator(), msg, problem);
     }
     
     /**
      * Factory method used when "upgrading" an {@link IOException} into
      * {@link JsonMappingException}: usually only needed to comply with
      * a signature.
+     *<p>
+     * NOTE: since 2.9 should usually NOT be used on input-side (deserialization)
+     *    exceptions; instead use method(s) of <code>InputMismatchException</code>
      * 
      * @since 2.1
      */
@@ -400,7 +413,7 @@ public class JsonMappingException
     }
 
     /**
-     * Method for accesing description of path that lead to the
+     * Method for accessing description of path that lead to the
      * problem that triggered this exception
      */
     public String getPathReference()
@@ -452,6 +465,10 @@ public class JsonMappingException
     /* Overridden methods
     /**********************************************************
      */
+
+    @Override // since 2.7.5
+    @JsonIgnore // as per [databind#1368]
+    public Object getProcessor() { return _processor; }
 
     @Override
     public String getLocalizedMessage() {

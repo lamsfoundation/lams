@@ -1,12 +1,17 @@
 package com.fasterxml.jackson.databind;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.Annotations;
 import com.fasterxml.jackson.databind.util.Named;
 
@@ -14,7 +19,7 @@ import com.fasterxml.jackson.databind.util.Named;
  * Bean properties are logical entities that represent data
  * that Java objects (POJOs (Plain Old Java Objects), sometimes also called "beans")
  * contain; and that are accessed using accessors (methods like getters
- * and setters, fields, constructor parametrers).
+ * and setters, fields, constructor parameters).
  * Instances allow access to annotations directly associated
  * to property (via field or method), as well as contextual
  * annotations (annotations for class that contains properties).
@@ -26,7 +31,7 @@ import com.fasterxml.jackson.databind.util.Named;
  * {@link com.fasterxml.jackson.databind.deser.ContextualDeserializer}
  * resolution occurs (<code>createContextual(...)</code> method is called).
  * References may (need to) be retained by serializers and deserializers,
- * especially when further resolving dependant handlers like value
+ * especially when further resolving dependent handlers like value
  * serializers/deserializers or structured types.
  */
 public interface BeanProperty extends Named
@@ -136,7 +141,10 @@ public interface BeanProperty extends Named
      * use {@link #findPropertyFormat} if such defaults would be useful.
      *
      * @since 2.6
+     * 
+     * @deprecated since 2.8 use {@link #findPropertyFormat} instead.
      */
+    @Deprecated
     public JsonFormat.Value findFormatOverrides(AnnotationIntrospector intr);
 
     /**
@@ -157,6 +165,16 @@ public interface BeanProperty extends Named
      * @since 2.7
      */
     public JsonInclude.Value findPropertyInclusion(MapperConfig<?> config, Class<?> baseType);
+
+    /**
+     * Method for accessing set of possible alternate names that are accepted
+     * during deserialization.
+     *
+     * @return List (possibly empty) of alternate names; never null
+     *
+     * @since 2.9
+     */
+    public List<PropertyName> findAliases(MapperConfig<?> config);
 
     /*
     /**********************************************************
@@ -193,8 +211,10 @@ public interface BeanProperty extends Named
      * Simple stand-alone implementation, useful as a placeholder
      * or base class for more complex implementations.
      */
-    public static class Std implements BeanProperty
+    public static class Std implements BeanProperty,
+        java.io.Serializable // 2.9
     {
+        private static final long serialVersionUID = 1L;
 
         protected final PropertyName _name;
         protected final JavaType _type;
@@ -209,39 +229,32 @@ public interface BeanProperty extends Named
          */
         protected final AnnotatedMember _member;
 
-        /**
-         * Annotations defined in the context class (if any); may be null
-         * if no annotations were found
-         */
-        protected final Annotations _contextAnnotations;
-
         public Std(PropertyName name, JavaType type, PropertyName wrapperName,
-                Annotations contextAnnotations, AnnotatedMember member,
-                PropertyMetadata metadata)
+                AnnotatedMember member, PropertyMetadata metadata)
         {
             _name = name;
             _type = type;
             _wrapperName = wrapperName;
             _metadata = metadata;
             _member = member;
-            _contextAnnotations = contextAnnotations;
+        }
+
+        /**
+         * @deprecated Since 2.9
+         */
+        @Deprecated
+        public Std(PropertyName name, JavaType type, PropertyName wrapperName,
+                Annotations contextAnnotations,
+                AnnotatedMember member, PropertyMetadata metadata)
+        {
+            this(name, type, wrapperName, member, metadata);
         }
 
         /**
          * @since 2.6
          */
         public Std(Std base, JavaType newType) {
-            this(base._name, newType, base._wrapperName, base._contextAnnotations, base._member, base._metadata);
-        }
-
-        @Deprecated // since 2.3
-        public Std(String name, JavaType type, PropertyName wrapperName,
-                Annotations contextAnnotations, AnnotatedMember member,
-                boolean isRequired)
-        {
-            this(new PropertyName(name), type, wrapperName, contextAnnotations,
-                    member,
-                    isRequired ? PropertyMetadata.STD_REQUIRED : PropertyMetadata.STD_OPTIONAL);
+            this(base._name, newType, base._wrapperName, base._member, base._metadata);
         }
 
         public Std withType(JavaType type) {
@@ -255,7 +268,7 @@ public interface BeanProperty extends Named
 
         @Override
         public <A extends Annotation> A getContextAnnotation(Class<A> acls) {
-            return (_contextAnnotations == null) ? null : _contextAnnotations.get(acls);
+            return null;
         }
 
         @Override
@@ -287,7 +300,7 @@ public interface BeanProperty extends Named
         @Override
         public JsonInclude.Value findPropertyInclusion(MapperConfig<?> config, Class<?> baseType)
         {
-            JsonInclude.Value v0 = config.getDefaultPropertyInclusion(baseType);
+            JsonInclude.Value v0 = config.getDefaultInclusion(baseType, _type.getRawClass());
             AnnotationIntrospector intr = config.getAnnotationIntrospector();
             if ((intr == null) || (_member == null)) {
                 return v0;
@@ -299,6 +312,13 @@ public interface BeanProperty extends Named
             return v0.withOverrides(v);
         }
 
+        @Override
+        public List<PropertyName> findAliases(MapperConfig<?> config) {
+            // 26-Feb-2017, tatu: Do we really need to allow actual definition?
+            //    For now, let's not.
+            return Collections.emptyList();
+        }
+
         @Override public String getName() { return _name.getSimpleName(); }
         @Override public PropertyName getFullName() { return _name; }
         @Override public JavaType getType() { return _type; }
@@ -307,13 +327,6 @@ public interface BeanProperty extends Named
         @Override public PropertyMetadata getMetadata() { return _metadata; }
         @Override public AnnotatedMember getMember() { return _member; }
 
-        /**
-         *<p>
-         * TODO: move to {@link BeanProperty} in near future, once all standard
-         * implementations define it.
-         * 
-         * @since 2.5
-         */
         @Override
         public boolean isVirtual() { return false; }
 
@@ -327,6 +340,93 @@ public interface BeanProperty extends Named
         public void depositSchemaProperty(JsonObjectFormatVisitor objectVisitor,
                 SerializerProvider provider) {
             throw new UnsupportedOperationException("Instances of "+getClass().getName()+" should not get visited");
+        }
+    }
+
+    /**
+     * Alternative "Null" implementation that can be used in cases where a non-null
+     * {@link BeanProperty} is needed
+     *
+     * @since 2.9
+     */
+    public static class Bogus implements BeanProperty
+    {
+        @Override
+        public String getName() {
+            return "";
+        }
+
+        @Override
+        public PropertyName getFullName() {
+            return PropertyName.NO_NAME;
+        }
+
+        @Override
+        public JavaType getType() {
+            return TypeFactory.unknownType();
+        }
+
+        @Override
+        public PropertyName getWrapperName() {
+            return null;
+        }
+
+        @Override
+        public PropertyMetadata getMetadata() {
+            return PropertyMetadata.STD_REQUIRED_OR_OPTIONAL;
+        }
+
+        @Override
+        public boolean isRequired() {
+            return false;
+        }
+
+        @Override
+        public boolean isVirtual() {
+            return false;
+        }
+
+        @Override
+        public <A extends Annotation> A getAnnotation(Class<A> acls) {
+            return null;
+        }
+
+        @Override
+        public <A extends Annotation> A getContextAnnotation(Class<A> acls) {
+            return null;
+        }
+
+        @Override
+        public AnnotatedMember getMember() {
+            return null;
+        }
+
+        @Override
+        @Deprecated
+        public Value findFormatOverrides(AnnotationIntrospector intr) {
+            return Value.empty();
+        }
+
+        @Override
+        public Value findPropertyFormat(MapperConfig<?> config, Class<?> baseType) {
+            return Value.empty();
+        }
+
+        @Override
+        public com.fasterxml.jackson.annotation.JsonInclude.Value findPropertyInclusion(
+                MapperConfig<?> config, Class<?> baseType)
+        {
+            return null;
+        }
+
+        @Override
+        public List<PropertyName> findAliases(MapperConfig<?> config) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public void depositSchemaProperty(JsonObjectFormatVisitor objectVisitor,
+                SerializerProvider provider) throws JsonMappingException {
         }
     }
 }

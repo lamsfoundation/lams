@@ -77,6 +77,8 @@ public class UndertowOptions {
      */
     public static final Option<Integer> NO_REQUEST_TIMEOUT = Option.simple(UndertowOptions.class, "NO_REQUEST_TIMEOUT", Integer.class);
 
+    public static final int DEFAULT_MAX_PARAMETERS = 1000;
+
     /**
      * The maximum number of parameters that will be parsed. This is used to protect against hash vulnerabilities.
      * <p>
@@ -86,6 +88,8 @@ public class UndertowOptions {
      * Defaults to 1000
      */
     public static final Option<Integer> MAX_PARAMETERS = Option.simple(UndertowOptions.class, "MAX_PARAMETERS", Integer.class);
+
+    public static final int DEFAULT_MAX_HEADERS = 200;
 
     /**
      * The maximum number of headers that will be parsed. This is used to protect against hash vulnerabilities.
@@ -157,6 +161,8 @@ public class UndertowOptions {
      */
     public static final Option<Integer> MAX_BUFFERED_REQUEST_SIZE = Option.simple(UndertowOptions.class, "MAX_BUFFERED_REQUEST_SIZE", Integer.class);
 
+    public static final int DEFAULT_MAX_BUFFERED_REQUEST_SIZE = 16384;
+
     /**
      * If this is true then Undertow will record the request start time, to allow for request time to be logged
      *
@@ -174,6 +180,15 @@ public class UndertowOptions {
      * default is false
      */
     public static final Option<Boolean> ALLOW_EQUALS_IN_COOKIE_VALUE = Option.simple(UndertowOptions.class, "ALLOW_EQUALS_IN_COOKIE_VALUE", Boolean.class);
+
+    /**
+     * If this is true then Undertow will enable RFC6265 compliant cookie validation for Set-Cookie header instead of legacy backward compatible behavior.
+     *
+     * default is false
+     */
+    public static final Option<Boolean> ENABLE_RFC6265_COOKIE_VALIDATION = Option.simple(UndertowOptions.class, "ENABLE_RFC6265_COOKIE_VALIDATION", Boolean.class);
+
+    public static final boolean DEFAULT_ENABLE_RFC6265_COOKIE_VALIDATION = false;
 
     /**
      * If we should attempt to use SPDY for HTTPS connections.
@@ -238,7 +253,19 @@ public class UndertowOptions {
 
     public static final Option<Integer> HTTP2_SETTINGS_INITIAL_WINDOW_SIZE = Option.simple(UndertowOptions.class, "HTTP2_SETTINGS_INITIAL_WINDOW_SIZE", Integer.class);
     public static final Option<Integer> HTTP2_SETTINGS_MAX_FRAME_SIZE = Option.simple(UndertowOptions.class, "HTTP2_SETTINGS_MAX_FRAME_SIZE", Integer.class);
+
+    /**
+     * Deprecated, as it is effectively a duplicate of MAX_HEADER_SIZE
+     *
+     * @see #MAX_HEADER_SIZE
+     */
+    @Deprecated
     public static final Option<Integer> HTTP2_SETTINGS_MAX_HEADER_LIST_SIZE = Option.simple(UndertowOptions.class, "HTTP2_SETTINGS_MAX_HEADER_LIST_SIZE", Integer.class);
+
+    /**
+     * The maximum amount of padding to send in a HTTP/2 frame. Actual amount will be randomly determined, defaults to Zero.
+     */
+    public static final Option<Integer> HTTP2_PADDING_SIZE = Option.simple(UndertowOptions.class, "HTTP2_PADDING_SIZE", Integer.class);
 
     /**
      * Undertow keeps a LRU cache of common huffman encodings. This sets the maximum size, setting this to 0 will disable the caching.
@@ -249,12 +276,12 @@ public class UndertowOptions {
     /**
      * The maximum number of concurrent requests that will be processed at a time. This differs from max concurrent streams in that it is not sent to the remote client.
      *
-     * If the number of pending requests exceeds this number then requests will be queued, the difference between this and max concurrent streams determins
+     * If the number of pending requests exceeds this number then requests will be queued, the difference between this and max concurrent streams determines
      * the maximum number of requests that will be queued.
      *
      * Queued requests are processed by a priority queue, rather than a FIFO based queue, using HTTP2 stream priority.
      *
-     * If this number is smaller than or equal to zero then max concurrent streams determins the maximum number of streams that can be run.
+     * If this number is smaller than or equal to zero then max concurrent streams determines the maximum number of streams that can be run.
      *
      *
      */
@@ -274,6 +301,36 @@ public class UndertowOptions {
      * If this is true then HTTP/1.1 requests will be failed if no host header is present.
      */
     public static final Option<Boolean> REQUIRE_HOST_HTTP11 = Option.simple(UndertowOptions.class, "REQUIRE_HOST_HTTP11", Boolean.class);
+
+    public static final int DEFAULT_MAX_CACHED_HEADER_SIZE = 150;
+
+    /**
+     * The maximum size of a header name+value combo that is cached in the per connection cache. Defaults to 150
+     */
+    public static final Option<Integer> MAX_CACHED_HEADER_SIZE = Option.simple(UndertowOptions.class, "MAX_CACHED_HEADER_SIZE", Integer.class);
+
+    public static final int DEFAULT_HTTP_HEADERS_CACHE_SIZE = 15;
+
+    /**
+     * The maximum number of headers that are cached per connection. Defaults to 15. If this is set to zero the cache is disabled.
+     */
+    public static final Option<Integer> HTTP_HEADERS_CACHE_SIZE = Option.simple(UndertowOptions.class, "HTTP_HEADERS_CACHE_SIZE", Integer.class);
+
+    /**
+     * If the SSLEngine should prefer the servers cipher version. Only applicable on JDK8+.
+     */
+    public static final Option<Boolean> SSL_USER_CIPHER_SUITES_ORDER = Option.simple(UndertowOptions.class, "SSL_USER_CIPHER_SUITES_ORDER", Boolean.class);
+
+
+    public static final Option<Boolean> ALLOW_UNESCAPED_CHARACTERS_IN_URL = Option.simple(UndertowOptions.class,"ALLOW_UNESCAPED_CHARACTERS_IN_URL", Boolean.class);
+
+    /**
+     * The server shutdown timeout in milliseconds after which the executor will be forcefully shut down interrupting
+     * tasks which are still executing.
+     *
+     * There is no timeout by default.
+     */
+    public static final Option<Integer> SHUTDOWN_TIMEOUT = Option.simple(UndertowOptions.class, "SHUTDOWN_TIMEOUT", Integer.class);
 
     private UndertowOptions() {
 

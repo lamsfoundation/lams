@@ -2,8 +2,8 @@ package com.fasterxml.jackson.databind.deser;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.impl.PropertyValueBuffer;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedWithParams;
 
@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedWithParams;
  * is a scalar value (String, number, boolean).
  *<p>
  * Note that this type is not parameterized (even though it would seemingly
- * make sense), because such type information can not be use effectively
+ * make sense), because such type information cannot be use effectively
  * during runtime: access is always using either wildcard type, or just
  * basic {@link java.lang.Object}; and so adding type parameter seems
  * like unnecessary extra work.
@@ -37,10 +37,30 @@ public abstract class ValueInstantiator
      */
 
     /**
+     * Accessor for raw (type-erased) type of instances to create.
+     *<p>
+     * NOTE: since this method has not existed since beginning of
+     * Jackson 2.0 series, default implementation will just return
+     * <code>Object.class</code>; implementations are expected
+     * to override it with real value.
+     *
+     * @since 2.8
+     */
+    public Class<?> getValueClass() {
+        return Object.class;
+    }
+
+    /**
      * Method that returns description of the value type this instantiator
      * handles. Used for error messages, diagnostics.
      */
-    public abstract String getValueTypeDesc();
+    public String getValueTypeDesc() {
+        Class<?> cls = getValueClass();
+        if (cls == null) {
+            return "UNKNOWN";
+        }
+        return cls.getName();
+    }
 
     /**
      * Method that will return true if any of <code>canCreateXxx</code> method
@@ -48,12 +68,13 @@ public abstract class ValueInstantiator
      * be created.
      */
     public boolean canInstantiate() {
-        return canCreateUsingDefault() || canCreateUsingDelegate()
-             || canCreateFromObjectWith() || canCreateFromString()
-             || canCreateFromInt() || canCreateFromLong()
-             || canCreateFromDouble() || canCreateFromBoolean();
-    }    
-    
+        return canCreateUsingDefault()
+                || canCreateUsingDelegate() || canCreateUsingArrayDelegate()
+                || canCreateFromObjectWith() || canCreateFromString()
+                || canCreateFromInt() || canCreateFromLong()
+                || canCreateFromDouble() || canCreateFromBoolean();
+    }
+
     /**
      * Method that can be called to check whether a String-based creator
      * is available for this instantiator
@@ -83,7 +104,7 @@ public abstract class ValueInstantiator
      * creator is available to use (to call {@link #createFromDouble}).
      */
     public boolean canCreateFromBoolean() { return false; }
-    
+
     /**
      * Method that can be called to check whether a default creator (constructor,
      * or no-arg static factory method)
@@ -102,6 +123,8 @@ public abstract class ValueInstantiator
      * Method that can be called to check whether a array-delegate-based creator
      * (single-arg constructor or factory method)
      * is available for this instantiator
+     *
+     * @since 2.7
      */
     public boolean canCreateUsingArrayDelegate() { return false; }
 
@@ -141,9 +164,11 @@ public abstract class ValueInstantiator
      * non-null type is returned, deserializer will bind JSON into specified
      * type (using standard deserializer for that type), and pass that to
      * instantiator.
+     *
+     * @since 2.7
      */
     public JavaType getArrayDelegateType(DeserializationConfig config) { return null; }
-    
+
     /*
     /**********************************************************
     /* Instantiation methods for JSON Object
@@ -161,8 +186,8 @@ public abstract class ValueInstantiator
      * null or empty List.
      */
     public Object createUsingDefault(DeserializationContext ctxt) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s; no default creator found",
-                getValueTypeDesc());
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no default no-arguments constructor found");
     }
 
     /**
@@ -174,8 +199,34 @@ public abstract class ValueInstantiator
      * a non-empty List of arguments.
      */
     public Object createFromObjectWith(DeserializationContext ctxt, Object[] args) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s with arguments",
-                getValueTypeDesc());
+        // sanity check; shouldn't really get called if no Creator specified
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no creator with arguments specified");
+    }
+
+    /**
+     * Method that delegates to
+     * {@link #createFromObjectWith(DeserializationContext, Object[])} by
+     * default, but can be overridden if the application should have customized
+     * behavior with respect to missing properties.
+     *<p>
+     * The default implementation of this method uses
+     * {@link PropertyValueBuffer#getParameters(SettableBeanProperty[])} to read
+     * and validate all properties in bulk, possibly substituting defaults for
+     * missing properties or throwing exceptions for missing properties.  An
+     * overridden implementation of this method could, for example, use
+     * {@link PropertyValueBuffer#hasParameter(SettableBeanProperty)} and
+     * {@link PropertyValueBuffer#getParameter(SettableBeanProperty)} to safely
+     * read the present properties only, and to have some other behavior for the
+     * missing properties.
+     * 
+     * @since 2.8
+     */
+    public Object createFromObjectWith(DeserializationContext ctxt,
+            SettableBeanProperty[] props, PropertyValueBuffer buffer)
+        throws IOException
+    {
+        return createFromObjectWith(ctxt, buffer.getParameters(props));
     }
 
     /**
@@ -183,8 +234,8 @@ public abstract class ValueInstantiator
      * an intermediate "delegate" value to pass to createor method
      */
     public Object createUsingDelegate(DeserializationContext ctxt, Object delegate) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s using delegate",
-                getValueTypeDesc());
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no delegate creator specified");
     }
 
     /**
@@ -192,8 +243,8 @@ public abstract class ValueInstantiator
      * an intermediate "delegate" value to pass to createor method
      */
     public Object createUsingArrayDelegate(DeserializationContext ctxt, Object delegate) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s using delegate",
-                getValueTypeDesc());
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no array delegate creator specified");
     }
 
     /*
@@ -208,23 +259,27 @@ public abstract class ValueInstantiator
     }
 
     public Object createFromInt(DeserializationContext ctxt, int value) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s from Integer number (%s, int)",
-                getValueTypeDesc(), value);
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no int/Int-argument constructor/factory method to deserialize from Number value (%s)",
+                value);
     }
 
     public Object createFromLong(DeserializationContext ctxt, long value) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s from Integer number (%s, long)",
-                getValueTypeDesc(), value);
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no long/Long-argument constructor/factory method to deserialize from Number value (%s)",
+                value);
     }
 
     public Object createFromDouble(DeserializationContext ctxt, double value) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s from Floating-point number (%s, double)",
-                getValueTypeDesc(), value);
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no double/Double-argument constructor/factory method to deserialize from Number value (%s)",
+                value);
     }
-    
+
     public Object createFromBoolean(DeserializationContext ctxt, boolean value) throws IOException {
-        throw ctxt.mappingException("Can not instantiate value of type %s from Boolean value (%s)",
-                getValueTypeDesc(), value);
+        return ctxt.handleMissingInstantiator(getValueClass(), this, null,
+                "no boolean/Boolean-argument constructor/factory method to deserialize from boolean value (%s)",
+                value);
     }
 
     /*
@@ -292,7 +347,7 @@ public abstract class ValueInstantiator
      * @since 2.4 (demoted from <code>StdValueInstantiator</code>)
      */
     protected Object _createFromStringFallbacks(DeserializationContext ctxt, String value)
-            throws IOException, JsonProcessingException
+            throws IOException
     {
         /* 28-Sep-2011, tatu: Ok this is not clean at all; but since there are legacy
          *   systems that expect conversions in some cases, let's just add a minimal
@@ -313,7 +368,54 @@ public abstract class ValueInstantiator
                 return null;
             }
         }
-        throw ctxt.mappingException("Can not instantiate value of type %s from String value ('%s'); no single-String constructor/factory method",
-                getValueTypeDesc(), value);
+        return ctxt.handleMissingInstantiator(getValueClass(), this, ctxt.getParser(),
+                "no String-argument constructor/factory method to deserialize from String value ('%s')",
+                value);
+    }
+
+    /*
+    /**********************************************************
+    /* Introspection
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.9
+     */
+    public interface Gettable {
+        public ValueInstantiator getValueInstantiator();
+    }
+
+    /*
+    /**********************************************************
+    /* Standard Base implementation (since 2.8)
+    /**********************************************************
+     */
+
+    /**
+     * Partial {@link ValueInstantiator} implementation that is strongly recommended
+     * to be used instead of directly extending {@link ValueInstantiator} itself.
+     */
+    public static class Base extends ValueInstantiator
+    {
+        protected final Class<?> _valueType;
+
+        public Base(Class<?> type) {
+            _valueType = type;
+        }
+
+        public Base(JavaType type) {
+            _valueType = type.getRawClass();
+        }
+        
+        @Override
+        public String getValueTypeDesc() {
+            return _valueType.getName();
+        }
+
+        @Override
+        public Class<?> getValueClass() {
+            return _valueType;
+        }
     }
 }

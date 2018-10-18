@@ -23,8 +23,10 @@ import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.AttachmentKey;
 import io.undertow.util.ConcurrentDirectDeque;
+import io.undertow.util.WorkerUtils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -34,10 +36,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import org.xnio.XnioExecutor;
+import org.xnio.XnioIoThread;
 import org.xnio.XnioWorker;
 
 /**
@@ -68,10 +72,12 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
     private final String deploymentName;
 
     private final AtomicLong createdSessionCount = new AtomicLong();
-    private final AtomicLong expiredSessionCount = new AtomicLong();
     private final AtomicLong rejectedSessionCount = new AtomicLong();
-    private final AtomicLong averageSessionLifetime = new AtomicLong();
-    private final AtomicLong longestSessionLifetime = new AtomicLong();
+    private volatile long longestSessionLifetime = 0;
+    private volatile long expiredSessionCount = 0;
+    private volatile BigInteger totalSessionLifetime = BigInteger.ZERO;
+    private final AtomicInteger highestSessionCount = new AtomicInteger();
+
     private final boolean statisticsEnabled;
 
     private volatile long startTime;
@@ -95,7 +101,7 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
         this.sessions = new ConcurrentHashMap<>();
         this.maxSize = maxSessions;
         ConcurrentDirectDeque<String> evictionQueue = null;
-        if (maxSessions > 0) {
+        if (maxSessions > 0 && expireOldestUnusedSessionOnMax) {
             evictionQueue = ConcurrentDirectDeque.newInstance();
         }
         this.evictionQueue = evictionQueue;
@@ -117,7 +123,9 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
     @Override
     public void start() {
         createdSessionCount.set(0);
-        expiredSessionCount.set(0);
+        expiredSessionCount = 0;
+        rejectedSessionCount.set(0);
+        totalSessionLifetime = BigInteger.ZERO;
         startTime = System.currentTimeMillis();
     }
 
@@ -132,7 +140,7 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
 
     @Override
     public Session createSession(final HttpServerExchange serverExchange, final SessionConfig config) {
-        if (evictionQueue != null) {
+        if (maxSize > 0) {
             if(expireOldestUnusedSessionOnMax) {
                 while (sessions.size() >= maxSize && !evictionQueue.isEmpty()) {
 
@@ -172,18 +180,27 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
         } else {
             evictionToken = null;
         }
-        if(statisticsEnabled) {
-            createdSessionCount.incrementAndGet();
-        }
         final SessionImpl session = new SessionImpl(this, sessionID, config, serverExchange.getIoThread(), serverExchange.getConnection().getWorker(), evictionToken, defaultSessionTimeout);
 
         UndertowLogger.SESSION_LOGGER.debugf("Created session with id %s for exchange %s", sessionID, serverExchange);
         sessions.put(sessionID, session);
         config.setSessionId(serverExchange, session.getId());
-        session.lastAccessed = System.currentTimeMillis();
         session.bumpTimeout();
         sessionListeners.sessionCreated(session, serverExchange);
         serverExchange.putAttachment(NEW_SESSION, session);
+
+        if(statisticsEnabled) {
+            createdSessionCount.incrementAndGet();
+            int highest;
+            int sessionSize;
+            do {
+                highest = highestSessionCount.get();
+                sessionSize = sessions.size();
+                if(sessionSize <= highest) {
+                    break;
+                }
+            } while (!highestSessionCount.compareAndSet(highest, sessionSize));
+        }
         return session;
     }
 
@@ -196,7 +213,11 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
             }
         }
         String sessionId = config.findSessionId(serverExchange);
-        return getSession(sessionId);
+        InMemorySessionManager.SessionImpl session = (SessionImpl) getSession(sessionId);
+        if(session != null && serverExchange != null) {
+            session.requestStarted(serverExchange);
+        }
+        return session;
     }
 
     @Override
@@ -278,13 +299,18 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
     }
 
     @Override
+    public long getHighestSessionCount() {
+        return highestSessionCount.get();
+    }
+
+    @Override
     public long getActiveSessionCount() {
         return sessions.size();
     }
 
     @Override
     public long getExpiredSessionCount() {
-        return expiredSessionCount.get();
+        return expiredSessionCount;
     }
 
     @Override
@@ -295,12 +321,16 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
 
     @Override
     public long getMaxSessionAliveTime() {
-        return longestSessionLifetime.get();
+        return longestSessionLifetime;
     }
 
     @Override
-    public long getAverageSessionAliveTime() {
-        return averageSessionLifetime.get();
+    public synchronized long getAverageSessionAliveTime() {
+        //this method needs to be synchronised to make sure the session count and the total are in sync
+        if(expiredSessionCount == 0) {
+            return 0;
+        }
+        return new BigDecimal(totalSessionLifetime).divide(BigDecimal.valueOf(expiredSessionCount), MathContext.DECIMAL128).longValue();
     }
 
     @Override
@@ -315,6 +345,7 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
     private static class SessionImpl implements Session {
 
 
+        final AttachmentKey<Long> FIRST_REQUEST_ACCESS = AttachmentKey.create(Long.class);
         final InMemorySessionManager sessionManager;
         final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<>();
         volatile long lastAccessed;
@@ -346,7 +377,7 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
         private volatile boolean invalid = false;
         private volatile boolean invalidationStarted = false;
 
-        final XnioExecutor executor;
+        final XnioIoThread executor;
         final XnioWorker worker;
 
         XnioExecutor.Key timerCancelKey;
@@ -361,14 +392,14 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
                         if(currentTime >= expireTime) {
                             invalidate(null, SessionListener.SessionDestroyedReason.TIMEOUT);
                         } else {
-                            timerCancelKey = executor.executeAfter(cancelTask, expireTime - currentTime, TimeUnit.MILLISECONDS);
+                            timerCancelKey = WorkerUtils.executeAfter(executor, cancelTask, expireTime - currentTime, TimeUnit.MILLISECONDS);
                         }
                     }
                 });
             }
         };
 
-        private SessionImpl(final InMemorySessionManager sessionManager, final String sessionId, final SessionConfig sessionCookieConfig, final XnioExecutor executor, final XnioWorker worker, final Object evictionToken, final int maxInactiveInterval) {
+        private SessionImpl(final InMemorySessionManager sessionManager, final String sessionId, final SessionConfig sessionCookieConfig, final XnioIoThread executor, final XnioWorker worker, final Object evictionToken, final int maxInactiveInterval) {
             this.sessionManager = sessionManager;
             this.sessionId = sessionId;
             this.sessionCookieConfig = sessionCookieConfig;
@@ -397,10 +428,10 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
                 expireTime = newExpireTime;
                 UndertowLogger.SESSION_LOGGER.tracef("Bumping timeout for session %s to %s", sessionId, expireTime);
                 if(timerCancelKey == null) {
-                    //+500ms, to make sure that the time has actually expired
+                    //+1, to make sure that the time has actually expired
                     //we don't re-schedule every time, as it is expensive
                     //instead when it expires we check if the timeout has been bumped, and if so we re-schedule
-                    timerCancelKey = executor.executeAfter(cancelTask, (maxInactiveInterval * 1000L) + 500L, TimeUnit.MILLISECONDS);
+                    timerCancelKey = executor.executeAfter(cancelTask, (maxInactiveInterval * 1000L) + 1L, TimeUnit.MILLISECONDS);
                 }
             } else {
                 expireTime = -1;
@@ -424,10 +455,20 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
             return sessionId;
         }
 
+        void requestStarted(HttpServerExchange serverExchange) {
+            Long existing = serverExchange.getAttachment(FIRST_REQUEST_ACCESS);
+            if(existing == null) {
+                if (!invalid) {
+                    serverExchange.putAttachment(FIRST_REQUEST_ACCESS, System.currentTimeMillis());
+                }
+            }
+        }
+
         @Override
         public void requestDone(final HttpServerExchange serverExchange) {
-            if (!invalid) {
-                lastAccessed = System.currentTimeMillis();
+            Long existing = serverExchange.getAttachment(FIRST_REQUEST_ACCESS);
+            if(existing != null) {
+                lastAccessed = existing;
             }
         }
 
@@ -520,6 +561,10 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
             if(exchange != null) {
                 exchange.removeAttachment(sessionManager.NEW_SESSION);
             }
+            Object evictionToken = this.evictionToken;
+            if(evictionToken != null) {
+                sessionManager.evictionQueue.removeToken(evictionToken);
+            }
         }
 
         void invalidate(final HttpServerExchange exchange, SessionListener.SessionDestroyedReason reason) {
@@ -542,23 +587,13 @@ public class InMemorySessionManager implements SessionManager, SessionManagerSta
             invalid = true;
 
             if(sessionManager.statisticsEnabled) {
-                long avg, newAvg;
-                do {
-                    avg = sessionManager.averageSessionLifetime.get();
-                    BigDecimal bd = new BigDecimal(avg);
-                    bd.multiply(new BigDecimal(sessionManager.expiredSessionCount.get())).add(bd);
-                    newAvg = bd.divide(new BigDecimal(sessionManager.expiredSessionCount.get() + 1), MathContext.DECIMAL64).longValue();
-                } while (!sessionManager.averageSessionLifetime.compareAndSet(avg, newAvg));
-
-
-                sessionManager.expiredSessionCount.incrementAndGet();
                 long life = System.currentTimeMillis() - creationTime;
-                long existing = sessionManager.longestSessionLifetime.get();
-                while (life > existing) {
-                    if (sessionManager.longestSessionLifetime.compareAndSet(existing, life)) {
-                        break;
+                synchronized (sessionManager) {
+                    sessionManager.expiredSessionCount++;
+                    sessionManager.totalSessionLifetime = sessionManager.totalSessionLifetime.add(BigInteger.valueOf(life));
+                    if(sessionManager.longestSessionLifetime < life) {
+                        sessionManager.longestSessionLifetime = life;
                     }
-                    existing = sessionManager.longestSessionLifetime.get();
                 }
             }
             if (exchange != null) {

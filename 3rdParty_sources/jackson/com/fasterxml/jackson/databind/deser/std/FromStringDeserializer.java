@@ -3,6 +3,7 @@ package com.fasterxml.jackson.databind.deser.std;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -12,16 +13,42 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.util.VersionUtil;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
- * Base class for simple deserializers that only accept JSON String
- * values as the source.
+ * Base class for simple deserializers that serialize values from String
+ * representation: this includes JSON Strings and other Scalar values that
+ * can be coerced into text, like Numbers and Booleans).
+ * Simple JSON String values are trimmed using {@link java.lang.String#trim}.
+ * Partial deserializer implementation will try to first access current token as
+ * a String, calls {@link #_deserialize(String,DeserializationContext)} and
+ * returns return value.
+ * If this does not work (current token not a simple scalar type), attempts
+ * are made so that:
+ *<ul>
+ * <li>Embedded values ({@link JsonToken#VALUE_EMBEDDED_OBJECT}) are returned as-is
+ *    if they are of compatible type
+ *  </li>
+ * <li>Arrays may be "unwrapped" if (and only if) {@link DeserializationFeature#UNWRAP_SINGLE_VALUE_ARRAYS}
+ *    is enabled, and array contains just a single scalar value that can be deserialized
+ *    (for example, JSON Array with single JSON String element).
+ *  </li>
+ * </ul>
+ *<p>
+ * Special handling includes:
+ * <ul>
+ * <li>Null values ({@link JsonToken#VALUE_NULL}) are handled by returning value
+ *   returned by {@link JsonDeserializer#getNullValue(DeserializationContext)}: default
+ *   implementation simply returns Java `null` but this may be overridden.
+ *  </li>
+ * <li>Empty String (after trimming) will result in {@link #_deserializeFromEmptyString}
+ *   getting called, and return value being returned as deserialization: default implementation
+ *   simply returns `null`.
+ *  </li>
+ * </ul>
  */
 @SuppressWarnings("serial")
 public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
@@ -40,6 +67,7 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
             TimeZone.class,
             InetAddress.class,
             InetSocketAddress.class,
+            StringBuilder.class,
         };
     }
     
@@ -84,6 +112,8 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
             kind = Std.STD_INET_ADDRESS;
         } else if (rawType == InetSocketAddress.class) {
             kind = Std.STD_INET_SOCKET_ADDRESS;
+        } else if (rawType == StringBuilder.class) {
+            kind = Std.STD_STRING_BUILDER;
         } else {
             return null;
         }
@@ -95,52 +125,45 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
     /* Deserializer implementations
     /**********************************************************
      */
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        // Issue#381
-        if (p.getCurrentToken() == JsonToken.START_ARRAY && ctxt.isEnabled(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS)) {
-            p.nextToken();
-            final T value = deserialize(p, ctxt);
-            if (p.nextToken() != JsonToken.END_ARRAY) {
-                throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, 
-                                "Attempted to unwrap single value array for single '" + _valueClass.getName() + "' value but there was more than a single value in the array");
-            }
-            return value;
-        }
-        // 22-Sep-2012, tatu: For 2.1, use this new method, may force coercion:
+        // Let's get textual value, possibly via coercion from other scalar types
         String text = p.getValueAsString();
         if (text != null) { // has String representation
             if (text.length() == 0 || (text = text.trim()).length() == 0) {
-                // 04-Feb-2013, tatu: Usually should become null; but not always
+                // Usually should become null; but not always
                 return _deserializeFromEmptyString();
             }
             Exception cause = null;
             try {
-                T result = _deserialize(text, ctxt);
-                if (result != null) {
-                    return result;
-                }
-            } catch (IllegalArgumentException iae) {
-                cause = iae;
+                // 19-May-2017, tatu: Used to require non-null result (assuming `null`
+                //    indicated error; but that seems wrong. Should be able to return
+                //    `null` as value.
+                return _deserialize(text, ctxt);
+            } catch (IllegalArgumentException | MalformedURLException e) {
+                cause = e;
             }
+            // note: `cause` can't be null
             String msg = "not a valid textual representation";
-            if (cause != null) {
-                String m2 = cause.getMessage();
-                if (m2 != null) {
-                    msg = msg + ", problem: "+m2;
-                }
+            String m2 = cause.getMessage();
+            if (m2 != null) {
+                msg = msg + ", problem: "+m2;
             }
+            // 05-May-2016, tatu: Unlike most usage, this seems legit, so...
             JsonMappingException e = ctxt.weirdStringException(text, _valueClass, msg);
-            if (cause != null) {
-                e.initCause(cause);
-            }
+            e.initCause(cause);
             throw e;
             // nothing to do here, yet? We'll fail anyway
         }
-        if (p.getCurrentToken() == JsonToken.VALUE_EMBEDDED_OBJECT) {
+        JsonToken t = p.getCurrentToken();
+        // [databind#381]
+        if (t == JsonToken.START_ARRAY) {
+            return _deserializeFromArray(p, ctxt);
+        }
+        if (t == JsonToken.VALUE_EMBEDDED_OBJECT) {
             // Trivial cases; null to null, instance of type itself returned as is
             Object ob = p.getEmbeddedObject();
             if (ob == null) {
@@ -151,15 +174,17 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
             }
             return _deserializeEmbedded(ob, ctxt);
         }
-        throw ctxt.mappingException(_valueClass);
+        return (T) ctxt.handleUnexpectedToken(_valueClass, p);
     }
         
     protected abstract T _deserialize(String value, DeserializationContext ctxt) throws IOException;
 
     protected T _deserializeEmbedded(Object ob, DeserializationContext ctxt) throws IOException {
         // default impl: error out
-        throw ctxt.mappingException("Don't know how to convert embedded Object of type %s into %s",
+        ctxt.reportInputMismatch(this,
+                "Don't know how to convert embedded Object of type %s into %s",
                 ob.getClass().getName(), _valueClass.getName());
+        return null;
     }
 
     protected T _deserializeFromEmptyString() throws IOException {
@@ -194,6 +219,7 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
         public final static int STD_TIME_ZONE = 10;
         public final static int STD_INET_ADDRESS = 11;
         public final static int STD_INET_SOCKET_ADDRESS = 12;
+        public final static int STD_STRING_BUILDER = 13;
 
         protected final int _kind;
         
@@ -216,7 +242,8 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
                 try {
                     return ctxt.findClass(value);
                 } catch (Exception e) {
-                    throw ctxt.instantiationException(_valueClass, ClassUtil.getRootCause(e));
+                    return ctxt.handleInstantiationProblem(_valueClass, value,
+                            ClassUtil.getRootCause(e));
                 }
             case STD_JAVA_TYPE:
                 return ctxt.getTypeFactory().constructFromCanonical(value);
@@ -228,13 +255,13 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
                 return Pattern.compile(value);
             case STD_LOCALE:
                 {
-                    int ix = value.indexOf('_');
+                    int ix = _firstHyphenOrUnderscore(value);
                     if (ix < 0) { // single argument
                         return new Locale(value);
                     }
                     String first = value.substring(0, ix);
                     value = value.substring(ix+1);
-                    ix = value.indexOf('_');
+                    ix = _firstHyphenOrUnderscore(value);
                     if (ix < 0) { // two pieces
                         return new Locale(first, value);
                     }
@@ -261,18 +288,20 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
                     int j = value.indexOf(':', i);
                     int port = j > -1 ? Integer.parseInt(value.substring(j + 1)) : 0;
                     return new InetSocketAddress(value.substring(0, i + 1), port);
-                } else {
-                    int ix = value.indexOf(':');
-                    if (ix >= 0 && value.indexOf(':', ix + 1) < 0) {
-                        // host:port
-                        int port = Integer.parseInt(value.substring(ix+1));
-                        return new InetSocketAddress(value.substring(0, ix), port);
-                    }
-                    // host or unbracketed IPv6, without port number
-                    return new InetSocketAddress(value, 0);
                 }
+                int ix = value.indexOf(':');
+                if (ix >= 0 && value.indexOf(':', ix + 1) < 0) {
+                    // host:port
+                    int port = Integer.parseInt(value.substring(ix+1));
+                    return new InetSocketAddress(value.substring(0, ix), port);
+                }
+                // host or unbracketed IPv6, without port number
+                return new InetSocketAddress(value, 0);
+            case STD_STRING_BUILDER:
+                return new StringBuilder(value);
             }
-            throw new IllegalArgumentException();
+            VersionUtil.throwInternal();
+            return null;
         }
 
         @Override
@@ -285,7 +314,21 @@ public abstract class FromStringDeserializer<T> extends StdScalarDeserializer<T>
             if (_kind == STD_LOCALE) {
                 return Locale.ROOT;
             }
+            if (_kind == STD_STRING_BUILDER) {
+                return new StringBuilder();
+            }
             return super._deserializeFromEmptyString();
+        }
+
+        protected int _firstHyphenOrUnderscore(String str)
+        {
+            for (int i = 0, end = str.length(); i < end; ++i) {
+                char c = str.charAt(i);
+                if (c == '_' || c == '-') {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

@@ -37,7 +37,7 @@ public class BeanSerializerBuilder
     /**
      * Bean properties, in order of serialization
      */
-    protected List<BeanPropertyWriter> _properties;
+    protected List<BeanPropertyWriter> _properties = Collections.emptyList();
 
     /**
      * Optional array of filtered property writers; if null, no
@@ -66,13 +66,13 @@ public class BeanSerializerBuilder
      * type, if any.
      */
     protected ObjectIdWriter _objectIdWriter;
-    
+
     /*
     /**********************************************************
     /* Construction and setter methods
     /**********************************************************
      */
-    
+
     public BeanSerializerBuilder(BeanDescription beanDesc) {
         _beanDesc = beanDesc;
     }
@@ -105,10 +105,22 @@ public class BeanSerializerBuilder
         _properties = properties;
     }
 
+    /**
+     * @param properties Number and order of properties here MUST match that
+     *    of "regular" properties set earlier using {@link #setProperties(List)}; if not,
+     *    an {@link IllegalArgumentException} will be thrown
+     */
     public void setFilteredProperties(BeanPropertyWriter[] properties) {
+        if (properties != null) {
+            if (properties.length != _properties.size()) { // as per [databind#1612]
+                throw new IllegalArgumentException(String.format(
+                        "Trying to set %d filtered properties; must match length of non-filtered `properties` (%d)",
+                        properties.length, _properties.size()));
+            }
+        }
         _filteredProperties = properties;
     }
-    
+
     public void setAnyGetter(AnyGetterWriter anyGetter) {
         _anyGetter = anyGetter;
     }
@@ -179,11 +191,32 @@ public class BeanSerializerBuilder
             properties = NO_PROPERTIES;
         } else {
             properties = _properties.toArray(new BeanPropertyWriter[_properties.size()]);
+            if (_config.isEnabled(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS)) {
+                for (int i = 0, end = properties.length; i < end; ++i) {
+                    properties[i].fixAccess(_config);
+                }
+            }
+        }
+        // 27-Apr-2017, tatu: Verify that filtered-properties settings are compatible
+        if (_filteredProperties != null) {
+            if (_filteredProperties.length != _properties.size()) {
+                throw new IllegalStateException(String.format(
+"Mismatch between `properties` size (%d), `filteredProperties` (%s): should have as many (or `null` for latter)",
+_properties.size(), _filteredProperties.length));
+            }
+        }
+        if (_anyGetter != null) {
+            _anyGetter.fixAccess(_config);
+        }
+        if (_typeId != null) {
+            if (_config.isEnabled(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS)) {
+                _typeId.fixAccess(_config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
+            }
         }
         return new BeanSerializer(_beanDesc.getType(), this,
                 properties, _filteredProperties);
     }
-    
+
     /**
      * Factory method for constructing an "empty" serializer; one that
      * outputs no properties (but handles JSON objects properly, including

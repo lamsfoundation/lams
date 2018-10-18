@@ -28,6 +28,7 @@ public class StringArraySerializer
     /* Note: not clean in general, but we are betting against
      * anyone re-defining properties of String.class here...
      */
+    @SuppressWarnings("deprecation")
     private final static JavaType VALUE_TYPE = TypeFactory.defaultInstance().uncheckedSimpleType(String.class);
 
     public final static StringArraySerializer instance = new StringArraySerializer();
@@ -106,11 +107,9 @@ public class StringArraySerializer
             ser = _elementSerializer;
         }
         // May have a content converter
-        ser = findConvertingContentSerializer(provider, property, ser);
+        ser = findContextualConvertingSerializer(provider, property, ser);
         if (ser == null) {
             ser = provider.findValueSerializer(String.class, property);
-        } else {
-            ser = provider.handleSecondaryContextualization(ser, property);
         }
         // Optimization: default serializer just writes String, so we can avoid a call:
         if (isDefaultSerializer(ser)) {
@@ -141,7 +140,7 @@ public class StringArraySerializer
     
     @Override
     public boolean isEmpty(SerializerProvider prov, String[] value) {
-        return (value == null) || (value.length == 0);
+        return (value.length == 0);
     }
 
     @Override

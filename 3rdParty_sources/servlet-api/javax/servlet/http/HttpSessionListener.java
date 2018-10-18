@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -84,16 +84,20 @@ public interface HttpSessionListener extends EventListener {
     /** 
      * Receives notification that a session has been created.
      *
+     * @implSpec
+     * The default implementation takes no action.
+     *
      * @param se the HttpSessionEvent containing the session
      */
-    public void sessionCreated(HttpSessionEvent se);
+    default public void sessionCreated(HttpSessionEvent se) {}
     
     /** 
      * Receives notification that a session is about to be invalidated.
      *
+     * @implSpec
+     * The default implementation takes no action.
+     *
      * @param se the HttpSessionEvent containing the session
      */
-    public void sessionDestroyed(HttpSessionEvent se);
-    
+    default public void sessionDestroyed(HttpSessionEvent se) {}
 }
-

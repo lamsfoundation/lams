@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,6 +60,8 @@ package javax.servlet.http;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
 import javax.servlet.ServletResponseWrapper;
 
 /**
@@ -80,6 +82,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     /** 
      * Constructs a response adaptor wrapping the given response.
      * @throws java.lang.IllegalArgumentException if the response is null
+     *
+     * @param response the {@link HttpServletResponse} to be wrapped.
      */
     public HttpServletResponseWrapper(HttpServletResponse response) {
         super(response);
@@ -132,6 +136,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * @deprecated As of version 2.1, use {@link #encodeURL(String url)}
      * instead
      */
+    @Deprecated
     @Override
     public String encodeUrl(String url) {
         return this._getHttpServletResponse().encodeUrl(url);
@@ -144,6 +149,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * @deprecated As of version 2.1, use 
      * {@link #encodeRedirectURL(String url)} instead
      */
+    @Deprecated
     @Override
     public String encodeRedirectUrl(String url) {
         return this._getHttpServletResponse().encodeRedirectUrl(url);
@@ -248,6 +254,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * use {@link #setStatus(int)}, to send an error with a description
      * use {@link #sendError(int, String)}
      */
+    @Deprecated
     @Override
     public void setStatus(int sc, String sm) {
         this._getHttpServletResponse().setStatus(sc, sm);
@@ -319,5 +326,33 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     @Override
     public Collection<String> getHeaderNames() {
         return _getHttpServletResponse().getHeaderNames();
+    }
+
+    /**
+     * The default behaviour of this method is to call
+     * {@link HttpServletResponse#setTrailerFields} on the wrapped response
+     * object.
+     *
+     * @param supplier of trailer headers
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        _getHttpServletResponse().setTrailerFields(supplier);
+    }
+
+    /**
+     * The default behaviour of this method is to call
+     * {@link HttpServletResponse#getTrailerFields} on the wrapped response
+     * object.
+     *
+     * @return supplier of trailer headers
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return _getHttpServletResponse().getTrailerFields();
     }
 }

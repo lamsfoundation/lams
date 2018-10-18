@@ -4,9 +4,8 @@ import java.lang.reflect.Type;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.ObjectIdGenerator;
-import com.fasterxml.jackson.annotation.ObjectIdResolver;
+import com.fasterxml.jackson.annotation.*;
+
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.Annotated;
@@ -26,6 +25,15 @@ import com.fasterxml.jackson.databind.util.Converter;
  */
 public abstract class DatabindContext
 {
+    /**
+     * Let's limit length of error messages, for cases where underlying data
+     * may be very large -- no point in spamming logs with megabytes of meaningless
+     * data.
+     *
+     * @since 2.9
+     */
+    private final static int MAX_ERROR_STR_LEN = 500;
+
     /*
     /**********************************************************
     /* Generic config access
@@ -90,7 +98,7 @@ public abstract class DatabindContext
      * @since 2.7
      */
     public abstract JsonFormat.Value getDefaultPropertyFormat(Class<?> baseType);
-    
+
     /*
     /**********************************************************
     /* Generic attributes (2.3+)
@@ -135,7 +143,10 @@ public abstract class DatabindContext
      * type (usually {@link java.lang.Class})
      */
     public JavaType constructType(Type type) {
-         return getTypeFactory().constructType(type);
+        if (type == null) {
+            return null;
+        }
+        return getTypeFactory().constructType(type);
     }
 
     /**
@@ -149,6 +160,59 @@ public abstract class DatabindContext
         }
         return getConfig().constructSpecializedType(baseType, subclass);
     }
+
+    /**
+     * Lookup method called when code needs to resolve class name from input;
+     * usually simple lookup
+     *
+     * @since 2.9
+     */
+    public JavaType resolveSubType(JavaType baseType, String subClass)
+        throws JsonMappingException
+    {
+        // 30-Jan-2010, tatu: Most ids are basic class names; so let's first
+        //    check if any generics info is added; and only then ask factory
+        //    to do translation when necessary
+        if (subClass.indexOf('<') > 0) {
+            // note: may want to try combining with specialization (esp for EnumMap)?
+            // 17-Aug-2017, tatu: As per [databind#1735] need to ensure assignment
+            //    compatibility -- needed later anyway, and not doing so may open
+            //    security issues.
+            JavaType t = getTypeFactory().constructFromCanonical(subClass);
+            if (t.isTypeOrSubTypeOf(baseType.getRawClass())) {
+                return t;
+            }
+        } else {
+            Class<?> cls;
+            try {
+                cls =  getTypeFactory().findClass(subClass);
+            } catch (ClassNotFoundException e) { // let caller handle this problem
+                return null;
+            } catch (Exception e) {
+                throw invalidTypeIdException(baseType, subClass, String.format(
+                        "problem: (%s) %s",
+                        e.getClass().getName(), e.getMessage()));
+            }
+            if (baseType.isTypeOrSuperTypeOf(cls)) {
+                return getTypeFactory().constructSpecializedType(baseType, cls);
+            }
+        }
+        throw invalidTypeIdException(baseType, subClass, "Not a subtype");
+    }
+
+    /**
+     * Helper method for constructing exception to indicate that given type id
+     * could not be resolved to a valid subtype of specified base type.
+     * Most commonly called during polymorphic deserialization.
+     *<p>
+     * Note that most of the time this method should NOT be called directly: instead,
+     * method <code>handleUnknownTypeId()</code> should be called which will call this method
+     * if necessary.
+     *
+     * @since 2.9
+     */
+    protected abstract JsonMappingException invalidTypeIdException(JavaType baseType, String typeId,
+            String extraDesc);
 
     public abstract TypeFactory getTypeFactory();
 
@@ -224,5 +288,88 @@ public abstract class DatabindContext
                     config.canOverrideAccessModifiers());
         }
         return (Converter<Object,Object>) conv;
+    }
+
+    /*
+    /**********************************************************
+    /* Error reporting
+    /**********************************************************
+     */
+
+    /**
+     * Helper method called to indicate a generic problem that stems from type
+     * definition(s), not input data, or input/output state; typically this
+     * means throwing a {@link com.fasterxml.jackson.databind.exc.InvalidDefinitionException}.
+     *
+     * @since 2.9
+     */
+    public abstract <T> T reportBadDefinition(JavaType type, String msg) throws JsonMappingException;
+
+    /**
+     * @since 2.9
+     */
+    public <T> T reportBadDefinition(Class<?> type, String msg) throws JsonMappingException {
+        return reportBadDefinition(constructType(type), msg);
+    }
+
+    /*
+    /**********************************************************
+    /* Helper methods
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.9
+     */
+    protected final String _format(String msg, Object... msgArgs) {
+        if (msgArgs.length > 0) {
+            return String.format(msg, msgArgs);
+        }
+        return msg;
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected final String _truncate(String desc) {
+        if (desc == null) {
+            return "";
+        }
+        if (desc.length() <= MAX_ERROR_STR_LEN) {
+            return desc;
+        }
+        return desc.substring(0, MAX_ERROR_STR_LEN) + "]...[" + desc.substring(desc.length() - MAX_ERROR_STR_LEN);
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected String _quotedString(String desc) {
+        if (desc == null) {
+            return "[N/A]";
+        }
+        // !!! should we quote it? (in case there are control chars, linefeeds)
+        return String.format("\"%s\"", _truncate(desc));
+    }
+    
+    /**
+     * @since 2.9
+     */
+    protected String _colonConcat(String msgBase, String extra) {
+        if (extra == null) {
+            return msgBase;
+        }
+        return msgBase + ": " + extra;
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected String _desc(String desc) {
+        if (desc == null) {
+            return "[N/A]";
+        }
+        // !!! should we quote it? (in case there are control chars, linefeeds)
+        return _truncate(desc);
     }
 }

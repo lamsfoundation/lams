@@ -23,12 +23,13 @@ import java.io.Serializable;
  * A file filter that always returns false.
  *
  * @since 1.0
- *
+ * @version $Id: FalseFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  *
  * @see FileFilterUtils#falseFileFilter()
  */
 public class FalseFileFilter implements IOFileFilter, Serializable {
 
+    private static final long serialVersionUID = 6210271677940926200L;
     /**
      * Singleton instance of false filter.
      * @since 1.3
@@ -54,7 +55,7 @@ public class FalseFileFilter implements IOFileFilter, Serializable {
      * @param file  the file to check (ignored)
      * @return false
      */
-    public boolean accept(File file) {
+    public boolean accept(final File file) {
         return false;
     }
 
@@ -65,7 +66,7 @@ public class FalseFileFilter implements IOFileFilter, Serializable {
      * @param name  the filename (ignored)
      * @return false
      */
-    public boolean accept(File dir, String name) {
+    public boolean accept(final File dir, final String name) {
         return false;
     }
 

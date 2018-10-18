@@ -23,8 +23,11 @@ public class AsWrapperTypeDeserializer
 {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @since 2.8
+     */
     public AsWrapperTypeDeserializer(JavaType bt, TypeIdResolver idRes,
-            String typePropertyName, boolean typeIdVisible, Class<?> defaultImpl)
+            String typePropertyName, boolean typeIdVisible, JavaType defaultImpl)
     {
         super(bt, idRes, typePropertyName, typeIdVisible, defaultImpl);
     }
@@ -90,11 +93,11 @@ public class AsWrapperTypeDeserializer
         if (t == JsonToken.START_OBJECT) {
             // should always get field name, but just in case...
             if (p.nextToken() != JsonToken.FIELD_NAME) {
-                throw ctxt.wrongTokenException(p, JsonToken.FIELD_NAME,
+                ctxt.reportWrongTokenException(baseType(), JsonToken.FIELD_NAME,
                         "need JSON String that contains type id (for subtype of "+baseTypeName()+")");
             }
         } else if (t != JsonToken.FIELD_NAME) {
-            throw ctxt.wrongTokenException(p, JsonToken.START_OBJECT,
+            ctxt.reportWrongTokenException(baseType(), JsonToken.START_OBJECT,
                     "need JSON Object to contain As.WRAPPER_OBJECT type information for class "+baseTypeName());
         }
         final String typeId = p.getText();
@@ -108,14 +111,17 @@ public class AsWrapperTypeDeserializer
             tb.writeStartObject(); // recreate START_OBJECT
             tb.writeFieldName(_typePropertyName);
             tb.writeString(typeId);
-            p = JsonParserSequence.createFlattened(tb.asParser(p), p);
+            // 02-Jul-2016, tatu: Depending on for JsonParserSequence is initialized it may
+            //   try to access current token; ensure there isn't one
+            p.clearCurrentToken();
+            p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
             p.nextToken();
         }
         
         Object value = deser.deserialize(p, ctxt);
         // And then need the closing END_OBJECT
         if (p.nextToken() != JsonToken.END_OBJECT) {
-            throw ctxt.wrongTokenException(p, JsonToken.END_OBJECT,
+            ctxt.reportWrongTokenException(baseType(), JsonToken.END_OBJECT,
                     "expected closing END_OBJECT after type information and deserialized value");
         }
         return value;

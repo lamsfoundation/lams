@@ -31,21 +31,23 @@ import java.util.Comparator;
  * {@link #LASTMODIFIED_COMPARATOR} singleton instance:
  * <pre>
  *       List&lt;File&gt; list = ...
- *       LastModifiedFileComparator.LASTMODIFIED_COMPARATOR.sort(list);
+ *       ((AbstractFileComparator) LastModifiedFileComparator.LASTMODIFIED_COMPARATOR).sort(list);
  * </pre>
  * <p>
  * Example of doing a <i>reverse</i> sort of an array of files using the
  * {@link #LASTMODIFIED_REVERSE} singleton instance:
  * <pre>
  *       File[] array = ...
- *       LastModifiedFileComparator.LASTMODIFIED_REVERSE.sort(array);
+ *       ((AbstractFileComparator) LastModifiedFileComparator.LASTMODIFIED_REVERSE).sort(array);
  * </pre>
  * <p>
  *
- *
+ * @version $Id: LastModifiedFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 public class LastModifiedFileComparator extends AbstractFileComparator implements Serializable {
+
+    private static final long serialVersionUID = 7372168004395734046L;
 
     /** Last modified comparator instance */
     public static final Comparator<File> LASTMODIFIED_COMPARATOR = new LastModifiedFileComparator();
@@ -64,8 +66,8 @@ public class LastModifiedFileComparator extends AbstractFileComparator implement
      * is greater than the second file.
      * 
      */
-    public int compare(File file1, File file2) {
-        long result = file1.lastModified() - file2.lastModified();
+    public int compare(final File file1, final File file2) {
+        final long result = file1.lastModified() - file2.lastModified();
         if (result < 0) {
             return -1;
         } else if (result > 0) {

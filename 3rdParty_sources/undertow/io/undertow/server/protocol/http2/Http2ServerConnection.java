@@ -24,6 +24,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import javax.net.ssl.SSLSession;
+
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowOptions;
 import io.undertow.protocols.http2.Http2HeadersStreamSinkChannel;
@@ -35,6 +37,7 @@ import io.undertow.server.protocol.http.HttpContinue;
 import io.undertow.util.ConduitFactory;
 import io.undertow.util.DateUtils;
 import io.undertow.util.Headers;
+import io.undertow.util.ParameterLimitException;
 import io.undertow.util.Protocols;
 import org.xnio.ChannelListener;
 import org.xnio.Option;
@@ -44,13 +47,16 @@ import org.xnio.Pool;
 import org.xnio.StreamConnection;
 import org.xnio.XnioIoThread;
 import org.xnio.XnioWorker;
+import org.xnio.channels.Configurable;
 import org.xnio.channels.ConnectedChannel;
 import org.xnio.conduits.ConduitStreamSinkChannel;
 import org.xnio.conduits.ConduitStreamSourceChannel;
+import org.xnio.conduits.EmptyStreamSourceConduit;
 import org.xnio.conduits.StreamSinkChannelWrappingConduit;
 import org.xnio.conduits.StreamSinkConduit;
 import org.xnio.conduits.StreamSourceChannelWrappingConduit;
 import org.xnio.conduits.StreamSourceConduit;
+import org.xnio.conduits.WriteReadyHandler;
 
 import io.undertow.UndertowMessages;
 import io.undertow.protocols.http2.Http2Channel;
@@ -65,6 +71,7 @@ import io.undertow.util.AttachmentKey;
 import io.undertow.util.AttachmentList;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
+import io.undertow.util.StatusCodes;
 
 /**
  * A server connection. There is one connection per request
@@ -126,7 +133,7 @@ public class Http2ServerConnection extends ServerConnection {
         originalSinkConduit = new StreamSinkChannelWrappingConduit(responseChannel);
         originalSourceConduit = new StreamSourceChannelWrappingConduit(requestChannel);
         this.conduitStreamSinkChannel = new ConduitStreamSinkChannel(responseChannel, originalSinkConduit);
-        this.conduitStreamSourceChannel = null;
+        this.conduitStreamSourceChannel = new ConduitStreamSourceChannel(Configurable.EMPTY, new EmptyStreamSourceConduit(getIoThread()));
     }
     @Override
     public Pool<ByteBuffer> getBufferPool() {
@@ -134,6 +141,10 @@ public class Http2ServerConnection extends ServerConnection {
             poolAdaptor = new XnioBufferPoolAdaptor(getByteBufferPool());
         }
         return poolAdaptor;
+    }
+
+    public SSLSession getSslSession() {
+        return channel.getSslSession();
     }
 
     @Override
@@ -178,7 +189,10 @@ public class Http2ServerConnection extends ServerConnection {
                 headers.add(STATUS, exchange.getStatusCode());
                 Connectors.flattenCookies(exchange);
                 Http2HeadersStreamSinkChannel sink = new Http2HeadersStreamSinkChannel(channel, requestChannel.getStreamId(), headers);
-                return new StreamSinkChannelWrappingConduit(sink);
+
+                StreamSinkChannelWrappingConduit ret = new StreamSinkChannelWrappingConduit(sink);
+                ret.setWriteReadyHandler(new WriteReadyHandler.ChannelListenerHandler(Connectors.getConduitSinkChannel(exchange)));
+                return ret;
             }
         });
         continueSent = true;
@@ -194,20 +208,22 @@ public class Http2ServerConnection extends ServerConnection {
     @Override
     public void terminateRequestChannel(HttpServerExchange exchange) {
         if(HttpContinue.requiresContinueResponse(exchange.getRequestHeaders()) && !continueSent) {
-            requestChannel.setIgnoreForceClose(true);
-            requestChannel.close();
-            //if this request requires a 100-continue and it was not sent we have to reset the stream
-            //we do it in a completion listener though, to make sure the response is sent first
-            exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
-                @Override
-                public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
-                    try {
-                        channel.sendRstStream(responseChannel.getStreamId(), Http2Channel.ERROR_CANCEL);
-                    } finally {
-                        nextListener.proceed();
+            if(requestChannel != null) { //can happen on upgrade
+                requestChannel.setIgnoreForceClose(true);
+                requestChannel.close();
+                //if this request requires a 100-continue and it was not sent we have to reset the stream
+                //we do it in a completion listener though, to make sure the response is sent first
+                exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
+                    @Override
+                    public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
+                        try {
+                            channel.sendRstStream(responseChannel.getStreamId(), Http2Channel.ERROR_CANCEL);
+                        } finally {
+                            nextListener.proceed();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -233,7 +249,7 @@ public class Http2ServerConnection extends ServerConnection {
 
     @Override
     public void close() throws IOException {
-        channel.close();
+        channel.sendRstStream(requestChannel.getStreamId(), Http2Channel.ERROR_CANCEL);
     }
 
     @Override
@@ -377,6 +393,11 @@ public class Http2ServerConnection extends ServerConnection {
     }
 
     @Override
+    public boolean isRequestTrailerFieldsSupported() {
+        return true;
+    }
+
+    @Override
     public boolean pushResource(String path, HttpString method, HeaderMap requestHeaders) {
         return pushResource(path, method, requestHeaders, rootHandler);
     }
@@ -397,7 +418,14 @@ public class Http2ServerConnection extends ServerConnection {
             exchange.setRequestMethod(method);
             exchange.setProtocol(Protocols.HTTP_1_1);
             exchange.setRequestScheme(this.exchange.getRequestScheme());
-            Connectors.setExchangeRequestPath(exchange, path, getUndertowOptions().get(UndertowOptions.URL_CHARSET, StandardCharsets.UTF_8.name()), getUndertowOptions().get(UndertowOptions.DECODE_URL, true), getUndertowOptions().get(UndertowOptions.ALLOW_ENCODED_SLASH, false), new StringBuilder());
+            try {
+                Connectors.setExchangeRequestPath(exchange, path, getUndertowOptions().get(UndertowOptions.URL_CHARSET, StandardCharsets.UTF_8.name()), getUndertowOptions().get(UndertowOptions.DECODE_URL, true), getUndertowOptions().get(UndertowOptions.ALLOW_ENCODED_SLASH, false), new StringBuilder(), getUndertowOptions().get(UndertowOptions.MAX_PARAMETERS, UndertowOptions.DEFAULT_MAX_HEADERS));
+            } catch (ParameterLimitException e) {
+                UndertowLogger.REQUEST_IO_LOGGER.debug("Too many parameters in HTTP/2 request", e);
+                exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                exchange.endExchange();
+                return false;
+            }
 
             Connectors.terminateRequest(exchange);
             getIoThread().execute(new Runnable() {

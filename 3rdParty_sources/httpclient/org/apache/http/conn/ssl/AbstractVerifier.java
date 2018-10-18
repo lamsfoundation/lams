@@ -129,6 +129,7 @@ public abstract class AbstractVerifier implements X509HostnameVerifier {
         }
     }
 
+    @Override
     public final void verify(
             final String host, final X509Certificate cert) throws SSLException {
         final boolean ipv4 = InetAddressUtils.isIPv4Address(host);
@@ -154,7 +155,7 @@ public abstract class AbstractVerifier implements X509HostnameVerifier {
                 DefaultHostnameVerifier.normaliseAddress(host.toLowerCase(Locale.ROOT)) : host;
 
         if (subjectAltList != null) {
-            for (String subjectAlt: subjectAltList) {
+            for (final String subjectAlt: subjectAltList) {
                 final String normalizedAltSubject = InetAddressUtils.isIPv6Address(subjectAlt) ?
                         DefaultHostnameVerifier.normaliseAddress(subjectAlt) : subjectAlt;
                 if (matchIdentity(normalizedHost, normalizedAltSubject, strictWithSubDomains)) {
@@ -222,7 +223,7 @@ public abstract class AbstractVerifier implements X509HostnameVerifier {
         try {
             final String cn = DefaultHostnameVerifier.extractCN(subjectPrincipal);
             return cn != null ? new String[] { cn } : null;
-        } catch (SSLException ex) {
+        } catch (final SSLException ex) {
             return null;
         }
     }

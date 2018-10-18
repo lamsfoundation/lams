@@ -61,16 +61,17 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
     private final ClientRequest request;
 
     private static final int STATE_BODY = 0; // Message body, normal pass-through operation
-    private static final int STATE_START = 1; // No headers written yet
-    private static final int STATE_HDR_NAME = 2; // Header name indexed by charIndex
-    private static final int STATE_HDR_D = 3; // Header delimiter ':'
-    private static final int STATE_HDR_DS = 4; // Header delimiter ': '
-    private static final int STATE_HDR_VAL = 5; // Header value
-    private static final int STATE_HDR_EOL_CR = 6; // Header line CR
-    private static final int STATE_HDR_EOL_LF = 7; // Header line LF
-    private static final int STATE_HDR_FINAL_CR = 8; // Final CR
-    private static final int STATE_HDR_FINAL_LF = 9; // Final LF
-    private static final int STATE_BUF_FLUSH = 10; // flush the buffer and go to writing body
+    private static final int STATE_URL = 1; //Writing the URL
+    private static final int STATE_START = 2; // No headers written yet
+    private static final int STATE_HDR_NAME = 3; // Header name indexed by charIndex
+    private static final int STATE_HDR_D = 4; // Header delimiter ':'
+    private static final int STATE_HDR_DS = 5; // Header delimiter ': '
+    private static final int STATE_HDR_VAL = 6; // Header value
+    private static final int STATE_HDR_EOL_CR = 7; // Header line CR
+    private static final int STATE_HDR_EOL_LF = 8; // Header line LF
+    private static final int STATE_HDR_FINAL_CR = 9; // Final CR
+    private static final int STATE_HDR_FINAL_LF = 10; // Final LF
+    private static final int STATE_BUF_FLUSH = 11; // flush the buffer and go to writing body
 
     private static final int MASK_STATE         = 0x0000000F;
     private static final int FLAG_SHUTDOWN      = 0x00000010;
@@ -126,18 +127,34 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
                 }
                 case STATE_START: {
                     log.trace("Starting request");
-                    // we assume that our buffer has enough space for the initial request line plus one more CR+LF
-                    assert buffer.remaining() >= 50;
-                    request.getMethod().appendTo(buffer);
-                    buffer.put((byte) ' ');
-                    string = request.getPath();
-                    length = string.length();
-                    for (charIndex = 0; charIndex < length; charIndex ++) {
-                        buffer.put((byte) string.charAt(charIndex));
+                    int len = request.getMethod().length() + request.getPath().length() + request.getProtocol().length() + 4;
+
+                    // test that our buffer has enough space for the initial request line plus one more CR+LF
+                    if(len <= buffer.remaining()) {
+                        assert buffer.remaining() >= 50;
+                        request.getMethod().appendTo(buffer);
+                        buffer.put((byte) ' ');
+                        string = request.getPath();
+                        length = string.length();
+                        for (charIndex = 0; charIndex < length; charIndex++) {
+                            buffer.put((byte) string.charAt(charIndex));
+                        }
+                        buffer.put((byte) ' ');
+                        request.getProtocol().appendTo(buffer);
+                        buffer.put((byte) '\r').put((byte) '\n');
+                    } else {
+                        StringBuilder sb = new StringBuilder(len);
+                        sb.append(request.getMethod().toString());
+                        sb.append(" ");
+                        sb.append(request.getPath());
+                        sb.append(" ");
+                        sb.append(request.getProtocol());
+                        sb.append("\r\n");
+                        string = sb.toString();
+                        charIndex = 0;
+                        state = STATE_URL;
+                        break;
                     }
-                    buffer.put((byte) ' ');
-                    request.getProtocol().appendTo(buffer);
-                    buffer.put((byte) '\r').put((byte) '\n');
                     HeaderMap headers = request.getRequestHeaders();
                     nameIterator = headers.getHeaderNames().iterator();
                     if (! nameIterator.hasNext()) {
@@ -441,6 +458,48 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
                     pooledBuffer = null;
                     return STATE_BODY;
                 }
+                case STATE_URL: {
+                    for(int i = charIndex; i < string.length(); ++i) {
+                        if(!buffer.hasRemaining()) {
+                            buffer.flip();
+                            do {
+                                res = next.write(buffer);
+                                if (res == 0) {
+                                    log.trace("Continuation");
+                                    this.charIndex = i;
+                                    this.string = string;
+                                    this.state = STATE_URL;
+                                    return STATE_URL;
+                                }
+                            } while (buffer.hasRemaining());
+                            buffer.clear();
+                        }
+                        buffer.put((byte) string.charAt(i));
+                    }
+
+                    HeaderMap headers = request.getRequestHeaders();
+                    nameIterator = headers.getHeaderNames().iterator();
+                    state = STATE_HDR_NAME;
+                    if (! nameIterator.hasNext()) {
+                        log.trace("No request headers");
+                        buffer.put((byte) '\r').put((byte) '\n');
+                        buffer.flip();
+                        while (buffer.hasRemaining()) {
+                            res = next.write(buffer);
+                            if (res == 0) {
+                                log.trace("Continuation");
+                                return STATE_BUF_FLUSH;
+                            }
+                        }
+                        pooledBuffer.close();
+                        pooledBuffer = null;
+                        log.trace("Body");
+                        return STATE_BODY;
+                    }
+                    headerName = nameIterator.next();
+                    charIndex = 0;
+                    break;
+                }
                 default: {
                     throw new IllegalStateException();
                 }
@@ -471,6 +530,13 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
                 return next.write(src) + alreadyWritten;
             }
             return alreadyWritten;
+        } catch (IOException | RuntimeException | Error e) {
+            this.state |= FLAG_SHUTDOWN;
+            if(pooledBuffer != null) {
+                pooledBuffer.close();
+                pooledBuffer = null;
+            }
+            throw e;
         } finally {
             this.state = oldState & ~MASK_STATE | state;
         }
@@ -500,6 +566,13 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
                 }
             }
             return length == 1 ? next.write(srcs[offset]) : next.write(srcs, offset, length);
+        } catch (IOException | RuntimeException | Error e) {
+            this.state |= FLAG_SHUTDOWN;
+            if(pooledBuffer != null) {
+                pooledBuffer.close();
+                pooledBuffer = null;
+            }
+            throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
         }
@@ -534,6 +607,13 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
                 }
             }
             return next.transferFrom(src, position, count);
+        } catch (IOException | RuntimeException | Error e) {
+            this.state |= FLAG_SHUTDOWN;
+            if(pooledBuffer != null) {
+                pooledBuffer.close();
+                pooledBuffer = null;
+            }
+            throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
         }
@@ -559,12 +639,20 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
                 }
             }
             return next.transferFrom(source, count, throughBuffer);
+        } catch (IOException | RuntimeException | Error e) {
+            this.state |= FLAG_SHUTDOWN;
+            if(pooledBuffer != null) {
+                pooledBuffer.close();
+                pooledBuffer = null;
+            }
+            throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
         }
     }
 
     public boolean flush() throws IOException {
+
         log.trace("flush");
         int oldVal = state;
         int state = oldVal & MASK_STATE;
@@ -582,6 +670,13 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
             }
             log.trace("Delegating flush");
             return next.flush();
+        } catch (IOException | RuntimeException | Error e) {
+            this.state |= FLAG_SHUTDOWN;
+            if(pooledBuffer != null) {
+                pooledBuffer.close();
+                pooledBuffer = null;
+            }
+            throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
         }
@@ -612,11 +707,19 @@ final class HttpRequestConduit extends AbstractStreamSinkConduit<StreamSinkCondu
             }
             return;
         }
-        this.state = oldVal & ~MASK_STATE | FLAG_SHUTDOWN | STATE_BODY;
+        this.state = oldVal & ~MASK_STATE | FLAG_SHUTDOWN;
         throw new TruncatedResponseException();
     }
 
     public XnioWorker getWorker() {
         return next.getWorker();
+    }
+
+    public void freeBuffers() {
+        if(pooledBuffer != null) {
+            pooledBuffer.close();
+            pooledBuffer = null;
+            this.state = state & ~MASK_STATE | FLAG_SHUTDOWN;
+        }
     }
 }

@@ -23,8 +23,11 @@ public class AsArrayTypeDeserializer
 {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @since 2.8
+     */
     public AsArrayTypeDeserializer(JavaType bt, TypeIdResolver idRes,
-            String typePropertyName, boolean typeIdVisible, Class<?> defaultImpl)
+            String typePropertyName, boolean typeIdVisible, JavaType defaultImpl)
     {
         super(bt, idRes, typePropertyName, typeIdVisible, defaultImpl);
     }
@@ -104,39 +107,50 @@ public class AsArrayTypeDeserializer
             tb.writeStartObject(); // recreate START_OBJECT
             tb.writeFieldName(_typePropertyName);
             tb.writeString(typeId);
-            p = JsonParserSequence.createFlattened(tb.asParser(p), p);
+            // 02-Jul-2016, tatu: Depending on for JsonParserSequence is initialized it may
+            //   try to access current token; ensure there isn't one
+            p.clearCurrentToken();
+            p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
             p.nextToken();
         }
         Object value = deser.deserialize(p, ctxt);
         // And then need the closing END_ARRAY
         if (hadStartArray && p.nextToken() != JsonToken.END_ARRAY) {
-            throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY,
+            ctxt.reportWrongTokenException(baseType(), JsonToken.END_ARRAY,
                     "expected closing END_ARRAY after type information and deserialized value");
+            // 05-May-2016, tatu: Not 100% what to do if exception is stored for
+            //     future, and not thrown immediately: should probably skip until END_ARRAY
+
+            // ... but for now, fall through
         }
         return value;
     }    
     
-    protected String _locateTypeId(JsonParser jp, DeserializationContext ctxt) throws IOException
+    protected String _locateTypeId(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        if (!jp.isExpectedStartArrayToken()) {
+        if (!p.isExpectedStartArrayToken()) {
             // Need to allow even more customized handling, if something unexpected seen...
             // but should there be a way to limit this to likely success cases?
             if (_defaultImpl != null) {
                 return _idResolver.idFromBaseType();
             }
-            throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY, "need JSON Array to contain As.WRAPPER_ARRAY type information for class "+baseTypeName());
+             ctxt.reportWrongTokenException(baseType(), JsonToken.START_ARRAY,
+                     "need JSON Array to contain As.WRAPPER_ARRAY type information for class "+baseTypeName());
+             return null;
         }
         // And then type id as a String
-        JsonToken t = jp.nextToken();
+        JsonToken t = p.nextToken();
         if (t == JsonToken.VALUE_STRING) {
-            String result = jp.getText();
-            jp.nextToken();
+            String result = p.getText();
+            p.nextToken();
             return result;
         }
         if (_defaultImpl != null) {
             return _idResolver.idFromBaseType();
         }
-        throw ctxt.wrongTokenException(jp, JsonToken.VALUE_STRING, "need JSON String that contains type id (for subtype of "+baseTypeName()+")");
+        ctxt.reportWrongTokenException(baseType(), JsonToken.VALUE_STRING,
+                "need JSON String that contains type id (for subtype of %s)", baseTypeName());
+        return null;
     }
 
     /**

@@ -24,11 +24,14 @@ import java.nio.channels.FileChannel;
 import org.xnio.Bits;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
+import io.undertow.UndertowLogger;
 import io.undertow.connector.PooledByteBuffer;
+import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
 import io.undertow.server.protocol.framed.FrameHeaderData;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.Headers;
 
 /**
  * @author Stuart Douglas
@@ -46,6 +49,9 @@ public class Http2StreamSourceChannel extends AbstractHttp2StreamSourceChannel i
     private Http2HeadersStreamSinkChannel response;
     private int flowControlWindow;
     private ChannelListener<Http2StreamSourceChannel> completionListener;
+
+    private int remainingPadding;
+
     /**
      * This is a bit of a hack, basically it allows the container to delay sending a RST_STREAM on a channel that is knows is broken,
      * because it wants to delay the RST until after the response has been set
@@ -54,17 +60,55 @@ public class Http2StreamSourceChannel extends AbstractHttp2StreamSourceChannel i
      */
     private boolean ignoreForceClose = false;
 
+    private long contentLengthRemaining;
+
+    private TrailersHandler trailersHandler;
+
     Http2StreamSourceChannel(Http2Channel framedChannel, PooledByteBuffer data, long frameDataRemaining, HeaderMap headers, int streamId) {
         super(framedChannel, data, frameDataRemaining);
         this.headers = headers;
         this.streamId = streamId;
         this.flowControlWindow = framedChannel.getInitialReceiveWindowSize();
+        String contentLengthString = headers.getFirst(Headers.CONTENT_LENGTH);
+        if(contentLengthString != null) {
+            contentLengthRemaining = Long.parseLong(contentLengthString);
+        } else {
+            contentLengthRemaining = -1;
+        }
     }
 
     @Override
     protected void handleHeaderData(FrameHeaderData headerData) {
         Http2FrameHeaderParser data = (Http2FrameHeaderParser) headerData;
+        Http2PushBackParser parser = data.getParser();
+        if(parser instanceof Http2DataFrameParser) {
+            remainingPadding = ((Http2DataFrameParser) parser).getPadding();
+            if(remainingPadding > 0) {
+                try {
+                    updateFlowControlWindow(remainingPadding + 1);
+                } catch (IOException e) {
+                    IoUtils.safeClose(getFramedChannel());
+                    throw new RuntimeException(e);
+                }
+            }
+        } else if(parser instanceof Http2HeadersParser) {
+            if(trailersHandler != null) {
+                trailersHandler.handleTrailers(((Http2HeadersParser) parser).getHeaderMap());
+            }
+        }
         handleFinalFrame(data);
+    }
+
+    @Override
+    protected long updateFrameDataRemaining(PooledByteBuffer data, long frameDataRemaining) {
+        long actualDataRemaining = frameDataRemaining - remainingPadding;
+        if(data.getBuffer().remaining() > actualDataRemaining) {
+            long paddingThisBuffer = data.getBuffer().remaining() - actualDataRemaining;
+            data.getBuffer().limit((int) (data.getBuffer().position() + actualDataRemaining));
+            remainingPadding -= paddingThisBuffer;
+            return frameDataRemaining - paddingThisBuffer;
+        }
+        return frameDataRemaining;
     }
 
     void handleFinalFrame(Http2FrameHeaderParser headerData) {
@@ -143,6 +187,7 @@ public class Http2StreamSourceChannel extends AbstractHttp2StreamSourceChannel i
         Http2Channel http2Channel = getHttp2Channel();
         http2Channel.updateReceiveFlowControlWindow(read);
         int initialWindowSize = http2Channel.getInitialReceiveWindowSize();
+        //TODO: this is not great, as we may have already received all the data so there is no need, need to have a way to figure out if all data is buffered
         if (flowControlWindow < (initialWindowSize / 2)) {
             int delta = initialWindowSize - flowControlWindow;
             flowControlWindow += delta;
@@ -209,10 +254,41 @@ public class Http2StreamSourceChannel extends AbstractHttp2StreamSourceChannel i
         return headersEndStream;
     }
 
+    public TrailersHandler getTrailersHandler() {
+        return trailersHandler;
+    }
+
+    public void setTrailersHandler(TrailersHandler trailersHandler) {
+        this.trailersHandler = trailersHandler;
+    }
+
     @Override
     public String toString() {
         return "Http2StreamSourceChannel{" +
                 "headers=" + headers +
                 '}';
     }
+
+    /**
+     * Checks that the actual content size matches the expected. We check this proactivly, rather than as the data is read
+     * @param frameLength The amount of data in the frame
+     * @param last If this is the last frame
+     */
+    void updateContentSize(long frameLength, boolean last) {
+        if(contentLengthRemaining != -1) {
+            contentLengthRemaining -= frameLength;
+            if(contentLengthRemaining < 0) {
+                UndertowLogger.REQUEST_IO_LOGGER.debugf("Closing stream %s on %s as data length exceeds content size", streamId, getFramedChannel());
+                getFramedChannel().sendRstStream(streamId, Http2Channel.ERROR_PROTOCOL_ERROR);
+            } else if(last && contentLengthRemaining != 0) {
+                UndertowLogger.REQUEST_IO_LOGGER.debugf("Closing stream %s on %s as data length was less than content size", streamId, getFramedChannel());
+                getFramedChannel().sendRstStream(streamId, Http2Channel.ERROR_PROTOCOL_ERROR);
+            }
+        }
+    }
+
+    public interface TrailersHandler {
+        void handleTrailers(HeaderMap headerMap);
+    }
+
 }

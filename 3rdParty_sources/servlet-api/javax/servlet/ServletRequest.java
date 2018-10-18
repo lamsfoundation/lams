@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -116,8 +116,13 @@ public interface ServletRequest {
     
     /**
      * Returns the name of the character encoding used in the body of this
-     * request. This method returns <code>null</code> if the request
-     * does not specify a character encoding
+     * request. This method returns <code>null</code> if no request encoding
+     * character encoding has been specified. The following methods for
+     * specifying the request character encoding are consulted, in decreasing
+     * order of priority: per request, per web app (using
+     * {@link ServletContext#setRequestCharacterEncoding}, deployment
+     * descriptor), and per container (for all web applications deployed in 
+     * that container, using vendor specific configuration).
      * 
      * @return a <code>String</code> containing the name of the character
      * encoding, or <code>null</code> if the request does not specify a
@@ -457,6 +462,11 @@ public interface ServletRequest {
     public RequestDispatcher getRequestDispatcher(String path);
     
     /**
+     * @param path the path for which the real path is to be returned.
+
+     * @return the <i>real</i> path, or <tt>null</tt> if the
+     * translation cannot be performed.
+
      * @deprecated  As of Version 2.1 of the Java Servlet API,
      *    use {@link ServletContext#getRealPath} instead.
      */

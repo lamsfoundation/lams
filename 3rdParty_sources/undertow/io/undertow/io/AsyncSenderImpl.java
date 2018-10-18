@@ -20,10 +20,12 @@ package io.undertow.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
@@ -117,16 +119,25 @@ public class AsyncSenderImpl implements Sender {
         if (callback == null) {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("callback");
         }
+        if(!exchange.getConnection().isOpen()) {
+            invokeOnException(callback, new ClosedChannelException());
+            return;
+        }
         if(exchange.isResponseComplete()) {
-            throw UndertowMessages.MESSAGES.responseComplete();
+            invokeOnException(callback, new IOException(UndertowMessages.MESSAGES.responseComplete()));
         }
         if (this.buffer != null || this.fileChannel != null) {
             throw UndertowMessages.MESSAGES.dataAlreadyQueued();
         }
+        long responseContentLength = exchange.getResponseContentLength();
+        if(responseContentLength > 0 && buffer.remaining() > responseContentLength) {
+            invokeOnException(callback, UndertowLogger.ROOT_LOGGER.dataLargerThanContentLength(buffer.remaining(), responseContentLength));
+            return;
+        }
         StreamSinkChannel channel = this.channel;
         if (channel == null) {
             if (callback == IoCallback.END_EXCHANGE) {
-                if (exchange.getResponseContentLength() == -1 && !exchange.getResponseHeaders().contains(Headers.TRANSFER_ENCODING)) {
+                if (responseContentLength == -1 && !exchange.getResponseHeaders().contains(Headers.TRANSFER_ENCODING)) {
                     exchange.setResponseContentLength(buffer.remaining());
                 }
             }
@@ -173,8 +184,12 @@ public class AsyncSenderImpl implements Sender {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("callback");
         }
 
+        if(!exchange.getConnection().isOpen()) {
+            invokeOnException(callback, new ClosedChannelException());
+            return;
+        }
         if(exchange.isResponseComplete()) {
-            throw UndertowMessages.MESSAGES.responseComplete();
+            invokeOnException(callback, new IOException(UndertowMessages.MESSAGES.responseComplete()));
         }
         if (this.buffer != null) {
             throw UndertowMessages.MESSAGES.dataAlreadyQueued();
@@ -186,11 +201,16 @@ public class AsyncSenderImpl implements Sender {
         }
 
         long totalToWrite = Buffers.remaining(buffer);
+        long responseContentLength = exchange.getResponseContentLength();
+        if(responseContentLength > 0 && totalToWrite > responseContentLength) {
+            invokeOnException(callback, UndertowLogger.ROOT_LOGGER.dataLargerThanContentLength(totalToWrite, responseContentLength));
+            return;
+        }
 
         StreamSinkChannel channel = this.channel;
         if (channel == null) {
             if (callback == IoCallback.END_EXCHANGE) {
-                if (exchange.getResponseContentLength() == -1 && !exchange.getResponseHeaders().contains(Headers.TRANSFER_ENCODING)) {
+                if (responseContentLength == -1 && !exchange.getResponseHeaders().contains(Headers.TRANSFER_ENCODING)) {
                     exchange.setResponseContentLength(totalToWrite);
                 }
             }
@@ -233,8 +253,12 @@ public class AsyncSenderImpl implements Sender {
             throw UndertowMessages.MESSAGES.argumentCannotBeNull("callback");
         }
 
+        if(!exchange.getConnection().isOpen()) {
+            invokeOnException(callback, new ClosedChannelException());
+            return;
+        }
         if(exchange.isResponseComplete()) {
-            throw UndertowMessages.MESSAGES.responseComplete();
+            invokeOnException(callback, new IOException(UndertowMessages.MESSAGES.responseComplete()));
         }
         if (this.fileChannel != null || this.buffer != null) {
             throw UndertowMessages.MESSAGES.dataAlreadyQueued();
@@ -274,8 +298,12 @@ public class AsyncSenderImpl implements Sender {
     @Override
     public void send(final String data, final Charset charset, final IoCallback callback) {
 
+        if(!exchange.getConnection().isOpen()) {
+            invokeOnException(callback, new ClosedChannelException());
+            return;
+        }
         if(exchange.isResponseComplete()) {
-            throw UndertowMessages.MESSAGES.responseComplete();
+            invokeOnException(callback, new IOException(UndertowMessages.MESSAGES.responseComplete()));
         }
         ByteBuffer bytes = ByteBuffer.wrap(data.getBytes(charset));
         if (bytes.remaining() == 0) {

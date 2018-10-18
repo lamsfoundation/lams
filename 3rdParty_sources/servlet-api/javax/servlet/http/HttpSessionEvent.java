@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -70,6 +70,8 @@ public class HttpSessionEvent extends java.util.EventObject {
 
     /**
      * Construct a session event from the given source.
+     *
+     * @param source the {@link HttpSession} corresponding to this event
      */
     public HttpSessionEvent(HttpSession source) {
         super(source);
@@ -77,6 +79,7 @@ public class HttpSessionEvent extends java.util.EventObject {
 
     /**
      * Return the session that changed.
+     * @return the {@link HttpSession} for this event.
      */
     public HttpSession getSession () { 
         return (HttpSession) super.getSource();

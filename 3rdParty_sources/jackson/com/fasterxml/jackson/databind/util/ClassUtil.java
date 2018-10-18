@@ -1,33 +1,25 @@
 package com.fasterxml.jackson.databind.util;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 
 public final class ClassUtil
 {
     private final static Class<?> CLS_OBJECT = Object.class;
 
-    /*
-    /**********************************************************
-    /* Helper classes
-    /**********************************************************
-     */
+    private final static Annotation[] NO_ANNOTATIONS = new Annotation[0];
+    private final static Ctor[] NO_CTORS = new Ctor[0];
 
-    /* 21-Feb-2016, tatu: Unfortunately `Collections.emptyIterator()` only
-     *   comes with JDK7, so we'll still have to include our bogus implementation
-     *   for as long as we want JDK6 runtime compatibility
-     */
-    private final static class EmptyIterator<T> implements Iterator<T> {
-        @Override public boolean hasNext() { return false; }
-        @Override public T next() { throw new NoSuchElementException(); }
-        @Override public void remove() { throw new UnsupportedOperationException(); }
-    }
-    
-    private final static EmptyIterator<?> EMPTY_ITERATOR = new EmptyIterator<Object>();
+    private final static Iterator<?> EMPTY_ITERATOR = Collections.emptyIterator();
 
     /*
     /**********************************************************
@@ -40,8 +32,6 @@ public final class ClassUtil
      */
     @SuppressWarnings("unchecked")
     public static <T> Iterator<T> emptyIterator() {
-// 21-Feb-2016, tatu: As per above, use a locally defined empty iterator
-//        return Collections.emptyIterator();
         return (Iterator<T>) EMPTY_ITERATOR;
     }
 
@@ -282,184 +272,45 @@ public final class ClassUtil
         return false;
     }
 
-    /*
-    /**********************************************************
-    /* Type name handling methods
-    /**********************************************************
-     */
-    
+    public static boolean isBogusClass(Class<?> cls) {
+        return (cls == Void.class || cls == Void.TYPE
+                || cls == com.fasterxml.jackson.databind.annotation.NoClass.class);
+    }
+
+    public static boolean isNonStaticInnerClass(Class<?> cls) {
+        return !Modifier.isStatic(cls.getModifiers())
+                && (getEnclosingClass(cls) != null);
+    }
+
     /**
-     * Helper method used to construct appropriate description
-     * when passed either type (Class) or an instance; in latter
-     * case, class of instance is to be used.
+     * @since 2.7
      */
-    public static String getClassDescription(Object classOrInstance)
+    public static boolean isObjectOrPrimitive(Class<?> cls) {
+        return (cls == CLS_OBJECT) || cls.isPrimitive();
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static boolean hasClass(Object inst, Class<?> raw) {
+        // 10-Nov-2016, tatu: Could use `Class.isInstance()` if we didn't care
+        //    about being exactly that type
+        return (inst != null) && (inst.getClass() == raw);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static void verifyMustOverride(Class<?> expType, Object instance,
+            String method)
     {
-        if (classOrInstance == null) {
-            return "unknown";
+        if (instance.getClass() != expType) {
+            throw new IllegalStateException(String.format(
+                    "Sub-class %s (of class %s) must override method '%s'",
+                instance.getClass().getName(), expType.getName(), method));
         }
-        Class<?> cls = (classOrInstance instanceof Class<?>) ?
-            (Class<?>) classOrInstance : classOrInstance.getClass();
-        return cls.getName();
     }
 
-    /*
-    /**********************************************************
-    /* Class loading
-    /**********************************************************
-     */
-
-    /**
-     * @deprecated Since 2.6, use method in {@link com.fasterxml.jackson.databind.type.TypeFactory}.
-     */
-    @Deprecated
-    public static Class<?> findClass(String className) throws ClassNotFoundException
-    {
-        // [JACKSON-597]: support primitive types (and void)
-        if (className.indexOf('.') < 0) {
-            if ("int".equals(className)) return Integer.TYPE;
-            if ("long".equals(className)) return Long.TYPE;
-            if ("float".equals(className)) return Float.TYPE;
-            if ("double".equals(className)) return Double.TYPE;
-            if ("boolean".equals(className)) return Boolean.TYPE;
-            if ("byte".equals(className)) return Byte.TYPE;
-            if ("char".equals(className)) return Character.TYPE;
-            if ("short".equals(className)) return Short.TYPE;
-            if ("void".equals(className)) return Void.TYPE;
-        }
-        // Two-phase lookup: first using context ClassLoader; then default
-        Throwable prob = null;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        
-        if (loader != null) {
-            try {
-                return Class.forName(className, true, loader);
-            } catch (Exception e) {
-                prob = getRootCause(e);
-            }
-        }
-        try {
-            return Class.forName(className);
-        } catch (Exception e) {
-            if (prob == null) {
-                prob = getRootCause(e);
-            }
-        }
-        if (prob instanceof RuntimeException) {
-            throw (RuntimeException) prob;
-        }
-        throw new ClassNotFoundException(prob.getMessage(), prob);
-    }
-
-    /*
-    /**********************************************************
-    /* Caching access to class metadata, added in 2.7
-    /**********************************************************
-     */
-
-    /* 17-Sep-2015, tatu: Although access methods should not be significant
-     *   problems for most proper usage, they may become problematic if
-     *   ObjectMapper has to be re-created; and especially so on Android.
-     *   So let's do somewhat aggressive caching.
-     */
-
-    private final static LRUMap<Class<?>,ClassMetadata> sCached = new LRUMap<Class<?>,ClassMetadata>(48, 48);    
-
-    /**
-     * @since 2.7
-     */
-    public static String getPackageName(Class<?> cls) {
-        return _getMetadata(cls).getPackageName();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static boolean hasEnclosingMethod(Class<?> cls) {
-        return _getMetadata(cls).hasEnclosingMethod();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static Field[] getDeclaredFields(Class<?> cls) {
-        return _getMetadata(cls).getDeclaredFields();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static Method[] getDeclaredMethods(Class<?> cls) {
-        return _getMetadata(cls).getDeclaredMethods();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static Annotation[] findClassAnnotations(Class<?> cls) {
-        return _getMetadata(cls).getDeclaredAnnotations();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static Ctor[] getConstructors(Class<?> cls) {
-        return _getMetadata(cls).getConstructors();
-    }
-
-    // // // Then methods that do NOT cache access but were considered
-    // // // (and could be added to do caching if it was proven effective)
-
-    /**
-     * @since 2.7
-     */
-    public static Class<?> getDeclaringClass(Class<?> cls) {
-        // Caching does not seem worthwhile, as per profiling
-        return isObjectOrPrimitive(cls) ? null : cls.getDeclaringClass();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static Type getGenericSuperclass(Class<?> cls) {
-        return cls.getGenericSuperclass();
-    }
-
-    /**
-     * @since 2.7
-     */
-    public static Type[] getGenericInterfaces(Class<?> cls) {
-        return _getMetadata(cls).getGenericInterfaces();
-    }
-    
-    /**
-     * @since 2.7
-     */
-    public static Class<?> getEnclosingClass(Class<?> cls) {
-        // Caching does not seem worthwhile, as per profiling
-        return isObjectOrPrimitive(cls) ? null : cls.getEnclosingClass();
-    }
-
-    
-    private static Class<?>[] _interfaces(Class<?> cls) {
-        return _getMetadata(cls).getInterfaces();
-    }
-
-    private static ClassMetadata _getMetadata(Class<?> cls)
-    {
-        ClassMetadata md = sCached.get(cls);
-        if (md == null) {
-            md = new ClassMetadata(cls);
-            // tiny optimization, but in case someone concurrently constructed it,
-            // let's use that instance, to reduce extra concurrent work.
-            ClassMetadata old = sCached.putIfAbsent(cls, md);
-            if (old != null) {
-                md = old;
-            }
-        }
-        return md;
-    }
-    
     /*
     /**********************************************************
     /* Method type detection methods
@@ -491,10 +342,55 @@ public final class ClassUtil
 
     /*
     /**********************************************************
-    /* Exception handling
+    /* Exception handling; simple re-throw
     /**********************************************************
      */
 
+    /**
+     * Helper method that will check if argument is an {@link Error},
+     * and if so, (re)throw it; otherwise just return
+     *
+     * @since 2.9
+     */
+    public static Throwable throwIfError(Throwable t) {
+        if (t instanceof Error) {
+            throw (Error) t;
+        }
+        return t;
+    }
+
+    /**
+     * Helper method that will check if argument is an {@link RuntimeException},
+     * and if so, (re)throw it; otherwise just return
+     *
+     * @since 2.9
+     */
+    public static Throwable throwIfRTE(Throwable t) {
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
+        }
+        return t;
+    }
+
+    /**
+     * Helper method that will check if argument is an {@link IOException},
+     * and if so, (re)throw it; otherwise just return
+     *
+     * @since 2.9
+     */
+    public static Throwable throwIfIOE(Throwable t) throws IOException {
+        if (t instanceof IOException) {
+            throw (IOException) t;
+        }
+        return t;
+    }
+
+    /*
+    /**********************************************************
+    /* Exception handling; other
+    /**********************************************************
+     */
+    
     /**
      * Method that can be used to find the "root cause", innermost
      * of chained (wrapped) exceptions.
@@ -508,26 +404,21 @@ public final class ClassUtil
     }
 
     /**
-     * Method that will unwrap root causes of given Throwable, and throw
-     * the innermost {@link Exception} or {@link Error} as is.
-     * This is useful in cases where mandatory wrapping is added, which
-     * is often done by Reflection API.
+     * Method that works like by calling {@link #getRootCause} and then
+     * either throwing it (if instanceof {@link IOException}), or
+     * return.
+     *
+     * @since 2.8
      */
-    public static void throwRootCause(Throwable t) throws Exception
-    {
-        t = getRootCause(t);
-        if (t instanceof Exception) {
-            throw (Exception) t;
-        }
-        throw (Error) t;
+    public static Throwable throwRootCauseIfIOE(Throwable t) throws IOException {
+        return throwIfIOE(getRootCause(t));
     }
-    
+
     /**
      * Method that will wrap 't' as an {@link IllegalArgumentException} if it
      * is a checked exception; otherwise (runtime exception or error) throw as is
      */
-    public static void throwAsIAE(Throwable t)
-    {
+    public static void throwAsIAE(Throwable t) {
         throwAsIAE(t, t.getMessage());
     }
 
@@ -538,13 +429,22 @@ public final class ClassUtil
      */
     public static void throwAsIAE(Throwable t, String msg)
     {
-        if (t instanceof RuntimeException) {
-            throw (RuntimeException) t;
-        }
-        if (t instanceof Error) {
-            throw (Error) t;
-        }
+        throwIfRTE(t);
+        throwIfError(t);
         throw new IllegalArgumentException(msg, t);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static <T> T throwAsMappingException(DeserializationContext ctxt,
+            IOException e0) throws JsonMappingException {
+        if (e0 instanceof JsonMappingException) {
+            throw (JsonMappingException) e0;
+        }
+        JsonMappingException e = JsonMappingException.from(ctxt, e0.getMessage());
+        e.initCause(e0);
+        throw e;
     }
 
     /**
@@ -565,6 +465,65 @@ public final class ClassUtil
     public static void unwrapAndThrowAsIAE(Throwable t, String msg)
     {
         throwAsIAE(getRootCause(t), msg);
+    }
+
+    /**
+     * Helper method that encapsulate logic in trying to close output generator
+     * in case of failure; useful mostly in forcing flush()ing as otherwise
+     * error conditions tend to be hard to diagnose. However, it is often the
+     * case that output state may be corrupt so we need to be prepared for
+     * secondary exception without masking original one.
+     *
+     * @since 2.8
+     */
+    public static void closeOnFailAndThrowAsIOE(JsonGenerator g, Exception fail)
+        throws IOException
+    {
+        /* 04-Mar-2014, tatu: Let's try to prevent auto-closing of
+         *    structures, which typically causes more damage.
+         */
+        g.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
+        try {
+            g.close();
+        } catch (Exception e) {
+            fail.addSuppressed(e);
+        }
+        throwIfIOE(fail);
+        throwIfRTE(fail);
+        throw new RuntimeException(fail);
+    }
+
+    /**
+     * Helper method that encapsulate logic in trying to close given {@link Closeable}
+     * in case of failure; useful mostly in forcing flush()ing as otherwise
+     * error conditions tend to be hard to diagnose. However, it is often the
+     * case that output state may be corrupt so we need to be prepared for
+     * secondary exception without masking original one.
+     *
+     * @since 2.8
+     */
+    public static void closeOnFailAndThrowAsIOE(JsonGenerator g,
+            Closeable toClose, Exception fail)
+        throws IOException
+    {
+        if (g != null) {
+            g.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
+            try {
+                g.close();
+            } catch (Exception e) {
+                fail.addSuppressed(e);
+            }
+        }
+        if (toClose != null) {
+            try {
+                toClose.close();
+            } catch (Exception e) {
+                fail.addSuppressed(e);
+            }
+        }
+        throwIfIOE(fail);
+        throwIfRTE(fail);
+        throw new RuntimeException(fail);
     }
 
     /*
@@ -601,17 +560,17 @@ public final class ClassUtil
         }
     }
 
-    public static <T> Constructor<T> findConstructor(Class<T> cls, boolean canFixAccess)
+    public static <T> Constructor<T> findConstructor(Class<T> cls, boolean forceAccess)
         throws IllegalArgumentException
     {
         try {
             Constructor<T> ctor = cls.getDeclaredConstructor();
-            if (canFixAccess) {
-                checkAndFixAccess(ctor);
+            if (forceAccess) {
+                checkAndFixAccess(ctor, forceAccess);
             } else {
                 // Has to be public...
                 if (!Modifier.isPublic(ctor.getModifiers())) {
-                    throw new IllegalArgumentException("Default constructor for "+cls.getName()+" is not accessible (non-public?): not allowed to try modify access via Reflection: can not instantiate type");
+                    throw new IllegalArgumentException("Default constructor for "+cls.getName()+" is not accessible (non-public?): not allowed to try modify access via Reflection: cannot instantiate type");
                 }
             }
             return ctor;
@@ -621,6 +580,158 @@ public final class ClassUtil
             ClassUtil.unwrapAndThrowAsIAE(e, "Failed to find default constructor of class "+cls.getName()+", problem: "+e.getMessage());
         }
         return null;
+    }
+
+    /*
+    /**********************************************************
+    /* Class name, description access
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.9
+     */
+    public static Class<?> classOf(Object inst) {
+        if (inst == null) {
+            return null;
+        }
+        return inst.getClass();
+    }
+    
+    /**
+     * @since 2.9
+     */
+    public static Class<?> rawClass(JavaType t) {
+        if (t == null) {
+            return null;
+        }
+        return t.getRawClass();
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static <T> T nonNull(T valueOrNull, T defaultValue) {
+        return (valueOrNull == null) ? defaultValue : valueOrNull;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static String nullOrToString(Object value) {
+        if (value == null) {
+            return null;
+        }
+        return value.toString();
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static String nonNullString(String str) {
+        if (str == null) {
+            return "";
+        }
+        return str;
+    }
+
+    /**
+     * Returns either quoted value (with double-quotes) -- if argument non-null
+     * String -- or String NULL (no quotes) (if null).
+     *
+     * @since 2.9
+     */
+    public static String quotedOr(Object str, String forNull) {
+        if (str == null) {
+            return forNull;
+        }
+        return String.format("\"%s\"", str);
+    }
+
+    /*
+    /**********************************************************
+    /* Type name, name, desc handling methods
+    /**********************************************************
+     */
+    
+    /**
+     * Helper method used to construct appropriate description
+     * when passed either type (Class) or an instance; in latter
+     * case, class of instance is to be used.
+     */
+    public static String getClassDescription(Object classOrInstance)
+    {
+        if (classOrInstance == null) {
+            return "unknown";
+        }
+        Class<?> cls = (classOrInstance instanceof Class<?>) ?
+            (Class<?>) classOrInstance : classOrInstance.getClass();
+        return nameOf(cls);
+    }
+
+    /**
+     * Helper method used to construct appropriate description
+     * when passed either type (Class) or an instance; in latter
+     * case, class of instance is to be used.
+     *
+     * @since 2.9
+     */
+    public static String classNameOf(Object inst) {
+        if (inst == null) {
+            return "[null]";
+        }
+        return nameOf(inst.getClass());
+    }
+
+    /**
+     * Returns either `cls.getName()` (if `cls` not null),
+     * or "[null]" if `cls` is null.
+     *
+     * @since 2.9
+     */
+    public static String nameOf(Class<?> cls) {
+        if (cls == null) {
+            return "[null]";
+        }
+        int index = 0;
+        while (cls.isArray()) {
+            ++index;
+            cls = cls.getComponentType();
+        }
+        String base = cls.isPrimitive() ? cls.getSimpleName() : cls.getName();
+        if (index > 0) {
+            StringBuilder sb = new StringBuilder(base);
+            do {
+                sb.append("[]");
+            } while (--index > 0);
+            base = sb.toString();
+        }
+        return backticked(base);
+    }
+
+    /**
+     * Returns either backtick-quoted `named.getName()` (if `named` not null),
+     * or "[null]" if `named` is null.
+     *
+     * @since 2.9
+     */
+    public static String nameOf(Named named) {
+        if (named == null) {
+            return "[null]";
+        }
+        return backticked(named.getName());
+    }
+
+    /**
+     * Returns either `text` or [null].
+     *
+     * @since 2.9
+     */
+    public static String backticked(String text) {
+        if (text == null) {
+            return "[null]";
+        }
+        return new StringBuilder(text.length()+2).append('`').append(text).append('`').toString();
     }
 
     /*
@@ -773,7 +884,6 @@ public final class ClassUtil
          *   always to make it accessible (latter because it will force
          *   skipping checks we have no use for...), so let's always call it.
          */
-        //if (!ao.isAccessible()) {
         try {
             if (force || 
                     (!Modifier.isPublic(member.getModifiers())
@@ -781,18 +891,15 @@ public final class ClassUtil
                 ao.setAccessible(true);
             }
         } catch (SecurityException se) {
-            /* 17-Apr-2009, tatu: Related to [JACKSON-101]: this can fail on
-             *    platforms like EJB and Google App Engine); so let's
-             *    only fail if we really needed it...
-             */
+            // 17-Apr-2009, tatu: Related to [JACKSON-101]: this can fail on platforms like
+            // Google App Engine); so let's only fail if we really needed it...
             if (!ao.isAccessible()) {
                 Class<?> declClass = member.getDeclaringClass();
-                throw new IllegalArgumentException("Can not access "+member+" (from class "+declClass.getName()+"; failed to set access: "+se.getMessage());
+                throw new IllegalArgumentException("Cannot access "+member+" (from class "+declClass.getName()+"; failed to set access: "+se.getMessage());
             }
         }
-        //}
     }
-    
+
     /*
     /**********************************************************
     /* Enum type detection
@@ -809,7 +916,7 @@ public final class ClassUtil
     {
         // First things first: if not empty, easy to determine
         if (!s.isEmpty()) {
-    		    return findEnumType(s.iterator().next());
+            return findEnumType(s.iterator().next());
         }
         // Otherwise need to locate using an internal field
         return EnumTypeLocator.instance.enumTypeFor(s);
@@ -863,42 +970,190 @@ public final class ClassUtil
         return (Class<? extends Enum<?>>) cls;
     }
 
+    /**
+     * A method that will look for the first Enum value annotated with the given Annotation.
+     * <p>
+     * If there's more than one value annotated, the first one found will be returned. Which one exactly is used is undetermined.
+     *
+     * @param enumClass The Enum class to scan for a value with the given annotation
+     * @param annotationClass The annotation to look for.
+     * @return the Enum value annotated with the given Annotation or {@code null} if none is found.
+     * @throws IllegalArgumentException if there's a reflection issue accessing the Enum
+     * @since 2.8
+     */
+    public static <T extends Annotation> Enum<?> findFirstAnnotatedEnumValue(Class<Enum<?>> enumClass, Class<T> annotationClass)
+    {
+        Field[] fields = getDeclaredFields(enumClass);
+        for (Field field : fields) {
+            if (field.isEnumConstant()) {
+                Annotation defaultValueAnnotation = field.getAnnotation(annotationClass);
+                if (defaultValueAnnotation != null) {
+                    final String name = field.getName();
+                    for (Enum<?> enumValue : enumClass.getEnumConstants()) {
+                        if (name.equals(enumValue.name())) {
+                            return enumValue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     /*
     /**********************************************************
     /* Jackson-specific stuff
     /**********************************************************
      */
-    
+
     /**
      * Method that can be called to determine if given Object is the default
      * implementation Jackson uses; as opposed to a custom serializer installed by
      * a module or calling application. Determination is done using
      * {@link JacksonStdImpl} annotation on handler (serializer, deserializer etc)
      * class.
+     *<p>
+     * NOTE: passing `null` is legal, and will result in <code>true</code>
+     * being returned.
      */
     public static boolean isJacksonStdImpl(Object impl) {
-        return (impl != null) && isJacksonStdImpl(impl.getClass());
+        return (impl == null) || isJacksonStdImpl(impl.getClass());
     }
 
     public static boolean isJacksonStdImpl(Class<?> implClass) {
         return (implClass.getAnnotation(JacksonStdImpl.class) != null);
     }
 
-    public static boolean isBogusClass(Class<?> cls) {
-        return (cls == Void.class || cls == Void.TYPE
-                || cls == com.fasterxml.jackson.databind.annotation.NoClass.class);
-    }
+    /*
+    /**********************************************************
+    /* Access to various Class definition aspects; possibly
+    /* cacheable; and attempts was made in 2.7.0 - 2.7.7; however
+    /* unintented retention (~= memory leak) wrt [databind#1363]
+    /* resulted in removal of caching
+    /**********************************************************
+     */
 
-    public static boolean isNonStaticInnerClass(Class<?> cls) {
-        return !Modifier.isStatic(cls.getModifiers())
-                && (getEnclosingClass(cls) != null);
+    /**
+     * @since 2.7
+     */
+    public static String getPackageName(Class<?> cls) {
+        Package pkg = cls.getPackage();
+        return (pkg == null) ? null : pkg.getName();
     }
 
     /**
      * @since 2.7
      */
-    public static boolean isObjectOrPrimitive(Class<?> cls) {
-        return (cls == CLS_OBJECT) || cls.isPrimitive();
+    public static boolean hasEnclosingMethod(Class<?> cls) {
+        return !isObjectOrPrimitive(cls) && (cls.getEnclosingMethod() != null);
+    }
+
+    /**
+     * @since 2.7
+     */
+    public static Field[] getDeclaredFields(Class<?> cls) {
+        return cls.getDeclaredFields();
+    }
+
+    /**
+     * @since 2.7
+     */
+    public static Method[] getDeclaredMethods(Class<?> cls) {
+        return cls.getDeclaredMethods();
+    }
+
+    /**
+     * @since 2.7
+     */
+    public static Annotation[] findClassAnnotations(Class<?> cls) {
+        if (isObjectOrPrimitive(cls)) {
+            return NO_ANNOTATIONS;
+        }
+        return cls.getDeclaredAnnotations();
+    }
+
+    /**
+     * Helper method that gets methods declared in given class; usually a simple thing,
+     * but sometimes (as per [databind#785]) more complicated, depending on classloader
+     * setup.
+     *
+     * @since 2.9
+     */
+    public static Method[] getClassMethods(Class<?> cls)
+    {
+        try {
+            return ClassUtil.getDeclaredMethods(cls);
+        } catch (final NoClassDefFoundError ex) {
+            // One of the methods had a class that was not found in the cls.getClassLoader.
+            // Maybe the developer was nice and has a different class loader for this context.
+            final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            if (loader == null){
+                // Nope... this is going to end poorly
+                throw ex;
+            }
+            final Class<?> contextClass;
+            try {
+                contextClass = loader.loadClass(cls.getName());
+            } catch (ClassNotFoundException e) {
+                ex.addSuppressed(e);
+                throw ex;
+            }
+            return contextClass.getDeclaredMethods(); // Cross fingers
+        }
+    }
+    
+    /**
+     * @since 2.7
+     */
+    public static Ctor[] getConstructors(Class<?> cls) {
+        // Note: can NOT skip abstract classes as they may be used with mix-ins
+        // and for regular use shouldn't really matter.
+        if (cls.isInterface() || isObjectOrPrimitive(cls)) {
+            return NO_CTORS;
+        }
+        Constructor<?>[] rawCtors = cls.getDeclaredConstructors();
+        final int len = rawCtors.length;
+        Ctor[] result = new Ctor[len];
+        for (int i = 0; i < len; ++i) {
+            result[i] = new Ctor(rawCtors[i]);
+        }
+        return result;
+    }
+
+    // // // Then methods that do NOT cache access but were considered
+    // // // (and could be added to do caching if it was proven effective)
+
+    /**
+     * @since 2.7
+     */
+    public static Class<?> getDeclaringClass(Class<?> cls) {
+        return isObjectOrPrimitive(cls) ? null : cls.getDeclaringClass();
+    }
+
+    /**
+     * @since 2.7
+     */
+    public static Type getGenericSuperclass(Class<?> cls) {
+        return cls.getGenericSuperclass();
+    }
+
+    /**
+     * @since 2.7
+     */
+    public static Type[] getGenericInterfaces(Class<?> cls) {
+        return cls.getGenericInterfaces();
+    }
+
+    /**
+     * @since 2.7
+     */
+    public static Class<?> getEnclosingClass(Class<?> cls) {
+        // Caching does not seem worthwhile, as per profiling
+        return isObjectOrPrimitive(cls) ? null : cls.getEnclosingClass();
+    }
+
+    private static Class<?>[] _interfaces(Class<?> cls) {
+        return cls.getInterfaces();
     }
 
     /*
@@ -919,67 +1174,67 @@ public final class ClassUtil
         private final Field enumMapTypeField;
     	
         private EnumTypeLocator() {
-    	    //JDK uses following fields to store information about actual Enumeration
-    	    // type for EnumSets, EnumMaps...
-    	    enumSetTypeField = locateField(EnumSet.class, "elementType", Class.class);
-    	    enumMapTypeField = locateField(EnumMap.class, "elementType", Class.class);
-    	}
+            //JDK uses following fields to store information about actual Enumeration
+            // type for EnumSets, EnumMaps...
+    	        enumSetTypeField = locateField(EnumSet.class, "elementType", Class.class);
+    	        enumMapTypeField = locateField(EnumMap.class, "elementType", Class.class);
+        }
 
-    	@SuppressWarnings("unchecked")
-    	public Class<? extends Enum<?>> enumTypeFor(EnumSet<?> set)
-    	{
-    	    if (enumSetTypeField != null) {
-    	        return (Class<? extends Enum<?>>) get(set, enumSetTypeField);
-    	    }
-    	    throw new IllegalStateException("Can not figure out type for EnumSet (odd JDK platform?)");
-    	}
-
-    	@SuppressWarnings("unchecked")
-    	public Class<? extends Enum<?>> enumTypeFor(EnumMap<?,?> set)
+        @SuppressWarnings("unchecked")
+        public Class<? extends Enum<?>> enumTypeFor(EnumSet<?> set)
         {
-    	    if (enumMapTypeField != null) {
-    	        return (Class<? extends Enum<?>>) get(set, enumMapTypeField);
-    	    }
-    	    throw new IllegalStateException("Can not figure out type for EnumMap (odd JDK platform?)");
+            if (enumSetTypeField != null) {
+                return (Class<? extends Enum<?>>) get(set, enumSetTypeField);
+            }
+            throw new IllegalStateException("Cannot figure out type for EnumSet (odd JDK platform?)");
+        }
+
+        @SuppressWarnings("unchecked")
+        public Class<? extends Enum<?>> enumTypeFor(EnumMap<?,?> set)
+        {
+            if (enumMapTypeField != null) {
+                return (Class<? extends Enum<?>>) get(set, enumMapTypeField);
+            }
+            throw new IllegalStateException("Cannot figure out type for EnumMap (odd JDK platform?)");
         }
     	
-    	private Object get(Object bean, Field field)
-    	{
-    	    try {
-    	        return field.get(bean);
-    	    } catch (Exception e) {
-    	        throw new IllegalArgumentException(e);
-    	    }
-    	}
+        private Object get(Object bean, Field field)
+        {
+            try {
+                return field.get(bean);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
     	
-    	private static Field locateField(Class<?> fromClass, String expectedName, Class<?> type)
-    	{
-    	    Field found = null;
-    	    // First: let's see if we can find exact match:
-    	    Field[] fields = getDeclaredFields(fromClass);
-    	    for (Field f : fields) {
-    	        if (expectedName.equals(f.getName()) && f.getType() == type) {
-    	            found = f;
-    	            break;
-    	        }
-    	    }
-    	    // And if not, if there is just one field with the type, that field
-    	    if (found == null) {
+        private static Field locateField(Class<?> fromClass, String expectedName, Class<?> type)
+        {
+            Field found = null;
+    	        // First: let's see if we can find exact match:
+            Field[] fields = getDeclaredFields(fromClass);
     	        for (Field f : fields) {
-    	            if (f.getType() == type) {
-    	                // If more than one, can't choose
-    	                if (found != null) return null;
+    	            if (expectedName.equals(f.getName()) && f.getType() == type) {
     	                found = f;
+    	                break;
     	            }
     	        }
-    	    }
-    	    if (found != null) { // it's non-public, need to force accessible
-    	        try {
-    	            found.setAccessible(true);
-    	        } catch (Throwable t) { }
-    	    }
-    	    return found;
-    	}
+    	        // And if not, if there is just one field with the type, that field
+    	        if (found == null) {
+    	            for (Field f : fields) {
+    	                if (f.getType() == type) {
+    	                    // If more than one, can't choose
+    	                    if (found != null) return null;
+    	                    found = f;
+    	                }
+    	            }
+    	        }
+    	        if (found != null) { // it's non-public, need to force accessible
+    	            try {
+    	                found.setAccessible(true);
+    	            } catch (Throwable t) { }
+    	        }
+    	        return found;
+        }
     }
 
     /*
@@ -987,144 +1242,6 @@ public final class ClassUtil
     /* Helper classed used for caching
     /**********************************************************
      */
-
-    /**
-     * @since 2.7
-     */
-    private final static class ClassMetadata
-    {
-        private final static Annotation[] NO_ANNOTATIONS = new Annotation[0];
-        private final static Ctor[] NO_CTORS = new Ctor[0];
-
-        private final Class<?> _forClass;
-
-        private String _packageName;
-        private Boolean _hasEnclosingMethod;
-
-        private Class<?>[] _interfaces;
-        private Type[] _genericInterfaces;
-
-        private Annotation[] _annotations;
-        private Ctor[] _constructors;
-        private Field[] _fields;
-        private Method[] _methods;
-
-        public ClassMetadata(Class<?> forClass) {
-            _forClass = forClass;
-        }
-
-        public String getPackageName() {
-            String name = _packageName;
-            if (name == null) {
-                Package pkg = _forClass.getPackage();
-                name = (pkg == null) ? null : pkg.getName();
-                if (name == null) {
-                    name = "";
-                }
-                _packageName = name;
-            }
-            return (name == "") ? null : name;
-        }
-
-        // 19-Sep-2015, tatu: Bit of performance improvement, after finding this
-        //   in profile; maybe 5% in "wasteful" deserialization case
-        public Class<?>[] getInterfaces() {
-            Class<?>[] result = _interfaces;
-            if (result == null) {
-                result = _forClass.getInterfaces();
-                _interfaces = result;
-            }
-            return result;
-        }
-
-        // 30-Oct-2015, tatu: Minor performance boost too (5% or less)
-        public Type[] getGenericInterfaces() {
-            Type[] result = _genericInterfaces;
-            if (result == null) {
-                result = _forClass.getGenericInterfaces();
-                _genericInterfaces = result;
-            }
-            return result;
-        }
-
-        // 19-Sep-2015, tatu: Modest performance improvement, after finding this
-        //   in profile; maybe 2-3% in "wasteful" deserialization case
-        public Annotation[] getDeclaredAnnotations() {
-            Annotation[] result = _annotations;
-            if (result == null) {
-                result = isObjectOrPrimitive() ? NO_ANNOTATIONS : _forClass.getDeclaredAnnotations();
-                _annotations = result;
-            }
-            return result;
-        }
-
-        // 19-Sep-2015, tatu: Some performance improvement, after finding this
-        //   in profile; maybe 8-10% in "wasteful" deserialization case
-        public Ctor[] getConstructors() {
-            Ctor[] result = _constructors;
-            if (result == null) {
-                // Note: can NOT skip abstract classes as they may be used with mix-ins
-                // and for regular use shouldn't really matter.
-                if (_forClass.isInterface() || isObjectOrPrimitive()) {
-                    result = NO_CTORS;
-                } else {
-                    Constructor<?>[] rawCtors = _forClass.getDeclaredConstructors();
-                    final int len = rawCtors.length;
-                    result = new Ctor[len];
-                    for (int i = 0; i < len; ++i) {
-                        result[i] = new Ctor(rawCtors[i]);
-                    }
-                }
-                _constructors = result;
-            }
-            return result;
-        }
-
-        // 21-Spe-2015, tatu: Surprisingly significant improvement (+10%)...
-        public Field[] getDeclaredFields() {
-            Field[] fields = _fields;
-            if (fields == null) {
-                fields = _forClass.getDeclaredFields();
-                _fields = fields;
-            }
-            return fields;
-        }
-
-        // 21-Spe-2015, tatu: Surprisingly significant improvement (+30%)...
-        public Method[] getDeclaredMethods() {
-            Method[] methods = _methods;
-            if (methods == null) {
-                methods = _forClass.getDeclaredMethods();
-                _methods = methods;
-            }
-            return methods;
-        }
-
-        // Prominently listed on profiling when not cached, improvement
-        // modest, 1-2% range; but at least is measurable so keep it
-        public boolean hasEnclosingMethod() {
-            Boolean b = _hasEnclosingMethod;
-            if (b == null) {
-                b = isObjectOrPrimitive() ? Boolean.FALSE : Boolean.valueOf(_forClass.getEnclosingMethod() != null);
-                _hasEnclosingMethod = b;
-            }
-            return b.booleanValue();
-        }
-
-        private boolean isObjectOrPrimitive() {
-            return (_forClass == CLS_OBJECT) || _forClass.isPrimitive();
-        }
-
-        /* And then we have a bunch of accessors that did show up in profiling
-         * of "wasteful" cases, but for which caching did not yield non-trivial
-         * improvements (for tests less than 1% improvement)
-         */
-
-        // Caching does not seem worthwhile, as per profiling
-//        public Type getGenericSuperclass();
-//        public Class<?> getDeclaringClass();
-//        public Class<?> getEnclosingClass();
-    }
 
     /**
      * Value class used for caching Constructor declarations; used because
@@ -1163,7 +1280,6 @@ public final class ClassUtil
             return _ctor.getDeclaringClass();
         }
 
-        // Modest boost: maybe 1%?
         public Annotation[] getDeclaredAnnotations() {
             Annotation[] result = _annotations;
             if (result == null) {
@@ -1173,7 +1289,6 @@ public final class ClassUtil
             return result;
         }
 
-        // Modest boost: maybe 1%?
         public  Annotation[][] getParameterAnnotations() {
             Annotation[][] result = _paramAnnotations;
             if (result == null) {

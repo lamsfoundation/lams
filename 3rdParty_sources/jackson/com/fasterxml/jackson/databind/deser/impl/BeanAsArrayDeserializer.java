@@ -1,11 +1,10 @@
 package com.fasterxml.jackson.databind.deser.impl;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.*;
 import com.fasterxml.jackson.databind.util.NameTransformer;
@@ -22,7 +21,7 @@ public class BeanAsArrayDeserializer
     private static final long serialVersionUID = 1L;
 
     /**
-     * Deserializer we delegate operations that we can not handle.
+     * Deserializer we delegate operations that we cannot handle.
      */
     protected final BeanDeserializerBase _delegate;
 
@@ -61,17 +60,23 @@ public class BeanAsArrayDeserializer
     }
 
     @Override
-    public BeanAsArrayDeserializer withObjectIdReader(ObjectIdReader oir) {
+    public BeanDeserializerBase withObjectIdReader(ObjectIdReader oir) {
         return new BeanAsArrayDeserializer(_delegate.withObjectIdReader(oir),
                 _orderedProperties);
     }
 
     @Override
-    public BeanAsArrayDeserializer withIgnorableProperties(HashSet<String> ignorableProps) {
+    public BeanDeserializerBase withIgnorableProperties(Set<String> ignorableProps) {
         return new BeanAsArrayDeserializer(_delegate.withIgnorableProperties(ignorableProps),
                 _orderedProperties);
     }
 
+    @Override
+    public BeanDeserializerBase withBeanProperties(BeanPropertyMap props) {
+        return new BeanAsArrayDeserializer(_delegate.withBeanProperties(props),
+                _orderedProperties);
+    }
+    
     @Override
     protected BeanDeserializerBase asArrayDeserializer() {
         return this;
@@ -121,14 +126,16 @@ public class BeanAsArrayDeserializer
             ++i;
         }
         // Ok; extra fields? Let's fail, unless ignoring extra props is fine
-        if (!_ignoreAllUnknown) {
-            throw ctxt.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)",
+        if (!_ignoreAllUnknown && ctxt.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)) {
+            ctxt.reportWrongTokenException(this, JsonToken.END_ARRAY,
+                    "Unexpected JSON values; expected at most %d properties (in JSON Array)",
                     propCount);
+            // never gets here
         }
         // otherwise, skip until end
-        while (p.nextToken() != JsonToken.END_ARRAY) {
+        do {
             p.skipChildren();
-        }
+        } while (p.nextToken() != JsonToken.END_ARRAY);
         return bean;
     }
 
@@ -138,6 +145,11 @@ public class BeanAsArrayDeserializer
     {
         // [databind#631]: Assign current value, to be accessible by custom serializers
         p.setCurrentValue(bean);
+
+        if (!p.isExpectedStartArrayToken()) {
+            return _deserializeFromNonArray(p, ctxt);
+        }
+        
         /* No good way to verify that we have an array... although could I guess
          * check via JsonParser. So let's assume everything is working fine, for now.
          */
@@ -168,17 +180,18 @@ public class BeanAsArrayDeserializer
         }
         
         // Ok; extra fields? Let's fail, unless ignoring extra props is fine
-        if (!_ignoreAllUnknown) {
-            throw ctxt.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)",
+        if (!_ignoreAllUnknown && ctxt.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)) {
+            ctxt.reportWrongTokenException(this, JsonToken.END_ARRAY,
+                    "Unexpected JSON values; expected at most %d properties (in JSON Array)",
                     propCount);
+            // never gets here
         }
         // otherwise, skip until end
-        while (p.nextToken() != JsonToken.END_ARRAY) {
+        do {
             p.skipChildren();
-        }
+        } while (p.nextToken() != JsonToken.END_ARRAY);
         return bean;
     }
-
 
     // needed since 2.1
     @Override
@@ -187,7 +200,7 @@ public class BeanAsArrayDeserializer
     {
         return _deserializeFromNonArray(p, ctxt);
     }
-    
+
     /*
     /**********************************************************
     /* Helper methods, non-standard creation
@@ -202,7 +215,7 @@ public class BeanAsArrayDeserializer
         throws IOException
     {
         if (_nonStandardCreation) {
-            return _deserializeWithCreator(p, ctxt);
+            return deserializeFromObjectUsingNonDefault(p, ctxt);
         }
         final Object bean = _valueInstantiator.createUsingDefault(ctxt);
         // [databind#631]: Assign current value, to be accessible by custom serializers
@@ -214,6 +227,7 @@ public class BeanAsArrayDeserializer
         final SettableBeanProperty[] props = _orderedProperties;
         int i = 0;
         final int propCount = props.length;
+
         while (true) {
             if (p.nextToken() == JsonToken.END_ARRAY) {
                 return bean;
@@ -238,32 +252,16 @@ public class BeanAsArrayDeserializer
         }
         // Ok; extra fields? Let's fail, unless ignoring extra props is fine
         if (!_ignoreAllUnknown) {
-            throw ctxt.mappingException("Unexpected JSON values; expected at most %d properties (in JSON Array)",
+            ctxt.reportWrongTokenException(this, JsonToken.END_ARRAY,
+                    "Unexpected JSON values; expected at most %d properties (in JSON Array)",
                     propCount);
+            // will never reach here as exception has been thrown
         }
         // otherwise, skip until end
-        while (p.nextToken() != JsonToken.END_ARRAY) {
+        do {
             p.skipChildren();
-        }
+        } while (p.nextToken() != JsonToken.END_ARRAY);
         return bean;
-    }
-    
-    protected Object _deserializeWithCreator(JsonParser p, DeserializationContext ctxt)
-        throws IOException
-    {        
-        if (_delegateDeserializer != null) {
-            return _valueInstantiator.createUsingDelegate(ctxt, _delegateDeserializer.deserialize(p, ctxt));
-        }
-        if (_propertyBasedCreator != null) {
-            return _deserializeUsingPropertyBased(p, ctxt);
-        }
-        // should only occur for abstract types...
-        if (_beanType.isAbstract()) {
-            throw JsonMappingException.from(p, "Can not instantiate abstract type "+_beanType
-                    +" (need to add/enable type information?)");
-        }
-        throw JsonMappingException.from(p, "No suitable constructor found for type "
-                +_beanType+": can not instantiate from JSON object (need to add/enable type information?)");
     }
 
     /**
@@ -285,13 +283,19 @@ public class BeanAsArrayDeserializer
         final int propCount = props.length;
         int i = 0;
         Object bean = null;
-        
+        final Class<?> activeView = _needViewProcesing ? ctxt.getActiveView() : null;
+
         for (; p.nextToken() != JsonToken.END_ARRAY; ++i) {
             SettableBeanProperty prop = (i < propCount) ? props[i] : null;
             if (prop == null) { // we get null if there are extra elements; maybe otherwise too?
                 p.skipChildren();
                 continue;
             }
+            if ((activeView != null) && !prop.visibleInView(activeView)) {
+                p.skipChildren();
+                continue;
+            }
+
             // if we have already constructed POJO, things are simple:
             if (bean != null) {
                 try {
@@ -322,9 +326,10 @@ public class BeanAsArrayDeserializer
                          *   supported (since ordering of elements may not be guaranteed);
                          *   but make explicitly non-supported for now.
                          */
-                        throw ctxt.mappingException("Can not support implicit polymorphic deserialization for POJOs-as-Arrays style: "
+                        ctxt.reportBadDefinition(_beanType, String.format(
+                                "Cannot support implicit polymorphic deserialization for POJOs-as-Arrays style: "
                                 +"nominal type %s, actual type %s",
-                                _beanType.getRawClass().getName(), bean.getClass().getName());
+                                _beanType.getRawClass().getName(), bean.getClass().getName()));
                     }
                 }
                 continue;
@@ -342,8 +347,7 @@ public class BeanAsArrayDeserializer
             try {
                 bean = creator.build(ctxt, buffer);
             } catch (Exception e) {
-                wrapInstantiationProblem(e, ctxt);
-                return null; // never gets here
+                return wrapInstantiationProblem(e, ctxt);
             }
         }
         return bean;
@@ -358,8 +362,8 @@ public class BeanAsArrayDeserializer
     protected Object _deserializeFromNonArray(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        // Let's start with failure
-        throw ctxt.mappingException("Can not deserialize a POJO (of type %s) from non-Array representation (token: %s): "
+        return ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+                "Cannot deserialize a POJO (of type %s) from non-Array representation (token: %s): "
                 +"type/property designed to be serialized as JSON Array",
                 _beanType.getRawClass().getName(),
                 p.getCurrentToken());

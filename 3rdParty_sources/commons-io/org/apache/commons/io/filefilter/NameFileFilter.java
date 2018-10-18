@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.apache.commons.io.IOCase;
 /**
  * Filters filenames for a certain name.
  * <p>
- * For example, to print all files and directories in the 
+ * For example, to print all files and directories in the
  * current directory whose name is <code>Test</code>:
  *
  * <pre>
@@ -37,12 +37,13 @@ import org.apache.commons.io.IOCase;
  * </pre>
  *
  * @since 1.0
- *
+ * @version $Id: NameFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @see FileFilterUtils#nameFileFilter(String)
  * @see FileFilterUtils#nameFileFilter(String, IOCase)
  */
 public class NameFileFilter extends AbstractFileFilter implements Serializable {
-    
+
+    private static final long serialVersionUID = 176844364689077340L;
     /** The filenames to search for */
     private final String[] names;
     /** Whether the comparison is case sensitive. */
@@ -50,11 +51,11 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
 
     /**
      * Constructs a new case-sensitive name file filter for a single name.
-     * 
+     *
      * @param name  the name to allow, must not be null
      * @throws IllegalArgumentException if the name is null
      */
-    public NameFileFilter(String name) {
+    public NameFileFilter(final String name) {
         this(name, null);
     }
 
@@ -65,7 +66,7 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
      * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
      * @throws IllegalArgumentException if the name is null
      */
-    public NameFileFilter(String name, IOCase caseSensitivity) {
+    public NameFileFilter(final String name, final IOCase caseSensitivity) {
         if (name == null) {
             throw new IllegalArgumentException("The wildcard must not be null");
         }
@@ -78,25 +79,22 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
      * <p>
      * The array is not cloned, so could be changed after constructing the
      * instance. This would be inadvisable however.
-     * 
+     *
      * @param names  the names to allow, must not be null
      * @throws IllegalArgumentException if the names array is null
      */
-    public NameFileFilter(String[] names) {
+    public NameFileFilter(final String[] names) {
         this(names, null);
     }
 
     /**
      * Constructs a new name file filter for an array of names specifying case-sensitivity.
-     * <p>
-     * The array is not cloned, so could be changed after constructing the
-     * instance. This would be inadvisable however.
-     * 
+     *
      * @param names  the names to allow, must not be null
      * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
      * @throws IllegalArgumentException if the names array is null
      */
-    public NameFileFilter(String[] names, IOCase caseSensitivity) {
+    public NameFileFilter(final String[] names, final IOCase caseSensitivity) {
         if (names == null) {
             throw new IllegalArgumentException("The array of names must not be null");
         }
@@ -107,24 +105,24 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
 
     /**
      * Constructs a new case-sensitive name file filter for a list of names.
-     * 
+     *
      * @param names  the names to allow, must not be null
      * @throws IllegalArgumentException if the name list is null
      * @throws ClassCastException if the list does not contain Strings
      */
-    public NameFileFilter(List<String> names) {
+    public NameFileFilter(final List<String> names) {
         this(names, null);
     }
 
     /**
      * Constructs a new name file filter for a list of names specifying case-sensitivity.
-     * 
+     *
      * @param names  the names to allow, must not be null
      * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
      * @throws IllegalArgumentException if the name list is null
      * @throws ClassCastException if the list does not contain Strings
      */
-    public NameFileFilter(List<String> names, IOCase caseSensitivity) {
+    public NameFileFilter(final List<String> names, final IOCase caseSensitivity) {
         if (names == null) {
             throw new IllegalArgumentException("The list of names must not be null");
         }
@@ -135,14 +133,14 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
     //-----------------------------------------------------------------------
     /**
      * Checks to see if the filename matches.
-     * 
+     *
      * @param file  the File to check
      * @return true if the filename matches
      */
     @Override
-    public boolean accept(File file) {
-        String name = file.getName();
-        for (String name2 : this.names) {
+    public boolean accept(final File file) {
+        final String name = file.getName();
+        for (final String name2 : this.names) {
             if (caseSensitivity.checkEquals(name, name2)) {
                 return true;
             }
@@ -152,14 +150,14 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
 
     /**
      * Checks to see if the filename matches.
-     * 
+     *
      * @param dir  the File directory (ignored)
      * @param name  the filename
      * @return true if the filename matches
      */
     @Override
-    public boolean accept(File dir, String name) {
-        for (String name2 : names) {
+    public boolean accept(final File dir, final String name) {
+        for (final String name2 : names) {
             if (caseSensitivity.checkEquals(name, name2)) {
                 return true;
             }
@@ -174,7 +172,7 @@ public class NameFileFilter extends AbstractFileFilter implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(super.toString());
         buffer.append("(");
         if (names != null) {

@@ -22,7 +22,7 @@ import java.util.List;
  * Defines operations for conditional file filters.
  *
  * @since 1.1
- *
+ * @version $Id: ConditionalFileFilter.java 1307462 2012-03-30 15:13:11Z ggregory $
  */
 public interface ConditionalFileFilter {
 

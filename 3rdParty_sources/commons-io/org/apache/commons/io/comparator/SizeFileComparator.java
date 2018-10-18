@@ -33,23 +33,25 @@ import org.apache.commons.io.FileUtils;
  * {@link #SIZE_COMPARATOR} singleton instance:
  * <pre>
  *       List&lt;File&gt; list = ...
- *       SizeFileComparator.SIZE_COMPARATOR.sort(list);
+ *       ((AbstractFileComparator) SizeFileComparator.SIZE_COMPARATOR).sort(list);
  * </pre>
  * <p>
  * Example of doing a <i>reverse</i> sort of an array of files using the
  * {@link #SIZE_REVERSE} singleton instance:
  * <pre>
  *       File[] array = ...
- *       SizeFileComparator.SIZE_REVERSE.sort(array);
+ *       ((AbstractFileComparator) SizeFileComparator.SIZE_REVERSE).sort(array);
  * </pre>
  * <p>
  * <strong>N.B.</strong> Directories are treated as <b>zero size</b> unless
  * <code>sumDirectoryContents</code> is {@code true}.
  *
- *
+ * @version $Id: SizeFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 public class SizeFileComparator extends AbstractFileComparator implements Serializable {
+
+    private static final long serialVersionUID = -1201561106411416190L;
 
     /** Size comparator instance - directories are treated as zero size */
     public static final Comparator<File> SIZE_COMPARATOR = new SizeFileComparator();
@@ -90,7 +92,7 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
      *  should be calculated, otherwise {@code false} if directories should be treated
      *  as size zero (see {@link FileUtils#sizeOfDirectory(File)}).
      */
-    public SizeFileComparator(boolean sumDirectoryContents) {
+    public SizeFileComparator(final boolean sumDirectoryContents) {
         this.sumDirectoryContents = sumDirectoryContents;
     }
 
@@ -105,7 +107,7 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
      * is greater than the second file.
      * 
      */
-    public int compare(File file1, File file2) {
+    public int compare(final File file1, final File file2) {
         long size1 = 0;
         if (file1.isDirectory()) {
             size1 = sumDirectoryContents && file1.exists() ? FileUtils.sizeOfDirectory(file1) : 0;
@@ -118,7 +120,7 @@ public class SizeFileComparator extends AbstractFileComparator implements Serial
         } else {
             size2 = file2.length();
         }
-        long result = size1 - size2;
+        final long result = size1 - size2;
         if (result < 0) {
             return -1;
         } else if (result > 0) {

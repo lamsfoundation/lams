@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.*;
@@ -29,7 +30,7 @@ public abstract class ArraySerializerBase<T>
      * @since 2.6
      */
     protected final Boolean _unwrapSingle;
-    
+
     protected ArraySerializerBase(Class<T> cls)
     {
         super(cls);
@@ -87,14 +88,14 @@ public abstract class ArraySerializerBase<T>
             Boolean unwrapSingle);
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider provider,
+    public JsonSerializer<?> createContextual(SerializerProvider serializers,
             BeanProperty property) throws JsonMappingException
     {
         Boolean unwrapSingle = null;
 
         // First: if we have a property, may have property-annotation overrides
         if (property != null) {
-            JsonFormat.Value format = property.findPropertyFormat(provider.getConfig(), _handledType);
+            JsonFormat.Value format = findFormatOverrides(serializers, property, handledType());
             if (format != null) {
                 unwrapSingle = format.getFeature(JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
                 if (unwrapSingle != _unwrapSingle) {
@@ -111,34 +112,42 @@ public abstract class ArraySerializerBase<T>
     @Override
     public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        if (((_unwrapSingle == null) &&
-                provider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED))
-                || (_unwrapSingle == Boolean.TRUE)) {
+        if (_shouldUnwrapSingle(provider)) {
             if (hasSingleElement(value)) {
                 serializeContents(value, gen, provider);
                 return;
             }
         }
+        gen.setCurrentValue(value);
         gen.writeStartArray();
         // [databind#631]: Assign current value, to be accessible by custom serializers
-        gen.setCurrentValue(value);
         serializeContents(value, gen, provider);
         gen.writeEndArray();
     }
 
     @Override
-    public final void serializeWithType(T value, JsonGenerator gen, SerializerProvider provider,
+    public final void serializeWithType(T value, JsonGenerator g, SerializerProvider provider,
             TypeSerializer typeSer)
         throws IOException
     {
-        // note: let's NOT consider [JACKSON-805] here; gets too complicated, and probably just won't work
-        typeSer.writeTypePrefixForArray(value, gen);
         // [databind#631]: Assign current value, to be accessible by custom serializers
-        gen.setCurrentValue(value);
-        serializeContents(value, gen, provider);
-        typeSer.writeTypeSuffixForArray(value, gen);
+        g.setCurrentValue(value);
+        WritableTypeId typeIdDef = typeSer.writeTypePrefix(g,
+                typeSer.typeId(value, JsonToken.START_ARRAY));
+        serializeContents(value, g, provider);
+        typeSer.writeTypeSuffix(g, typeIdDef);
     }
-    
+
     protected abstract void serializeContents(T value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException;
+
+    /**
+     * @since 2.9
+     */
+    protected final boolean _shouldUnwrapSingle(SerializerProvider provider) {
+        if (_unwrapSingle == null) {
+            return provider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED);
+        }
+        return _unwrapSingle.booleanValue();
+    }
 }

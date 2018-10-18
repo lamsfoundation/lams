@@ -52,7 +52,9 @@ public class UsernamePasswordCredentials implements Credentials, Serializable {
      *
      * @param usernamePassword the username:password formed string
      * @see #toString
+     * @deprecated (4.5) will be replaced with {@code String}, {@code char[]} in 5.0
      */
+    @Deprecated
     public UsernamePasswordCredentials(final String usernamePassword) {
         super();
         Args.notNull(usernamePassword, "Username:password string");

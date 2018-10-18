@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
 
 /**
  * We also want to directly support serialization of {@link TokenBuffer};
- * and since it is part of core package, it can not implement
+ * and since it is part of core package, it cannot implement
  * {@link com.fasterxml.jackson.databind.JsonSerializable}
  * (which is only included in the mapper package)
  */
@@ -28,7 +29,7 @@ public class TokenBufferSerializer
 
     @Override
     public void serialize(TokenBuffer value, JsonGenerator jgen, SerializerProvider provider)
-            throws IOException
+        throws IOException
     {
         value.serialize(jgen);
     }
@@ -44,14 +45,17 @@ public class TokenBufferSerializer
      * than doing introspection on both serialization and deserialization.
      */
     @Override
-    public final void serializeWithType(TokenBuffer value, JsonGenerator jgen, SerializerProvider provider,
-            TypeSerializer typeSer) throws IOException
+    public final void serializeWithType(TokenBuffer value, JsonGenerator g,
+            SerializerProvider provider, TypeSerializer typeSer) throws IOException
     {
-        typeSer.writeTypePrefixForScalar(value, jgen);
-        serialize(value, jgen, provider);
-        typeSer.writeTypeSuffixForScalar(value, jgen);
+        // 28-Jun-2017, tatu: As per javadoc, not sure what to report as likely shape. Could
+        //    even look into first actual token inside... but, for now let's keep it simple
+        WritableTypeId typeIdDef = typeSer.writeTypePrefix(g,
+                typeSer.typeId(value, JsonToken.VALUE_EMBEDDED_OBJECT));
+        serialize(value, g, provider);
+        typeSer.writeTypeSuffix(g, typeIdDef);
     }
-    
+
     @Override
     public JsonNode getSchema(SerializerProvider provider, Type typeHint)
     {

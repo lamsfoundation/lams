@@ -19,7 +19,6 @@
 package io.undertow.attribute;
 
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 
 /**
  * The local server name
@@ -39,7 +38,7 @@ public class LocalServerNameAttribute implements ExchangeAttribute {
 
     @Override
     public String readAttribute(final HttpServerExchange exchange) {
-        return exchange.getRequestHeaders().getFirst(Headers.HOST);
+        return exchange.getHostName();
     }
 
     @Override
