@@ -312,8 +312,9 @@
 							 subGrid : hasArchivedMarks,
 							 subGridRowExpanded: function(subgrid_id, row_id) {
 							    var subgrid_table_id = subgrid_id + "_t",
-							   	    rowData = jQuery("#" + subgrid_id.substring(0, subgrid_id.lastIndexOf('_'))).getRowData(row_id),
-							   	    activityID = rowData["id"].split("_")[0];
+						    		nameParts = subgrid_id.split("_"),
+						   	    	activityID = nameParts[3],
+						   	    	userID = nameParts[1];
 								jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 								jQuery("#"+subgrid_table_id).jqGrid({
 										 guiStyle: "bootstrap",
@@ -328,63 +329,31 @@
 									     pager: false,
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
-									    	"<fmt:message key="gradebook.columntitle.restart"/>",
-									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.progress"/>",
 									     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 									    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 									    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.mark"/>"
 									     ],
 									     colModel: [
-									       	{name:'id', index:'id',  sortable:false, editable: false ,width:40, align:"right"},
-									       	{name:'restart',index:'restart', sortable:false, editable: false, width:60,align:"left"},
-											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:50, align:"center" },
+									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
 											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
 											{name:'timeTaken',index:'timeTaken', sortable:false, editable: false, width:80, align:"center"},
 										    {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 										    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
 											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
 									     ],
 									     loadError: function(xhr,st,err) {
 									    	jQuery("#"+subgrid_table_id).clearGridData();
 									 	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
-									     },
-									     formatCell: function(rowid, cellname,value, iRow, iCol) {
-								    	 	if (cellname == "mark") {
-								    	 		
-								    	 		var rowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
-								    	 		var string = removeHTMLTags(rowData["mark"]);
-								    	 		
-								    	 		
-								    	 		if (string.indexOf("-") != -1)
-								    	 		{
-								    	 			string = " ";
-								    	 			
-								    	 		} else if (string.indexOf("/") != -1) {
-								    	 			splits = string.split("/");
-								    	 			
-								    	 			if(splits.length == 2) {
-								    	 				tempMark = splits[0];
-								    	 				string = " ";
-								    	 			} else {
-								    	 				string = " ";
-								    	 			}
-								    	 		}
-								    	 		
-								    	 		return string;
-								    	 		
-								    	 	}
-								    	 },
-										 gridComplete: function(){
-										 	toolTip($(".jqgrow"), "jqgridTooltip");
-										 }
+									     }
 								  	});
-							}
+								}
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
-					  
 					},
 					gridComplete: function(){
 				   	 	initializePortraitPopover('<lams:LAMSURL/>');
@@ -466,8 +435,9 @@
 						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 						     	"<fmt:message key="gradebook.columntitle.mark"/>",
-							    	'portraitId',
-						     	'activityURL'
+							    'portraitId',
+						     	'activityURL',
+						     	'hasArchivedMarks'
 						     ],
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -480,7 +450,8 @@
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"},
 						     	{name:'portraitId', index:'portraitId', width:0, hidden: true},
-						     	{name:'activityURL', index:'activityURL', width:0, hidden: true}
+						     	{name:'activityURL', index:'activityURL', width:0, hidden: true},
+							    {name:'hasArchivedMarks', index:'hasArchivedMarks', width:0, hidden: true}
 						     ],
 						     loadError: function(xhr,st,err) {
 						    		jQuery("#"+subgrid_table_id).clearGridData();
@@ -552,7 +523,56 @@
 							 gridComplete: function(){
 						   	 	initializePortraitPopover('<lams:LAMSURL/>');
 						   	 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
-							 }
+							 },
+							 subGrid : true,
+							 subGridOptions: {
+							    hasSubgrid: function (options) {
+							        return options.data.hasArchivedMarks == 'true';
+							    }
+							 },
+							 subGridRowExpanded: function(subgrid_id, row_id) {
+							    var subgrid_table_id = subgrid_id + "_t",
+							    	nameParts = subgrid_id.split("_"),
+							   	    activityID = nameParts[1],
+							   	    userID = nameParts[3];
+								jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+								jQuery("#"+subgrid_table_id).jqGrid({
+										 guiStyle: "bootstrap",
+										 iconSet: 'fontAwesome',
+										 autoencode:false,
+									     datatype: "xml",
+									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
+										      + activityID + "&view=monUserView&userID=" + userID,
+									     height: "100%",
+									     autowidth:true,
+									     cellEdit:false,
+									     pager: false,
+									     colNames: [
+									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
+									     	"<fmt:message key="gradebook.columntitle.progress"/>",
+									     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+									    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+									    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
+									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
+									     	"<fmt:message key="gradebook.columntitle.mark"/>"
+									     ],
+									     colModel: [
+									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
+											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
+											{name:'timeTaken',index:'timeTaken', sortable:false, editable: false, width:80, align:"center"},
+										    {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+										    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
+											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
+									     ],
+									     loadError: function(xhr,st,err) {
+									    	jQuery("#"+subgrid_table_id).clearGridData();
+									 	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
+									     }
+								  	});
+								}
 						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
 						 jQuery("#"+subgrid_table_id).jqGrid('filterToolbar');
 
