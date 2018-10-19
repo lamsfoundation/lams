@@ -156,7 +156,7 @@ public class OutcomeController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("/outcomeEdit")
+    @RequestMapping("/outcomeSave")
     public String outcomeSave(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -575,7 +575,7 @@ public class OutcomeController {
     }
 
     @RequestMapping("/scaleEdit")
-    public String scaleEdit(@ModelAttribute OutcomeScaleForm scaleForm, HttpServletRequest request,
+    public String scaleEdit(@ModelAttribute("scaleForm") OutcomeScaleForm scaleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
 	Long scaleId = WebUtil.readLongParam(request, "scaleId", true);
@@ -613,7 +613,7 @@ public class OutcomeController {
     }
 
     @RequestMapping("/scaleSave")
-    public String scaleSave(@ModelAttribute OutcomeScaleForm scaleForm, HttpServletRequest request,
+    public String scaleSave(@ModelAttribute("scaleForm") OutcomeScaleForm scaleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
 	Long scaleId = scaleForm.getScaleId();

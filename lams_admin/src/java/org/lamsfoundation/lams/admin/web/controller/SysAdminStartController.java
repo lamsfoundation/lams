@@ -63,6 +63,7 @@ public class SysAdminStartController {
 	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
 	    links.add(new LinkBean("policyManagement/list.do", "admin.policies.title"));
 	    links.add(new LinkBean("toolcontentlist/start.do", "sysadmin.tool.management"));
+	    links.add(new LinkBean("../outcome/outcomeManage.do", "admin.outcome.title"));
 	    links.add(new LinkBean("themeManagement/start.do", "admin.themes.title"));
 	    links.add(new LinkBean("sessionmaintain/list.do", "sysadmin.maintain.session"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_CONFIG_LINKS, links });

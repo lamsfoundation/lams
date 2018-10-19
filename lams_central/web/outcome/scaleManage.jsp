@@ -2,21 +2,20 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
 
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/outcome.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/outcome.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		var organisationId = '${param.organisationID}',
 			LAMS_URL = '<lams:LAMSURL/>',

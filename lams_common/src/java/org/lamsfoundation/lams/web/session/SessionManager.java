@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.web.session;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -31,6 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SessionManager {
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
@@ -204,10 +209,16 @@ public class SessionManager {
     /**
      * Lists all logins with their assigned sessions
      */
-    public static Map<String, String> getLoginToSessionIDMappings() {
-	Map<String, String> result = new TreeMap<String, String>();
+    public static Map<String, List<String>> getLoginToSessionIDMappings() {
+	Map<String, List<String>> result = new TreeMap<String, List<String>>();
 	for (Entry<String, HttpSession> entry : loginMapping.entrySet()) {
-	    result.put(entry.getKey(), entry.getValue().getId());
+	    HttpSession session = entry.getValue();
+	    UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    List<String> sessionInfo = new LinkedList<String>();
+	    sessionInfo.add(user.getFirstName());
+	    sessionInfo.add(user.getLastName());
+	    sessionInfo.add(session.getId());
+	    result.put(entry.getKey(), sessionInfo);
 	}
 	return result;
     }

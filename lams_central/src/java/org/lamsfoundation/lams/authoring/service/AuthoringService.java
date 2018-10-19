@@ -352,7 +352,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getToolOutputDefinitions(java.lang.Long, int)
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getToolOutputDefinitions(java.lang.Long,
+     *      int)
      */
     @Override
     public List<ToolOutputDefinitionDTO> getToolOutputDefinitions(Long toolContentID, int definitionType) {
@@ -1560,7 +1561,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
     }
-    
+
     @Override
     public FolderContentDTO getUserWorkspaceFolder(Integer userID) throws IOException {
 	return workspaceManagementService.getUserWorkspaceFolder(userID);

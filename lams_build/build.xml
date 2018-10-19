@@ -167,6 +167,7 @@
 		<ant antfile="../lams_gradebook/build.xml"         target="_build-product" inheritAll="false" />
 	</target>
 	
+	
 	<target name="_build-ear" depends="_clean-dirs, _build-core">
 		<!-- Internal target: Assembles LAMS EAR in exploded form -->
 		<echo>${ant.project.name}: Copying libraries</echo>
