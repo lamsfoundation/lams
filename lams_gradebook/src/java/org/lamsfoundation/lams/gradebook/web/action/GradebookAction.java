@@ -136,7 +136,7 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
@@ -174,7 +174,7 @@ public class GradebookAction extends LamsDispatchAction {
 	// Getting userID param, it is passed differently from different views
 	UserDTO currentUserDTO = getUser();
 	Integer userID = null;
-	if (view == GBGridView.MON_USER) {
+	if (view == GBGridView.MON_USER || view == GBGridView.MON_ACTIVITY) {
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	} else if (view == GBGridView.LRN_ACTIVITY) {
 	    if (currentUserDTO != null) {
@@ -182,11 +182,11 @@ public class GradebookAction extends LamsDispatchAction {
 	    }
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
-	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
+	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY) || (view == GBGridView.MON_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
 	    gradebookActivityDTOs = getGradebookService().getGBActivityArchiveRowsForLearner(activityID, userID,
 		    currentUserDTO.getTimeZone());
 	}
@@ -317,7 +317,7 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 
 	// Get the user gradebook list from the db
-	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<>();
 
 	int totalUsers = 0;
 	// if leesonID is specified show results based on lesson

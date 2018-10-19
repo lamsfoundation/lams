@@ -404,7 +404,7 @@
 									     colModel: [
 									       	{name:'id', index:'id',  sortable:false, editable: false ,width:140, align:"right"},
 											{name:'status',  index:'status', sortable:false, editable:false, width:30, align:"center"},
-											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:50, title : true, align:"center",
+											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:52, title : true, align:"center",
 												cellattr: function(rowID, val, rawObject, cm, rdata) {
 													if (rdata.startDate != "-") {
 														return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
@@ -614,30 +614,36 @@
 										 autoencode:false,
 									     datatype: "xml",
 									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
-										      + activityID + "&view=monUserView&userID=" + userID,
+										      + activityID + "&view=monActivityView&userID=" + userID,
 									     height: "100%",
 									     autowidth:true,
 									     cellEdit:false,
 									     pager: false,
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
+									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.progress"/>",
 									     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 									    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
 									    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
-									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
-									     	"<fmt:message key="gradebook.columntitle.lesson.mark"/>",
 									     	"<fmt:message key="gradebook.columntitle.mark"/>"
 									     ],
 									     colModel: [
-									       	{name:'id', index:'id',  sortable:false, editable: false ,width:70, align:"right"},
-											{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
-											{name:'timeTaken',index:'timeTaken', sortable:false, editable: false, width:80, align:"center"},
-										    {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
-										    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
-											{name:'feedback',  index:'feedback', sortable:false, editable: false, width:200, hidden:true},
-											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false, width:80, align:"center" },
-											{name:'mark', index:'mark', sortable:false, editable: false, width:50, align:"center" }
+									       	{name:'id', index:'id',  sortable:false, editable: false, align:"right"},
+											{name:'feedback',  index:'feedback', sortable:false, editable: false, hidden:true},
+											{name:'lessonMark',  index:'lessonMark', sortable:false, editable: false,width: 180, align:"center" },
+											{name:'status',  index:'status', sortable:false, editable:false, width:65, align:"center"},
+											{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:112, title : true, align:"center",
+												cellattr: function(rowID, val, rawObject, cm, rdata) {
+													if (rdata.startDate != "-") {
+														return 'title="' + rdata.startDate + ' - ' + rdata.finishDate + '"';
+													}
+										    	}
+									    	},
+										    {name:'startDate',index:'startDate', width:0, hidden: true},
+										    {name:'finishDate',index:'finishDate', width:0, hidden: true},
+											{name:'mark', index:'mark', sortable:false, editable: false, width:108, align:"center" }
 									     ],
 									     loadError: function(xhr,st,err) {
 									    	jQuery("#"+subgrid_table_id).clearGridData();
