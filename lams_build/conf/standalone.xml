@@ -267,19 +267,6 @@
 				    <connection-property name="useLegacyDatetimeCode">false</connection-property>
 				    <connection-property name="serverTimezone">@db.timezone@</connection-property>
 				    
-				    <!-- Properties below are used only for embedded MySQL server -->
-				    <connection-property name="server.basedir">@db.location@</connection-property>
-				    <connection-property name="createDatabaseIfNotExist">false</connection-property>
-				    <connection-property name="server.initialize-user">false</connection-property>
-				    <connection-property name="server.thread_stack">128K</connection-property>
-				    <connection-property name="server.table_cache">4</connection-property>
-				    <connection-property name="server.read_buffer_size">256K</connection-property>
-				    <connection-property name="server.read_rnd_buffer_size">256K</connection-property>
-				    <connection-property name="server.max_allowed_packet">1M</connection-property>
-				    <connection-property name="server.key_buffer">16K</connection-property>
-				    <connection-property name="server.sort_buffer_size">64K</connection-property>
-				    <connection-property name="server.net_buffer_length">2K</connection-property>
-				    
 				    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 				    <pool>
 				      <min-pool-size>0</min-pool-size>

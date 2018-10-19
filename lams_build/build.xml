@@ -142,14 +142,6 @@
 
 	
 	<target name="build-db" description="Rebuilds LAMS Database.">
-		<echo>Copying embedded MySQL drivers to library dir, if available</echo>
-		<copy todir="../lams_build/lib/mysql" overwrite="false" verbose="true">
-			<fileset dir="../mysql_embedded/connectors" erroronmissingdir="false">
-				<include name="*-driver.jar" />
-				<include name="*-db-files-${osPropertiesName}.jar" />
-			</fileset>
-		</copy>
-		
 		<ant antfile="../lams_common/build.xml" target="build-db" inheritAll="false" />
 	</target>
 	
@@ -640,7 +632,6 @@
 			<fileset file="${conf.dir}/standalone.xml" />
 	        <filterset>
 	        	<filter token="db.url.run" value="${db.url.run}"/>
-	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
 	        	<filter token="db.timezone" value="${db.timezone}"/>
@@ -654,7 +645,6 @@
 			<fileset file="${conf.dir}/slim/standalone.xml" />
 	        <filterset>
 	        	<filter token="db.url.run" value="${db.url.run}"/>
-	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
 	        	<filter token="db.timezone" value="${db.timezone}"/>
@@ -752,7 +742,6 @@
 			</fileset>
 	        <filterset>
 	        	<filter token="db.url.run" value="${db.url.run}"/>
-	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
 	        	<filter token="db.timezone" value="${db.timezone}"/>
