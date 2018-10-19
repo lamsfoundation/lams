@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
-@RequestMapping("/TblMonitoring")
+@RequestMapping("/tblmonitoring")
 public class TblMonitoringController {
     private static Logger log = Logger.getLogger(TblMonitoringController.class);
 

@@ -267,14 +267,12 @@
         }
 
         function switchToTblMonitor() {
-			$("#content").load(
-				"<c:url value='tblmonitor/start.do'/>",
-				{
-					lessonID: ${lesson.lessonID}
-				}
-			);
-    		}
-
+        	$("#content").load(LAMS_URL + 'monitoring/tblmonitor/start.do', 
+        	{
+        		lessonID: ${lesson.lessonID}
+        	});
+        }
+        
     	<%@ include file="monitorTour.jsp" %> 
 
 	</script>
