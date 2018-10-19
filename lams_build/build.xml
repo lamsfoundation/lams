@@ -168,19 +168,6 @@
 	</target>
 	
 	
-	<target name="copy-to-lams-lib"
-		    description="Copies LAMS core JARs to lams_build library for other projects to use">
-		<echo>Copying LAMS core projects' JARs to lams_build/lib/lams</echo>
-		<ant antfile="../lams_common/build.xml"            target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_central/build.xml"           target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_contentrepository/build.xml" target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_learning/build.xml"          target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_monitoring/build.xml"        target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_admin/build.xml"             target="copy-to-lams-lib" inheritAll="false" />
-		<ant antfile="../lams_gradebook/build.xml"         target="copy-to-lams-lib" inheritAll="false" />
-	</target>
-	
-	
 	<target name="_build-ear" depends="_clean-dirs, _build-core">
 		<!-- Internal target: Assembles LAMS EAR in exploded form -->
 		<echo>${ant.project.name}: Copying libraries</echo>

@@ -115,7 +115,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author lfoxton
  */
 public class GradebookService implements IGradebookFullService {
-
     private static Logger logger = Logger.getLogger(GradebookService.class);
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
@@ -414,6 +413,10 @@ public class GradebookService implements IGradebookFullService {
 		    gUserDTO.setMark(gradebookUserActivity.getMark());
 
 		}
+		
+		boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
+		gUserDTO.setHasArchivedMarks(hasArchivedMarks);
+		
 		gradebookUserDTOs.add(gUserDTO);
 	    }
 	}

@@ -47,8 +47,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
-import org.apache.tomcat.util.json.JSONArray;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.outcome.Outcome;
@@ -72,6 +70,10 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OutcomeAction extends DispatchAction {
 
@@ -280,12 +282,12 @@ public class OutcomeAction extends DispatchAction {
 	}
 
 	List<Outcome> outcomes = getOutcomeService().getOutcomes(search, organisationIds);
-	JSONArray responseJSON = new JSONArray();
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (Outcome outcome : outcomes) {
-	    JSONObject outcomeJSON = new JSONObject();
+	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("value", outcome.getOutcomeId());
 	    outcomeJSON.put("label", outcome.getName() + " (" + outcome.getCode() + ")");
-	    responseJSON.put(outcomeJSON);
+	    responseJSON.add(outcomeJSON);
 	}
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);
@@ -361,14 +363,14 @@ public class OutcomeAction extends DispatchAction {
 	}
 
 	List<OutcomeMapping> outcomeMappings = getOutcomeService().getOutcomeMappings(lessonId, toolContentId, itemId);
-	JSONArray responseJSON = new JSONArray();
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (OutcomeMapping outcomeMapping : outcomeMappings) {
-	    JSONObject outcomeJSON = new JSONObject();
+	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("mappingId", outcomeMapping.getMappingId());
 	    outcomeJSON.put("outcomeId", outcomeMapping.getOutcome().getOutcomeId());
 	    outcomeJSON.put("label",
 		    outcomeMapping.getOutcome().getName() + " (" + outcomeMapping.getOutcome().getCode() + ")");
-	    responseJSON.put(outcomeJSON);
+	    responseJSON.add(outcomeJSON);
 	}
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON);

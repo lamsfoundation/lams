@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -134,6 +133,7 @@ public interface IGradebookFullService extends IGradebookService {
      *
      * @param activity
      */
+    @Override
     void recalculateGradebookMarksForActivity(Activity activity);
 
     /**
@@ -144,6 +144,7 @@ public interface IGradebookFullService extends IGradebookService {
      * @param lessonId
      * @throws Exception
      */
+    @Override
     void recalculateTotalMarksForLesson(Long lessonId) throws Exception;
 
     /**
@@ -257,6 +258,7 @@ public interface IGradebookFullService extends IGradebookService {
      */
     Activity getActivityById(Long activityID);
 
+    @Override
     void removeLearnerFromLesson(Long lessonId, Integer learnerId);
 
     /**

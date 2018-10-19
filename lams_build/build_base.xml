@@ -21,6 +21,7 @@
 		<fileset dir="../../lams/lams_build/lib">
 			<include name="**/*.jar" />
 		</fileset>
+		<fileset file="../../lams/lams_common/build/lib/lams.jar" />
 		<!-- Same list as in projects' .classpath file references to WildFly modules.
 			 They need to be exactly listed as **/*.jar would load other versions of JARs
 			 that are also present in lams_build/lib.
@@ -156,7 +157,13 @@
 	<!-- Compilations								                      -->
 	<!-- ================================================================ -->
 
-	<target name="_compile-java" depends="_clean-dirs">
+	<available property="common.jar.exists" file="../../lams/lams_common/build/lib/lams.jar" type="file" />
+	
+	<target name="_build-common" unless="common.jar.exists">
+		<ant antfile="../lams_common/build.xml" target="_build-jar" inheritAll="false"/>
+	</target>
+	
+	<target name="_compile-java-nocommon" depends="_clean-dirs">
 		<!-- Internal target: Compile Java sources. -->
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
@@ -181,6 +188,8 @@
 			</fileset>
 		</copy>
 	</target>
+
+	<target name="_compile-java" depends="_build-common, _compile-java-nocommon" />
 
 	<!-- ================================================================ -->
 	<!-- Build archives        		    	          					  -->
@@ -273,16 +282,6 @@
 		    <include name="**/*.txt"/>
 		   </fileset>
 		</copy>
-	</target>
-	
-	
-	<target name="copy-to-lams-lib" if="product.core" depends="_build-jar"
-		    description="Copies JAR file to lams_build/lib/lams for other projects to use.">
-  		<copy overwrite="yes" todir="../../lams/lams_build/lib/lams">
-  			<fileset dir="${basedir}/build/lib">
-  				<include name="${product}.jar"/>
-  			</fileset>
-  		</copy>	
 	</target>
 	
 	
