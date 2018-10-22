@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.http.HttpException;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.Option;
@@ -44,10 +43,12 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AuthoringJsonTags;
@@ -324,7 +325,7 @@ public abstract class LdTemplateController {
     protected ObjectNode saveLearningDesign(String templateCode, String userEnteredTitleString,
 	    String userEnteredDescription, Integer workspaceFolderID, String contentFolderId, Integer maxUIID,
 	    ArrayNode activities, ArrayNode transitions, ArrayNode groupings, ArrayNode branchMappings)
-	    throws HttpException, IOException {
+	    throws IOException {
 
 	// fill in required LD data
 	ObjectNode ldJSON = JsonNodeFactory.instance.objectNode();
@@ -348,9 +349,8 @@ public abstract class LdTemplateController {
 	try {
 	    learningDesign = authoringService.saveLearningDesignDetails(ldJSON);
 	} catch (Exception e) {
-	    LdTemplateController.log.error("Unable to learning design with details " + ldJSON, e);
-	    throw new HttpException("Unable to learning design with details " + ldJSON);
-
+	    log.error("Unable to save learning design with details " + ldJSON, e);
+	    throw new LearningDesignException("Unable to save learning design with details " + ldJSON);
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
@@ -617,8 +617,7 @@ public abstract class LdTemplateController {
     /* ************************************** Tool related methods ********************************************** */
     /** General method to create a tool content. All calls to create tool content should go through this method */
     protected Long createToolContent(UserDTO user, String toolSignature, ObjectNode toolContentJSON)
-	    throws HttpException, IOException {
-
+	    throws IOException {
 	try {
 	    Tool tool = getTool(toolSignature);
 	    Long toolContentID = authoringService.insertToolContentID(tool.getToolId());
@@ -629,15 +628,13 @@ public abstract class LdTemplateController {
 
 	    return toolContentID;
 	} catch (Exception e) {
-	    LdTemplateController.log.error("Unable to create tool content for " + toolSignature + " with details "
-		    + toolContentJSON
+	    log.error("Unable to create tool content for " + toolSignature + " with details " + toolContentJSON
 		    + ". \nThe tool probably threw an exception - check the server logs for more details.\n"
 		    + "If the exception is \"Servlet.service() for servlet ToolContentRestServlet threw exception java.lang.ClassCastException: com.sun.proxy.$ProxyXXX cannot be cast to org.lamsfoundation.lams.rest.ToolRestManager)\""
 		    + " then the tool doesn't support the LDTemplate service calls (ie has not implemented the ToolRestManager interface / createRestToolContent() method.");
-	    throw new HttpException(
+	    throw new ToolException(
 		    "Unable to create tool content for " + toolSignature + " with details " + toolContentJSON);
 	}
-
     }
 
     /**
@@ -728,8 +725,7 @@ public abstract class LdTemplateController {
      * to be expanded.
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, boolean selectLeaderToolOutput, ArrayNode questions)
-	    throws HttpException, IOException {
+	    String reflectionInstructions, boolean selectLeaderToolOutput, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
@@ -766,7 +762,7 @@ public abstract class LdTemplateController {
      * finished and filterKeywords in case it is wanted. The keywords should be a comma deliminated string.
      */
     protected Long createChatToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
-	    String filterKeywords, String reflectionInstructions) throws HttpException, IOException {
+	    String filterKeywords, String reflectionInstructions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
 		lockWhenFinished, null, null);
@@ -805,7 +801,7 @@ public abstract class LdTemplateController {
      */
     protected Long createForumToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean allowRichTextEditor, boolean allowNewTopic, boolean allowRateMessages, boolean allowUpload,
-	    boolean limitedMaxCharacters, Integer maxCharacters, ArrayNode topics) throws HttpException, IOException {
+	    boolean limitedMaxCharacters, Integer maxCharacters, ArrayNode topics) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
 		allowRichTextEditor, user);
@@ -837,8 +833,7 @@ public abstract class LdTemplateController {
      * does not support lockWhenFinished.
      */
     protected Long createLeaderSelectionToolContent(UserDTO user, String title, String instructions)
-	    throws HttpException, IOException {
-
+	    throws IOException {
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	return createToolContent(user, LdTemplateController.LEADER_TOOL_SIGNATURE, toolContentJSON);
     }
@@ -861,7 +856,7 @@ public abstract class LdTemplateController {
      * finished and allow rich text editor in case it is wanted.
      */
     protected Long createNotebookToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
-	    boolean allowRichTextEditor) throws HttpException, IOException {
+	    boolean allowRichTextEditor) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
 		allowRichTextEditor, null);
@@ -885,7 +880,7 @@ public abstract class LdTemplateController {
      * support a reflection in case it is wanted.
      */
     protected Long createNoticeboardToolContent(UserDTO user, String title, String content,
-	    String reflectionInstructions) throws HttpException, IOException {
+	    String reflectionInstructions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, null, reflectionInstructions, null, null, null);
 	toolContentJSON.put("content", content != null ? content : "");
@@ -910,7 +905,7 @@ public abstract class LdTemplateController {
      */
     protected Long createQAToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean allowRichTextEditor, boolean oneQuestionPerPage, boolean showOtherLearnersAnswers,
-	    boolean showOtherLearnersNames, ArrayNode questions) throws HttpException, IOException {
+	    boolean showOtherLearnersNames, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished,
 		allowRichTextEditor, null);
@@ -938,8 +933,7 @@ public abstract class LdTemplateController {
      * details of questions). Other fields are optional.
      */
     protected Long createMCQToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, ArrayNode questions)
-	    throws HttpException, IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
@@ -965,7 +959,7 @@ public abstract class LdTemplateController {
      * Helper method to create a mindmap tool content.
      */
     protected Long createMindmapToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
-	    boolean multiUserMode, String reflectionInstruction) throws HttpException, IOException {
+	    boolean multiUserMode, String reflectionInstruction) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, null);
 	toolContentJSON.put("multiUserMode", multiUserMode);
@@ -994,7 +988,7 @@ public abstract class LdTemplateController {
     protected Long createResourcesToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean runContentAutomatically, boolean allowLearnerAddURL, boolean allowLearnerAddFile,
 	    boolean notifyInstructors, Integer minResourcesToView, String reflectionInstructions, ArrayNode resources)
-	    throws HttpException, IOException {
+	    throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
 		lockWhenFinished, null, user);
@@ -1089,7 +1083,7 @@ public abstract class LdTemplateController {
      */
     protected Long createScratchieToolContent(UserDTO user, String title, String instructions,
 	    boolean useSelectLeaderToolOuput, Integer confidenceLevelsActivityUiid, ArrayNode questions)
-	    throws HttpException, IOException {
+	    throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
@@ -1117,7 +1111,7 @@ public abstract class LdTemplateController {
      */
     protected Long createScribeToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean autoSelectScribe, boolean showAggregatedReports, String reflectionInstructions, ArrayNode questions)
-	    throws HttpException, IOException {
+	    throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
 		lockWhenFinished, null, null);
@@ -1146,7 +1140,7 @@ public abstract class LdTemplateController {
      */
     protected Long createSubmitToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    Boolean limitUpload, Integer limitUploadNumber, String reflectionInstructions)
-	    throws HttpException, IOException {
+	    throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions,
 		lockWhenFinished, null, user);
@@ -1175,7 +1169,7 @@ public abstract class LdTemplateController {
      * first/last names! See the survey implementation for the full field list.
      */
     protected Long createSurveyToolContent(UserDTO user, String title, String instructions, Boolean lockWhenFinished,
-	    ArrayNode questions) throws HttpException, IOException {
+	    ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, user);
 	toolContentJSON.set("questions", questions);
@@ -1199,7 +1193,7 @@ public abstract class LdTemplateController {
      * Other fields are optional.
      */
     protected Long createVoteToolContent(UserDTO user, String title, String instructions, ArrayNode answers,
-	    Boolean showResults) throws HttpException, IOException {
+	    Boolean showResults) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.set(RestTags.ANSWERS, answers);
@@ -1223,7 +1217,7 @@ public abstract class LdTemplateController {
      * Helper method to create a wiki tool content.
      */
     protected Long createWikiToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
-	    String reflectionInstruction, ArrayNode pages) throws HttpException, IOException {
+	    String reflectionInstruction, ArrayNode pages) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, lockWhenFinished, null, null);
 	toolContentJSON.set("pages", pages);
@@ -1250,7 +1244,7 @@ public abstract class LdTemplateController {
      * The criterias entry should be ArrayNode as defined in PeerReviewCriters object.
      */
     protected Long createPeerReviewToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, ArrayNode criterias) throws HttpException, IOException {
+	    String reflectionInstructions, ArrayNode criterias) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);

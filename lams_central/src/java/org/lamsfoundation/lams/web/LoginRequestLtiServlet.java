@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Enumeration;
 
@@ -32,8 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.imsglobal.lti.BasicLTIConstants;
 import org.imsglobal.lti.launch.LtiLaunch;
@@ -48,6 +45,7 @@ import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -116,7 +114,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	LtiLaunch ltiLaunch = ltiResult.getLtiLaunchResult();
 	if (!ltiResult.getSuccess()) {
 	    log.warn("Authentication error: " + ltiResult.getMessage());
-	    response.sendError(HttpStatus.SC_UNAUTHORIZED,
+	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 		    "Login Failed - authentication error. " + ltiResult.getMessage());
 	    return;
 	}
@@ -156,42 +154,38 @@ public class LoginRequestLtiServlet extends HttpServlet {
 		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
 	String hash = HashUtil.sha1(plaintext);
 
-	try {
+	// constructing redirectUrl by getting request.getQueryString() for POST requests 
+	String redirectUrl = "lti.do";
+	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + LoginRequestDispatcher.PARAM_METHOD, method);
+	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+	    String paramName = e.nextElement();
 
-	    // constructing redirectUrl by getting request.getQueryString() for POST requests 
-	    URIBuilder redirectUrl = new URIBuilder("lti.do");
-	    redirectUrl.addParameter("_" + LoginRequestDispatcher.PARAM_METHOD, method);
-	    for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
-		String paramName = e.nextElement();
-
-		//skip parameters starting with oath_
-		if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
-			|| !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
-		    redirectUrl.addParameter(paramName, request.getParameter(paramName));
-		}
+	    //skip parameters starting with oath_
+	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
+		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
+		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName, request.getParameter(paramName));
 	    }
-
-	    URIBuilder url = new URIBuilder("LoginRequest");
-	    url.addParameter(LoginRequestDispatcher.PARAM_USER_ID, URLEncoder.encode(extUsername, "UTF8"));
-	    url.addParameter(LoginRequestDispatcher.PARAM_METHOD, method);
-	    url.addParameter(LoginRequestDispatcher.PARAM_TIMESTAMP, timestamp);
-	    url.addParameter(LoginRequestDispatcher.PARAM_SERVER_ID, consumerKey);
-	    url.addParameter(LoginRequestDispatcher.PARAM_HASH, hash);
-	    url.addParameter(LoginRequestDispatcher.PARAM_COURSE_ID, contextId);
-	    url.addParameter(CentralConstants.PARAM_COURSE_NAME, contextLabel);
-	    url.addParameter(LoginRequestDispatcher.PARAM_COUNTRY, countryIsoCode);
-	    url.addParameter(LoginRequestDispatcher.PARAM_LANGUAGE, langIsoCode);
-	    url.addParameter(LoginRequestDispatcher.PARAM_FIRST_NAME, firstName);//TODO ?? URLEncoder.encode(queryString, "UTF-8");
-	    url.addParameter(LoginRequestDispatcher.PARAM_LAST_NAME, lastName);//TODO ?? URLEncoder.encode(queryString, "UTF-8");
-	    url.addParameter(LoginRequestDispatcher.PARAM_LESSON_ID, lessonId);
-	    url.addParameter(LoginRequestDispatcher.PARAM_EMAIL, email);
-	    url.addParameter("redirectURL", redirectUrl.build().toString());
-	    response.sendRedirect(response.encodeRedirectURL(url.build().toString()));
-
-	} catch (URISyntaxException e) {
-	    throw new ServletException("Error creating URL for LoginRequest", e);
 	}
 
+	String url = "LoginRequest";
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_USER_ID,
+		URLEncoder.encode(extUsername, "UTF8"));
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_METHOD, method);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_TIMESTAMP, timestamp);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_SERVER_ID, consumerKey);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_HASH, hash);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_COURSE_ID, contextId);
+	url = WebUtil.appendParameterToURL(url, CentralConstants.PARAM_COURSE_NAME, contextLabel);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_COUNTRY, countryIsoCode);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LANGUAGE, langIsoCode);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_FIRST_NAME,
+		URLEncoder.encode(firstName, "UTF-8"));
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LAST_NAME,
+		URLEncoder.encode(lastName, "UTF-8"));
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LESSON_ID, lessonId);
+	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_EMAIL, email);
+	url = WebUtil.appendParameterToURL(url, "redirectURL", URLEncoder.encode(redirectUrl, "UTF-8"));
+	response.sendRedirect(response.encodeRedirectURL(url));
     }
 
     @Override
