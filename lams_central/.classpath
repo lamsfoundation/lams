@@ -29,8 +29,6 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/httpcomponents/main/httpclient-4.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/httpclient"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/httpcomponents/main/httpcore-4.4.1.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/httpcore"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/codec/main/commons-codec-1.10.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.4.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/core/main/undertow-core-1.4.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>
