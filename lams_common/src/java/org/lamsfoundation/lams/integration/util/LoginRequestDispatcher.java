@@ -20,9 +20,6 @@
  */
 package org.lamsfoundation.lams.integration.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,7 +33,7 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -98,7 +95,7 @@ public class LoginRequestDispatcher {
 
     private static final String URL_LEARNER = "/home/learner.do?lessonID=";
 
-    private static final String URL_MONITOR = "/home/monitorLesson&lessonID=.do?lessonID=";
+    private static final String URL_MONITOR = "/home/monitorLesson.do?lessonID=";
 
     private static final String URL_GRADEBOOK = "/services/Gradebook?";
 
@@ -144,19 +141,26 @@ public class LoginRequestDispatcher {
 	}
 	/** AUTHOR * */
 	else if (METHOD_AUTHOR.equals(method)) {
+	    String authorUrl = request.getContextPath() + URL_AUTHOR;
+	    
+	    // append the extra parameters if they are present in the request
 	    String ldID = request.getParameter(PARAM_LEARNING_DESIGN_ID);
+	    if (ldID != null) {
+		authorUrl = WebUtil.appendParameterToURL(authorUrl, "learningDesignID", ldID);
+	    }
 
 	    // Custom CSV string to be used for tool adapters
 	    String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
-	    String extLmsId = request.getParameter(PARAM_SERVER_ID);
+	    if (customCSV != null) {
+		authorUrl = WebUtil.appendParameterToURL(authorUrl, PARAM_CUSTOM_CSV, customCSV);
+	    }
 	    
-	    // append the extra parameters if they are present in the request
-	    String parameters = "";
-	    parameters = ldID != null ? parameters + "&learningDesignID" + "=" + ldID : parameters;
-	    parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
-	    parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
+	    String extLmsId = request.getParameter(PARAM_SERVER_ID);
+	    if (extLmsId != null) {
+		authorUrl = WebUtil.appendParameterToURL(authorUrl, PARAM_EXT_LMS_ID, extLmsId);
+	    }
 
-	    return request.getContextPath() + URL_AUTHOR + parameters;
+	    return authorUrl;
 	}
 	/** MONITOR * */
 	else if (METHOD_MONITOR.equals(method) && lessonId != null) {
