@@ -6,7 +6,6 @@
  */
 package org.hibernate.engine.spi;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

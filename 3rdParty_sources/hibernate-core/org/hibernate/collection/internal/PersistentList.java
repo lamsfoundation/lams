@@ -17,6 +17,7 @@ import java.util.ListIterator;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.loader.CollectionAliases;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.type.Type;
@@ -42,8 +43,19 @@ public class PersistentList extends AbstractPersistentCollection implements List
 	 *
 	 * @param session The session
 	 */
-	public PersistentList(SessionImplementor session) {
+	public PersistentList(SharedSessionContractImplementor session) {
 		super( session );
+	}
+
+	/**
+	 * Constructs a PersistentList.
+	 *
+	 * @param session The session
+	 * @deprecated {@link #PersistentList(SharedSessionContractImplementor)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentList(SessionImplementor session) {
+		this( (SharedSessionContractImplementor) session );
 	}
 
 	/**
@@ -52,11 +64,23 @@ public class PersistentList extends AbstractPersistentCollection implements List
 	 * @param session The session
 	 * @param list The raw list
 	 */
-	public PersistentList(SessionImplementor session, List list) {
+	public PersistentList(SharedSessionContractImplementor session, List list) {
 		super( session );
 		this.list = list;
 		setInitialized();
 		setDirectlyAccessible( true );
+	}
+
+	/**
+	 * Constructs a PersistentList.
+	 *
+	 * @param session The session
+	 * @param list The raw list
+	 * @deprecated {@link #PersistentList(SharedSessionContractImplementor, List)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentList(SessionImplementor session, List list) {
+		this( (SharedSessionContractImplementor) session, list );
 	}
 
 	@Override
@@ -163,6 +187,7 @@ public class PersistentList extends AbstractPersistentCollection implements List
 		if ( exists == null ) {
 			initialize( true );
 			if ( list.remove( value ) ) {
+				elementRemoved = true;
 				dirty();
 				return true;
 			}
@@ -171,6 +196,7 @@ public class PersistentList extends AbstractPersistentCollection implements List
 			}
 		}
 		else if ( exists ) {
+			elementRemoved = true;
 			queueOperation( new SimpleRemove( value ) );
 			return true;
 		}
@@ -222,6 +248,7 @@ public class PersistentList extends AbstractPersistentCollection implements List
 		if ( coll.size()>0 ) {
 			initialize( true );
 			if ( list.removeAll( coll ) ) {
+				elementRemoved = true;
 				dirty();
 				return true;
 			}
@@ -298,8 +325,10 @@ public class PersistentList extends AbstractPersistentCollection implements List
 			throw new ArrayIndexOutOfBoundsException( "negative index" );
 		}
 		final Object old = isPutQueueEnabled() ? readElementByIndex( index ) : UNKNOWN;
+		elementRemoved = true;
 		if ( old == UNKNOWN ) {
 			write();
+			dirty();
 			return list.remove( index );
 		}
 		else {

@@ -129,10 +129,10 @@ class FromElementType {
 	 */
 	String renderScalarIdentifierSelect(int i) {
 		checkInitialized();
-		String[] cols = getPropertyMapping( EntityPersister.ENTITY_ID ).toColumns(
-				getTableAlias(),
-				EntityPersister.ENTITY_ID
-		);
+
+		final String idPropertyName = getIdentifierPropertyName();
+		String[] cols = getPropertyMapping( idPropertyName ).toColumns( getTableAlias(), idPropertyName );
+
 		StringBuilder buf = new StringBuilder();
 		// For property references generate <tablealias>.<columnname> as <projectionalias>
 		for ( int j = 0; j < cols.length; j++ ) {
@@ -429,7 +429,7 @@ class FromElementType {
 			// this is hacky, but really this is difficult to handle given the current codebase.
 			if ( persister != propertyMapping ) {
 				// we want the subquery...
-				DeprecationLogger.DEPRECATION_LOGGER.logDeprecationOfCollectionPropertiesInHql( path, fromElement.getClassAlias() );
+//				DeprecationLogger.DEPRECATION_LOGGER.logDeprecationOfCollectionPropertiesInHql( path, fromElement.getClassAlias() );
 				return getCollectionPropertyReference( path ).toColumns( tableAlias );
 			}
 		}
@@ -457,7 +457,7 @@ class FromElementType {
 			// table name as the column qualification
 			// 2) otherwise (not correlated), use the given alias
 			if ( isCorrelation() ) {
-				if ( isMultiTable() ) {
+				if ( isMultiTable() || isInsertQuery() ) {
 					return propertyMapping.toColumns( tableAlias, path );
 				}
 				return propertyMapping.toColumns( extractTableName(), path );
@@ -496,6 +496,10 @@ class FromElementType {
 	private String extractTableName() {
 		// should be safe to only ever expect EntityPersister references here
 		return fromElement.getQueryable().getTableName();
+	}
+
+	private boolean isInsertQuery() {
+		return fromElement.getWalker().getStatementType() == HqlSqlTokenTypes.INSERT;
 	}
 
 	private boolean isManipulationQuery() {
@@ -618,7 +622,7 @@ class FromElementType {
 
 				Map enabledFilters = fromElement.getWalker().getEnabledFilters();
 				String subquery = CollectionSubqueryFactory.createCollectionSubquery(
-						joinSequence.copy().setUseThetaStyle( true ),
+						joinSequence.copyForCollectionProperty().setUseThetaStyle( true ),
 						enabledFilters,
 						collectionPropertyMapping.toColumns( tableAlias, propertyName )
 				);
@@ -675,6 +679,16 @@ class FromElementType {
 		public String[] toColumns(String propertyName) throws QueryException, UnsupportedOperationException {
 			validate( propertyName );
 			return queryableCollection.toColumns( propertyName );
+		}
+	}
+
+	public String getIdentifierPropertyName() {
+		if ( getEntityPersister() != null && getEntityPersister().getEntityMetamodel() != null
+				&& getEntityPersister().getEntityMetamodel().hasNonIdentifierPropertyNamedId() ) {
+			return getEntityPersister().getIdentifierPropertyName();
+		}
+		else {
+			return EntityPersister.ENTITY_ID;
 		}
 	}
 }

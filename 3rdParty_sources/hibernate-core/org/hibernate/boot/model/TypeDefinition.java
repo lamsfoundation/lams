@@ -11,9 +11,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
-
-import org.hibernate.internal.util.compare.EqualsHelper;
 
 /**
  * Models the information pertaining to a custom type definition supplied by the user.  Used
@@ -21,7 +20,7 @@ import org.hibernate.internal.util.compare.EqualsHelper;
  *
  * Generally speaking this information would come from annotations
  * ({@link org.hibernate.annotations.TypeDef}) or XML mappings.  An alternative form of
- * supplying custom types is programatically via one of:<ul>
+ * supplying custom types is programmatically via one of:<ul>
  *     <li>{@link org.hibernate.boot.MetadataBuilder#applyBasicType(org.hibernate.type.BasicType)}</li>
  *     <li>{@link org.hibernate.boot.MetadataBuilder#applyBasicType(org.hibernate.usertype.UserType, String[])}</li>
  *     <li>{@link org.hibernate.boot.MetadataBuilder#applyTypes(TypeContributor)}</li>
@@ -110,10 +109,10 @@ public class TypeDefinition implements Serializable {
 		}
 
 		final TypeDefinition that = (TypeDefinition) o;
-		return EqualsHelper.equals( this.name, that.name )
-				&& EqualsHelper.equals( this.typeImplementorClass, that.typeImplementorClass )
+		return Objects.equals( this.name, that.name )
+				&& Objects.equals( this.typeImplementorClass, that.typeImplementorClass )
 				&& Arrays.equals( this.registrationKeys, that.registrationKeys )
-				&& EqualsHelper.equals( this.parameters, that.parameters );
+				&& Objects.equals( this.parameters, that.parameters );
 	}
 
 	@Override

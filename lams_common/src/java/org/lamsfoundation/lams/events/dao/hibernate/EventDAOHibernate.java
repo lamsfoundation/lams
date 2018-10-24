@@ -27,7 +27,7 @@ class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
 
     private static final String COUNT_PENDING_NOTIFICATIONS = "SELECT COUNT(*) FROM " + Subscription.class.getName()
 	    + " AS s WHERE (s.lastOperationMessage IS NULL OR s.lastOperationMessage != '"
-	    + DeliveryMethodNotification.LAST_OPERATION_SEEN + "') AND s.userId = ? AND s.event.scope LIKE 'LESSON_%'";
+	    + DeliveryMethodNotification.LAST_OPERATION_SEEN + "') AND s.userId = :userId AND s.event.scope LIKE 'LESSON_%'";
 
     private static final String GET_ARCHIVED_EMAIL_NOTIFICATION_RECIPIENTS = "SELECT u FROM " + User.class.getName()
 	    + " AS u, " + EmailNotificationArchive.class.getName()
@@ -84,12 +84,12 @@ class EventDAOHibernate extends LAMSBaseDAO implements EventDAO {
     public long getPendingNotificationCount(Long lessonId, Integer userId) {
 	String query = EventDAOHibernate.COUNT_PENDING_NOTIFICATIONS;
 	if (lessonId != null) {
-	    query += " AND s.event.eventSessionId = ?";
+	    query += " AND s.event.eventSessionId = :lessonId";
 	}
 	Query queryObject = getSession().createQuery(query);
-	queryObject.setInteger(0, userId);
+	queryObject.setInteger("userId", userId);
 	if (lessonId != null) {
-	    queryObject.setLong(1, lessonId);
+	    queryObject.setLong("lessonId", lessonId);
 	}
 	return (Long) queryObject.uniqueResult();
     }

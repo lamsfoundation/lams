@@ -8,20 +8,21 @@ package org.hibernate.resource.transaction.backend.jdbc.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.RollbackException;
 import javax.transaction.Status;
 
-import org.hibernate.TransactionException;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.transaction.spi.IsolationDelegate;
 import org.hibernate.engine.transaction.spi.TransactionObserver;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.jpa.spi.JpaCompliance;
 import org.hibernate.resource.jdbc.spi.JdbcSessionOwner;
-import org.hibernate.resource.transaction.SynchronizationRegistry;
-import org.hibernate.resource.transaction.TransactionCoordinator;
-import org.hibernate.resource.transaction.TransactionCoordinatorBuilder;
 import org.hibernate.resource.transaction.backend.jdbc.spi.JdbcResourceTransaction;
 import org.hibernate.resource.transaction.backend.jdbc.spi.JdbcResourceTransactionAccess;
 import org.hibernate.resource.transaction.internal.SynchronizationRegistryStandardImpl;
+import org.hibernate.resource.transaction.spi.SynchronizationRegistry;
+import org.hibernate.resource.transaction.spi.TransactionCoordinator;
+import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorOwner;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 
@@ -43,6 +44,8 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 	private final TransactionCoordinatorOwner transactionCoordinatorOwner;
 	private final SynchronizationRegistryStandardImpl synchronizationRegistry = new SynchronizationRegistryStandardImpl();
 
+	private final JpaCompliance jpaCompliance;
+
 	private TransactionDriverControlImpl physicalTransactionDelegate;
 
 	private int timeOut = -1;
@@ -59,10 +62,26 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 			TransactionCoordinatorBuilder transactionCoordinatorBuilder,
 			TransactionCoordinatorOwner owner,
 			JdbcResourceTransactionAccess jdbcResourceTransactionAccess) {
-		this.observers = new ArrayList<TransactionObserver>();
+		this.observers = new ArrayList<>();
 		this.transactionCoordinatorBuilder = transactionCoordinatorBuilder;
 		this.jdbcResourceTransactionAccess = jdbcResourceTransactionAccess;
 		this.transactionCoordinatorOwner = owner;
+
+		this.jpaCompliance = owner.getJdbcSessionOwner()
+				.getJdbcSessionContext()
+				.getSessionFactory()
+				.getSessionFactoryOptions()
+				.getJpaCompliance();
+	}
+
+	/**
+	 * Needed because while iterating the observers list and executing the before/update callbacks,
+	 * some observers might get removed from the list.
+	 *
+	 * @return TransactionObserver
+	 */
+	private Iterable<TransactionObserver> observers() {
+		return new ArrayList<>( observers );
 	}
 
 	@Override
@@ -84,8 +103,7 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 
 	@Override
 	public boolean isJoined() {
-		return physicalTransactionDelegate != null && physicalTransactionDelegate.getStatus() == TransactionStatus.ACTIVE;
-
+		return physicalTransactionDelegate != null && getTransactionDriverControl().isActive( true );
 	}
 
 	@Override
@@ -96,6 +114,11 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 	@Override
 	public SynchronizationRegistry getLocalSynchronizations() {
 		return synchronizationRegistry;
+	}
+
+	@Override
+	public JpaCompliance getJpaCompliance() {
+		return jpaCompliance;
 	}
 
 	@Override
@@ -134,8 +157,16 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 		if(this.timeOut > 0) {
 			transactionCoordinatorOwner.setTransactionTimeOut( this.timeOut );
 		}
+
+
+		// report entering into a "transactional context"
+		transactionCoordinatorOwner.startTransactionBoundary();
+
+		// trigger the Transaction-API-only after-begin callback
 		transactionCoordinatorOwner.afterTransactionBegin();
-		for ( TransactionObserver observer : observers ) {
+
+		// notify all registered observers
+		for ( TransactionObserver observer : observers() ) {
 			observer.afterBegin();
 		}
 		log.trace( "ResourceLocalTransactionCoordinatorImpl#afterBeginCallback" );
@@ -146,7 +177,7 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 		try {
 			transactionCoordinatorOwner.beforeTransactionCompletion();
 			synchronizationRegistry.notifySynchronizationsBeforeTransactionCompletion();
-			for ( TransactionObserver observer : observers ) {
+			for ( TransactionObserver observer : observers() ) {
 				observer.beforeCompletion();
 			}
 		}
@@ -165,21 +196,12 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 		synchronizationRegistry.notifySynchronizationsAfterTransactionCompletion( statusToSend );
 
 		transactionCoordinatorOwner.afterTransactionCompletion( successful, false );
-		for ( TransactionObserver observer : observers ) {
+		for ( TransactionObserver observer : observers() ) {
 			observer.afterCompletion( successful, false );
 		}
-		invalidateDelegate();
 	}
 
-	private void invalidateDelegate() {
-		if ( physicalTransactionDelegate == null ) {
-			throw new IllegalStateException( "Physical-transaction delegate not known on attempt to invalidate" );
-		}
-
-		physicalTransactionDelegate.invalidate();
-		physicalTransactionDelegate = null;
-	}
-
+	@Override
 	public void addObserver(TransactionObserver observer) {
 		observers.add( observer );
 	}
@@ -225,12 +247,33 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 		public void commit() {
 			try {
 				if ( rollbackOnly ) {
-					throw new TransactionException( "Transaction was marked for rollback only; cannot commit" );
+					log.debugf( "On commit, transaction was marked for roll-back only, rolling back" );
+
+					try {
+						rollback();
+
+						if ( jpaCompliance.isJpaTransactionComplianceEnabled() ) {
+							log.debugf( "Throwing RollbackException on roll-back of transaction marked rollback-only on commit" );
+							throw new RollbackException( "Transaction was marked for rollback-only" );
+						}
+
+						return;
+					}
+					catch (RollbackException e) {
+						throw e;
+					}
+					catch (RuntimeException e) {
+						log.debug( "Encountered failure rolling back failed commit", e );
+						throw e;
+					}
 				}
 
 				JdbcResourceLocalTransactionCoordinatorImpl.this.beforeCompletionCallback();
 				jdbcResourceTransaction.commit();
 				JdbcResourceLocalTransactionCoordinatorImpl.this.afterCompletionCallback( true );
+			}
+			catch (RollbackException e) {
+				throw e;
 			}
 			catch (RuntimeException e) {
 				try {
@@ -245,10 +288,15 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 
 		@Override
 		public void rollback() {
-			if ( rollbackOnly || getStatus() == TransactionStatus.ACTIVE ) {
+			try {
+				TransactionStatus status = jdbcResourceTransaction.getStatus();
+				if ( ( rollbackOnly && status != TransactionStatus.NOT_ACTIVE ) || status == TransactionStatus.ACTIVE ) {
+					jdbcResourceTransaction.rollback();
+					JdbcResourceLocalTransactionCoordinatorImpl.this.afterCompletionCallback( false );
+				}
+			}
+			finally {
 				rollbackOnly = false;
-				jdbcResourceTransaction.rollback();
-				JdbcResourceLocalTransactionCoordinatorImpl.this.afterCompletionCallback( false );
 			}
 
 			// no-op otherwise.
@@ -261,14 +309,16 @@ public class JdbcResourceLocalTransactionCoordinatorImpl implements TransactionC
 
 		@Override
 		public void markRollbackOnly() {
-			if ( log.isDebugEnabled() ) {
-				log.debug(
-						"JDBC transaction marked for rollback-only (exception provided for stack trace)",
-						new Exception( "exception just for purpose of providing stack trace" )
-				);
-			}
+			if ( getStatus() != TransactionStatus.ROLLED_BACK ) {
+				if ( log.isDebugEnabled() ) {
+					log.debug(
+							"JDBC transaction marked for rollback-only (exception provided for stack trace)",
+							new Exception( "exception just for purpose of providing stack trace" )
+					);
+				}
 
-			rollbackOnly = true;
+				rollbackOnly = true;
+			}
 		}
 	}
 }

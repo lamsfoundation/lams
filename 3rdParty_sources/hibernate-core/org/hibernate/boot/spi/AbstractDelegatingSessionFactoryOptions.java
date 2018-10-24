@@ -7,6 +7,8 @@
 package org.hibernate.boot.spi;
 
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.function.Supplier;
 
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.CustomEntityDirtinessStrategy;
@@ -19,13 +21,17 @@ import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.boot.TempTableDdlTransactionHandling;
 import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.cache.spi.QueryCacheFactory;
+import org.hibernate.cache.spi.TimestampsCacheFactory;
 import org.hibernate.cfg.BaselineSessionEventsListenerBuilder;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.jpa.spi.JpaCompliance;
 import org.hibernate.loader.BatchFetchStyle;
 import org.hibernate.proxy.EntityNotFoundDelegate;
+import org.hibernate.query.ImmutableEntityUpdateQueryHandlingMode;
+import org.hibernate.query.criteria.LiteralHandlingMode;
+import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.hibernate.tuple.entity.EntityTuplizerFactory;
 
@@ -34,16 +40,41 @@ import org.hibernate.tuple.entity.EntityTuplizerFactory;
  *
  * @author Steve Ebersole
  */
-public abstract class AbstractDelegatingSessionFactoryOptions implements SessionFactoryOptions {
+@SuppressWarnings("unused")
+public class AbstractDelegatingSessionFactoryOptions implements SessionFactoryOptions {
 	private final SessionFactoryOptions delegate;
 
 	public AbstractDelegatingSessionFactoryOptions(SessionFactoryOptions delegate) {
 		this.delegate = delegate;
 	}
 
+	protected SessionFactoryOptions delegate() {
+		return delegate;
+	}
+
+	@Override
+	public String getUuid() {
+		return delegate().getUuid();
+	}
+
 	@Override
 	public StandardServiceRegistry getServiceRegistry() {
 		return delegate.getServiceRegistry();
+	}
+
+	@Override
+	public boolean isJpaBootstrap() {
+		return delegate.isJpaBootstrap();
+	}
+
+	@Override
+	public boolean isJtaTransactionAccessEnabled() {
+		return delegate.isJtaTransactionAccessEnabled();
+	}
+
+	@Override
+	public boolean isAllowRefreshDetachedEntity() {
+		return delegate.isAllowRefreshDetachedEntity();
 	}
 
 	@Override
@@ -142,6 +173,11 @@ public abstract class AbstractDelegatingSessionFactoryOptions implements Session
 	}
 
 	@Override
+	public boolean isDelayBatchFetchLoaderCreationsEnabled() {
+		return delegate.isDelayBatchFetchLoaderCreationsEnabled();
+	}
+
+	@Override
 	public int getDefaultBatchFetchSize() {
 		return delegate.getDefaultBatchFetchSize();
 	}
@@ -187,13 +223,33 @@ public abstract class AbstractDelegatingSessionFactoryOptions implements Session
 	}
 
 	@Override
-	public boolean isStrictJpaQueryLanguageCompliance() {
-		return delegate.isStrictJpaQueryLanguageCompliance();
+	public boolean isNamedQueryStartupCheckingEnabled() {
+		return delegate.isNamedQueryStartupCheckingEnabled();
 	}
 
 	@Override
-	public boolean isNamedQueryStartupCheckingEnabled() {
-		return delegate.isNamedQueryStartupCheckingEnabled();
+	public boolean isConventionalJavaConstants() {
+		return delegate.isConventionalJavaConstants();
+	}
+
+	@Override
+	public boolean isProcedureParameterNullPassingEnabled() {
+		return delegate.isProcedureParameterNullPassingEnabled();
+	}
+
+	@Override
+	public boolean isCollectionJoinSubqueryRewriteEnabled() {
+		return delegate.isCollectionJoinSubqueryRewriteEnabled();
+	}
+
+	@Override
+	public boolean isAllowOutOfTransactionUpdateOperations() {
+		return delegate.isAllowOutOfTransactionUpdateOperations();
+	}
+
+	@Override
+	public boolean isReleaseResourcesOnCloseEnabled() {
+		return delegate.isReleaseResourcesOnCloseEnabled();
 	}
 
 	@Override
@@ -207,8 +263,8 @@ public abstract class AbstractDelegatingSessionFactoryOptions implements Session
 	}
 
 	@Override
-	public QueryCacheFactory getQueryCacheFactory() {
-		return delegate.getQueryCacheFactory();
+	public TimestampsCacheFactory getTimestampsCacheFactory() {
+		return delegate.getTimestampsCacheFactory();
 	}
 
 	@Override
@@ -272,6 +328,17 @@ public abstract class AbstractDelegatingSessionFactoryOptions implements Session
 	}
 
 	@Override
+	public PhysicalConnectionHandlingMode getPhysicalConnectionHandlingMode() {
+		return delegate.getPhysicalConnectionHandlingMode();
+	}
+
+	@Override
+	public boolean doesConnectionProviderDisableAutoCommit() {
+		return delegate.doesConnectionProviderDisableAutoCommit();
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
 	public ConnectionReleaseMode getConnectionReleaseMode() {
 		return delegate.getConnectionReleaseMode();
 	}
@@ -309,5 +376,60 @@ public abstract class AbstractDelegatingSessionFactoryOptions implements Session
 	@Override
 	public boolean isPreferUserTransaction() {
 		return delegate.isPreferUserTransaction();
+	}
+
+	@Override
+	public Class<? extends Interceptor> getStatelessInterceptorImplementor() {
+		return delegate.getStatelessInterceptorImplementor();
+	}
+
+	@Override
+	public Supplier<? extends Interceptor> getStatelessInterceptorImplementorSupplier() {
+		return delegate.getStatelessInterceptorImplementorSupplier();
+	}
+
+	@Override
+	public TimeZone getJdbcTimeZone() {
+		return delegate.getJdbcTimeZone();
+	}
+
+	@Override
+	public boolean isQueryParametersValidationEnabled() {
+		return delegate.isQueryParametersValidationEnabled();
+	}
+
+	@Override
+	public LiteralHandlingMode getCriteriaLiteralHandlingMode() {
+		return delegate.getCriteriaLiteralHandlingMode();
+	}
+
+	@Override
+	public boolean jdbcStyleParamsZeroBased() {
+		return delegate.jdbcStyleParamsZeroBased();
+	}
+
+	@Override
+	public JpaCompliance getJpaCompliance() {
+		return delegate.getJpaCompliance();
+	}
+
+	@Override
+	public boolean isFailOnPaginationOverCollectionFetchEnabled() {
+		return delegate.isFailOnPaginationOverCollectionFetchEnabled();
+	}
+
+	@Override
+	public ImmutableEntityUpdateQueryHandlingMode getImmutableEntityUpdateQueryHandlingMode() {
+		return delegate.getImmutableEntityUpdateQueryHandlingMode();
+	}
+
+	@Override
+	public boolean inClauseParameterPaddingEnabled() {
+		return delegate.inClauseParameterPaddingEnabled();
+	}
+
+	@Override
+	public boolean nativeExceptionHandling51Compliance() {
+		return delegate.nativeExceptionHandling51Compliance();
 	}
 }

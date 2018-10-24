@@ -17,16 +17,18 @@ import java.util.Set;
 import org.hibernate.CacheMode;
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
-import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
+import org.hibernate.bytecode.spi.BytecodeEnhancementMetadata;
+import org.hibernate.cache.spi.access.CollectionDataAccess;
 import org.hibernate.cache.spi.entry.CollectionCacheEntry;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.CollectionEntry;
 import org.hibernate.engine.spi.CollectionKey;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.EntityPersister;
@@ -47,7 +49,7 @@ public class CollectionLoadContext {
 
 	private final LoadContexts loadContexts;
 	private final ResultSet resultSet;
-	private Set<CollectionKey> localLoadingCollectionKeys = new HashSet<CollectionKey>();
+	private Set<CollectionKey> localLoadingCollectionKeys = new HashSet<>();
 
 	/**
 	 * Creates a collection load context for the given result set.
@@ -148,7 +150,7 @@ public class CollectionLoadContext {
 	 * @param persister The persister for which to complete loading.
 	 */
 	public void endLoadingCollections(CollectionPersister persister) {
-		final SessionImplementor session = getLoadContext().getPersistenceContext().getSession();
+		final SharedSessionContractImplementor session = getLoadContext().getPersistenceContext().getSession();
 		if ( !loadContexts.hasLoadingCollectionEntries()
 				&& localLoadingCollectionKeys.isEmpty() ) {
 			return;
@@ -170,7 +172,7 @@ public class CollectionLoadContext {
 			}
 			else if ( lce.getResultSet() == resultSet && lce.getPersister() == persister ) {
 				if ( matches == null ) {
-					matches = new ArrayList<LoadingCollectionEntry>();
+					matches = new ArrayList<>();
 				}
 				matches.add( lce );
 				if ( lce.getCollection().getOwner() == null ) {
@@ -228,7 +230,7 @@ public class CollectionLoadContext {
 
 	private void endLoadingCollection(LoadingCollectionEntry lce, CollectionPersister persister) {
 		LOG.tracev( "Ending loading collection [{0}]", lce );
-		final SessionImplementor session = getLoadContext().getPersistenceContext().getSession();
+		final SharedSessionContractImplementor session = getLoadContext().getPersistenceContext().getSession();
 
 		// warning: can cause a recursive calls! (proxy initialization)
 		final boolean hasNoQueuedAdds = lce.getCollection().endRead();
@@ -248,6 +250,38 @@ public class CollectionLoadContext {
 //			}
 		}
 
+		// The collection has been completely initialized and added to the PersistenceContext.
+
+		if ( lce.getCollection().getOwner() != null ) {
+			// If the owner is bytecode-enhanced and the owner's collection value is uninitialized,
+			// then go ahead and set it to the newly initialized collection.
+			final BytecodeEnhancementMetadata bytecodeEnhancementMetadata =
+					persister.getOwnerEntityPersister().getInstrumentationMetadata();
+			if ( bytecodeEnhancementMetadata.isEnhancedForLazyLoading() ) {
+				// Lazy properties in embeddables/composites are not currently supported for embeddables (HHH-10480),
+				// so check to make sure the collection is not in an embeddable before checking to see if
+				// the collection is lazy.
+				// TODO: More will probably need to be done here when HHH-10480 is fixed..
+				if ( StringHelper.qualifier( persister.getRole() ).length() ==
+						persister.getOwnerEntityPersister().getEntityName().length() ) {
+					// Assume the collection is not in an embeddable.
+					// Strip off <entityName><dot> to get the collection property name.
+					final String propertyName = persister.getRole().substring(
+							persister.getOwnerEntityPersister().getEntityName().length() + 1
+					);
+					if ( !bytecodeEnhancementMetadata.isAttributeLoaded( lce.getCollection().getOwner(), propertyName ) ) {
+						int propertyIndex = persister.getOwnerEntityPersister().getEntityMetamodel().getPropertyIndex(
+								propertyName
+						);
+						persister.getOwnerEntityPersister().setPropertyValue(
+								lce.getCollection().getOwner(),
+								propertyIndex,
+								lce.getCollection()
+						);
+					}
+				}
+			}
+		}
 
 		// add to cache if:
 		boolean addToCache =
@@ -268,7 +302,7 @@ public class CollectionLoadContext {
 			);
 		}
 		if ( session.getFactory().getStatistics().isStatisticsEnabled() ) {
-			session.getFactory().getStatisticsImplementor().loadCollection( persister.getRole() );
+			session.getFactory().getStatistics().loadCollection( persister.getRole() );
 		}
 	}
 
@@ -279,7 +313,7 @@ public class CollectionLoadContext {
 	 * @param persister The persister
 	 */
 	private void addCollectionToCache(LoadingCollectionEntry lce, CollectionPersister persister) {
-		final SessionImplementor session = getLoadContext().getPersistenceContext().getSession();
+		final SharedSessionContractImplementor session = getLoadContext().getPersistenceContext().getSession();
 		final SessionFactoryImplementor factory = session.getFactory();
 
 		final boolean debugEnabled = LOG.isDebugEnabled();
@@ -330,8 +364,8 @@ public class CollectionLoadContext {
 		}
 
 		final CollectionCacheEntry entry = new CollectionCacheEntry( lce.getCollection(), persister );
-		final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
-		final Object cacheKey = cache.generateCacheKey(
+		final CollectionDataAccess cacheAccess = persister.getCacheAccessStrategy();
+		final Object cacheKey = cacheAccess.generateCacheKey(
 				lce.getKey(),
 				persister,
 				session.getFactory(),
@@ -353,17 +387,19 @@ public class CollectionLoadContext {
 		if (isPutFromLoad) {
 			try {
 				session.getEventListenerManager().cachePutStart();
-				final boolean put = cache.putFromLoad(
+				final boolean put = cacheAccess.putFromLoad(
 						session,
 						cacheKey,
 						persister.getCacheEntryStructure().structure( entry ),
-						session.getTimestamp(),
 						version,
-						factory.getSettings().isMinimalPutsEnabled() && session.getCacheMode()!= CacheMode.REFRESH
+						factory.getSessionFactoryOptions().isMinimalPutsEnabled() && session.getCacheMode()!= CacheMode.REFRESH
 				);
 
 				if ( put && factory.getStatistics().isStatisticsEnabled() ) {
-					factory.getStatisticsImplementor().secondLevelCachePut( persister.getCacheAccessStrategy().getRegion().getName() );
+					factory.getStatistics().collectionCachePut(
+							persister.getNavigableRole(),
+							persister.getCacheAccessStrategy().getRegion().getName()
+					);
 				}
 			}
 			finally {

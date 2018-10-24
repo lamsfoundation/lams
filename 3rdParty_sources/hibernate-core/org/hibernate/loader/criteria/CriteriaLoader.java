@@ -19,13 +19,12 @@ import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.QueryException;
 import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.loader.OuterJoinLoader;
@@ -33,6 +32,7 @@ import org.hibernate.loader.spi.AfterLoadAction;
 import org.hibernate.persister.entity.Loadable;
 import org.hibernate.persister.entity.Lockable;
 import org.hibernate.persister.entity.OuterJoinLoadable;
+import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
@@ -44,8 +44,8 @@ import org.hibernate.type.Type;
  */
 public class CriteriaLoader extends OuterJoinLoader {
 
-	//TODO: this class depends directly upon CriteriaImpl, 
-	//      in the impl package ... add a CriteriaImplementor 
+	//TODO: this class depends directly upon CriteriaImpl,
+	//      in the impl package ... add a CriteriaImplementor
 	//      interface
 
 	//NOTE: unlike all other Loaders, this one is NOT
@@ -73,7 +73,7 @@ public class CriteriaLoader extends OuterJoinLoader {
 				criteria,
 				rootEntityName,
 				CriteriaQueryTranslator.ROOT_SQL_ALIAS
-		);
+			);
 
 		querySpaces = translator.getQuerySpaces();
 
@@ -84,9 +84,9 @@ public class CriteriaLoader extends OuterJoinLoader {
 				criteria,
 				rootEntityName,
 				loadQueryInfluencers
-		);
+			);
 
-		initFromWalker( walker );
+		initFromWalker(walker);
 
 		userAliases = walker.getUserAliases();
 		resultTypes = walker.getResultTypes();
@@ -97,15 +97,15 @@ public class CriteriaLoader extends OuterJoinLoader {
 
 	}
 
-	public ScrollableResults scroll(SessionImplementor session, ScrollMode scrollMode)
-			throws HibernateException {
+	public ScrollableResultsImplementor scroll(SharedSessionContractImplementor session, ScrollMode scrollMode)
+	throws HibernateException {
 		QueryParameters qp = translator.getQueryParameters();
-		qp.setScrollMode( scrollMode );
-		return scroll( qp, resultTypes, null, session );
+		qp.setScrollMode(scrollMode);
+		return scroll(qp, resultTypes, null, session);
 	}
 
-	public List list(SessionImplementor session)
-			throws HibernateException {
+	public List list(SharedSessionContractImplementor session)
+	throws HibernateException {
 		return list( session, translator.getQueryParameters(), querySpaces, resultTypes );
 
 	}
@@ -135,30 +135,30 @@ public class CriteriaLoader extends OuterJoinLoader {
 			Object[] row,
 			ResultTransformer transformer,
 			ResultSet rs,
-			SessionImplementor session)
-			throws SQLException, HibernateException {
+			SharedSessionContractImplementor session)
+	throws SQLException, HibernateException {
 		return resolveResultTransformer( transformer ).transformTuple(
-				getResultRow( row, rs, session ),
+				getResultRow( row, rs, session),
 				getResultRowAliases()
 		);
 	}
 
 	@Override
-	protected Object[] getResultRow(Object[] row, ResultSet rs, SessionImplementor session)
+	protected Object[] getResultRow(Object[] row, ResultSet rs, SharedSessionContractImplementor session)
 			throws SQLException, HibernateException {
 		final Object[] result;
 		if ( translator.hasProjection() ) {
 			Type[] types = translator.getProjectedTypes();
 			result = new Object[types.length];
 			String[] columnAliases = translator.getProjectedColumnAliases();
-			for ( int i = 0, pos = 0; i < result.length; i++ ) {
+			for ( int i=0, pos=0; i<result.length; i++ ) {
 				int numColumns = types[i].getColumnSpan( session.getFactory() );
 				if ( numColumns > 1 ) {
 					String[] typeColumnAliases = ArrayHelper.slice( columnAliases, pos, numColumns );
-					result[i] = types[i].nullSafeGet( rs, typeColumnAliases, session, null );
+					result[i] = types[i].nullSafeGet(rs, typeColumnAliases, session, null);
 				}
 				else {
-					result[i] = types[i].nullSafeGet( rs, columnAliases[pos], session, null );
+					result[i] = types[i].nullSafeGet(rs, columnAliases[pos], session, null);
 				}
 				pos += numColumns;
 			}
@@ -174,7 +174,7 @@ public class CriteriaLoader extends OuterJoinLoader {
 			return row;
 		}
 		else {
-			Object[] result = new Object[resultRowLength];
+			Object[] result = new Object[ resultRowLength ];
 			int j = 0;
 			for ( int i = 0; i < row.length; i++ ) {
 				if ( includeInResultRow[i] ) {
@@ -205,7 +205,8 @@ public class CriteriaLoader extends OuterJoinLoader {
 			return sql;
 		}
 
-		if ( dialect.useFollowOnLocking() ) {
+		if ( ( parameters.getLockOptions().getFollowOnLocking() == null && dialect.useFollowOnLocking( parameters ) ) ||
+			( parameters.getLockOptions().getFollowOnLocking() != null && parameters.getLockOptions().getFollowOnLocking() ) ) {
 			final LockMode lockMode = determineFollowOnLockMode( lockOptions );
 			if ( lockMode != LockMode.UPGRADE_SKIPLOCKED ) {
 				// Dialect prefers to perform locking in a separate step
@@ -217,27 +218,27 @@ public class CriteriaLoader extends OuterJoinLoader {
 
 				afterLoadActions.add(
 						new AfterLoadAction() {
-							@Override
-							public void afterLoad(SessionImplementor session, Object entity, Loadable persister) {
-								( (Session) session ).buildLockRequest( lockOptionsToUse )
+								@Override
+							public void afterLoad(SharedSessionContractImplementor session, Object entity, Loadable persister) {
+									( (Session) session ).buildLockRequest( lockOptionsToUse )
 										.lock( persister.getEntityName(), entity );
-							}
+								}
 						}
 				);
 				parameters.setLockOptions( new LockOptions() );
 				return sql;
 			}
 		}
-		final LockOptions locks = new LockOptions( lockOptions.getLockMode() );
-		locks.setScope( lockOptions.getScope() );
-		locks.setTimeOut( lockOptions.getTimeOut() );
+		final LockOptions locks = new LockOptions(lockOptions.getLockMode());
+		locks.setScope( lockOptions.getScope());
+		locks.setTimeOut( lockOptions.getTimeOut());
 
-		final Map keyColumnNames = dialect.forUpdateOfColumns() ? new HashMap() : null;
+		final Map<String,String[]> keyColumnNames = dialect.forUpdateOfColumns() ? new HashMap() : null;
 		final String[] drivingSqlAliases = getAliases();
 		for ( int i = 0; i < drivingSqlAliases.length; i++ ) {
 			final LockMode lockMode = lockOptions.getAliasSpecificLockMode( drivingSqlAliases[i] );
 			if ( lockMode != null ) {
-				final Lockable drivingPersister = (Lockable) getEntityPersisters()[i];
+				final Lockable drivingPersister = ( Lockable ) getEntityPersisters()[i];
 				final String rootSqlAlias = drivingPersister.getRootTableAlias( drivingSqlAliases[i] );
 				locks.setAliasSpecificLockMode( rootSqlAlias, lockMode );
 				if ( keyColumnNames != null ) {
@@ -269,9 +270,9 @@ public class CriteriaLoader extends OuterJoinLoader {
 		}
 		final int size = entityAliases.length;
 		LockMode[] lockModesArray = new LockMode[size];
-		for ( int i = 0; i < size; i++ ) {
+		for ( int i=0; i<size; i++ ) {
 			LockMode lockMode = lockOptions.getAliasSpecificLockMode( entityAliases[i] );
-			lockModesArray[i] = lockMode == null ? lockOptions.getLockMode() : lockMode;
+			lockModesArray[i] = lockMode==null ? lockOptions.getLockMode() : lockMode;
 		}
 		return lockModesArray;
 	}

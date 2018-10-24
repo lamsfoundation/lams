@@ -18,10 +18,9 @@ import org.hibernate.MappingException;
 import org.hibernate.collection.internal.AbstractPersistentCollection;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.internal.CoreLogging;
+import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.pretty.MessageHelper;
-
-import org.jboss.logging.Logger;
 
 /**
  * We need an entry to tell us all about the current state
@@ -30,7 +29,7 @@ import org.jboss.logging.Logger;
  * @author Gavin King
  */
 public final class CollectionEntry implements Serializable {
-	private static final Logger LOG = CoreLogging.logger( CollectionEntry.class );
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( CollectionEntry.class );
 
 	//ATTRIBUTES MAINTAINED BETWEEN FLUSH CYCLES
 
@@ -121,7 +120,7 @@ public final class CollectionEntry implements Serializable {
 		ignore = false;
 
 		loadedKey = collection.getKey();
-		setLoadedPersister( factory.getCollectionPersister( collection.getRole() ) );
+		setLoadedPersister( factory.getMetamodel().collectionPersister( collection.getRole() ) );
 
 		snapshot = collection.getStoredSnapshot();
 	}
@@ -217,7 +216,7 @@ public final class CollectionEntry implements Serializable {
 			ignore = false;
 		}
 		else if ( !isProcessed() ) {
-			throw new AssertionFailure( "collection [" + collection.getRole() + "] was not processed by flush()" );
+			throw new HibernateException( LOG.collectionNotProcessedByFlush( collection.getRole() ) );
 		}
 		collection.setSnapshot(loadedKey, role, snapshot);
 	}
@@ -279,7 +278,7 @@ public final class CollectionEntry implements Serializable {
 	}
 
 	void afterDeserialize(SessionFactoryImplementor factory) {
-		loadedPersister = ( factory == null ? null : factory.getCollectionPersister( role ) );
+		loadedPersister = ( factory == null ? null : factory.getMetamodel().collectionPersister( role ) );
 	}
 
 	public boolean wasDereferenced() {

@@ -8,6 +8,7 @@ package org.hibernate.mapping;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,7 +24,6 @@ import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.internal.FilterConfiguration;
 import org.hibernate.internal.util.StringHelper;
-import org.hibernate.internal.util.collections.EmptyIterator;
 import org.hibernate.internal.util.collections.JoinedIterator;
 import org.hibernate.internal.util.collections.SingletonIterator;
 import org.hibernate.service.ServiceRegistry;
@@ -54,20 +54,20 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 
 	private String discriminatorValue;
 	private boolean lazy;
-	private ArrayList properties = new ArrayList();
-	private ArrayList declaredProperties = new ArrayList();
-	private final ArrayList<Subclass> subclasses = new ArrayList<Subclass>();
-	private final ArrayList subclassProperties = new ArrayList();
-	private final ArrayList subclassTables = new ArrayList();
+	private java.util.List<Property> properties = new ArrayList<>();
+	private java.util.List<Property> declaredProperties = new ArrayList<>();
+	private final java.util.List<Subclass> subclasses = new ArrayList<>();
+	private final java.util.List<Property> subclassProperties = new ArrayList<>();
+	private final java.util.List<Table> subclassTables = new ArrayList<>();
 	private boolean dynamicInsert;
 	private boolean dynamicUpdate;
 	private int batchSize = -1;
 	private boolean selectBeforeUpdate;
 	private java.util.Map metaAttributes;
-	private ArrayList<Join> joins = new ArrayList<Join>();
-	private final ArrayList subclassJoins = new ArrayList();
-	private final java.util.List filters = new ArrayList();
-	protected final java.util.Set synchronizedTables = new HashSet();
+	private java.util.List<Join> joins = new ArrayList<>();
+	private final java.util.List<Join> subclassJoins = new ArrayList<>();
+	private final java.util.List<FilterConfiguration> filters = new ArrayList<>();
+	protected final java.util.Set<String> synchronizedTables = new HashSet<>();
 	private String loaderName;
 	private Boolean isAbstract;
 	private boolean hasSubselectLoadableCollections;
@@ -89,6 +89,8 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 	private MappedSuperclass superMappedSuperclass;
 	private Component declaredIdentifierMapper;
 	private OptimisticLockStyle optimisticLockStyle;
+
+	private boolean isCached;
 
 	public PersistentClass(MetadataBuildingContext metadataBuildingContext) {
 		this.metadataBuildingContext = metadataBuildingContext;
@@ -123,7 +125,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 
 		try {
 			if ( mappedClass == null ) {
-				mappedClass = metadataBuildingContext.getClassLoaderAccess().classForName( className );
+				mappedClass = metadataBuildingContext.getBootstrapContext().getClassLoaderAccess().classForName( className );
 			}
 			return mappedClass;
 		}
@@ -138,7 +140,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 		}
 		try {
 			if ( proxyInterface == null ) {
-				proxyInterface = metadataBuildingContext.getClassLoaderAccess().classForName( proxyInterfaceName );
+				proxyInterface = metadataBuildingContext.getBootstrapContext().getClassLoaderAccess().classForName( proxyInterfaceName );
 			}
 			return proxyInterface;
 		}
@@ -270,9 +272,34 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 
 	public abstract boolean isVersioned();
 
-	public abstract String getNaturalIdCacheRegionName();
+
+	public boolean isCached() {
+		return isCached;
+	}
+
+	public void setCached(boolean cached) {
+		isCached = cached;
+	}
+
+	/**
+	 * @deprecated Use {@link #isCached} instead
+	 */
+	@Deprecated
+	public boolean isCachingExplicitlyRequested() {
+		return isCached();
+	}
+
+	/**
+	 * @deprecated Use {@link #setCached} instead
+	 */
+	@Deprecated
+	public void setCachingExplicitlyRequested(boolean cached) {
+		setCached( cached );
+	}
 
 	public abstract String getCacheConcurrencyStrategy();
+
+	public abstract String getNaturalIdCacheRegionName();
 
 	public abstract PersistentClass getSuperclass();
 
@@ -303,7 +330,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 		iters.add( getPropertyClosureIterator() );
 		iters.add( subclassProperties.iterator() );
 		for ( int i = 0; i < subclassJoins.size(); i++ ) {
-			Join join = (Join) subclassJoins.get( i );
+			Join join = subclassJoins.get( i );
 			iters.add( join.getPropertyIterator() );
 		}
 		return new JoinedIterator( iters );
@@ -382,11 +409,13 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 	}
 
 	/**
-	 * Build an iterator of properties which are "referenceable".
-	 *
-	 * @return The property iterator.
+	 * Build an iterator of properties which may be referenced in association mappings.
+	 * <p>
+	 * Includes properties defined in superclasses of the mapping inheritance.
+	 * Includes all properties defined as part of a join.
 	 *
 	 * @see #getReferencedProperty for a discussion of "referenceable"
+	 * @return The referenceable property iterator.
 	 */
 	public Iterator getReferenceablePropertyIterator() {
 		return getPropertyClosureIterator();
@@ -396,7 +425,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 	 * Given a property path, locate the appropriate referenceable property reference.
 	 * <p/>
 	 * A referenceable property is a property  which can be a target of a foreign-key
-	 * mapping (an identifier or explcitly named in a property-ref).
+	 * mapping (e.g. {@code @ManyToOne}, {@code @OneToOne}).
 	 *
 	 * @param propertyPath The property path to resolve into a property reference.
 	 *
@@ -417,7 +446,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 
 	public Property getRecursiveProperty(String propertyPath) throws MappingException {
 		try {
-			return getRecursiveProperty( propertyPath, getPropertyIterator() );
+			return getRecursiveProperty( propertyPath, getPropertyClosureIterator() );
 		}
 		catch (MappingException e) {
 			throw new MappingException(
@@ -606,7 +635,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 	}
 
 	private void checkPropertyDuplication() throws MappingException {
-		HashSet<String> names = new HashSet<String>();
+		HashSet<String> names = new HashSet<>();
 		Iterator iter = getPropertyIterator();
 		while ( iter.hasNext() ) {
 			Property prop = (Property) iter.next();
@@ -686,8 +715,11 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 	 * iterator only accounts for "normal" properties (i.e. non-identifier
 	 * properties).
 	 * <p/>
-	 * Differs from {@link #getUnjoinedPropertyIterator} in that the iterator
-	 * we return here will include properties defined as part of a join.
+	 * Differs from {@link #getUnjoinedPropertyIterator} in that the returned iterator
+	 * will include properties defined as part of a join.
+	 * <p/>
+	 * Differs from {@link #getReferenceablePropertyIterator} in that the properties
+	 * defined in superclasses of the mapping inheritance are not included.
 	 *
 	 * @return An iterator over the "normal" properties.
 	 */
@@ -695,7 +727,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 		ArrayList iterators = new ArrayList();
 		iterators.add( properties.iterator() );
 		for ( int i = 0; i < joins.size(); i++ ) {
-			Join join = (Join) joins.get( i );
+			Join join = joins.get( i );
 			iterators.add( join.getPropertyIterator() );
 		}
 		return new JoinedIterator( iterators );
@@ -856,7 +888,7 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 	}
 
 	protected Iterator getDiscriminatorColumnIterator() {
-		return EmptyIterator.INSTANCE;
+		return Collections.emptyIterator();
 	}
 
 	protected void checkColumnDuplication() {
@@ -950,14 +982,12 @@ public abstract class PersistentClass implements AttributeContainer, Serializabl
 		return false;
 	}
 
-	public abstract boolean isLazyPropertiesCacheable();
-
 	// The following methods are added to support @MappedSuperclass in the metamodel
 	public Iterator getDeclaredPropertyIterator() {
 		ArrayList iterators = new ArrayList();
 		iterators.add( declaredProperties.iterator() );
 		for ( int i = 0; i < joins.size(); i++ ) {
-			Join join = (Join) joins.get( i );
+			Join join = joins.get( i );
 			iterators.add( join.getDeclaredPropertyIterator() );
 		}
 		return new JoinedIterator( iterators );

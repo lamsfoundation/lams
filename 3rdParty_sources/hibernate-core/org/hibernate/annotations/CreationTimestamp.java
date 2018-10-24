@@ -6,8 +6,12 @@
  */
 package org.hibernate.annotations;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import org.hibernate.tuple.CreationTimestampGeneration;
 
@@ -22,11 +26,22 @@ import org.hibernate.tuple.CreationTimestampGeneration;
  * <li>{@link java.sql.Date}</li>
  * <li>{@link java.sql.Time}</li>
  * <li>{@link java.sql.Timestamp}</li>
+ * <li>{@link java.time.Instant}</li>
+ * <li>{@link java.time.LocalDate}</li>
+ * <li>{@link java.time.LocalDateTime}</li>
+ * <li>{@link java.time.LocalTime}</li>
+ * <li>{@link java.time.MonthDay}</li>
+ * <li>{@link java.time.OffsetDateTime}</li>
+ * <li>{@link java.time.OffsetTime}</li>
+ * <li>{@link java.time.Year}</li>
+ * <li>{@link java.time.YearMonth}</li>
+ * <li>{@link java.time.ZonedDateTime}</li>
  * </ul>
  *
  * @author Gunnar Morling
  */
 @ValueGenerationType(generatedBy = CreationTimestampGeneration.class)
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ FIELD, METHOD })
 public @interface CreationTimestamp {
 }

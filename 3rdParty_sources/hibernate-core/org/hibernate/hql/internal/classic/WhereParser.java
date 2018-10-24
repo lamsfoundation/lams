@@ -16,7 +16,6 @@ import java.util.StringTokenizer;
 
 import org.hibernate.MappingException;
 import org.hibernate.QueryException;
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.internal.JoinSequence;
 import org.hibernate.hql.spi.QueryTranslator;
 import org.hibernate.internal.util.ReflectHelper;
@@ -27,6 +26,8 @@ import org.hibernate.sql.InFragment;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.LiteralType;
 import org.hibernate.type.Type;
+
+import static org.hibernate.hql.spi.QueryTranslator.ERROR_LEGACY_ORDINAL_PARAMS_NO_LONGER_SUPPORTED;
 
 /**
  * Parses the where clause of a hibernate query and translates it to an
@@ -397,12 +398,32 @@ public class WhereParser implements Parser {
 	}
 
 	private void doToken(String token, QueryTranslatorImpl q) throws QueryException {
-		if ( q.isName( StringHelper.root( token ) ) ) { //path expression
+		if ( q.isName( StringHelper.root( token ) ) ) {
+			//path expression
 			doPathExpression( q.unalias( token ), q );
 		}
-		else if ( token.startsWith( ParserHelper.HQL_VARIABLE_PREFIX ) ) { //named query parameter
+		else if ( token.startsWith( ParserHelper.HQL_VARIABLE_PREFIX ) ) {
+			//named query parameter
 			q.addNamedParameter( token.substring( 1 ) );
 			appendToken( q, "?" );
+		}
+		else if ( token.startsWith( "?" ) ) {
+			// ordinal query parameter
+			if ( token.length() == 1 ) {
+				q.addLegacyPositionalParameter();
+				appendToken( q, "?" );
+			}
+			else {
+				final String labelString = token.substring( 1 );
+				try {
+					final int label = Integer.parseInt( labelString );
+					q.addOrdinalParameter( label );
+					appendToken( q, "?" );
+				}
+				catch (NumberFormatException e) {
+					throw new QueryException( "Ordinal parameter label must be numeric : " + labelString, e );
+				}
+			}
 		}
 		else {
 			Queryable persister = q.getEntityPersisterUsingImports( token );
@@ -419,7 +440,7 @@ public class WhereParser implements Parser {
 				Object constant;
 				if (
 						token.indexOf( '.' ) > -1 &&
-						( constant = ReflectHelper.getConstantValue( token, q.getFactory().getServiceRegistry().getService( ClassLoaderService.class ) ) ) != null
+						( constant = ReflectHelper.getConstantValue( token, q.getFactory() ) ) != null
 				) {
 					Type type;
 					try {

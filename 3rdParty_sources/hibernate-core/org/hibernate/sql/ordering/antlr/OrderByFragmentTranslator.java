@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.hql.internal.ast.util.ASTPrinter;
+import org.hibernate.hql.internal.ast.util.TokenPrinters;
 
 import org.jboss.logging.Logger;
 
@@ -36,6 +37,8 @@ public class OrderByFragmentTranslator {
 	 * @return The translation.
 	 */
 	public static OrderByTranslation translate(TranslationContext context, String fragment) {
+		LOG.tracef( "Beginning parsing of order-by fragment : " + fragment );
+
 		GeneratedOrderByLexer lexer = new GeneratedOrderByLexer( new StringReader( fragment ) );
 
 		// Perform the parsing (and some analysis/resolution).  Another important aspect is the collection
@@ -53,8 +56,7 @@ public class OrderByFragmentTranslator {
 		}
 
 		if ( LOG.isTraceEnabled() ) {
-			ASTPrinter printer = new ASTPrinter( OrderByTemplateTokenTypes.class );
-			LOG.trace( printer.showAsString( parser.getAST(), "--- {order-by fragment} ---" ) );
+			LOG.trace( TokenPrinters.ORDERBY_FRAGMENT_PRINTER.showAsString( parser.getAST(), "--- {order-by fragment} ---" ) );
 		}
 
 		// Render the parsed tree to text.

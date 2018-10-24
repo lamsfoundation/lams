@@ -11,8 +11,10 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import org.hibernate.HibernateException;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.engine.jdbc.BinaryStream;
 import org.hibernate.engine.jdbc.internal.BinaryStreamImpl;
 import org.hibernate.internal.util.SerializationHelper;
@@ -28,13 +30,9 @@ public class SerializableTypeDescriptor<T extends Serializable> extends Abstract
 
 	// unfortunately the param types cannot be the same so use something other than 'T' here to make that obvious
 	public static class SerializableMutabilityPlan<S extends Serializable> extends MutableMutabilityPlan<S> {
-		private final Class<S> type;
+		public static final SerializableMutabilityPlan<Serializable> INSTANCE = new SerializableMutabilityPlan<>();
 
-		public static final SerializableMutabilityPlan<Serializable> INSTANCE
-				= new SerializableMutabilityPlan<Serializable>( Serializable.class );
-
-		public SerializableMutabilityPlan(Class<S> type) {
-			this.type = type;
+		private SerializableMutabilityPlan() {
 		}
 
 		@Override
@@ -45,14 +43,16 @@ public class SerializableTypeDescriptor<T extends Serializable> extends Abstract
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public SerializableTypeDescriptor(Class<T> type) {
-		super(
-				type,
-				Serializable.class.equals( type )
-						? (MutabilityPlan<T>) SerializableMutabilityPlan.INSTANCE
-						: new SerializableMutabilityPlan<T>( type )
-		);
+		super( type, createMutabilityPlan( type ) );
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private static <T> MutabilityPlan<T> createMutabilityPlan(Class<T> type) {
+		if ( type.isAnnotationPresent( Immutable.class ) ) {
+			return ImmutableMutabilityPlan.INSTANCE;
+		}
+		return (MutabilityPlan<T>) SerializableMutabilityPlan.INSTANCE;
 	}
 
 	public String toString(T value) {
@@ -72,7 +72,7 @@ public class SerializableTypeDescriptor<T extends Serializable> extends Abstract
 			return false;
 		}
 		return one.equals( another )
-				|| PrimitiveByteArrayTypeDescriptor.INSTANCE.areEqual( toBytes( one ), toBytes( another ) );
+				|| Arrays.equals( toBytes( one ), toBytes( another ) );
 	}
 
 	@Override
@@ -97,10 +97,10 @@ public class SerializableTypeDescriptor<T extends Serializable> extends Abstract
 		else if ( BinaryStream.class.isAssignableFrom( type ) ) {
 			return (X) new BinaryStreamImpl( toBytes( value ) );
 		}
-		else if ( Blob.class.isAssignableFrom( type )) {
-			return (X) options.getLobCreator().createBlob( toBytes(value) );
+		else if ( Blob.class.isAssignableFrom( type ) ) {
+			return (X) options.getLobCreator().createBlob( toBytes( value ) );
 		}
-		
+
 		throw unknownUnwrap( type );
 	}
 
@@ -115,15 +115,15 @@ public class SerializableTypeDescriptor<T extends Serializable> extends Abstract
 		else if ( InputStream.class.isInstance( value ) ) {
 			return fromBytes( DataHelper.extractBytes( (InputStream) value ) );
 		}
-		else if ( Blob.class.isInstance( value )) {
+		else if ( Blob.class.isInstance( value ) ) {
 			try {
-				return fromBytes( DataHelper.extractBytes( ( (Blob) value ).getBinaryStream() ) );
+				return fromBytes( DataHelper.extractBytes( ((Blob) value).getBinaryStream() ) );
 			}
 			catch ( SQLException e ) {
-				throw new HibernateException(e);
+				throw new HibernateException( e );
 			}
 		}
-		else if ( getJavaTypeClass().isInstance( value ) ) {
+		else if ( getJavaType().isInstance( value ) ) {
 			return (T) value;
 		}
 		throw unknownWrap( value.getClass() );
@@ -135,6 +135,6 @@ public class SerializableTypeDescriptor<T extends Serializable> extends Abstract
 
 	@SuppressWarnings({ "unchecked" })
 	protected T fromBytes(byte[] bytes) {
-		return (T) SerializationHelper.deserialize( bytes, getJavaTypeClass().getClassLoader() );
+		return (T) SerializationHelper.deserialize( bytes, getJavaType().getClassLoader() );
 	}
 }

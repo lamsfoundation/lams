@@ -5,12 +5,13 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.param;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.type.Type;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.engine.spi.TypedValue;
 
 /**
  * Parameter bind specification for an explicit  positional (or ordinal) parameter.
@@ -18,18 +19,24 @@ import org.hibernate.type.Type;
  * @author Steve Ebersole
  */
 public class PositionalParameterSpecification extends AbstractExplicitParameterSpecification  {
-	private final int hqlPosition;
+	private final int label;
+	private final int bindingPosition;
 
 	/**
 	 * Constructs a position/ordinal parameter bind specification.
 	 *
 	 * @param sourceLine See {@link #getSourceLine()}
 	 * @param sourceColumn See {@link #getSourceColumn()}
-	 * @param hqlPosition The position in the source query, relative to the other source positional parameters.
+	 * @param label The position in the source query, relative to the other source positional parameters.
 	 */
-	public PositionalParameterSpecification(int sourceLine, int sourceColumn, int hqlPosition) {
+	public PositionalParameterSpecification(
+			int sourceLine,
+			int sourceColumn,
+			int label,
+			int bindingPosition) {
 		super( sourceLine, sourceColumn );
-		this.hqlPosition = hqlPosition;
+		this.label = label;
+		this.bindingPosition = bindingPosition;
 	}
 
 	/**
@@ -43,25 +50,18 @@ public class PositionalParameterSpecification extends AbstractExplicitParameterS
 	 * @return The number of sql bind positions "eaten" by this bind operation.
 	 */
 	@Override
-	public int bind(PreparedStatement statement, QueryParameters qp, SessionImplementor session, int position) throws SQLException {
-		Type type = qp.getPositionalParameterTypes()[hqlPosition];
-		Object value = qp.getPositionalParameterValues()[hqlPosition];
-
-		type.nullSafeSet( statement, value, position, session );
-		return type.getColumnSpan( session.getFactory() );
+	public int bind(PreparedStatement statement, QueryParameters qp, SharedSessionContractImplementor session, int position) throws SQLException {
+		final TypedValue typedValue = qp.getNamedParameters().get( Integer.toString( label ) );
+		typedValue.getType().nullSafeSet( statement, typedValue.getValue(), position, session );
+		return typedValue.getType().getColumnSpan( session.getFactory() );
 	}
 
 	@Override
 	public String renderDisplayInfo() {
-		return "ordinal=" + hqlPosition + ", expectedType=" + getExpectedType();
+		return "label=" + label + ", expectedType=" + getExpectedType();
 	}
 
-	/**
-	 * Getter for property 'hqlPosition'.
-	 *
-	 * @return Value for property 'hqlPosition'.
-	 */
-	public int getHqlPosition() {
-		return hqlPosition;
+	public int getLabel() {
+		return label;
 	}
 }

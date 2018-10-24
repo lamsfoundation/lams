@@ -41,13 +41,13 @@ public class TransitionDAO extends LAMSBaseDAO implements ITransitionDAO {
 
     private static final String TABLENAME = "lams_learning_transition";
     private static final String FIND_BY_TO_ACTIVITY = "from " + TABLENAME + " in class " + Transition.class.getName()
-	    + " where to_activity_id =?";
+	    + " where to_activity_id =:activity_id";
     private static final String FIND_BY_FROM_ACTIVITY = "from " + TABLENAME + " in class " + Transition.class.getName()
-	    + " where from_activity_id =?";
+	    + " where from_activity_id =:activity_id";
     private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + TABLENAME + " in class "
-	    + Transition.class.getName() + " where learning_design_id=?";
+	    + Transition.class.getName() + " where learning_design_id=:ldId";
     private static final String FIND_BY_UI_ID = "from " + TABLENAME + " in class " + Transition.class.getName()
-	    + " where transition_ui_id=?" + " AND " + " learning_design_id=?";
+	    + " where transition_ui_id=:uiid" + " AND " + " learning_design_id=:ldId";
 
     /**
      * (non-Javadoc)
@@ -68,7 +68,7 @@ public class TransitionDAO extends LAMSBaseDAO implements ITransitionDAO {
     public Transition getTransitionByToActivityID(Long toActivityID) {
 	if (toActivityID != null) {
 	    Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_TO_ACTIVITY);
-	    query.setLong(0, toActivityID.longValue());
+	    query.setLong("activity_id", toActivityID.longValue());
 	    return (Transition) query.uniqueResult();
 	}
 	return null;
@@ -83,7 +83,7 @@ public class TransitionDAO extends LAMSBaseDAO implements ITransitionDAO {
     public Transition getTransitionByfromActivityID(Long fromActivityID) {
 	if (fromActivityID != null) {
 	    return (Transition) getSessionFactory().getCurrentSession().createQuery(FIND_BY_FROM_ACTIVITY)
-		    .setLong(0, fromActivityID.longValue()).uniqueResult();
+		    .setLong("activity_id", fromActivityID.longValue()).uniqueResult();
 	}
 	return null;
     }
@@ -92,7 +92,7 @@ public class TransitionDAO extends LAMSBaseDAO implements ITransitionDAO {
     public List getTransitionsByLearningDesignID(Long learningDesignID) {
 	if (learningDesignID != null) {
 	    return getSessionFactory().getCurrentSession().createQuery(FIND_BY_LEARNING_DESIGN_ID)
-		    .setLong(0, learningDesignID.longValue()).list();
+		    .setLong("ldId", learningDesignID.longValue()).list();
 	}
 	return null;
     }
@@ -112,8 +112,8 @@ public class TransitionDAO extends LAMSBaseDAO implements ITransitionDAO {
 	if (transitionUUID != null && learningDesign != null) {
 	    Long designID = learningDesign.getLearningDesignId();
 	    Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_UI_ID);
-	    query.setInteger(0, transitionUUID.intValue());
-	    query.setLong(1, designID.longValue());
+	    query.setInteger("uiid", transitionUUID.intValue());
+	    query.setLong("ldId", designID.longValue());
 	    return (Transition) query.uniqueResult();
 	}
 	return null;

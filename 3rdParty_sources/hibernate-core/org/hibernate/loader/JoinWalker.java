@@ -232,7 +232,7 @@ public class JoinWalker {
 				aliasedLhsColumns,
 				subalias,
 				joinType,
-				getWithClause( path ),
+				joinable.consumesEntityAlias() ? getWithClause( path ) : "",
 				hasRestriction( path ),
 				getFactory(),
 				loadQueryInfluencers.getEnabledFilters()
@@ -817,7 +817,7 @@ public class JoinWalker {
 		@Override
 		public boolean equals(Object other) {
 			AssociationKey that = (AssociationKey) other;
-			return that.table.equals( table ) && Arrays.equals( columns, that.columns );
+			return that != null && that.table.equals( table ) && Arrays.equals( columns, that.columns );
 		}
 
 		@Override

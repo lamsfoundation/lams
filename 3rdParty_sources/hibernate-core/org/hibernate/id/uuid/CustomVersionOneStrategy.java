@@ -5,10 +5,12 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.id.uuid;
+
 import java.util.UUID;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.UUIDGenerationStrategy;
+import org.hibernate.internal.build.AllowSysOut;
 import org.hibernate.internal.util.BytesHelper;
 
 /**
@@ -43,7 +45,7 @@ public class CustomVersionOneStrategy implements UUIDGenerationStrategy {
 		mostSignificantBits = BytesHelper.asLong( hiBits );
 	}
 	@Override
-	public UUID generateUUID(SessionImplementor session) {
+	public UUID generateUUID(SharedSessionContractImplementor session) {
 		long leastSignificantBits = generateLeastSignificantBits( System.currentTimeMillis() );
 		return new UUID( mostSignificantBits, leastSignificantBits );
 	}
@@ -61,11 +63,12 @@ public class CustomVersionOneStrategy implements UUIDGenerationStrategy {
 		System.arraycopy( BytesHelper.fromInt( loTime ), 0, loBits, 2, 4 );
 		System.arraycopy( Helper.getCountBytes(), 0, loBits, 6, 2 );
 		loBits[0] &= 0x3f;
-		loBits[0] |= ((byte)2 << (byte)6);
+		loBits[0] |= ((byte)2 << (byte)6 );
 
 		return BytesHelper.asLong( loBits );
 	}
 
+	@AllowSysOut
 	public static void main(String[] args) {
 		CustomVersionOneStrategy strategy = new CustomVersionOneStrategy();
 

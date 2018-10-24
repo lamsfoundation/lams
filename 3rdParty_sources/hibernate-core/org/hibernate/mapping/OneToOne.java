@@ -8,8 +8,10 @@ package org.hibernate.mapping;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.ForeignKeyDirection;
@@ -27,8 +29,18 @@ public class OneToOne extends ToOne {
 	private String propertyName;
 	private String entityName;
 
+	/**
+	 * @deprecated Use {@link OneToOne#OneToOne(MetadataBuildingContext, Table, PersistentClass)} instead.
+	 */
+	@Deprecated
 	public OneToOne(MetadataImplementor metadata, Table table, PersistentClass owner) throws MappingException {
 		super( metadata, table );
+		this.identifier = owner.getKey();
+		this.entityName = owner.getEntityName();
+	}
+
+	public OneToOne(MetadataBuildingContext buildingContext, Table table, PersistentClass owner) throws MappingException {
+		super( buildingContext, table );
 		this.identifier = owner.getKey();
 		this.entityName = owner.getEntityName();
 	}
@@ -145,6 +157,20 @@ public class OneToOne extends ToOne {
 
 	public Object accept(ValueVisitor visitor) {
 		return visitor.accept(this);
+	}
+
+	@Override
+	public boolean isSame(ToOne other) {
+		return other instanceof OneToOne && isSame( (OneToOne) other );
+	}
+
+	public boolean isSame(OneToOne other) {
+		return super.isSame( other )
+				&& Objects.equals( foreignKeyType, other.foreignKeyType )
+				&& isSame( identifier, other.identifier )
+				&& Objects.equals( propertyName, other.propertyName )
+				&& Objects.equals( entityName, other.entityName )
+				&& constrained == other.constrained;
 	}
 	
 }

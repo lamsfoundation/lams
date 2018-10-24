@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
+import org.hibernate.boot.registry.classloading.internal.TcclLookupPrecedence;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.internal.BootstrapServiceRegistryImpl;
 import org.hibernate.boot.registry.selector.StrategyRegistration;
@@ -39,6 +40,7 @@ public class BootstrapServiceRegistryBuilder {
 	private List<ClassLoader> providedClassLoaders;
 	private ClassLoaderService providedClassLoaderService;
 	private StrategySelectorBuilder strategySelectorBuilder = new StrategySelectorBuilder();
+	private TcclLookupPrecedence tcclLookupPrecedence = TcclLookupPrecedence.AFTER;
 
 	private boolean autoCloseRegistry = true;
 
@@ -83,6 +85,15 @@ public class BootstrapServiceRegistryBuilder {
 		}
 		providedClassLoaders.add( classLoader );
 		return this;
+	}
+
+	/**
+	 * Defines when the lookup in the thread context {@code ClassLoader} is done
+	 * 
+	 * @param precedence The lookup precedence
+	 */
+	public void applyTcclLookupPrecedence(TcclLookupPrecedence precedence) {
+		tcclLookupPrecedence = precedence;
 	}
 
 	/**
@@ -145,7 +156,7 @@ public class BootstrapServiceRegistryBuilder {
 	/**
 	 * Applies one or more strategy selectors announced as available by the passed announcer.
 	 *
-	 * @param strategyRegistrationProvider An provider for one or more available selectors
+	 * @param strategyRegistrationProvider A provider for one or more available selectors
 	 *
 	 * @return {@code this}, for method chaining
 	 *
@@ -204,7 +215,7 @@ public class BootstrapServiceRegistryBuilder {
 				classLoaders.addAll( providedClassLoaders );
 			}
 			
-			classLoaderService = new ClassLoaderServiceImpl( classLoaders );
+			classLoaderService = new ClassLoaderServiceImpl( classLoaders,tcclLookupPrecedence );
 		}
 		else {
 			classLoaderService = providedClassLoaderService;
@@ -214,7 +225,6 @@ public class BootstrapServiceRegistryBuilder {
 				providedIntegrators,
 				classLoaderService
 		);
-
 
 		return new BootstrapServiceRegistryImpl(
 				autoCloseRegistry,

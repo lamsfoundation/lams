@@ -639,6 +639,8 @@ public class FileUtil {
 	IdentifierGenerator uuidGen = new UUIDGenerator();
 	((Configurable) uuidGen).configure(StringType.INSTANCE, new Properties(), null);
 
+//	Serializable generate(SharedSessionContractImplementor session, Object object)
+	
 	// lowercase to resolve OS issues
 	return ((String) uuidGen.generate(null, null)).toLowerCase();
     }

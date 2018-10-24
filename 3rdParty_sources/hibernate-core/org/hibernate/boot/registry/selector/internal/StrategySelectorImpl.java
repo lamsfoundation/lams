@@ -6,6 +6,9 @@
  */
 package org.hibernate.boot.registry.selector.internal;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -13,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.registry.selector.spi.StrategyCreator;
 import org.hibernate.boot.registry.selector.spi.StrategySelectionException;
 import org.hibernate.boot.registry.selector.spi.StrategySelector;
 
@@ -26,8 +30,20 @@ import org.jboss.logging.Logger;
 public class StrategySelectorImpl implements StrategySelector {
 	private static final Logger log = Logger.getLogger( StrategySelectorImpl.class );
 
-	private final Map<Class,Map<String,Class>> namedStrategyImplementorByStrategyMap
-			= new ConcurrentHashMap<Class, Map<String, Class>>();
+
+	public static StrategyCreator STANDARD_STRATEGY_CREATOR = strategyClass -> {
+		try {
+			return strategyClass.newInstance();
+		}
+		catch (Exception e) {
+			throw new StrategySelectionException(
+					String.format( "Could not instantiate named strategy class [%s]", strategyClass.getName() ),
+					e
+			);
+		}
+	};
+
+	private final Map<Class,Map<String,Class>> namedStrategyImplementorByStrategyMap = new ConcurrentHashMap<>();
 
 	private final ClassLoaderService classLoaderService;
 
@@ -44,31 +60,35 @@ public class StrategySelectorImpl implements StrategySelector {
 	public <T> void registerStrategyImplementor(Class<T> strategy, String name, Class<? extends T> implementation) {
 		Map<String,Class> namedStrategyImplementorMap = namedStrategyImplementorByStrategyMap.get( strategy );
 		if ( namedStrategyImplementorMap == null ) {
-			namedStrategyImplementorMap = new ConcurrentHashMap<String, Class>();
+			namedStrategyImplementorMap = new ConcurrentHashMap<>();
 			namedStrategyImplementorByStrategyMap.put( strategy, namedStrategyImplementorMap );
 		}
 
 		final Class old = namedStrategyImplementorMap.put( name, implementation );
 		if ( old == null ) {
-			log.trace(
-					String.format(
-							"Registering named strategy selector [%s] : [%s] -> [%s]",
-							strategy.getName(),
-							name,
-							implementation.getName()
-					)
-			);
+			if ( log.isTraceEnabled() ) {
+				log.trace(
+						String.format(
+								"Registering named strategy selector [%s] : [%s] -> [%s]",
+								strategy.getName(),
+								name,
+								implementation.getName()
+						)
+				);
+			}
 		}
 		else {
-			log.debug(
-					String.format(
-							"Registering named strategy selector [%s] : [%s] -> [%s] (replacing [%s])",
-							strategy.getName(),
-							name,
-							implementation.getName(),
-							old.getName()
-					)
-			);
+			if ( log.isDebugEnabled() ) {
+				log.debug(
+						String.format(
+								"Registering named strategy selector [%s] : [%s] -> [%s] (replacing [%s])",
+								strategy.getName(),
+								name,
+								implementation.getName(),
+								old.getName()
+						)
+				);
+			}
 		}
 	}
 
@@ -88,7 +108,7 @@ public class StrategySelectorImpl implements StrategySelector {
 			}
 		}
 
-		// try tp clean up after ourselves...
+		// try to clean up after ourselves...
 		if ( namedStrategyImplementorMap.isEmpty() ) {
 			namedStrategyImplementorByStrategyMap.remove( strategy );
 		}
@@ -110,7 +130,8 @@ public class StrategySelectorImpl implements StrategySelector {
 		}
 		catch (ClassLoadingException e) {
 			throw new StrategySelectionException(
-					"Unable to resolve name [" + name + "] as strategy [" + strategy.getName() + "]"
+					"Unable to resolve name [" + name + "] as strategy [" + strategy.getName() + "]",
+					e
 			);
 		}
 	}
@@ -126,12 +147,7 @@ public class StrategySelectorImpl implements StrategySelector {
 		return resolveDefaultableStrategy(
 				strategy,
 				strategyReference,
-				new Callable<T>() {
-					@Override
-					public T call() {
-						return defaultValue;
-					}
-				}
+				(Callable<T>) () -> defaultValue
 		);
 	}
 
@@ -141,6 +157,40 @@ public class StrategySelectorImpl implements StrategySelector {
 			Class<T> strategy,
 			Object strategyReference,
 			Callable<T> defaultResolver) {
+		return (T) resolveStrategy( strategy, strategyReference, defaultResolver, STANDARD_STRATEGY_CREATOR );
+	}
+
+	@Override
+	public <T> T resolveStrategy(
+			Class<T> strategy,
+			Object strategyReference,
+			T defaultValue,
+			StrategyCreator<T> creator) {
+		return resolveStrategy(
+				strategy,
+				strategyReference,
+				(Callable<T>) () -> defaultValue,
+				creator
+		);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Collection getRegisteredStrategyImplementors(Class strategy) {
+		final Map<String, Class> registrations = namedStrategyImplementorByStrategyMap.get( strategy );
+		if ( registrations == null ) {
+			return Collections.emptySet();
+		}
+		return new HashSet( registrations.values() );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T resolveStrategy(
+			Class<T> strategy,
+			Object strategyReference,
+			Callable<T> defaultResolver,
+			StrategyCreator<T> creator) {
 		if ( strategyReference == null ) {
 			try {
 				return defaultResolver.call();
@@ -163,7 +213,7 @@ public class StrategySelectorImpl implements StrategySelector {
 		}
 
 		try {
-			return implementationClass.newInstance();
+			return creator.create( implementationClass );
 		}
 		catch (Exception e) {
 			throw new StrategySelectionException(

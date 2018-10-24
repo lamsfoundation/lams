@@ -9,6 +9,7 @@ package org.hibernate.mapping;
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.Mapping;
 
@@ -23,8 +24,16 @@ public abstract class IndexedCollection extends Collection {
 
 	private Value index;
 
+	/**
+	 * @deprecated Use {@link IndexedCollection#IndexedCollection(MetadataBuildingContext, PersistentClass)} insetad.
+	 */
+	@Deprecated
 	public IndexedCollection(MetadataImplementor metadata, PersistentClass owner) {
 		super( metadata, owner );
+	}
+
+	public IndexedCollection(MetadataBuildingContext buildingContext, PersistentClass owner) {
+		super( buildingContext, owner );
 	}
 
 	public Value getIndex() {
@@ -37,11 +46,22 @@ public abstract class IndexedCollection extends Collection {
 		return true;
 	}
 
+	@Override
+	public boolean isSame(Collection other) {
+		return other instanceof IndexedCollection
+				&& isSame( (IndexedCollection) other );
+	}
+
+	public boolean isSame(IndexedCollection other) {
+		return super.isSame( other )
+				&& isSame( index, other.index );
+	}
+
 	void createPrimaryKey() {
 		if ( !isOneToMany() ) {
 			PrimaryKey pk = new PrimaryKey( getCollectionTable() );
 			pk.addColumns( getKey().getColumnIterator() );
-			
+
 			// index should be last column listed
 			boolean isFormula = false;
 			Iterator iter = getIndex().getColumnIterator();
@@ -55,7 +75,7 @@ public abstract class IndexedCollection extends Collection {
 				pk.addColumns( getElement().getColumnIterator() );
 			}
 			else {
-				pk.addColumns( getIndex().getColumnIterator() ); 
+				pk.addColumns( getIndex().getColumnIterator() );
 			}
 			getCollectionTable().setPrimaryKey(pk);
 		}
@@ -84,7 +104,7 @@ public abstract class IndexedCollection extends Collection {
 			);
 		}
 	}
-	
+
 	public boolean isList() {
 		return false;
 	}

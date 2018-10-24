@@ -79,10 +79,12 @@ public interface TableInformation {
 
 	/**
 	 * Retrieve the named IndexInformation
-	 * 
+	 *
 	 * @param indexName The index identifier (simple name)
-	 * 
+	 *
 	 * @return The matching index information.  May return {@code null}
 	 */
 	public IndexInformation getIndex(Identifier indexName);
+
+	public void addColumn(ColumnInformation columnIdentifier);
 }

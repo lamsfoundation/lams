@@ -94,10 +94,10 @@ public class TransactionAwareSessionContext implements CurrentSessionContext {
 
 	    if (registerSynchronization(session)) {
 		// Normalizes Session flush mode, defaulting it to AUTO. Required for
-		// synchronization.
-		FlushMode flushMode = session.getFlushMode();
+		// synchronization. LDEV-4696 Updated for Hibernate 5.3. See SPR-14364.
+		FlushMode flushMode = session.getHibernateFlushMode();
 
-		if (FlushMode.isManualFlushMode(flushMode)
+		if (FlushMode.MANUAL.equals(flushMode)
 			&& !TransactionSynchronizationManager.isCurrentTransactionReadOnly()) {
 		    session.setFlushMode(FlushMode.AUTO);
 		}

@@ -23,8 +23,8 @@ import javax.transaction.SystemException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.cache.CacheException;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
 import org.hibernate.engine.jndi.JndiException;
@@ -43,6 +43,7 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.ValidIdRange;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
@@ -56,6 +57,7 @@ import static org.jboss.logging.Logger.Level.WARN;
  * New messages must be added after the last message defined to ensure message codes are unique.
  */
 @MessageLogger(projectCode = "HHH")
+@ValidIdRange( min = 1, max = 10000 )
 public interface CoreMessageLogger extends BasicLogger {
 
 	@LogMessage(level = WARN)
@@ -300,7 +302,7 @@ public interface CoreMessageLogger extends BasicLogger {
 	void factoryUnboundFromName(String name);
 
 	@LogMessage(level = ERROR)
-	@Message(value = "an assertion failure occured" + " (this may indicate a bug in Hibernate, but is more likely due"
+	@Message(value = "an assertion failure occurred" + " (this may indicate a bug in Hibernate, but is more likely due"
 			+ " to unsafe use of the session): %s", id = 99)
 	void failed(Throwable throwable);
 
@@ -360,11 +362,14 @@ public interface CoreMessageLogger extends BasicLogger {
 	void hibernateConnectionPoolSize(int poolSize, int minSize);
 
 	@LogMessage(level = WARN)
-	@Message(value = "Config specified explicit optimizer of [%s], but [%s=%s; honoring optimizer setting", id = 116)
+	@Message(value = "Config specified explicit optimizer of [%s], but [%s=%s]; using optimizer [%s] increment default of [%s].", id = 116)
 	void honoringOptimizerSetting(
 			String none,
 			String incrementParam,
-			int incrementSize);
+			int incrementSize,
+			String positiveOrNegative,
+			int defaultIncrementSize
+	);
 
 	@LogMessage(level = DEBUG)
 	@Message(value = "HQL: %s, time: %sms, rows: %s", id = 117)
@@ -445,8 +450,8 @@ public interface CoreMessageLogger extends BasicLogger {
 	void invalidOnDeleteAnnotation(String entityName);
 
 	@LogMessage(level = WARN)
-	@Message(value = "Root entity should not hold an PrimaryKeyJoinColum(s), will be ignored", id = 137)
-	void invalidPrimaryKeyJoinColumnAnnotation();
+	@Message(value = "Root entity should not hold a PrimaryKeyJoinColum(s), will be ignored: %s", id = 137)
+	void invalidPrimaryKeyJoinColumnAnnotation(String className);
 
 	@LogMessage(level = WARN)
 	@Message(value = "Mixing inheritance strategy in a entity hierarchy is not allowed, ignoring sub strategy in: %s",
@@ -468,8 +473,8 @@ public interface CoreMessageLogger extends BasicLogger {
 			String old,
 			String name);
 
-	@Message(value = "Javassist Enhancement failed: %s", id = 142)
-	String javassistEnhancementFailed(String entityName);
+	@Message(value = "Bytecode enhancement failed: %s", id = 142)
+	String bytecodeEnhancementFailed(String entityName);
 
 	@LogMessage(level = WARN)
 	@Message(value = "%s = false breaks the EJB3 specification", id = 144)
@@ -1063,12 +1068,12 @@ public interface CoreMessageLogger extends BasicLogger {
 	String unableToDetermineTransactionStatusAfterCommit();
 
 	@LogMessage(level = WARN)
-	@Message(value = "Unable to drop temporary id table after use [%s]", id = 314)
+	@Message(value = "Unable to evictData temporary id table after use [%s]", id = 314)
 	void unableToDropTemporaryIdTable(String message);
 
 	@LogMessage(level = ERROR)
-	@Message(value = "Exception executing batch [%s]", id = 315)
-	void unableToExecuteBatch(String message);
+	@Message(value = "Exception executing batch [%s], SQL: %s", id = 315)
+	void unableToExecuteBatch(Exception e, String sql );
 
 	@LogMessage(level = WARN)
 	@Message(value = "Error executing resolver [%s] : %s", id = 316)
@@ -1239,7 +1244,7 @@ public interface CoreMessageLogger extends BasicLogger {
 	void unableToResolveMappingFile(String xmlFile);
 
 	@LogMessage(level = INFO)
-	@Message(value = "Unable to retreive cache from JNDI [%s]: %s", id = 361)
+	@Message(value = "Unable to retrieve cache from JNDI [%s]: %s", id = 361)
 	void unableToRetrieveCache(
 			String namespace,
 			String message);
@@ -1301,7 +1306,7 @@ public interface CoreMessageLogger extends BasicLogger {
 	void unableToUnbindFactoryFromJndi(@Cause JndiException e);
 
 	@Message(value = "Could not update hi value in: %s", id = 375)
-	Object unableToUpdateHiValue(String tableName);
+	String unableToUpdateHiValue(String tableName);
 
 	@LogMessage(level = ERROR)
 	@Message(value = "Could not updateQuery hi value in: %s", id = 376)
@@ -1328,8 +1333,8 @@ public interface CoreMessageLogger extends BasicLogger {
 	void unexpectedRowCounts();
 
 	@LogMessage(level = WARN)
-	@Message(value = "unrecognized bytecode provider [%s], using javassist by default", id = 382)
-	void unknownBytecodeProvider(String providerName);
+	@Message(value = "unrecognized bytecode provider [%s], using [%s] by default", id = 382)
+	void unknownBytecodeProvider(String providerName, String defaultProvider);
 
 	@LogMessage(level = WARN)
 	@Message(value = "Unknown Ingres major version [%s]; using Ingres 9.2 dialect", id = 383)
@@ -1340,8 +1345,8 @@ public interface CoreMessageLogger extends BasicLogger {
 	void unknownOracleVersion(int databaseMajorVersion);
 
 	@LogMessage(level = WARN)
-	@Message(value = "Unknown Microsoft SQL Server major version [%s] using SQL Server 2000 dialect", id = 385)
-	void unknownSqlServerVersion(int databaseMajorVersion);
+	@Message(value = "Unknown Microsoft SQL Server major version [%s] using [%s] dialect", id = 385)
+	void unknownSqlServerVersion(int databaseMajorVersion, Class<? extends Dialect> dialectClass);
 
 	@LogMessage(level = WARN)
 	@Message(value = "ResultSet had no statement associated with it, but was not yet registered", id = 386)
@@ -1357,8 +1362,12 @@ public interface CoreMessageLogger extends BasicLogger {
 	@Message(value = "Unsuccessful: %s", id = 388)
 	void unsuccessful(String sql);
 
+	/**
+	 * @deprecated Use {@link #unsuccessfulSchemaManagementCommand} instead
+	 */
 	@LogMessage(level = ERROR)
 	@Message(value = "Unsuccessful: %s", id = 389)
+	@Deprecated
 	void unsuccessfulCreate(String string);
 
 	@LogMessage(level = WARN)
@@ -1425,10 +1434,6 @@ public interface CoreMessageLogger extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(value = "Using java.io streams to persist binary types", id = 407)
 	void usingStreams();
-
-	@LogMessage(level = INFO)
-	@Message(value = "Using workaround for JVM bug in java.sql.Timestamp", id = 408)
-	void usingTimestampWorkaround();
 
 	@LogMessage(level = WARN)
 	@Message(value = "Using %s which does not generate IETF RFC 4122 compliant UUID values; consider using %s instead",
@@ -1734,7 +1739,79 @@ public interface CoreMessageLogger extends BasicLogger {
 	@Message(value = "Executing import script '%s'", id = 476)
 	void executingImportScript(String scriptName);
 
+	@LogMessage(level = INFO)
+	@Message(value = "Starting delayed evictData of schema as part of SessionFactory shut-down'", id = 477)
+	void startingDelayedSchemaDrop();
+
+	@LogMessage(level = ERROR)
+	@Message(value = "Unsuccessful: %s", id = 478)
+	void unsuccessfulSchemaManagementCommand(String command);
+
+	@Message(
+			value = "Collection [%s] was not processed by flush()."
+			+ " This is likely due to unsafe use of the session (e.g. used in multiple threads concurrently, updates during entity lifecycle hooks).",
+			id = 479
+	)
+	String collectionNotProcessedByFlush(String role);
+
 	@LogMessage(level = WARN)
 	@Message(value = "A ManagedEntity was associated with a stale PersistenceContext. A ManagedEntity may only be associated with one PersistenceContext at a time; %s", id = 480)
 	void stalePersistenceContextInEntityEntry(String msg);
+
+	@LogMessage(level = WARN)
+	@Message(
+			id = 481,
+			value = "Encountered Java type [%s] for which we could not locate a JavaTypeDescriptor and " +
+					"which does not appear to implement equals and/or hashCode.  This can lead to " +
+					"significant performance problems when performing equality/dirty checking involving " +
+					"this Java type.  Consider registering a custom JavaTypeDescriptor or at least " +
+					"implementing equals/hashCode."
+	)
+	void unknownJavaTypeNoEqualsHashCode(Class javaType);
+
+	@LogMessage(level = WARN)
+	@Message(value = "@org.hibernate.annotations.Cache used on a non-root entity: ignored for [%s]. Please see the Hibernate documentation for proper usage.", id = 482)
+	void cacheOrCacheableAnnotationOnNonRoot(String className);
+
+	@LogMessage(level = WARN)
+	@Message(
+			id = 483,
+			value = "An experimental feature has been enabled (" +
+					AvailableSettings.CREATE_EMPTY_COMPOSITES_ENABLED +
+					"=true) that instantiates empty composite/embedded " +
+					"objects when all of its attribute values are null. This feature has known issues and " +
+					"should not be used in production until it is stabilized. See Hibernate Jira " +
+					"issue HHH-11936 for details."
+	)
+	void emptyCompositesEnabled();
+
+	@LogMessage(level = WARN)
+	@Message(value = "Vibur properties were encountered, but the Vibur ConnectionProvider was not found on the classpath; these properties are going to be ignored.",
+			id = 484)
+	void viburProviderClassNotFound();
+
+	@LogMessage(level = ERROR)
+	@Message(value = "Illegally attempted to associate a proxy for entity [%s] with id [%s] with two open sessions.", id = 485)
+	void attemptToAssociateProxyWithTwoOpenSessions(
+			String entityName,
+			Object id
+	);
+
+	@LogMessage(level = WARN)
+	@Message(value = "Agroal properties were encountered, but the Agroal ConnectionProvider was not found on the classpath; these properties are going to be ignored.",
+			id = 486)
+	void agroalProviderClassNotFound();
+
+	@LogMessage(level = WARN)
+	@Message(value = "The query: [%s] attempts to update an immutable entity: %s",
+			id = 487)
+	void immutableEntityUpdateQuery(String sourceQuery, String querySpaces);
+
+	@Message(value = "Bytecode enhancement failed for class: %1$s. It might be due to the Java module system preventing Hibernate ORM from defining an enhanced class "
+			+ "in the same package as class %1$s. In this case, the class should be opened and exported to Hibernate ORM.", id = 488)
+	String bytecodeEnhancementFailedUnableToGetPrivateLookupFor(String className);
+
+	@LogMessage(level = WARN)
+	@Message(value = "Setting " + AvailableSettings.NATIVE_EXCEPTION_HANDLING_51_COMPLIANCE + "=true is not valid with JPA bootstrapping; setting will be ignored.", id = 489 )
+	void nativeExceptionHandling51ComplianceJpaBootstrapping();
 }

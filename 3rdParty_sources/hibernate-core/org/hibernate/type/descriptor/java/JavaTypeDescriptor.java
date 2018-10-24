@@ -8,7 +8,9 @@ package org.hibernate.type.descriptor.java;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Objects;
 
+import org.hibernate.internal.util.compare.ComparableComparator;
 import org.hibernate.type.descriptor.WrapperOptions;
 
 /**
@@ -21,22 +23,34 @@ public interface JavaTypeDescriptor<T> extends Serializable {
 	 * Retrieve the Java type handled here.
 	 *
 	 * @return The Java type.
+	 *
+	 * @deprecated Use {@link #getJavaType()} instead
 	 */
-	public Class<T> getJavaTypeClass();
+	@Deprecated
+	Class<T> getJavaTypeClass();
+
+	/**
+	 * Get the Java type described
+	 */
+	default Class<T> getJavaType() {
+		// default on this side since #getJavaTypeClass is the currently implemented method
+		return getJavaTypeClass();
+	}
 
 	/**
 	 * Retrieve the mutability plan for this Java type.
-	 *
-	 * @return The mutability plan
 	 */
-	public MutabilityPlan<T> getMutabilityPlan();
+	@SuppressWarnings("unchecked")
+	default MutabilityPlan<T> getMutabilityPlan() {
+		return ImmutableMutabilityPlan.INSTANCE;
+	}
 
 	/**
 	 * Retrieve the natural comparator for this type.
-	 *
-	 * @return The natural comparator.
 	 */
-	public Comparator<T> getComparator();
+	default Comparator<T> getComparator() {
+		return Comparable.class.isAssignableFrom( Comparable.class ) ? ComparableComparator.INSTANCE : null;
+	}
 
 	/**
 	 * Extract a proper hash code for this value.
@@ -45,7 +59,12 @@ public interface JavaTypeDescriptor<T> extends Serializable {
 	 *
 	 * @return The extracted hash code.
 	 */
-	public int extractHashCode(T value);
+	default int extractHashCode(T value) {
+		if ( value == null ) {
+			throw new IllegalArgumentException( "Value to extract hashCode from cannot be null" );
+		}
+		return value.hashCode();
+	}
 
 	/**
 	 * Determine if two instances are equal
@@ -55,7 +74,9 @@ public interface JavaTypeDescriptor<T> extends Serializable {
 	 *
 	 * @return True if the two are considered equal; false otherwise.
 	 */
-	public boolean areEqual(T one, T another);
+	default boolean areEqual(T one, T another) {
+		return Objects.deepEquals( one, another );
+	}
 
 	/**
 	 * Extract a loggable representation of the value.
@@ -64,11 +85,15 @@ public interface JavaTypeDescriptor<T> extends Serializable {
 	 *
 	 * @return The loggable representation
 	 */
-	public String extractLoggableRepresentation(T value);
+	default String extractLoggableRepresentation(T value) {
+		return toString( value );
+	}
 
-	public String toString(T value);
+	default String toString(T value) {
+		return value == null ? "null" : value.toString();
+	}
 
-	public T fromString(String string);
+	T fromString(String string);
 
 	/**
 	 * Unwrap an instance of our handled Java type into the requested type.
@@ -86,7 +111,7 @@ public interface JavaTypeDescriptor<T> extends Serializable {
 	 *
 	 * @return The unwrapped value.
 	 */
-	public <X> X unwrap(T value, Class<X> type, WrapperOptions options);
+	<X> X unwrap(T value, Class<X> type, WrapperOptions options);
 
 	/**
 	 * Wrap a value as our handled Java type.
@@ -99,5 +124,5 @@ public interface JavaTypeDescriptor<T> extends Serializable {
 	 *
 	 * @return The wrapped value.
 	 */
-	public <X> T wrap(X value, WrapperOptions options);
+	<X> T wrap(X value, WrapperOptions options);
 }

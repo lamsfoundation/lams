@@ -53,7 +53,8 @@ public class DefaultUniqueDelegate implements UniqueDelegate {
 		);
 
 		final String constraintName = dialect.quote( uniqueKey.getName() );
-		return "alter table " + tableName + " add constraint " + constraintName + " " + uniqueConstraintSql( uniqueKey );
+		return dialect.getAlterTableString( tableName )
+				+ " add constraint " + constraintName + " " + uniqueConstraintSql( uniqueKey );
 	}
 
 	protected String uniqueConstraintSql(UniqueKey uniqueKey) {
@@ -83,9 +84,8 @@ public class DefaultUniqueDelegate implements UniqueDelegate {
 				dialect
 		);
 
-		final StringBuilder buf = new StringBuilder( "alter table " );
-		buf.append( tableName );
-		buf.append(" drop constraint " );
+		final StringBuilder buf = new StringBuilder( dialect.getAlterTableString(tableName) );
+		buf.append( getDropUnique() );
 		if ( dialect.supportsIfExistsBeforeConstraintName() ) {
 			buf.append( "if exists " );
 		}
@@ -94,6 +94,10 @@ public class DefaultUniqueDelegate implements UniqueDelegate {
 			buf.append( " if exists" );
 		}
 		return buf.toString();
+	}
+
+	protected String getDropUnique(){
+		return " drop constraint ";
 	}
 
 }

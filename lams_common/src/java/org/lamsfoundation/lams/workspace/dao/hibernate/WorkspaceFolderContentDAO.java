@@ -39,11 +39,8 @@ public class WorkspaceFolderContentDAO extends LAMSBaseDAO implements IWorkspace
 
     private static final String TABLENAME = "lams_workspace_folder_content";
 
-    private static final String FIND_BY_TYPE_IN_FOLDER = "from " + TABLENAME + " in class "
-	    + WorkspaceFolderContent.class.getName() + " where workspace_folder_id=? AND mime_type=?";
-
     private static final String DELETE_BY_VERSION = "from " + TABLENAME + " in class "
-	    + WorkspaceFolderContent.class.getName() + " where folder_content_id=? AND uuid=? AND version_id=?";
+	    + WorkspaceFolderContent.class.getName() + " where folder_content_id=:folder_content_id AND uuid=:uuid AND version_id=:version_id";
 
     /**
      * (non-Javadoc)
@@ -66,8 +63,8 @@ public class WorkspaceFolderContentDAO extends LAMSBaseDAO implements IWorkspace
 	int numDeleted = 0;
 	if (uuid != null && versionID != null && folderContentID != null) {
 	    List list = getSessionFactory().getCurrentSession().createQuery(DELETE_BY_VERSION)
-		    .setLong(0, folderContentID.longValue()).setLong(1, uuid.longValue())
-		    .setLong(2, versionID.longValue()).list();
+		    .setLong("folder_content_id", folderContentID.longValue()).setLong("uuid", uuid.longValue())
+		    .setLong("version_id", versionID.longValue()).list();
 	    if (list != null && list.size() > 0) {
 		Iterator iter = list.iterator();
 		while (iter.hasNext()) {

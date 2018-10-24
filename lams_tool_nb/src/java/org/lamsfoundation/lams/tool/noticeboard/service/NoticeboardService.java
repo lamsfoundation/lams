@@ -52,16 +52,17 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -72,6 +73,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author mtruong
  */
+@Service(value="nbService")
 public class NoticeboardService
 	implements INoticeboardService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(NoticeboardService.class);

@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,12 +26,15 @@ import org.hibernate.JDBCException;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.resource.jdbc.ResourceRegistry;
+import org.hibernate.resource.jdbc.spi.JdbcObserver;
 
 /**
  * @author Steve Ebersole
  */
 public class ResourceRegistryStandardImpl implements ResourceRegistry {
 	private static final CoreMessageLogger log = CoreLogging.messageLogger( ResourceRegistryStandardImpl.class );
+
+	private final JdbcObserver jdbcObserver;
 
 	private final Map<Statement, Set<ResultSet>> xref = new HashMap<Statement, Set<ResultSet>>();
 	private final Set<ResultSet> unassociatedResultSets = new HashSet<ResultSet>();
@@ -40,6 +44,14 @@ public class ResourceRegistryStandardImpl implements ResourceRegistry {
 	private List<NClob> nclobs;
 
 	private Statement lastQuery;
+
+	public ResourceRegistryStandardImpl() {
+		this( null );
+	}
+
+	public ResourceRegistryStandardImpl(JdbcObserver jdbcObserver) {
+		this.jdbcObserver = jdbcObserver;
+	}
 
 	@Override
 	public boolean hasRegisteredResources() {
@@ -51,12 +63,14 @@ public class ResourceRegistryStandardImpl implements ResourceRegistry {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void register(Statement statement, boolean cancelable) {
 		log.tracef( "Registering statement [%s]", statement );
-		if ( xref.containsKey( statement ) ) {
+
+		Set<ResultSet> previousValue = xref.putIfAbsent( statement, Collections.EMPTY_SET );
+		if ( previousValue != null ) {
 			throw new HibernateException( "JDBC Statement already registered" );
 		}
-		xref.put( statement, null );
 
 		if ( cancelable ) {
 			lastQuery = statement;
@@ -190,13 +204,15 @@ public class ResourceRegistryStandardImpl implements ResourceRegistry {
 			}
 		}
 		if ( statement != null ) {
+			Set<ResultSet> resultSets = xref.get( statement );
+
 			// Keep this at DEBUG level, rather than warn.  Numerous connection pool implementations can return a
 			// proxy/wrapper around the JDBC Statement, causing excessive logging here.  See HHH-8210.
-			if ( log.isDebugEnabled() && !xref.containsKey( statement ) ) {
+			if ( log.isDebugEnabled() && resultSets == null ) {
 				log.debug( "ResultSet statement was not registered (on register)" );
 			}
-			Set<ResultSet> resultSets = xref.get( statement );
-			if ( resultSets == null ) {
+
+			if ( resultSets == null || resultSets == Collections.EMPTY_SET ) {
 				resultSets = new HashSet<ResultSet>();
 				xref.put( statement, resultSets );
 			}
@@ -285,6 +301,10 @@ public class ResourceRegistryStandardImpl implements ResourceRegistry {
 	public void releaseResources() {
 		log.trace( "Releasing JDBC resources" );
 
+		if ( jdbcObserver != null ) {
+			jdbcObserver.jdbcReleaseRegistryResourcesStart();
+		}
+
 		for ( Map.Entry<Statement, Set<ResultSet>> entry : xref.entrySet() ) {
 			if ( entry.getValue() != null ) {
 				closeAll( entry.getValue() );
@@ -331,6 +351,9 @@ public class ResourceRegistryStandardImpl implements ResourceRegistry {
 			nclobs.clear();
 		}
 
+		if ( jdbcObserver != null )	{
+			jdbcObserver.jdbcReleaseRegistryResourcesEnd();
+		}
 	}
 
 	private boolean hasRegistered(Map resource) {

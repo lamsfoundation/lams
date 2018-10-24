@@ -15,6 +15,7 @@ import org.hibernate.PropertyAccessException;
 import org.hibernate.PropertySetterAccessException;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
 
 import static org.hibernate.internal.CoreLogging.messageLogger;
 
@@ -145,7 +146,9 @@ public class SetterMethodImpl implements Setter {
 		@SuppressWarnings("unchecked")
 		private Method resolveMethod() {
 			try {
-				return declaringClass.getDeclaredMethod( methodName, argumentType );
+				final Method method = declaringClass.getDeclaredMethod( methodName, argumentType );
+				ReflectHelper.ensureAccessibility( method );
+				return method;
 			}
 			catch (NoSuchMethodException e) {
 				throw new PropertyAccessSerializationException(

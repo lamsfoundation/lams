@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.hibernate.EntityMode;
-import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
-import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
+import org.hibernate.cache.spi.access.CollectionDataAccess;
+import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.internal.CacheHelper;
 import org.hibernate.internal.CoreLogging;
@@ -42,7 +42,7 @@ public class BatchFetchQueue {
 	 * A map of {@link SubselectFetch subselect-fetch descriptors} keyed by the
 	 * {@link EntityKey) against which the descriptor is registered.
 	 */
-	private final Map<EntityKey, SubselectFetch> subselectsByEntityKey = new HashMap<EntityKey, SubselectFetch>(8);
+	private final Map<EntityKey, SubselectFetch> subselectsByEntityKey = new HashMap<>( 8 );
 
 	/**
 	 * Used to hold information about the entities that are currently eligible for batch-fetching.  Ultimately
@@ -51,14 +51,13 @@ public class BatchFetchQueue {
 	 * A Map structure is used to segment the keys by entity type since loading can only be done for a particular entity
 	 * type at a time.
 	 */
-	private final Map <String,LinkedHashSet<EntityKey>> batchLoadableEntityKeys = new HashMap <String,LinkedHashSet<EntityKey>>(8);
+	private final Map <String,LinkedHashSet<EntityKey>> batchLoadableEntityKeys = new HashMap<>( 8 );
 	
 	/**
 	 * Used to hold information about the collections that are currently eligible for batch-fetching.  Ultimately
 	 * used by {@link #getCollectionBatch} to build collection load batches.
 	 */
-	private final Map<String, LinkedHashMap<CollectionEntry, PersistentCollection>> batchLoadableCollections =
-			new HashMap<String, LinkedHashMap <CollectionEntry, PersistentCollection>>(8);
+	private final Map<String, LinkedHashMap<CollectionEntry, PersistentCollection>> batchLoadableCollections = new HashMap<>( 8 );
 
 	/**
 	 * Constructs a queue for the given context.
@@ -130,7 +129,7 @@ public class BatchFetchQueue {
 		if ( key.isBatchLoadable() ) {
 			LinkedHashSet<EntityKey> set =  batchLoadableEntityKeys.get( key.getEntityName());
 			if (set == null) {
-				set = new LinkedHashSet<EntityKey>(8);
+				set = new LinkedHashSet<>( 8 );
 				batchLoadableEntityKeys.put( key.getEntityName(), set);
 			}
 			set.add(key);
@@ -150,6 +149,19 @@ public class BatchFetchQueue {
 				set.remove(key);
 			}
 		}
+	}
+
+	/**
+	 * Intended for test usage.  Really has no use-case in Hibernate proper.
+	 */
+	public boolean containsEntityKey(EntityKey key) {
+		if ( key.isBatchLoadable() ) {
+			LinkedHashSet<EntityKey> set =  batchLoadableEntityKeys.get( key.getEntityName());
+			if ( set != null ) {
+				return set.contains( key );
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -202,9 +214,9 @@ public class BatchFetchQueue {
 	}
 
 	private boolean isCached(EntityKey entityKey, EntityPersister persister) {
-		final SessionImplementor session = context.getSession();
-		if ( context.getSession().getCacheMode().isGetEnabled() && persister.hasCache() ) {
-			final EntityRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+		final SharedSessionContractImplementor session = context.getSession();
+		if ( context.getSession().getCacheMode().isGetEnabled() && persister.canReadFromCache() ) {
+			final EntityDataAccess cache = persister.getCacheAccessStrategy();
 			final Object key = cache.generateCacheKey(
 					entityKey.getIdentifier(),
 					persister,
@@ -220,7 +232,7 @@ public class BatchFetchQueue {
 	// collection batch support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	/**
-	 * If an CollectionEntry represents a batch loadable collection, add
+	 * If a CollectionEntry represents a batch loadable collection, add
 	 * it to the queue.
 	 */
 	public void addBatchLoadableCollection(PersistentCollection collection, CollectionEntry ce) {
@@ -228,7 +240,7 @@ public class BatchFetchQueue {
 
 		LinkedHashMap<CollectionEntry, PersistentCollection> map =  batchLoadableCollections.get( persister.getRole() );
 		if ( map == null ) {
-			map = new LinkedHashMap<CollectionEntry, PersistentCollection>( 16 );
+			map = new LinkedHashMap<>( 16 );
 			batchLoadableCollections.put( persister.getRole(), map );
 		}
 		map.put( ce, collection );
@@ -318,9 +330,9 @@ public class BatchFetchQueue {
 	}
 
 	private boolean isCached(Serializable collectionKey, CollectionPersister persister) {
-		SessionImplementor session = context.getSession();
+		SharedSessionContractImplementor session = context.getSession();
 		if ( session.getCacheMode().isGetEnabled() && persister.hasCache() ) {
-			CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			CollectionDataAccess cache = persister.getCacheAccessStrategy();
 			Object cacheKey = cache.generateCacheKey(
 					collectionKey,
 					persister,

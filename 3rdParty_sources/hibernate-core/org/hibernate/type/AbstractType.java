@@ -10,46 +10,49 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.util.compare.EqualsHelper;
-
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /**
  * Abstract superclass of the built in Type hierarchy.
- * 
+ *
  * @author Gavin King
  */
 public abstract class AbstractType implements Type {
 	protected static final Size LEGACY_DICTATED_SIZE = new Size();
 	protected static final Size LEGACY_DEFAULT_SIZE = new Size( 19, 2, 255, Size.LobMultiplier.NONE ); // to match legacy behavior
 
+	@Override
 	public boolean isAssociationType() {
 		return false;
 	}
 
+	@Override
 	public boolean isCollectionType() {
 		return false;
 	}
 
+	@Override
 	public boolean isComponentType() {
 		return false;
 	}
 
+	@Override
 	public boolean isEntityType() {
 		return false;
 	}
-	
+
+	@Override
 	public int compare(Object x, Object y) {
 		return ( (Comparable) x ).compareTo(y);
 	}
 
-	public Serializable disassemble(Object value, SessionImplementor session, Object owner)
+	@Override
+	public Serializable disassemble(Object value, SharedSessionContractImplementor session, Object owner)
 	throws HibernateException {
 
 		if (value==null) {
@@ -60,7 +63,8 @@ public abstract class AbstractType implements Type {
 		}
 	}
 
-	public Object assemble(Serializable cached, SessionImplementor session, Object owner)
+	@Override
+	public Object assemble(Serializable cached, SharedSessionContractImplementor session, Object owner)
 	throws HibernateException {
 		if ( cached==null ) {
 			return null;
@@ -70,14 +74,16 @@ public abstract class AbstractType implements Type {
 		}
 	}
 
-	public boolean isDirty(Object old, Object current, SessionImplementor session) throws HibernateException {
+	@Override
+	public boolean isDirty(Object old, Object current, SharedSessionContractImplementor session) throws HibernateException {
 		return !isSame( old, current );
 	}
 
+	@Override
 	public Object hydrate(
 		ResultSet rs,
 		String[] names,
-		SessionImplementor session,
+		SharedSessionContractImplementor session,
 		Object owner)
 	throws HibernateException, SQLException {
 		// TODO: this is very suboptimal for some subclasses (namely components),
@@ -85,56 +91,67 @@ public abstract class AbstractType implements Type {
 		return nullSafeGet(rs, names, session, owner);
 	}
 
-	public Object resolve(Object value, SessionImplementor session, Object owner)
+	@Override
+	public Object resolve(Object value, SharedSessionContractImplementor session, Object owner)
 	throws HibernateException {
 		return value;
 	}
 
-	public Object semiResolve(Object value, SessionImplementor session, Object owner) 
+	@Override
+	public Object semiResolve(Object value, SharedSessionContractImplementor session, Object owner)
 	throws HibernateException {
 		return value;
 	}
-	
+
+	@Override
 	public boolean isAnyType() {
 		return false;
 	}
 
-	public boolean isModified(Object old, Object current, boolean[] checkable, SessionImplementor session)
+	@Override
+	public boolean isModified(Object old, Object current, boolean[] checkable, SharedSessionContractImplementor session)
 	throws HibernateException {
 		return isDirty(old, current, session);
 	}
-	
+
+	@Override
 	public boolean isSame(Object x, Object y) throws HibernateException {
 		return isEqual(x, y );
 	}
 
+	@Override
 	public boolean isEqual(Object x, Object y) {
-		return EqualsHelper.equals(x, y);
+		return Objects.equals( x, y );
 	}
-	
+
+	@Override
 	public int getHashCode(Object x) {
 		return x.hashCode();
 	}
 
+	@Override
 	public boolean isEqual(Object x, Object y, SessionFactoryImplementor factory) {
 		return isEqual(x, y );
 	}
-	
+
+	@Override
 	public int getHashCode(Object x, SessionFactoryImplementor factory) {
 		return getHashCode(x );
 	}
-	
+
+	@Override
 	public Type getSemiResolvedType(SessionFactoryImplementor factory) {
 		return this;
 	}
 
+	@Override
 	public Object replace(
-			Object original, 
-			Object target, 
-			SessionImplementor session, 
-			Object owner, 
-			Map copyCache, 
-			ForeignKeyDirection foreignKeyDirection) 
+			Object original,
+			Object target,
+			SharedSessionContractImplementor session,
+			Object owner,
+			Map copyCache,
+			ForeignKeyDirection foreignKeyDirection)
 	throws HibernateException {
 		boolean include;
 		if ( isAssociationType() ) {
@@ -147,9 +164,10 @@ public abstract class AbstractType implements Type {
 		return include ? replace(original, target, session, owner, copyCache) : target;
 	}
 
-	public void beforeAssemble(Serializable cached, SessionImplementor session) {}
+	@Override
+	public void beforeAssemble(Serializable cached, SharedSessionContractImplementor session) {}
 
-	/*public Object copy(Object original, Object target, SessionImplementor session, Object owner, Map copyCache)
+	/*public Object copy(Object original, Object target, SharedSessionContractImplementor session, Object owner, Map copyCache)
 	throws HibernateException {
 		if (original==null) return null;
 		return assemble( disassemble(original, session), session, owner );

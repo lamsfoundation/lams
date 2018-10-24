@@ -13,7 +13,7 @@ import java.util.List;
 import org.hibernate.QueryException;
 import org.hibernate.engine.internal.JoinSequence;
 import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.hql.internal.ast.SqlGenerator;
 import org.hibernate.hql.internal.ast.util.SessionFactoryHelper;
 import org.hibernate.internal.CoreLogging;
@@ -65,7 +65,7 @@ public class IndexNode extends FromReferenceNode {
 	}
 
 	@Override
-	public void resolve(boolean generateJoin, boolean implicitJoin, String classAlias, AST parent)
+	public void resolve(boolean generateJoin, boolean implicitJoin, String classAlias, AST parent, AST parentPredicate)
 			throws SemanticException {
 		if ( isResolved() ) {
 			return;
@@ -167,7 +167,7 @@ public class IndexNode extends FromReferenceNode {
 		}
 
 		@Override
-		public int bind(PreparedStatement statement, QueryParameters qp, SessionImplementor session, int position)
+		public int bind(PreparedStatement statement, QueryParameters qp, SharedSessionContractImplementor session, int position)
 				throws SQLException {
 			int bindCount = 0;
 			for ( ParameterSpecification paramSpec : paramSpecs ) {

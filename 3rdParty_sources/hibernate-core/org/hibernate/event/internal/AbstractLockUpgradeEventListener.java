@@ -9,7 +9,7 @@ package org.hibernate.event.internal;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.ObjectDeletedException;
-import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
+import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.Status;
@@ -61,12 +61,12 @@ public abstract class AbstractLockUpgradeEventListener extends AbstractReassocia
 				);
 			}
 
-			final boolean cachingEnabled = persister.hasCache();
+			final boolean cachingEnabled = persister.canWriteToCache();
 			SoftLock lock = null;
 			Object ck = null;
 			try {
 				if ( cachingEnabled ) {
-					EntityRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+					EntityDataAccess cache = persister.getCacheAccessStrategy();
 					ck = cache.generateCacheKey( entry.getId(), persister, source.getFactory(), source.getTenantIdentifier() );
 					lock = cache.lockItem( source, ck, entry.getVersion() );
 				}

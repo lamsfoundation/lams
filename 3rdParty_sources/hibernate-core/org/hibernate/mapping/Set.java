@@ -9,6 +9,7 @@ package org.hibernate.mapping;
 import java.util.Iterator;
 
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.type.CollectionType;
@@ -19,8 +20,16 @@ import org.hibernate.type.CollectionType;
  * @author Gavin King
  */
 public class Set extends Collection {
+	/**
+	 * @deprecated Use {@link Set#Set(MetadataBuildingContext, PersistentClass)} instead.
+	 */
+	@Deprecated
 	public Set(MetadataImplementor metadata, PersistentClass owner) {
 		super( metadata, owner );
+	}
+
+	public Set(MetadataBuildingContext buildingContext, PersistentClass owner) {
+		super( buildingContext, owner );
 	}
 
 	public void validate(Mapping mapping) throws MappingException {
@@ -68,17 +77,20 @@ public class Set extends Collection {
 				if ( selectable instanceof Column ) {
 					Column col = (Column) selectable;
 					if ( !col.isNullable() ) {
-						pk.addColumn(col);
+						pk.addColumn( col );
+					}
+					else {
+						return;
 					}
 				}
 			}
-			if ( pk.getColumnSpan()==getKey().getColumnSpan() ) { 
-				//for backward compatibility, allow a set with no not-null 
+			if ( pk.getColumnSpan() == getKey().getColumnSpan() ) {
+				//for backward compatibility, allow a set with no not-null
 				//element columns, using all columns in the row locater SQL
 				//TODO: create an implicit not null constraint on all cols?
 			}
 			else {
-				getCollectionTable().setPrimaryKey(pk);
+				getCollectionTable().setPrimaryKey( pk );
 			}
 		}
 		else {

@@ -24,8 +24,8 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.dao;
 
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 
 /**
  * <p>

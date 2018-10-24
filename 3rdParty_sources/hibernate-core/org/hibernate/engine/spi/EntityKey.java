@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.internal.util.compare.EqualsHelper;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
 
@@ -56,6 +56,8 @@ public final class EntityKey implements Serializable {
 
 	private int generateHashCode() {
 		int result = 17;
+		final String rootEntityName = persister.getRootEntityName();
+		result = 37 * result + ( rootEntityName != null ? rootEntityName.hashCode() : 0 );
 		result = 37 * result + persister.getIdentifierType().getHashCode( identifier, persister.getFactory() );
 		return result;
 	}
@@ -96,7 +98,7 @@ public final class EntityKey implements Serializable {
 			return true;
 		}
 		else {
-			return EqualsHelper.equals( otherKey.persister.getRootEntityName(), persister.getRootEntityName() );
+			return Objects.equals( otherKey.persister.getRootEntityName(), persister.getRootEntityName() );
 		}
 	}
 

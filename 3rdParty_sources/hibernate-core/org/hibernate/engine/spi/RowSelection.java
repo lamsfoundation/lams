@@ -18,6 +18,13 @@ public final class RowSelection {
 	private Integer fetchSize;
 
 	public void setFirstRow(Integer firstRow) {
+		if ( firstRow != null && firstRow < 0 ) {
+			throw new IllegalArgumentException( "first-row value cannot be negative : " + firstRow );
+		}
+		this.firstRow = firstRow;
+	}
+
+	public void setFirstRow(int firstRow) {
 		this.firstRow = firstRow;
 	}
 
@@ -29,11 +36,19 @@ public final class RowSelection {
 		this.maxRows = maxRows;
 	}
 
+	public void setMaxRows(int maxRows) {
+		this.maxRows = maxRows;
+	}
+
 	public Integer getMaxRows() {
 		return maxRows;
 	}
 
 	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
+	}
+
+	public void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}
 
@@ -49,7 +64,12 @@ public final class RowSelection {
 		this.fetchSize = fetchSize;
 	}
 
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+	}
+
 	public boolean definesLimits() {
 		return maxRows != null || (firstRow != null && firstRow <= 0);
 	}
+
 }

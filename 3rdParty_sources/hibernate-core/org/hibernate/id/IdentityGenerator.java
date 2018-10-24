@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.insert.AbstractReturningDelegate;
 import org.hibernate.id.insert.AbstractSelectingDelegate;
 import org.hibernate.id.insert.IdentifierGeneratingInsert;
@@ -74,7 +74,7 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 		}
 
 		@Override
-		protected PreparedStatement prepare(String insertSQL, SessionImplementor session) throws SQLException {
+		protected PreparedStatement prepare(String insertSQL, SharedSessionContractImplementor session) throws SQLException {
 			return session
 					.getJdbcCoordinator()
 					.getStatementPreparer()
@@ -82,22 +82,23 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 		}
 
 		@Override
-		public Serializable executeAndExtract(PreparedStatement insert, SessionImplementor session)
+		public Serializable executeAndExtract(PreparedStatement insert, SharedSessionContractImplementor session)
 				throws SQLException {
 			ResultSet rs = session.getJdbcCoordinator().getResultSetReturn().execute( insert );
 			try {
 				return IdentifierGeneratorHelper.getGeneratedIdentity(
 						rs,
 						persister.getRootTableKeyColumnNames()[0],
-						persister.getIdentifierType()
+						persister.getIdentifierType(),
+						session.getJdbcServices().getJdbcEnvironment().getDialect()
 				);
 			}
 			finally {
-				session.getJdbcCoordinator().getResourceRegistry().release( rs, insert );
+				session.getJdbcCoordinator().getLogicalConnection().getResourceRegistry().release( rs, insert );
 			}
 		}
 
-		public Serializable determineGeneratedIdentifier(SessionImplementor session, Object entity) {
+		public Serializable determineGeneratedIdentifier(SharedSessionContractImplementor session, Object entity) {
 			throw new AssertionFailure( "insert statement returns generated value" );
 		}
 	}
@@ -132,13 +133,14 @@ public class IdentityGenerator extends AbstractPostInsertGenerator {
 
 		@Override
 		protected Serializable getResult(
-				SessionImplementor session,
+				SharedSessionContractImplementor session,
 				ResultSet rs,
 				Object object) throws SQLException {
 			return IdentifierGeneratorHelper.getGeneratedIdentity(
 					rs,
 					persister.getRootTableKeyColumnNames()[0],
-					persister.getIdentifierType()
+					persister.getIdentifierType(),
+					session.getJdbcServices().getJdbcEnvironment().getDialect()
 			);
 		}
 	}

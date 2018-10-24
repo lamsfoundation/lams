@@ -27,9 +27,9 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 
 /**
  * Defines the contract that the tool service provider must follow

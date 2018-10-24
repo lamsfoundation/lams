@@ -12,15 +12,18 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.CacheMode;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
-import org.hibernate.bytecode.instrumentation.spi.LazyPropertyInitializer;
-import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
+import org.hibernate.bytecode.enhance.spi.LazyPropertyInitializer;
+import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.cache.spi.entry.CacheEntry;
+import org.hibernate.engine.profile.Fetch;
+import org.hibernate.engine.profile.FetchProfile;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.SessionEventListenerManager;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.event.service.spi.EventListenerGroup;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -34,6 +37,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
 import org.hibernate.property.access.internal.PropertyAccessStrategyBackRefImpl;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.stat.internal.StatsHelper;
 import org.hibernate.type.Type;
 import org.hibernate.type.TypeHelper;
 
@@ -67,7 +71,6 @@ public final class TwoPhaseLoad {
 	 * @param rowId The rowId for the entity
 	 * @param object An optional instance for the entity being loaded
 	 * @param lockMode The lock mode
-	 * @param lazyPropertiesAreUnFetched Whether properties defined as lazy are yet un-fetched
 	 * @param session The Session
 	 */
 	public static void postHydrate(
@@ -77,8 +80,7 @@ public final class TwoPhaseLoad {
 			final Object rowId,
 			final Object object,
 			final LockMode lockMode,
-			final boolean lazyPropertiesAreUnFetched,
-			final SessionImplementor session) {
+			final SharedSessionContractImplementor session) {
 		final Object version = Versioning.getVersion( values, persister );
 		session.getPersistenceContext().addEntry(
 				object,
@@ -90,8 +92,7 @@ public final class TwoPhaseLoad {
 				lockMode,
 				true,
 				persister,
-				false,
-				lazyPropertiesAreUnFetched
+				false
 			);
 
 		if ( version != null && LOG.isTraceEnabled() ) {
@@ -118,7 +119,7 @@ public final class TwoPhaseLoad {
 	public static void initializeEntity(
 			final Object entity,
 			final boolean readOnly,
-			final SessionImplementor session,
+			final SharedSessionContractImplementor session,
 			final PreLoadEvent preLoadEvent) {
 		final PersistenceContext persistenceContext = session.getPersistenceContext();
 		final EntityEntry entityEntry = persistenceContext.getEntry( entity );
@@ -132,7 +133,7 @@ public final class TwoPhaseLoad {
 			final Object entity,
 			final EntityEntry entityEntry,
 			final boolean readOnly,
-			final SessionImplementor session,
+			final SharedSessionContractImplementor session,
 			final PreLoadEvent preLoadEvent) throws HibernateException {
 		final PersistenceContext persistenceContext = session.getPersistenceContext();
 		final EntityPersister persister = entityEntry.getPersister();
@@ -147,11 +148,28 @@ public final class TwoPhaseLoad {
 			);
 		}
 
+		String entityName = persister.getEntityName();
+		String[] propertyNames = persister.getPropertyNames();
 		final Type[] types = persister.getPropertyTypes();
 		for ( int i = 0; i < hydratedState.length; i++ ) {
 			final Object value = hydratedState[i];
-			if ( value!=LazyPropertyInitializer.UNFETCHED_PROPERTY && value!= PropertyAccessStrategyBackRefImpl.UNKNOWN ) {
-				hydratedState[i] = types[i].resolve( value, session, entity );
+			Boolean overridingEager = getOverridingEager( session, entityName, propertyNames[i], types[i] );
+			if ( value == LazyPropertyInitializer.UNFETCHED_PROPERTY ) {
+				// IMPLEMENTATION NOTE: This is a lazy property on a bytecode-enhanced entity.
+				// hydratedState[i] needs to remain LazyPropertyInitializer.UNFETCHED_PROPERTY so that
+				// setPropertyValues() below (ultimately AbstractEntityTuplizer#setPropertyValues) works properly
+				// No resolution is necessary, unless the lazy property is a collection.
+				if ( types[i].isCollectionType() ) {
+					// IMPLEMENTATION NOTE: this is a lazy collection property on a bytecode-enhanced entity.
+					// HHH-10989: We need to resolve the collection so that a CollectionReference is added to StatefulPersistentContext.
+					// As mentioned above, hydratedState[i] needs to remain LazyPropertyInitializer.UNFETCHED_PROPERTY
+					// so do not assign the resolved, unitialized PersistentCollection back to hydratedState[i].
+					types[i].resolve( value, session, entity, overridingEager );
+				}
+			}
+			else if ( value != PropertyAccessStrategyBackRefImpl.UNKNOWN ) {
+				// we know value != LazyPropertyInitializer.UNFETCHED_PROPERTY
+				hydratedState[i] = types[i].resolve( value, session, entity, overridingEager );
 			}
 		}
 
@@ -172,7 +190,7 @@ public final class TwoPhaseLoad {
 		persister.setPropertyValues( entity, hydratedState );
 
 		final SessionFactoryImplementor factory = session.getFactory();
-		if ( persister.hasCache() && session.getCacheMode().isPutEnabled() ) {
+		if ( persister.canWriteToCache() && session.getCacheMode().isPutEnabled() ) {
 
 			if ( debugEnabled ) {
 				LOG.debugf(
@@ -183,7 +201,7 @@ public final class TwoPhaseLoad {
 
 			final Object version = Versioning.getVersion( hydratedState, persister );
 			final CacheEntry entry = persister.buildCacheEntry( entity, hydratedState, version, session );
-			final EntityRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final EntityDataAccess cache = persister.getCacheAccessStrategy();
 			final Object cacheKey = cache.generateCacheKey( id, persister, factory, session.getTenantIdentifier() );
 
 			// explicit handling of caching for rows just inserted and then somehow forced to be read
@@ -209,13 +227,15 @@ public final class TwoPhaseLoad {
 							session,
 							cacheKey,
 							persister.getCacheEntryStructure().structure( entry ),
-							session.getTimestamp(),
 							version,
 							useMinimalPuts( session, entityEntry )
 					);
 
 					if ( put && factory.getStatistics().isStatisticsEnabled() ) {
-						factory.getStatisticsImplementor().secondLevelCachePut( cache.getRegion().getName() );
+						factory.getStatistics().entityCachePut(
+								StatsHelper.INSTANCE.getRootEntityRole( persister ),
+								cache.getRegion().getName()
+						);
 					}
 				}
 				finally {
@@ -264,11 +284,7 @@ public final class TwoPhaseLoad {
 			persistenceContext.setEntryStatus( entityEntry, Status.MANAGED );
 		}
 
-		persister.afterInitialize(
-				entity,
-				entityEntry.isLoadedWithLazyPropertiesUnfetched(),
-				session
-		);
+		persister.afterInitialize( entity, session );
 
 		if ( debugEnabled ) {
 			LOG.debugf(
@@ -278,10 +294,57 @@ public final class TwoPhaseLoad {
 		}
 
 		if ( factory.getStatistics().isStatisticsEnabled() ) {
-			factory.getStatisticsImplementor().loadEntity( persister.getEntityName() );
+			factory.getStatistics().loadEntity( persister.getEntityName() );
 		}
 	}
-	
+
+	/**
+	 * Check if eager of the association is overriden by anything.
+	 *
+	 * @param session session
+	 * @param entityName entity name
+	 * @param associationName association name
+	 *
+	 * @return null if there is no overriding, true if it is overridden to eager and false if it is overridden to lazy
+	 */
+	private static Boolean getOverridingEager(
+			SharedSessionContractImplementor session,
+			String entityName,
+			String associationName,
+			Type type) {
+		if ( type.isAssociationType() || type.isCollectionType() ) {
+			Boolean overridingEager = isEagerFetchProfile( session, entityName + "." + associationName );
+
+			if ( LOG.isDebugEnabled() ) {
+				if ( overridingEager != null ) {
+					LOG.debugf(
+							"Overriding eager fetching using active fetch profile. EntityName: %s, associationName: %s, eager fetching: %s",
+							entityName,
+							associationName,
+							overridingEager
+					);
+				}
+			}
+
+			return overridingEager;
+		}
+		return null;
+	}
+
+	private static Boolean isEagerFetchProfile(SharedSessionContractImplementor session, String role) {
+		LoadQueryInfluencers loadQueryInfluencers = session.getLoadQueryInfluencers();
+
+		for ( String fetchProfileName : loadQueryInfluencers.getEnabledFetchProfileNames() ) {
+			FetchProfile fp = session.getFactory().getFetchProfile( fetchProfileName );
+			Fetch fetch = fp.getFetchByRole( role );
+			if ( fetch != null && Fetch.Style.JOIN == fetch.getStyle() ) {
+				return true;
+			}
+		}
+		
+		return null;
+	}
+
 	/**
 	 * PostLoad cannot occur during initializeEntity, as that call occurs *before*
 	 * the Set collections are added to the persistence context by Loader.
@@ -289,16 +352,16 @@ public final class TwoPhaseLoad {
 	 * postLoad if it acts upon the collection.
 	 *
 	 * HHH-6043
-	 * 
+	 *
 	 * @param entity The entity
 	 * @param session The Session
 	 * @param postLoadEvent The (re-used) post-load event
 	 */
 	public static void postLoad(
 			final Object entity,
-			final SessionImplementor session,
+			final SharedSessionContractImplementor session,
 			final PostLoadEvent postLoadEvent) {
-		
+
 		if ( session.isEventSource() ) {
 			final PersistenceContext persistenceContext
 					= session.getPersistenceContext();
@@ -316,12 +379,14 @@ public final class TwoPhaseLoad {
 		}
 	}
 
-	private static boolean useMinimalPuts(SessionImplementor session, EntityEntry entityEntry) {
-		return ( session.getFactory().getSettings().isMinimalPutsEnabled()
-				&& session.getCacheMode()!=CacheMode.REFRESH )
-				|| ( entityEntry.getPersister().hasLazyProperties()
-				&& entityEntry.isLoadedWithLazyPropertiesUnfetched()
-				&& entityEntry.getPersister().isLazyPropertiesCacheable() );
+	private static boolean useMinimalPuts(SharedSessionContractImplementor session, EntityEntry entityEntry) {
+		if ( session.getFactory().getSessionFactoryOptions().isMinimalPutsEnabled() ) {
+			return session.getCacheMode() != CacheMode.REFRESH;
+		}
+		else {
+			return entityEntry.getPersister().hasLazyProperties()
+					&& entityEntry.getPersister().isLazyPropertiesCacheable();
+		}
 	}
 
 	/**
@@ -335,7 +400,6 @@ public final class TwoPhaseLoad {
 	 * @param object The entity instance
 	 * @param persister The entity persister
 	 * @param lockMode The lock mode
-	 * @param lazyPropertiesAreUnFetched Are lazy properties still un-fetched?
 	 * @param session The Session
 	 */
 	public static void addUninitializedEntity(
@@ -343,8 +407,7 @@ public final class TwoPhaseLoad {
 			final Object object,
 			final EntityPersister persister,
 			final LockMode lockMode,
-			final boolean lazyPropertiesAreUnFetched,
-			final SessionImplementor session) {
+			final SharedSessionContractImplementor session) {
 		session.getPersistenceContext().addEntity(
 				object,
 				Status.LOADING,
@@ -354,8 +417,7 @@ public final class TwoPhaseLoad {
 				lockMode,
 				true,
 				persister,
-				false,
-				lazyPropertiesAreUnFetched
+				false
 		);
 	}
 
@@ -366,7 +428,6 @@ public final class TwoPhaseLoad {
 	 * @param object The entity instance
 	 * @param persister The entity persister
 	 * @param lockMode The lock mode
-	 * @param lazyPropertiesAreUnFetched Are lazy properties still un-fetched?
 	 * @param version The version
 	 * @param session The Session
 	 */
@@ -375,9 +436,8 @@ public final class TwoPhaseLoad {
 			final Object object,
 			final EntityPersister persister,
 			final LockMode lockMode,
-			final boolean lazyPropertiesAreUnFetched,
 			final Object version,
-			final SessionImplementor session) {
+			final SharedSessionContractImplementor session) {
 		session.getPersistenceContext().addEntity(
 				object,
 				Status.LOADING,
@@ -387,8 +447,7 @@ public final class TwoPhaseLoad {
 				lockMode,
 				true,
 				persister,
-				false,
-				lazyPropertiesAreUnFetched
-			);
+				false
+		);
 	}
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.loader.CollectionAliases;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.type.Type;
@@ -50,8 +51,19 @@ public class PersistentMap extends AbstractPersistentCollection implements Map {
 	 *
 	 * @param session The session to which this map will belong.
 	 */
-	public PersistentMap(SessionImplementor session) {
+	public PersistentMap(SharedSessionContractImplementor session) {
 		super( session );
+	}
+
+	/**
+	 * Instantiates a lazy map (the underlying map is un-initialized).
+	 *
+	 * @param session The session to which this map will belong.
+	 * @deprecated {@link #PersistentMap(SharedSessionContractImplementor)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentMap(SessionImplementor session) {
+		this( (SharedSessionContractImplementor) session );
 	}
 
 	/**
@@ -61,11 +73,24 @@ public class PersistentMap extends AbstractPersistentCollection implements Map {
 	 * @param session The session to which this map will belong.
 	 * @param map The underlying map data.
 	 */
-	public PersistentMap(SessionImplementor session, Map map) {
+	public PersistentMap(SharedSessionContractImplementor session, Map map) {
 		super( session );
 		this.map = map;
 		setInitialized();
 		setDirectlyAccessible( true );
+	}
+
+	/**
+	 * Instantiates a non-lazy map (the underlying map is constructed
+	 * from the incoming map reference).
+	 *
+	 * @param session The session to which this map will belong.
+	 * @param map The underlying map data.
+	 * @deprecated {@link #PersistentMap(SharedSessionContractImplementor, Map)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentMap(SessionImplementor session, Map map) {
+		this( (SharedSessionContractImplementor) session, map );
 	}
 
 	@Override
@@ -178,6 +203,7 @@ public class PersistentMap extends AbstractPersistentCollection implements Map {
 		if ( isPutQueueEnabled() ) {
 			final Object old = readElementByIndex( key );
 			if ( old != UNKNOWN ) {
+				elementRemoved = true;
 				queueOperation( new Remove( key, old ) );
 				return old;
 			}
@@ -185,6 +211,7 @@ public class PersistentMap extends AbstractPersistentCollection implements Map {
 		// TODO : safe to interpret "map.remove(key) == null" as non-dirty?
 		initialize( true );
 		if ( map.containsKey( key ) ) {
+			elementRemoved = true;
 			dirty();
 		}
 		return map.remove( key );
@@ -264,7 +291,7 @@ public class PersistentMap extends AbstractPersistentCollection implements Map {
 		if ( element != null ) {
 			final Object index = persister.readIndex( rs, descriptor.getSuffixedIndexAliases(), getSession() );
 			if ( loadingEntries == null ) {
-				loadingEntries = new ArrayList<Object[]>();
+				loadingEntries = new ArrayList<>();
 			}
 			loadingEntries.add( new Object[] { index, element } );
 		}

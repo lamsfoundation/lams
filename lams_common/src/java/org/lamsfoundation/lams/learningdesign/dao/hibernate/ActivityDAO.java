@@ -57,16 +57,16 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
     private static final String TABLENAME = "lams_learning_activity";
 
     private static final String FIND_BY_PARENT = "from " + ActivityDAO.TABLENAME + " in class "
-	    + Activity.class.getName() + " where parent_activity_id=?";
+	    + Activity.class.getName() + " where parent_activity_id=:P1";
 
     private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + ActivityDAO.TABLENAME + " in class "
-	    + Activity.class.getName() + " where learning_design_id=?";
+	    + Activity.class.getName() + " where learning_design_id=:P1";
     private static final String FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID = "from " + ActivityDAO.TABLENAME
-	    + " in class " + GroupingActivity.class.getName() + " where learning_design_id=?";
+	    + " in class " + GroupingActivity.class.getName() + " where learning_design_id=:P1";
     private static final String FIND_BY_UI_ID = "from " + ActivityDAO.TABLENAME + " in class "
-	    + Activity.class.getName() + " where activity_ui_id=?" + " AND " + " learning_design_id=?";
+	    + Activity.class.getName() + " where activity_ui_id=:uiid" + " AND " + " learning_design_id=:ldId";
     private static final String FIND_BY_LIBRARY_ID = "from " + ActivityDAO.TABLENAME + " in class "
-	    + Activity.class.getName() + " where learning_library_id=?" + " AND learning_design_id IS NULL";
+	    + Activity.class.getName() + " where learning_library_id=:P1" + " AND learning_design_id IS NULL";
 
     /*
      * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivityById(java.lang.Long)
@@ -81,10 +81,10 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
     public ToolActivity getToolActivityByToolContentId(Long toolContentId) {
 
 	final String FIND_BY_TOOL_CONTENT_ID = "from " + ActivityDAO.TABLENAME + " in class " + Activity.class.getName()
-		+ " where toolContentId=?";
+		+ " where toolContentId=:toolContentId";
 
 	Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_TOOL_CONTENT_ID);
-	query.setLong(0, toolContentId);
+	query.setLong("toolContentId", toolContentId);
 	return (ToolActivity) getNonCGLibActivity((Activity) query.uniqueResult());
     }
 
@@ -224,8 +224,8 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	if (id != null && design != null) {
 	    Long designID = design.getLearningDesignId();
 	    Query query = this.getSessionFactory().getCurrentSession().createQuery(ActivityDAO.FIND_BY_UI_ID);
-	    query.setInteger(0, id.intValue());
-	    query.setLong(1, designID.longValue());
+	    query.setInteger("uiid", id.intValue());
+	    query.setLong("ldId", designID.longValue());
 	    return getNonCGLibActivity((Activity) query.uniqueResult());
 	}
 	return null;

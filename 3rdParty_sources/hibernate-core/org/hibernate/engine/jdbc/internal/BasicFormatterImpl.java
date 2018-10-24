@@ -68,7 +68,7 @@ public class BasicFormatterImpl implements Formatter {
 	}
 
 	private static final String INDENT_STRING = "    ";
-	private static final String INITIAL = "\n    ";
+	private static final String INITIAL = System.lineSeparator() + INDENT_STRING;
 
 	@Override
 	public String format(String source) {
@@ -127,7 +127,17 @@ public class BasicFormatterImpl implements Formatter {
 						t = tokens.nextToken();
 						token += t;
 					}
-					while ( !"\"".equals( t ) );
+					while ( !"\"".equals( t )  && tokens.hasMoreTokens() );
+				}
+				// SQL Server uses "[" and "]" to escape reserved words
+				// see SQLServerDialect.openQuote and SQLServerDialect.closeQuote
+				else if ( "[".equals( token ) ) {
+					String t;
+					do {
+						t = tokens.nextToken();
+						token += t;
+					}
+					while ( !"]".equals( t ) && tokens.hasMoreTokens());
 				}
 
 				if ( afterByOrSetOrFromOrSelect && ",".equals( token ) ) {
@@ -356,6 +366,10 @@ public class BasicFormatterImpl implements Formatter {
 		}
 
 		private static boolean isFunctionName(String tok) {
+			if ( tok == null || tok.length() == 0 ) {
+				return false;
+			}
+
 			final char begin = tok.charAt( 0 );
 			final boolean isIdentifier = Character.isJavaIdentifierStart( begin ) || '"' == begin;
 			return isIdentifier &&
@@ -371,7 +385,7 @@ public class BasicFormatterImpl implements Formatter {
 		}
 
 		private void newline() {
-			result.append( "\n" );
+			result.append( System.lineSeparator() );
 			for ( int i = 0; i < indent; i++ ) {
 				result.append( INDENT_STRING );
 			}

@@ -35,7 +35,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CompetenceDAO extends LAMSBaseDAO implements ICompetenceDAO {
     private static final String LOAD_COMPETENCE_BY_LDID_AND_TITLE = "from lams_competence in class "
-	    + Competence.class.getName() + " where title=? AND learning_design_id=?";
+	    + Competence.class.getName() + " where title=:title AND learning_design_id=:ldId";
 
     /**
      * @see org.lamsfoundation.lams.competence.dao.ICompetenceDAO#saveOrUpdate()
@@ -54,8 +54,8 @@ public class CompetenceDAO extends LAMSBaseDAO implements ICompetenceDAO {
 	if (design != null && competenceTitle != null) {
 	    Long designID = design.getLearningDesignId();
 	    Query query = getSessionFactory().getCurrentSession().createQuery(LOAD_COMPETENCE_BY_LDID_AND_TITLE);
-	    query.setString(0, competenceTitle);
-	    query.setLong(1, designID.longValue());
+	    query.setString("title", competenceTitle);
+	    query.setLong("ldId", designID.longValue());
 	    return (Competence) query.uniqueResult();
 	}
 	return null;

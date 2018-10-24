@@ -12,7 +12,8 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.action.spi.Executable;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.event.service.spi.EventListenerGroup;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventSource;
@@ -20,6 +21,8 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * Base class for actions relating to insert/update/delete of an entity
@@ -29,13 +32,16 @@ import org.hibernate.pretty.MessageHelper;
  */
 public abstract class EntityAction
 		implements Executable, Serializable, Comparable, AfterTransactionCompletionProcess {
+	private static final Logger LOG = Logger.getLogger(EntityAction.class);
 
 	private final String entityName;
 	private final Serializable id;
 
 	private transient Object instance;
-	private transient SessionImplementor session;
+	private transient SharedSessionContractImplementor session;
 	private transient EntityPersister persister;
+
+	private transient boolean veto;
 
 	/**
 	 * Instantiate an action.
@@ -45,12 +51,20 @@ public abstract class EntityAction
 	 * @param instance The entity instance
 	 * @param persister The entity persister
 	 */
-	protected EntityAction(SessionImplementor session, Serializable id, Object instance, EntityPersister persister) {
+	protected EntityAction(SharedSessionContractImplementor session, Serializable id, Object instance, EntityPersister persister) {
 		this.entityName = persister.getEntityName();
 		this.id = id;
 		this.instance = instance;
 		this.session = session;
 		this.persister = persister;
+	}
+
+	public boolean isVeto() {
+		return veto;
+	}
+
+	public void setVeto(boolean veto) {
+		this.veto = veto;
 	}
 
 	@Override
@@ -68,7 +82,7 @@ public abstract class EntityAction
 	protected abstract boolean hasPostCommitEventListeners();
 
 	protected boolean needsAfterTransactionCompletion() {
-		return persister.hasCache() || hasPostCommitEventListeners();
+		return persister.canWriteToCache() || hasPostCommitEventListeners();
 	}
 
 	/**
@@ -87,7 +101,19 @@ public abstract class EntityAction
 	 */
 	public final Serializable getId() {
 		if ( id instanceof DelayedPostInsertIdentifier ) {
-			final Serializable eeId = session.getPersistenceContext().getEntry( instance ).getId();
+			final EntityEntry entry = session.getPersistenceContext().getEntry( instance );
+			if ( entry == null ) {
+				if ( LOG.isDebugEnabled() ) {
+					LOG.debugf(
+							"Skipping action - the persistence context does not contain any entry for the entity [%s]. This may occur if an entity is created and then deleted in the same transaction/flush.",
+							instance
+					);
+				}
+				// If an Entity is created and then deleted in the same Transaction, when Action#postDelete() calls this method the persistence context
+				// does not contain anymore an entry.
+				return null;
+			}
+			final Serializable eeId = entry.getId();
 			return eeId instanceof DelayedPostInsertIdentifier ? null : eeId;
 		}
 		return id;
@@ -113,7 +139,7 @@ public abstract class EntityAction
 	 *
 	 * @return The session from which this action originated.
 	 */
-	public final SessionImplementor getSession() {
+	public final SharedSessionContractImplementor getSession() {
 		return session;
 	}
 
@@ -161,7 +187,7 @@ public abstract class EntityAction
 	 * @param session The session being deserialized
 	 */
 	@Override
-	public void afterDeserialize(SessionImplementor session) {
+	public void afterDeserialize(SharedSessionContractImplementor session) {
 		if ( this.session != null || this.persister != null ) {
 			throw new IllegalStateException( "already attached to a session." );
 		}
@@ -169,7 +195,7 @@ public abstract class EntityAction
 		// guard against NullPointerException
 		if ( session != null ) {
 			this.session = session;
-			this.persister = session.getFactory().getEntityPersister( entityName );
+			this.persister = session.getFactory().getMetamodel().entityPersister( entityName );
 			this.instance = session.getPersistenceContext().getEntity( session.generateEntityKey( id, persister ) );
 		}
 	}

@@ -15,6 +15,7 @@ import java.util.Map;
 import org.hibernate.Filter;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.FilterDefinition;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
 /**
@@ -28,10 +29,10 @@ public class FilterImpl implements Filter, Serializable {
 
 	private transient FilterDefinition definition;
 	private String filterName;
-	private Map<String,Object> parameters = new HashMap<String, Object>();
+	private Map<String,Object> parameters = new HashMap<>();
 	
-	void afterDeserialize(SessionFactoryImpl factory) {
-		definition = factory.getFilterDefinition(filterName);
+	void afterDeserialize(SessionFactoryImplementor factory) {
+		definition = factory.getFilterDefinition( filterName );
 		validate();
 	}
 

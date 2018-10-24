@@ -6,6 +6,11 @@
  */
 package org.hibernate.hql.internal.ast.tree;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.QueryException;
 import org.hibernate.engine.internal.JoinSequence;
 import org.hibernate.hql.internal.CollectionProperties;
@@ -16,6 +21,7 @@ import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.log.DeprecationLogger;
 import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.persister.entity.EntityPersister;
@@ -194,7 +200,7 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		dereferenceCollection( (CollectionType) propertyType, true, true, null, parent );
 	}
 
-	public void resolve(boolean generateJoin, boolean implicitJoin, String classAlias, AST parent)
+	public void resolve(boolean generateJoin, boolean implicitJoin, String classAlias, AST parent, AST parentPredicate)
 			throws SemanticException {
 		// If this dot has already been resolved, stop now.
 		if ( isResolved() ) {
@@ -227,7 +233,7 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		else if ( propertyType.isEntityType() ) {
 			// The property is another class..
 			checkLhsIsNotCollection();
-			dereferenceEntity( (EntityType) propertyType, implicitJoin, classAlias, generateJoin, parent );
+			dereferenceEntity( (EntityType) propertyType, implicitJoin, classAlias, generateJoin, parent, parentPredicate );
 			initText();
 		}
 		else if ( propertyType.isCollectionType() ) {
@@ -248,7 +254,7 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 
 	private void initText() {
 		String[] cols = getColumns();
-		String text = StringHelper.join( ", ", cols );
+		String text = String.join( ", ", cols );
 		boolean countDistinct = getWalker().isInCountDistinct()
 				&& getWalker().getSessionFactoryHelper().getFactory().getDialect().requiresParensForTupleDistinctCounts();
 		if ( cols.length > 1 &&
@@ -361,7 +367,8 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 			boolean implicitJoin,
 			String classAlias,
 			boolean generateJoin,
-			AST parent) throws SemanticException {
+			AST parent,
+			AST parentPredicate) throws SemanticException {
 		checkForCorrelatedSubquery( "dereferenceEntity" );
 		// three general cases we check here as to whether to render a physical SQL join:
 		// 1) is our parent a DotNode as well?  If so, our property reference is
@@ -402,6 +409,10 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		else if ( regressionStyleJoinSuppression ) {
 			// this is the regression style determination which matches the logic of the classic translator
 			joinIsNeeded = generateJoin && ( !getWalker().isInSelect() || !getWalker().isShallowQuery() );
+		}
+		else if ( parentPredicate != null ) {
+			// Never generate a join when we compare entities directly
+			joinIsNeeded = generateJoin;
 		}
 		else {
 			joinIsNeeded = generateJoin || ( getWalker().isInSelect() || getWalker().isInFrom() );
@@ -478,11 +489,6 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 		boolean useFoundFromElement = found && canReuse( classAlias, elem );
 
 		if ( !useFoundFromElement ) {
-			// If this is an implied join in a from element, then use the impled join type which is part of the
-			// tree parser's state (set by the gramamar actions).
-			JoinSequence joinSequence = getSessionFactoryHelper()
-					.createJoinSequence( impliedJoin, propertyType, tableAlias, joinType, joinColumns );
-
 			// If the lhs of the join is a "component join", we need to go back to the
 			// first non-component-join as the origin to properly link aliases and
 			// join columns
@@ -495,6 +501,27 @@ public class DotNode extends FromReferenceNode implements DisplayableNode, Selec
 			}
 
 			String role = lhsFromElement.getClassName() + "." + propertyName;
+
+			JoinSequence joinSequence;
+
+			if ( joinColumns.length == 0 ) {
+				// When no columns are available, this is a special join that involves multiple subtypes
+				String lhsTableAlias = getLhs().getFromElement().getTableAlias();
+
+				AbstractEntityPersister persister = (AbstractEntityPersister) lhsFromElement.getEntityPersister();
+
+				String[][] polyJoinColumns = persister.getPolymorphicJoinColumns(lhsTableAlias, propertyPath);
+
+				// Special join sequence that uses the poly join columns
+				joinSequence = getSessionFactoryHelper()
+						.createJoinSequence( impliedJoin, propertyType, tableAlias, joinType, polyJoinColumns );
+			}
+			else {
+				// If this is an implied join in a from element, then use the implied join type which is part of the
+				// tree parser's state (set by the grammar actions).
+				joinSequence = getSessionFactoryHelper()
+						.createJoinSequence( impliedJoin, propertyType, tableAlias, joinType, joinColumns );
+			}
 
 			FromElementFactory factory = new FromElementFactory(
 					currentFromClause,

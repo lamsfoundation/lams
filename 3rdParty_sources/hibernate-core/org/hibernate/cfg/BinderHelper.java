@@ -6,6 +6,24 @@
  */
 package org.hibernate.cfg;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Index;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
+import javax.persistence.UniqueConstraint;
+
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.MappingException;
@@ -17,13 +35,17 @@ import org.hibernate.annotations.common.reflection.ClassLoadingException;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XPackage;
+import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.boot.model.IdGeneratorStrategyInterpreter;
 import org.hibernate.boot.model.IdentifierGeneratorDefinition;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.cfg.annotations.EntityBinder;
 import org.hibernate.cfg.annotations.Nullability;
 import org.hibernate.cfg.annotations.TableBinder;
+import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.MultipleHiLoPerTableGenerator;
 import org.hibernate.id.PersistentIdentifierGenerator;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.Any;
@@ -39,18 +61,8 @@ import org.hibernate.mapping.SyntheticProperty;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
-import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import org.jboss.logging.Logger;
 
 /**
  * @author Emmanuel Bernard
@@ -59,13 +71,14 @@ public class BinderHelper {
 
 	public static final String ANNOTATION_STRING_DEFAULT = "";
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, BinderHelper.class.getName());
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( BinderHelper.class );
+	private static final Logger log = CoreLogging.logger( BinderHelper.class );
 
 	private BinderHelper() {
 	}
 
 	static {
-		Set<String> primitiveNames = new HashSet<String>();
+		Set<String> primitiveNames = new HashSet<>();
 		primitiveNames.add( byte.class.getName() );
 		primitiveNames.add( short.class.getName() );
 		primitiveNames.add( int.class.getName() );
@@ -237,7 +250,9 @@ public class BinderHelper {
 			boolean inverse,
 			MetadataBuildingContext context) {
 		//associated entity only used for more precise exception, yuk!
-		if ( columns[0].isImplicit() || StringHelper.isNotEmpty( columns[0].getMappedBy() ) ) return;
+		if ( columns[0].isImplicit() || StringHelper.isNotEmpty( columns[0].getMappedBy() ) ) {
+			return;
+		}
 		int fkEnum = Ejb3JoinColumn.checkReferencedColumnsType( columns, ownerEntity, context );
 		PersistentClass associatedClass = columns[0].getPropertyHolder() != null ?
 				columns[0].getPropertyHolder().getPersistentClass() :
@@ -258,12 +273,12 @@ public class BinderHelper {
 			Object columnOwner = findColumnOwner( ownerEntity, columns[0].getReferencedColumn(), context );
 			List<Property> properties = findPropertiesByColumns( columnOwner, columns, context );
 			//create an embeddable component
-                        Property synthProp = null;
+			Property synthProp;
 			if ( properties != null ) {
                         //todo how about properties.size() == 1, this should be much simpler
 				Component embeddedComp = columnOwner instanceof PersistentClass ?
-						new Component( context.getMetadataCollector(), (PersistentClass) columnOwner ) :
-						new Component( context.getMetadataCollector(), (Join) columnOwner );
+						new Component( context, (PersistentClass) columnOwner ) :
+						new Component( context, (Join) columnOwner );
 				embeddedComp.setEmbedded( true );
 				embeddedComp.setComponentClassName( embeddedComp.getOwner().getClassName() );
 				for (Property property : properties) {
@@ -273,8 +288,8 @@ public class BinderHelper {
 					clone.setNaturalIdentifier( false );
 					clone.setValueGenerationStrategy( property.getValueGenerationStrategy() );
 					embeddedComp.addProperty( clone );
-                                }
-                                    synthProp = new SyntheticProperty();
+				}
+				synthProp = new SyntheticProperty();
 				synthProp.setName( syntheticPropertyName );
 				synthProp.setPersistentClass( ownerEntity );
 				synthProp.setUpdateable( false );
@@ -282,9 +297,9 @@ public class BinderHelper {
 				synthProp.setValue( embeddedComp );
 				synthProp.setPropertyAccessorName( "embedded" );
 				ownerEntity.addProperty( synthProp );
-                                //make it unique
+				//make it unique
 				TableBinder.createUniqueConstraint( embeddedComp );
-                            }
+			}
 			else {
 				//TODO use a ToOne type doing a second select
 				StringBuilder columnsList = new StringBuilder();
@@ -356,9 +371,9 @@ public class BinderHelper {
 			Object columnOwner,
 			Ejb3JoinColumn[] columns,
 			MetadataBuildingContext context) {
-		Map<Column, Set<Property>> columnsToProperty = new HashMap<Column, Set<Property>>();
-		List<Column> orderedColumns = new ArrayList<Column>( columns.length );
-		Table referencedTable = null;
+		Map<Column, Set<Property>> columnsToProperty = new HashMap<>();
+		List<Column> orderedColumns = new ArrayList<>( columns.length );
+		Table referencedTable;
 		if ( columnOwner instanceof PersistentClass ) {
 			referencedTable = ( (PersistentClass) columnOwner ).getTable();
 		}
@@ -381,7 +396,7 @@ public class BinderHelper {
 					)
 			);
 			orderedColumns.add( column );
-			columnsToProperty.put( column, new HashSet<Property>() );
+			columnsToProperty.put( column, new HashSet<>() );
 		}
 		boolean isPersistentClass = columnOwner instanceof PersistentClass;
 		Iterator it = isPersistentClass ?
@@ -397,7 +412,7 @@ public class BinderHelper {
 		//first naive implementation
 		//only check 1 columns properties
 		//TODO make it smarter by checking correctly ordered multi column properties
-		List<Property> orderedProperties = new ArrayList<Property>();
+		List<Property> orderedProperties = new ArrayList<>();
 		for (Column column : orderedColumns) {
 			boolean found = false;
 			for (Property property : columnsToProperty.get( column ) ) {
@@ -407,13 +422,18 @@ public class BinderHelper {
 					break;
 				}
 			}
-			if ( !found ) return null; //have to find it the hard way
+			if ( !found ) {
+				//have to find it the hard way
+				return null;
+			}
 		}
 		return orderedProperties;
 	}
 
 	private static void matchColumnsByProperty(Property property, Map<Column, Set<Property>> columnsToProperty) {
-		if ( property == null ) return;
+		if ( property == null ) {
+			return;
+		}
 		if ( "noop".equals( property.getPropertyAccessorName() )
 				|| "embedded".equals( property.getPropertyAccessorName() ) ) {
 			return;
@@ -428,7 +448,8 @@ public class BinderHelper {
 		else {
 			Iterator columnIt = property.getColumnIterator();
 			while ( columnIt.hasNext() ) {
-				Object column = columnIt.next(); //can be a Formula so we don't cast
+				//can be a Formula so we don't cast
+				Object column = columnIt.next();
 				//noinspection SuspiciousMethodCalls
 				if ( columnsToProperty.containsKey( column ) ) {
 					columnsToProperty.get( column ).add( property );
@@ -464,7 +485,9 @@ public class BinderHelper {
 						property = associatedClass.getProperty( element );
 					}
 					else {
-						if ( !property.isComposite() ) return null;
+						if ( !property.isComposite() ) {
+							return null;
+						}
 						property = ( (Component) property.getValue() ).getProperty( element );
 					}
 				}
@@ -473,7 +496,9 @@ public class BinderHelper {
 		catch (MappingException e) {
 			try {
 				//if we do not find it try to check the identifier mapper
-				if ( associatedClass.getIdentifierMapper() == null ) return null;
+				if ( associatedClass.getIdentifierMapper() == null ) {
+					return null;
+				}
 				StringTokenizer st = new StringTokenizer( propertyName, ".", false );
 				while ( st.hasMoreElements() ) {
 					String element = (String) st.nextElement();
@@ -481,7 +506,9 @@ public class BinderHelper {
 						property = associatedClass.getIdentifierMapper().getProperty( element );
 					}
 					else {
-						if ( !property.isComposite() ) return null;
+						if ( !property.isComposite() ) {
+							return null;
+						}
 						property = ( (Component) property.getValue() ).getProperty( element );
 					}
 				}
@@ -512,7 +539,9 @@ public class BinderHelper {
 						property = component.getProperty( element );
 					}
 					else {
-						if ( !property.isComposite() ) return null;
+						if ( !property.isComposite() ) {
+							return null;
+						}
 						property = ( (Component) property.getValue() ).getProperty( element );
 					}
 				}
@@ -521,7 +550,9 @@ public class BinderHelper {
 		catch (MappingException e) {
 			try {
 				//if we do not find it try to check the identifier mapper
-				if ( component.getOwner().getIdentifierMapper() == null ) return null;
+				if ( component.getOwner().getIdentifierMapper() == null ) {
+					return null;
+				}
 				StringTokenizer st = new StringTokenizer( propertyName, ".", false );
 				while ( st.hasMoreElements() ) {
 					String element = (String) st.nextElement();
@@ -529,7 +560,9 @@ public class BinderHelper {
 						property = component.getOwner().getIdentifierMapper().getProperty( element );
 					}
 					else {
-						if ( !property.isComposite() ) return null;
+						if ( !property.isComposite() ) {
+							return null;
+						}
 						property = ( (Component) property.getValue() ).getProperty( element );
 					}
 				}
@@ -542,7 +575,9 @@ public class BinderHelper {
 	}
 
 	public static String getRelativePath(PropertyHolder propertyHolder, String propertyName) {
-		if ( propertyHolder == null ) return propertyName;
+		if ( propertyHolder == null ) {
+			return propertyName;
+		}
 		String path = propertyHolder.getPath();
 		String entityName = propertyHolder.getPersistentClass().getEntityName();
 		if ( path.length() == entityName.length() ) {
@@ -562,7 +597,8 @@ public class BinderHelper {
 			String columnName,
 			MetadataBuildingContext context) {
 		if ( StringHelper.isEmpty( columnName ) ) {
-			return persistentClass; //shortcut for implicit referenced column names
+			//shortcut for implicit referenced column names
+			return persistentClass;
 		}
 		PersistentClass current = persistentClass;
 		Object result;
@@ -600,10 +636,13 @@ public class BinderHelper {
 	 */
 	public static void makeIdGenerator(
 			SimpleValue id,
+			XProperty idXProperty,
 			String generatorType,
 			String generatorName,
 			MetadataBuildingContext buildingContext,
 			Map<String, IdentifierGeneratorDefinition> localGenerators) {
+		log.debugf( "#makeIdGenerator(%s, %s, %s, %s, ...)", id, idXProperty, generatorType, generatorName );
+
 		Table table = id.getTable();
 		table.setIdentifierValue( id );
 		//generator settings
@@ -633,12 +672,18 @@ public class BinderHelper {
 		}
 		// YUCK!  but cannot think of a clean way to do this given the string-config based scheme
 		params.put( PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER, buildingContext.getObjectNameNormalizer() );
+		params.put( IdentifierGenerator.GENERATOR_NAME, generatorName );
 
 		if ( !isEmptyAnnotationValue( generatorName ) ) {
 			//we have a named generator
-			IdentifierGeneratorDefinition gen = getIdentifierGenerator( generatorName, localGenerators, buildingContext );
+			IdentifierGeneratorDefinition gen = getIdentifierGenerator(
+					generatorName,
+					idXProperty,
+					localGenerators,
+					buildingContext
+			);
 			if ( gen == null ) {
-				throw new AnnotationException( "Unknown Id.generator: " + generatorName );
+				throw new AnnotationException( "Unknown named generator (@GeneratedValue#generatorName): " + generatorName );
 			}
 			//This is quite vague in the spec but a generator could override the generate choice
 			String identifierGeneratorStrategy = gen.getStrategy();
@@ -653,15 +698,39 @@ public class BinderHelper {
 			//checkIfMatchingGenerator(gen, generatorType, generatorName);
 			for ( Object o : gen.getParameters().entrySet() ) {
 				Map.Entry elt = (Map.Entry) o;
+				if ( elt.getKey() == null ) {
+					continue;
+				}
 				params.setProperty( (String) elt.getKey(), (String) elt.getValue() );
 			}
 		}
-		if ( "assigned".equals( generatorType ) ) id.setNullValue( "undefined" );
+		if ( "assigned".equals( generatorType ) ) {
+			id.setNullValue( "undefined" );
+		}
 		id.setIdentifierGeneratorProperties( params );
 	}
 
-	public static IdentifierGeneratorDefinition getIdentifierGenerator(
+	/**
+	 * apply an id generator to a SimpleValue
+	 */
+	public static void makeIdGenerator(
+			SimpleValue id,
+			XProperty idXProperty,
+			String generatorType,
+			String generatorName,
+			MetadataBuildingContext buildingContext,
+			IdentifierGeneratorDefinition foreignKGeneratorDefinition) {
+		Map<String, IdentifierGeneratorDefinition> localIdentifiers = null;
+		if ( foreignKGeneratorDefinition != null ) {
+			localIdentifiers = new HashMap<>();
+			localIdentifiers.put( foreignKGeneratorDefinition.getName(), foreignKGeneratorDefinition );
+		}
+		makeIdGenerator( id, idXProperty, generatorType, generatorName, buildingContext, localIdentifiers );
+	}
+
+	private static IdentifierGeneratorDefinition getIdentifierGenerator(
 			String name,
+			XProperty idXProperty,
 			Map<String, IdentifierGeneratorDefinition> localGenerators,
 			MetadataBuildingContext buildingContext) {
 		if ( localGenerators != null ) {
@@ -671,12 +740,199 @@ public class BinderHelper {
 			}
 		}
 
-		return buildingContext.getMetadataCollector().getIdentifierGenerator( name );
+		final IdentifierGeneratorDefinition globalDefinition = buildingContext.getMetadataCollector().getIdentifierGenerator( name );
+		if ( globalDefinition != null ) {
+			return globalDefinition;
+		}
+
+		log.debugf( "Could not resolve explicit IdentifierGeneratorDefinition - using implicit interpretation (%s)", name );
+
+		// If we were unable to locate an actual matching named generator assume a sequence/table of the given name.
+		//		this really needs access to the `javax.persistence.GenerationType` to work completely properly
+		//
+		// 		(the crux of HHH-12122)
+
+		// temporarily, in lieu of having access to GenerationType, assume the EnhancedSequenceGenerator
+		//		for the purpose of testing the feasibility of the approach
+
+		final GeneratedValue generatedValueAnn = idXProperty.getAnnotation( GeneratedValue.class );
+		if ( generatedValueAnn == null ) {
+			// this should really never happen, but its easy to protect against it...
+			return new IdentifierGeneratorDefinition( "assigned", "assigned" );
+		}
+
+		final IdGeneratorStrategyInterpreter generationInterpreter = buildingContext.getBuildingOptions().getIdGenerationTypeInterpreter();
+
+		final GenerationType generationType = interpretGenerationType( generatedValueAnn );
+
+		if ( generationType == null || generationType == GenerationType.SEQUENCE ) {
+			// NOTE : `null` will ultimately be interpreted as "hibernate_sequence"
+			log.debugf( "Building implicit sequence-based IdentifierGeneratorDefinition (%s)", name );
+			final IdentifierGeneratorDefinition.Builder builder = new IdentifierGeneratorDefinition.Builder();
+			generationInterpreter.interpretSequenceGenerator(
+					new SequenceGenerator() {
+						@Override
+						public String name() {
+							return name;
+						}
+
+						@Override
+						public String sequenceName() {
+							return "";
+						}
+
+						@Override
+						public String catalog() {
+							return "";
+						}
+
+						@Override
+						public String schema() {
+							return "";
+						}
+
+						@Override
+						public int initialValue() {
+							return 1;
+						}
+
+						@Override
+						public int allocationSize() {
+							return 50;
+						}
+
+						@Override
+						public Class<? extends Annotation> annotationType() {
+							return SequenceGenerator.class;
+						}
+					},
+					builder
+			);
+
+			return builder.build();
+		}
+		else if ( generationType == GenerationType.TABLE ) {
+			// NOTE : `null` will ultimately be interpreted as "hibernate_sequence"
+			log.debugf( "Building implicit table-based IdentifierGeneratorDefinition (%s)", name );
+			final IdentifierGeneratorDefinition.Builder builder = new IdentifierGeneratorDefinition.Builder();
+			generationInterpreter.interpretTableGenerator(
+					new TableGenerator() {
+						@Override
+						public String name() {
+							return name;
+						}
+
+						@Override
+						public String table() {
+							return "";
+						}
+
+						@Override
+						public int initialValue() {
+							return 0;
+						}
+
+						@Override
+						public int allocationSize() {
+							return 50;
+						}
+
+						@Override
+						public String catalog() {
+							return "";
+						}
+
+						@Override
+						public String schema() {
+							return "";
+						}
+
+						@Override
+						public String pkColumnName() {
+							return "";
+						}
+
+						@Override
+						public String valueColumnName() {
+							return "";
+						}
+
+						@Override
+						public String pkColumnValue() {
+							return "";
+						}
+
+						@Override
+						public UniqueConstraint[] uniqueConstraints() {
+							return new UniqueConstraint[0];
+						}
+
+						@Override
+						public Index[] indexes() {
+							return new Index[0];
+						}
+
+						@Override
+						public Class<? extends Annotation> annotationType() {
+							return TableGenerator.class;
+						}
+					},
+					builder
+			);
+
+			return builder.build();
+		}
+
+
+		// really AUTO and IDENTITY work the same in this respect, aside from the actual strategy name
+		final String strategyName;
+		if ( generationType == GenerationType.IDENTITY ) {
+			strategyName = "identity";
+		}
+		else {
+			strategyName = generationInterpreter.determineGeneratorName(
+					generationType,
+					new IdGeneratorStrategyInterpreter.GeneratorNameDeterminationContext() {
+						@Override
+						public Class getIdType() {
+							return buildingContext
+									.getBootstrapContext()
+									.getReflectionManager()
+									.toClass( idXProperty.getType() );
+						}
+
+						@Override
+						public String getGeneratedValueGeneratorName() {
+							return generatedValueAnn.generator();
+						}
+					}
+			);
+		}
+
+		log.debugf( "Building implicit generic IdentifierGeneratorDefinition (%s) : %s", name, strategyName );
+		return new IdentifierGeneratorDefinition(
+				name,
+				strategyName,
+				Collections.singletonMap( IdentifierGenerator.GENERATOR_NAME, name )
+		);
+	}
+
+	@SuppressWarnings("ConstantConditions")
+	private static GenerationType interpretGenerationType(GeneratedValue generatedValueAnn) {
+		if ( generatedValueAnn.strategy() == null ) {
+			return GenerationType.AUTO;
+		}
+
+		return generatedValueAnn.strategy();
 	}
 
 	public static boolean isEmptyAnnotationValue(String annotationString) {
 		return annotationString != null && annotationString.length() == 0;
 		//equivalent to (but faster) ANNOTATION_STRING_DEFAULT.equals( annotationString );
+	}
+
+	public static boolean isEmptyOrNullAnnotationValue(String annotationString) {
+		return annotationString == null || annotationString.length() == 0;
 	}
 
 	public static Any buildAnyValue(
@@ -691,7 +947,7 @@ public class BinderHelper {
 			boolean optional,
 			MetadataBuildingContext context) {
 		//All FK columns should be in the same table
-		Any value = new Any( context.getMetadataCollector(), columns[0].getTable() );
+		Any value = new Any( context, columns[0].getTable() );
 		AnyMetaDef metaAnnDef = inferredData.getProperty().getAnnotation( AnyMetaDef.class );
 
 		if ( metaAnnDef != null ) {
@@ -722,7 +978,9 @@ public class BinderHelper {
 					throw new MappingException( "could not interpret metaValue", e );
 				}
 			}
-			if ( !values.isEmpty() ) value.setMetaValues( values );
+			if ( !values.isEmpty() ) {
+				value.setMetaValues( values );
+			}
 		}
 		else {
 			throw new AnnotationException( "Unable to find @AnyMetaDef for an @(ManyTo)Any mapping: "
@@ -792,7 +1050,8 @@ public class BinderHelper {
 
 	private static void bindAnyMetaDef(AnyMetaDef defAnn, MetadataBuildingContext context) {
 		if ( isEmptyAnnotationValue( defAnn.name() ) ) {
-			return; //don't map not named definitions
+			//don't map not named definitions
+			return;
 		}
 		if ( LOG.isDebugEnabled() ) {
 			LOG.debugf( "Binding Any Meta definition: %s", defAnn.name() );
@@ -819,7 +1078,7 @@ public class BinderHelper {
 
 		if ( retrieve ) {
 			return context.getMetadataCollector().getMappedSuperclass(
-					context.getBuildingOptions().getReflectionManager().toClass( declaringClass )
+					context.getBootstrapContext().getReflectionManager().toClass( declaringClass )
 			);
 		}
 		else {
@@ -838,7 +1097,7 @@ public class BinderHelper {
 			MetadataBuildingContext buildingContext) {
 		final XClass persistentXClass;
 		try {
-			 persistentXClass = buildingContext.getBuildingOptions().getReflectionManager()
+			persistentXClass = buildingContext.getBootstrapContext().getReflectionManager()
 					.classForName( propertyHolder.getPersistentClass().getClassName() );
 		}
 		catch ( ClassLoadingException e ) {
@@ -857,25 +1116,25 @@ public class BinderHelper {
 			}
 			return pd;
 		}
-        String propertyPath = isId ? "" : propertyName;
-        return buildingContext.getMetadataCollector().getPropertyAnnotatedWithMapsId( persistentXClass, propertyPath );
+		String propertyPath = isId ? "" : propertyName;
+		return buildingContext.getMetadataCollector().getPropertyAnnotatedWithMapsId( persistentXClass, propertyPath );
 	}
 	
 	public static Map<String,String> toAliasTableMap(SqlFragmentAlias[] aliases){
-		Map<String,String> ret = new HashMap<String,String>();
-		for (int i = 0; i < aliases.length; i++){
-			if (StringHelper.isNotEmpty(aliases[i].table())){
-				ret.put(aliases[i].alias(), aliases[i].table());
+		Map<String,String> ret = new HashMap<>();
+		for ( int i = 0; i < aliases.length; i++ ){
+			if ( StringHelper.isNotEmpty( aliases[i].table() ) ){
+				ret.put( aliases[i].alias(), aliases[i].table() );
 }
 		}
 		return ret;
 	}
 	
 	public static Map<String,String> toAliasEntityMap(SqlFragmentAlias[] aliases){
-		Map<String,String> ret = new HashMap<String,String>();
+		Map<String,String> ret = new HashMap<>();
 		for (int i = 0; i < aliases.length; i++){
 			if (aliases[i].entity() != void.class){
-				ret.put(aliases[i].alias(), aliases[i].entity().getName());
+				ret.put( aliases[i].alias(), aliases[i].entity().getName() );
 			}
 		}
 		return ret;

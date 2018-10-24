@@ -12,7 +12,7 @@
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
- 		 rather than several local Session Factiories.
+ 		 rather than several local Session Factories.
  	-->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="dataSource"/></property>
@@ -22,6 +22,7 @@
 				<value>classpath*:org/eucm/lams/**/*.hbm.xml</value>
 			</list>
 		</property>
+		<property name="packagesToScan" value="org.lamsfoundation/lams/**/model/"/>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 	</bean>
 	

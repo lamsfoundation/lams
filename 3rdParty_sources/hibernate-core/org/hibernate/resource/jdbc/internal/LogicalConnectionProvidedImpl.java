@@ -14,6 +14,7 @@ import java.sql.Connection;
 import org.hibernate.resource.jdbc.LogicalConnection;
 import org.hibernate.resource.jdbc.ResourceRegistry;
 import org.hibernate.resource.jdbc.spi.LogicalConnectionImplementor;
+import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 
 import org.jboss.logging.Logger;
 
@@ -26,10 +27,6 @@ public class LogicalConnectionProvidedImpl extends AbstractLogicalConnectionImpl
 	private transient Connection providedConnection;
 	private final boolean initiallyAutoCommit;
 	private boolean closed;
-
-	public LogicalConnectionProvidedImpl(Connection providedConnection) {
-		this( providedConnection, new ResourceRegistryStandardImpl() );
-	}
 
 	public LogicalConnectionProvidedImpl(Connection providedConnection, ResourceRegistry resourceRegistry) {
 		this.resourceRegistry = resourceRegistry;
@@ -45,6 +42,11 @@ public class LogicalConnectionProvidedImpl extends AbstractLogicalConnectionImpl
 		this.resourceRegistry = new ResourceRegistryStandardImpl();
 		this.closed = closed;
 		this.initiallyAutoCommit = initiallyAutoCommit;
+	}
+
+	@Override
+	public PhysicalConnectionHandlingMode getConnectionHandlingMode() {
+		return PhysicalConnectionHandlingMode.IMMEDIATE_ACQUISITION_AND_HOLD;
 	}
 
 	@Override
@@ -83,7 +85,7 @@ public class LogicalConnectionProvidedImpl extends AbstractLogicalConnectionImpl
 	public LogicalConnectionImplementor makeShareableCopy() {
 		errorIfClosed();
 
-		return new LogicalConnectionProvidedImpl( providedConnection );
+		return new LogicalConnectionProvidedImpl( providedConnection, new ResourceRegistryStandardImpl() );
 	}
 
 	@Override

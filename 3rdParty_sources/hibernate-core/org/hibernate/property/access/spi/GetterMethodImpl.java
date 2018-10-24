@@ -14,8 +14,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.hibernate.PropertyAccessException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
 
 import static org.hibernate.internal.CoreLogging.messageLogger;
 
@@ -72,7 +73,7 @@ public class GetterMethodImpl implements Getter {
 	}
 
 	@Override
-	public Object getForInsert(Object owner, Map mergeMap, SessionImplementor session) {
+	public Object getForInsert(Object owner, Map mergeMap, SharedSessionContractImplementor session) {
 		return get( owner );
 	}
 
@@ -121,7 +122,9 @@ public class GetterMethodImpl implements Getter {
 		@SuppressWarnings("unchecked")
 		private Method resolveMethod() {
 			try {
-				return declaringClass.getDeclaredMethod( methodName );
+				final Method method = declaringClass.getDeclaredMethod( methodName );
+				ReflectHelper.ensureAccessibility( method );
+				return method;
 			}
 			catch (NoSuchMethodException e) {
 				throw new PropertyAccessSerializationException(

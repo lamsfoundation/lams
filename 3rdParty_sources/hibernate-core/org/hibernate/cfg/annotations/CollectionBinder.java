@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CollectionTable;
@@ -44,8 +43,10 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.LazyGroup;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OptimisticLock;
 import org.hibernate.annotations.OrderBy;
 import org.hibernate.annotations.Parameter;
@@ -82,6 +83,7 @@ import org.hibernate.cfg.PropertyHolderBuilder;
 import org.hibernate.cfg.PropertyInferredData;
 import org.hibernate.cfg.PropertyPreloadedData;
 import org.hibernate.cfg.SecondPass;
+import org.hibernate.criterion.Junction;
 import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
@@ -98,6 +100,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.Table;
+
 import org.jboss.logging.Logger;
 
 import static org.hibernate.cfg.BinderHelper.toAliasEntityMap;
@@ -109,23 +112,23 @@ import static org.hibernate.cfg.BinderHelper.toAliasTableMap;
  * @author inger
  * @author Emmanuel Bernard
  */
-@SuppressWarnings({"unchecked", "serial"})
+@SuppressWarnings({"unchecked", "serial", "WeakerAccess", "deprecation"})
 public abstract class CollectionBinder {
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, CollectionBinder.class.getName());
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, CollectionBinder.class.getName());
 
 	private MetadataBuildingContext buildingContext;
 
 	protected Collection collection;
 	protected String propertyName;
 	PropertyHolder propertyHolder;
-	int batchSize;
+	private int batchSize;
 	private String mappedBy;
 	private XClass collectionType;
 	private XClass targetEntity;
 	private Ejb3JoinColumn[] inverseJoinColumns;
 	private String cascadeStrategy;
-	String cacheConcurrencyStrategy;
-	String cacheRegionName;
+	private String cacheConcurrencyStrategy;
+	private String cacheRegionName;
 	private boolean oneToMany;
 	protected IndexColumn indexColumn;
 	protected boolean cascadeDeleteEnabled;
@@ -158,6 +161,10 @@ public abstract class CollectionBinder {
 	private String explicitType;
 	private final Properties explicitTypeParameters = new Properties();
 
+	protected CollectionBinder(boolean isSortedCollection) {
+		this.isSortedCollection = isSortedCollection;
+	}
+
 	protected MetadataBuildingContext getBuildingContext() {
 		return buildingContext;
 	}
@@ -170,7 +177,7 @@ public abstract class CollectionBinder {
 		return false;
 	}
 
-	public void setIsHibernateExtensionMapping(boolean hibernateExtensionMapping) {
+	protected void setIsHibernateExtensionMapping(boolean hibernateExtensionMapping) {
 		this.hibernateExtensionMapping = hibernateExtensionMapping;
 	}
 
@@ -344,10 +351,6 @@ public abstract class CollectionBinder {
 		return result;
 	}
 
-	protected CollectionBinder(boolean isSortedCollection) {
-		this.isSortedCollection = isSortedCollection;
-	}
-
 	public void setMappedBy(String mappedBy) {
 		this.mappedBy = mappedBy;
 	}
@@ -478,6 +481,15 @@ public abstract class CollectionBinder {
 			throw new AnnotationException( message );
 		}
 
+		if (!isMappedBy
+				&& oneToMany
+				&& property.isAnnotationPresent( OnDelete.class )
+				&& !property.isAnnotationPresent( JoinColumn.class )) {
+			String message = "Unidirectional one-to-many associations annotated with @OnDelete must define @JoinColumn: ";
+			message += StringHelper.qualify( propertyHolder.getPath(), propertyName );
+			throw new AnnotationException( message );
+		}
+
 		collection.setInverse( isMappedBy );
 
 		//many to many may need some second pass informations
@@ -521,10 +533,14 @@ public abstract class CollectionBinder {
 		binder.setName( propertyName );
 		binder.setValue( collection );
 		binder.setCascade( cascadeStrategy );
-		if ( cascadeStrategy != null && cascadeStrategy.indexOf( "delete-orphan" ) >= 0 ) {
+		if ( cascadeStrategy != null && cascadeStrategy.contains( "delete-orphan" ) ) {
 			collection.setOrphanDelete( true );
 		}
 		binder.setLazy( collection.isLazy() );
+		final LazyGroup lazyGroupAnnotation = property.getAnnotation( LazyGroup.class );
+		if ( lazyGroupAnnotation != null ) {
+			binder.setLazyGroup( lazyGroupAnnotation.value() );
+		}
 		binder.setAccessType( accessType );
 		binder.setProperty( property );
 		binder.setInsertable( insertable );
@@ -536,8 +552,6 @@ public abstract class CollectionBinder {
 	}
 
 	private void applySortingAndOrdering(Collection collection) {
-		boolean isSorted = isSortedCollection;
-
 		boolean hadOrderBy = false;
 		boolean hadExplicitSort = false;
 
@@ -551,10 +565,10 @@ public abstract class CollectionBinder {
 				}
 				hadExplicitSort = deprecatedSort.type() != SortType.UNSORTED;
 				if ( deprecatedSort.type() == SortType.NATURAL ) {
-					isSorted = true;
+					isSortedCollection = true;
 				}
 				else if ( deprecatedSort.type() == SortType.COMPARATOR ) {
-					isSorted = true;
+					isSortedCollection = true;
 					comparatorClass = deprecatedSort.comparator();
 				}
 			}
@@ -633,7 +647,7 @@ public abstract class CollectionBinder {
 		Fetch fetch = property.getAnnotation( Fetch.class );
 		OneToMany oneToMany = property.getAnnotation( OneToMany.class );
 		ManyToMany manyToMany = property.getAnnotation( ManyToMany.class );
-		ElementCollection elementCollection = property.getAnnotation( ElementCollection.class ); //jpa 2
+		ElementCollection elementCollection = property.getAnnotation( ElementCollection.class );
 		ManyToAny manyToAny = property.getAnnotation( ManyToAny.class );
 		FetchType fetchType;
 		if ( oneToMany != null ) {
@@ -715,7 +729,7 @@ public abstract class CollectionBinder {
 			final MetadataBuildingContext buildingContext) {
 		return new CollectionSecondPass( buildingContext, collection ) {
 			@Override
-            public void secondPass(java.util.Map persistentClasses, java.util.Map inheritedMetas) throws MappingException {
+			public void secondPass(java.util.Map persistentClasses, java.util.Map inheritedMetas) throws MappingException {
 				bindStarToManySecondPass(
 						persistentClasses,
 						collType,
@@ -759,14 +773,14 @@ public abstract class CollectionBinder {
 				);
 			}
 			catch (MappingException e) {
-				StringBuilder error = new StringBuilder( 80 );
-				error.append( "mappedBy reference an unknown target entity property: " )
-						.append( collType ).append( "." ).append( this.mappedBy )
-						.append( " in " )
-						.append( collection.getOwnerEntityName() )
-						.append( "." )
-						.append( property.getName() );
-				throw new AnnotationException( error.toString() );
+				throw new AnnotationException(
+						"mappedBy reference an unknown target entity property: " +
+								collType + "." + this.mappedBy +
+								" in " +
+								collection.getOwnerEntityName() +
+								"." +
+								property.getName()
+				);
 			}
 		}
 		if ( persistentClass != null
@@ -823,7 +837,12 @@ public abstract class CollectionBinder {
 		if ( debugEnabled ) {
 			LOG.debugf( "Binding a OneToMany: %s.%s through a foreign key", propertyHolder.getEntityName(), propertyName );
 		}
-		org.hibernate.mapping.OneToMany oneToMany = new org.hibernate.mapping.OneToMany( buildingContext.getMetadataCollector(), collection.getOwner() );
+		if ( buildingContext == null ) {
+			throw new AssertionFailure(
+					"CollectionSecondPass for oneToMany should not be called with null mappings"
+			);
+		}
+		org.hibernate.mapping.OneToMany oneToMany = new org.hibernate.mapping.OneToMany( buildingContext, collection.getOwner() );
 		collection.setElement( oneToMany );
 		oneToMany.setReferencedEntityName( collectionType.getName() );
 		oneToMany.setIgnoreNotFound( ignoreNotFound );
@@ -840,16 +859,11 @@ public abstract class CollectionBinder {
 				collection.setOrderBy( orderByFragment );
 			}
 		}
-
-		if ( buildingContext == null ) {
-			throw new AssertionFailure(
-					"CollectionSecondPass for oneToMany should not be called with null mappings"
-			);
-		}
 		Map<String, Join> joins = buildingContext.getMetadataCollector().getJoins( assocClass );
 		if ( associatedClass == null ) {
 			throw new MappingException(
-					"Association references unmapped class: " + assocClass
+					String.format("Association [%s] for entity [%s] references unmapped class [%s]",
+							propertyName, propertyHolder.getClassName(), assocClass)
 			);
 		}
 		oneToMany.setAssociatedClass( associatedClass );
@@ -862,7 +876,7 @@ public abstract class CollectionBinder {
 			LOG.debugf( "Mapping collection: %s -> %s", collection.getRole(), collection.getCollectionTable().getName() );
 		}
 		bindFilters( false );
-		bindCollectionSecondPass( collection, null, fkJoinColumns, cascadeDeleteEnabled, property, buildingContext );
+		bindCollectionSecondPass( collection, null, fkJoinColumns, cascadeDeleteEnabled, property, propertyHolder, buildingContext );
 		if ( !collection.isInverse()
 				&& !collection.getKey().isNullable() ) {
 			// for non-inverse one-to-many, with a not-null fk, add a backref!
@@ -939,21 +953,47 @@ public abstract class CollectionBinder {
 			}
 		}
 
-		Where where = property.getAnnotation( Where.class );
-		String whereClause = where == null ? null : where.clause();
-		if ( StringHelper.isNotEmpty( whereClause ) ) {
-			if ( hasAssociationTable ) {
-				collection.setManyToManyWhere( whereClause );
+		// There are 2 possible sources of "where" clauses that apply to the associated entity table:
+		// 1) from the associated entity mapping; i.e., @Entity @Where(clause="...")
+		// 2) from the collection mapping;
+		//    for one-to-many, e.g., @OneToMany @JoinColumn @Where(clause="...") public Set<Rating> getRatings();
+		//    for many-to-many e.g., @ManyToMany @Where(clause="...") public Set<Rating> getRatings();
+		String whereOnClassClause = null;
+		if ( property.getElementClass() != null ) {
+			Where whereOnClass = property.getElementClass().getAnnotation( Where.class );
+			if ( whereOnClass != null ) {
+				whereOnClassClause = whereOnClass.clause();
 			}
-			else {
-				collection.setWhere( whereClause );
-			}
+		}
+		Where whereOnCollection = property.getAnnotation( Where.class );
+		String whereOnCollectionClause = null;
+		if ( whereOnCollection != null ) {
+			whereOnCollectionClause = whereOnCollection.clause();
+		}
+		final String whereClause = StringHelper.getNonEmptyOrConjunctionIfBothNonEmpty(
+				whereOnClassClause,
+				whereOnCollectionClause
+		);
+		if ( hasAssociationTable ) {
+			// A many-to-many association has an association (join) table
+			// Collection#setManytoManyWhere is used to set the "where" clause that applies to
+			// to the many-to-many associated entity table (not the join table).
+			collection.setManyToManyWhere( whereClause );
+		}
+		else {
+			// A one-to-many association does not have an association (join) table.
+			// Collection#setWhere is used to set the "where" clause that applies to the collection table
+			// (which is the associated entity table for a one-to-many association).
+			collection.setWhere( whereClause );
 		}
 
 		WhereJoinTable whereJoinTable = property.getAnnotation( WhereJoinTable.class );
 		String whereJoinTableClause = whereJoinTable == null ? null : whereJoinTable.clause();
 		if ( StringHelper.isNotEmpty( whereJoinTableClause ) ) {
 			if ( hasAssociationTable ) {
+				// This is a many-to-many association.
+				// Collection#setWhere is used to set the "where" clause that applies to the collection table
+				// (which is the join table for a many-to-many association).
 				collection.setWhere( whereJoinTableClause );
 			}
 			else {
@@ -972,13 +1012,6 @@ public abstract class CollectionBinder {
 //			        "not valid within collection using join fetching [" + collection.getRole() + "]"
 //				);
 //		}
-	}
-
-	private String getCondition(FilterJoinTable filter) {
-		//set filtering
-		String name = filter.name();
-		String cond = filter.condition();
-		return getCondition( cond, name );
 	}
 
 	private String getCondition(Filter filter) {
@@ -1039,17 +1072,28 @@ public abstract class CollectionBinder {
 		return orderByFragment;
 	}
 
-	private static String adjustUserSuppliedValueCollectionOrderingFragment(String orderByFragment) {
+	public static String adjustUserSuppliedValueCollectionOrderingFragment(String orderByFragment) {
 		if ( orderByFragment != null ) {
-			// NOTE: "$element$" is a specially recognized collection property recognized by the collection persister
-			if ( orderByFragment.length() == 0 ) {
-				//order by element
+			orderByFragment = orderByFragment.trim();
+			if ( orderByFragment.length() == 0 || orderByFragment.equalsIgnoreCase( "asc" ) ) {
+				// This indicates something like either:
+				//		`@OrderBy()`
+				//		`@OrderBy("asc")
+				//
+				// JPA says this should indicate an ascending natural ordering of the elements - id for
+				//		entity associations or the value(s) for "element collections"
 				return "$element$ asc";
 			}
-			else if ( "desc".equals( orderByFragment ) ) {
+			else if ( orderByFragment.equalsIgnoreCase( "desc" ) ) {
+				// This indicates:
+				//		`@OrderBy("desc")`
+				//
+				// JPA says this should indicate a descending natural ordering of the elements - id for
+				//		entity associations or the value(s) for "element collections"
 				return "$element$ desc";
 			}
 		}
+
 		return orderByFragment;
 	}
 
@@ -1058,6 +1102,7 @@ public abstract class CollectionBinder {
 			Ejb3JoinColumn[] joinColumns,
 			boolean cascadeDeleteEnabled,
 			XProperty property,
+			PropertyHolder propertyHolder,
 			MetadataBuildingContext buildingContext) {
 		//binding key reference using column
 		KeyValue keyVal;
@@ -1085,7 +1130,7 @@ public abstract class CollectionBinder {
 					.getReferencedProperty( propRef )
 					.getValue();
 		}
-		DependantValue key = new DependantValue( buildingContext.getMetadataCollector(), collValue.getCollectionTable(), keyVal );
+		DependantValue key = new DependantValue( buildingContext, collValue.getCollectionTable(), keyVal );
 		key.setTypeName( null );
 		Ejb3Column.checkPropertyConsistency( joinColumns, collValue.getOwnerEntityName() );
 		key.setNullable( joinColumns.length == 0 || joinColumns[0].isNullable() );
@@ -1105,17 +1150,27 @@ public abstract class CollectionBinder {
 					}
 					else {
 						key.setForeignKeyName( StringHelper.nullIfEmpty( collectionTableAnn.foreignKey().name() ) );
+						key.setForeignKeyDefinition( StringHelper.nullIfEmpty( collectionTableAnn.foreignKey().foreignKeyDefinition() ) );
+						if ( key.getForeignKeyName() == null &&
+							 key.getForeignKeyDefinition() == null &&
+							 collectionTableAnn.joinColumns().length == 1 ) {
+							JoinColumn joinColumn = collectionTableAnn.joinColumns()[0];
+							key.setForeignKeyName( StringHelper.nullIfEmpty( joinColumn.foreignKey().name() ) );
+							key.setForeignKeyDefinition( StringHelper.nullIfEmpty( joinColumn.foreignKey().foreignKeyDefinition() ) );
+						}
 					}
 				}
 				else {
 					final JoinTable joinTableAnn = property.getAnnotation( JoinTable.class );
 					if ( joinTableAnn != null ) {
 						String foreignKeyName = joinTableAnn.foreignKey().name();
+						String foreignKeyDefinition = joinTableAnn.foreignKey().foreignKeyDefinition();
 						ConstraintMode foreignKeyValue = joinTableAnn.foreignKey().value();
 						if ( joinTableAnn.joinColumns().length != 0 ) {
 							final JoinColumn joinColumnAnn = joinTableAnn.joinColumns()[0];
 							if ( "".equals( foreignKeyName ) ) {
 								foreignKeyName = joinColumnAnn.foreignKey().name();
+								foreignKeyDefinition = joinColumnAnn.foreignKey().foreignKeyDefinition();
 							}
 							if ( foreignKeyValue != ConstraintMode.NO_CONSTRAINT ) {
 								foreignKeyValue = joinColumnAnn.foreignKey().value();
@@ -1126,16 +1181,30 @@ public abstract class CollectionBinder {
 						}
 						else {
 							key.setForeignKeyName( StringHelper.nullIfEmpty( foreignKeyName ) );
+							key.setForeignKeyDefinition( StringHelper.nullIfEmpty( foreignKeyDefinition ) );
 						}
 					}
 					else {
-						final JoinColumn joinColumnAnn = property.getAnnotation( JoinColumn.class );
-						if ( joinColumnAnn != null ) {
-							if ( joinColumnAnn.foreignKey().value() == ConstraintMode.NO_CONSTRAINT ) {
-								key.setForeignKeyName( "none" );
-							}
-							else {
-								key.setForeignKeyName( StringHelper.nullIfEmpty( joinColumnAnn.foreignKey().name() ) );
+						final javax.persistence.ForeignKey fkOverride = propertyHolder.getOverriddenForeignKey(
+								StringHelper.qualify( propertyHolder.getPath(), property.getName() )
+						);
+						if ( fkOverride != null && fkOverride.value() == ConstraintMode.NO_CONSTRAINT ) {
+							key.setForeignKeyName( "none" );
+						}
+						else if ( fkOverride != null ) {
+							key.setForeignKeyName( StringHelper.nullIfEmpty( fkOverride.name() ) );
+							key.setForeignKeyDefinition( StringHelper.nullIfEmpty( fkOverride.foreignKeyDefinition() ) );
+						}
+						else {
+							final JoinColumn joinColumnAnn = property.getAnnotation( JoinColumn.class );
+							if ( joinColumnAnn != null ) {
+								if ( joinColumnAnn.foreignKey().value() == ConstraintMode.NO_CONSTRAINT ) {
+									key.setForeignKeyName( "none" );
+								}
+								else {
+									key.setForeignKeyName( StringHelper.nullIfEmpty( joinColumnAnn.foreignKey().name() ) );
+									key.setForeignKeyDefinition( StringHelper.nullIfEmpty( joinColumnAnn.foreignKey().foreignKeyDefinition() ) );
+								}
 							}
 						}
 					}
@@ -1146,7 +1215,7 @@ public abstract class CollectionBinder {
 		return key;
 	}
 
-	protected void bindManyToManySecondPass(
+	private void bindManyToManySecondPass(
 			Collection collValue,
 			Map persistentClasses,
 			Ejb3JoinColumn[] joinColumns,
@@ -1169,18 +1238,18 @@ public abstract class CollectionBinder {
 
 		boolean isCollectionOfEntities = collectionEntity != null;
 		ManyToAny anyAnn = property.getAnnotation( ManyToAny.class );
-        if ( LOG.isDebugEnabled() ) {
+		if ( LOG.isDebugEnabled() ) {
 			String path = collValue.getOwnerEntityName() + "." + joinColumns[0].getPropertyName();
-            if ( isCollectionOfEntities && unique ) {
+			if ( isCollectionOfEntities && unique ) {
 				LOG.debugf("Binding a OneToMany: %s through an association table", path);
 			}
-            else if (isCollectionOfEntities) {
+			else if (isCollectionOfEntities) {
 				LOG.debugf("Binding as ManyToMany: %s", path);
 			}
-            else if (anyAnn != null) {
+			else if (anyAnn != null) {
 				LOG.debugf("Binding a ManyToAny: %s", path);
 			}
-            else {
+			else {
 				LOG.debugf("Binding a collection of element: %s", path);
 			}
 		}
@@ -1214,14 +1283,12 @@ public abstract class CollectionBinder {
 		boolean mappedBy = !BinderHelper.isEmptyAnnotationValue( joinColumns[0].getMappedBy() );
 		if ( mappedBy ) {
 			if ( !isCollectionOfEntities ) {
-				StringBuilder error = new StringBuilder( 80 )
-						.append(
-								"Collection of elements must not have mappedBy or association reference an unmapped entity: "
-						)
-						.append( collValue.getOwnerEntityName() )
-						.append( "." )
-						.append( joinColumns[0].getPropertyName() );
-				throw new AnnotationException( error.toString() );
+				throw new AnnotationException(
+						"Collection of elements must not have mappedBy or association reference an unmapped entity: " +
+								collValue.getOwnerEntityName() +
+								"." +
+								joinColumns[0].getPropertyName()
+				);
 			}
 			Property otherSideProperty;
 			try {
@@ -1287,11 +1354,11 @@ public abstract class CollectionBinder {
 			collValue.setCollectionTable( associationTableBinder.bind() );
 		}
 		bindFilters( isCollectionOfEntities );
-		bindCollectionSecondPass( collValue, collectionEntity, joinColumns, cascadeDeleteEnabled, property, buildingContext );
+		bindCollectionSecondPass( collValue, collectionEntity, joinColumns, cascadeDeleteEnabled, property, propertyHolder, buildingContext );
 
 		ManyToOne element = null;
 		if ( isCollectionOfEntities ) {
-			element = new ManyToOne( buildingContext.getMetadataCollector(),  collValue.getCollectionTable() );
+			element = new ManyToOne( buildingContext,  collValue.getCollectionTable() );
 			collValue.setElement( element );
 			element.setReferencedEntityName( collType.getName() );
 			//element.setFetchMode( fetchMode );
@@ -1315,21 +1382,24 @@ public abstract class CollectionBinder {
 				final JoinTable joinTableAnn = property.getAnnotation( JoinTable.class );
 				if ( joinTableAnn != null ) {
 					String foreignKeyName = joinTableAnn.inverseForeignKey().name();
-					ConstraintMode foreignKeyValue = joinTableAnn.foreignKey().value();
+					String foreignKeyDefinition = joinTableAnn.inverseForeignKey().foreignKeyDefinition();
+					ConstraintMode foreignKeyValue = joinTableAnn.inverseForeignKey().value();
 					if ( joinTableAnn.inverseJoinColumns().length != 0 ) {
 						final JoinColumn joinColumnAnn = joinTableAnn.inverseJoinColumns()[0];
 						if ( "".equals( foreignKeyName ) ) {
 							foreignKeyName = joinColumnAnn.foreignKey().name();
+							foreignKeyDefinition = joinColumnAnn.foreignKey().foreignKeyDefinition();
 						}
 						if ( foreignKeyValue != ConstraintMode.NO_CONSTRAINT ) {
 							foreignKeyValue = joinColumnAnn.foreignKey().value();
 						}
 					}
-					if ( joinTableAnn.foreignKey().value() == ConstraintMode.NO_CONSTRAINT ) {
+					if ( joinTableAnn.inverseForeignKey().value() == ConstraintMode.NO_CONSTRAINT ) {
 						element.setForeignKeyName( "none" );
 					}
 					else {
 						element.setForeignKeyName( StringHelper.nullIfEmpty( foreignKeyName ) );
+						element.setForeignKeyDefinition( StringHelper.nullIfEmpty( foreignKeyDefinition ) );
 					}
 				}
 			}
@@ -1337,7 +1407,12 @@ public abstract class CollectionBinder {
 		else if ( anyAnn != null ) {
 			//@ManyToAny
 			//Make sure that collTyp is never used during the @ManyToAny branch: it will be set to void.class
-			PropertyData inferredData = new PropertyInferredData(null, property, "unsupported", buildingContext.getBuildingOptions().getReflectionManager() );
+			PropertyData inferredData = new PropertyInferredData(
+					null,
+					property,
+					"unsupported",
+					buildingContext.getBootstrapContext().getReflectionManager()
+			);
 			//override the table
 			for (Ejb3Column column : inverseJoinColumns) {
 				column.setTable( collValue.getCollectionTable() );
@@ -1360,7 +1435,7 @@ public abstract class CollectionBinder {
 			XClass elementClass;
 			AnnotatedClassType classType;
 
-			CollectionPropertyHolder holder = null;
+			CollectionPropertyHolder holder;
 			if ( BinderHelper.PRIMITIVE_NAMES.contains( collType.getName() ) ) {
 				classType = AnnotatedClassType.NONE;
 				elementClass = null;
@@ -1457,7 +1532,6 @@ public abstract class CollectionBinder {
 				collValue.setElement( component );
 
 				if ( StringHelper.isNotEmpty( hqlOrderBy ) ) {
-					String path = collValue.getOwnerEntityName() + "." + joinColumns[0].getPropertyName();
 					String orderBy = adjustUserSuppliedValueCollectionOrderingFragment( hqlOrderBy );
 					if ( orderBy != null ) {
 						collValue.setOrderBy( orderBy );
@@ -1479,7 +1553,7 @@ public abstract class CollectionBinder {
 					column.setLength( Ejb3Column.DEFAULT_COLUMN_LENGTH );
 					column.setLogicalColumnName( Collection.DEFAULT_ELEMENT_COLUMN_NAME );
 					//TODO create an EMPTY_JOINS collection
-					column.setJoins( new HashMap<String, Join>() );
+					column.setJoins( new HashMap<>() );
 					column.setBuildingContext( buildingContext );
 					column.bind();
 					elementColumns[0] = column;
@@ -1493,7 +1567,7 @@ public abstract class CollectionBinder {
 						property,
 						elementClass,
 						collValue.getOwnerEntityName(),
-						holder.resolveElementAttributeConverterDefinition( elementClass )
+						holder.resolveElementAttributeConverterDescriptor( property, elementClass )
 				);
 				elementBinder.setPersistentClassName( propertyHolder.getEntityName() );
 				elementBinder.setAccessType( accessType );
@@ -1540,6 +1614,7 @@ public abstract class CollectionBinder {
 			Ejb3JoinColumn[] joinColumns,
 			boolean cascadeDeleteEnabled,
 			XProperty property,
+			PropertyHolder propertyHolder,
 			MetadataBuildingContext buildingContext) {
 		try {
 			BinderHelper.createSyntheticPropertyReference(
@@ -1554,7 +1629,7 @@ public abstract class CollectionBinder {
 		catch (AnnotationException ex) {
 			throw new AnnotationException( "Unable to map collection " + collValue.getOwner().getClassName() + "." + property.getName(), ex );
 		}
-		SimpleValue key = buildCollectionKey( collValue, joinColumns, cascadeDeleteEnabled, property, buildingContext );
+		SimpleValue key = buildCollectionKey( collValue, joinColumns, cascadeDeleteEnabled, property, propertyHolder, buildingContext );
 		if ( property.isAnnotationPresent( ElementCollection.class ) && joinColumns.length > 0 ) {
 			joinColumns[0].setJPA2ElementCollection( true );
 		}

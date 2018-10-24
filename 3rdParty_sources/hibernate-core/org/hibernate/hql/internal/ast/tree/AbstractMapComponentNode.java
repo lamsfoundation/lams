@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.hibernate.hql.internal.antlr.HqlSqlTokenTypes;
 import org.hibernate.hql.internal.ast.util.ColumnHelper;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.persister.collection.QueryableCollection;
 import org.hibernate.type.CollectionType;
 import org.hibernate.type.Type;
@@ -45,39 +44,38 @@ public abstract class AbstractMapComponentNode extends FromReferenceNode impleme
 			boolean generateJoin,
 			boolean implicitJoin,
 			String classAlias,
-			AST parent) throws SemanticException {
-		if ( parent != null ) {
-			throw attemptedDereference();
-		}
+			AST parent,
+			AST parentPredicate) throws SemanticException {
+		if ( mapFromElement == null ) {
+			final FromReferenceNode mapReference = getMapReference();
+			mapReference.resolve( true, true );
 
-		final FromReferenceNode mapReference = getMapReference();
-		mapReference.resolve( true, true );
-
-		FromElement sourceFromElement = null;
-		if ( isAliasRef( mapReference ) ) {
-			final QueryableCollection collectionPersister = mapReference.getFromElement().getQueryableCollection();
-			if ( Map.class.isAssignableFrom( collectionPersister.getCollectionType().getReturnedClass() ) ) {
-				sourceFromElement = mapReference.getFromElement();
-			}
-		}
-		else {
-			if ( mapReference.getDataType().isCollectionType() ) {
-				final CollectionType collectionType = (CollectionType) mapReference.getDataType();
-				if ( Map.class.isAssignableFrom( collectionType.getReturnedClass() ) ) {
+			FromElement sourceFromElement = null;
+			if ( isAliasRef( mapReference ) ) {
+				final QueryableCollection collectionPersister = mapReference.getFromElement().getQueryableCollection();
+				if ( Map.class.isAssignableFrom( collectionPersister.getCollectionType().getReturnedClass() ) ) {
 					sourceFromElement = mapReference.getFromElement();
 				}
 			}
+			else {
+				if ( mapReference.getDataType().isCollectionType() ) {
+					final CollectionType collectionType = (CollectionType) mapReference.getDataType();
+					if ( Map.class.isAssignableFrom( collectionType.getReturnedClass() ) ) {
+						sourceFromElement = mapReference.getFromElement();
+					}
+				}
+			}
+
+			if ( sourceFromElement == null ) {
+				throw nonMap();
+			}
+
+			mapFromElement = sourceFromElement;
 		}
 
-		if ( sourceFromElement == null ) {
-			throw nonMap();
-		}
-
-		mapFromElement = sourceFromElement;
-
-		setFromElement( sourceFromElement );
-		setDataType( resolveType( sourceFromElement.getQueryableCollection() ) );
-		this.columns = resolveColumns( sourceFromElement.getQueryableCollection() );
+		setFromElement( mapFromElement );
+		setDataType( resolveType( mapFromElement.getQueryableCollection() ) );
+		this.columns = resolveColumns( mapFromElement.getQueryableCollection() );
 		initText( this.columns );
 		setFirstChild( null );
 	}
@@ -91,7 +89,7 @@ public abstract class AbstractMapComponentNode extends FromReferenceNode impleme
 	}
 
 	private void initText(String[] columns) {
-		String text = StringHelper.join( ", ", columns );
+		String text = String.join( ", ", columns );
 		if ( columns.length > 1 && getWalker().isComparativeExpressionClause() ) {
 			text = "(" + text + ")";
 		}
@@ -101,10 +99,6 @@ public abstract class AbstractMapComponentNode extends FromReferenceNode impleme
 	protected abstract String expressionDescription();
 	protected abstract String[] resolveColumns(QueryableCollection collectionPersister);
 	protected abstract Type resolveType(QueryableCollection collectionPersister);
-
-	protected SemanticException attemptedDereference() {
-		return new SemanticException( expressionDescription() + " expression cannot be further de-referenced" );
-	}
 
 	protected SemanticException nonMap() {
 		return new SemanticException( expressionDescription() + " expression did not reference map property" );

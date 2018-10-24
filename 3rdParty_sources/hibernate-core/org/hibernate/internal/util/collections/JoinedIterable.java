@@ -6,12 +6,13 @@
  */
 package org.hibernate.internal.util.collections;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 
 /**
- * An JoinedIterable is an Iterable that wraps a number of Iterables.
+ * A JoinedIterable is an Iterable that wraps a number of Iterables.
  *
  * This class makes multiple iterables look like one to the caller.
  * When any method from the Iterator interface is called on the
@@ -76,7 +77,7 @@ public class JoinedIterable<T> implements Iterable<T> {
 
 			if ( currentIterator == null) {
 				if( iterables.size() == 0  ) {
-					currentIterator = EmptyIterator.INSTANCE;
+					currentIterator = Collections.emptyIterator();
 				}
 				else {
 					currentIterator = iterables.get( 0 ).iterator();

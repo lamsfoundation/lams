@@ -13,16 +13,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.bytecode.enhance.spi.LazyPropertyInitializer;
 import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.WrapperOptionsImpl;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.type.descriptor.WrapperOptions;
-import org.hibernate.type.descriptor.WrapperOptionsContext;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
 import org.hibernate.type.descriptor.java.MutabilityPlan;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
@@ -56,10 +56,12 @@ public abstract class AbstractStandardBasicType<T>
 		return javaTypeDescriptor.fromString( string );
 	}
 
+	@Override
 	public String toString(T value) {
 		return javaTypeDescriptor.toString( value );
 	}
 
+	@Override
 	public T fromStringValue(String xml) throws HibernateException {
 		return fromString( xml );
 	}
@@ -68,11 +70,12 @@ public abstract class AbstractStandardBasicType<T>
 		return javaTypeDescriptor.getMutabilityPlan();
 	}
 
-	protected T getReplacement(T original, T target, SessionImplementor session) {
-		if ( !isMutable() ) {
-			return original;
+	protected T getReplacement(T original, T target, SharedSessionContractImplementor session) {
+		if ( original == LazyPropertyInitializer.UNFETCHED_PROPERTY ) {
+			return target;
 		}
-		else if ( isEqual( original, target ) ) {
+		else if ( !isMutable() ||
+					( target != LazyPropertyInitializer.UNFETCHED_PROPERTY && isEqual( original, target ) ) ) {
 			return original;
 		}
 		else {
@@ -80,13 +83,15 @@ public abstract class AbstractStandardBasicType<T>
 		}
 	}
 
+	@Override
 	public boolean[] toColumnNullness(Object value, Mapping mapping) {
 		return value == null ? ArrayHelper.FALSE : ArrayHelper.TRUE;
 	}
 
+	@Override
 	public String[] getRegistrationKeys() {
 		return registerUnderJavaType()
-				? new String[] { getName(), javaTypeDescriptor.getJavaTypeClass().getName() }
+				? new String[] { getName(), javaTypeDescriptor.getJavaType().getName() }
 				: new String[] { getName() };
 	}
 
@@ -101,13 +106,13 @@ public abstract class AbstractStandardBasicType<T>
 	protected Size getDictatedSize() {
 		return dictatedSize;
 	}
-	
+
 	// final implementations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public final JavaTypeDescriptor<T> getJavaTypeDescriptor() {
 		return javaTypeDescriptor;
 	}
-	
+
 	public final void setJavaTypeDescriptor( JavaTypeDescriptor<T> javaTypeDescriptor ) {
 		this.javaTypeDescriptor = javaTypeDescriptor;
 	}
@@ -121,14 +126,17 @@ public abstract class AbstractStandardBasicType<T>
 		this.sqlTypes = new int[] { sqlTypeDescriptor.getSqlType() };
 	}
 
+	@Override
 	public final Class getReturnedClass() {
-		return javaTypeDescriptor.getJavaTypeClass();
+		return javaTypeDescriptor.getJavaType();
 	}
 
+	@Override
 	public final int getColumnSpan(Mapping mapping) throws MappingException {
 		return 1;
 	}
 
+	@Override
 	public final int[] sqlTypes(Mapping mapping) throws MappingException {
 		return sqlTypes;
 	}
@@ -143,22 +151,27 @@ public abstract class AbstractStandardBasicType<T>
 		return new Size[] { getDefaultSize() };
 	}
 
+	@Override
 	public final boolean isAssociationType() {
 		return false;
 	}
 
+	@Override
 	public final boolean isCollectionType() {
 		return false;
 	}
 
+	@Override
 	public final boolean isComponentType() {
 		return false;
 	}
 
+	@Override
 	public final boolean isEntityType() {
 		return false;
 	}
 
+	@Override
 	public final boolean isAnyType() {
 		return false;
 	}
@@ -167,40 +180,48 @@ public abstract class AbstractStandardBasicType<T>
 		return false;
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final boolean isSame(Object x, Object y) {
 		return isEqual( x, y );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final boolean isEqual(Object x, Object y, SessionFactoryImplementor factory) {
 		return isEqual( x, y );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final boolean isEqual(Object one, Object another) {
 		return javaTypeDescriptor.areEqual( (T) one, (T) another );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final int getHashCode(Object x) {
 		return javaTypeDescriptor.extractHashCode( (T) x );
 	}
 
+	@Override
 	public final int getHashCode(Object x, SessionFactoryImplementor factory) {
 		return getHashCode( x );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final int compare(Object x, Object y) {
 		return javaTypeDescriptor.getComparator().compare( (T) x, (T) y );
 	}
 
-	public final boolean isDirty(Object old, Object current, SessionImplementor session) {
+	@Override
+	public final boolean isDirty(Object old, Object current, SharedSessionContractImplementor session) {
 		return isDirty( old, current );
 	}
 
-	public final boolean isDirty(Object old, Object current, boolean[] checkable, SessionImplementor session) {
+	@Override
+	public final boolean isDirty(Object old, Object current, boolean[] checkable, SharedSessionContractImplementor session) {
 		return checkable[0] && isDirty( old, current );
 	}
 
@@ -208,48 +229,50 @@ public abstract class AbstractStandardBasicType<T>
 		return !isSame( old, current );
 	}
 
+	@Override
 	public final boolean isModified(
 			Object oldHydratedState,
 			Object currentState,
 			boolean[] checkable,
-			SessionImplementor session) {
+			SharedSessionContractImplementor session) {
 		return isDirty( oldHydratedState, currentState );
 	}
 
+	@Override
 	public final Object nullSafeGet(
 			ResultSet rs,
 			String[] names,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			Object owner) throws SQLException {
 		return nullSafeGet( rs, names[0], session );
 	}
 
-	public final Object nullSafeGet(ResultSet rs, String name, SessionImplementor session, Object owner)
+	@Override
+	public final Object nullSafeGet(ResultSet rs, String name, SharedSessionContractImplementor session, Object owner)
 			throws SQLException {
 		return nullSafeGet( rs, name, session );
 	}
 
-	public final T nullSafeGet(ResultSet rs, String name, final SessionImplementor session) throws SQLException {
-		final WrapperOptions options = getOptions(session);
-		return nullSafeGet( rs, name, options );
+	public final T nullSafeGet(ResultSet rs, String name, final SharedSessionContractImplementor session) throws SQLException {
+		return nullSafeGet( rs, name, (WrapperOptions) session );
 	}
 
 	protected final T nullSafeGet(ResultSet rs, String name, WrapperOptions options) throws SQLException {
 		return remapSqlTypeDescriptor( options ).getExtractor( javaTypeDescriptor ).extract( rs, name, options );
 	}
 
-	public Object get(ResultSet rs, String name, SessionImplementor session) throws HibernateException, SQLException {
+	public Object get(ResultSet rs, String name, SharedSessionContractImplementor session) throws HibernateException, SQLException {
 		return nullSafeGet( rs, name, session );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final void nullSafeSet(
 			PreparedStatement st,
 			Object value,
 			int index,
-			final SessionImplementor session) throws SQLException {
-		final WrapperOptions options = getOptions(session);
-		nullSafeSet( st, value, index, options );
+			final SharedSessionContractImplementor session) throws SQLException {
+		nullSafeSet( st, value, index, (WrapperOptions) session );
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -261,19 +284,25 @@ public abstract class AbstractStandardBasicType<T>
 		return options.remapSqlTypeDescriptor( sqlTypeDescriptor );
 	}
 
-	public void set(PreparedStatement st, T value, int index, SessionImplementor session) throws HibernateException, SQLException {
+	public void set(PreparedStatement st, T value, int index, SharedSessionContractImplementor session) throws HibernateException, SQLException {
 		nullSafeSet( st, value, index, session );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final String toLoggableString(Object value, SessionFactoryImplementor factory) {
+		if ( value == LazyPropertyInitializer.UNFETCHED_PROPERTY || !Hibernate.isInitialized( value ) ) {
+			return  "<uninitialized>";
+		}
 		return javaTypeDescriptor.extractLoggableRepresentation( (T) value );
 	}
 
+	@Override
 	public final boolean isMutable() {
 		return getMutabilityPlan().isMutable();
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public final Object deepCopy(Object value, SessionFactoryImplementor factory) {
 		return deepCopy( (T) value );
@@ -283,45 +312,54 @@ public abstract class AbstractStandardBasicType<T>
 		return getMutabilityPlan().deepCopy( value );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
-	public final Serializable disassemble(Object value, SessionImplementor session, Object owner) throws HibernateException {
+	public final Serializable disassemble(Object value, SharedSessionContractImplementor session, Object owner) throws HibernateException {
 		return getMutabilityPlan().disassemble( (T) value );
 	}
 
-	public final Object assemble(Serializable cached, SessionImplementor session, Object owner) throws HibernateException {
+	@Override
+	public final Object assemble(Serializable cached, SharedSessionContractImplementor session, Object owner) throws HibernateException {
 		return getMutabilityPlan().assemble( cached );
 	}
 
-	public final void beforeAssemble(Serializable cached, SessionImplementor session) {
+	@Override
+	public final void beforeAssemble(Serializable cached, SharedSessionContractImplementor session) {
 	}
 
-	public final Object hydrate(ResultSet rs, String[] names, SessionImplementor session, Object owner)
+	@Override
+	public final Object hydrate(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		return nullSafeGet(rs, names, session, owner);
 	}
 
-	public final Object resolve(Object value, SessionImplementor session, Object owner) throws HibernateException {
+	@Override
+	public final Object resolve(Object value, SharedSessionContractImplementor session, Object owner) throws HibernateException {
 		return value;
 	}
 
-	public final Object semiResolve(Object value, SessionImplementor session, Object owner) throws HibernateException {
+	@Override
+	public final Object semiResolve(Object value, SharedSessionContractImplementor session, Object owner) throws HibernateException {
 		return value;
 	}
 
+	@Override
 	public final Type getSemiResolvedType(SessionFactoryImplementor factory) {
 		return this;
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
-	public final Object replace(Object original, Object target, SessionImplementor session, Object owner, Map copyCache) {
+	public final Object replace(Object original, Object target, SharedSessionContractImplementor session, Object owner, Map copyCache) {
 		return getReplacement( (T) original, (T) target, session );
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public Object replace(
 			Object original,
 			Object target,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			Object owner,
 			Map copyCache,
 			ForeignKeyDirection foreignKeyDirection) {
@@ -336,37 +374,31 @@ public abstract class AbstractStandardBasicType<T>
 	}
 
 	@Override
-	public T extract(CallableStatement statement, int startIndex, final SessionImplementor session) throws SQLException {
-		final WrapperOptions options = getOptions(session);
-		return remapSqlTypeDescriptor( options ).getExtractor( javaTypeDescriptor ).extract(
+	public T extract(CallableStatement statement, int startIndex, final SharedSessionContractImplementor session) throws SQLException {
+		return remapSqlTypeDescriptor( session ).getExtractor( javaTypeDescriptor ).extract(
 				statement,
 				startIndex,
-				options
+				session
 		);
 	}
 
 	@Override
-	public T extract(CallableStatement statement, String[] paramNames, final SessionImplementor session) throws SQLException {
-		final WrapperOptions options = getOptions(session);
-		return remapSqlTypeDescriptor( options ).getExtractor( javaTypeDescriptor ).extract( statement, paramNames, options );
-	}
-	
-	private WrapperOptions getOptions(final SessionImplementor session) {
-		if ( session instanceof WrapperOptionsContext ) {
-			return ( (WrapperOptionsContext) session ).getWrapperOptions();
-		}
-
-		return new WrapperOptionsImpl( session );
+	public T extract(CallableStatement statement, String[] paramNames, final SharedSessionContractImplementor session) throws SQLException {
+		return remapSqlTypeDescriptor( session ).getExtractor( javaTypeDescriptor ).extract(
+				statement,
+				paramNames,
+				session
+		);
 	}
 
 	@Override
-	public void nullSafeSet(
-			CallableStatement st, Object value, String name, SessionImplementor session) throws SQLException {
-		nullSafeSet( st, value, name, getOptions( session ) );
+	public void nullSafeSet(CallableStatement st, Object value, String name, SharedSessionContractImplementor session) throws SQLException {
+		nullSafeSet( st, value, name, (WrapperOptions) session );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected final void nullSafeSet(CallableStatement st, Object value, String name, WrapperOptions options) throws SQLException {
-		remapSqlTypeDescriptor( options ).getBinder( javaTypeDescriptor ).bind( st, ( T ) value, name, options );
+		remapSqlTypeDescriptor( options ).getBinder( javaTypeDescriptor ).bind( st, (T) value, name, options );
 	}
 
 	@Override

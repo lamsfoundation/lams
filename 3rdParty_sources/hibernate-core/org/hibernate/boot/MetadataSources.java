@@ -39,7 +39,6 @@ import org.hibernate.boot.spi.MetadataBuilderFactory;
 import org.hibernate.boot.spi.XmlMappingBinderAccess;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.SerializationException;
 import org.w3c.dom.Document;
@@ -60,10 +59,10 @@ public class MetadataSources implements Serializable {
 
 	private XmlMappingBinderAccess xmlMappingBinderAccess;
 
-	private List<Binding> xmlBindings = new ArrayList<Binding>();
-	private LinkedHashSet<Class<?>> annotatedClasses = new LinkedHashSet<Class<?>>();
-	private LinkedHashSet<String> annotatedClassNames = new LinkedHashSet<String>();
-	private LinkedHashSet<String> annotatedPackages = new LinkedHashSet<String>();
+	private List<Binding> xmlBindings = new ArrayList<>();
+	private LinkedHashSet<Class<?>> annotatedClasses = new LinkedHashSet<>();
+	private LinkedHashSet<String> annotatedClassNames = new LinkedHashSet<>();
+	private LinkedHashSet<String> annotatedPackages = new LinkedHashSet<>();
 
 	public MetadataSources() {
 		this( new BootstrapServiceRegistryBuilder().build() );
@@ -130,7 +129,9 @@ public class MetadataSources implements Serializable {
 	 * Get a builder for metadata where non-default options can be specified.
 	 *
 	 * @return The built metadata.
+	 * @deprecated Use {@link #getMetadataBuilder()} instead
 	 */
+	@Deprecated
 	public MetadataBuilder getMetadataBuilder(StandardServiceRegistry serviceRegistry) {
 		MetadataBuilderImpl defaultBuilder = new MetadataBuilderImpl( this, serviceRegistry );
 		return getCustomBuilderOrDefault( defaultBuilder );
@@ -151,7 +152,7 @@ public class MetadataSources implements Serializable {
 			final MetadataBuilder returnedBuilder = discoveredBuilderFactory.getMetadataBuilder( this, defaultBuilder );
 			if ( returnedBuilder != null ) {
 				if ( activeFactoryNames == null ) {
-					activeFactoryNames = new ArrayList<String>();
+					activeFactoryNames = new ArrayList<>();
 				}
 				activeFactoryNames.add( discoveredBuilderFactory.getClass().getName() );
 				builder = returnedBuilder;
@@ -161,7 +162,7 @@ public class MetadataSources implements Serializable {
 		if ( activeFactoryNames != null && activeFactoryNames.size() > 1 ) {
 			throw new HibernateException(
 					"Multiple active MetadataBuilder definitions were discovered : " +
-							StringHelper.join( ", ", activeFactoryNames )
+							String.join(", ", activeFactoryNames)
 			);
 		}
 

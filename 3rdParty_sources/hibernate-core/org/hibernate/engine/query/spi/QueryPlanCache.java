@@ -26,6 +26,8 @@ import org.hibernate.internal.FilterImpl;
 import org.hibernate.internal.util.collections.BoundedConcurrentHashMap;
 import org.hibernate.internal.util.collections.CollectionHelper;
 import org.hibernate.internal.util.config.ConfigurationHelper;
+import org.hibernate.query.ParameterMetadata;
+import org.hibernate.query.internal.ParameterMetadataImpl;
 
 /**
  * Acts as a cache for compiled query plans, as well as query-parameter metadata.
@@ -62,10 +64,10 @@ public class QueryPlanCache implements Serializable {
 	 * Used solely for caching param metadata for native-sql queries, see {@link #getSQLParameterMetadata} for a
 	 * discussion as to why...
 	 */
-	private final BoundedConcurrentHashMap<String,ParameterMetadata> parameterMetadataCache;
+	private final BoundedConcurrentHashMap<ParameterMetadataKey,ParameterMetadataImpl> parameterMetadataCache;
 
 
-	private NativeQueryInterpreter nativeQueryInterpreterService;
+	private NativeQueryInterpreter nativeQueryInterpreter;
 
 	/**
 	 * Constructs the QueryPlanCache to be used by the given SessionFactory
@@ -100,13 +102,13 @@ public class QueryPlanCache implements Serializable {
 		}
 
 		queryPlanCache = new BoundedConcurrentHashMap( maxQueryPlanCount, 20, BoundedConcurrentHashMap.Eviction.LIRS );
-		parameterMetadataCache = new BoundedConcurrentHashMap<String, ParameterMetadata>(
+		parameterMetadataCache = new BoundedConcurrentHashMap<>(
 				maxParameterMetadataCount,
 				20,
 				BoundedConcurrentHashMap.Eviction.LIRS
 		);
 
-		nativeQueryInterpreterService = factory.getServiceRegistry().getService( NativeQueryInterpreter.class );
+		nativeQueryInterpreter = factory.getServiceRegistry().getService( NativeQueryInterpreter.class );
 	}
 
 	/**
@@ -119,11 +121,12 @@ public class QueryPlanCache implements Serializable {
 	 * @param query The query
 	 * @return The parameter metadata
 	 */
-	public ParameterMetadata getSQLParameterMetadata(final String query)  {
-		ParameterMetadata value = parameterMetadataCache.get( query );
+	public ParameterMetadata getSQLParameterMetadata(final String query, boolean isOrdinalParameterZeroBased)  {
+		final ParameterMetadataKey key = new ParameterMetadataKey( query, isOrdinalParameterZeroBased );
+		ParameterMetadataImpl value = parameterMetadataCache.get( key );
 		if ( value == null ) {
-			value = nativeQueryInterpreterService.getParameterMetadata( query );
-			parameterMetadataCache.putIfAbsent( query, value );
+			value = nativeQueryInterpreter.getParameterMetadata( query );
+			parameterMetadataCache.putIfAbsent( key, value );
 		}
 		return value;
 	}
@@ -207,7 +210,7 @@ public class QueryPlanCache implements Serializable {
 		NativeSQLQueryPlan value = (NativeSQLQueryPlan) queryPlanCache.get( spec );
 		if ( value == null ) {
 			LOG.tracev( "Unable to locate native-sql query plan in cache; generating ({0})", spec.getQueryString() );
-			value = nativeQueryInterpreterService.createQueryPlan( spec, factory );
+			value = nativeQueryInterpreter.createQueryPlan( spec, factory );
 			queryPlanCache.putIfAbsent( spec, value );
 		}
 		else {
@@ -217,12 +220,57 @@ public class QueryPlanCache implements Serializable {
 	}
 
 	/**
-	 * clean up QueryPlanCache when SessionFactory is closed
+	 * Clean up the caches when the SessionFactory is closed.
+	 * <p>
+	 * Note that depending on the cache strategy implementation chosen, clearing the cache might not reclaim all the
+	 * memory.
+	 * <p>
+	 * Typically, when using LIRS, clearing the cache only invalidates the entries but the outdated entries are kept in
+	 * memory until they are replaced by others. It is not considered a memory leak as the cache is bounded.
 	 */
 	public void cleanup() {
 		LOG.trace( "Cleaning QueryPlan Cache" );
 		queryPlanCache.clear();
 		parameterMetadataCache.clear();
+	}
+
+	public NativeQueryInterpreter getNativeQueryInterpreter() {
+		return nativeQueryInterpreter;
+	}
+
+	private static class ParameterMetadataKey implements Serializable {
+		private final String query;
+		private final boolean isOrdinalParameterZeroBased;
+		private final int hashCode;
+
+		public ParameterMetadataKey(String query, boolean isOrdinalParameterZeroBased) {
+			this.query = query;
+			this.isOrdinalParameterZeroBased = isOrdinalParameterZeroBased;
+			int hash = query.hashCode();
+			hash = 29 * hash + ( isOrdinalParameterZeroBased ? 1 : 0 );
+			this.hashCode = hash;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+
+			final ParameterMetadataKey that = (ParameterMetadataKey) o;
+
+			return isOrdinalParameterZeroBased == that.isOrdinalParameterZeroBased
+					&& query.equals( that.query );
+
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
 	}
 
 	private static class HQLQueryPlanKey implements Serializable {

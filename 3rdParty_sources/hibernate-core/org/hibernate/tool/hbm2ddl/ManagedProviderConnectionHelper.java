@@ -12,8 +12,11 @@ import java.util.Properties;
 
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
@@ -22,7 +25,11 @@ import org.hibernate.internal.util.config.ConfigurationHelper;
  * built and managed {@link ConnectionProvider}.
  *
  * @author Steve Ebersole
+ *
+ * @deprecated Everything in this package has been replaced with
+ * {@link org.hibernate.tool.schema.spi.SchemaManagementTool} and friends.
  */
+@Deprecated
 class ManagedProviderConnectionHelper implements ConnectionHelper {
 	private Properties cfgProperties;
 	private StandardServiceRegistryImpl serviceRegistry;
@@ -63,10 +70,11 @@ class ManagedProviderConnectionHelper implements ConnectionHelper {
 	private void releaseConnection() throws SQLException {
 		if ( connection != null ) {
 			try {
-				new SqlExceptionHelper().logAndClearWarnings( connection );
+				serviceRegistry.getService( JdbcEnvironment.class ).getSqlExceptionHelper().logAndClearWarnings(
+						connection );
 			}
 			finally {
-				try  {
+				try {
 					serviceRegistry.getService( ConnectionProvider.class ).closeConnection( connection );
 				}
 				finally {

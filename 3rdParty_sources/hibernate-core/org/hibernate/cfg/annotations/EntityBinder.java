@@ -6,12 +6,14 @@
  */
 package org.hibernate.cfg.annotations;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import javax.persistence.Access;
+import javax.persistence.Cacheable;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -21,6 +23,7 @@ import javax.persistence.NamedEntityGraphs;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
+import javax.persistence.SharedCacheMode;
 
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
@@ -61,6 +64,7 @@ import org.hibernate.boot.model.naming.EntityNaming;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.ImplicitEntityNameSource;
 import org.hibernate.boot.model.naming.NamingStrategyHelper;
+import org.hibernate.boot.model.relational.QualifiedTableName;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.boot.spi.InFlightMetadataCollector;
 import org.hibernate.boot.spi.MetadataBuildingContext;
@@ -73,15 +77,14 @@ import org.hibernate.cfg.ObjectNameSource;
 import org.hibernate.cfg.PropertyHolder;
 import org.hibernate.cfg.UniqueConstraintHolder;
 import org.hibernate.engine.OptimisticLockStyle;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.hibernate.engine.spi.FilterDefinition;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.mapping.DependantValue;
 import org.hibernate.mapping.Join;
-import org.hibernate.mapping.MappedSuperclass;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
 import org.hibernate.mapping.RootClass;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.SingleTableSubclass;
@@ -101,8 +104,8 @@ import static org.hibernate.cfg.BinderHelper.toAliasTableMap;
  * @author Emmanuel Bernard
  */
 public class EntityBinder {
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, EntityBinder.class.getName());
-    private static final String NATURAL_ID_CACHE_SUFFIX = "##NaturalId";
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, EntityBinder.class.getName());
+	private static final String NATURAL_ID_CACHE_SUFFIX = "##NaturalId";
 
 	private MetadataBuildingContext context;
 
@@ -124,18 +127,20 @@ public class EntityBinder {
 	private String where;
 	// todo : we should defer to InFlightMetadataCollector.EntityTableXref for secondary table tracking;
 	//		atm we use both from here; HBM binding solely uses InFlightMetadataCollector.EntityTableXref
-	private java.util.Map<String, Join> secondaryTables = new HashMap<String, Join>();
-	private java.util.Map<String, Object> secondaryTableJoins = new HashMap<String, Object>();
-	private String cacheConcurrentStrategy;
-	private String cacheRegion;
-	private String naturalIdCacheRegion;
-	private List<Filter> filters = new ArrayList<Filter>();
+	private java.util.Map<String, Join> secondaryTables = new HashMap<>();
+	private java.util.Map<String, Object> secondaryTableJoins = new HashMap<>();
+	private List<Filter> filters = new ArrayList<>();
 	private InheritanceState inheritanceState;
 	private boolean ignoreIdAnnotations;
-	private boolean cacheLazyProperty;
 	private AccessType propertyAccessType = AccessType.DEFAULT;
 	private boolean wrapIdsInEmbeddedComponents;
 	private String subselect;
+
+	private boolean isCached;
+	private String cacheConcurrentStrategy;
+	private String cacheRegion;
+	private boolean cacheLazyProperty;
+	private String naturalIdCacheRegion;
 
 	public boolean wrapIdsInEmbeddedComponents() {
 		return wrapIdsInEmbeddedComponents;
@@ -175,7 +180,6 @@ public class EntityBinder {
 		if ( persistentClass == null ) {
 			return false;
 		}
-
 		return persistentClass.isPropertyDefinedInSuperHierarchy( name );
 	}
 
@@ -281,29 +285,40 @@ public class EntityBinder {
 			}
 			rootClass.setMutable( mutable );
 			rootClass.setExplicitPolymorphism( isExplicitPolymorphism( polymorphismType ) );
-			if ( StringHelper.isNotEmpty( where ) ) rootClass.setWhere( where );
+
+			if ( StringHelper.isNotEmpty( where ) ) {
+				rootClass.setWhere( where );
+			}
+
 			if ( cacheConcurrentStrategy != null ) {
 				rootClass.setCacheConcurrencyStrategy( cacheConcurrentStrategy );
 				rootClass.setCacheRegionName( cacheRegion );
 				rootClass.setLazyPropertiesCacheable( cacheLazyProperty );
 			}
+
 			rootClass.setNaturalIdCacheRegionName( naturalIdCacheRegion );
+
 			boolean forceDiscriminatorInSelects = forceDiscriminator == null
 					? context.getBuildingOptions().shouldImplicitlyForceDiscriminatorInSelect()
 					: forceDiscriminator;
+
 			rootClass.setForceDiscriminator( forceDiscriminatorInSelects );
-			if( insertableDiscriminator != null) {
+
+			if ( insertableDiscriminator != null ) {
 				rootClass.setDiscriminatorInsertable( insertableDiscriminator );
 			}
 		}
 		else {
-            if (explicitHibernateEntityAnnotation) {
+			if (explicitHibernateEntityAnnotation) {
 				LOG.entityAnnotationOnNonRoot(annotatedClass.getName());
 			}
-            if (annotatedClass.isAnnotationPresent(Immutable.class)) {
+			if (annotatedClass.isAnnotationPresent(Immutable.class)) {
 				LOG.immutableAnnotationOnNonRoot(annotatedClass.getName());
 			}
 		}
+
+		persistentClass.setCached( isCached );
+
 		persistentClass.setOptimisticLockStyle( getVersioning( optimisticLockType ) );
 		persistentClass.setSelectBeforeUpdate( selectBeforeUpdate );
 
@@ -317,7 +332,7 @@ public class EntityBinder {
 			org.hibernate.annotations.Entity entityAnn = annotatedClass.getAnnotation( org.hibernate.annotations.Entity.class );
 			if ( entityAnn != null && !BinderHelper.isEmptyAnnotationValue( entityAnn.persister() ) ) {
 				try {
-					persister = context.getClassLoaderAccess().classForName( entityAnn.persister() );
+					persister = context.getBootstrapContext().getClassLoaderAccess().classForName( entityAnn.persister() );
 				}
 				catch (ClassLoadingException e) {
 					throw new AnnotationException( "Could not find persister class: " + entityAnn.persister(), e );
@@ -362,12 +377,18 @@ public class EntityBinder {
 			persistentClass.setLoaderName( loader.namedQuery() );
 		}
 
+		final JdbcEnvironment jdbcEnvironment = context.getMetadataCollector().getDatabase().getJdbcEnvironment();
 		if ( annotatedClass.isAnnotationPresent( Synchronize.class )) {
 			Synchronize synchronizedWith = annotatedClass.getAnnotation(Synchronize.class);
 
 			String [] tables = synchronizedWith.value();
 			for (String table : tables) {
-				persistentClass.addSynchronizedTable(table);
+				persistentClass.addSynchronizedTable(
+						context.getBuildingOptions().getPhysicalNamingStrategy().toPhysicalTableName(
+								jdbcEnvironment.getIdentifierHelper().toIdentifier( table ),
+								jdbcEnvironment
+						).render( jdbcEnvironment.getDialect() )
+				);
 			}
 		}
 
@@ -507,7 +528,7 @@ public class EntityBinder {
 				proxyClass = null;
 			}
 			else {
-				final ReflectionManager reflectionManager = context.getBuildingOptions().getReflectionManager();
+				final ReflectionManager reflectionManager = context.getBootstrapContext().getReflectionManager();
 				if ( AnnotationBinder.isDefault( reflectionManager.toXClass( proxy.proxyClass() ), context ) ) {
 					proxyClass = annotatedClass;
 				}
@@ -532,6 +553,173 @@ public class EntityBinder {
 		this.wrapIdsInEmbeddedComponents = wrapIdsInEmbeddedComponents;
 	}
 
+	public void applyCaching(
+			XClass clazzToProcess,
+			SharedCacheMode sharedCacheMode,
+			MetadataBuildingContext context) {
+		final Cache explicitCacheAnn = clazzToProcess.getAnnotation( Cache.class );
+		final Cacheable explicitCacheableAnn = clazzToProcess.getAnnotation( Cacheable.class );
+
+		isCached = false;
+		cacheConcurrentStrategy = null;
+		cacheRegion = null;
+		cacheLazyProperty = true;
+
+		if ( persistentClass instanceof RootClass ) {
+			Cache effectiveCacheAnn = explicitCacheAnn;
+
+			if ( explicitCacheAnn != null ) {
+				// preserve legacy behavior of circumventing SharedCacheMode when Hibernate's @Cache is used.
+				isCached = true;
+			}
+			else {
+				effectiveCacheAnn = buildCacheMock( clazzToProcess.getName(), context );
+
+				switch ( sharedCacheMode ) {
+					case ALL: {
+						// all entities should be cached
+						isCached = true;
+						break;
+					}
+					case ENABLE_SELECTIVE: {
+						if ( explicitCacheableAnn != null && explicitCacheableAnn.value() ) {
+							isCached = true;
+						}
+						break;
+					}
+					case DISABLE_SELECTIVE: {
+						if ( explicitCacheableAnn == null || explicitCacheableAnn.value() ) {
+							isCached = true;
+						}
+						break;
+					}
+					default: {
+						// treat both NONE and UNSPECIFIED the same
+						isCached = false;
+						break;
+					}
+				}
+			}
+
+			cacheConcurrentStrategy = resolveCacheConcurrencyStrategy( effectiveCacheAnn.usage() );
+			cacheRegion = effectiveCacheAnn.region();
+			switch ( effectiveCacheAnn.include().toLowerCase( Locale.ROOT ) ) {
+				case "all": {
+					cacheLazyProperty = true;
+					break;
+				}
+				case "non-lazy": {
+					cacheLazyProperty = false;
+					break;
+				}
+				default: {
+					throw new AnnotationException(
+							"Unknown @Cache.include value [" + effectiveCacheAnn.include() + "] : "
+									+ annotatedClass.getName()
+					);
+				}
+			}
+		}
+		else {
+			if ( explicitCacheAnn != null ) {
+				LOG.cacheOrCacheableAnnotationOnNonRoot(
+						persistentClass.getClassName() == null
+								? annotatedClass.getName()
+								: persistentClass.getClassName()
+				);
+			}
+			else if ( explicitCacheableAnn == null && persistentClass.getSuperclass() != null ) {
+				// we should inherit our super's caching config
+				isCached = persistentClass.getSuperclass().isCached();
+			}
+			else {
+				switch ( sharedCacheMode ) {
+					case ALL: {
+						// all entities should be cached
+						isCached = true;
+						break;
+					}
+					case ENABLE_SELECTIVE: {
+						// only entities with @Cacheable(true) should be cached
+						if ( explicitCacheableAnn != null && explicitCacheableAnn.value() ) {
+							isCached = true;
+						}
+						break;
+					}
+					case DISABLE_SELECTIVE: {
+						if ( explicitCacheableAnn == null || !explicitCacheableAnn.value() ) {
+							isCached = true;
+						}
+						break;
+					}
+					default: {
+						// treat both NONE and UNSPECIFIED the same
+						isCached = false;
+						break;
+					}
+				}
+			}
+		}
+
+		naturalIdCacheRegion = null;
+
+		final NaturalIdCache naturalIdCacheAnn = clazzToProcess.getAnnotation( NaturalIdCache.class );
+		if ( naturalIdCacheAnn != null ) {
+			if ( BinderHelper.isEmptyAnnotationValue( naturalIdCacheAnn.region() ) ) {
+				if ( explicitCacheAnn != null && StringHelper.isNotEmpty( explicitCacheAnn.region() ) ) {
+					naturalIdCacheRegion = explicitCacheAnn.region() + NATURAL_ID_CACHE_SUFFIX;
+				}
+				else {
+					naturalIdCacheRegion = clazzToProcess.getName() + NATURAL_ID_CACHE_SUFFIX;
+				}
+			}
+			else {
+				naturalIdCacheRegion = naturalIdCacheAnn.region();
+			}
+		}
+	}
+
+	private static String resolveCacheConcurrencyStrategy(CacheConcurrencyStrategy strategy) {
+		final org.hibernate.cache.spi.access.AccessType accessType = strategy.toAccessType();
+		return accessType == null ? null : accessType.getExternalName();
+	}
+
+	private static Cache buildCacheMock(String region, MetadataBuildingContext context) {
+		return new LocalCacheAnnotationStub( region, determineCacheConcurrencyStrategy( context ) );
+	}
+
+	@SuppressWarnings({ "ClassExplicitlyAnnotation" })
+	private static class LocalCacheAnnotationStub implements Cache {
+		private final String region;
+		private final CacheConcurrencyStrategy usage;
+
+		private LocalCacheAnnotationStub(String region, CacheConcurrencyStrategy usage) {
+			this.region = region;
+			this.usage = usage;
+		}
+
+		public CacheConcurrencyStrategy usage() {
+			return usage;
+		}
+
+		public String region() {
+			return region;
+		}
+
+		public String include() {
+			return "all";
+		}
+
+		public Class<? extends Annotation> annotationType() {
+			return Cache.class;
+		}
+	}
+
+	private static CacheConcurrencyStrategy determineCacheConcurrencyStrategy(MetadataBuildingContext context) {
+		return CacheConcurrencyStrategy.fromAccessType(
+				context.getBuildingOptions().getImplicitCacheAccessType()
+		);
+	}
 
 	private static class EntityTableObjectNameSource implements ObjectNameSource {
 		private final String explicitName;
@@ -777,7 +965,7 @@ public class EntityBinder {
 	}
 
 	private void bindJoinToPersistentClass(Join join, Ejb3JoinColumn[] ejb3JoinColumns, MetadataBuildingContext buildingContext) {
-		SimpleValue key = new DependantValue( buildingContext.getMetadataCollector(), join.getTable(), persistentClass.getIdentifier() );
+		SimpleValue key = new DependantValue( buildingContext, join.getTable(), persistentClass.getIdentifier() );
 		join.setKey( key );
 		setFKNameIfDefined( join );
 		key.setCascadeDeleteEnabled( false );
@@ -802,6 +990,7 @@ public class EntityBinder {
 				}
 				else {
 					( (SimpleValue) join.getKey() ).setForeignKeyName( StringHelper.nullIfEmpty( jpaSecondaryTable.foreignKey().name() ) );
+					( (SimpleValue) join.getKey() ).setForeignKeyDefinition( StringHelper.nullIfEmpty( jpaSecondaryTable.foreignKey().foreignKeyDefinition() ) );
 				}
 			}
 		}
@@ -817,12 +1006,11 @@ public class EntityBinder {
 
 		SecondaryTables secondaryTables = annotatedClass.getAnnotation( SecondaryTables.class );
 		if ( secondaryTables != null ) {
-			for ( SecondaryTable secondaryTable2 : secondaryTables.value() ) {
-				if ( secondaryTable != null && nameToMatch.equals( secondaryTable.name() ) ) {
-					return secondaryTable;
+			for ( SecondaryTable secondaryTablesEntry : secondaryTables.value() ) {
+				if ( secondaryTablesEntry != null && nameToMatch.equals( secondaryTablesEntry.name() ) ) {
+					return secondaryTablesEntry;
 				}
 			}
-
 		}
 
 		return null;
@@ -868,23 +1056,6 @@ public class EntityBinder {
 		return addJoin( null, joinTable, holder, noDelayInPkColumnCreation );
 	}
 
-	private static class SecondaryTableNameSource implements ObjectNameSource {
-		// always has an explicit name
-		private final String explicitName;
-
-		private SecondaryTableNameSource(String explicitName) {
-			this.explicitName = explicitName;
-		}
-
-		public String getExplicitName() {
-			return explicitName;
-		}
-
-		public String getLogicalName() {
-			return explicitName;
-		}
-	}
-
 	private static class SecondaryTableNamingStrategyHelper implements NamingStrategyHelper {
 		@Override
 		public Identifier determineImplicitName(MetadataBuildingContext buildingContext) {
@@ -923,30 +1094,37 @@ public class EntityBinder {
 
 		final String schema;
 		final String catalog;
-		final SecondaryTableNameSource secondaryTableNameContext;
 		final Object joinColumns;
 		final List<UniqueConstraintHolder> uniqueConstraintHolders;
 
-		final Identifier logicalName;
+		final QualifiedTableName logicalName;
 		if ( secondaryTable != null ) {
 			schema = secondaryTable.schema();
 			catalog = secondaryTable.catalog();
-			logicalName = context.getMetadataCollector()
+			logicalName = new QualifiedTableName(
+				Identifier.toIdentifier( catalog ),
+				Identifier.toIdentifier( schema ),
+					context.getMetadataCollector()
 					.getDatabase()
 					.getJdbcEnvironment()
 					.getIdentifierHelper()
-					.toIdentifier( secondaryTable.name() );
+					.toIdentifier( secondaryTable.name() )
+			);
 			joinColumns = secondaryTable.pkJoinColumns();
 			uniqueConstraintHolders = TableBinder.buildUniqueConstraintHolders( secondaryTable.uniqueConstraints() );
 		}
 		else if ( joinTable != null ) {
 			schema = joinTable.schema();
 			catalog = joinTable.catalog();
-			logicalName = context.getMetadataCollector()
-					.getDatabase()
-					.getJdbcEnvironment()
-					.getIdentifierHelper()
-					.toIdentifier( joinTable.name() );
+			logicalName = new QualifiedTableName(
+				Identifier.toIdentifier( catalog ),
+				Identifier.toIdentifier( schema ),
+				context.getMetadataCollector()
+						.getDatabase()
+						.getJdbcEnvironment()
+						.getIdentifierHelper()
+						.toIdentifier( joinTable.name() )
+			);
 			joinColumns = joinTable.joinColumns();
 			uniqueConstraintHolders = TableBinder.buildUniqueConstraintHolders( joinTable.uniqueConstraints() );
 		}
@@ -957,7 +1135,7 @@ public class EntityBinder {
 		final Table table = TableBinder.buildAndFillTable(
 				schema,
 				catalog,
-				logicalName,
+				logicalName.getTableName(),
 				false,
 				uniqueConstraintHolders,
 				null,
@@ -1031,48 +1209,6 @@ public class EntityBinder {
 
 	public java.util.Map<String, Join> getSecondaryTables() {
 		return secondaryTables;
-	}
-
-	public void setCache(Cache cacheAnn) {
-		if ( cacheAnn != null ) {
-			cacheRegion = BinderHelper.isEmptyAnnotationValue( cacheAnn.region() ) ?
-					null :
-					cacheAnn.region();
-			cacheConcurrentStrategy = getCacheConcurrencyStrategy( cacheAnn.usage() );
-			if ( "all".equalsIgnoreCase( cacheAnn.include() ) ) {
-				cacheLazyProperty = true;
-			}
-			else if ( "non-lazy".equalsIgnoreCase( cacheAnn.include() ) ) {
-				cacheLazyProperty = false;
-			}
-			else {
-				throw new AnnotationException( "Unknown lazy property annotations: " + cacheAnn.include() );
-			}
-		}
-		else {
-			cacheConcurrentStrategy = null;
-			cacheRegion = null;
-			cacheLazyProperty = true;
-		}
-	}
-	
-	public void setNaturalIdCache(XClass clazzToProcess, NaturalIdCache naturalIdCacheAnn) {
-		if ( naturalIdCacheAnn != null ) {
-			if ( BinderHelper.isEmptyAnnotationValue( naturalIdCacheAnn.region() ) ) {
-				if (cacheRegion != null) {
-					naturalIdCacheRegion = cacheRegion + NATURAL_ID_CACHE_SUFFIX;
-				}
-				else {
-					naturalIdCacheRegion = clazzToProcess.getName() + NATURAL_ID_CACHE_SUFFIX;
-				}
-			}
-			else {
-				naturalIdCacheRegion = naturalIdCacheAnn.region();
-			}
-		}
-		else {
-			naturalIdCacheRegion = null;
-		}
 	}
 
 	public static String getCacheConcurrencyStrategy(CacheConcurrencyStrategy strategy) {
@@ -1154,7 +1290,7 @@ public class EntityBinder {
 	public AccessType getPropertyAccessor(XAnnotatedElement element) {
 		AccessType accessType = getExplicitAccessType( element );
 		if ( accessType == null ) {
-		   accessType = propertyAccessType;
+			accessType = propertyAccessType;
 		}
 		return accessType;
 	}

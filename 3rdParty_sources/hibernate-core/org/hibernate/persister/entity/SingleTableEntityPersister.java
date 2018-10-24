@@ -18,8 +18,8 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.boot.model.relational.Database;
-import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
-import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
+import org.hibernate.cache.spi.access.EntityDataAccess;
+import org.hibernate.cache.spi.access.NaturalIdDataAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -117,8 +117,8 @@ public class SingleTableEntityPersister extends AbstractEntityPersister {
 
 	public SingleTableEntityPersister(
 			final PersistentClass persistentClass,
-			final EntityRegionAccessStrategy cacheAccessStrategy,
-			final NaturalIdRegionAccessStrategy naturalIdRegionAccessStrategy,
+			final EntityDataAccess cacheAccessStrategy,
+			final NaturalIdDataAccess naturalIdRegionAccessStrategy,
 			final PersisterCreationContext creationContext) throws HibernateException {
 
 		super( persistentClass, cacheAccessStrategy, naturalIdRegionAccessStrategy, creationContext );
@@ -178,7 +178,11 @@ public class SingleTableEntityPersister extends AbstractEntityPersister {
 			Join join = (Join) joinIter.next();
 			qualifiedTableNames[j] = determineTableName( join.getTable(), jdbcEnvironment );
 			isInverseTable[j] = join.isInverse();
-			isNullableTable[j] = join.isOptional();
+			isNullableTable[j] = join.isOptional()
+					|| creationContext.getSessionFactory()
+							.getSessionFactoryOptions()
+							.getJpaCompliance()
+							.isJpaCacheComplianceEnabled();
 			cascadeDeleteEnabled[j] = join.getKey().isCascadeDeleteEnabled() &&
 					factory.getDialect().supportsCascadeDelete();
 
@@ -244,7 +248,12 @@ public class SingleTableEntityPersister extends AbstractEntityPersister {
 			isConcretes.add( persistentClass.isClassOrSuperclassJoin( join ) );
 			isDeferreds.add( join.isSequentialSelect() );
 			isInverses.add( join.isInverse() );
-			isNullables.add( join.isOptional() );
+			isNullables.add(
+					join.isOptional() || creationContext.getSessionFactory()
+							.getSessionFactoryOptions()
+							.getJpaCompliance()
+							.isJpaCacheComplianceEnabled()
+			);
 			isLazies.add( lazyAvailable && join.isLazy() );
 			if ( join.isSequentialSelect() && !persistentClass.isClassOrSuperclassJoin( join ) ) {
 				hasDeferred = true;
@@ -620,6 +629,21 @@ public class SingleTableEntityPersister extends AbstractEntityPersister {
 			if ( !queryable.isAbstract() ) {
 				values.add( queryable.getDiscriminatorSQLValue() );
 			}
+			else if ( queryable.hasSubclasses() ) {
+				// if the treat is an abstract class, add the concrete implementations to values if any
+				Set<String> actualSubClasses = queryable.getEntityMetamodel().getSubclassEntityNames();
+
+				for ( String actualSubClass : actualSubClasses ) {
+					if ( actualSubClass.equals( subclass ) ) {
+						continue;
+					}
+
+					Queryable actualQueryable = (Queryable) getFactory().getEntityPersister( actualSubClass );
+					if ( !actualQueryable.hasSubclasses() ) {
+						values.add( actualQueryable.getDiscriminatorSQLValue() );
+					}
+				}
+			}
 		}
 		return values.toArray( new String[values.size()] );
 	}
@@ -697,7 +721,19 @@ public class SingleTableEntityPersister extends AbstractEntityPersister {
 	}
 
 	private int getSubclassPropertyTableNumber(String propertyName, String entityName) {
-		Type type = propertyMapping.toType( propertyName );
+		// When there are duplicated property names in the subclasses
+		// then propertyMapping.toType( propertyName ) may return an
+		// incorrect Type. To ensure correct results, lookup the property type
+		// using the concrete EntityPersister with the specified entityName
+		// (since the concrete EntityPersister cannot have duplicated property names).
+		final EntityPersister concreteEntityPersister;
+		if ( getEntityName().equals( entityName ) ) {
+			concreteEntityPersister = this;
+		}
+		else {
+			concreteEntityPersister = getFactory().getMetamodel().entityPersister( entityName );
+		}
+		Type type = concreteEntityPersister.getPropertyType( propertyName );
 		if ( type.isAssociationType() && ( (AssociationType) type ).useLHSPrimaryKey() ) {
 			return 0;
 		}

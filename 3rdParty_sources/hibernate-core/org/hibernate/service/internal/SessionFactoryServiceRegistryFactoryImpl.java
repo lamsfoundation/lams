@@ -6,9 +6,13 @@
  */
 package org.hibernate.service.internal;
 
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.hibernate.service.spi.SessionFactoryServiceContributor;
+import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.service.spi.SessionFactoryServiceRegistryFactory;
 
 /**
@@ -25,9 +29,17 @@ public class SessionFactoryServiceRegistryFactoryImpl implements SessionFactoryS
 	}
 
 	@Override
-	public SessionFactoryServiceRegistryImpl buildServiceRegistry(
+	public SessionFactoryServiceRegistry buildServiceRegistry(
 			SessionFactoryImplementor sessionFactory,
+			BootstrapContext bootstrapContext,
 			SessionFactoryOptions options) {
-		return new SessionFactoryServiceRegistryImpl( theBasicServiceRegistry, sessionFactory, options );
+		final ClassLoaderService cls = options.getServiceRegistry().getService( ClassLoaderService.class );
+		final SessionFactoryServiceRegistryBuilderImpl builder = new SessionFactoryServiceRegistryBuilderImpl( theBasicServiceRegistry );
+
+		for ( SessionFactoryServiceContributor contributor : cls.loadJavaServices( SessionFactoryServiceContributor.class ) ) {
+			contributor.contribute( builder );
+		}
+
+		return builder.buildSessionFactoryServiceRegistry( sessionFactory, bootstrapContext, options );
 	}
 }

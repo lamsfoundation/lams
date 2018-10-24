@@ -22,6 +22,8 @@ import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.dialect.identity.AbstractTransactSQLIdentityColumnSupport;
+import org.hibernate.dialect.identity.IdentityColumnSupport;
 import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
 import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
 import org.hibernate.hql.spi.id.local.AfterUseAction;
@@ -135,32 +137,6 @@ abstract class AbstractTransactSQLDialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsIdentityColumns() {
-		return true;
-	}
-
-	@Override
-	public String getIdentitySelectString() {
-		return "select @@identity";
-	}
-
-	@Override
-	public String getIdentityColumnString() {
-		//starts with 1, implicitly
-		return "identity not null";
-	}
-
-	@Override
-	public boolean supportsInsertSelectIdentity() {
-		return true;
-	}
-
-	@Override
-	public String appendIdentitySelectToInsert(String insertSQL) {
-		return insertSQL + "\nselect @@identity";
-	}
-
-	@Override
 	public String appendLockHint(LockOptions lockOptions, String tableName) {
 		return lockOptions.getLockMode().greaterThan( LockMode.READ ) ? tableName + " holdlock" : tableName;
 	}
@@ -170,7 +146,7 @@ abstract class AbstractTransactSQLDialect extends Dialect {
 		// TODO:  merge additional lockoptions support in Dialect.applyLocksToSql
 		final Iterator itr = aliasedLockOptions.getAliasLockIterator();
 		final StringBuilder buffer = new StringBuilder( sql );
-		int correction = 0;
+
 		while ( itr.hasNext() ) {
 			final Map.Entry entry = (Map.Entry) itr.next();
 			final LockMode lockMode = (LockMode) entry.getValue();
@@ -179,24 +155,23 @@ abstract class AbstractTransactSQLDialect extends Dialect {
 				int start = -1;
 				int end = -1;
 				if ( sql.endsWith( " " + alias ) ) {
-					start = ( sql.length() - alias.length() ) + correction;
+					start = ( buffer.length() - alias.length() );
 					end = start + alias.length();
 				}
 				else {
-					int position = sql.indexOf( " " + alias + " " );
+					int position = buffer.indexOf( " " + alias + " " );
 					if ( position <= -1 ) {
-						position = sql.indexOf( " " + alias + "," );
+						position = buffer.indexOf( " " + alias + "," );
 					}
 					if ( position > -1 ) {
-						start = position + correction + 1;
+						start = position + 1;
 						end = start + alias.length();
 					}
 				}
 
 				if ( start > -1 ) {
-					final String lockHint = appendLockHint( lockMode, alias );
+					final String lockHint = appendLockHint( aliasedLockOptions, alias );
 					buffer.replace( start, end, lockHint );
-					correction += ( lockHint.length() - alias.length() );
 				}
 			}
 		}
@@ -292,5 +267,15 @@ abstract class AbstractTransactSQLDialect extends Dialect {
 	@Override
 	public boolean supportsTuplesInSubqueries() {
 		return false;
+	}
+
+	@Override
+	public IdentityColumnSupport getIdentityColumnSupport() {
+		return new AbstractTransactSQLIdentityColumnSupport();
+	}
+
+	@Override
+	public boolean supportsPartitionBy() {
+		return true;
 	}
 }

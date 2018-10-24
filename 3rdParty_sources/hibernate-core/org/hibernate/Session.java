@@ -6,11 +6,19 @@
  */
 package org.hibernate;
 
+import java.io.Closeable;
 import java.io.Serializable;
 import java.sql.Connection;
+import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 
 import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.jdbc.Work;
+import org.hibernate.jpa.HibernateEntityManager;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.stat.SessionStatistics;
 
 /**
@@ -70,9 +78,11 @@ import org.hibernate.stat.SessionStatistics;
  * be consistent with the database after the exception occurs.
  *
  * @see SessionFactory
+ *
  * @author Gavin King
+ * @author Steve Ebersole
  */
-public interface Session extends SharedSessionContract, java.io.Closeable {
+public interface Session extends SharedSessionContract, EntityManager, HibernateEntityManager, AutoCloseable, Closeable {
 	/**
 	 * Obtain a {@link Session} builder with the ability to grab certain information from this session.
 	 *
@@ -106,16 +116,46 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	 * order to achieve some extra performance).
 	 *
 	 * @param flushMode the new flush mode
-	 * @see FlushMode
+	 *
+	 * @deprecated (since 5.2) use {@link #setHibernateFlushMode(FlushMode)} instead
 	 */
+	@Deprecated
 	void setFlushMode(FlushMode flushMode);
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * For users of the Hibernate native APIs, we've had to rename this method
+	 * as defined by Hibernate historically because the JPA contract defines a method of the same
+	 * name, but returning the JPA {@link FlushModeType} rather than Hibernate's {@link FlushMode}.  For
+	 * the former behavior, use {@link Session#getHibernateFlushMode()} instead.
+	 *
+	 * @return The FlushModeType in effect for this Session.
+	 */
+	@Override
+	FlushModeType getFlushMode();
+
+	/**
+	 * Set the flush mode for this session.
+	 * <p/>
+	 * The flush mode determines the points at which the session is flushed.
+	 * <i>Flushing</i> is the process of synchronizing the underlying persistent
+	 * store with persistable state held in memory.
+	 * <p/>
+	 * For a logically "read only" session, it is reasonable to set the session's
+	 * flush mode to {@link FlushMode#MANUAL} at the start of the session (in
+	 * order to achieve some extra performance).
+	 *
+	 * @param flushMode the new flush mode
+	 */
+	void setHibernateFlushMode(FlushMode flushMode);
 
 	/**
 	 * Get the current flush mode for this session.
 	 *
 	 * @return The flush mode
 	 */
-	FlushMode getFlushMode();
+	FlushMode getHibernateFlushMode();
 
 	/**
 	 * Set the cache mode.
@@ -143,15 +183,6 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	SessionFactory getSessionFactory();
 
 	/**
-	 * End the session by releasing the JDBC connection and cleaning up.  It is
-	 * not strictly necessary to close the session but you must at least
-	 * {@link #disconnect()} it.
-	 *
-	 * @throws HibernateException Indicates problems cleaning up.
-	 */
-	void close() throws HibernateException;
-
-	/**
 	 * Cancel the execution of the current query.
 	 * <p/>
 	 * This is the sole method on session which may be safely called from
@@ -160,20 +191,6 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	 * @throws HibernateException There was a problem canceling the query
 	 */
 	void cancelQuery() throws HibernateException;
-
-	/**
-	 * Check if the session is still open.
-	 *
-	 * @return boolean
-	 */
-	boolean isOpen();
-
-	/**
-	 * Check if the session is currently connected.
-	 *
-	 * @return boolean
-	 */
-	boolean isConnected();
 
 	/**
 	 * Does this session contain any changes which must be synchronized with
@@ -236,12 +253,15 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	Serializable getIdentifier(Object object);
 
 	/**
-	 * Check if this instance is associated with this <tt>Session</tt>.
+	 * Check if this entity is associated with this Session.  This form caters to
+	 * non-POJO entities, by allowing the entity-name to be passed in
 	 *
+	 * @param entityName The entity name
 	 * @param object an instance of a persistent class
+	 *
 	 * @return true if the given instance is associated with this <tt>Session</tt>
 	 */
-	boolean contains(Object object);
+	boolean contains(String entityName, Object object);
 
 	/**
 	 * Remove this instance from the session cache. Changes to the instance will
@@ -663,8 +683,11 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	 * @param queryString a Hibernate query fragment.
 	 *
 	 * @return The query instance for manipulation and execution
+	 *
+	 * @deprecated (since 5.3) with no real replacement.
 	 */
-	Query createFilter(Object collection, String queryString);
+	@Deprecated
+	org.hibernate.Query createFilter(Object collection, String queryString);
 
 	/**
 	 * Completely clear the session. Evict all loaded instances and cancel all pending
@@ -783,6 +806,30 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	IdentifierLoadAccess byId(String entityName);
 
 	/**
+	 * Create a {@link MultiIdentifierLoadAccess} instance to retrieve multiple entities at once
+	 * as specified by primary key values.
+	 *
+	 * @param entityClass The entity type to be retrieved
+	 *
+	 * @return load delegate for loading the specified entity type by primary key values
+	 *
+	 * @throws HibernateException If the specified Class cannot be resolved as a mapped entity
+	 */
+	<T> MultiIdentifierLoadAccess<T> byMultipleIds(Class<T> entityClass);
+
+	/**
+	 * Create a {@link MultiIdentifierLoadAccess} instance to retrieve multiple entities at once
+	 * as specified by primary key values.
+	 *
+	 * @param entityName The entity name of the entity type to be retrieved
+	 *
+	 * @return load delegate for loading the specified entity type by primary key values
+	 *
+	 * @throws HibernateException If the specified entity name cannot be resolved as an entity name
+	 */
+	MultiIdentifierLoadAccess byMultipleIds(String entityName);
+
+	/**
 	 * Create an {@link IdentifierLoadAccess} instance to retrieve the specified entity by
 	 * primary key.
 	 *
@@ -795,7 +842,7 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	<T> IdentifierLoadAccess<T> byId(Class<T> entityClass);
 
 	/**
-	 * Create an {@link NaturalIdLoadAccess} instance to retrieve the specified entity by
+	 * Create a {@link NaturalIdLoadAccess} instance to retrieve the specified entity by
 	 * its natural id.
 	 * 
 	 * @param entityName The entity name of the entity type to be retrieved
@@ -807,7 +854,7 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	NaturalIdLoadAccess byNaturalId(String entityName);
 
 	/**
-	 * Create an {@link NaturalIdLoadAccess} instance to retrieve the specified entity by
+	 * Create a {@link NaturalIdLoadAccess} instance to retrieve the specified entity by
 	 * its natural id.
 	 * 
 	 * @param entityClass The entity type to be retrieved
@@ -819,7 +866,7 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	<T> NaturalIdLoadAccess<T> byNaturalId(Class<T> entityClass);
 
 	/**
-	 * Create an {@link SimpleNaturalIdLoadAccess} instance to retrieve the specified entity by
+	 * Create a {@link SimpleNaturalIdLoadAccess} instance to retrieve the specified entity by
 	 * its natural id.
 	 *
 	 * @param entityName The entity name of the entity type to be retrieved
@@ -832,7 +879,7 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	SimpleNaturalIdLoadAccess bySimpleNaturalId(String entityName);
 
 	/**
-	 * Create an {@link SimpleNaturalIdLoadAccess} instance to retrieve the specified entity by
+	 * Create a {@link SimpleNaturalIdLoadAccess} instance to retrieve the specified entity by
 	 * its simple (single attribute) natural id.
 	 *
 	 * @param entityClass The entity type to be retrieved
@@ -1095,4 +1142,27 @@ public interface Session extends SharedSessionContract, java.io.Closeable {
 	 * @param listeners The listener(s) to add
 	 */
 	void addEventListeners(SessionEventListener... listeners);
+
+	@Override
+	org.hibernate.query.Query createQuery(String queryString);
+
+	@Override
+	<T> org.hibernate.query.Query<T> createQuery(String queryString, Class<T> resultType);
+
+	@Override
+	<T> org.hibernate.query.Query<T> createQuery(CriteriaQuery<T> criteriaQuery);
+
+	@Override
+	org.hibernate.query.Query createQuery(CriteriaUpdate updateQuery);
+
+	@Override
+	org.hibernate.query.Query createQuery(CriteriaDelete deleteQuery);
+
+	@Override
+	org.hibernate.query.Query getNamedQuery(String queryName);
+
+	<T> org.hibernate.query.Query<T> createNamedQuery(String name, Class<T> resultType);
+
+	@Override
+	NativeQuery createSQLQuery(String queryString);
 }

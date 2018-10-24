@@ -12,8 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.LockOptions;
+import org.hibernate.engine.internal.BatchFetchQueueHelper;
 import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.loader.Loader;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
@@ -45,7 +46,7 @@ public abstract class BatchingEntityLoader implements UniqueEntityLoader {
 	}
 
 	@Override
-	public Object load(Serializable id, Object optionalObject, SessionImplementor session) {
+	public Object load(Serializable id, Object optionalObject, SharedSessionContractImplementor session) {
 		return load( id, optionalObject, session, LockOptions.NONE );
 	}
 
@@ -67,7 +68,7 @@ public abstract class BatchingEntityLoader implements UniqueEntityLoader {
 		return qp;
 	}
 
-	protected Object getObjectFromList(List results, Serializable id, SessionImplementor session) {
+	protected Object getObjectFromList(List results, Serializable id, SharedSessionContractImplementor session) {
 		for ( Object obj : results ) {
 			final boolean equal = persister.getIdentifierType().isEqual(
 					id,
@@ -84,7 +85,7 @@ public abstract class BatchingEntityLoader implements UniqueEntityLoader {
 	protected Object doBatchLoad(
 			Serializable id,
 			Loader loaderToUse,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			Serializable[] ids,
 			Object optionalObject,
 			LockOptions lockOptions) {
@@ -97,10 +98,19 @@ public abstract class BatchingEntityLoader implements UniqueEntityLoader {
 		try {
 			final List results = loaderToUse.doQueryAndInitializeNonLazyCollections( session, qp, false );
 			log.debug( "Done entity batch load" );
+			// The EntityKey for any entity that is not found will remain in the batch.
+			// Explicitly remove the EntityKeys for entities that were not found to
+			// avoid including them in future batches that get executed.
+			BatchFetchQueueHelper.removeNotFoundBatchLoadableEntityKeys(
+					ids,
+					results,
+					persister(),
+					session
+			);
 			return getObjectFromList(results, id, session);
 		}
 		catch ( SQLException sqle ) {
-			throw session.getFactory().getSQLExceptionHelper().convert(
+			throw session.getJdbcServices().getSqlExceptionHelper().convert(
 					sqle,
 					"could not load an entity batch: " + MessageHelper.infoString( persister(), ids, session.getFactory() ),
 					loaderToUse.getSQLString()

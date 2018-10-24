@@ -13,24 +13,21 @@ import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.hibernate.engine.jdbc.batch.spi.BatchBuilder;
 import org.hibernate.engine.jdbc.batch.spi.BatchKey;
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.service.spi.Configurable;
-
-import org.jboss.logging.Logger;
+import org.hibernate.service.spi.Manageable;
 
 /**
  * A builder for {@link Batch} instances.
  *
  * @author Steve Ebersole
  */
-public class BatchBuilderImpl implements BatchBuilder, Configurable {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			BatchBuilderImpl.class.getName()
-	);
+public class BatchBuilderImpl implements BatchBuilder, Configurable, Manageable, BatchBuilderMXBean {
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( BatchBuilderImpl.class );
 
-	private int size;
+	private int jdbcBatchSize;
 
 	/**
 	 * Constructs a BatchBuilderImpl
@@ -41,27 +38,36 @@ public class BatchBuilderImpl implements BatchBuilder, Configurable {
 	/**
 	 * Constructs a BatchBuilderImpl
 	 *
-	 * @param size The batch size to use.
+	 * @param jdbcBatchSize The batch jdbcBatchSize to use.
 	 */
-	public BatchBuilderImpl(int size) {
-		this.size = size;
+	public BatchBuilderImpl(int jdbcBatchSize) {
+		this.jdbcBatchSize = jdbcBatchSize;
 	}
 
 	@Override
 	public void configure(Map configurationValues) {
-		size = ConfigurationHelper.getInt( Environment.STATEMENT_BATCH_SIZE, configurationValues, size );
+		jdbcBatchSize = ConfigurationHelper.getInt( Environment.STATEMENT_BATCH_SIZE, configurationValues, jdbcBatchSize );
 	}
 
-	@SuppressWarnings("UnusedDeclaration")
-	public void setJdbcBatchSize(int size) {
-		this.size = size;
+	@Override
+	public int getJdbcBatchSize() {
+		return jdbcBatchSize;
+	}
+
+	@Override
+	public void setJdbcBatchSize(int jdbcBatchSize) {
+		this.jdbcBatchSize = jdbcBatchSize;
 	}
 
 	@Override
 	public Batch buildBatch(BatchKey key, JdbcCoordinator jdbcCoordinator) {
-		LOG.tracef( "Building batch [size=%s]", size );
-		return size > 1
-				? new BatchingBatch( key, jdbcCoordinator, size )
+		final Integer sessionJdbcBatchSize = jdbcCoordinator.getJdbcSessionOwner()
+				.getJdbcBatchSize();
+		final int jdbcBatchSizeToUse = sessionJdbcBatchSize == null ?
+				this.jdbcBatchSize :
+				sessionJdbcBatchSize;
+		return jdbcBatchSizeToUse > 1
+				? new BatchingBatch( key, jdbcCoordinator, jdbcBatchSizeToUse )
 				: new NonBatchingBatch( key, jdbcCoordinator );
 	}
 

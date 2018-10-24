@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 import javassist.util.proxy.MethodHandler;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.proxy.pojo.BasicLazyInitializer;
@@ -40,7 +40,7 @@ public class JavassistLazyInitializer extends BasicLazyInitializer implements Me
 			Method getIdentifierMethod,
 			Method setIdentifierMethod,
 			CompositeType componentIdType,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			boolean overridesEquals) {
 		super( entityName, persistentClass, id, getIdentifierMethod, setIdentifierMethod, componentIdType, session, overridesEquals );
 		this.interfaces = interfaces;
@@ -67,7 +67,7 @@ public class JavassistLazyInitializer extends BasicLazyInitializer implements Me
 				result = this.invoke( thisMethod, args, proxy );
 			}
 			catch ( Throwable t ) {
-				throw new Exception( t.getCause() );
+				throw t instanceof RuntimeException ? t : new Exception( t.getCause() );
 			}
 			if ( result == INVOKE_IMPLEMENTATION ) {
 				Object target = getImplementation();
@@ -125,6 +125,8 @@ public class JavassistLazyInitializer extends BasicLazyInitializer implements Me
 				interfaces,
 				getIdentifier(),
 				( isReadOnlySettingAvailable() ? Boolean.valueOf( isReadOnly() ) : isReadOnlyBeforeAttachedToSession() ),
+				getSessionFactoryUuid(),
+				isAllowLoadOutsideTransaction(),
 				getIdentifierMethod,
 				setIdentifierMethod,
 				componentIdType

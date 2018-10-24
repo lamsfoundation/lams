@@ -21,6 +21,7 @@ import org.hibernate.TransientPropertyValueException;
 import org.hibernate.engine.internal.NonNullableTransientDependencies;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.collections.IdentitySet;
@@ -49,10 +50,8 @@ public class UnresolvedEntityInsertActions {
 
 	private static final int INIT_SIZE = 5;
 
-	private final Map<AbstractEntityInsertAction,NonNullableTransientDependencies> dependenciesByAction =
-			new IdentityHashMap<AbstractEntityInsertAction,NonNullableTransientDependencies>( INIT_SIZE );
-	private final Map<Object,Set<AbstractEntityInsertAction>> dependentActionsByTransientEntity =
-			new IdentityHashMap<Object,Set<AbstractEntityInsertAction>>( INIT_SIZE );
+	private final Map<AbstractEntityInsertAction,NonNullableTransientDependencies> dependenciesByAction = new IdentityHashMap<>( INIT_SIZE );
+	private final Map<Object,Set<AbstractEntityInsertAction>> dependentActionsByTransientEntity = new IdentityHashMap<>( INIT_SIZE );
 
 	/**
 	 * Add an unresolved insert action.
@@ -126,14 +125,14 @@ public class UnresolvedEntityInsertActions {
 		}
 	}
 
-	private void logCannotResolveNonNullableTransientDependencies(SessionImplementor session) {
+	private void logCannotResolveNonNullableTransientDependencies(SharedSessionContractImplementor session) {
 		for ( Map.Entry<Object,Set<AbstractEntityInsertAction>> entry : dependentActionsByTransientEntity.entrySet() ) {
 			final Object transientEntity = entry.getKey();
 			final String transientEntityName = session.guessEntityName( transientEntity );
-			final Serializable transientEntityId = session.getFactory().getEntityPersister( transientEntityName ).getIdentifier( transientEntity, session );
+			final Serializable transientEntityId = session.getFactory().getMetamodel().entityPersister( transientEntityName ).getIdentifier( transientEntity, session );
 			final String transientEntityString = MessageHelper.infoString( transientEntityName, transientEntityId );
-			final Set<String> dependentEntityStrings = new TreeSet<String>();
-			final Set<String> nonNullableTransientPropertyPaths = new TreeSet<String>();
+			final Set<String> dependentEntityStrings = new TreeSet<>();
+			final Set<String> nonNullableTransientPropertyPaths = new TreeSet<>();
 			for ( AbstractEntityInsertAction dependentAction : entry.getValue() ) {
 				dependentEntityStrings.add( MessageHelper.infoString( dependentAction.getEntityName(), dependentAction.getId() ) );
 				for ( String path : dependenciesByAction.get( dependentAction ).getNonNullableTransientPropertyPaths( transientEntity ) ) {

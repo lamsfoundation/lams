@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -19,6 +20,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Example;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -48,6 +51,8 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     private static Logger log = Logger.getLogger(LAMSBaseDAO.class);
 
+    @Autowired
+    @Qualifier("coreSessionFactory")
     private SessionFactory sessionFactory;
 
     /*
@@ -465,22 +470,36 @@ public class LAMSBaseDAO implements IBaseDAO {
     }
 
     public List<?> doFind(final String queryString, final Object... values) {
-	Query queryObject = getSession().createQuery(queryString);
-	if (values != null) {
-	    for (int i = 0; i < values.length; i++) {
-		queryObject.setParameter(i, values[i]);
-	    }
-	}
+	Query queryObject = convertLegacyStyleParameters(queryString, values);
 	return queryObject.list();
     }
 
-    public int doBulkUpdate(final String queryString, final Object... values) {
-	Query queryObject = getSession().createQuery(queryString);
-	if (values != null) {
-	    for (int i = 0; i < values.length; i++) {
-		queryObject.setParameter(i, values[i]);
+    private Query convertLegacyStyleParameters(final String queryString, final Object... values) {
+	Query queryObject = null;
+	if (values == null) {
+	    queryObject = getSession().createQuery(queryString);
+	} else {
+	    // replace all the current ? with :P1, :P2, etc
+	    String[] parts = Pattern.compile("\\?").split(queryString, 0);
+	    StringBuilder bldr = new StringBuilder(parts[0]);
+	    int i=1;
+	    if (parts.length > 1) {
+		for (; i < parts.length; i++) {
+		    bldr.append( ":P").append(i).append(" ").append(parts[i]);
+		}
+	    }  
+	    if ( queryString.endsWith("?"))
+		bldr.append(" :P").append(i).append(" ");
+	    queryObject = getSession().createQuery(bldr.toString());
+	    for (i = 0; i < values.length; i++) {
+		queryObject.setParameter("P"+Integer.toString(i+1), values[i]);
 	    }
 	}
+	return queryObject;
+    }
+
+    public int doBulkUpdate(final String queryString, final Object... values) {
+	Query queryObject = convertLegacyStyleParameters(queryString, values);
 	return queryObject.executeUpdate();
     }
 

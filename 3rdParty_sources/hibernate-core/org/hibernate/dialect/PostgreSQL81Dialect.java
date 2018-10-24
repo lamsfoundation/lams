@@ -6,6 +6,13 @@
  */
 package org.hibernate.dialect;
 
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.hibernate.JDBCException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
@@ -16,6 +23,8 @@ import org.hibernate.dialect.function.PositionSubstringFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.dialect.identity.IdentityColumnSupport;
+import org.hibernate.dialect.identity.PostgreSQL81IdentityColumnSupport;
 import org.hibernate.dialect.pagination.AbstractLimitHandler;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.pagination.LimitHelper;
@@ -28,8 +37,6 @@ import org.hibernate.hql.spi.id.IdTableSupportStandardImpl;
 import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
 import org.hibernate.hql.spi.id.local.AfterUseAction;
 import org.hibernate.hql.spi.id.local.LocalTemporaryTableBulkIdStrategy;
-import org.hibernate.id.SequenceGenerator;
-import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import org.hibernate.internal.util.JdbcExceptionHelper;
 import org.hibernate.procedure.internal.PostgresCallableStatementSupport;
 import org.hibernate.procedure.spi.CallableStatementSupport;
@@ -37,13 +44,6 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.descriptor.sql.BlobTypeDescriptor;
 import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
-
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * An SQL dialect for Postgres
@@ -266,15 +266,10 @@ public class PostgreSQL81Dialect extends Dialect {
 	}
 
 	@Override
-	public boolean supportsIdentityColumns() {
-		return true;
-	}
-
-	@Override
 	public String getForUpdateString(String aliases) {
 		return getForUpdateString() + " of " + aliases;
 	}
-	
+
 	@Override
 	public String getForUpdateString(String aliases, LockOptions lockOptions) {
 		/*
@@ -292,24 +287,26 @@ public class PostgreSQL81Dialect extends Dialect {
 				}
 			}
 		}
-		return getForUpdateString( aliases );
-	}
-
-	@Override
-	public String getIdentitySelectString(String table, String column, int type) {
-		return "select currval('" + table + '_' + column + "_seq')";
-	}
-
-	@Override
-	public String getIdentityColumnString(int type) {
-		return type==Types.BIGINT ?
-			"bigserial not null" :
-			"serial not null";
-	}
-
-	@Override
-	public boolean hasDataTypeInIdentityColumn() {
-		return false;
+		LockMode lockMode = lockOptions.getAliasSpecificLockMode( aliases );
+		if (lockMode == null ) {
+			lockMode = lockOptions.getLockMode();
+		}
+		switch ( lockMode ) {
+			case UPGRADE:
+				return getForUpdateString(aliases);
+			case PESSIMISTIC_READ:
+				return getReadLockString( aliases, lockOptions.getTimeOut() );
+			case PESSIMISTIC_WRITE:
+				return getWriteLockString( aliases, lockOptions.getTimeOut() );
+			case UPGRADE_NOWAIT:
+			case FORCE:
+			case PESSIMISTIC_FORCE_INCREMENT:
+				return getForUpdateNowaitString(aliases);
+			case UPGRADE_SKIPLOCKED:
+				return getForUpdateSkipLockedString(aliases);
+			default:
+				return "";
+		}
 	}
 
 	@Override
@@ -328,8 +325,8 @@ public class PostgreSQL81Dialect extends Dialect {
 	}
 
 	@Override
-	public Class getNativeIdentifierGeneratorClass() {
-		return SequenceStyleGenerator.class;
+	public String getNativeIdentifierGeneratorStrategy() {
+		return "sequence";
 	}
 
 	@Override
@@ -490,7 +487,35 @@ public class PostgreSQL81Dialect extends Dialect {
 	 */
 	@Override
 	protected String getCreateSequenceString(String sequenceName, int initialValue, int incrementSize) {
-		return getCreateSequenceString( sequenceName ) + " start " + initialValue + " increment " + incrementSize;
+		if ( initialValue < 0 && incrementSize > 0 ) {
+			return
+					String.format(
+							"%s minvalue %d start %d increment %d",
+							getCreateSequenceString( sequenceName ),
+							initialValue,
+							initialValue,
+							incrementSize
+					);
+		}
+		else if ( initialValue > 0 && incrementSize < 0 ) {
+			return
+					String.format(
+							"%s maxvalue %d start %d increment %d",
+							getCreateSequenceString( sequenceName ),
+							initialValue,
+							initialValue,
+							incrementSize
+					);
+		}
+		else {
+			return
+					String.format(
+							"%s start %d increment %d",
+							getCreateSequenceString( sequenceName ),
+							initialValue,
+							incrementSize
+					);
+		}
 	}
 	
 	// Overridden informational metadata ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -531,12 +556,32 @@ public class PostgreSQL81Dialect extends Dialect {
 	}
 
 	@Override
+	public String getWriteLockString(String aliases, int timeout) {
+		if ( timeout == LockOptions.NO_WAIT ) {
+			return String.format( " for update of %s nowait", aliases );
+		}
+		else {
+			return " for update of " + aliases;
+		}
+	}
+
+	@Override
 	public String getReadLockString(int timeout) {
 		if ( timeout == LockOptions.NO_WAIT ) {
 			return " for share nowait";
 		}
 		else {
 			return " for share";
+		}
+	}
+
+	@Override
+	public String getReadLockString(String aliases, int timeout) {
+		if ( timeout == LockOptions.NO_WAIT ) {
+			return String.format( " for share of %s nowait", aliases );
+		}
+		else {
+			return " for share of " + aliases;
 		}
 	}
 
@@ -570,11 +615,26 @@ public class PostgreSQL81Dialect extends Dialect {
 
 	@Override
 	public ResultSet getResultSet(CallableStatement statement, String name) throws SQLException {
-		throw new UnsupportedOperationException( "PostgreSQL only supports accessing REF_CURSOR parameters by name" );
+		throw new UnsupportedOperationException( "PostgreSQL only supports accessing REF_CURSOR parameters by position" );
 	}
 
 	@Override
 	public boolean qualifyIndexName() {
 		return false;
+	}
+
+	@Override
+	public IdentityColumnSupport getIdentityColumnSupport() {
+		return new PostgreSQL81IdentityColumnSupport();
+	}
+
+	@Override
+	public boolean supportsNationalizedTypes() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsNoWait() {
+		return true;
 	}
 }
