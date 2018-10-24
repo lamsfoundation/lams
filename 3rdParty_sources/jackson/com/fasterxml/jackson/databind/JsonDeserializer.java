@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.util.Collection;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
-import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
+
+import com.fasterxml.jackson.databind.deser.*;
 import com.fasterxml.jackson.databind.deser.impl.ObjectIdReader;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.util.AccessPattern;
 import com.fasterxml.jackson.databind.util.NameTransformer;
 
 /**
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
  *<p>
  * In addition, to support per-property annotations (to configure aspects
  * of deserialization on per-property basis), deserializers may want
- * to implement 
+ * to implement
  * {@link com.fasterxml.jackson.databind.deser.ContextualDeserializer},
  * which allows specialization of deserializers: call to
  * {@link com.fasterxml.jackson.databind.deser.ContextualDeserializer#createContextual}
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
  * contextualization.
  */
 public abstract class JsonDeserializer<T>
+    implements NullValueProvider // since 2.9
 {
     /*
     /**********************************************************
@@ -80,8 +82,8 @@ public abstract class JsonDeserializer<T>
      *  after the @class. Thus, if you want your method to work correctly
      *  both with and without polymorphism, you must begin your method with:
      *  <pre>
-     *       if (jp.getCurrentToken() == JsonToken.START_OBJECT) {
-     *         jp.nextToken();
+     *       if (p.getCurrentToken() == JsonToken.START_OBJECT) {
+     *         p.nextToken();
      *       }
      *  </pre>
      * This results in the stream pointing to the field name, so that
@@ -121,9 +123,12 @@ public abstract class JsonDeserializer<T>
      * update-existing-value operation (esp. immutable types)
      */
     public T deserialize(JsonParser p, DeserializationContext ctxt, T intoValue)
-        throws IOException, JsonProcessingException
+        throws IOException
     {
-        throw new UnsupportedOperationException("Can not update object of type "
+        if (ctxt.isEnabled(MapperFeature.IGNORE_MERGE_FOR_UNMERGEABLE)) {
+            return deserialize(p, ctxt);
+        }
+        throw new UnsupportedOperationException("Cannot update object of type "
                 +intoValue.getClass().getName()+" (by deserializer of type "+getClass().getName()+")");
     }
 
@@ -251,10 +256,10 @@ public abstract class JsonDeserializer<T>
 
     /*
     /**********************************************************
-    /* Other accessors
+    /* Default NullValueProvider implementation
     /**********************************************************
      */
-    
+
     /**
      * Method that can be called to determine value to be used for
      * representing null values (values deserialized when JSON token
@@ -270,11 +275,43 @@ public abstract class JsonDeserializer<T>
      * 
      * @since 2.6 Added to replace earlier no-arguments variant
      */
+    @Override
     public T getNullValue(DeserializationContext ctxt) throws JsonMappingException {
         // Change the direction in 2.7
         return getNullValue();
     }
 
+    /**
+     * Default implementation indicates that "null value" to use for input null
+     * is simply Java `null` for all deserializers, unless overridden by sub-classes.
+     * This information may be used as optimization.
+     */
+    @Override
+    public AccessPattern getNullAccessPattern() {
+        // Default implementation assumes that the null value does not vary, which
+        // is usually the case for most implementations. But it is not necessarily
+        // `null`; so sub-classes may want to refine further.
+        return AccessPattern.CONSTANT;
+    }
+
+    /**
+     * This method may be called in conjunction with calls to
+     * {@link #getEmptyValue(DeserializationContext)}, to check whether it needs
+     * to be called just once (static values), or each time empty value is
+     * needed.
+     *
+     * @since 2.9
+     */
+    public AccessPattern getEmptyAccessPattern() {
+        return AccessPattern.DYNAMIC;
+    }
+
+    /*
+    /**********************************************************
+    /* Other accessors
+    /**********************************************************
+     */
+    
     /**
      * Method called to determine value to be used for "empty" values
      * (most commonly when deserializing from empty JSON Strings).
@@ -286,23 +323,24 @@ public abstract class JsonDeserializer<T>
      * Since version 2.6 (in which the context argument was added), call is
      * expected to be made each and every time an empty value is needed.
      *<p>
-     * Default implementation simple calls {@link #getNullValue} and
+     * Since version 2.9 does not require return of `T` any more.
+     *<p>
+     * Default implementation simply calls {@link #getNullValue} and
      * returns value.
      *
      * @since 2.6 Added to replace earlier no-arguments variant
      */
-    public T getEmptyValue(DeserializationContext ctxt) throws JsonMappingException {
-        // Change the direction in 2.7
-        return getEmptyValue();
+    public Object getEmptyValue(DeserializationContext ctxt) throws JsonMappingException {
+        return getNullValue(ctxt);
     }
-    
+
     /**
      * Accessor that can be used to check whether this deserializer
      * is expecting to possibly get an Object Identifier value instead of full value
      * serialization, and if so, should be able to resolve it to actual
      * Object instance to return as deserialized value.
      *<p>
-     * Default implementation returns null, as support can not be implemented
+     * Default implementation returns null, as support cannot be implemented
      * generically. Some standard deserializers (most notably
      * {@link com.fasterxml.jackson.databind.deser.BeanDeserializer})
      * do implement this feature, and may return reader instance, depending on exact
@@ -324,8 +362,31 @@ public abstract class JsonDeserializer<T>
      */
     public SettableBeanProperty findBackReference(String refName)
     {
-        throw new IllegalArgumentException("Can not handle managed/back reference '"+refName
+        throw new IllegalArgumentException("Cannot handle managed/back reference '"+refName
                 +"': type: value deserializer of type "+getClass().getName()+" does not support them");
+    }
+
+    /**
+     * Introspection method that may be called to see whether deserializer supports
+     * update of an existing value (aka "merging") or not. Return value should either
+     * be {@link Boolean#FALSE} if update is not supported at all (immutable values);
+     * {@link Boolean#TRUE} if update should usually work (regular POJOs, for example),
+     * or <code>null</code> if this is either not known, or may sometimes work.
+     *<p>
+     * Information gathered is typically used to either prevent merging update for
+     * property (either by skipping, if based on global defaults; or by exception during
+     * deserialization construction if explicit attempt made) if {@link Boolean#FALSE}
+     * returned, or inclusion if {@link Boolean#TRUE} is specified. If "unknown" case
+     * (<code>null</code> returned) behavior is to exclude property if global defaults
+     * used; or to allow if explicit per-type or property merging is defined.
+     *<p>
+     * Default implementation returns <code>null</code> to allow explicit per-type
+     * or per-property attempts.
+     *
+     * @since 2.9
+     */
+    public Boolean supportsUpdate(DeserializationConfig config) {
+        return null;
     }
 
     /*
@@ -344,8 +405,8 @@ public abstract class JsonDeserializer<T>
      * @deprecated Since 2.6 Use overloaded variant that takes context argument
      */
     @Deprecated
-    public T getEmptyValue() { return getNullValue(); }
-    
+    public Object getEmptyValue() { return getNullValue(); }
+
     /*
     /**********************************************************
     /* Helper classes

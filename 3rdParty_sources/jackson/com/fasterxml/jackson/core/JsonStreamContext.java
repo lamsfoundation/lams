@@ -5,6 +5,8 @@
 
 package com.fasterxml.jackson.core;
 
+import com.fasterxml.jackson.core.io.CharTypes;
+
 /**
  * Shared base class for streaming processing contexts used during
  * reading and writing of Json content using Streaming API.
@@ -42,6 +44,25 @@ public abstract class JsonStreamContext
 
     protected JsonStreamContext() { }
 
+    /**
+     * Copy constructor used by sub-classes for creating copies for
+     * buffering.
+     *
+     * @since 2.9
+     */
+    protected JsonStreamContext(JsonStreamContext base) {
+        _type = base._type;
+        _index = base._index;
+    }
+
+    /**
+     * @since 2.9
+     */
+    protected JsonStreamContext(int type, int index) {
+        _type = type;
+        _index = index;
+    }
+
     /*
     /**********************************************************
     /* Public API, accessors
@@ -77,12 +98,27 @@ public abstract class JsonStreamContext
      * Method for accessing simple type description of current context;
      * either ROOT (for root-level values), OBJECT (for field names and
      * values of JSON Objects) or ARRAY (for values of JSON Arrays)
+     *
+     * @deprecated Since 2.8 use {@link #typeDesc} instead
      */
+    @Deprecated // since 2.8
     public final String getTypeDesc() {
         switch (_type) {
         case TYPE_ROOT: return "ROOT";
         case TYPE_ARRAY: return "ARRAY";
         case TYPE_OBJECT: return "OBJECT";
+        }
+        return "?";
+    }
+
+    /**
+     * @since 2.8
+     */
+    public String typeDesc() {
+        switch (_type) {
+        case TYPE_ROOT: return "root";
+        case TYPE_ARRAY: return "Array";
+        case TYPE_OBJECT: return "Object";
         }
         return "?";
     }
@@ -98,11 +134,51 @@ public abstract class JsonStreamContext
     public final int getCurrentIndex() { return (_index < 0) ? 0 : _index; }
 
     /**
+     * Method that may be called to verify whether this context has valid index:
+     * will return `false` before the first entry of Object context or before
+     * first element of Array context; otherwise returns `true`.
+     *
+     * @since 2.9
+     */
+    public boolean hasCurrentIndex() { return _index >= 0; }
+
+    /**
+     * Method that may be called to check if this context is either:
+     *<ul>
+     * <li>Object, with at least one entry written (partially or completely)
+     *  </li>
+     * <li>Array, with at least one entry written (partially or completely)
+     *  </li>
+     *</ul>
+     * and if so, return `true`; otherwise return `false`. Latter case includes
+     * Root context (always), and Object/Array contexts before any entries/elements
+     * have been read or written.
+     *<p>
+     * Method is mostly used to determine whether this context should be used for
+     * constructing {@link JsonPointer}
+     *
+     * @since 2.9
+     */
+    public boolean hasPathSegment() {
+        if (_type == TYPE_OBJECT) {
+            return hasCurrentName();
+        } else if (_type == TYPE_ARRAY) {
+            return hasCurrentIndex();
+        }
+        return false;
+    }
+    
+    /**
      * Method for accessing name associated with the current location.
      * Non-null for <code>FIELD_NAME</code> and value events that directly
      * follow field names; null for root level and array values.
      */
     public abstract String getCurrentName();
+
+    /**
+     * @since 2.9
+     */
+    public boolean hasCurrentName() { return getCurrentName() != null; }
 
     /**
      * Method for accessing currently active value being used by data-binding
@@ -130,4 +206,82 @@ public abstract class JsonStreamContext
      * @since 2.5
      */
     public void setCurrentValue(Object v) { }
+
+    /**
+     * Factory method for constructing a {@link JsonPointer} that points to the current
+     * location within the stream that this context is for, excluding information about
+     * "root context" (only relevant for multi-root-value cases)
+     *
+     * @since 2.9
+     */
+    public JsonPointer pathAsPointer() {
+        return JsonPointer.forPath(this, false);
+    }
+
+    /**
+     * Factory method for constructing a {@link JsonPointer} that points to the current
+     * location within the stream that this context is for, optionally including
+     * "root value index"
+     *
+     * @param includeRoot Whether root-value offset is included as the first segment or not;
+     *
+     * @since 2.9
+     */
+    public JsonPointer pathAsPointer(boolean includeRoot) {
+        return JsonPointer.forPath(this, includeRoot);
+    }
+
+    /**
+     * Optional method that may be used to access starting location of this context:
+     * for example, in case of JSON `Object` context, offset at which `[` token was
+     * read or written. Often used for error reporting purposes.
+     * Implementations that do not keep track of such location are expected to return
+     * {@link JsonLocation#NA}; this is what the default implementation does.
+     *
+     * @return Location pointing to the point where the context
+     *   start marker was found (or written); never `null`.
+     *<p>
+     * NOTE: demoted from <code>JsonReadContext</code> in 2.9, to allow use for
+     * "non-standard" read contexts.
+     *
+     * @since 2.9
+     */
+    public JsonLocation getStartLocation(Object srcRef) {
+        return JsonLocation.NA;
+    }
+
+    /**
+     * Overridden to provide developer readable "JsonPath" representation
+     * of the context.
+     * 
+     * @since 2.9
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(64);
+        switch (_type) {
+        case TYPE_ROOT:
+            sb.append("/");
+            break;
+        case TYPE_ARRAY:
+            sb.append('[');
+            sb.append(getCurrentIndex());
+            sb.append(']');
+            break;
+        case TYPE_OBJECT:
+        default:
+            sb.append('{');
+            String currentName = getCurrentName();
+            if (currentName != null) {
+                sb.append('"');
+                CharTypes.appendQuoted(sb, currentName);
+                sb.append('"');
+            } else {
+                sb.append('?');
+            }
+            sb.append('}');
+            break;
+        }
+        return sb.toString();
+    }
 }

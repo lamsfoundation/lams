@@ -5,8 +5,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import com.fasterxml.jackson.core.JsonParser;
-
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.*;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
@@ -28,6 +29,11 @@ public final class MethodProperty
      * "regular" method-accessible properties.
      */
     protected final transient Method _setter;
+
+    /**
+     * @since 2.9
+     */
+    final protected boolean _skipNulls;
     
     public MethodProperty(BeanPropertyDefinition propDef,
             JavaType type, TypeDeserializer typeDeser,
@@ -36,18 +42,22 @@ public final class MethodProperty
         super(propDef, type, typeDeser, contextAnnotations);
         _annotated = method;
         _setter = method.getAnnotated();
+        _skipNulls = NullsConstantProvider.isSkipper(_nullProvider);
     }
 
-    protected MethodProperty(MethodProperty src, JsonDeserializer<?> deser) {
-        super(src, deser);
+    protected MethodProperty(MethodProperty src, JsonDeserializer<?> deser,
+            NullValueProvider nva) {
+        super(src, deser, nva);
         _annotated = src._annotated;
         _setter = src._setter;
+        _skipNulls = NullsConstantProvider.isSkipper(nva);
     }
 
     protected MethodProperty(MethodProperty src, PropertyName newName) {
         super(src, newName);
         _annotated = src._annotated;
         _setter = src._setter;
+        _skipNulls = src._skipNulls;
     }
 
     /**
@@ -57,18 +67,33 @@ public final class MethodProperty
         super(src);
         _annotated = src._annotated;
         _setter = m;
+        _skipNulls = src._skipNulls;
     }
-    
+
     @Override
-    public MethodProperty withName(PropertyName newName) {
+    public SettableBeanProperty withName(PropertyName newName) {
         return new MethodProperty(this, newName);
     }
     
     @Override
-    public MethodProperty withValueDeserializer(JsonDeserializer<?> deser) {
-        return new MethodProperty(this, deser);
+    public SettableBeanProperty withValueDeserializer(JsonDeserializer<?> deser) {
+        if (_valueDeserializer == deser) {
+            return this;
+        }
+        return new MethodProperty(this, deser, _nullProvider);
     }
-    
+
+    @Override
+    public SettableBeanProperty withNullProvider(NullValueProvider nva) {
+        return new MethodProperty(this, _valueDeserializer, nva);
+    }
+
+    @Override
+    public void fixAccess(DeserializationConfig config) {
+        _annotated.fixAccess(
+                config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
+    }
+
     /*
     /**********************************************************
     /* BeanProperty impl
@@ -92,7 +117,17 @@ public final class MethodProperty
     public void deserializeAndSet(JsonParser p, DeserializationContext ctxt,
             Object instance) throws IOException
     {
-        Object value = deserialize(p, ctxt);
+        Object value;
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            if (_skipNulls) {
+                return;
+            }
+            value = _nullProvider.getNullValue(ctxt);
+        } else if (_valueTypeDeserializer == null) {
+            value = _valueDeserializer.deserialize(p, ctxt);
+        } else {
+            value = _valueDeserializer.deserializeWithType(p, ctxt, _valueTypeDeserializer);
+        }
         try {
             _setter.invoke(instance, value);
         } catch (Exception e) {
@@ -104,7 +139,17 @@ public final class MethodProperty
     public Object deserializeSetAndReturn(JsonParser p,
     		DeserializationContext ctxt, Object instance) throws IOException
     {
-        Object value = deserialize(p, ctxt);
+        Object value;
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            if (_skipNulls) {
+                return instance;
+            }
+            value = _nullProvider.getNullValue(ctxt);
+        } else if (_valueTypeDeserializer == null) {
+            value = _valueDeserializer.deserialize(p, ctxt);
+        } else {
+            value = _valueDeserializer.deserializeWithType(p, ctxt, _valueTypeDeserializer);
+        }
         try {
             Object result = _setter.invoke(instance, value);
             return (result == null) ? instance : result;
@@ -113,7 +158,7 @@ public final class MethodProperty
             return null;
         }
     }
-    
+
     @Override
     public final void set(Object instance, Object value) throws IOException
     {

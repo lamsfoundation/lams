@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Abstract file {@link Comparator} which provides sorting for file arrays and lists.
  *
- *
+ * @version $Id: AbstractFileComparator.java 1415850 2012-11-30 20:51:39Z ggregory $
  * @since 2.0
  */
 abstract class AbstractFileComparator implements Comparator<File> {
@@ -40,7 +40,7 @@ abstract class AbstractFileComparator implements Comparator<File> {
      * @return The sorted array
      * @since 2.0
      */
-    public File[] sort(File... files) {
+    public File[] sort(final File... files) {
         if (files != null) {
             Arrays.sort(files, this);
         }
@@ -57,7 +57,7 @@ abstract class AbstractFileComparator implements Comparator<File> {
      * @return The sorted list
      * @since 2.0
      */
-    public List<File> sort(List<File> files) {
+    public List<File> sort(final List<File> files) {
         if (files != null) {
             Collections.sort(files, this);
         }

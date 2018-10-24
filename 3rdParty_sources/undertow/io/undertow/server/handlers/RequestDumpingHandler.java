@@ -25,12 +25,15 @@ import java.util.Map;
 import java.util.Set;
 
 import io.undertow.UndertowLogger;
+import io.undertow.attribute.StoredResponse;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.builder.HandlerBuilder;
+import io.undertow.server.handlers.form.FormData;
+import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.LocaleUtils;
@@ -108,11 +111,14 @@ public class RequestDumpingHandler implements HttpHandler {
         sb.append("              host=" + exchange.getRequestHeaders().getFirst(Headers.HOST) + "\n");
         sb.append("        serverPort=" + exchange.getDestinationAddress().getPort() + "\n");
         //sb.append("       servletPath=" + exchange.getServletPath());
-        //sb.append("          isSecure=" + exchange.isSecure());
+        sb.append("          isSecure=" + exchange.isSecure() + "\n");
 
         exchange.addExchangeCompleteListener(new ExchangeCompletionListener() {
             @Override
             public void exchangeEvent(final HttpServerExchange exchange, final NextListener nextListener) {
+
+                dumpRequestBody(exchange, sb);
+
                 // Log post-service information
                 sb.append("--------------------------RESPONSE--------------------------\n");
                 if (sc != null) {
@@ -137,7 +143,14 @@ public class RequestDumpingHandler implements HttpHandler {
                     }
                 }
                 sb.append("            status=" + exchange.getStatusCode() + "\n");
-                sb.append("==============================================================");
+                String storedResponse = StoredResponse.INSTANCE.readAttribute(exchange);
+                if (storedResponse != null) {
+                    sb.append("body=\n");
+                    sb.append(storedResponse);
+                }
+
+                sb.append("\n==============================================================");
+
 
                 nextListener.proceed();
                 UndertowLogger.REQUEST_DUMPER_LOGGER.info(sb.toString());
@@ -149,6 +162,36 @@ public class RequestDumpingHandler implements HttpHandler {
         next.handleRequest(exchange);
     }
 
+    private void dumpRequestBody(HttpServerExchange exchange, StringBuilder sb) {
+        try {
+            FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
+            if (formData != null) {
+                sb.append("body=\n");
+
+                for (String formField : formData) {
+                    Deque<FormData.FormValue> formValues = formData.get(formField);
+
+                    sb.append(formField)
+                            .append("=");
+                    for (FormData.FormValue formValue : formValues) {
+                        sb.append(formValue.isFile() ? "[file-content]" : formValue.getValue());
+                        sb.append("\n");
+
+                        if (formValue.getHeaders() != null) {
+                            sb.append("headers=\n");
+                            for (HeaderValues header : formValue.getHeaders()) {
+                                sb.append("\t")
+                                        .append(header.getHeaderName()).append("=").append(header.getFirst()).append("\n");
+
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     public static class Builder implements HandlerBuilder {

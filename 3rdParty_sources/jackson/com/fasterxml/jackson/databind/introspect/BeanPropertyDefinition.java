@@ -48,7 +48,7 @@ public abstract class BeanPropertyDefinition
 
     /*
     /**********************************************************
-    /* Basic property information, name, type
+    /* Property name information
     /**********************************************************
      */
 
@@ -83,15 +83,6 @@ public abstract class BeanPropertyDefinition
     public abstract PropertyName getWrapperName();
 
     /**
-     * Method for accessing additional metadata.
-     * NOTE: will never return null, so de-referencing return value
-     * is safe.
-     * 
-     * @since 2.3
-     */
-    public abstract PropertyMetadata getMetadata();
-    
-    /**
      * Accessor that can be called to check whether property was included
      * due to an explicit marker (usually annotation), or just by naming
      * convention.
@@ -116,7 +107,42 @@ public abstract class BeanPropertyDefinition
     public boolean isExplicitlyNamed() {
         return isExplicitlyIncluded();
     }
+
+    /*
+    /**********************************************************
+    /* Basic property metadata
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.9
+     */
+    public abstract JavaType getPrimaryType();
+
+    /**
+     * @since 2.9
+     */
+    public abstract Class<?> getRawPrimaryType();
     
+    /**
+     * Method for accessing additional metadata.
+     * NOTE: will never return null, so de-referencing return value
+     * is safe.
+     * 
+     * @since 2.3
+     */
+    public abstract PropertyMetadata getMetadata();
+
+    /**
+     * Method used to check if this property is expected to have a value;
+     * and if none found, should either be considered invalid (and most likely
+     * fail deserialization), or handled by other means (by providing default
+     * value)
+     */
+    public boolean isRequired() {
+        return getMetadata().isRequired();
+    }
+
     /*
     /**********************************************************
     /* Capabilities
@@ -157,20 +183,42 @@ public abstract class BeanPropertyDefinition
      * value of the property.
      * Null if no such member exists.
      */
-    public abstract AnnotatedMember getAccessor();
+    public AnnotatedMember getAccessor()
+    {
+        AnnotatedMember m = getGetter();
+        if (m == null) {
+            m = getField();
+        }
+        return m;
+    }
 
     /**
      * Method used to find mutator (constructor parameter, setter, field) to use for
      * changing value of the property.
      * Null if no such member exists.
      */
-    public abstract AnnotatedMember getMutator();
+    public AnnotatedMember getMutator() {
+        AnnotatedMember acc = getConstructorParameter();
+        if (acc == null) {
+            acc = getSetter();
+            if (acc == null) {
+                acc = getField();
+            }
+        }
+        return acc;
+    }
 
     /**
      * @since 2.3
      */
-    public abstract AnnotatedMember getNonConstructorMutator();
-    
+    public AnnotatedMember getNonConstructorMutator() {
+        AnnotatedMember m = getSetter();
+        if (m == null) {
+            m = getField();
+        }
+        return m;
+    }
+
     /**
      * Method used to find the property member (getter, setter, field) that has
      * the highest precedence in current context (getter method when serializing,
@@ -185,12 +233,12 @@ public abstract class BeanPropertyDefinition
     /*
     /**********************************************************
     /* More refined access to configuration features
-    /* (usually based on annotations)
+    /* (usually based on annotations and/or config overrides)
     /* Since most trivial implementations do not support
     /* these methods, they are implemented as no-ops.
     /**********************************************************
      */
-    
+
     /**
      * Method used to find View-inclusion definitions for the property.
      */
@@ -201,6 +249,14 @@ public abstract class BeanPropertyDefinition
      * reference.
      */
     public AnnotationIntrospector.ReferenceProperty findReferenceType() { return null; }
+
+    /**
+     * @since 2.9
+     */
+    public String findReferenceName() {
+        AnnotationIntrospector.ReferenceProperty ref = findReferenceType();
+        return (ref == null) ? null : ref.getName();
+    }
 
     /**
      * Method used to check whether this logical property has a marker
@@ -215,25 +271,14 @@ public abstract class BeanPropertyDefinition
      * (or, when multiple references exist, all but first AS Object Identifier).
      */
     public ObjectIdInfo findObjectIdInfo() { return null; }
-    
-    /**
-     * Method used to check if this property is expected to have a value;
-     * and if none found, should either be considered invalid (and most likely
-     * fail deserialization), or handled by other means (by providing default
-     * value)
-     */
-    public boolean isRequired() {
-        PropertyMetadata md = getMetadata();
-        return (md != null)  && md.isRequired();
-    }
 
     /**
      * Method used to check if this property has specific inclusion override
      * associated with it or not.
+     * It should NOT check for any default settings (global, per-type, or
+     * containing POJO settings)
      * 
      * @since 2.5
      */
-    public JsonInclude.Value findInclusion() {
-        return EMPTY_INCLUDE;
-    }
+    public abstract JsonInclude.Value findInclusion();
 }

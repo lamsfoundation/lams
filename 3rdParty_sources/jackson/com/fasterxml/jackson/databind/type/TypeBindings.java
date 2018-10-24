@@ -4,6 +4,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Helper class used for resolving type parameters for given class
@@ -109,7 +110,7 @@ public class TypeBindings
         }
         // Check here to give better error message
         if (names.length != types.length) {
-            throw new IllegalArgumentException("Can not create TypeBindings for class "+erasedType.getName()
+            throw new IllegalArgumentException("Cannot create TypeBindings for class "+erasedType.getName()
                    +" with "+types.length+" type parameter"
                    +((types.length == 1) ? "" : "s")+": class expects "+names.length);
         }
@@ -122,7 +123,7 @@ public class TypeBindings
         TypeVariable<?>[] vars = TypeParamStash.paramsFor1(erasedType);
         int varLen = (vars == null) ? 0 : vars.length;
         if (varLen != 1) {
-            throw new IllegalArgumentException("Can not create TypeBindings for class "+erasedType.getName()
+            throw new IllegalArgumentException("Cannot create TypeBindings for class "+erasedType.getName()
                     +" with 1 type parameter: class expects "+varLen);
         }
         return new TypeBindings(new String[] { vars[0].getName() },
@@ -135,7 +136,7 @@ public class TypeBindings
         TypeVariable<?>[] vars = TypeParamStash.paramsFor2(erasedType);
         int varLen = (vars == null) ? 0 : vars.length;
         if (varLen != 2) {
-            throw new IllegalArgumentException("Can not create TypeBindings for class "+erasedType.getName()
+            throw new IllegalArgumentException("Cannot create TypeBindings for class "+erasedType.getName()
                     +" with 2 type parameters: class expects "+varLen);
         }
         return new TypeBindings(new String[] { vars[0].getName(), vars[1].getName() },
@@ -155,7 +156,7 @@ public class TypeBindings
             return EMPTY;
         }
         if (varLen != 1) {
-            throw new IllegalArgumentException("Can not create TypeBindings for class "+erasedType.getName()
+            throw new IllegalArgumentException("Cannot create TypeBindings for class "+erasedType.getName()
                     +" with 1 type parameter: class expects "+varLen);
         }
         return new TypeBindings(new String[] { vars[0].getName() },
@@ -183,7 +184,7 @@ public class TypeBindings
         }
         // Check here to give better error message
         if (names.length != types.length) {
-            throw new IllegalArgumentException("Can not create TypeBindings for class "+erasedType.getName()
+            throw new IllegalArgumentException("Cannot create TypeBindings for class "+erasedType.getName()
                    +" with "+types.length+" type parameter"
                    +((types.length == 1) ? "" : "s")+": class expects "+names.length);
         }
@@ -209,7 +210,7 @@ public class TypeBindings
     /* Accessors
     /**********************************************************************
      */
-    
+
     /**
      * Find type bound to specified name, if there is one; returns bound type if so, null if not.
      */
@@ -293,6 +294,18 @@ name, i, t.getRawClass()));
         return false;
     }
 
+    /**
+     * Factory method that will create an object that can be used as a key for
+     * caching purposes by {@link TypeFactory}
+     *
+     * @since 2.8
+     */
+    public Object asKey(Class<?> rawBase) {
+        // safe to pass _types array without copy since it is not exposed via
+        // any access, nor modified by this class
+        return new AsKey(rawBase, _types, _hashCode);
+    }
+
     /*
     /**********************************************************************
     /* Standard methods
@@ -302,7 +315,7 @@ name, i, t.getRawClass()));
     @Override public String toString()
     {
         if (_types.length == 0) {
-            return "";
+            return "<>";
         }
         StringBuilder sb = new StringBuilder();
         sb.append('<');
@@ -323,7 +336,9 @@ name, i, t.getRawClass()));
     @Override public boolean equals(Object o)
     {
         if (o == this) return true;
-        if (o == null || o.getClass() != getClass()) return false;
+        if (!ClassUtil.hasClass(o, getClass())) {
+            return false;
+        }
         TypeBindings other = (TypeBindings) o;
         int len = _types.length;
         if (len != other.size()) {
@@ -409,5 +424,53 @@ name, i, t.getRawClass()));
             }
             return erasedType.getTypeParameters();
         }    
-    }    
+    }
+
+    /**
+     * Helper type used to allow caching of generic types
+     *
+     * @since 2.8
+     */
+    final static class AsKey {
+        private final Class<?> _raw;
+        private final JavaType[] _params;
+        private final int _hash;
+
+        public AsKey(Class<?> raw, JavaType[] params, int hash) {
+            _raw = raw ;
+            _params = params;
+            _hash = hash;
+        }
+
+        @Override
+        public int hashCode() { return _hash; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (o == null) return false;
+            if (o.getClass() != getClass()) return false;
+            AsKey other = (AsKey) o;
+
+            if ((_hash == other._hash) && (_raw == other._raw)) {
+                final JavaType[] otherParams = other._params;
+                final int len = _params.length;
+
+                if (len == otherParams.length) {
+                    for (int i = 0; i < len; ++i) {
+                        if (!_params[i].equals(otherParams[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return _raw.getName()+"<>";
+        }
+    }
 }

@@ -2,16 +2,16 @@ package com.fasterxml.jackson.databind.exc;
 
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
- * Specialized sub-class of {@link JsonMappingException}
+ * Specialized sub-class of {@link MismatchedInputException}
  * that is used when the underlying problem appears to be that
  * of bad formatting of a value to deserialize.
  * 
  * @since 2.1
  */
-public class InvalidFormatException extends JsonMappingException
+public class InvalidFormatException
+    extends MismatchedInputException // since 2.9
 {
     private static final long serialVersionUID = 1L; // silly Eclipse, warnings
 
@@ -21,12 +21,6 @@ public class InvalidFormatException extends JsonMappingException
      */
     protected final Object _value;
 
-    /**
-     * Intended target type (type-erased class) that value could not
-     * be deserialized into, if known.
-     */
-    protected final Class<?> _targetType;
-    
     /*
     /**********************************************************
     /* Life-cycle
@@ -63,9 +57,8 @@ public class InvalidFormatException extends JsonMappingException
     public InvalidFormatException(JsonParser p,
             String msg, Object value, Class<?> targetType)
     {
-        super(p, msg);
+        super(p, msg, targetType);
         _value = value;
-        _targetType = targetType;
     }
 
     public static InvalidFormatException from(JsonParser p, String msg,
@@ -88,15 +81,5 @@ public class InvalidFormatException extends JsonMappingException
      */
     public Object getValue() {
         return _value;
-    }
-
-    /**
-     * Accessor for checking target type of value ({@link #getValue} that failed
-     * to deserialize.
-     * Note that type may not be available, depending on who throws the exception
-     * and when.
-     */
-    public Class<?> getTargetType() {
-        return _targetType;
     }
 }

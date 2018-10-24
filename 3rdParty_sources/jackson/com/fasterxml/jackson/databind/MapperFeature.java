@@ -18,10 +18,10 @@ public enum MapperFeature implements ConfigFeature
 {
     /*
     /******************************************************
-    /* Introspection features
+    /* General introspection features
     /******************************************************
      */
-    
+
     /**
      * Feature that determines whether annotation introspection
      * is used for configuration; if enabled, configured
@@ -31,6 +31,43 @@ public enum MapperFeature implements ConfigFeature
      * Feature is enabled by default.
      */
     USE_ANNOTATIONS(true),
+
+    /**
+     * Feature that determines whether otherwise regular "getter"
+     * methods (but only ones that handle Collections and Maps,
+     * not getters of other type)
+     * can be used for purpose of getting a reference to a Collection
+     * and Map to modify the property, without requiring a setter
+     * method.
+     * This is similar to how JAXB framework sets Collections and
+     * Maps: no setter is involved, just setter.
+     *<p>
+     * Note that such getters-as-setters methods have lower
+     * precedence than setters, so they are only used if no
+     * setter is found for the Map/Collection property.
+     *<p>
+     * Feature is enabled by default.
+     */
+    USE_GETTERS_AS_SETTERS(true),
+
+    /**
+     * Feature that determines how <code>transient</code> modifier for fields
+     * is handled: if disabled, it is only taken to mean exclusion of the field
+     * as accessor; if true, it is taken to imply removal of the whole property.
+     *<p>
+     * Feature is disabled by default, meaning that existence of `transient`
+     * for a field does not necessarily lead to ignoral of getters or setters
+     * but just ignoring the use of field for access.
+     *
+     * @since 2.6
+     */
+    PROPAGATE_TRANSIENT_MARKER(false),
+
+    /*
+    /******************************************************
+    /* Introspection-based property auto-detection
+    /******************************************************
+     */
 
     /**
      * Feature that determines whether "creator" methods are
@@ -61,7 +98,7 @@ public enum MapperFeature implements ConfigFeature
      *<p>
      * Feature is enabled by default.
      */
-     AUTO_DETECT_FIELDS(true),
+    AUTO_DETECT_FIELDS(true),
     
     /**
      * Feature that determines whether regular "getter" methods are
@@ -98,22 +135,22 @@ public enum MapperFeature implements ConfigFeature
      */
     AUTO_DETECT_IS_GETTERS(true),
 
-     /**
-      * Feature that determines whether "setter" methods are
-      * automatically detected based on standard Bean naming convention
-      * or not. If yes, then all public one-argument methods that
-      * start with prefix "set"
-      * are considered setters. If disabled, only methods explicitly
-      * annotated are considered setters.
-      *<p>
-      * Note that this feature has lower precedence than per-class
-      * annotations, and is only used if there isn't more granular
-      * configuration available.
-      *<P>
-      * Feature is enabled by default.
-      */
-     AUTO_DETECT_SETTERS(true),
-     
+    /**
+     * Feature that determines whether "setter" methods are
+     * automatically detected based on standard Bean naming convention
+     * or not. If yes, then all public one-argument methods that
+     * start with prefix "set"
+     * are considered setters. If disabled, only methods explicitly
+     * annotated are considered setters.
+     *<p>
+     * Note that this feature has lower precedence than per-class
+     * annotations, and is only used if there isn't more granular
+     * configuration available.
+     *<P>
+     * Feature is enabled by default.
+     */
+    AUTO_DETECT_SETTERS(true),
+
     /**
      * Feature that determines whether getters (getter methods)
      * can be auto-detected if there is no matching mutator (setter,
@@ -126,22 +163,61 @@ public enum MapperFeature implements ConfigFeature
     REQUIRE_SETTERS_FOR_GETTERS(false),
 
     /**
-     * Feature that determines whether otherwise regular "getter"
-     * methods (but only ones that handle Collections and Maps,
-     * not getters of other type)
-     * can be used for purpose of getting a reference to a Collection
-     * and Map to modify the property, without requiring a setter
-     * method.
-     * This is similar to how JAXB framework sets Collections and
-     * Maps: no setter is involved, just setter.
+     * Feature that determines whether member fields declared as 'final' may
+     * be auto-detected to be used mutators (used to change value of the logical
+     * property) or not. If enabled, 'final' access modifier has no effect, and
+     * such fields may be detected according to usual visibility and inference
+     * rules; if disabled, such fields are NOT used as mutators except if
+     * explicitly annotated for such use.
      *<p>
-     * Note that such getters-as-setters methods have lower
-     * precedence than setters, so they are only used if no
-     * setter is found for the Map/Collection property.
+     * Feature is enabled by default, for backwards compatibility reasons.
+     *
+     * @since 2.2
+     */
+    ALLOW_FINAL_FIELDS_AS_MUTATORS(true),
+
+    /**
+     * Feature that determines whether member mutators (fields and
+     * setters) may be "pulled in" even if they are not visible,
+     * as long as there is a visible accessor (getter or field) with same name.
+     * For example: field "value" may be inferred as mutator,
+     * if there is visible or explicitly marked getter "getValue()".
+     * If enabled, inferring is enabled; otherwise (disabled) only visible and
+     * explicitly annotated accessors are ever used.
+     *<p>
+     * Note that 'getters' are never inferred and need to be either visible (including
+     * bean-style naming) or explicitly annotated.
      *<p>
      * Feature is enabled by default.
+     *
+     * @since 2.2
      */
-    USE_GETTERS_AS_SETTERS(true),
+    INFER_PROPERTY_MUTATORS(true),
+
+    /**
+     * Feature that determines handling of <code>java.beans.ConstructorProperties<code>
+     * annotation: when enabled, it is considered as alias of
+     * {@link com.fasterxml.jackson.annotation.JsonCreator}, to mean that constructor
+     * should be considered a property-based Creator; when disabled, only constructor
+     * parameter name information is used, but constructor is NOT considered an explicit
+     * Creator (although may be discovered as one using other annotations or heuristics).
+     *<p>
+     * Feature is mostly used to help interoperability with frameworks like Lombok
+     * that may automatically generate <code>ConstructorProperties</code> annotation
+     * but without necessarily meaning that constructor should be used as Creator
+     * for deserialization.
+     *<p>
+     * Feature is enabled by default.
+     *
+     * @since 2.9
+     */
+    INFER_CREATOR_FROM_CONSTRUCTOR_PROPERTIES(true),
+
+    /*
+    /******************************************************
+    /* Access modifier handling
+    /******************************************************
+     */
 
     /**
      * Feature that determines whether method and field access
@@ -186,49 +262,6 @@ public enum MapperFeature implements ConfigFeature
      * @since 2.7
      */
     OVERRIDE_PUBLIC_ACCESS_MODIFIERS(true),
-
-    /**
-     * Feature that determines whether member mutators (fields and
-     * setters) may be "pulled in" even if they are not visible,
-     * as long as there is a visible accessor (getter or field) with same name.
-     * For example: field "value" may be inferred as mutator,
-     * if there is visible or explicitly marked getter "getValue()".
-     * If enabled, inferring is enabled; otherwise (disabled) only visible and
-     * explicitly annotated accessors are ever used.
-     *<p>
-     * Note that 'getters' are never inferred and need to be either visible (including
-     * bean-style naming) or explicitly annotated.
-     *<p>
-     * Feature is enabled by default.
-     * 
-     * @since 2.2
-     */
-    INFER_PROPERTY_MUTATORS(true),
-
-    /**
-     * Feature that determines whether member fields declared as 'final' may
-     * be auto-detected to be used mutators (used to change value of the logical
-     * property) or not. If enabled, 'final' access modifier has no effect, and
-     * such fields may be detected according to usual visibility and inference
-     * rules; if disabled, such fields are NOT used as mutators except if
-     * explicitly annotated for such use.
-     *<p>
-     * Feature is enabled by default, for backwards compatibility reasons.
-     * 
-     * @since 2.2
-     */
-    ALLOW_FINAL_FIELDS_AS_MUTATORS(true),
-
-    /**
-     * Feature that determines for <code>transient</code> modifier for fields
-     * is handled: if disabled, it is only taken to mean exclusion of
-     *<p>
-     * Feature is disabled by default, meaning that existence of `transient`
-     * for a field does not necessarily lead to ignoral of getters or setters.
-     *
-     * @since 2.6
-     */
-    PROPAGATE_TRANSIENT_MARKER(false),
 
     /*
     /******************************************************
@@ -305,6 +338,7 @@ public enum MapperFeature implements ConfigFeature
     /* Name-related features
     /******************************************************
      */
+
     /**
      * Feature that will allow for more forgiving deserialization of incoming JSON.
      * If enabled, the bean properties will be matched using their lower-case equivalents,
@@ -320,7 +354,20 @@ public enum MapperFeature implements ConfigFeature
      * @since 2.5
      */
     ACCEPT_CASE_INSENSITIVE_PROPERTIES(false),
-    
+
+
+    /**
+     * Feature that determines if Enum deserialization should be case sensitive or not.
+     * If enabled, Enum deserialization will ignore case, that is, case of incoming String
+     * value and enum id (dependant on other settings, either `name()`, `toString()`, or
+     * explicit override) do not need to match.
+     * <p>
+     * Feature is disabled by default.
+     *
+     * @since 2.9
+     */
+    ACCEPT_CASE_INSENSITIVE_ENUMS(false),
+
     /**
      * Feature that can be enabled to make property names be
      * overridden by wrapper name (usually detected with annotations
@@ -364,6 +411,34 @@ public enum MapperFeature implements ConfigFeature
 
     /*
     /******************************************************
+    /* Coercion features
+    /******************************************************
+     */
+
+    /**
+     * Feature that determines whether coercions from secondary representations are allowed
+     * for simple non-textual scalar types: numbers and booleans. This includes `primitive`
+     * types and their wrappers, but excludes `java.lang.String` and date/time types.
+     *<p>
+     * When feature is disabled, only strictly compatible input may be bound: numbers for
+     * numbers, boolean values for booleans. When feature is enabled, conversions from
+     * JSON String are allowed, as long as textual value matches (for example, String
+     * "true" is allowed as equivalent of JSON boolean token `true`; or String "1.0"
+     * for `double`).
+     *<p>
+     * Note that it is possible that other configurability options can override this
+     * in closer scope (like on per-type or per-property basis); this is just the global
+     * default.
+     *<p>
+     * Feature is enabled by default (for backwards compatibility since this was the
+     * default behavior)
+     *
+     * @since 2.9
+     */
+    ALLOW_COERCION_OF_SCALARS(true),
+
+    /*
+    /******************************************************
     /* Other features
     /******************************************************
      */
@@ -385,8 +460,22 @@ public enum MapperFeature implements ConfigFeature
      *
      * @since 2.5
      */
-    IGNORE_DUPLICATE_MODULE_REGISTRATIONS(true)
-    
+    IGNORE_DUPLICATE_MODULE_REGISTRATIONS(true),
+
+    /**
+     * Setting that determines what happens if an attempt is made to explicitly
+     * "merge" value of a property, where value does not support merging; either
+     * merging is skipped and new value is created (<code>true</code>) or
+     * an exception is thrown (false).
+     *<p>
+     * Feature is disabled by default since non-mergeable property types are ignored
+     * even if defaults call for merging, and usually explicit per-type or per-property
+     * settings for such types should result in an exception.
+     *
+     * @since 2.9
+     */
+    IGNORE_MERGE_FOR_UNMERGEABLE(true)
+
     ;
 
     private final boolean _defaultState;

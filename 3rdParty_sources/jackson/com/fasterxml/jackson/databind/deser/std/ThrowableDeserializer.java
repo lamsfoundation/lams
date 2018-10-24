@@ -38,7 +38,7 @@ public class ThrowableDeserializer
     protected ThrowableDeserializer(BeanDeserializer src, NameTransformer unwrapper) {
         super(src, unwrapper);
     }
-    
+
     @Override
     public JsonDeserializer<Object> unwrappingDeserializer(NameTransformer unwrapper) {
         if (getClass() != ThrowableDeserializer.class) {
@@ -51,7 +51,6 @@ public class ThrowableDeserializer
         return new ThrowableDeserializer(this, unwrapper);
     }
 
-    
     /*
     /************************************************************
     /* Overridden methods
@@ -70,15 +69,15 @@ public class ThrowableDeserializer
                     _delegateDeserializer.deserialize(p, ctxt));
         }
         if (_beanType.isAbstract()) { // for good measure, check this too
-            throw JsonMappingException.from(p, "Can not instantiate abstract type "+_beanType
-                    +" (need to add/enable type information?)");
+            return ctxt.handleMissingInstantiator(handledType(), getValueInstantiator(), p,
+                    "abstract type (need to add/enable type information?)");
         }
         boolean hasStringCreator = _valueInstantiator.canCreateFromString();
         boolean hasDefaultCtor = _valueInstantiator.canCreateUsingDefault();
         // and finally, verify we do have single-String arg constructor (if no @JsonCreator)
         if (!hasStringCreator && !hasDefaultCtor) {
-            throw JsonMappingException.from(p,"Can not deserialize Throwable of type "+_beanType
-                    +" without having a default contructor, a single-String-arg constructor; or explicit @JsonCreator");
+            return ctxt.handleMissingInstantiator(handledType(), getValueInstantiator(), p,
+                    "Throwable needs a default contructor, a single-String-arg constructor; or explicit @JsonCreator");
         }
         
         Object throwable = null;
@@ -106,9 +105,10 @@ public class ThrowableDeserializer
             }
 
             // Maybe it's "message"?
-            if (PROP_NAME_MESSAGE.equals(propName)) {
+            final boolean isMessage = PROP_NAME_MESSAGE.equals(propName);
+            if (isMessage) {
                 if (hasStringCreator) {
-                    throwable = _valueInstantiator.createFromString(ctxt, p.getText());
+                    throwable = _valueInstantiator.createFromString(ctxt, p.getValueAsString());
                     // any pending values?
                     if (pending != null) {
                         for (int i = 0, len = pendingIx; i < len; i += 2) {
@@ -120,10 +120,8 @@ public class ThrowableDeserializer
                     continue;
                 }
             }
-            /* As per [JACKSON-313], things marked as ignorable should not be
-             * passed to any setter
-             */
-            if (_ignorableProps != null && _ignorableProps.contains(propName)) {
+            // Things marked as ignorable should not be passed to any setter
+            if ((_ignorableProps != null) && _ignorableProps.contains(propName)) {
                 p.skipChildren();
                 continue;
             }
@@ -131,6 +129,9 @@ public class ThrowableDeserializer
                 _anySetter.deserializeAndSet(p, ctxt, throwable, propName);
                 continue;
             }
+            // 23-Jan-2018, tatu: One concern would be `message`, but without any-setter or single-String-ctor
+            //   (or explicit constructor). We could just ignore it but for now, let it fail
+
             // Unknown: let's call handler method
             handleUnknownProperty(p, ctxt, throwable, propName);
         }

@@ -21,6 +21,7 @@ package io.undertow.conduits;
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowOptions;
 import io.undertow.server.OpenListener;
+import io.undertow.util.WorkerUtils;
 
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
@@ -63,7 +64,7 @@ public final class ReadTimeoutStreamSourceConduit extends AbstractStreamSourceCo
             long current = System.currentTimeMillis();
             if (current  < expireTime) {
                 //timeout has been bumped, re-schedule
-                handle = connection.getIoThread().executeAfter(timeoutCommand, (expireTime - current) + FUZZ_FACTOR, TimeUnit.MILLISECONDS);
+                handle = WorkerUtils.executeAfter(connection.getIoThread(),timeoutCommand, (expireTime - current) + FUZZ_FACTOR, TimeUnit.MILLISECONDS);
                 return;
             }
             UndertowLogger.REQUEST_LOGGER.tracef("Timing out channel %s due to inactivity", connection.getSourceChannel());
@@ -180,7 +181,9 @@ public final class ReadTimeoutStreamSourceConduit extends AbstractStreamSourceCo
         Integer timeout = 0;
         try {
             timeout = connection.getSourceChannel().getOption(Options.READ_TIMEOUT);
-        } catch (IOException ignore) {}
+        } catch (IOException ignore) {
+            // should never happen
+        }
         Integer idleTimeout = openListener.getUndertowOptions().get(UndertowOptions.IDLE_TIMEOUT);
         if ((timeout == null || timeout <= 0) && idleTimeout != null) {
             timeout = idleTimeout;

@@ -19,7 +19,7 @@ package org.apache.commons.io.input;
 /**
  * {@link TailerListener} Adapter.
  *
- *
+ * @version $Id: TailerListenerAdapter.java 1714076 2015-11-12 16:06:41Z krosenvold $
  * @since 2.0
  */
 public class TailerListenerAdapter implements TailerListener {
@@ -29,7 +29,7 @@ public class TailerListenerAdapter implements TailerListener {
      * giving the listener a method of stopping the tailer.
      * @param tailer the tailer.
      */
-    public void init(Tailer tailer) {
+    public void init(final Tailer tailer) {
     }
 
     /**
@@ -51,14 +51,26 @@ public class TailerListenerAdapter implements TailerListener {
      * Handles a line from a Tailer.
      * @param line the line.
      */
-    public void handle(String line) {
+    public void handle(final String line) {
     }
 
     /**
      * Handles an Exception .
      * @param ex the exception.
      */
-    public void handle(Exception ex) {
+    public void handle(final Exception ex) {
     }
 
+    /**
+     * Called each time the Tailer reaches the end of the file.
+     *
+     * <b>Note:</b> this is called from the tailer thread.
+     *
+     * Note: a future version of commons-io will pull this method up to the TailerListener interface,
+     * for now clients must subclass this class to use this feature.
+     *
+     * @since 2.5
+     */
+    public void endOfFileReached() {
+    }
 }

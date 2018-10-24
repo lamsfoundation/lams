@@ -4,19 +4,13 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.PropertyMetadata;
-import com.fasterxml.jackson.databind.PropertyName;
-import com.fasterxml.jackson.databind.SerializerProvider;
+
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  * Helper class needed to support flexible filtering of Map properties
@@ -28,11 +22,13 @@ public class MapProperty extends PropertyWriter
 {
     private static final long serialVersionUID = 1L;
 
+    private final static BeanProperty BOGUS_PROP = new BeanProperty.Bogus();
+    
     protected final TypeSerializer _typeSerializer;
 
     protected final BeanProperty _property;
 
-    protected Object _key;
+    protected Object _key, _value;
 
     protected JsonSerializer<Object> _keySerializer, _valueSerializer;
 
@@ -40,27 +36,51 @@ public class MapProperty extends PropertyWriter
     {
         super((prop == null) ? PropertyMetadata.STD_REQUIRED_OR_OPTIONAL : prop.getMetadata());
         _typeSerializer = typeSer;
-        _property = prop;
+        _property = (prop == null) ? BOGUS_PROP : prop;
     }
 
     /**
      * Initialization method that needs to be called before passing
      * property to filter.
+     *
+     * @since 2.9
      */
-    public void reset(Object key,
+    public void reset(Object key, Object value,
             JsonSerializer<Object> keySer, JsonSerializer<Object> valueSer)
     {
         _key = key;
+        _value = value;
         _keySerializer = keySer;
         _valueSerializer = valueSer;
     }
-    
+
+    @Deprecated // since 2.9
+    public void reset(Object key,
+            JsonSerializer<Object> keySer, JsonSerializer<Object> valueSer)
+    {
+        reset(key, _value, keySer, valueSer);
+    }
+
     @Override
     public String getName() {
         if (_key instanceof String) {
             return (String) _key;
         }
         return String.valueOf(_key);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public Object getValue() {
+        return _value;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public void setValue(Object v) {
+        _value = v;
     }
 
     @Override
@@ -70,28 +90,28 @@ public class MapProperty extends PropertyWriter
 
     @Override
     public <A extends Annotation> A getAnnotation(Class<A> acls) {
-        return (_property == null) ? null : _property.getAnnotation(acls);
+        return _property.getAnnotation(acls);
     }
 
     @Override
     public <A extends Annotation> A getContextAnnotation(Class<A> acls) {
-        return (_property == null) ? null : _property.getContextAnnotation(acls);
+        return _property.getContextAnnotation(acls);
     }
     
     @Override
-    public void serializeAsField(Object value, JsonGenerator gen,
+    public void serializeAsField(Object map, JsonGenerator gen,
             SerializerProvider provider) throws IOException
     {
         _keySerializer.serialize(_key, gen, provider);
         if (_typeSerializer == null) {
-            _valueSerializer.serialize(value, gen, provider);
+            _valueSerializer.serialize(_value, gen, provider);
         } else {
-            _valueSerializer.serializeWithType(value, gen, provider, _typeSerializer);
+            _valueSerializer.serializeWithType(_value, gen, provider, _typeSerializer);
         }
     }
 
     @Override
-    public void serializeAsOmittedField(Object value, JsonGenerator gen,
+    public void serializeAsOmittedField(Object map, JsonGenerator gen,
             SerializerProvider provider) throws Exception
     {
         if (!gen.canOmitFields()) {
@@ -100,13 +120,13 @@ public class MapProperty extends PropertyWriter
     }
 
     @Override
-    public void serializeAsElement(Object value, JsonGenerator gen,
+    public void serializeAsElement(Object map, JsonGenerator gen,
             SerializerProvider provider) throws Exception
     {
         if (_typeSerializer == null) {
-            _valueSerializer.serialize(value, gen, provider);
+            _valueSerializer.serialize(_value, gen, provider);
         } else {
-            _valueSerializer.serializeWithType(value, gen, provider, _typeSerializer);
+            _valueSerializer.serializeWithType(_value, gen, provider, _typeSerializer);
         }
     }
     
@@ -128,9 +148,7 @@ public class MapProperty extends PropertyWriter
             SerializerProvider provider)
         throws JsonMappingException
     {
-        if (_property != null) {
-            _property.depositSchemaProperty(objectVisitor, provider);
-        }
+        _property.depositSchemaProperty(objectVisitor, provider);
     }
 
     @Override
@@ -138,20 +156,20 @@ public class MapProperty extends PropertyWriter
     public void depositSchemaProperty(ObjectNode propertiesNode,
             SerializerProvider provider) throws JsonMappingException {
         // nothing to do here
-   }
+    }
 
     @Override
     public JavaType getType() {
-        return (_property == null) ? TypeFactory.unknownType() : _property.getType();
+        return _property.getType();
     }
 
     @Override
     public PropertyName getWrapperName() {
-        return (_property == null) ? null : _property.getWrapperName();
+        return _property.getWrapperName();
     }
 
     @Override
     public AnnotatedMember getMember() {
-        return (_property == null) ? null : _property.getMember();
+        return _property.getMember();
     }
 }

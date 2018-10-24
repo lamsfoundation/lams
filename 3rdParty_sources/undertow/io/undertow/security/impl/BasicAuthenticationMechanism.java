@@ -56,6 +56,8 @@ import static io.undertow.util.StatusCodes.UNAUTHORIZED;
  */
 public class BasicAuthenticationMechanism implements AuthenticationMechanism {
 
+    public static final AuthenticationMechanismFactory FACTORY = new Factory();
+
     public static final String SILENT = "silent";
     public static final String CHARSET = "charset";
     /**
@@ -76,8 +78,6 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
     private static final String LOWERCASE_BASIC_PREFIX = BASIC_PREFIX.toLowerCase(Locale.ENGLISH);
     private static final int PREFIX_LENGTH = BASIC_PREFIX.length();
     private static final String COLON = ":";
-
-    private static final Map<Pattern, Charset> EMPTY_CHARSETS_MAP = Collections.emptyMap();
 
     /**
      * If silent is true then this mechanism will only take effect if there is an Authorization header.
@@ -104,7 +104,7 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
         this(realmName, mechanismName, silent, null);
     }
     public BasicAuthenticationMechanism(final String realmName, final String mechanismName, final boolean silent, final IdentityManager identityManager) {
-        this(realmName, mechanismName, silent, identityManager, StandardCharsets.UTF_8, EMPTY_CHARSETS_MAP);
+        this(realmName, mechanismName, silent, identityManager, StandardCharsets.UTF_8, Collections.emptyMap());
     }
 
     public BasicAuthenticationMechanism(final String realmName, final String mechanismName, final boolean silent, final IdentityManager identityManager, Charset charset, Map<Pattern, Charset> userAgentCharsets) {
@@ -196,7 +196,7 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
             //otherwise we assume another method will send the challenge
             String authHeader = exchange.getRequestHeaders().getFirst(AUTHORIZATION);
             if(authHeader == null) {
-                return new ChallengeResult(false);
+                return ChallengeResult.NOT_SENT;
             }
         }
         exchange.getResponseHeaders().add(WWW_AUTHENTICATE, challenge);
@@ -212,14 +212,13 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
 
     public static class Factory implements AuthenticationMechanismFactory {
 
-        private final IdentityManager identityManager;
+        @Deprecated
+        public Factory(IdentityManager identityManager) {}
 
-        public Factory(IdentityManager identityManager) {
-            this.identityManager = identityManager;
-        }
+        public Factory() {}
 
         @Override
-        public AuthenticationMechanism create(String mechanismName, FormParserFactory formParserFactory, Map<String, String> properties) {
+        public AuthenticationMechanism create(String mechanismName,IdentityManager identityManager, FormParserFactory formParserFactory, Map<String, String> properties) {
             String realm = properties.get(REALM);
             String silent = properties.get(SILENT);
             String charsetString = properties.get(CHARSET);

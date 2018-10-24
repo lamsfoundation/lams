@@ -36,7 +36,7 @@ public final class AnnotatedMethod
     {
         super(ctxt, classAnn, paramAnnotations);
         if (method == null) {
-            throw new IllegalArgumentException("Can not construct AnnotatedMethod with null Method");
+            throw new IllegalArgumentException("Cannot construct AnnotatedMethod with null Method");
         }
         _method = method;
     }
@@ -51,25 +51,12 @@ public final class AnnotatedMethod
         _method = null;
         _serialization = ser;
     }
-    
-    /**
-     * Method that constructs a new instance with settings (annotations, parameter annotations)
-     * of this instance, but with different physical {@link Method}.
-     */
-    public AnnotatedMethod withMethod(Method m) {
-        return new AnnotatedMethod(_typeContext, m, _annotations, _paramAnnotations);
-    }
-    
+
     @Override
     public AnnotatedMethod withAnnotations(AnnotationMap ann) {
         return new AnnotatedMethod(_typeContext, _method, ann, _paramAnnotations);
     }
 
-    /*
-    /*****************************************************
-    /* Annotated impl
-    /*****************************************************
-     */
 
     @Override
     public Method getAnnotated() { return _method; }
@@ -82,8 +69,8 @@ public final class AnnotatedMethod
 
     /**
      * For methods, this returns declared return type, which is only
-     * useful with getters (setters do not return anything; hence "void"
-     * type is returned here)
+     * useful with getters (setters do not return anything; hence `Void`
+     * would be returned here)
      */
     @Override
     public JavaType getType() {
@@ -100,6 +87,18 @@ public final class AnnotatedMethod
         return _method.getReturnType();
     }
 
+    @Deprecated
+    @Override
+    public Type getGenericType() {
+        return _method.getGenericReturnType();
+    }
+
+    /*
+    /*****************************************************
+    /* AnnotatedWithParams
+    /*****************************************************
+     */
+    
     @Override
     public final Object call() throws Exception {
         return _method.invoke(null);
@@ -114,7 +113,15 @@ public final class AnnotatedMethod
     public final Object call1(Object arg) throws Exception {
         return _method.invoke(null, arg);
     }
-    
+
+    public final Object callOn(Object pojo) throws Exception {
+        return _method.invoke(pojo, (Object[]) null);
+    }
+
+    public final Object callOnWith(Object pojo, Object... args) throws Exception {
+        return _method.invoke(pojo, args);
+    }
+
     /*
     /********************************************************
     /* AnnotatedMember impl
@@ -122,67 +129,10 @@ public final class AnnotatedMethod
      */
 
     @Override
-    public Class<?> getDeclaringClass() { return _method.getDeclaringClass(); }
-
-    @Override
-    public Method getMember() { return _method; }
-
-    @Override
-    public void setValue(Object pojo, Object value) throws IllegalArgumentException
-    {
-        try {
-            _method.invoke(pojo, value);
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException("Failed to setValue() with method "
-                    +getFullName()+": "+e.getMessage(), e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed to setValue() with method "
-                    +getFullName()+": "+e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public Object getValue(Object pojo) throws IllegalArgumentException
-    {
-        try {
-            return _method.invoke(pojo);
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException("Failed to getValue() with method "
-                    +getFullName()+": "+e.getMessage(), e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed to getValue() with method "
-                    +getFullName()+": "+e.getMessage(), e);
-        }
-    }
-    
-    /*
-    /*****************************************************
-    /* Extended API, generic
-    /*****************************************************
-     */
-
-    @Override
     public int getParameterCount() {
         return getRawParameterTypes().length;
     }
-
-    public String getFullName() {
-        return getDeclaringClass().getName() + "#" + getName() + "("
-            +getParameterCount()+" params)";
-    }
     
-    public Class<?>[] getRawParameterTypes()
-    {
-        if (_paramClasses == null) {
-            _paramClasses = _method.getParameterTypes();
-        }
-        return _paramClasses;
-    }
-    
-    public Type[] getGenericParameterTypes() {
-        return _method.getGenericParameterTypes();
-    }
-
     @Override
     public Class<?> getRawParameterType(int index)
     {
@@ -197,6 +147,68 @@ public final class AnnotatedMethod
             return null;
         }
         return _typeContext.resolveType(types[index]);
+    }
+
+    @Override
+    @Deprecated // since 2.7
+    public Type getGenericParameterType(int index) {
+        Type[] types = getGenericParameterTypes();
+        if (index >= types.length) {
+            return null;
+        }
+        return types[index];
+    }
+    
+    @Override
+    public Class<?> getDeclaringClass() { return _method.getDeclaringClass(); }
+
+    @Override
+    public Method getMember() { return _method; }
+
+    @Override
+    public void setValue(Object pojo, Object value) throws IllegalArgumentException
+    {
+        try {
+            _method.invoke(pojo, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalArgumentException("Failed to setValue() with method "
+                    +getFullName()+": "+e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Object getValue(Object pojo) throws IllegalArgumentException
+    {
+        try {
+            return _method.invoke(pojo, (Object[]) null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalArgumentException("Failed to getValue() with method "
+                    +getFullName()+": "+e.getMessage(), e);
+        }
+    }
+
+    /*
+    /*****************************************************
+    /* Extended API, generic
+    /*****************************************************
+     */
+
+    @Override
+    public String getFullName() {
+        return String.format("%s(%d params)", super.getFullName(), getParameterCount());
+    }
+
+    public Class<?>[] getRawParameterTypes()
+    {
+        if (_paramClasses == null) {
+            _paramClasses = _method.getParameterTypes();
+        }
+        return _paramClasses;
+    }
+
+    @Deprecated // since 2.7
+    public Type[] getGenericParameterTypes() {
+        return _method.getGenericParameterTypes();
     }
 
     public Class<?> getRawReturnType() {
@@ -234,10 +246,10 @@ public final class AnnotatedMethod
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (o == null || o.getClass() != getClass()) return false;
-        return ((AnnotatedMethod) o)._method == _method;
+        return ClassUtil.hasClass(o, getClass())
+                && (((AnnotatedMethod) o)._method == _method);
     }
-    
+
     /*
     /**********************************************************
     /* JDK serialization handling

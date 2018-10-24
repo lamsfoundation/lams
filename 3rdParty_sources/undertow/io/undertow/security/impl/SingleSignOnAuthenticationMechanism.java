@@ -88,7 +88,7 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
         if (cookie != null) {
             final String ssoId = cookie.getValue();
             log.tracef("Found SSO cookie %s", ssoId);
-            try (final SingleSignOn sso = this.singleSignOnManager.findSingleSignOn(ssoId)) {
+            try (SingleSignOn sso = this.singleSignOnManager.findSingleSignOn(ssoId)) {
                 if (sso != null) {
                     if(log.isTraceEnabled()) {
                         log.tracef("SSO session with ID: %s found.", ssoId);
@@ -134,10 +134,10 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
                 log.tracef("SSO_SESSION_ATTRIBUTE not found. Creating it with SSO ID %s as value.", sso.getId());
             }
             session.setAttribute(SSO_SESSION_ATTRIBUTE, sso.getId());
-            SessionManager manager = session.getSessionManager();
-            if (seenSessionManagers.add(manager)) {
-                manager.registerSessionListener(listener);
-            }
+        }
+        SessionManager manager = session.getSessionManager();
+        if (seenSessionManagers.add(manager)) {
+            manager.registerSessionListener(listener);
         }
     }
 
@@ -147,7 +147,7 @@ public class SingleSignOnAuthenticationMechanism implements AuthenticationMechan
 
     @Override
     public ChallengeResult sendChallenge(HttpServerExchange exchange, SecurityContext securityContext) {
-        return new ChallengeResult(false);
+        return ChallengeResult.NOT_SENT;
     }
 
     protected Session getSession(final HttpServerExchange exchange) {

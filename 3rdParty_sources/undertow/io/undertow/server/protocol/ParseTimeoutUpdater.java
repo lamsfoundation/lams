@@ -20,9 +20,13 @@ package io.undertow.server.protocol;
 
 import io.undertow.UndertowLogger;
 import io.undertow.server.ServerConnection;
+import io.undertow.util.WorkerUtils;
 import org.xnio.IoUtils;
 import org.xnio.XnioExecutor;
+import org.xnio.channels.ConnectedChannel;
 
+import java.io.Closeable;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,17 +35,19 @@ import java.util.concurrent.TimeUnit;
  * @author Sebastian Laskawiec
  * @see io.undertow.UndertowOptions#REQUEST_PARSE_TIMEOUT
  */
-public final class ParseTimeoutUpdater implements Runnable, ServerConnection.CloseListener {
+public final class ParseTimeoutUpdater implements Runnable, ServerConnection.CloseListener, Closeable {
 
-    private final ServerConnection connection;
+    private final ConnectedChannel connection;
     private final long requestParseTimeout;
     private final long requestIdleTimeout;
     private volatile XnioExecutor.Key handle;
     private volatile long expireTime = -1;
-    private boolean parsing = false;
+    private volatile boolean parsing = false;
 
     //we add 50ms to the timeout to make sure the underlying channel has actually timed out
     private static final int FUZZ_FACTOR = 50;
+
+    private final Runnable closeTask;
 
 
     /**
@@ -50,12 +56,27 @@ public final class ParseTimeoutUpdater implements Runnable, ServerConnection.Clo
      * @param requestParseTimeout Timeout value. Negative value will indicate that this updated is disabled.
      * @param requestIdleTimeout
      */
-    public ParseTimeoutUpdater(ServerConnection channel, long requestParseTimeout, long requestIdleTimeout) {
+    public ParseTimeoutUpdater(ConnectedChannel channel, long requestParseTimeout, long requestIdleTimeout) {
+        this(channel, requestParseTimeout, requestIdleTimeout, new Runnable() {
+            @Override
+            public void run() {
+                IoUtils.safeClose(channel);
+            }
+        });
+    }
+
+    /**
+     * Creates new instance of ParseTimeoutSourceConduit.
+     *  @param channel             Channel which will be closed in case of timeout.
+     * @param requestParseTimeout Timeout value. Negative value will indicate that this updated is disabled.
+     * @param requestIdleTimeout
+     */
+    public ParseTimeoutUpdater(ConnectedChannel channel, long requestParseTimeout, long requestIdleTimeout, Runnable closeTask) {
         this.connection = channel;
         this.requestParseTimeout = requestParseTimeout;
         this.requestIdleTimeout = requestIdleTimeout;
+        this.closeTask = closeTask;
     }
-
     /**
      * Called when the connection goes idle
      */
@@ -82,7 +103,11 @@ public final class ParseTimeoutUpdater implements Runnable, ServerConnection.Clo
             }
         }
         if(handle == null) {
-            handle = connection.getIoThread().executeAfter(this, timeout + FUZZ_FACTOR, TimeUnit.MILLISECONDS);
+            try {
+                handle = WorkerUtils.executeAfter(connection.getIoThread(), this, timeout + FUZZ_FACTOR, TimeUnit.MILLISECONDS);
+            } catch (RejectedExecutionException e) {
+                UndertowLogger.REQUEST_LOGGER.debug("Failed to schedule parse timeout, server is probably shutting down", e);
+            }
         }
     }
 
@@ -118,16 +143,24 @@ public final class ParseTimeoutUpdater implements Runnable, ServerConnection.Clo
         if (expireTime > 0) { //timeout is not active
             long now = System.currentTimeMillis();
             if(expireTime > now) {
-                handle = connection.getIoThread().executeAfter(this, (expireTime - now) + FUZZ_FACTOR, TimeUnit.MILLISECONDS);
+                handle = WorkerUtils.executeAfter(connection.getIoThread(), this, (expireTime - now) + FUZZ_FACTOR, TimeUnit.MILLISECONDS);
             } else {
-                UndertowLogger.REQUEST_LOGGER.parseRequestTimedOut(connection.getPeerAddress());
-                IoUtils.safeClose(connection);
+                if(parsing) {
+                    UndertowLogger.REQUEST_LOGGER.parseRequestTimedOut(connection.getPeerAddress());
+                } else {
+                    UndertowLogger.REQUEST_LOGGER.debugf("Timing out idle connection from %s", connection.getPeerAddress());
+                }
+                closeTask.run();
             }
         }
     }
 
     @Override
     public void closed(ServerConnection connection) {
+        close();
+    }
+
+    public void close() {
         if(handle != null) {
             handle.remove();
             handle = null;

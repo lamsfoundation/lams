@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ package org.apache.commons.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * Dumps data in hexadecimal format.
@@ -27,7 +28,7 @@ import java.io.OutputStream;
  * <p>
  * Origin of code: POI.
  *
- *
+ * @version $Id: HexDump.java 1471767 2013-04-24 23:24:19Z sebb $
  */
 public class HexDump {
 
@@ -53,7 +54,7 @@ public class HexDump {
      * the first byte on that line is located.
      * <p>
      * All bytes between the given index (inclusive) and the end of the
-     * data array are dumped. 
+     * data array are dumped.
      *
      * @param data  the byte array to be dumped
      * @param offset  offset of the byte array within a larger entity
@@ -68,11 +69,11 @@ public class HexDump {
      * @throws IllegalArgumentException if the output stream is null
      */
 
-    public static void dump(byte[] data, long offset,
-                            OutputStream stream, int index)
+    public static void dump(final byte[] data, final long offset,
+                            final OutputStream stream, final int index)
             throws IOException, ArrayIndexOutOfBoundsException,
             IllegalArgumentException {
-        
+
         if (index < 0 || index >= data.length) {
             throw new ArrayIndexOutOfBoundsException(
                     "illegal index: " + index + " into array of length "
@@ -82,7 +83,7 @@ public class HexDump {
             throw new IllegalArgumentException("cannot write to nullstream");
         }
         long display_offset = offset + index;
-        StringBuilder buffer = new StringBuilder(74);
+        final StringBuilder buffer = new StringBuilder(74);
 
         for (int j = index; j < data.length; j += 16) {
             int chars_read = data.length - j;
@@ -107,7 +108,8 @@ public class HexDump {
                 }
             }
             buffer.append(EOL);
-            stream.write(buffer.toString().getBytes());
+            // make explicit the dependency on the default encoding
+            stream.write(buffer.toString().getBytes(Charset.defaultCharset()));
             stream.flush();
             buffer.setLength(0);
             display_offset += chars_read;
@@ -136,7 +138,7 @@ public class HexDump {
      * @param value  the long value to be dumped
      * @return StringBuilder containing the dumped value.
      */
-    private static StringBuilder dump(StringBuilder _lbuffer, long value) {
+    private static StringBuilder dump(final StringBuilder _lbuffer, final long value) {
         for (int j = 0; j < 8; j++) {
             _lbuffer
                     .append(_hexcodes[(int) (value >> _shifts[j]) & 15]);
@@ -151,7 +153,7 @@ public class HexDump {
      * @param value  the byte value to be dumped
      * @return StringBuilder containing the dumped value.
      */
-    private static StringBuilder dump(StringBuilder _cbuffer, byte value) {
+    private static StringBuilder dump(final StringBuilder _cbuffer, final byte value) {
         for (int j = 0; j < 2; j++) {
             _cbuffer.append(_hexcodes[value >> _shifts[j + 6] & 15]);
         }

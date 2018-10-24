@@ -25,6 +25,14 @@ public class ResolvedRecursiveType extends TypeBase
         }
         _referencedType = ref;
     }
+   
+    @Override
+    public JavaType getSuperClass() {
+    	if (_referencedType != null) {
+    		return _referencedType.getSuperClass();
+    	}
+    	return super.getSuperClass();
+    }
 
     public JavaType getSelfReferencedType() { return _referencedType; }
 
@@ -87,19 +95,38 @@ public class ResolvedRecursiveType extends TypeBase
 
     @Override
     public String toString() {
-        return new StringBuilder(40)
-        .append("[resolved recursive type -> ")
-        .append(_referencedType)
-        .append(']')
-        .toString();
+        StringBuilder sb = new StringBuilder(40)
+                .append("[recursive type; ");
+        if (_referencedType == null) {
+            sb.append("UNRESOLVED");
+        } else {
+            // [databind#1301]: Typically resolves to a loop so short-cut
+            //   and only include type-erased class
+            sb.append(_referencedType.getRawClass().getName());
+        }
+        return sb.toString();
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o == null) return false;
-        if (o.getClass() != getClass()) return false;
+        if (o.getClass() == getClass()) {
+            // 16-Jun-2017, tatu: as per [databind#1658], cannot do recursive call since
+            //    there is likely to be a cycle...
 
-        return ((ResolvedRecursiveType) o).getSelfReferencedType().equals(getSelfReferencedType());
+            // but... true or false?
+            return false;
+            
+            /*
+            // Do NOT ever match unresolved references
+            if (_referencedType == null) {
+                return false;
+            }
+            return (o.getClass() == getClass()
+                    && _referencedType.equals(((ResolvedRecursiveType) o).getSelfReferencedType()));
+                    */
+        }
+        return false;
     }
 }

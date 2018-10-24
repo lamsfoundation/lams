@@ -19,6 +19,7 @@
 package io.undertow.servlet.core;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,18 +31,15 @@ import java.util.concurrent.Executor;
 
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.api.ServletDispatcher;
-import io.undertow.servlet.api.ThreadSetupAction;
 import io.undertow.servlet.api.ThreadSetupHandler;
 import io.undertow.servlet.handlers.ServletInitialHandler;
 import io.undertow.servlet.handlers.ServletPathMatches;
-import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.servlet.spec.ServletContextImpl;
 
 /**
@@ -70,7 +68,13 @@ public class DeploymentImpl implements Deployment {
     private volatile ErrorPages errorPages;
     private volatile Map<String, String> mimeExtensionMappings;
     private volatile SessionManager sessionManager;
-    private volatile Charset defaultCharset;
+    @Deprecated
+    private volatile Charset defaultCharset = StandardCharsets.ISO_8859_1;
+    private volatile Charset defaultRequestCharset = StandardCharsets.ISO_8859_1;
+    private volatile Charset defaultResponseCharset = StandardCharsets.ISO_8859_1;
+
+
+
     private volatile List<AuthenticationMechanism> authenticationMechanisms;
     private volatile List<ThreadSetupHandler> threadSetupActions;
 
@@ -165,31 +169,6 @@ public class DeploymentImpl implements Deployment {
         return ret;
     }
 
-    @Override
-    public ThreadSetupAction getThreadSetupAction() {
-        //TODO: remove all this, it is a hack to presever some backwards compat
-        return new ThreadSetupAction() {
-            @Override
-            public Handle setup(HttpServerExchange exchange) {
-
-                final ClassLoader old = SecurityActions.getContextClassLoader();
-                SecurityActions.setContextClassLoader(deploymentInfo.getClassLoader());
-                final ServletRequestContext oldSc = ServletRequestContext.current();
-                if(exchange != null) {
-                    ServletRequestContext sc = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
-                    SecurityActions.setCurrentRequestContext(sc);
-                }
-                return new Handle() {
-                    @Override
-                    public void tearDown() {
-                        SecurityActions.setContextClassLoader(old);
-                        SecurityActions.setCurrentRequestContext(oldSc);
-                    }
-                };
-            }
-        };
-    }
-
     public ErrorPages getErrorPages() {
         return errorPages;
     }
@@ -227,8 +206,19 @@ public class DeploymentImpl implements Deployment {
         return deploymentInfo.getAsyncExecutor();
     }
 
+    @Deprecated
     public Charset getDefaultCharset() {
         return defaultCharset;
+    }
+
+    @Override
+    public Charset getDefaultRequestCharset() {
+        return defaultRequestCharset;
+    }
+
+    @Override
+    public Charset getDefaultResponseCharset() {
+        return defaultResponseCharset;
     }
 
     public void setAuthenticationMechanisms(List<AuthenticationMechanism> authenticationMechanisms) {
@@ -245,8 +235,17 @@ public class DeploymentImpl implements Deployment {
         return deploymentManager.getState();
     }
 
+    @Deprecated
     public void setDefaultCharset(Charset defaultCharset) {
         this.defaultCharset = defaultCharset;
+    }
+
+    public void setDefaultRequestCharset(Charset defaultRequestCharset) {
+        this.defaultRequestCharset = defaultRequestCharset;
+    }
+
+    public void setDefaultResponseCharset(Charset defaultResponseCharset) {
+        this.defaultResponseCharset = defaultResponseCharset;
     }
 
     void destroy(){

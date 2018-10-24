@@ -37,11 +37,14 @@ import java.util.List;
  * example), you should consider stopping the background thread if it is no
  * longer needed. This is done by invoking the method
  * {@link #exitWhenFinished}, typically in
- * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
+ * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)} or similar.
  *
- *
+ * @version $Id: FileCleaningTracker.java 1686747 2015-06-21 18:44:49Z krosenvold $
  */
 public class FileCleaningTracker {
+
+    // Note: fields are package protected to allow use by test cases
+
     /**
      * Queue of <code>Tracker</code> instances being watched.
      */
@@ -73,8 +76,8 @@ public class FileCleaningTracker {
      * @param marker  the marker object used to track the file, not null
      * @throws NullPointerException if the file is null
      */
-    public void track(File file, Object marker) {
-        track(file, marker, (FileDeleteStrategy) null);
+    public void track(final File file, final Object marker) {
+        track(file, marker, null);
     }
 
     /**
@@ -87,7 +90,7 @@ public class FileCleaningTracker {
      * @param deleteStrategy  the strategy to delete the file, null means normal
      * @throws NullPointerException if the file is null
      */
-    public void track(File file, Object marker, FileDeleteStrategy deleteStrategy) {
+    public void track(final File file, final Object marker, final FileDeleteStrategy deleteStrategy) {
         if (file == null) {
             throw new NullPointerException("The file must not be null");
         }
@@ -103,8 +106,8 @@ public class FileCleaningTracker {
      * @param marker  the marker object used to track the file, not null
      * @throws NullPointerException if the path is null
      */
-    public void track(String path, Object marker) {
-        track(path, marker, (FileDeleteStrategy) null);
+    public void track(final String path, final Object marker) {
+        track(path, marker, null);
     }
 
     /**
@@ -117,7 +120,7 @@ public class FileCleaningTracker {
      * @param deleteStrategy  the strategy to delete the file, null means normal
      * @throws NullPointerException if the path is null
      */
-    public void track(String path, Object marker, FileDeleteStrategy deleteStrategy) {
+    public void track(final String path, final Object marker, final FileDeleteStrategy deleteStrategy) {
         if (path == null) {
             throw new NullPointerException("The path must not be null");
         }
@@ -126,12 +129,13 @@ public class FileCleaningTracker {
 
     /**
      * Adds a tracker to the list of trackers.
-     * 
+     *
      * @param path  the full path to the file to be tracked, not null
      * @param marker  the marker object used to track the file, not null
      * @param deleteStrategy  the strategy to delete the file, null means normal
      */
-    private synchronized void addTracker(String path, Object marker, FileDeleteStrategy deleteStrategy) {
+    private synchronized void addTracker(final String path, final Object marker, final FileDeleteStrategy
+            deleteStrategy) {
         // synchronized block protects reaper
         if (exitWhenFinished) {
             throw new IllegalStateException("No new trackers can be added once exitWhenFinished() is called");
@@ -182,7 +186,8 @@ public class FileCleaningTracker {
      * posing a memory leak.
      * <p>
      * This method allows the thread to be terminated. Simply call this method
-     * in the resource cleanup code, such as {@link javax.servlet.ServletContextListener#contextDestroyed}.
+     * in the resource cleanup code, such as
+     * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)}.
      * Once called, no new objects can be tracked by the file cleaner.
      */
     public synchronized void exitWhenFinished() {
@@ -217,13 +222,13 @@ public class FileCleaningTracker {
             while (exitWhenFinished == false || trackers.size() > 0) {
                 try {
                     // Wait for a tracker to remove.
-                    Tracker tracker = (Tracker) q.remove(); // cannot return null
+                    final Tracker tracker = (Tracker) q.remove(); // cannot return null
                     trackers.remove(tracker);
                     if (!tracker.delete()) {
                         deleteFailures.add(tracker.getPath());
                     }
                     tracker.clear();
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     continue;
                 }
             }
@@ -253,7 +258,8 @@ public class FileCleaningTracker {
          * @param marker  the marker object used to track the file, not null
          * @param queue  the queue on to which the tracker will be pushed, not null
          */
-        Tracker(String path, FileDeleteStrategy deleteStrategy, Object marker, ReferenceQueue<? super Object> queue) {
+        Tracker(final String path, final FileDeleteStrategy deleteStrategy, final Object marker,
+                final ReferenceQueue<? super Object> queue) {
             super(marker, queue);
             this.path = path;
             this.deleteStrategy = deleteStrategy == null ? FileDeleteStrategy.NORMAL : deleteStrategy;

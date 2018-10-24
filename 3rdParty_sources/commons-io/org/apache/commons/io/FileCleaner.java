@@ -30,9 +30,9 @@ import java.io.File;
  * example), you should consider stopping the background thread if it is no
  * longer needed. This is done by invoking the method
  * {@link #exitWhenFinished}, typically in
- * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
+ * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)} or similar.
  *
- *
+ * @version $Id: FileCleaner.java 1680650 2015-05-20 18:36:40Z britter $
  * @deprecated Use {@link FileCleaningTracker}
  */
 @Deprecated
@@ -54,7 +54,7 @@ public class FileCleaner {
      * @deprecated Use {@link FileCleaningTracker#track(File, Object)}.
      */
     @Deprecated
-    public static void track(File file, Object marker) {
+    public static void track(final File file, final Object marker) {
         theInstance.track(file, marker);
     }
 
@@ -70,7 +70,7 @@ public class FileCleaner {
      * @deprecated Use {@link FileCleaningTracker#track(File, Object, FileDeleteStrategy)}.
      */
     @Deprecated
-    public static void track(File file, Object marker, FileDeleteStrategy deleteStrategy) {
+    public static void track(final File file, final Object marker, final FileDeleteStrategy deleteStrategy) {
         theInstance.track(file, marker, deleteStrategy);
     }
 
@@ -85,7 +85,7 @@ public class FileCleaner {
      * @deprecated Use {@link FileCleaningTracker#track(String, Object)}.
      */
     @Deprecated
-    public static void track(String path, Object marker) {
+    public static void track(final String path, final Object marker) {
         theInstance.track(path, marker);
     }
 
@@ -101,7 +101,7 @@ public class FileCleaner {
      * @deprecated Use {@link FileCleaningTracker#track(String, Object, FileDeleteStrategy)}.
      */
     @Deprecated
-    public static void track(String path, Object marker, FileDeleteStrategy deleteStrategy) {
+    public static void track(final String path, final Object marker, final FileDeleteStrategy deleteStrategy) {
         theInstance.track(path, marker, deleteStrategy);
     }
 
@@ -136,7 +136,8 @@ public class FileCleaner {
      * posing a memory leak.
      * <p>
      * This method allows the thread to be terminated. Simply call this method
-     * in the resource cleanup code, such as {@link javax.servlet.ServletContextListener#contextDestroyed}.
+     * in the resource cleanup code, such as 
+     * {@code javax.servlet.ServletContextListener.contextDestroyed(javax.servlet.ServletContextEvent)}.
      * One called, no new objects can be tracked by the file cleaner.
      * @deprecated Use {@link FileCleaningTracker#exitWhenFinished()}.
      */

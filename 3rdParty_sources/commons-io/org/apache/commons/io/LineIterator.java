@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,13 +44,13 @@ import java.util.NoSuchElementException;
  * }
  * </pre>
  *
- *
+ * @version $Id: LineIterator.java 1471767 2013-04-24 23:24:19Z sebb $
  * @since 1.2
  */
 public class LineIterator implements Iterator<String> {
 
     // N.B. This class deliberately does not implement Iterable, see https://issues.apache.org/jira/browse/IO-181
-    
+
     /** The reader that is being read. */
     private final BufferedReader bufferedReader;
     /** The current line. */
@@ -92,7 +92,7 @@ public class LineIterator implements Iterator<String> {
         } else {
             try {
                 while (true) {
-                    String line = bufferedReader.readLine();
+                    final String line = bufferedReader.readLine();
                     if (line == null) {
                         finished = true;
                         return false;
@@ -101,7 +101,7 @@ public class LineIterator implements Iterator<String> {
                         return true;
                     }
                 }
-            } catch(IOException ioe) {
+            } catch(final IOException ioe) {
                 close();
                 throw new IllegalStateException(ioe);
             }
@@ -114,7 +114,7 @@ public class LineIterator implements Iterator<String> {
      * @param line  the line that is to be validated
      * @return true if valid, false to remove from the iterator
      */
-    protected boolean isValidLine(String line) {
+    protected boolean isValidLine(final String line) {
         return true;
     }
 
@@ -138,9 +138,9 @@ public class LineIterator implements Iterator<String> {
         if (!hasNext()) {
             throw new NoSuchElementException("No more lines");
         }
-        String currentLine = cachedLine;
+        final String currentLine = cachedLine;
         cachedLine = null;
-        return currentLine;        
+        return currentLine;
     }
 
     /**
@@ -171,7 +171,7 @@ public class LineIterator implements Iterator<String> {
      *
      * @param iterator  the iterator to close
      */
-    public static void closeQuietly(LineIterator iterator) {
+    public static void closeQuietly(final LineIterator iterator) {
         if (iterator != null) {
             iterator.close();
         }

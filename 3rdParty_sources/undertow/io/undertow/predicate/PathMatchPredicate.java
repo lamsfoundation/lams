@@ -28,7 +28,7 @@ import io.undertow.util.PathMatcher;
 /**
  * @author Stuart Douglas
  */
-class PathMatchPredicate implements Predicate {
+public class PathMatchPredicate implements Predicate {
 
     private final PathMatcher<Boolean> pathMatcher;
 
@@ -48,7 +48,7 @@ class PathMatchPredicate implements Predicate {
     public boolean resolve(final HttpServerExchange value) {
         final String relativePath = value.getRelativePath();
         PathMatcher.PathMatch<Boolean> result = pathMatcher.match(relativePath);
-        return result.getValue() == Boolean.TRUE;
+        return Boolean.TRUE.equals(result.getValue());
     }
 
     public static class Builder implements PredicateBuilder {

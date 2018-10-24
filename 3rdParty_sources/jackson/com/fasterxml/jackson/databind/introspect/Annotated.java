@@ -24,20 +24,6 @@ public abstract class Annotated
      * @since 2.7
      */
     public abstract boolean hasOneOf(Class<? extends Annotation>[] annoClasses);
-    
-    /**
-     * Fluent factory method that will construct a new instance that uses specified
-     * instance annotations instead of currently configured ones.
-     */
-    public abstract Annotated withAnnotations(AnnotationMap fallback);
-
-    /**
-     * Fluent factory method that will construct a new instance that uses
-     * annotations from specified {@link Annotated} as fallback annotations
-     */
-    public final Annotated withFallBackAnnotationsFrom(Annotated annotated) {
-        return withAnnotations(AnnotationMap.merge(getAllAnnotations(), annotated.getAllAnnotations()));
-    }
 
     /**
      * Method that can be used to find actual JDK element that this instance
@@ -48,7 +34,7 @@ public abstract class Annotated
 
     protected abstract int getModifiers();
 
-    public final boolean isPublic() {
+    public boolean isPublic() {
         return Modifier.isPublic(getModifiers());
     }
 
@@ -63,7 +49,7 @@ public abstract class Annotated
     public abstract JavaType getType();
 
     /**
-     * @deprecated Since 2.7 Use {@link #getType()} instead. To be removed from 2.8.
+     * @deprecated Since 2.7 Use {@link #getType()} instead. To be removed from 2.9
      */
     @Deprecated
     public final JavaType getType(TypeBindings bogus) {
@@ -71,10 +57,13 @@ public abstract class Annotated
     }
 
     /**
-     * Full generic type of the annotated element; definition
-     * of what exactly this means depends on sub-class.
+     * JDK declared generic type of the annotated element; definition
+     * of what exactly this means depends on sub-class. Note that such type
+     * cannot be reliably resolved without {@link TypeResolutionContext}, and
+     * as a result use of this method was deprecated in Jackson 2.7: see
+     * {@link #getType} for replacement.
      *
-     * @deprecated Since 2.7 should instead use {@link #getType()}. To be removed from 2.8
+     * @deprecated Since 2.7 should instead use {@link #getType()}. To be removed from 2.9
      */
     @Deprecated
     public Type getGenericType() {
@@ -90,16 +79,12 @@ public abstract class Annotated
     /**
      * Accessor that can be used to iterate over all the annotations
      * associated with annotated component.
-     * 
+     *
      * @since 2.3
+     * @deprecated Since 2.9 should instead use {@link #getAnnotated()}
      */
+    @Deprecated
     public abstract Iterable<Annotation> annotations();
-
-    /**
-     * Internal helper method used to access annotation information;
-     * not exposed to developers since instances are mutable.
-     */
-    protected abstract AnnotationMap getAllAnnotations();
 
     // Also: ensure we can use #equals, #hashCode
     

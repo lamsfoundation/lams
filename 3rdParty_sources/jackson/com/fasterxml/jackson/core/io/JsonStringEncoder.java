@@ -1,8 +1,6 @@
 package com.fasterxml.jackson.core.io;
 
-import java.lang.ref.SoftReference;
-
-import com.fasterxml.jackson.core.util.BufferRecycler;
+import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.TextBuffer;
 
@@ -13,6 +11,9 @@ import com.fasterxml.jackson.core.util.TextBuffer;
  * Note that methods in here are somewhat optimized, but not ridiculously so.
  * Reason is that conversion method results are expected to be cached so that
  * these methods will not be hot spots during normal operation.
+ *<p>
+ * NOTE: starting with 2.9.3, access to most functionality should go through
+ * {@link BufferRecyclers} and NOT directly through this class.
  */
 public final class JsonStringEncoder
 {
@@ -28,14 +29,6 @@ public final class JsonStringEncoder
 //    private final static int INT_BACKSLASH = '\\';
 //    private final static int INT_U = 'u';
 //    private final static int INT_0 = '0';
-    
-    /**
-     * This <code>ThreadLocal</code> contains a {@link java.lang.ref.SoftReference}
-     * to a {@link BufferRecycler} used to provide a low-cost
-     * buffer recycling between reader and writer instances.
-     */
-    final protected static ThreadLocal<SoftReference<JsonStringEncoder>> _threadEncoder
-        = new ThreadLocal<SoftReference<JsonStringEncoder>>();
 
     /**
      * Lazily constructed text buffer used to produce JSON encoded Strings
@@ -70,16 +63,12 @@ public final class JsonStringEncoder
     /**
      * Factory method for getting an instance; this is either recycled per-thread instance,
      * or a newly constructed one.
+     *
+     * @deprecated Since 2.9.2 use {@link BufferRecyclers#getJsonStringEncoder()} instead
      */
+    @Deprecated
     public static JsonStringEncoder getInstance() {
-        SoftReference<JsonStringEncoder> ref = _threadEncoder.get();
-        JsonStringEncoder enc = (ref == null) ? null : ref.get();
-
-        if (enc == null) {
-            enc = new JsonStringEncoder();
-            _threadEncoder.set(new SoftReference<JsonStringEncoder>(enc));
-        }
-        return enc;
+        return BufferRecyclers.getJsonStringEncoder();
     }
 
     /*
@@ -146,6 +135,44 @@ public final class JsonStringEncoder
         }
         textBuffer.setCurrentLength(outPtr);
         return textBuffer.contentsAsArray();
+    }
+
+    /**
+     * Method that will quote text contents using JSON standard quoting,
+     * and append results to a supplied {@link StringBuilder}.
+     * Use this variant if you have e.g. a {@link StringBuilder} and want to avoid superfluous copying of it.
+     *
+     * @since 2.8
+     */
+    public void quoteAsString(CharSequence input, StringBuilder output)
+    {
+        final int[] escCodes = CharTypes.get7BitOutputEscapes();
+        final int escCodeCount = escCodes.length;
+        int inPtr = 0;
+        final int inputLen = input.length();
+
+        outer:
+        while (inPtr < inputLen) {
+            tight_loop:
+            while (true) {
+                char c = input.charAt(inPtr);
+                if (c < escCodeCount && escCodes[c] != 0) {
+                    break tight_loop;
+                }
+                output.append(c);
+                if (++inPtr >= inputLen) {
+                    break outer;
+                }
+            }
+            // something to escape; 2 or 6-char variant?
+            char d = input.charAt(inPtr++);
+            int escCode = escCodes[d];
+            int length = (escCode < 0)
+                    ? _appendNumeric(d, _qbuf)
+                    : _appendNamed(escCode, _qbuf);
+                    ;
+            output.append(_qbuf, 0, length);
+        }
     }
 
     /**

@@ -25,6 +25,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import io.undertow.UndertowLogger;
 import io.undertow.server.protocol.http.HttpAttachments;
@@ -137,6 +138,7 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
         }
         this.state |= FLAG_FIRST_DATA_WRITTEN;
         int oldLimit = src.limit();
+        boolean dataRemaining = false; //set to true if there is data in src that still needs to be written out
         if (chunkleft == 0 && !chunkingSepBuffer.hasRemaining()) {
             chunkingBuffer.clear();
             putIntAsHexString(chunkingBuffer, src.remaining());
@@ -149,6 +151,7 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
             chunkleft = src.remaining();
         } else {
             if (src.remaining() > chunkleft) {
+                dataRemaining = true;
                 src.limit(chunkleft + src.position());
             }
         }
@@ -158,7 +161,7 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
             if (chunkingSize > 0 || chunkingSepSize > 0 || lastChunkBuffer != null) {
                 int originalRemaining = src.remaining();
                 long result;
-                if (lastChunkBuffer == null) {
+                if (lastChunkBuffer == null || dataRemaining) {
                     final ByteBuffer[] buf = new ByteBuffer[]{chunkingBuffer, src, chunkingSepBuffer};
                     result = next.write(buf, 0, buf.length);
                 } else {
@@ -329,7 +332,22 @@ public class ChunkedStreamSinkConduit extends AbstractStreamSinkConduit<StreamSi
         }
         lastChunkBuffer.put(LAST_CHUNK);
         //we just assume it will fit
-        HeaderMap trailers = attachable.getAttachment(HttpAttachments.RESPONSE_TRAILERS);
+        HeaderMap attachment = attachable.getAttachment(HttpAttachments.RESPONSE_TRAILERS);
+        final HeaderMap trailers;
+        Supplier<HeaderMap> supplier = attachable.getAttachment(HttpAttachments.RESPONSE_TRAILER_SUPPLIER);
+        if(attachment != null && supplier == null) {
+            trailers = attachment;
+        } else if(attachment == null && supplier != null) {
+            trailers = supplier.get();
+        } else if(attachment != null) {
+            HeaderMap supplied = supplier.get();
+            for(HeaderValues k : supplied) {
+                attachment.putAll(k.getHeaderName(), k);
+            }
+            trailers = attachment;
+        } else {
+            trailers = null;
+        }
         if (trailers != null && trailers.size() != 0) {
             for (HeaderValues trailer : trailers) {
                 for (String val : trailer) {

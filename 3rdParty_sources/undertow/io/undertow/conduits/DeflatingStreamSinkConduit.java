@@ -43,7 +43,11 @@ import org.xnio.conduits.WriteReadyHandler;
 import io.undertow.UndertowLogger;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.ConduitFactory;
+import io.undertow.util.NewInstanceObjectPool;
+import io.undertow.util.ObjectPool;
 import io.undertow.util.Headers;
+import io.undertow.util.PooledObject;
+import io.undertow.util.SimpleObjectPool;
 
 /**
  * Channel that handles deflate compression
@@ -52,7 +56,9 @@ import io.undertow.util.Headers;
  */
 public class DeflatingStreamSinkConduit implements StreamSinkConduit {
 
-    protected final Deflater deflater;
+    protected volatile Deflater deflater;
+
+    protected final PooledObject<Deflater> pooledObject;
     private final ConduitFactory<StreamSinkConduit> conduitFactory;
     private final HttpServerExchange exchange;
 
@@ -82,12 +88,27 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
         this(conduitFactory, exchange, Deflater.DEFLATED);
     }
 
-    protected DeflatingStreamSinkConduit(final ConduitFactory<StreamSinkConduit> conduitFactory, final HttpServerExchange exchange, int deflateLevel) {
-        deflater = new Deflater(deflateLevel, true);
+    public DeflatingStreamSinkConduit(final ConduitFactory<StreamSinkConduit> conduitFactory, final HttpServerExchange exchange, int deflateLevel) {
+        this(conduitFactory, exchange, newInstanceDeflaterPool(deflateLevel));
+    }
+
+    public DeflatingStreamSinkConduit(final ConduitFactory<StreamSinkConduit> conduitFactory, final HttpServerExchange exchange, ObjectPool<Deflater> deflaterPool) {
+        this.pooledObject = deflaterPool.allocate();
+        this.deflater = pooledObject.getObject();
         this.currentBuffer = exchange.getConnection().getByteBufferPool().allocate();
         this.exchange = exchange;
         this.conduitFactory = conduitFactory;
+        setWriteReadyHandler(new WriteReadyHandler.ChannelListenerHandler<>(Connectors.getConduitSinkChannel(exchange)));
     }
+
+    public static ObjectPool<Deflater> newInstanceDeflaterPool(int deflateLevel) {
+        return new NewInstanceObjectPool<Deflater>(() -> new Deflater(deflateLevel, true), Deflater::end);
+    }
+
+    public static ObjectPool<Deflater> simpleDeflaterPool(int poolSize, int deflateLevel) {
+        return new SimpleObjectPool<Deflater>(poolSize, () -> new Deflater(deflateLevel, true), Deflater::reset, Deflater::end);
+    }
+
 
     @Override
     public int write(final ByteBuffer src) throws IOException {
@@ -115,7 +136,7 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
             Connectors.updateResponseBytesSent(exchange, 0 - data.length);
             deflateData(false);
             return data.length;
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             freeBuffer();
             throw e;
         }
@@ -142,7 +163,7 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
                 }
             }
             return total;
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             freeBuffer();
             throw e;
         }
@@ -244,7 +265,9 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
 
     @Override
     public void terminateWrites() throws IOException {
-        deflater.finish();
+        if (deflater != null) {
+            deflater.finish();
+        }
         state |= SHUTDOWN;
     }
 
@@ -377,13 +400,13 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
                     if (anyAreSet(state, WRITES_RESUMED) && !anyAreSet(state ,NEXT_SHUTDOWN)) {
                         try {
                             next.resumeWrites();
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             UndertowLogger.REQUEST_LOGGER.debug("Failed to resume", e);
                         }
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             freeBuffer();
             throw e;
         }
@@ -438,7 +461,9 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
             if (additionalBuffer != null) {
                 remaining += additionalBuffer.remaining();
             }
-            exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, Integer.toString(remaining));
+            if(!exchange.getResponseHeaders().contains(Headers.TRANSFER_ENCODING)) {
+                exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, Integer.toString(remaining));
+            }
         } else {
             exchange.getResponseHeaders().remove(Headers.CONTENT_LENGTH);
         }
@@ -513,6 +538,10 @@ public class DeflatingStreamSinkConduit implements StreamSinkConduit {
             currentBuffer.close();
             currentBuffer = null;
             state = state & ~FLUSHING_BUFFER;
+        }
+        if (deflater != null) {
+            pooledObject.close();
+            deflater = null;
         }
     }
 }

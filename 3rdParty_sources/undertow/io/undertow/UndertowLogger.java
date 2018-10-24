@@ -39,7 +39,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +68,7 @@ public interface UndertowLogger extends BasicLogger {
      * attacker to fill up the logs by intentionally causing IO exceptions.
      */
     UndertowLogger REQUEST_IO_LOGGER = Logger.getMessageLogger(UndertowLogger.class, UndertowLogger.class.getPackage().getName() + ".request.io");
+    UndertowLogger ERROR_RESPONSE = Logger.getMessageLogger(UndertowLogger.class, UndertowLogger.class.getPackage().getName() + ".request.error-response");
 
     @LogMessage(level = ERROR)
     @Message(id = 5001, value = "An exception occurred processing the request")
@@ -86,7 +86,7 @@ public interface UndertowLogger extends BasicLogger {
     @Message(id = 5005, value = "Cannot remove uploaded file %s")
     void cannotRemoveUploadedFile(Path file);
 
-    @LogMessage(level = ERROR)
+    @LogMessage(level = DEBUG)
     @Message(id = 5006, value = "Connection from %s terminated as request header was larger than %s")
     void requestHeaderWasTooLarge(SocketAddress address, int size);
 
@@ -115,8 +115,8 @@ public interface UndertowLogger extends BasicLogger {
     void ioException(@Cause IOException e);
 
     @LogMessage(level = DEBUG)
-    @Message(id = 5014, value = "Failed to parse HTTP request")
-    void failedToParseRequest(@Cause Exception e);
+    @Message(id = 5014, value = "Failed to parse request")
+    void failedToParseRequest(@Cause Throwable e);
 
     @LogMessage(level = ERROR)
     @Message(id = 5015, value = "Error rotating access log")
@@ -140,7 +140,7 @@ public interface UndertowLogger extends BasicLogger {
 
     @LogMessage(level = ERROR)
     @Message(id = 5020, value = "Error writing JDBC log")
-    void errorWritingJDBCLog(@Cause SQLException e);
+    void errorWritingJDBCLog(@Cause Exception e);
 
 //    @LogMessage(level = Logger.Level.ERROR)
 //    @Message(id = 5021, value = "Proxy request to %s timed out")
@@ -161,10 +161,10 @@ public interface UndertowLogger extends BasicLogger {
 //    @LogMessage(level = Logger.Level.ERROR)
 //    @Message(id = 5025, value = "Could not initiate SPDY connection and no HTTP fallback defined")
 //    void couldNotInitiateSpdyConnection();
-
-    @LogMessage(level = INFO)
-    @Message(id = 5026, value = "Jetty ALPN support not found on boot class path, %s client will not be available.")
-    void jettyALPNNotFound(String protocol);
+//
+//    @LogMessage(level = INFO)
+//    @Message(id = 5026, value = "Jetty ALPN support not found on boot class path, %s client will not be available.")
+//    void jettyALPNNotFound(String protocol);
 
     @LogMessage(level = ERROR)
     @Message(id = 5027, value = "Timing out request to %s")
@@ -335,7 +335,7 @@ public interface UndertowLogger extends BasicLogger {
 
     @LogMessage(level = ERROR)
     @Message(id = 5069, value = "Failed to write JDBC access log")
-    void failedToWriteJdbcAccessLog(@Cause SQLException e);
+    void failedToWriteJdbcAccessLog(@Cause Exception e);
 
     @LogMessage(level = ERROR)
     @Message(id = 5070, value = "Failed to write pre-cached file")
@@ -368,9 +368,9 @@ public interface UndertowLogger extends BasicLogger {
     @Message(id = 5077, value = "SSL unwrap buffer overflow detected. This should not happen, please report this to the Undertow developers. Current state %s")
     void sslBufferOverflow(SslConduit sslConduit);
 
-    @LogMessage(level = ERROR)
-    @Message(id = 5078, value = "ALPN connection failed")
-    void alpnConnectionFailed(@Cause Exception e);
+//    @LogMessage(level = ERROR)
+//    @Message(id = 5078, value = "ALPN connection failed")
+//    void alpnConnectionFailed(@Cause Exception e);
 
     @LogMessage(level = ERROR)
     @Message(id = 5079, value = "ALPN negotiation on %s failed")
@@ -379,4 +379,48 @@ public interface UndertowLogger extends BasicLogger {
     @LogMessage(level = ERROR)
     @Message(id = 5080, value = "HttpServerExchange cannot have both async IO resumed and dispatch() called in the same cycle")
     void resumedAndDispatched();
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5081, value = "Response has already been started, cannot proxy request %s")
+    void cannotProxyStartedRequest(HttpServerExchange exchange);
+
+    @Message(id = 5082, value = "Configured mod_cluster management host address cannot be a wildcard address (%s)!")
+    IllegalArgumentException cannotUseWildcardAddressAsModClusterManagementHost(String providedAddress);
+
+    @Message(id = 5083, value = "Unexpected end of compressed input")
+    IOException unexpectedEndOfCompressedInput();
+
+    @Message(id = 5084, value = "Attempted to write %s bytes however content-length has been set to %s")
+    IOException dataLargerThanContentLength(long totalToWrite, long responseContentLength);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5085, value = "Connection %s for exchange %s was not closed cleanly, forcibly closing connection")
+    void responseWasNotTerminated(ServerConnection connection, HttpServerExchange exchange);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5086, value = "Failed to accept SSL request")
+    void failedToAcceptSSLRequest(@Cause Exception e);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5087, value = "Failed to use the server order")
+    void failedToUseServerOrder(@Cause ReflectiveOperationException e);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5088, value = "Failed to execute ServletOutputStream.closeAsync() on IO thread")
+    void closeAsyncFailed(@Cause IOException e);
+
+    @Message(id = 5089, value = "Method parameter '%s' cannot be null")
+    IllegalArgumentException nullParameter(String name);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5090, value = "Unexpected failure")
+    void handleUnexpectedFailure(@Cause Throwable t);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 5091, value = "Failed to initialize DirectByteBufferDeallocator")
+    void directBufferDeallocatorInitializationFailed(@Cause Throwable t);
+
+    @LogMessage(level = DEBUG)
+    @Message(id = 5092, value = "Failed to free direct buffer")
+    void directBufferDeallocationFailed(@Cause Throwable t);
 }

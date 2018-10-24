@@ -446,8 +446,20 @@
 		<copy tofile="${server.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
 			  file="lib/fckeditor/fckeditor.module.xml" overwrite="true" verbose="true" />
 		
+
 		
-		
+		<delete dir="${server.home}/modules/system/layers/base/org/hibernate/main" />
+		<mkdir  dir="${server.home}/modules/system/layers/base/org/hibernate/main" />
+		<copy todir="${server.home}/modules/system/layers/base/org/hibernate/main" overwrite="true" verbose="true">
+			<fileset dir="lib/hibernate">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/hibernate/main/module.xml"
+			  file="lib/hibernate/hibernate.module.xml" overwrite="true" verbose="true" />
+			
+			
+			
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
 				<include name="commons-collections4-*.jar" />
@@ -487,12 +499,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"
 			  file="lib/jakarta-commons/validator.module.xml" overwrite="true" verbose="true" />
-		
-		
-		<!-- WildFly does not load all classes from JDK that LAMS needs (com/sun/org/apache/xerces/internal)
-		     We need our own, extended list -->
-		<copy tofile="${server.home}/modules/system/layers/base/sun/jdk/main/module.xml"
-			  file="lib/jdk/jdk.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
@@ -596,21 +602,6 @@
 		<echo>${ant.project.name}: Deploying configuration files</echo>
 		<antcall target="_deploy-standalone-config" />
 		<antcall target="_deploy-standalone-config-slimmed" />
-		
-		<!-- Backup and DELETE org/wildfly/clustering/web/undertow module. This module is used by default
-		 (no reconfiguration possible) by Wildfly shared-session (LAMS SSO) to store web sessions as
-		 DistributableSessions with Infinispan cache. When this module is not present - InMemorySessionManager
-		 is used instead. DistributableSessions for shared-session are buggy under wildfly 8.2.0, we don't
-		 use them till migration to Wildfly 9.x
-		 It will be placed back if deploy-cluster is run. -->
-		<copy todir="${server.home}/backup/undertow"
-			  overwrite="false" verbose="true" failonerror="false">
-			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
-		</copy>
-		
-		<delete failonerror="false">
-			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
-		</delete>
 		
 		<!-- Mark EAR for WildFly deployment -->
 		<delete >
@@ -728,11 +719,6 @@
 	
 	<!-- cruise control task : build lams -->
 	<target name="deploy-cluster" description="Prepare cluster environment">
-		<echo>${ant.project.name}: Restoring clustering library</echo>
-		<copy todir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow"
-			  overwrite="false" verbose="true">
-			<fileset dir="${server.home}/backup/undertow" />
-		</copy>
 		
 		<echo>${ant.project.name}: Copying configuration files</echo>
 		<copy todir="${server.home}/domain/configuration" overwrite="true" verbose="true">
@@ -772,8 +758,10 @@
 		/>
 	</target>
 	
-
-	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 10.1; do not run twice!">
+	
+	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 14.0.1; do not run twice!">
+		<fail message="This has not been implemented yet" />
+		
 		<delete includeemptydirs="true" verbose="true" failonerror="false">
 			<!-- Domain version of server. Standalone is used. -->
 			<fileset dir="${server.home}/domain/" />

@@ -39,7 +39,6 @@ public class IgnoredPropertyException
         super(msg, loc, referringClass, propName, propertyIds);
     }
 
-    
     /**
      * Factory method used for constructing instances of this exception type.
      * 
@@ -48,23 +47,20 @@ public class IgnoredPropertyException
      *    if available), or if not, type itself
      * @param propertyName Name of unrecognized property
      * @param propertyIds (optional, null if not available) Set of properties that
-     *    type would recognize, if completely known: null if set can not be determined.
+     *    type would recognize, if completely known: null if set cannot be determined.
      */
     public static IgnoredPropertyException from(JsonParser p,
             Object fromObjectOrClass, String propertyName,
             Collection<Object> propertyIds)
     {
-        if (fromObjectOrClass == null) {
-            throw new IllegalArgumentException();
-        }
         Class<?> ref;
         if (fromObjectOrClass instanceof Class<?>) {
             ref = (Class<?>) fromObjectOrClass;
-        } else {
+        } else { // also acts as null check:
             ref = fromObjectOrClass.getClass();
         }
-        String msg = "Ignored field \""+propertyName+"\" (class "+ref.getName()
-                +") encountered; mapper configured not to allow this";
+        String msg = String.format("Ignored field \"%s\" (class %s) encountered; mapper configured not to allow this",
+                propertyName, ref.getName());
         IgnoredPropertyException e = new IgnoredPropertyException(p, msg,
                 p.getCurrentLocation(), ref, propertyName, propertyIds);
         // but let's also ensure path includes this last (missing) segment

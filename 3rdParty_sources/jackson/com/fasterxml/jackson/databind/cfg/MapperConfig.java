@@ -5,15 +5,15 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.*;
-
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
+import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.fasterxml.jackson.databind.jsontype.SubtypeResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
@@ -37,7 +37,7 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
     implements ClassIntrospector.MixInResolver,
         java.io.Serializable
 {
-    private static final long serialVersionUID = 1L; // since 2.5
+    private static final long serialVersionUID = 2L; // since 2.9
 
     /**
      * @since 2.7
@@ -58,7 +58,7 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
      * Immutable container object for simple configuration settings.
      */
     protected final BaseSettings _base;
-    
+
     /*
     /**********************************************************
     /* Life-cycle: constructors
@@ -233,22 +233,12 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
      * Non-final since it is actually overridden by sub-classes (for now?)
      */
     public AnnotationIntrospector getAnnotationIntrospector() {
-        return _base.getAnnotationIntrospector();
+        if (isEnabled(MapperFeature.USE_ANNOTATIONS)) {
+            return _base.getAnnotationIntrospector();
+        }
+        return NopAnnotationIntrospector.instance;
     }
 
-    /**
-     * Accessor for object used for determining whether specific property elements
-     * (method, constructors, fields) can be auto-detected based on
-     * their visibility (access modifiers). Can be changed to allow
-     * different minimum visibility levels for auto-detection. Note
-     * that this is the global handler; individual types (classes)
-     * can further override active checker used (using
-     * {@link JsonAutoDetect} annotation)
-     */
-    public VisibilityChecker<?> getDefaultVisibilityChecker() {
-        return _base.getVisibilityChecker();
-    }
-    
     public final PropertyNamingStrategy getPropertyNamingStrategy() {
         return _base.getPropertyNamingStrategy();
     }
@@ -256,7 +246,7 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
     public final HandlerInstantiator getHandlerInstantiator() {
         return _base.getHandlerInstantiator();
     }
-    
+
     /*
     /**********************************************************
     /* Configuration: type and subtype handling
@@ -320,12 +310,14 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
     public BeanDescription introspectClassAnnotations(Class<?> cls) {
         return introspectClassAnnotations(constructType(cls));
     }
-    
+
     /**
      * Accessor for getting bean description that only contains class
      * annotations: useful if no getter/setter/creator information is needed.
      */
-    public abstract BeanDescription introspectClassAnnotations(JavaType type);
+    public BeanDescription introspectClassAnnotations(JavaType type) {
+        return getClassIntrospector().forClassAnnotations(this, type, this);
+    }
 
     /**
      * Accessor for getting bean description that only contains immediate class
@@ -335,18 +327,48 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
     public BeanDescription introspectDirectClassAnnotations(Class<?> cls) {
         return introspectDirectClassAnnotations(constructType(cls));
     }
+
     /**
      * Accessor for getting bean description that only contains immediate class
      * annotations: ones from the class, and its direct mix-in, if any, but
      * not from super types.
      */
-    public abstract BeanDescription introspectDirectClassAnnotations(JavaType type);
+    public final BeanDescription introspectDirectClassAnnotations(JavaType type) {
+        return getClassIntrospector().forDirectClassAnnotations(this, type, this);
+    }
 
     /*
     /**********************************************************
     /* Configuration: default settings with per-type overrides
     /**********************************************************
      */
+
+    /**
+     * Accessor for finding {@link ConfigOverride} to use for
+     * properties of given type, if any exist; or return `null` if not.
+     *<p>
+     * Note that only directly associated override
+     * is found; no type hierarchy traversal is performed.
+     *
+     * @since 2.8
+     * 
+     * @return Override object to use for the type, if defined; null if none.
+     */
+    public abstract ConfigOverride findConfigOverride(Class<?> type);
+
+    /**
+     * Accessor for finding {@link ConfigOverride} to use for
+     * properties of given type, if any exist; or if none, return an immutable
+     * "empty" instance with no overrides.
+     *<p>
+     * Note that only directly associated override
+     * is found; no type hierarchy traversal is performed.
+     *
+     * @since 2.9
+     * 
+     * @return Override object to use for the type, never null (but may be empty)
+     */
+    public abstract ConfigOverride getConfigOverride(Class<?> type);
 
     /**
      * Accessor for default property inclusion to use for serialization,
@@ -358,11 +380,69 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
 
     /**
      * Accessor for default property inclusion to use for serialization,
-     * considering possible per-type override for given base type.
+     * considering possible per-type override for given base type.<br>
+     * NOTE: if no override found, defaults to value returned by
+     * {@link #getDefaultPropertyInclusion()}.
      *
      * @since 2.7
      */
     public abstract JsonInclude.Value getDefaultPropertyInclusion(Class<?> baseType);
+
+    /**
+     * Accessor for default property inclusion to use for serialization,
+     * considering possible per-type override for given base type; but
+     * if none found, returning given <code>defaultIncl</code>
+     *
+     * @param defaultIncl Inclusion setting to return if no overrides found.
+     * 
+     * @since 2.8.2
+     */
+    public JsonInclude.Value getDefaultPropertyInclusion(Class<?> baseType,
+            JsonInclude.Value defaultIncl)
+    {
+        JsonInclude.Value v = getConfigOverride(baseType).getInclude();
+        if (v != null) {
+            return v;
+        }
+        return defaultIncl;
+    }
+
+    /**
+     * Accessor for default property inclusion to use for serialization,
+     * considering possible per-type override for given base type and
+     * possible per-type override for given property type.<br>
+     * NOTE: if no override found, defaults to value returned by
+     * {@link #getDefaultPropertyInclusion()}.
+     *
+     * @param baseType Type of the instance containing the targeted property.
+     * @param propertyType Type of the property to look up inclusion setting for.
+     *
+     * @since 2.9
+     */
+    public abstract JsonInclude.Value getDefaultInclusion(Class<?> baseType,
+            Class<?> propertyType);
+
+    /**
+     * Accessor for default property inclusion to use for serialization,
+     * considering possible per-type override for given base type and
+     * possible per-type override for given property type; but
+     * if none found, returning given <code>defaultIncl</code>
+     *
+     * @param baseType Type of the instance containing the targeted property.
+     * @param propertyType Type of the property to look up inclusion setting for.
+     * @param defaultIncl Inclusion setting to return if no overrides found.
+     *
+     * @since 2.9
+     */
+    public JsonInclude.Value getDefaultInclusion(Class<?> baseType,
+            Class<?> propertyType, JsonInclude.Value defaultIncl)
+    {
+        JsonInclude.Value baseOverride = getConfigOverride(baseType).getInclude();
+        JsonInclude.Value propOverride = getConfigOverride(propertyType).getIncludeAsProperty();
+
+        JsonInclude.Value result = JsonInclude.Value.mergeAll(defaultIncl, baseOverride, propOverride);
+        return result;
+    }
 
     /**
      * Accessor for default format settings to use for serialization (and, to a degree
@@ -372,7 +452,82 @@ public abstract class MapperConfig<T extends MapperConfig<T>>
      * @since 2.7
      */
     public abstract JsonFormat.Value getDefaultPropertyFormat(Class<?> baseType);
-    
+
+    /**
+     * Accessor for default property ignorals to use, if any, for given base type,
+     * based on config overrides settings (see {@link #findConfigOverride(Class)}).
+     *
+     * @since 2.8
+     */
+    public abstract JsonIgnoreProperties.Value getDefaultPropertyIgnorals(Class<?> baseType);
+
+    /**
+     * Helper method that may be called to see if there are property ignoral
+     * definitions from annotations (via {@link AnnotatedClass}) or through
+     * "config overrides". If both exist, config overrides have precedence
+     * over class annotations.
+     *
+     * @since 2.8
+     */
+    public abstract JsonIgnoreProperties.Value getDefaultPropertyIgnorals(Class<?> baseType,
+            AnnotatedClass actualClass);
+
+    /**
+     * Accessor for object used for determining whether specific property elements
+     * (method, constructors, fields) can be auto-detected based on
+     * their visibility (access modifiers). Can be changed to allow
+     * different minimum visibility levels for auto-detection. Note
+     * that this is the global handler; individual types (classes)
+     * can further override active checker used (using
+     * {@link JsonAutoDetect} annotation)
+     */
+    public abstract VisibilityChecker<?> getDefaultVisibilityChecker();
+
+    /**
+     * Accessor for object used for determining whether specific property elements
+     * (method, constructors, fields) can be auto-detected based on
+     * their visibility (access modifiers). This is based on global defaults
+     * (as would be returned by {@link #getDefaultVisibilityChecker()}, but
+     * then modified by possible class annotation (see {@link JsonAutoDetect})
+     * and/or per-type config override (see {@link ConfigOverride#getVisibility()}).
+     *
+     * @since 2.9
+     */
+    public abstract VisibilityChecker<?> getDefaultVisibilityChecker(Class<?> baseType,
+            AnnotatedClass actualClass);
+
+    /**
+     * Accessor for the baseline setter info used as the global baseline,
+     * not considering possible per-type overrides.
+     *
+     * @return Global base settings; never null
+     *
+     * @since 2.9
+     */
+    public abstract JsonSetter.Value getDefaultSetterInfo();
+
+    /**
+     * Accessor for the baseline merge info used as the global baseline,
+     * not considering possible per-type overrides.
+     *
+     * @return Global base settings, if any; `null` if none.
+     *
+     * @since 2.9
+     */
+    public abstract Boolean getDefaultMergeable();
+
+    /**
+     * Accessor for the baseline merge info used for given type, including global
+     * defaults if no type-specific overrides defined.
+     *
+     * @return Type-specific settings (if any); global defaults (same as
+     *    {@link #getDefaultMergeable()}) otherwise, if any defined; or `null`
+     *    if neither defined
+     *
+     * @since 2.9
+     */
+    public abstract Boolean getDefaultMergeable(Class<?> baseType);
+
     /*
     /**********************************************************
     /* Configuration: other

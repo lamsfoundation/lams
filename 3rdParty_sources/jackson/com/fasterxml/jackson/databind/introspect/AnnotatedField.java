@@ -18,7 +18,7 @@ public final class AnnotatedField
     /**
      * Actual {@link Field} used for access.
      *<p>
-     * Transient since it can not be persisted directly using
+     * Transient since it cannot be persisted directly using
      * JDK serialization
      */
     protected final transient Field _field;
@@ -75,6 +75,12 @@ public final class AnnotatedField
         return _field.getType();
     }
 
+    @Deprecated
+    @Override
+    public Type getGenericType() {
+        return _field.getGenericType();
+    }
+    
     @Override
     public JavaType getType() {
         return _typeContext.resolveType(_field.getGenericType());
@@ -120,10 +126,6 @@ public final class AnnotatedField
     /**********************************************************
      */
 
-    public String getFullName() {
-        return getDeclaringClass().getName() + "#" + getName();
-    }
-
     public int getAnnotationCount() { return _annotations.size(); }
 
     /**
@@ -139,8 +141,8 @@ public final class AnnotatedField
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (o == null || o.getClass() != getClass()) return false;
-        return ((AnnotatedField) o)._field == _field;
+        return ClassUtil.hasClass(o, getClass())
+                && (((AnnotatedField) o)._field == _field);
     }
 
     @Override

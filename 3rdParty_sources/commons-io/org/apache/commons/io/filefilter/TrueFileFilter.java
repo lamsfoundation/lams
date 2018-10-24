@@ -23,11 +23,12 @@ import java.io.Serializable;
  * A file filter that always returns true.
  *
  * @since 1.0
- *
+ * @version $Id: TrueFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @see FileFilterUtils#trueFileFilter()
  */
 public class TrueFileFilter implements IOFileFilter, Serializable {
 
+    private static final long serialVersionUID = 8782512160909720199L;
     /**
      * Singleton instance of true filter.
      * @since 1.3
@@ -42,7 +43,7 @@ public class TrueFileFilter implements IOFileFilter, Serializable {
     public static final IOFileFilter INSTANCE = TRUE;
 
     /**
-     * Restrictive consructor.
+     * Restrictive constructor.
      */
     protected TrueFileFilter() {
     }
@@ -53,7 +54,7 @@ public class TrueFileFilter implements IOFileFilter, Serializable {
      * @param file  the file to check (ignored)
      * @return true
      */
-    public boolean accept(File file) {
+    public boolean accept(final File file) {
         return true;
     }
 
@@ -64,7 +65,7 @@ public class TrueFileFilter implements IOFileFilter, Serializable {
      * @param name  the filename (ignored)
      * @return true
      */
-    public boolean accept(File dir, String name) {
+    public boolean accept(final File dir, final String name) {
         return true;
     }
 

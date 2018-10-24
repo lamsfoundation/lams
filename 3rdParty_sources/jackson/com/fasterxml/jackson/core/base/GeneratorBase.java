@@ -1,12 +1,14 @@
 package com.fasterxml.jackson.core.base;
 
-import java.io.*;
-
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.json.DupDetector;
 import com.fasterxml.jackson.core.json.JsonWriteContext;
+import com.fasterxml.jackson.core.json.PackageVersion;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.core.util.VersionUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
 
 /**
  * This base class implements part of API that a JSON generator exposes
@@ -34,13 +36,23 @@ public abstract class GeneratorBase extends JsonGenerator
 
     // // // Constants for validation messages (since 2.6)
 
-    protected final String WRITE_BINARY = "write a binary value";
-    protected final String WRITE_BOOLEAN = "write a boolean value";
-    protected final String WRITE_NULL = "write a null";
-    protected final String WRITE_NUMBER = "write a number";
-    protected final String WRITE_RAW = "write a raw (unencoded) value";
-    protected final String WRITE_STRING = "write a string";
+    protected final static String WRITE_BINARY = "write a binary value";
+    protected final static String WRITE_BOOLEAN = "write a boolean value";
+    protected final static String WRITE_NULL = "write a null";
+    protected final static String WRITE_NUMBER = "write a number";
+    protected final static String WRITE_RAW = "write a raw (unencoded) value";
+    protected final static String WRITE_STRING = "write a string";
 
+    /**
+     * This value is the limit of scale allowed for serializing {@link BigDecimal}
+     * in "plain" (non-engineering) notation; intent is to prevent asymmetric
+     * attack whereupon simple eng-notation with big scale is used to generate
+     * huge "plain" serialization. See [core#315] for details.
+     * 
+     * @since 2.7.7
+     */
+    protected final static int MAX_BIG_DECIMAL_SCALE = 9999;
+    
     /*
     /**********************************************************
     /* Configuration
@@ -114,7 +126,7 @@ public abstract class GeneratorBase extends JsonGenerator
      * a simple generated class, with information extracted from Maven project file
      * during build.
      */
-    @Override public Version version() { return VersionUtil.versionFor(getClass()); }
+    @Override public Version version() { return PackageVersion.VERSION; }
 
     @Override
     public Object getCurrentValue() {
@@ -251,9 +263,11 @@ public abstract class GeneratorBase extends JsonGenerator
      */
 
     /**
-     * Note: co-variant return type.
+     * Note: type was co-variant until Jackson 2.7; reverted back to
+     * base type in 2.8 to allow for overriding by subtypes that use
+     * custom context type.
      */
-    @Override public JsonWriteContext getOutputContext() { return _writeContext; }
+    @Override public JsonStreamContext getOutputContext() { return _writeContext; }
 
     /*
     /**********************************************************
@@ -266,6 +280,16 @@ public abstract class GeneratorBase extends JsonGenerator
     //public void writeStartObject() throws IOException
     //public void writeEndObject() throws IOException
 
+    @Override // since 2.8
+    public void writeStartObject(Object forValue) throws IOException
+    {
+        writeStartObject();
+        if ((_writeContext != null) && (forValue != null)) {
+            _writeContext.setCurrentValue(forValue);
+        }
+        setCurrentValue(forValue);
+    }
+
     /*
     /**********************************************************
     /* Public API, write methods, textual
@@ -275,10 +299,12 @@ public abstract class GeneratorBase extends JsonGenerator
     @Override public void writeFieldName(SerializableString name) throws IOException {
         writeFieldName(name.getValue());
     }
-    
+
     //public abstract void writeString(String text) throws IOException;
 
     //public abstract void writeString(char[] text, int offset, int len) throws IOException;
+
+    //public abstract void writeString(Reader reader, int len) throws IOException;
 
     //public abstract void writeRaw(String text) throws IOException,;
 
@@ -317,10 +343,10 @@ public abstract class GeneratorBase extends JsonGenerator
     }
 
     /*
-   /**********************************************************
-   /* Public API, write methods, primitive
-   /**********************************************************
-    */
+    /**********************************************************
+    /* Public API, write methods, primitive
+    /**********************************************************
+     */
 
     // Not implemented at this level, added as placeholders
 
@@ -412,6 +438,26 @@ public abstract class GeneratorBase extends JsonGenerator
      */
     protected PrettyPrinter _constructDefaultPrettyPrinter() {
         return new DefaultPrettyPrinter();
+    }
+
+    /**
+     * Helper method used to serialize a {@link java.math.BigDecimal} as a String,
+     * for serialization, taking into account configuration settings
+     *
+     * @since 2.7.7
+     */
+    protected String _asString(BigDecimal value) throws IOException {
+        if (Feature.WRITE_BIGDECIMAL_AS_PLAIN.enabledIn(_features)) {
+            // 24-Aug-2016, tatu: [core#315] prevent possible DoS vector
+            int scale = value.scale();
+            if ((scale < -MAX_BIG_DECIMAL_SCALE) || (scale > MAX_BIG_DECIMAL_SCALE)) {
+                _reportError(String.format(
+"Attempt to write plain `java.math.BigDecimal` (see JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN) with illegal scale (%d): needs to be between [-%d, %d]",
+scale, MAX_BIG_DECIMAL_SCALE, MAX_BIG_DECIMAL_SCALE));
+            }
+            return value.toPlainString();
+        }
+        return value.toString();
     }
 
     /*

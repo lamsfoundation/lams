@@ -135,7 +135,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
      *
      * This will be null if there is no data
      */
-    private PooledByteBuffer wrappedData;
+    private volatile PooledByteBuffer wrappedData;
     /**
      * Data that has been read from the underlying channel, and needs to be unwrapped.
      *
@@ -143,14 +143,14 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
      * flag must still be checked, otherwise there may be situations where even though some data
      * has been read there is not enough to unwrap (i.e. the engine returned buffer underflow).
      */
-    private PooledByteBuffer dataToUnwrap;
+    private volatile PooledByteBuffer dataToUnwrap;
 
     /**
      * Unwrapped data, ready to be delivered to the application. Will be null if there is no data.
      *
      * If possible we avoid allocating this buffer, and instead unwrap directly into the end users buffer.
      */
-    private PooledByteBuffer unwrappedData;
+    private volatile PooledByteBuffer unwrappedData;
 
     private SslWriteReadyHandler writeReadyHandler;
     private SslReadReadyHandler readReadyHandler;
@@ -238,7 +238,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
         if(anyAreSet(state, FLAG_READ_REQUIRES_WRITE)) {
             delegate.getSinkChannel().resumeWrites();
         } else {
-            if(anyAreSet(state, FLAG_DATA_TO_UNWRAP) || wakeup) {
+            if(anyAreSet(state, FLAG_DATA_TO_UNWRAP) || wakeup || unwrappedData != null) {
                 runReadListener(true);
             } else {
                 delegate.getSourceChannel().resumeReads();
@@ -260,7 +260,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
             } else {
                 delegate.getIoThread().execute(runReadListenerCommand);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             //will only happen on shutdown
             IoUtils.safeClose(connection, delegate);
             UndertowLogger.REQUEST_IO_LOGGER.debugf(e, "Failed to queue read listener invocation");
@@ -275,7 +275,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                     writeReadyHandler.writeReady();
                 }
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             //will only happen on shutdown
             IoUtils.safeClose(connection, delegate);
             UndertowLogger.REQUEST_IO_LOGGER.debugf(e, "Failed to queue read listener invocation");
@@ -532,7 +532,13 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
             if(allAreClear(state, FLAG_DELEGATE_SINK_SHUTDOWN)) {
                 sink.terminateWrites();
                 state |= FLAG_DELEGATE_SINK_SHUTDOWN;
+                notifyWriteClosed();
             }
+            boolean result = sink.flush();
+            if(result && anyAreSet(state, FLAG_READ_CLOSED)) {
+                closed();
+            }
+            return result;
         }
         return sink.flush();
     }
@@ -605,10 +611,13 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
         try {
             engine.closeInbound();
         } catch (SSLException e) {
-            UndertowLogger.REQUEST_IO_LOGGER.ioException(new IOException(e));
+            UndertowLogger.REQUEST_IO_LOGGER.trace("Exception closing read side of SSL channel", e);
+            if(allAreClear(state, FLAG_WRITE_CLOSED) && isWriteResumed()) {
+                runWriteListener();
+            }
         }
 
-        state |= FLAG_READ_CLOSED | FLAG_ENGINE_INBOUND_SHUTDOWN;
+        state |= FLAG_READ_CLOSED | FLAG_ENGINE_INBOUND_SHUTDOWN | FLAG_READ_SHUTDOWN;
         if(anyAreSet(state, FLAG_WRITE_CLOSED)) {
             closed();
         }
@@ -692,7 +701,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                 int res;
                 try {
                     res = source.read(dataToUnwrap.getBuffer());
-                } catch (IOException e) {
+                } catch (IOException | RuntimeException | Error e) {
                     dataToUnwrap.close();
                     dataToUnwrap = null;
                     throw e;
@@ -704,6 +713,12 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                     notifyReadClosed();
                     return -1;
                 } else if (res == 0 && engine.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.FINISHED) {
+                    //its possible there was some data in the buffer from a previous unwrap that had a buffer underflow
+                    //if not we just close the buffer so it does not hang around
+                    if(!dataToUnwrap.getBuffer().hasRemaining()) {
+                        dataToUnwrap.close();
+                        dataToUnwrap = null;
+                    }
                     return 0;
                 }
             }
@@ -754,7 +769,9 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
             }
 
             if (!handleHandshakeResult(result)) {
-                if (this.dataToUnwrap.getBuffer().hasRemaining() && result.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW && dataToUnwrap.getBuffer().remaining() != dataToUnwrapLength) {
+                if (this.dataToUnwrap.getBuffer().hasRemaining()
+                        && result.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW
+                        && dataToUnwrap.getBuffer().remaining() != dataToUnwrapLength) {
                     state |= FLAG_DATA_TO_UNWRAP;
                 } else {
                     state &= ~FLAG_DATA_TO_UNWRAP;
@@ -762,6 +779,10 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                 return 0;
             }
             if (result.getStatus() == SSLEngineResult.Status.CLOSED) {
+                if(dataToUnwrap != null) {
+                    dataToUnwrap.close();
+                    dataToUnwrap = null;
+                }
                 notifyReadClosed();
                 return -1;
             }
@@ -785,13 +806,35 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                 }
                 return res;
             }
-        } catch (RuntimeException|IOException e) {
-            close();
+        } catch (SSLException e) {
+            try {
+                try {
+                    //we make an effort to write out the final record
+                    //this is best effort, there are no guarantees
+                    clearWriteRequiresRead();
+                    doWrap(null, 0, 0);
+                    flush();
+                } catch (Exception e2) {
+                    UndertowLogger.REQUEST_LOGGER.debug("Failed to write out final SSL record", e2);
+                }
+                close();
+            } catch (Throwable ex) {
+                //we ignore this
+                UndertowLogger.REQUEST_LOGGER.debug("Exception closing SSLConduit after exception in doUnwrap", ex);
+            }
+            throw e;
+        } catch (RuntimeException|IOException|Error e) {
+            try {
+                close();
+            } catch (Throwable ex) {
+                //we ignore this
+                UndertowLogger.REQUEST_LOGGER.debug("Exception closing SSLConduit after exception in doUnwrap", ex);
+            }
             throw e;
         } finally {
             boolean requiresListenerInvocation = false; //if there is data in the buffer and reads are resumed we should re-run the listener
             //we always need to re-invoke if bytes have been produced, as the engine may have buffered some data
-            if (bytesProduced || (unwrappedData != null && unwrappedData.getBuffer().hasRemaining())) {
+            if (bytesProduced || (unwrappedData != null && unwrappedData.isOpen() && unwrappedData.getBuffer().hasRemaining())) {
                 requiresListenerInvocation = true;
             }
             if (dataToUnwrap != null) {
@@ -887,8 +930,12 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
             }
 
             return result.bytesConsumed();
-        } catch (RuntimeException|IOException e) {
-            close();
+        } catch (RuntimeException|IOException|Error e) {
+            try {
+                close();
+            } catch (Throwable ex) {
+                UndertowLogger.REQUEST_LOGGER.debug("Exception closing SSLConduit after exception in doWrap()", ex);
+            }
             throw e;
         } finally {
             //this can be cleared if the channel is fully closed
@@ -992,6 +1039,8 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                 engine.closeInbound();
             } catch (SSLException e) {
                 UndertowLogger.REQUEST_LOGGER.ioException(e);
+            } catch (Throwable t) {
+                UndertowLogger.REQUEST_LOGGER.handleUnexpectedFailure(t);
             }
         }
         IoUtils.safeClose(delegate);
@@ -1033,7 +1082,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                                                 --outstandingTasks;
                                                 try {
                                                     doHandshake();
-                                                } catch (IOException e) {
+                                                } catch (IOException | RuntimeException | Error e) {
                                                     IoUtils.safeClose(connection);
                                                 }
                                                 if (anyAreSet(state, FLAG_READS_RESUMED)) {
@@ -1088,10 +1137,18 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                 } catch (IOException e) {
                     UndertowLogger.REQUEST_LOGGER.ioException(e);
                     IoUtils.safeClose(delegate);
+                } catch (Throwable t) {
+                    UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
+                    IoUtils.safeClose(delegate);
                 } finally {
                     invokingReadListenerHandshake = false;
                 }
+
+                if(!anyAreSet(state, FLAG_READS_RESUMED) && !allAreSet(state, FLAG_WRITE_REQUIRES_READ | FLAG_WRITES_RESUMED)) {
+                    delegate.getSourceChannel().suspendReads();
+                }
             }
+
             boolean noProgress = false;
             int initialDataToUnwrap = -1;
             int initialUnwrapped = -1;
@@ -1118,9 +1175,7 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                     delegateHandler.readReady();
                 }
             }
-            if(!anyAreSet(state, FLAG_READS_RESUMED) && !allAreSet(state, FLAG_WRITE_REQUIRES_READ | FLAG_WRITES_RESUMED)) {
-                delegate.getSourceChannel().suspendReads();
-            } else if(anyAreSet(state, FLAG_READS_RESUMED) && (unwrappedData != null || anyAreSet(state, FLAG_DATA_TO_UNWRAP))) {
+            if(anyAreSet(state, FLAG_READS_RESUMED) && (unwrappedData != null || anyAreSet(state, FLAG_DATA_TO_UNWRAP))) {
                 if(anyAreSet(state, FLAG_READ_CLOSED)) {
                     if(unwrappedData != null) {
                         unwrappedData.close();
@@ -1198,6 +1253,9 @@ public class SslConduit implements StreamSourceConduit, StreamSinkConduit {
                         doHandshake();
                     } catch (IOException e) {
                         UndertowLogger.REQUEST_LOGGER.ioException(e);
+                        IoUtils.safeClose(delegate);
+                    } catch (Throwable t) {
+                        UndertowLogger.REQUEST_LOGGER.handleUnexpectedFailure(t);
                         IoUtils.safeClose(delegate);
                     }
                 }

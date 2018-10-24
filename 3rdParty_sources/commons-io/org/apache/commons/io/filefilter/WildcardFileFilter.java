@@ -32,7 +32,7 @@ import org.apache.commons.io.IOCase;
  * The wildcard matcher uses the characters '?' and '*' to represent a
  * single or multiple wildcard characters.
  * This is the same as often found on Dos/Unix command lines.
- * The extension check is case-sensitive by .
+ * The check is case-sensitive by default.
  * See {@link FilenameUtils#wildcardMatchOnSystem} for more information.
  * <p>
  * For example:
@@ -40,16 +40,17 @@ import org.apache.commons.io.IOCase;
  * File dir = new File(".");
  * FileFilter fileFilter = new WildcardFileFilter("*test*.java~*~");
  * File[] files = dir.listFiles(fileFilter);
- * for (int i = 0; i < files.length; i++) {
+ * for (int i = 0; i &lt; files.length; i++) {
  *   System.out.println(files[i]);
  * }
  * </pre>
  *
- *
+ * @version $Id: WildcardFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.3
  */
 public class WildcardFileFilter extends AbstractFileFilter implements Serializable {
 
+    private static final long serialVersionUID = -7426486598995782105L;
     /** The wildcards that will be used to match filenames. */
     private final String[] wildcards;
     /** Whether the comparison is case sensitive. */
@@ -61,8 +62,8 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
      * @param wildcard  the wildcard to match
      * @throws IllegalArgumentException if the pattern is null
      */
-    public WildcardFileFilter(String wildcard) {
-        this(wildcard, null);
+    public WildcardFileFilter(final String wildcard) {
+        this(wildcard, IOCase.SENSITIVE);
     }
 
     /**
@@ -72,7 +73,7 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
      * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
      * @throws IllegalArgumentException if the pattern is null
      */
-    public WildcardFileFilter(String wildcard, IOCase caseSensitivity) {
+    public WildcardFileFilter(final String wildcard, final IOCase caseSensitivity) {
         if (wildcard == null) {
             throw new IllegalArgumentException("The wildcard must not be null");
         }
@@ -83,27 +84,23 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
     /**
      * Construct a new case-sensitive wildcard filter for an array of wildcards.
      * <p>
-     * The array is not cloned, so could be changed after constructing the
-     * instance. This would be inadvisable however.
      *
      * @param wildcards  the array of wildcards to match
      * @throws IllegalArgumentException if the pattern array is null
      */
-    public WildcardFileFilter(String[] wildcards) {
-        this(wildcards, null);
+    public WildcardFileFilter(final String[] wildcards) {
+        this(wildcards, IOCase.SENSITIVE);
     }
 
     /**
      * Construct a new wildcard filter for an array of wildcards specifying case-sensitivity.
      * <p>
-     * The array is not cloned, so could be changed after constructing the
-     * instance. This would be inadvisable however.
      *
      * @param wildcards  the array of wildcards to match, not null
      * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
      * @throws IllegalArgumentException if the pattern array is null
      */
-    public WildcardFileFilter(String[] wildcards, IOCase caseSensitivity) {
+    public WildcardFileFilter(final String[] wildcards, final IOCase caseSensitivity) {
         if (wildcards == null) {
             throw new IllegalArgumentException("The wildcard array must not be null");
         }
@@ -119,8 +116,8 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
      * @throws IllegalArgumentException if the pattern list is null
      * @throws ClassCastException if the list does not contain Strings
      */
-    public WildcardFileFilter(List<String> wildcards) {
-        this(wildcards, null);
+    public WildcardFileFilter(final List<String> wildcards) {
+        this(wildcards, IOCase.SENSITIVE);
     }
 
     /**
@@ -131,7 +128,7 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
      * @throws IllegalArgumentException if the pattern list is null
      * @throws ClassCastException if the list does not contain Strings
      */
-    public WildcardFileFilter(List<String> wildcards, IOCase caseSensitivity) {
+    public WildcardFileFilter(final List<String> wildcards, final IOCase caseSensitivity) {
         if (wildcards == null) {
             throw new IllegalArgumentException("The wildcard list must not be null");
         }
@@ -148,8 +145,8 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
      * @return true if the filename matches one of the wildcards
      */
     @Override
-    public boolean accept(File dir, String name) {
-        for (String wildcard : wildcards) {
+    public boolean accept(final File dir, final String name) {
+        for (final String wildcard : wildcards) {
             if (FilenameUtils.wildcardMatch(name, wildcard, caseSensitivity)) {
                 return true;
             }
@@ -164,9 +161,9 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
      * @return true if the filename matches one of the wildcards
      */
     @Override
-    public boolean accept(File file) {
-        String name = file.getName();
-        for (String wildcard : wildcards) {
+    public boolean accept(final File file) {
+        final String name = file.getName();
+        for (final String wildcard : wildcards) {
             if (FilenameUtils.wildcardMatch(name, wildcard, caseSensitivity)) {
                 return true;
             }
@@ -175,13 +172,13 @@ public class WildcardFileFilter extends AbstractFileFilter implements Serializab
     }
 
     /**
-     * Provide a String representaion of this file filter.
+     * Provide a String representation of this file filter.
      *
-     * @return a String representaion
+     * @return a String representation
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(super.toString());
         buffer.append("(");
         if (wildcards != null) {

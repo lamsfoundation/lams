@@ -125,7 +125,7 @@ public final class ArrayType
     }
 
     private JavaType _reportUnsupported() {
-        throw new UnsupportedOperationException("Can not narrow or widen array types");
+        throw new UnsupportedOperationException("Cannot narrow or widen array types");
     }
 
     /*
@@ -181,6 +181,11 @@ public final class ArrayType
         return _componentType.getTypeHandler();
     }
 
+    @Override
+    public boolean hasHandlers() {
+        return super.hasHandlers() || _componentType.hasHandlers();
+    }
+    
     @Override
     public StringBuilder getGenericSignature(StringBuilder sb) {
         sb.append('[');

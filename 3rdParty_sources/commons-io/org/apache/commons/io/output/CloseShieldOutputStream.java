@@ -24,8 +24,8 @@ import java.io.OutputStream;
  * This class is typically used in cases where an output stream needs to be
  * passed to a component that wants to explicitly close the stream even if
  * other components would still use the stream for output.
- *
- *
+ * </p>
+ * @version $Id: CloseShieldOutputStream.java 1674710 2015-04-20 00:25:55Z ggregory $
  * @since 1.4
  */
 public class CloseShieldOutputStream extends ProxyOutputStream {
@@ -36,7 +36,7 @@ public class CloseShieldOutputStream extends ProxyOutputStream {
      *
      * @param out underlying output stream
      */
-    public CloseShieldOutputStream(OutputStream out) {
+    public CloseShieldOutputStream(final OutputStream out) {
         super(out);
     }
 

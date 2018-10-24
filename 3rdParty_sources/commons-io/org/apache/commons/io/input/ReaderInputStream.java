@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 package org.apache.commons.io.input;
+
+import static org.apache.commons.io.IOUtils.EOF;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,8 +44,8 @@ import java.nio.charset.CodingErrorAction;
  * in a {@link java.io.BufferedReader}.
  * <p>
  * {@link ReaderInputStream} implements the inverse transformation of {@link java.io.InputStreamReader};
- * in the following example, reading from <tt>in2</tt> would return the same byte
- * sequence as reading from <tt>in</tt> (provided that the initial byte sequence is legal
+ * in the following example, reading from {@code in2} would return the same byte
+ * sequence as reading from {@code in} (provided that the initial byte sequence is legal
  * with respect to the charset encoding):
  * <pre>
  * InputStream in = ...
@@ -69,9 +71,9 @@ import java.nio.charset.CodingErrorAction;
  * will always return 0. Also, this class doesn't support {@link InputStream#mark(int)}.
  * <p>
  * Instances of {@link ReaderInputStream} are not thread safe.
- * 
+ *
  * @see org.apache.commons.io.output.WriterOutputStream
- * 
+ *
  * @since 2.0
  */
 public class ReaderInputStream extends InputStream {
@@ -98,24 +100,24 @@ public class ReaderInputStream extends InputStream {
 
     /**
      * Construct a new {@link ReaderInputStream}.
-     * 
+     *
      * @param reader the target {@link Reader}
      * @param encoder the charset encoder
      * @since 2.1
      */
-    public ReaderInputStream(Reader reader, CharsetEncoder encoder) {
+    public ReaderInputStream(final Reader reader, final CharsetEncoder encoder) {
         this(reader, encoder, DEFAULT_BUFFER_SIZE);
     }
 
     /**
      * Construct a new {@link ReaderInputStream}.
-     * 
+     *
      * @param reader the target {@link Reader}
      * @param encoder the charset encoder
      * @param bufferSize the size of the input buffer in number of characters
      * @since 2.1
      */
-    public ReaderInputStream(Reader reader, CharsetEncoder encoder, int bufferSize) {
+    public ReaderInputStream(final Reader reader, final CharsetEncoder encoder, final int bufferSize) {
         this.reader = reader;
         this.encoder = encoder;
         this.encoderIn = CharBuffer.allocate(bufferSize);
@@ -126,12 +128,12 @@ public class ReaderInputStream extends InputStream {
 
     /**
      * Construct a new {@link ReaderInputStream}.
-     * 
+     *
      * @param reader the target {@link Reader}
      * @param charset the charset encoding
      * @param bufferSize the size of the input buffer in number of characters
      */
-    public ReaderInputStream(Reader reader, Charset charset, int bufferSize) {
+    public ReaderInputStream(final Reader reader, final Charset charset, final int bufferSize) {
         this(reader,
              charset.newEncoder()
                     .onMalformedInput(CodingErrorAction.REPLACE)
@@ -142,61 +144,63 @@ public class ReaderInputStream extends InputStream {
     /**
      * Construct a new {@link ReaderInputStream} with a default input buffer size of
      * 1024 characters.
-     * 
+     *
      * @param reader the target {@link Reader}
      * @param charset the charset encoding
      */
-    public ReaderInputStream(Reader reader, Charset charset) {
+    public ReaderInputStream(final Reader reader, final Charset charset) {
         this(reader, charset, DEFAULT_BUFFER_SIZE);
     }
 
     /**
      * Construct a new {@link ReaderInputStream}.
-     * 
+     *
      * @param reader the target {@link Reader}
      * @param charsetName the name of the charset encoding
      * @param bufferSize the size of the input buffer in number of characters
      */
-    public ReaderInputStream(Reader reader, String charsetName, int bufferSize) {
+    public ReaderInputStream(final Reader reader, final String charsetName, final int bufferSize) {
         this(reader, Charset.forName(charsetName), bufferSize);
     }
 
     /**
      * Construct a new {@link ReaderInputStream} with a default input buffer size of
      * 1024 characters.
-     * 
+     *
      * @param reader the target {@link Reader}
      * @param charsetName the name of the charset encoding
      */
-    public ReaderInputStream(Reader reader, String charsetName) {
+    public ReaderInputStream(final Reader reader, final String charsetName) {
         this(reader, charsetName, DEFAULT_BUFFER_SIZE);
     }
 
     /**
      * Construct a new {@link ReaderInputStream} that uses the default character encoding
      * with a default input buffer size of 1024 characters.
-     * 
+     *
      * @param reader the target {@link Reader}
+     * @deprecated 2.5 use {@link #ReaderInputStream(Reader, Charset)} instead
      */
-    public ReaderInputStream(Reader reader) {
+    @Deprecated
+    public ReaderInputStream(final Reader reader) {
         this(reader, Charset.defaultCharset());
     }
 
     /**
      * Fills the internal char buffer from the reader.
-     * 
+     *
      * @throws IOException
      *             If an I/O error occurs
      */
     private void fillBuffer() throws IOException {
         if (!endOfInput && (lastCoderResult == null || lastCoderResult.isUnderflow())) {
             encoderIn.compact();
-            int position = encoderIn.position();
+            final int position = encoderIn.position();
             // We don't use Reader#read(CharBuffer) here because it is more efficient
             // to write directly to the underlying char array (the default implementation
             // copies data to a temporary char array).
-            int c = reader.read(encoderIn.array(), position, encoderIn.remaining());
-            if (c == -1) {
+            final int c = reader.read(encoderIn.array(), position, encoderIn.remaining());
+            if (c == EOF) {
                 endOfInput = true;
             } else {
                 encoderIn.position(position+c);
@@ -207,10 +211,10 @@ public class ReaderInputStream extends InputStream {
         lastCoderResult = encoder.encode(encoderIn, encoderOut, endOfInput);
         encoderOut.flip();
     }
-    
+
     /**
      * Read the specified number of bytes into an array.
-     * 
+     *
      * @param b the byte array to read into
      * @param off the offset to start reading bytes into
      * @param len the number of bytes to read
@@ -219,7 +223,7 @@ public class ReaderInputStream extends InputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
+    public int read(final byte[] b, int off, int len) throws IOException {
         if (b == null) {
             throw new NullPointerException("Byte array must not be null");
         }
@@ -233,7 +237,7 @@ public class ReaderInputStream extends InputStream {
         }
         while (len > 0) {
             if (encoderOut.hasRemaining()) {
-                int c = Math.min(encoderOut.remaining(), len);
+                final int c = Math.min(encoderOut.remaining(), len);
                 encoderOut.get(b, off, c);
                 off += c;
                 len -= c;
@@ -245,19 +249,19 @@ public class ReaderInputStream extends InputStream {
                 }
             }
         }
-        return read == 0 && endOfInput ? -1 : read;
+        return read == 0 && endOfInput ? EOF : read;
     }
 
     /**
      * Read the specified number of bytes into an array.
-     * 
+     *
      * @param b the byte array to read into
      * @return the number of bytes read or <code>-1</code>
      *         if the end of the stream has been reached
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public int read(byte[] b) throws IOException {
+    public int read(final byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
@@ -273,11 +277,10 @@ public class ReaderInputStream extends InputStream {
         for (;;) {
             if (encoderOut.hasRemaining()) {
                 return encoderOut.get() & 0xFF;
-            } else {
-                fillBuffer();
-                if (endOfInput && !encoderOut.hasRemaining()) {
-                    return -1;
-                }
+            }
+            fillBuffer();
+            if (endOfInput && !encoderOut.hasRemaining()) {
+                return EOF;
             }
         }
     }

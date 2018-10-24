@@ -21,10 +21,12 @@ package io.undertow.servlet.handlers;
 import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.resource.DefaultResourceSupplier;
 import io.undertow.server.handlers.resource.DirectoryUtils;
+import io.undertow.server.handlers.resource.PreCompressedResourceSupplier;
 import io.undertow.server.handlers.resource.RangeAwareResource;
 import io.undertow.server.handlers.resource.Resource;
-import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.server.handlers.resource.ResourceSupplier;
 import io.undertow.servlet.api.DefaultServletConfig;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.spec.ServletContextImpl;
@@ -51,6 +53,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -77,18 +80,20 @@ public class DefaultServlet extends HttpServlet {
     public static final String ALLOWED_EXTENSIONS = "allowed-extensions";
     public static final String DISALLOWED_EXTENSIONS = "disallowed-extensions";
     public static final String RESOLVE_AGAINST_CONTEXT_ROOT = "resolve-against-context-root";
+    public static final String ALLOW_POST = "allow-post";
 
     private static final Set<String> DEFAULT_ALLOWED_EXTENSIONS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("js", "css", "png", "jpg", "gif", "html", "htm", "txt", "pdf", "jpeg", "xml")));
 
 
     private Deployment deployment;
-    private ResourceManager resourceManager;
+    private ResourceSupplier resourceSupplier;
     private boolean directoryListingEnabled = false;
 
     private boolean defaultAllowed = true;
     private Set<String> allowed = DEFAULT_ALLOWED_EXTENSIONS;
     private Set<String> disallowed = Collections.emptySet();
     private boolean resolveAgainstContextRoot;
+    private boolean allowPost = false;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -121,7 +126,18 @@ public class DefaultServlet extends HttpServlet {
         if (config.getInitParameter(RESOLVE_AGAINST_CONTEXT_ROOT) != null) {
             resolveAgainstContextRoot = Boolean.parseBoolean(config.getInitParameter(RESOLVE_AGAINST_CONTEXT_ROOT));
         }
-        this.resourceManager = deployment.getDeploymentInfo().getResourceManager();
+        if (config.getInitParameter(ALLOW_POST) != null) {
+            allowPost = Boolean.parseBoolean(config.getInitParameter(ALLOW_POST));
+        }
+        if(deployment.getDeploymentInfo().getPreCompressedResources().isEmpty()) {
+            this.resourceSupplier = new DefaultResourceSupplier(deployment.getDeploymentInfo().getResourceManager());
+        } else {
+            PreCompressedResourceSupplier preCompressedResourceSupplier = new PreCompressedResourceSupplier(deployment.getDeploymentInfo().getResourceManager());
+            for(Map.Entry<String, String> entry : deployment.getDeploymentInfo().getPreCompressedResources().entrySet()) {
+                preCompressedResourceSupplier.addEncoding(entry.getKey(), entry.getValue());
+            }
+            this.resourceSupplier = preCompressedResourceSupplier;
+        }
         String listings = config.getInitParameter(DIRECTORY_LISTING);
         if (Boolean.valueOf(listings)) {
             this.directoryListingEnabled = true;
@@ -139,10 +155,12 @@ public class DefaultServlet extends HttpServlet {
             //if the separator char is not / we want to replace it with a / and canonicalise
             path = CanonicalPathUtils.canonicalize(path.replace(File.separatorChar, '/'));
         }
+
+        HttpServerExchange exchange = SecurityActions.requireCurrentServletRequestContext().getOriginalRequest().getExchange();
         final Resource resource;
         //we want to disallow windows characters in the path
         if(File.separatorChar == '/' || !path.contains(File.separator)) {
-            resource = resourceManager.getResource(path);
+            resource = resourceSupplier.getResource(exchange, path);
         } else {
             resource = null;
         }
@@ -177,23 +195,27 @@ public class DefaultServlet extends HttpServlet {
                 resp.sendError(StatusCodes.NOT_FOUND);
                 return;
             }
-            serveFileBlocking(req, resp, resource);
+            serveFileBlocking(req, resp, resource, exchange);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        /*
-         * Where a servlet has received a POST request we still require the capability to include static content.
-         */
-        switch (req.getDispatcherType()) {
-            case INCLUDE:
-            case FORWARD:
-            case ERROR:
-                doGet(req, resp);
-                break;
-            default:
-                super.doPost(req, resp);
+        if(allowPost) {
+            doGet(req, resp);
+        } else {
+            /*
+             * Where a servlet has received a POST request we still require the capability to include static content.
+             */
+            switch (req.getDispatcherType()) {
+                case INCLUDE:
+                case FORWARD:
+                case ERROR:
+                    doGet(req, resp);
+                    break;
+                default:
+                    super.doPost(req, resp);
+            }
         }
     }
 
@@ -249,7 +271,7 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    private void serveFileBlocking(final HttpServletRequest req, final HttpServletResponse resp, final Resource resource) throws IOException {
+    private void serveFileBlocking(final HttpServletRequest req, final HttpServletResponse resp, final Resource resource, HttpServerExchange exchange) throws IOException {
         final ETag etag = resource.getETag();
         final Date lastModified = resource.getLastModified();
         if(req.getDispatcherType() != DispatcherType.INCLUDE) {
@@ -260,7 +282,11 @@ public class DefaultServlet extends HttpServlet {
             }
             if (!ETagUtils.handleIfNoneMatch(req.getHeader(Headers.IF_NONE_MATCH_STRING), etag, true) ||
                     !DateUtils.handleIfModifiedSince(req.getHeader(Headers.IF_MODIFIED_SINCE_STRING), lastModified)) {
-                resp.setStatus(StatusCodes.NOT_MODIFIED);
+                if(req.getMethod().equals(Methods.GET_STRING) || req.getMethod().equals(Methods.HEAD_STRING)) {
+                    resp.setStatus(StatusCodes.NOT_MODIFIED);
+                } else {
+                    resp.setStatus(StatusCodes.PRECONDITION_FAILED);
+                }
                 return;
             }
         }
@@ -327,7 +353,6 @@ public class DefaultServlet extends HttpServlet {
         }
         final boolean include = req.getDispatcherType() == DispatcherType.INCLUDE;
         if (!req.getMethod().equals(Methods.HEAD_STRING)) {
-            HttpServerExchange exchange = SecurityActions.requireCurrentServletRequestContext().getOriginalRequest().getExchange();
             if(rangeResponse == null) {
                 resource.serve(exchange.getResponseSender(), exchange, completionCallback(include));
             } else {
@@ -373,7 +398,7 @@ public class DefaultServlet extends HttpServlet {
         } else {
             result = CanonicalPathUtils.canonicalize(result);
         }
-        if ((result == null) || (result.equals(""))) {
+        if ((result == null) || (result.isEmpty())) {
             result = "/";
         }
         return result;

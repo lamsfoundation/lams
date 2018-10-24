@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -114,33 +117,13 @@ public class AnnotationIntrospectorPair
     }
 
     @Override
-    @Deprecated // since 2.6
-    public String[] findPropertiesToIgnore(Annotated ac) {
-        String[] result = _primary.findPropertiesToIgnore(ac);
-        if (result == null) {
-            result = _secondary.findPropertiesToIgnore(ac);
-        }
-        return result;            
-    }
-
-    @Override
-    public String[] findPropertiesToIgnore(Annotated ac, boolean forSerialization) {
-        String[] result = _primary.findPropertiesToIgnore(ac, forSerialization);
-        if (result == null) {
-            result = _secondary.findPropertiesToIgnore(ac, forSerialization);
-        }
-        return result;            
-    }
-
-    @Override
-    public Boolean findIgnoreUnknownProperties(AnnotatedClass ac)
+    public JsonIgnoreProperties.Value findPropertyIgnorals(Annotated a)
     {
-        Boolean result = _primary.findIgnoreUnknownProperties(ac);
-        if (result == null) {
-            result = _secondary.findIgnoreUnknownProperties(ac);
-        }
-        return result;
-    }        
+        JsonIgnoreProperties.Value v2 = _secondary.findPropertyIgnorals(a);
+        JsonIgnoreProperties.Value v1 = _primary.findPropertyIgnorals(a);
+        return (v2 == null) // shouldn't occur but
+            ? v1 : v2.withOverrides(v1);
+    }
 
     @Override
     public Boolean isIgnorableType(AnnotatedClass ac)
@@ -181,6 +164,37 @@ public class AnnotationIntrospectorPair
         return str;
     }
 
+    @Override
+    @Deprecated // since 2.6
+    public String[] findPropertiesToIgnore(Annotated ac) {
+        String[] result = _primary.findPropertiesToIgnore(ac);
+        if (result == null) {
+            result = _secondary.findPropertiesToIgnore(ac);
+        }
+        return result;            
+    }
+
+    @Override
+    @Deprecated // since 2.8
+    public String[] findPropertiesToIgnore(Annotated ac, boolean forSerialization) {
+        String[] result = _primary.findPropertiesToIgnore(ac, forSerialization);
+        if (result == null) {
+            result = _secondary.findPropertiesToIgnore(ac, forSerialization);
+        }
+        return result;            
+    }
+
+    @Override
+    @Deprecated // since 2.8
+    public Boolean findIgnoreUnknownProperties(AnnotatedClass ac)
+    {
+        Boolean result = _primary.findIgnoreUnknownProperties(ac);
+        if (result == null) {
+            result = _secondary.findIgnoreUnknownProperties(ac);
+        }
+        return result;
+    }        
+
     /*
     /******************************************************
     /* Property auto-detection
@@ -202,8 +216,8 @@ public class AnnotationIntrospectorPair
     /******************************************************
     /* Type handling
     /******************************************************
-    */
-    
+     */
+
     @Override
     public TypeResolverBuilder<?> findTypeResolver(MapperConfig<?> config,
             AnnotatedClass ac, JavaType baseType)
@@ -259,8 +273,11 @@ public class AnnotationIntrospectorPair
         }
         return name;
     }
-    
-    // // // General member (field, method/constructor) annotations
+    /*
+    /******************************************************
+    /* General member (field, method/constructor) annotations
+    /******************************************************
+     */
     
     @Override        
     public ReferenceProperty findReferenceType(AnnotatedMember member) {
@@ -275,50 +292,69 @@ public class AnnotationIntrospectorPair
     }
 
     @Override
-    public Object findInjectableValueId(AnnotatedMember m) {
-        Object r = _primary.findInjectableValueId(m);
-        return (r == null) ? _secondary.findInjectableValueId(m) : r;
+    public JacksonInject.Value findInjectableValue(AnnotatedMember m) {
+        JacksonInject.Value r = _primary.findInjectableValue(m);
+        return (r == null) ? _secondary.findInjectableValue(m) : r;
     }
 
     @Override
     public boolean hasIgnoreMarker(AnnotatedMember m) {
         return _primary.hasIgnoreMarker(m) || _secondary.hasIgnoreMarker(m);
     }
-    
+
     @Override
     public Boolean hasRequiredMarker(AnnotatedMember m) {
         Boolean r = _primary.hasRequiredMarker(m);
         return (r == null) ? _secondary.hasRequiredMarker(m) : r;
     }
-    
+
+    @Override
+    @Deprecated // since 2.9
+    public Object findInjectableValueId(AnnotatedMember m) {
+        Object r = _primary.findInjectableValueId(m);
+        return (r == null) ? _secondary.findInjectableValueId(m) : r;
+    }
+
     // // // Serialization: general annotations
 
     @Override
     public Object findSerializer(Annotated am) {
         Object r = _primary.findSerializer(am);
-        return _isExplicitClassOrOb(r, JsonSerializer.None.class)
-                ? r : _secondary.findSerializer(am);
+        if (_isExplicitClassOrOb(r, JsonSerializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findSerializer(am),
+                JsonSerializer.None.class);
     }
     
     @Override
     public Object findKeySerializer(Annotated a) {
         Object r = _primary.findKeySerializer(a);
-        return _isExplicitClassOrOb(r, JsonSerializer.None.class)
-        		? r : _secondary.findKeySerializer(a);
+        if (_isExplicitClassOrOb(r, JsonSerializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findKeySerializer(a),
+                JsonSerializer.None.class);
     }
 
     @Override
     public Object findContentSerializer(Annotated a) {
         Object r = _primary.findContentSerializer(a);
-        return _isExplicitClassOrOb(r, JsonSerializer.None.class)
-        		? r : _secondary.findContentSerializer(a);
+        if (_isExplicitClassOrOb(r, JsonSerializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findContentSerializer(a),
+                JsonSerializer.None.class);
     }
     
     @Override
     public Object findNullSerializer(Annotated a) {
         Object r = _primary.findNullSerializer(a);
-        return _isExplicitClassOrOb(r, JsonSerializer.None.class)
-                ? r : _secondary.findNullSerializer(a);
+        if (_isExplicitClassOrOb(r, JsonSerializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findNullSerializer(a),
+                JsonSerializer.None.class);
     }
     
     @Deprecated
@@ -449,9 +485,15 @@ public class AnnotationIntrospectorPair
     }
 
     @Override
-    public String findImplicitPropertyName(AnnotatedMember param) {
-        String r = _primary.findImplicitPropertyName(param);
-        return (r == null) ? _secondary.findImplicitPropertyName(param) : r;
+    public String findImplicitPropertyName(AnnotatedMember ann) {
+        String r = _primary.findImplicitPropertyName(ann);
+        return (r == null) ? _secondary.findImplicitPropertyName(ann) : r;
+    }
+
+    @Override
+    public List<PropertyName> findPropertyAliases(Annotated ann) {
+        List<PropertyName> r = _primary.findPropertyAliases(ann);
+        return (r == null) ? _secondary.findPropertyAliases(ann) : r;
     }
 
     @Override
@@ -547,17 +589,24 @@ public class AnnotationIntrospectorPair
         }
         return n;
     }
-    
+
     @Override
-    public boolean hasAsValueAnnotation(AnnotatedMethod am) {
-        return _primary.hasAsValueAnnotation(am) || _secondary.hasAsValueAnnotation(am);
+    public Boolean hasAsValue(Annotated a) {
+        Boolean b = _primary.hasAsValue(a);
+        if (b == null) {
+            b = _secondary.hasAsValue(a);
+        }
+        return b;
     }
-    
+
     @Override
-    public String findEnumValue(Enum<?> value) {
-        String r = _primary.findEnumValue(value);
-        return (r == null) ? _secondary.findEnumValue(value) : r;
-    }        
+    public Boolean hasAnyGetter(Annotated a) {
+        Boolean b = _primary.hasAnyGetter(a);
+        if (b == null) {
+            b = _secondary.hasAnyGetter(a);
+        }
+        return b;
+    }
 
     @Override
     public  String[] findEnumValues(Class<?> enumType, Enum<?>[] enumValues, String[] names) {
@@ -566,28 +615,63 @@ public class AnnotationIntrospectorPair
         names = _primary.findEnumValues(enumType, enumValues, names);
         return names;
     }
-    
-    // // // Deserialization: general annotations
 
     @Override
-    public Object findDeserializer(Annotated am) {
-        Object r = _primary.findDeserializer(am);
-        return _isExplicitClassOrOb(r, JsonDeserializer.None.class)
-                ? r : _secondary.findDeserializer(am);
+    public Enum<?> findDefaultEnumValue(Class<Enum<?>> enumCls) {
+        Enum<?> en = _primary.findDefaultEnumValue(enumCls);
+        return (en == null) ? _secondary.findDefaultEnumValue(enumCls) : en;
+    }
+
+    @Override
+    @Deprecated // since 2.8
+    public String findEnumValue(Enum<?> value) {
+        String r = _primary.findEnumValue(value);
+        return (r == null) ? _secondary.findEnumValue(value) : r;
+    }        
+
+    @Override
+    @Deprecated // since 2.9
+    public boolean hasAsValueAnnotation(AnnotatedMethod am) {
+        return _primary.hasAsValueAnnotation(am) || _secondary.hasAsValueAnnotation(am);
     }
     
     @Override
-    public Object findKeyDeserializer(Annotated am) {
-        Object r = _primary.findKeyDeserializer(am);
-        return _isExplicitClassOrOb(r, KeyDeserializer.None.class)
-                ? r : _secondary.findKeyDeserializer(am);
+    @Deprecated // since 2.9
+    public boolean hasAnyGetterAnnotation(AnnotatedMethod am) {
+        return _primary.hasAnyGetterAnnotation(am) || _secondary.hasAnyGetterAnnotation(am);
+    }
+
+    // // // Deserialization: general annotations
+
+    @Override
+    public Object findDeserializer(Annotated a) {
+        Object r = _primary.findDeserializer(a);
+        if (_isExplicitClassOrOb(r, JsonDeserializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findDeserializer(a),
+                JsonDeserializer.None.class);
+    }
+
+    @Override
+    public Object findKeyDeserializer(Annotated a) {
+        Object r = _primary.findKeyDeserializer(a);
+        if (_isExplicitClassOrOb(r, KeyDeserializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findKeyDeserializer(a),
+                KeyDeserializer.None.class);
     }
 
     @Override
     public Object findContentDeserializer(Annotated am) {
         Object r = _primary.findContentDeserializer(am);
-        return _isExplicitClassOrOb(r, JsonDeserializer.None.class)
-                ? r : _secondary.findContentDeserializer(am);
+        if (_isExplicitClassOrOb(r, JsonDeserializer.None.class)) {
+            return r;
+        }
+        return _explicitClassOrOb(_secondary.findContentDeserializer(am),
+                JsonDeserializer.None.class);
+                
     }
 
     @Override
@@ -653,7 +737,7 @@ public class AnnotationIntrospectorPair
         JsonPOJOBuilder.Value result = _primary.findPOJOBuilderConfig(ac);
         return (result == null) ? _secondary.findPOJOBuilderConfig(ac) : result;
     }
-    
+
     // // // Deserialization: method annotations
 
     @Override
@@ -671,23 +755,41 @@ public class AnnotationIntrospectorPair
         }
         return n;
     }
-    
+
     @Override
-    public boolean hasAnySetterAnnotation(AnnotatedMethod am) {
-        return _primary.hasAnySetterAnnotation(am) || _secondary.hasAnySetterAnnotation(am);
+    public Boolean hasAnySetter(Annotated a) {
+        Boolean b = _primary.hasAnySetter(a);
+        if (b == null) {
+            b = _secondary.hasAnySetter(a);
+        }
+        return b;
     }
 
     @Override
-    public boolean hasAnyGetterAnnotation(AnnotatedMethod am) {
-        return _primary.hasAnyGetterAnnotation(am) || _secondary.hasAnyGetterAnnotation(am);
+    public JsonSetter.Value findSetterInfo(Annotated a) {
+        JsonSetter.Value v2 = _secondary.findSetterInfo(a);
+        JsonSetter.Value v1 = _primary.findSetterInfo(a);
+        return (v2 == null) // shouldn't occur but
+            ? v1 : v2.withOverrides(v1);
     }
-    
+
+    @Override // since 2.9
+    public Boolean findMergeInfo(Annotated a) {
+        Boolean b = _primary.findMergeInfo(a);
+        if (b == null) {
+            b = _secondary.findMergeInfo(a);
+        }
+        return b;
+    }
+
     @Override
+    @Deprecated // since 2.9
     public boolean hasCreatorAnnotation(Annotated a) {
         return _primary.hasCreatorAnnotation(a) || _secondary.hasCreatorAnnotation(a);
     }
 
     @Override
+    @Deprecated // since 2.9
     public JsonCreator.Mode findCreatorBinding(Annotated a) {
         JsonCreator.Mode mode = _primary.findCreatorBinding(a);
         if (mode != null) {
@@ -695,15 +797,37 @@ public class AnnotationIntrospectorPair
         }
         return _secondary.findCreatorBinding(a);
     }
-    
+
+    @Override
+    public JsonCreator.Mode findCreatorAnnotation(MapperConfig<?> config, Annotated a) {
+        JsonCreator.Mode mode = _primary.findCreatorAnnotation(config, a);
+        return (mode == null) ? _secondary.findCreatorAnnotation(config, a) : mode;
+    }
+
+    @Override
+    @Deprecated // since 2.9
+    public boolean hasAnySetterAnnotation(AnnotatedMethod am) {
+        return _primary.hasAnySetterAnnotation(am) || _secondary.hasAnySetterAnnotation(am);
+    }
+
     protected boolean _isExplicitClassOrOb(Object maybeCls, Class<?> implicit) {
-        if (maybeCls == null) {
+        if ((maybeCls == null) || (maybeCls == implicit)) {
             return false;
         }
-        if (!(maybeCls instanceof Class<?>)) {
-            return true;
+        if (maybeCls instanceof Class<?>) {
+            return !ClassUtil.isBogusClass((Class<?>) maybeCls);
         }
-        Class<?> cls = (Class<?>) maybeCls;
-        return (cls != implicit && !ClassUtil.isBogusClass(cls));
+        return true;
+    }
+
+    // @since 2.9
+    protected Object _explicitClassOrOb(Object maybeCls, Class<?> implicit) {
+        if ((maybeCls == null) || (maybeCls == implicit)) {
+            return null;
+        }
+        if ((maybeCls instanceof Class<?>) && ClassUtil.isBogusClass((Class<?>) maybeCls)) {
+            return null;
+        }
+        return maybeCls;
     }
 }

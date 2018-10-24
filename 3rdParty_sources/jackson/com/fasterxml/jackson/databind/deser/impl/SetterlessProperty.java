@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
@@ -33,14 +34,16 @@ public final class SetterlessProperty
     protected final Method _getter;
 
     public SetterlessProperty(BeanPropertyDefinition propDef, JavaType type,
-            TypeDeserializer typeDeser, Annotations contextAnnotations, AnnotatedMethod method) {
+            TypeDeserializer typeDeser, Annotations contextAnnotations, AnnotatedMethod method)
+    {
         super(propDef, type, typeDeser, contextAnnotations);
         _annotated = method;
         _getter = method.getAnnotated();
     }
 
-    protected SetterlessProperty(SetterlessProperty src, JsonDeserializer<?> deser) {
-        super(src, deser);
+    protected SetterlessProperty(SetterlessProperty src, JsonDeserializer<?> deser,
+            NullValueProvider nva) {
+        super(src, deser, nva);
         _annotated = src._annotated;
         _getter = src._getter;
     }
@@ -52,15 +55,29 @@ public final class SetterlessProperty
     }
 
     @Override
-    public SetterlessProperty withName(PropertyName newName) {
+    public SettableBeanProperty withName(PropertyName newName) {
         return new SetterlessProperty(this, newName);
     }
-    
+
     @Override
-    public SetterlessProperty withValueDeserializer(JsonDeserializer<?> deser) {
-        return new SetterlessProperty(this, deser);
+    public SettableBeanProperty withValueDeserializer(JsonDeserializer<?> deser) {
+        if (_valueDeserializer == deser) {
+            return this;
+        }
+        return new SetterlessProperty(this, deser, _nullProvider);
     }
-    
+
+    @Override
+    public SettableBeanProperty withNullProvider(NullValueProvider nva) {
+        return new SetterlessProperty(this, _valueDeserializer, nva);
+    }
+
+    @Override
+    public void fixAccess(DeserializationConfig config) {
+        _annotated.fixAccess(
+                config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
+    }
+
     /*
     /**********************************************************
     /* BeanProperty impl
@@ -86,35 +103,32 @@ public final class SetterlessProperty
     {
         JsonToken t = p.getCurrentToken();
         if (t == JsonToken.VALUE_NULL) {
-            /* Hmmh. Is this a problem? We won't be setting anything, so it's
-             * equivalent of empty Collection/Map in this case
-             */
+            // Hmmh. Is this a problem? We won't be setting anything, so it's
+            // equivalent of empty Collection/Map in this case
             return;
         }
-
-        // For [#501] fix we need to implement this but:
+        // For [databind#501] fix we need to implement this but:
         if (_valueTypeDeserializer != null) {
-            throw JsonMappingException.from(p,
-                    "Problem deserializing 'setterless' property (\""+getName()+"\"): no way to handle typed deser with setterless yet");
-//            return _valueDeserializer.deserializeWithType(jp, ctxt, _valueTypeDeserializer);
+            ctxt.reportBadDefinition(getType(), String.format(
+                    "Problem deserializing 'setterless' property (\"%s\"): no way to handle typed deser with setterless yet",
+                    getName()));
+//            return _valueDeserializer.deserializeWithType(p, ctxt, _valueTypeDeserializer);
         }
-        
         // Ok: then, need to fetch Collection/Map to modify:
         Object toModify;
         try {
-            toModify = _getter.invoke(instance);
+            toModify = _getter.invoke(instance, (Object[]) null);
         } catch (Exception e) {
             _throwAsIOE(p, e);
             return; // never gets here
         }
-        /* Note: null won't work, since we can't then inject anything
-         * in. At least that's not good in common case. However,
-         * theoretically the case where we get JSON null might
-         * be compatible. If so, implementation could be changed.
-         */
+        // Note: null won't work, since we can't then inject anything in. At least
+        // that's not good in common case. However, theoretically the case where
+        // we get JSON null might be compatible. If so, implementation could be changed.
         if (toModify == null) {
-            throw JsonMappingException.from(p,
-                    "Problem deserializing 'setterless' property '"+getName()+"': get method returned null");
+            ctxt.reportBadDefinition(getType(), String.format(
+                    "Problem deserializing 'setterless' property '%s': get method returned null",
+                    getName()));
         }
         _valueDeserializer.deserialize(p, ctxt, toModify);
     }
@@ -126,16 +140,16 @@ public final class SetterlessProperty
         deserializeAndSet(p, ctxt, instance);
         return instance;
     }
-    
+
     @Override
     public final void set(Object instance, Object value) throws IOException {
-        throw new UnsupportedOperationException("Should never call 'set' on setterless property");
+        throw new UnsupportedOperationException("Should never call `set()` on setterless property ('"+getName()+"')");
     }
 
     @Override
     public Object setAndReturn(Object instance, Object value) throws IOException
     {
         set(instance, value);
-        return null;
+        return instance;
     }
 }

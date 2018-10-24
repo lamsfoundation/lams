@@ -24,6 +24,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.HttpString;
+import io.undertow.util.Protocols;
 import io.undertow.util.StatusCodes;
 import org.xnio.Buffers;
 import org.xnio.IoUtils;
@@ -50,6 +51,7 @@ import static org.xnio.Bits.allAreSet;
 final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkConduit> {
 
     private final ByteBufferPool pool;
+    private final HttpServerConnection connection;
 
     private int state = STATE_START;
 
@@ -80,14 +82,16 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     private static final int MASK_STATE = 0x0000000F;
     private static final int FLAG_SHUTDOWN = 0x00000010;
 
-    HttpResponseConduit(final StreamSinkConduit next, final ByteBufferPool pool) {
+    HttpResponseConduit(final StreamSinkConduit next, final ByteBufferPool pool, HttpServerConnection connection) {
         super(next);
         this.pool = pool;
+        this.connection = connection;
     }
 
-    HttpResponseConduit(final StreamSinkConduit next, final ByteBufferPool pool, HttpServerExchange exchange) {
+    HttpResponseConduit(final StreamSinkConduit next, final ByteBufferPool pool, HttpServerConnection connection, HttpServerExchange exchange) {
         super(next);
         this.pool = pool;
+        this.connection = connection;
         this.exchange = exchange;
     }
     void reset(HttpServerExchange exchange) {
@@ -164,7 +168,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
 
 
             assert buffer.remaining() >= 50;
-            exchange.getProtocol().appendTo(buffer);
+            Protocols.HTTP_1_1.appendTo(buffer);
             buffer.put((byte) ' ');
             int code = exchange.getStatusCode();
             assert 999 >= code && code >= 100;
@@ -260,7 +264,7 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
             } while (buffer.hasRemaining());
             bufferDone();
             return STATE_BODY;
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException | RuntimeException | Error e) {
             //WFLY-4696, just to be safe
             if (pooledBuffer != null) {
                 pooledBuffer.close();
@@ -289,7 +293,13 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     private static void writeString(ByteBuffer buffer, String string) {
         int length = string.length();
         for (int charIndex = 0; charIndex < length; charIndex++) {
-            buffer.put((byte) string.charAt(charIndex));
+            char c = string.charAt(charIndex);
+            byte b = (byte) c;
+            if(b != '\r' && b != '\n') {
+                buffer.put(b);
+            } else {
+                buffer.put((byte) ' ');
+            }
         }
     }
 
@@ -602,10 +612,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
             } finally {
                 this.state = oldState & ~MASK_STATE | state;
             }
-        } catch(IOException|RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch(IOException|RuntimeException|Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         }
     }
@@ -637,10 +645,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                 return ret;
             }
             return length == 1 ? next.write(srcs[offset]) : next.write(srcs, offset, length);
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
@@ -649,59 +655,61 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
 
     public long transferFrom(final FileChannel src, final long position, final long count) throws IOException {
         try {
-            if (state != 0) {
-                if(pooledFileTransferBuffer != null) {
-                    try {
-                        return write(pooledFileTransferBuffer.getBuffer());
-                    } catch (IOException|RuntimeException e) {
-                        if(pooledFileTransferBuffer != null) {
+            if (pooledFileTransferBuffer != null) {
+                try {
+                    return write(pooledFileTransferBuffer.getBuffer());
+                } catch (IOException | RuntimeException | Error e) {
+                    if (pooledFileTransferBuffer != null) {
+                        pooledFileTransferBuffer.close();
+                        pooledFileTransferBuffer = null;
+                    }
+                    throw e;
+                } finally {
+                    if (pooledFileTransferBuffer != null) {
+                        if (!pooledFileTransferBuffer.getBuffer().hasRemaining()) {
                             pooledFileTransferBuffer.close();
                             pooledFileTransferBuffer = null;
                         }
-                        throw e;
-                    } finally {
-                        if(pooledFileTransferBuffer != null) {
-                            if (!pooledFileTransferBuffer.getBuffer().hasRemaining()) {
-                                pooledFileTransferBuffer.close();
-                                pooledFileTransferBuffer = null;
-                            }
-                        }
-                    }
-                } else {
-                    final PooledByteBuffer pooled = exchange.getConnection().getByteBufferPool().allocate();
-
-                    ByteBuffer buffer = pooled.getBuffer();
-                    try {
-                        int res = src.read(buffer);
-                        buffer.flip();
-                        if (res <= 0) {
-                            return res;
-                        }
-                        return write(buffer);
-                    } finally {
-                        if(buffer.hasRemaining()) {
-                            pooledFileTransferBuffer = pooled;
-                        } else {
-                            pooled.close();
-                        }
                     }
                 }
+            } else if (state != 0) {
+                final PooledByteBuffer pooled = exchange.getConnection().getByteBufferPool().allocate();
+
+                ByteBuffer buffer = pooled.getBuffer();
+                try {
+                    int res = src.read(buffer);
+                    buffer.flip();
+                    if (res <= 0) {
+                        return res;
+                    }
+                    return write(buffer);
+                } finally {
+                    if (buffer.hasRemaining()) {
+                        pooledFileTransferBuffer = pooled;
+                    } else {
+                        pooled.close();
+                    }
+                }
+
             } else {
                 return next.transferFrom(src, position, count);
             }
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         }
     }
 
     public long transferFrom(final StreamSourceChannel source, final long count, final ByteBuffer throughBuffer) throws IOException {
-        if (state != 0) {
-            return IoUtils.transfer(source, count, throughBuffer, new ConduitWritableByteChannel(this));
-        } else {
-            return next.transferFrom(source, count, throughBuffer);
+        try {
+            if (state != 0) {
+                return IoUtils.transfer(source, count, throughBuffer, new ConduitWritableByteChannel(this));
+            } else {
+                return next.transferFrom(source, count, throughBuffer);
+            }
+        } catch (IOException| RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
+            throw e;
         }
     }
 
@@ -709,10 +717,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     public int writeFinal(ByteBuffer src) throws IOException {
         try {
             return Conduits.writeFinalBasic(this, src);
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         }
     }
@@ -721,10 +727,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     public long writeFinal(ByteBuffer[] srcs, int offset, int length) throws IOException {
         try {
             return Conduits.writeFinalBasic(this, srcs, offset, length);
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         }
     }
@@ -744,10 +748,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                 }
             }
             return next.flush();
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         } finally {
             this.state = oldVal & ~MASK_STATE | state;
@@ -763,10 +765,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
                 return;
             }
             this.state = oldVal | FLAG_SHUTDOWN;
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         }
     }
@@ -774,10 +774,8 @@ final class HttpResponseConduit extends AbstractStreamSinkConduit<StreamSinkCond
     public void truncateWrites() throws IOException {
         try {
             next.truncateWrites();
-        } catch (IOException | RuntimeException e) {
-            if(exchange != null) {
-                IoUtils.safeClose(exchange.getConnection());
-            }
+        } catch (IOException | RuntimeException | Error e) {
+            IoUtils.safeClose(connection);
             throw e;
         } finally {
             if (pooledBuffer != null) {

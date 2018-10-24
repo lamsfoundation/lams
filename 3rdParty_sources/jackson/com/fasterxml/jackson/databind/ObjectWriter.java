@@ -2,7 +2,9 @@ package com.fasterxml.jackson.databind;
 
 import java.io.*;
 import java.text.*;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.core.*;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.*;
 import com.fasterxml.jackson.databind.ser.impl.TypeWrappedSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Builder object that can be used for per-serialization configuration of
@@ -183,7 +186,7 @@ public class ObjectWriter
 
         _serializerProvider = base._serializerProvider;
         _serializerFactory = base._serializerFactory;
-        _generatorFactory = base._generatorFactory;
+        _generatorFactory = f;
 
         _generatorSettings = base._generatorSettings;
         _prefetch = base._prefetch;
@@ -221,6 +224,9 @@ public class ObjectWriter
      * @since 2.5
      */
     protected ObjectWriter _new(ObjectWriter base, SerializationConfig config) {
+        if (config == _config) {
+            return this;
+        }
         return new ObjectWriter(base, config);
     }
 
@@ -232,6 +238,9 @@ public class ObjectWriter
      * @since 2.5
      */
     protected ObjectWriter _new(GeneratorSettings genSettings, Prefetch prefetch) {
+        if ((_generatorSettings == genSettings) && (_prefetch == prefetch)) {
+            return this;
+        }
         return new ObjectWriter(this, _config, genSettings, prefetch);
     }
 
@@ -263,8 +272,7 @@ public class ObjectWriter
      * with specified feature enabled.
      */
     public ObjectWriter with(SerializationFeature feature)  {
-        SerializationConfig newConfig = _config.with(feature);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this,  _config.with(feature));
     }
 
     /**
@@ -272,8 +280,7 @@ public class ObjectWriter
      * with specified features enabled.
      */
     public ObjectWriter with(SerializationFeature first, SerializationFeature... other) {
-        SerializationConfig newConfig = _config.with(first, other);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.with(first, other));
     }    
 
     /**
@@ -281,8 +288,7 @@ public class ObjectWriter
      * with specified features enabled.
      */
     public ObjectWriter withFeatures(SerializationFeature... features) {
-        SerializationConfig newConfig = _config.withFeatures(features);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.withFeatures(features));
     }    
     
     /**
@@ -290,8 +296,7 @@ public class ObjectWriter
      * with specified feature enabled.
      */
     public ObjectWriter without(SerializationFeature feature) {
-        SerializationConfig newConfig = _config.without(feature);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.without(feature));
     }    
 
     /**
@@ -299,8 +304,7 @@ public class ObjectWriter
      * with specified features enabled.
      */
     public ObjectWriter without(SerializationFeature first, SerializationFeature... other) {
-        SerializationConfig newConfig = _config.without(first, other);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.without(first, other));
     }    
 
     /**
@@ -308,8 +312,7 @@ public class ObjectWriter
      * with specified features enabled.
      */
     public ObjectWriter withoutFeatures(SerializationFeature... features) {
-        SerializationConfig newConfig = _config.withoutFeatures(features);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.withoutFeatures(features));
     }
 
     /*
@@ -322,32 +325,28 @@ public class ObjectWriter
      * @since 2.5
      */
     public ObjectWriter with(JsonGenerator.Feature feature)  {
-        SerializationConfig newConfig = _config.with(feature);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.with(feature));
     }
 
     /**
      * @since 2.5
      */
     public ObjectWriter withFeatures(JsonGenerator.Feature... features) {
-        SerializationConfig newConfig = _config.withFeatures(features);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.withFeatures(features));
     }
 
     /**
      * @since 2.5
      */
     public ObjectWriter without(JsonGenerator.Feature feature) {
-        SerializationConfig newConfig = _config.without(feature);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.without(feature));
     }
 
     /**
      * @since 2.5
      */
     public ObjectWriter withoutFeatures(JsonGenerator.Feature... features) {
-        SerializationConfig newConfig = _config.withoutFeatures(features);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.withoutFeatures(features));
     }
 
     /*
@@ -360,34 +359,30 @@ public class ObjectWriter
      * @since 2.7
      */
     public ObjectWriter with(FormatFeature feature)  {
-        SerializationConfig newConfig = _config.with(feature);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.with(feature));
     }
 
     /**
      * @since 2.7
      */
     public ObjectWriter withFeatures(FormatFeature... features) {
-        SerializationConfig newConfig = _config.withFeatures(features);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.withFeatures(features));
     }
 
     /**
      * @since 2.7
      */
     public ObjectWriter without(FormatFeature feature) {
-        SerializationConfig newConfig = _config.without(feature);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.without(feature));
     }
 
     /**
      * @since 2.7
      */
     public ObjectWriter withoutFeatures(FormatFeature... features) {
-        SerializationConfig newConfig = _config.withoutFeatures(features);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.withoutFeatures(features));
     }
-    
+
     /*
     /**********************************************************
     /* Life-cycle, fluent factories, type-related
@@ -404,10 +399,8 @@ public class ObjectWriter
      * 
      * @since 2.5
      */
-    public ObjectWriter forType(JavaType rootType)
-    {
-        Prefetch pf = _prefetch.forRootType(this, rootType);
-        return (pf == _prefetch) ? this : _new(_generatorSettings, pf);
+    public ObjectWriter forType(JavaType rootType) {
+        return _new(_generatorSettings, _prefetch.forRootType(this, rootType));
     }
 
     /**
@@ -474,8 +467,7 @@ public class ObjectWriter
      * rather construct and returns a newly configured instance.
      */
     public ObjectWriter with(DateFormat df) {
-        SerializationConfig newConfig = _config.with(df);
-        return (newConfig == _config) ? this : _new(this, newConfig);
+        return _new(this, _config.with(df));
     }
 
     /**
@@ -491,8 +483,10 @@ public class ObjectWriter
      * provider for resolving filter instances by id.
      */
     public ObjectWriter with(FilterProvider filterProvider) {
-        return (filterProvider == _config.getFilterProvider()) ? this
-                 : _new(this, _config.withFilters(filterProvider));
+        if (filterProvider == _config.getFilterProvider()) {
+            return this;
+        }
+        return _new(this, _config.withFilters(filterProvider));
     }
 
     /**
@@ -500,11 +494,7 @@ public class ObjectWriter
      * printer (or, if null, will not do any pretty-printing)
      */
     public ObjectWriter with(PrettyPrinter pp) {
-        GeneratorSettings genSet = _generatorSettings.with(pp);
-        if (genSet == _generatorSettings) {
-            return this;
-        }
-        return _new(genSet, _prefetch);
+        return _new(_generatorSettings.with(pp), _prefetch);
     }
 
     /**
@@ -519,16 +509,14 @@ public class ObjectWriter
      *    and empty String ("") for "do NOT add root wrapper"
      */
     public ObjectWriter withRootName(String rootName) {
-        SerializationConfig newConfig = _config.withRootName(rootName);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withRootName(rootName));
     }
 
     /**
      * @since 2.6
      */
     public ObjectWriter withRootName(PropertyName rootName) {
-        SerializationConfig newConfig = _config.withRootName(rootName);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withRootName(rootName));
     }
 
     /**
@@ -542,8 +530,7 @@ public class ObjectWriter
      * @since 2.6
      */
     public ObjectWriter withoutRootName() {
-        SerializationConfig newConfig = _config.withRootName(PropertyName.NO_NAME);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withRootName(PropertyName.NO_NAME));
     }
     
     /**
@@ -554,12 +541,8 @@ public class ObjectWriter
      * rather construct and returns a newly configured instance.
      */
     public ObjectWriter with(FormatSchema schema) {
-        GeneratorSettings genSet = _generatorSettings.with(schema);
-        if (genSet == _generatorSettings) {
-            return this;
-        }
         _verifySchemaType(schema);
-        return _new(genSet, _prefetch);
+        return _new(_generatorSettings.with(schema), _prefetch);
     }
 
     /**
@@ -579,18 +562,15 @@ public class ObjectWriter
      * rather construct and returns a newly configured instance.
      */
     public ObjectWriter withView(Class<?> view) {
-        SerializationConfig newConfig = _config.withView(view);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withView(view));
     }    
 
     public ObjectWriter with(Locale l) {
-        SerializationConfig newConfig = _config.with(l);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.with(l));
     }
 
     public ObjectWriter with(TimeZone tz) {
-        SerializationConfig newConfig = _config.with(tz);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.with(tz));
     }
 
     /**
@@ -600,19 +580,14 @@ public class ObjectWriter
      * @since 2.1
      */
     public ObjectWriter with(Base64Variant b64variant) {
-        SerializationConfig newConfig = _config.with(b64variant);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.with(b64variant));
     }
 
     /**
      * @since 2.3
      */
     public ObjectWriter with(CharacterEscapes escapes) {
-        GeneratorSettings genSet = _generatorSettings.with(escapes);
-        if (genSet == _generatorSettings) {
-            return this;
-        }
-        return _new(genSet, _prefetch);
+        return _new(_generatorSettings.with(escapes), _prefetch);
     }
 
     /**
@@ -626,8 +601,7 @@ public class ObjectWriter
      * @since 2.3
      */
     public ObjectWriter with(ContextAttributes attrs) {
-        SerializationConfig newConfig = _config.with(attrs);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.with(attrs));
     }
 
     /**
@@ -637,46 +611,35 @@ public class ObjectWriter
      * @since 2.3
      */
     public ObjectWriter withAttributes(Map<?,?> attrs) {
-        SerializationConfig newConfig = _config.withAttributes(attrs);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withAttributes(attrs));
     }
 
     /**
      * @since 2.3
      */
     public ObjectWriter withAttribute(Object key, Object value) {
-        SerializationConfig newConfig = _config.withAttribute(key, value);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withAttribute(key, value));
     }
 
     /**
      * @since 2.3
      */
     public ObjectWriter withoutAttribute(Object key) {
-        SerializationConfig newConfig = _config.withoutAttribute(key);
-        return (newConfig == _config) ? this :  _new(this, newConfig);
+        return _new(this, _config.withoutAttribute(key));
     }
 
     /**
      * @since 2.5
      */
     public ObjectWriter withRootValueSeparator(String sep) {
-        GeneratorSettings genSet = _generatorSettings.withRootValueSeparator(sep);
-        if (genSet == _generatorSettings) {
-            return this;
-        }
-        return _new(genSet, _prefetch);
+        return _new(_generatorSettings.withRootValueSeparator(sep), _prefetch);
     }
 
     /**
      * @since 2.5
      */
     public ObjectWriter withRootValueSeparator(SerializableString sep) {
-        GeneratorSettings genSet = _generatorSettings.withRootValueSeparator(sep);
-        if (genSet == _generatorSettings) {
-            return this;
-        }
-        return _new(genSet, _prefetch);
+        return _new(_generatorSettings.withRootValueSeparator(sep), _prefetch);
     }
 
     /*
@@ -760,6 +723,14 @@ public class ObjectWriter
     }
 
     /**
+     * @since 2.8
+     */
+    public SequenceWriter writeValues(DataOutput out) throws IOException {
+        return _newSequenceWriter(false,
+                _generatorFactory.createGenerator(out), true);
+    }
+
+    /**
      * Method for creating a {@link SequenceWriter} to write an array of
      * root-level values, using configuration of this {@link ObjectWriter}.
      * Resulting writer needs to be {@link SequenceWriter#close()}d after all
@@ -838,6 +809,13 @@ public class ObjectWriter
                 _generatorFactory.createGenerator(out, JsonEncoding.UTF8), true);
     }
 
+    /**
+     * @since 2.8
+     */
+    public SequenceWriter writeValuesAsArray(DataOutput out) throws IOException {
+        return _newSequenceWriter(true, _generatorFactory.createGenerator(out), true);
+    }
+
     /*
     /**********************************************************
     /* Simple accessors
@@ -852,10 +830,21 @@ public class ObjectWriter
         return _config.isEnabled(f);
     }
 
+    /**
+     * @since 2.9
+     */
+    @Deprecated
     public boolean isEnabled(JsonParser.Feature f) {
         return _generatorFactory.isEnabled(f);
     }
 
+    /**
+     * @since 2.9
+     */
+    public boolean isEnabled(JsonGenerator.Feature f) {
+        return _generatorFactory.isEnabled(f);
+    }
+    
     /**
      * @since 2.2
      */
@@ -903,8 +892,7 @@ public class ObjectWriter
      * Method that can be used to serialize any Java value as
      * JSON output, using provided {@link JsonGenerator}.
      */
-    public void writeValue(JsonGenerator gen, Object value)
-        throws IOException, JsonGenerationException, JsonMappingException
+    public void writeValue(JsonGenerator gen, Object value) throws IOException
     {
         _configureGenerator(gen);
         if (_config.isEnabled(SerializationFeature.CLOSE_CLOSEABLE)
@@ -916,16 +904,11 @@ public class ObjectWriter
                 if (_config.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
                     gen.flush();
                 }
-                Closeable tmpToClose = toClose;
-                toClose = null;
-                tmpToClose.close();
-            } finally {
-                if (toClose != null) {
-                    try {
-                        toClose.close();
-                    } catch (IOException ioe) { }
-                }
+            } catch (Exception e) {
+                ClassUtil.closeOnFailAndThrowAsIOE(null, toClose, e);
+                return;
             }
+            toClose.close();
         } else {
             _prefetch.serialize(gen, value, _serializerProvider());
             if (_config.isEnabled(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)) {
@@ -984,6 +967,15 @@ public class ObjectWriter
     }
 
     /**
+     * @since 2.8
+     */
+    public void writeValue(DataOutput out, Object value)
+        throws IOException
+    {
+        _configAndWriteValue(_generatorFactory.createGenerator(out), value);
+    }
+
+    /**
      * Method that can be used to serialize any Java value as
      * a String. Functionally equivalent to calling
      * {@link #writeValue(Writer,Object)} with {@link java.io.StringWriter}
@@ -999,14 +991,14 @@ public class ObjectWriter
         SegmentedStringWriter sw = new SegmentedStringWriter(_generatorFactory._getBufferRecycler());
         try {
             _configAndWriteValue(_generatorFactory.createGenerator(sw), value);
-        } catch (JsonProcessingException e) { // to support [JACKSON-758]
+        } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
             throw JsonMappingException.fromUnexpectedIOE(e);
         }
         return sw.getAndClear();
     }
-    
+
     /**
      * Method that can be used to serialize any Java value as
      * a byte array. Functionally equivalent to calling
@@ -1107,7 +1099,7 @@ public class ObjectWriter
     {
         if (schema != null) {
             if (!_generatorFactory.canUseSchema(schema)) {
-                    throw new IllegalArgumentException("Can not use FormatSchema of type "+schema.getClass().getName()
+                    throw new IllegalArgumentException("Cannot use FormatSchema of type "+schema.getClass().getName()
                             +" for format "+_generatorFactory.getFormatName());
             }
         }
@@ -1124,24 +1116,13 @@ public class ObjectWriter
             _writeCloseable(gen, value);
             return;
         }
-        boolean closed = false;
         try {
             _prefetch.serialize(gen, value, _serializerProvider());
-            closed = true;
-            gen.close();
-        } finally {
-            // won't try to close twice; also, must catch exception (so it 
-            // will not mask exception that is pending)
-            if (!closed) {
-                /* 04-Mar-2014, tatu: But! Let's try to prevent auto-closing of
-                 *    structures, which typically causes more damage.
-                 */
-                gen.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                try {
-                    gen.close();
-                } catch (IOException ioe) { }
-            }
+        } catch (Exception e) {
+            ClassUtil.closeOnFailAndThrowAsIOE(gen, e);
+            return;
         }
+        gen.close();
     }
 
     /**
@@ -1154,31 +1135,14 @@ public class ObjectWriter
         Closeable toClose = (Closeable) value;
         try {
             _prefetch.serialize(gen, value, _serializerProvider());
-            JsonGenerator tmpGen = gen;
-            gen = null;
-            tmpGen.close();
             Closeable tmpToClose = toClose;
             toClose = null;
             tmpToClose.close();
-        } finally {
-            /* Need to close both generator and value, as long as they haven't yet
-             * been closed
-             */
-            if (gen != null) {
-                /* 04-Mar-2014, tatu: But! Let's try to prevent auto-closing of
-                 *    structures, which typically causes more damage.
-                 */
-                gen.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
-                try {
-                    gen.close();
-                } catch (IOException ioe) { }
-            }
-            if (toClose != null) {
-                try {
-                    toClose.close();
-                } catch (IOException ioe) { }
-            }
+        } catch (Exception e) {
+            ClassUtil.closeOnFailAndThrowAsIOE(gen, toClose, e);
+            return;
         }
+        gen.close();
     }
 
     /**
@@ -1274,11 +1238,13 @@ public class ObjectWriter
                 if (rootValueSeparator == null) {
                     return this;
                 }
-            } else if (sep.equals(rootValueSeparator)) {
+                return new GeneratorSettings(prettyPrinter, schema, characterEscapes, null);
+            }
+            if (sep.equals(_rootValueSeparatorAsString())) {
                 return this;
             }
             return new GeneratorSettings(prettyPrinter, schema, characterEscapes,
-                    (sep == null) ? null : new SerializedString(sep));
+                    new SerializedString(sep));
         }
 
         public GeneratorSettings withRootValueSeparator(SerializableString sep) {
@@ -1286,13 +1252,16 @@ public class ObjectWriter
                 if (rootValueSeparator == null) {
                     return this;
                 }
-            } else {
-                if (rootValueSeparator != null
-                        && sep.getValue().equals(rootValueSeparator.getValue())) {
-                    return this;
-                }
+                return new GeneratorSettings(prettyPrinter, schema, characterEscapes, null);
+            }
+            if (sep.equals(rootValueSeparator)) {
+                return this;
             }
             return new GeneratorSettings(prettyPrinter, schema, characterEscapes, sep);
+        }
+
+        private final String _rootValueSeparatorAsString() {
+            return (rootValueSeparator == null) ? null : rootValueSeparator.getValue();
         }
 
         /**
@@ -1353,7 +1322,7 @@ public class ObjectWriter
         private final JsonSerializer<Object> valueSerializer;
 
         /**
-         * When dealing with polymorphic types, we can not pre-fetch
+         * When dealing with polymorphic types, we cannot pre-fetch
          * serializer, but can pre-fetch {@link TypeSerializer}.
          */
         private final TypeSerializer typeSerializer;
@@ -1399,7 +1368,7 @@ public class ObjectWriter
                     ;
                 }
             }
-            return new Prefetch(null, null, typeSerializer);
+            return new Prefetch(newType, null, typeSerializer);
         }
 
         public final JsonSerializer<Object> getValueSerializer() {
@@ -1419,13 +1388,13 @@ public class ObjectWriter
         {
             if (typeSerializer != null) {
                 prov.serializePolymorphic(gen, value, rootType, valueSerializer, typeSerializer);
-                return;
-            }
-            if (valueSerializer != null) {
+            } else  if (valueSerializer != null) {
                 prov.serializeValue(gen, value, rootType, valueSerializer);
-                return;
+            } else if (rootType != null) {
+                prov.serializeValue(gen, value, rootType);
+            } else {
+                prov.serializeValue(gen, value);
             }
-            prov.serializeValue(gen, value);
         }
     }
 }

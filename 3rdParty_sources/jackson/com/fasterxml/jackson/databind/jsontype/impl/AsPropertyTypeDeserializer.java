@@ -24,14 +24,20 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer
 
     protected final As _inclusion;
 
+    /**
+     * @since 2.8
+     */
     public AsPropertyTypeDeserializer(JavaType bt, TypeIdResolver idRes,
-            String typePropertyName, boolean typeIdVisible, Class<?> defaultImpl)
+            String typePropertyName, boolean typeIdVisible, JavaType defaultImpl)
     {
         this(bt, idRes, typePropertyName, typeIdVisible, defaultImpl, As.PROPERTY);
     }
     
+    /**
+     * @since 2.8
+     */
     public AsPropertyTypeDeserializer(JavaType bt, TypeIdResolver idRes,
-            String typePropertyName, boolean typeIdVisible, Class<?> defaultImpl,
+            String typePropertyName, boolean typeIdVisible, JavaType defaultImpl,
             As inclusion)
     {
         super(bt, idRes, typePropertyName, typeIdVisible, defaultImpl);
@@ -100,7 +106,8 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer
     }
 
     @SuppressWarnings("resource")
-    protected Object _deserializeTypedForId(JsonParser p, DeserializationContext ctxt, TokenBuffer tb) throws IOException
+    protected Object _deserializeTypedForId(JsonParser p, DeserializationContext ctxt,
+            TokenBuffer tb) throws IOException
     {
         String typeId = p.getText();
         JsonDeserializer<Object> deser = _findDeserializer(ctxt, typeId);
@@ -112,7 +119,10 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer
             tb.writeString(typeId);
         }
         if (tb != null) { // need to put back skipped properties?
-            p = JsonParserSequence.createFlattened(tb.asParser(p), p);
+            // 02-Jul-2016, tatu: Depending on for JsonParserSequence is initialized it may
+            //   try to access current token; ensure there isn't one
+            p.clearCurrentToken();
+            p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
         }
         // Must point to the next value; tb had no current, jp pointed to VALUE_STRING:
         p.nextToken(); // to skip past String value
@@ -122,30 +132,50 @@ public class AsPropertyTypeDeserializer extends AsArrayTypeDeserializer
     
     // off-lined to keep main method lean and mean...
     @SuppressWarnings("resource")
-    protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt, TokenBuffer tb) throws IOException
+    protected Object _deserializeTypedUsingDefaultImpl(JsonParser p,
+            DeserializationContext ctxt, TokenBuffer tb) throws IOException
     {
-        // As per [JACKSON-614], may have default implementation to use
+        // May have default implementation to use
         JsonDeserializer<Object> deser = _findDefaultImplDeserializer(ctxt);
-        if (deser != null) {
-            if (tb != null) {
-                tb.writeEndObject();
-                p = tb.asParser(p);
-                // must move to point to the first token:
-                p.nextToken();
+        if (deser == null) {
+            // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
+            Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
+            if (result != null) {
+                return result;
             }
-            return deser.deserialize(p, ctxt);
+            // or, something for which "as-property" won't work, changed into "wrapper-array" type:
+            if (p.isExpectedStartArrayToken()) {
+                return super.deserializeTypedFromAny(p, ctxt);
+            }
+            if (p.hasToken(JsonToken.VALUE_STRING)) {
+                if (ctxt.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)) {
+                    String str = p.getText().trim();
+                    if (str.isEmpty()) {
+                        return null;
+                    }
+                }
+            }
+            String msg = String.format("missing type id property '%s'",
+                    _typePropertyName);
+            // even better, may know POJO property polymorphic value would be assigned to
+            if (_property != null) {
+                msg = String.format("%s (for POJO property '%s')", msg, _property.getName());
+            }
+            JavaType t = _handleMissingTypeId(ctxt, msg);
+            if (t == null) {
+                // 09-Mar-2017, tatu: Is this the right thing to do?
+                return null;
+            }
+            // ... would this actually work?
+            deser = ctxt.findContextualValueDeserializer(t, _property);
         }
-        // or, perhaps we just bumped into a "natural" value (boolean/int/double/String)?
-        Object result = TypeDeserializer.deserializeIfNatural(p, ctxt, _baseType);
-        if (result != null) {
-            return result;
+        if (tb != null) {
+            tb.writeEndObject();
+            p = tb.asParser(p);
+            // must move to point to the first token:
+            p.nextToken();
         }
-        // or, something for which "as-property" won't work, changed into "wrapper-array" type:
-        if (p.getCurrentToken() == JsonToken.START_ARRAY) {
-            return super.deserializeTypedFromAny(p, ctxt);
-        }
-        throw ctxt.wrongTokenException(p, JsonToken.FIELD_NAME,
-                "missing property '"+_typePropertyName+"' that is to contain type id  (for class "+baseTypeName()+")");
+        return deser.deserialize(p, ctxt);
     }
 
     /* Also need to re-route "unknown" version. Need to think

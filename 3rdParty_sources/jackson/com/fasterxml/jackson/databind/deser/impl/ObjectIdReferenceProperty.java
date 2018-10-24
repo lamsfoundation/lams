@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.deser.UnresolvedForwardReference;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId.Referring;
@@ -24,9 +25,10 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty
         _objectIdInfo = objectIdInfo;
     }
 
-    public ObjectIdReferenceProperty(ObjectIdReferenceProperty src, JsonDeserializer<?> deser)
+    public ObjectIdReferenceProperty(ObjectIdReferenceProperty src, JsonDeserializer<?> deser,
+            NullValueProvider nva)
     {
-        super(src, deser);
+        super(src, deser, nva);
         _forward = src._forward;
         _objectIdInfo = src._objectIdInfo;
     }
@@ -39,13 +41,28 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty
     }
 
     @Override
-    public SettableBeanProperty withValueDeserializer(JsonDeserializer<?> deser) {
-        return new ObjectIdReferenceProperty(this, deser);
+    public SettableBeanProperty withName(PropertyName newName) {
+        return new ObjectIdReferenceProperty(this, newName);
     }
 
     @Override
-    public SettableBeanProperty withName(PropertyName newName) {
-        return new ObjectIdReferenceProperty(this, newName);
+    public SettableBeanProperty withValueDeserializer(JsonDeserializer<?> deser) {
+        if (_valueDeserializer == deser) {
+            return this;
+        }
+        return new ObjectIdReferenceProperty(this, deser, _nullProvider);
+    }
+
+    @Override
+    public SettableBeanProperty withNullProvider(NullValueProvider nva) {
+        return new ObjectIdReferenceProperty(this, _valueDeserializer, nva);
+    }
+    
+    @Override
+    public void fixAccess(DeserializationConfig config) {
+        if (_forward != null) {
+            _forward.fixAccess(config);
+        }
     }
 
     @Override
@@ -76,7 +93,7 @@ public class ObjectIdReferenceProperty extends SettableBeanProperty
         } catch (UnresolvedForwardReference reference) {
             boolean usingIdentityInfo = (_objectIdInfo != null) || (_valueDeserializer.getObjectIdReader() != null);
             if (!usingIdentityInfo) {
-                throw JsonMappingException.from(p, "Unresolved forward reference but no identity info.", reference);
+                throw JsonMappingException.from(p, "Unresolved forward reference but no identity info", reference);
             }
             reference.getRoid().appendReferring(new PropertyReferring(this, reference, _type.getRawClass(), instance));
             return null;

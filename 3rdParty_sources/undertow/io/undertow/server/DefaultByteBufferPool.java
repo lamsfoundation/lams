@@ -122,9 +122,6 @@ public class DefaultByteBufferPool implements ByteBufferPool {
             local = threadLocalCache.get();
             if (local != null) {
                 buffer = local.buffers.poll();
-                if (buffer != null) {
-                    currentQueueLengthUpdater.decrementAndGet(this);
-                }
             } else {
                 local = new ThreadLocalData();
                 synchronized (threadLocalDataList) {
@@ -140,6 +137,9 @@ public class DefaultByteBufferPool implements ByteBufferPool {
         }
         if (buffer == null) {
             buffer = queue.poll();
+            if (buffer != null) {
+                currentQueueLengthUpdater.decrementAndGet(this);
+            }
         }
         if (buffer == null) {
             if (direct) {
@@ -149,10 +149,12 @@ public class DefaultByteBufferPool implements ByteBufferPool {
             }
         }
         if(local != null) {
-            local.allocationDepth++;
+            if(local.allocationDepth < threadLocalCacheSize) { //prevent overflow if the thread only allocates and never frees
+                local.allocationDepth++;
+            }
         }
         buffer.clear();
-        return new DefaultPooledBuffer(this, buffer, leakDectionPercent == 0 ? false : (++count % 100 > leakDectionPercent));
+        return new DefaultPooledBuffer(this, buffer, leakDectionPercent == 0 ? false : (++count % 100 < leakDectionPercent));
     }
 
     @Override
@@ -183,6 +185,7 @@ public class DefaultByteBufferPool implements ByteBufferPool {
 
     private void freeInternal(ByteBuffer buffer) {
         if (closed) {
+            DirectByteBufferDeallocator.free(buffer);
             return; //GC will take care of it
         }
         ThreadLocalData local = threadLocalCache.get();
@@ -203,9 +206,10 @@ public class DefaultByteBufferPool implements ByteBufferPool {
         do {
             size = currentQueueLength;
             if(size > maximumPoolSize) {
+                DirectByteBufferDeallocator.free(buffer);
                 return;
             }
-        } while (!currentQueueLengthUpdater.compareAndSet(this, size, currentQueueLength + 1));
+        } while (!currentQueueLengthUpdater.compareAndSet(this, size, size + 1));
         queue.add(buffer);
     }
 

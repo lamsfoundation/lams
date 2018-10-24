@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
@@ -41,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.xnio.IoUtils;
 import org.xnio.XnioExecutor;
+
 import io.undertow.UndertowLogger;
 import io.undertow.server.Connectors;
 import io.undertow.server.ExchangeCompletionListener;
@@ -50,8 +52,10 @@ import io.undertow.servlet.UndertowServletLogger;
 import io.undertow.servlet.UndertowServletMessages;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.ExceptionHandler;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.InstanceHandle;
+import io.undertow.servlet.api.LoggingExceptionHandler;
 import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.api.ServletDispatcher;
 import io.undertow.servlet.handlers.ServletDebugPageHandler;
@@ -61,6 +65,7 @@ import io.undertow.util.CanonicalPathUtils;
 import io.undertow.util.Headers;
 import io.undertow.util.SameThreadExecutor;
 import io.undertow.util.StatusCodes;
+import io.undertow.util.WorkerUtils;
 
 /**
  * @author Stuart Douglas
@@ -90,7 +95,8 @@ public class AsyncContextImpl implements AsyncContext {
 
     private final Deque<Runnable> asyncTaskQueue = new ArrayDeque<>();
     private boolean processingAsyncTask = false;
-    private boolean complete = false;
+    private volatile boolean complete = false;
+    private volatile boolean completedBeforeInitialRequestDone = false;
 
     public AsyncContextImpl(final HttpServerExchange exchange, final ServletRequest servletRequest, final ServletResponse servletResponse, final ServletRequestContext servletRequestContext, boolean requestSupplied, final AsyncContextImpl previousAsyncContext) {
         this.exchange = exchange;
@@ -119,7 +125,7 @@ public class AsyncContextImpl implements AsyncContext {
             }
         }
         if (timeout > 0 && !complete) {
-            this.timeoutKey = exchange.getIoThread().executeAfter(timeoutTask, timeout, TimeUnit.MILLISECONDS);
+            this.timeoutKey = WorkerUtils.executeAfter(exchange.getIoThread(), timeoutTask, timeout, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -268,7 +274,7 @@ public class AsyncContextImpl implements AsyncContext {
             timeoutKey = null;
         }
         if (!dispatched) {
-            completeInternal();
+            completeInternal(false);
         } else {
             onAsyncComplete();
         }
@@ -277,21 +283,16 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
 
-    public synchronized void completeInternal() {
-        servletRequestContext.getOriginalRequest().asyncRequestDispatched();
+    public synchronized void completeInternal(boolean forceComplete) {
         Thread currentThread = Thread.currentThread();
-        if (!initialRequestDone && currentThread == initiatingThread) {
-            //TODO: according to the spec we should delay this until the container initiated thread has returned?
-
-            onAsyncComplete();
+        if (!forceComplete && !initialRequestDone && currentThread == initiatingThread) {
+            completedBeforeInitialRequestDone = true;
             if (dispatched) {
                 throw UndertowServletMessages.MESSAGES.asyncRequestAlreadyDispatched();
             }
-            exchange.unDispatch();
-            dispatched = true;
-            initialRequestDone();
         } else {
-            if (currentThread == exchange.getIoThread()) {
+            servletRequestContext.getOriginalRequest().asyncRequestDispatched();
+            if (forceComplete || currentThread == exchange.getIoThread()) {
                 //the thread safety semantics here are a bit weird.
                 //basically if we are doing async IO we can't do a dispatch here, as then the IO thread can be racing
                 //with the dispatch thread.
@@ -304,8 +305,11 @@ public class AsyncContextImpl implements AsyncContext {
                     servletRequestContext.getOriginalRequest().clearAttributes();
                 } catch (IOException e) {
                     UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                } catch (Throwable t) {
+                    UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
                 }
             } else {
+                servletRequestContext.getOriginalRequest().asyncRequestDispatched();
                 doDispatch(new Runnable() {
                     @Override
                     public void run() {
@@ -317,6 +321,8 @@ public class AsyncContextImpl implements AsyncContext {
                             servletRequestContext.getOriginalRequest().closeAndDrainRequest();
                         } catch (IOException e) {
                             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                        } catch (Throwable t) {
+                            UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
                         }
                     }
                 });
@@ -362,6 +368,10 @@ public class AsyncContextImpl implements AsyncContext {
         return dispatched;
     }
 
+    public boolean isCompletedBeforeInitialRequestDone() {
+        return completedBeforeInitialRequestDone;
+    }
+
     @Override
     public <T extends AsyncListener> T createListener(final Class<T> clazz) throws ServletException {
         try {
@@ -401,22 +411,39 @@ public class AsyncContextImpl implements AsyncContext {
         dispatched = false; //we reset the dispatched state
         onAsyncError(error);
         if (!dispatched) {
-            exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
-            exchange.getResponseHeaders().clear();
+            if(!exchange.isResponseStarted()) {
+                exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
+                exchange.getResponseHeaders().clear();
+            }
             servletRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, error);
-            try {
-                boolean errorPage = servletRequestContext.displayStackTraces();
-                if (errorPage) {
-                    ServletDebugPageHandler.handleRequest(exchange, servletRequestContext, error);
-                } else {
-                    if (servletResponse instanceof HttpServletResponse) {
-                        ((HttpServletResponse) servletResponse).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if(!exchange.isResponseStarted()) {
+                try {
+                    boolean errorPage = servletRequestContext.displayStackTraces();
+                    if (errorPage) {
+                        ServletDebugPageHandler.handleRequest(exchange, servletRequestContext, error);
                     } else {
-                        servletRequestContext.getOriginalResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        if (servletResponse instanceof HttpServletResponse) {
+                            ((HttpServletResponse) servletResponse).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        } else {
+                            servletRequestContext.getOriginalResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        }
                     }
+                } catch (IOException e) {
+                    UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                } catch (Throwable t) {
+                    UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
                 }
-            } catch (IOException e) {
-                UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+            } else if (error instanceof IOException) {
+                UndertowLogger.REQUEST_IO_LOGGER.ioException((IOException) error);
+            } else {
+                ExceptionHandler exceptionHandler = servletRequestContext.getDeployment().getDeploymentInfo().getExceptionHandler();
+                if(exceptionHandler == null) {
+                    exceptionHandler = LoggingExceptionHandler.DEFAULT;
+                }
+                boolean handled = exceptionHandler.handleThrowable(exchange, getRequest(), getResponse(), error);
+                if(!handled) {
+                    exchange.endExchange();
+                }
             }
             if (!dispatched) {
                 complete();
@@ -460,6 +487,12 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
 
+    public void handleCompletedBeforeInitialRequestDone() {
+        assert completedBeforeInitialRequestDone;
+        completeInternal(true);
+        dispatched = true;
+    }
+
 
     private final class TimeoutTask implements Runnable {
 
@@ -498,6 +531,8 @@ public class AsyncContextImpl implements AsyncContext {
                                                             }
                                                         } catch (IOException e) {
                                                             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                                                        } catch (Throwable t) {
+                                                            UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
                                                         }
                                                     }
                                                 }, exchange);
@@ -586,6 +621,8 @@ public class AsyncContextImpl implements AsyncContext {
                             listener.asyncListener.onComplete(event);
                         } catch (IOException e) {
                             UndertowServletLogger.REQUEST_LOGGER.ioExceptionDispatchingAsyncEvent(e);
+                        } catch (Throwable t) {
+                            UndertowServletLogger.REQUEST_LOGGER.failureDispatchingAsyncEvent(t);
                         }
                     }
                 } finally {
@@ -602,6 +639,8 @@ public class AsyncContextImpl implements AsyncContext {
                 listener.asyncListener.onTimeout(event);
             } catch (IOException e) {
                 UndertowServletLogger.REQUEST_LOGGER.ioExceptionDispatchingAsyncEvent(e);
+            } catch (Throwable t) {
+                UndertowServletLogger.REQUEST_LOGGER.failureDispatchingAsyncEvent(t);
             }
         }
     }
@@ -623,6 +662,8 @@ public class AsyncContextImpl implements AsyncContext {
                             listener.asyncListener.onStartAsync(event);
                         } catch (IOException e) {
                             UndertowServletLogger.REQUEST_LOGGER.ioExceptionDispatchingAsyncEvent(e);
+                        } catch (Throwable t) {
+                            UndertowServletLogger.REQUEST_LOGGER.failureDispatchingAsyncEvent(t);
                         }
                     }
                 } finally {
@@ -646,6 +687,8 @@ public class AsyncContextImpl implements AsyncContext {
                             listener.asyncListener.onError(event);
                         } catch (IOException e) {
                             UndertowServletLogger.REQUEST_LOGGER.ioExceptionDispatchingAsyncEvent(e);
+                        } catch (Throwable t) {
+                            UndertowServletLogger.REQUEST_LOGGER.failureDispatchingAsyncEvent(t);
                         }
                     }
                 } finally {
@@ -669,7 +712,7 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
 
-    private final class BoundAsyncListener {
+    private static final class BoundAsyncListener {
         final AsyncListener asyncListener;
         final ServletRequest servletRequest;
         final ServletResponse servletResponse;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -212,7 +212,9 @@ public interface HttpSession {
      *			It will be removed in a future
      *			version of the Java Servlet API.
      *
+     * @return the {@link HttpSessionContext} for this session.
      */
+    @Deprecated
     public HttpSessionContext getSessionContext();
     
 
@@ -241,6 +243,7 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      */
+    @Deprecated
     public Object getValue(String name);
         
 
@@ -271,6 +274,7 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      */
+    @Deprecated
     public String[] getValueNames();
     
 
@@ -291,7 +295,7 @@ public interface HttpSession {
      * <code>HttpSessionBindingListener.valueUnbound</code> method is called.
      *
      * <p>If the value passed in is null, this has the same effect as calling 
-     * <code>removeAttribute()<code>.
+     * <code>removeAttribute()</code>.
      *
      *
      * @param name			the name to which the object is bound;
@@ -317,6 +321,7 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      */
+    @Deprecated
     public void putValue(String name, Object value);
 
 
@@ -351,6 +356,7 @@ public interface HttpSession {
      * @exception IllegalStateException	if this method is called on an
      *					invalidated session
      */
+    @Deprecated
     public void removeValue(String name);
 
 

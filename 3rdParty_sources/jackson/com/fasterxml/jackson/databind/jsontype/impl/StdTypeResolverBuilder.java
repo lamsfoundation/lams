@@ -3,13 +3,11 @@ package com.fasterxml.jackson.databind.jsontype.impl;
 import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.NoClass;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
-import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.jsontype.*;
 
 /**
  * Default {@link TypeResolverBuilder} implementation.
@@ -48,6 +46,16 @@ public class StdTypeResolverBuilder
 
     public StdTypeResolverBuilder() { }
 
+    /**
+     * @since 2.9
+     */
+    protected StdTypeResolverBuilder(JsonTypeInfo.Id idType,
+            JsonTypeInfo.As idAs, String propName) {
+        _idType = idType;
+        _includeAs = idAs;
+        _typeProperty = propName;
+    }
+
     public static StdTypeResolverBuilder noTypeInfoBuilder() {
         return new StdTypeResolverBuilder().init(JsonTypeInfo.Id.NONE, null);
     }
@@ -57,7 +65,7 @@ public class StdTypeResolverBuilder
     {
         // sanity checks
         if (idType == null) {
-            throw new IllegalArgumentException("idType can not be null");
+            throw new IllegalArgumentException("idType cannot be null");
         }
         _idType = idType;
         _customIdResolver = idRes;
@@ -71,6 +79,11 @@ public class StdTypeResolverBuilder
             JavaType baseType, Collection<NamedType> subtypes)
     {
         if (_idType == JsonTypeInfo.Id.NONE) { return null; }
+        // 03-Oct-2016, tatu: As per [databind#1395] better prevent use for primitives,
+        //    regardless of setting
+        if (baseType.isPrimitive()) {
+            return null;
+        }
         TypeIdResolver idRes = idResolver(config, baseType, subtypes, true, false);
         switch (_includeAs) {
         case WRAPPER_ARRAY:
@@ -99,24 +112,49 @@ public class StdTypeResolverBuilder
             JavaType baseType, Collection<NamedType> subtypes)
     {
         if (_idType == JsonTypeInfo.Id.NONE) { return null; }
+        // 03-Oct-2016, tatu: As per [databind#1395] better prevent use for primitives,
+        //    regardless of setting
+        if (baseType.isPrimitive()) {
+            return null;
+        }
 
         TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
-        
+
+        JavaType defaultImpl;
+
+        if (_defaultImpl == null) {
+            defaultImpl = null;
+        } else {
+            // 20-Mar-2016, tatu: It is important to do specialization go through
+            //   TypeFactory to ensure proper resolution; with 2.7 and before, direct
+            //   call to JavaType was used, but that cannot work reliably with 2.7
+            // 20-Mar-2016, tatu: Can finally add a check for type compatibility BUT
+            //   if so, need to add explicit checks for marker types. Not ideal, but
+            //   seems like a reasonable compromise.
+            if ((_defaultImpl == Void.class)
+                     || (_defaultImpl == NoClass.class)) {
+                defaultImpl = config.getTypeFactory().constructType(_defaultImpl);
+            } else {
+                defaultImpl = config.getTypeFactory()
+                    .constructSpecializedType(baseType, _defaultImpl);
+            }
+        }
+
         // First, method for converting type info to type id:
         switch (_includeAs) {
         case WRAPPER_ARRAY:
             return new AsArrayTypeDeserializer(baseType, idRes,
-                    _typeProperty, _typeIdVisible, _defaultImpl);
+                    _typeProperty, _typeIdVisible, defaultImpl);
         case PROPERTY:
         case EXISTING_PROPERTY: // as per [#528] same class as PROPERTY
             return new AsPropertyTypeDeserializer(baseType, idRes,
-                    _typeProperty, _typeIdVisible, _defaultImpl, _includeAs);
+                    _typeProperty, _typeIdVisible, defaultImpl, _includeAs);
         case WRAPPER_OBJECT:
             return new AsWrapperTypeDeserializer(baseType, idRes,
-                    _typeProperty, _typeIdVisible, _defaultImpl);
+                    _typeProperty, _typeIdVisible, defaultImpl);
         case EXTERNAL_PROPERTY:
             return new AsExternalTypeDeserializer(baseType, idRes,
-                    _typeProperty, _typeIdVisible, _defaultImpl);
+                    _typeProperty, _typeIdVisible, defaultImpl);
         }
         throw new IllegalStateException("Do not know how to construct standard type serializer for inclusion type: "+_includeAs);
     }
@@ -130,7 +168,7 @@ public class StdTypeResolverBuilder
     @Override
     public StdTypeResolverBuilder inclusion(JsonTypeInfo.As includeAs) {
         if (includeAs == null) {
-            throw new IllegalArgumentException("includeAs can not be null");
+            throw new IllegalArgumentException("includeAs cannot be null");
         }
         _includeAs = includeAs;
         return this;
@@ -189,7 +227,7 @@ public class StdTypeResolverBuilder
     {
         // Custom id resolver?
         if (_customIdResolver != null) { return _customIdResolver; }
-        if (_idType == null) throw new IllegalStateException("Can not build, 'init()' not yet called");
+        if (_idType == null) throw new IllegalStateException("Cannot build, 'init()' not yet called");
         switch (_idType) {
         case CLASS:
             return new ClassNameIdResolver(baseType, config.getTypeFactory());

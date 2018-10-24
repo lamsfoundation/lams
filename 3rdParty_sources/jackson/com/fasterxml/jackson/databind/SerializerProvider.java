@@ -7,11 +7,15 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.cfg.ContextAttributes;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.*;
 import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
@@ -153,7 +157,7 @@ public abstract class SerializerProvider
     /* State, for non-blueprint instances: generic
     /**********************************************************
      */
-    
+
     /**
      * For fast lookups, we will have a local non-shared read-only
      * map that contains serializers previously fetched.
@@ -209,9 +213,6 @@ public abstract class SerializerProvider
     protected SerializerProvider(SerializerProvider src,
             SerializationConfig config, SerializerFactory f)
     {
-        if (config == null) {
-            throw new NullPointerException();
-        }
         _serializerFactory = f;
         _config = config;
 
@@ -271,7 +272,7 @@ public abstract class SerializerProvider
     public void setDefaultKeySerializer(JsonSerializer<Object> ks)
     {
         if (ks == null) {
-            throw new IllegalArgumentException("Can not pass null JsonSerializer");
+            throw new IllegalArgumentException("Cannot pass null JsonSerializer");
         }
         _keySerializer = ks;
     }
@@ -288,7 +289,7 @@ public abstract class SerializerProvider
     public void setNullValueSerializer(JsonSerializer<Object> nvs)
     {
         if (nvs == null) {
-            throw new IllegalArgumentException("Can not pass null JsonSerializer");
+            throw new IllegalArgumentException("Cannot pass null JsonSerializer");
         }
         _nullValueSerializer = nvs;
     }
@@ -305,14 +306,15 @@ public abstract class SerializerProvider
     public void setNullKeySerializer(JsonSerializer<Object> nks)
     {
         if (nks == null) {
-            throw new IllegalArgumentException("Can not pass null JsonSerializer");
+            throw new IllegalArgumentException("Cannot pass null JsonSerializer");
         }
         _nullKeySerializer = nks;
     }
         
     /*
     /**********************************************************
-    /* DatabindContext implementation
+    /* DatabindContext implementation (and closely related
+    /* but ser-specific)
     /**********************************************************
      */
 
@@ -355,7 +357,14 @@ public abstract class SerializerProvider
     public final JsonFormat.Value getDefaultPropertyFormat(Class<?> baseType) {
         return _config.getDefaultPropertyFormat(baseType);
     }
-    
+
+    /**
+     * @since 2.8
+     */
+    public final JsonInclude.Value getDefaultPropertyInclusion(Class<?> baseType) {
+        return _config.getDefaultPropertyInclusion();
+    }
+
     /**
      * Method for accessing default Locale to use: convenience method for
      *<pre>
@@ -435,6 +444,17 @@ public abstract class SerializerProvider
         return _config.getFilterProvider();
     }
 
+    /**
+     *<p>
+     * NOTE: current implementation simply returns `null` as generator is not yet
+     * assigned to this provider.
+     *
+     * @since 2.8
+     */
+    public JsonGenerator getGenerator() {
+        return null;
+    }
+    
     /*
     /**********************************************************
     /* Access to Object Id aspects
@@ -509,6 +529,8 @@ public abstract class SerializerProvider
      * full generics-aware type instead of raw class.
      * This is necessary for accurate handling of external type information,
      * to handle polymorphic types.
+     *<p>
+     * Note: this call will also contextualize serializer before returning it.
      * 
      * @param property When creating secondary serializers, property for which
      *   serializer is needed: annotations of the property (or bean that contains it)
@@ -518,6 +540,9 @@ public abstract class SerializerProvider
     public JsonSerializer<Object> findValueSerializer(JavaType valueType, BeanProperty property)
         throws JsonMappingException
     {
+        if (valueType == null) {
+            reportMappingProblem("Null passed for `valueType` of `findValueSerializer()`");
+        }
         // (see comments from above method)
         JsonSerializer<Object> ser = _knownSerializers.untypedValueSerializer(valueType);
         if (ser == null) {
@@ -812,7 +837,7 @@ public abstract class SerializerProvider
     /**
      * Method called to find a serializer to use for null values for given
      * declared type. Note that type is completely based on declared type,
-     * since nulls in Java have no type and thus runtime type can not be
+     * since nulls in Java have no type and thus runtime type cannot be
      * determined.
      * 
      * @since 2.0
@@ -842,7 +867,7 @@ public abstract class SerializerProvider
 
     /**
      * Method called to get the serializer to use if provider
-     * can not determine an actual type-specific serializer
+     * cannot determine an actual type-specific serializer
      * to use; typically when none of {@link SerializerFactory}
      * instances are able to construct a serializer.
      *<p>
@@ -901,6 +926,29 @@ public abstract class SerializerProvider
      */
     public abstract JsonSerializer<Object> serializerInstance(Annotated annotated,
             Object serDef)
+        throws JsonMappingException;
+
+    /**
+     * Method that can be called to construct and configure {@link JsonInclude}
+     * filter instance,
+     * given a {@link Class} to instantiate (with default constructor, by default).
+     *
+     * @param forProperty (optional) If filter is created for a property, that property;
+     *    `null` if filter created via defaulting, global or per-type.
+     *
+     * @since 2.9
+     */
+    public abstract Object includeFilterInstance(BeanPropertyDefinition forProperty,
+            Class<?> filterClass)
+        throws JsonMappingException;
+
+    /**
+     * Follow-up method that may be called after calling {@link #includeFilterInstance},
+     * to check handling of `null` values by the filter.
+     *
+     * @since 2.9
+     */
+    public abstract boolean includeFilterSuppressNulls(Object filter)
         throws JsonMappingException;
 
     /*
@@ -1071,12 +1119,12 @@ public abstract class SerializerProvider
         }
     }
 
-    public final void defaultSerializeNull(JsonGenerator jgen) throws IOException
+    public final void defaultSerializeNull(JsonGenerator gen) throws IOException
     {
         if (_stdNullValueSerializer) { // minor perf optimization
-            jgen.writeNull();
+            gen.writeNull();
         } else {
-            _nullValueSerializer.serialize(null, jgen, this);
+            _nullValueSerializer.serialize(null, gen, this);
         }
     }
 
@@ -1087,13 +1135,134 @@ public abstract class SerializerProvider
      */
 
     /**
-     * @since 2.6
+     * Helper method called to indicate problem; default behavior is to construct and
+     * throw a {@link JsonMappingException}, but in future may collect more than one
+     * and only throw after certain number, or at the end of serialization.
+     *
+     * @since 2.8
      */
-    public JsonMappingException mappingException(String message, Object... args) {
-        if (args != null && args.length > 0) {
-            message = String.format(message, args);
+    public void reportMappingProblem(String message, Object... args) throws JsonMappingException {
+        throw mappingException(message, args);
+    }
+
+    /**
+     * Helper method called to indicate problem in POJO (serialization) definitions or settings
+     * regarding specific Java type, unrelated to actual JSON content to map.
+     * Default behavior is to construct and throw a {@link JsonMappingException}.
+     *
+     * @since 2.9
+     */
+    public <T> T reportBadTypeDefinition(BeanDescription bean,
+            String msg, Object... msgArgs) throws JsonMappingException {
+        String beanDesc = "N/A";
+        if (bean != null) {
+            beanDesc = ClassUtil.nameOf(bean.getBeanClass());
         }
-        return JsonMappingException.from(this, message);
+        msg = String.format("Invalid type definition for type %s: %s",
+                beanDesc, _format(msg, msgArgs));
+        throw InvalidDefinitionException.from(getGenerator(), msg, bean, null);
+    }
+
+    /**
+     * Helper method called to indicate problem in POJO (serialization) definitions or settings
+     * regarding specific property (of a type), unrelated to actual JSON content to map.
+     * Default behavior is to construct and throw a {@link JsonMappingException}.
+     *
+     * @since 2.9
+     */
+    public <T> T reportBadPropertyDefinition(BeanDescription bean, BeanPropertyDefinition prop,
+            String message, Object... msgArgs) throws JsonMappingException {
+        message = _format(message, msgArgs);
+        String propName = "N/A";
+        if (prop != null) {
+            propName = _quotedString(prop.getName());
+        }
+        String beanDesc = "N/A";
+        if (bean != null) {
+            beanDesc = ClassUtil.nameOf(bean.getBeanClass());
+        }
+        message = String.format("Invalid definition for property %s (of type %s): %s",
+                propName, beanDesc, message);
+        throw InvalidDefinitionException.from(getGenerator(), message, bean, prop);
+    }
+
+    @Override
+    public <T> T reportBadDefinition(JavaType type, String msg) throws JsonMappingException {
+        throw InvalidDefinitionException.from(getGenerator(), msg, type);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public <T> T reportBadDefinition(JavaType type, String msg, Throwable cause)
+            throws JsonMappingException {
+        InvalidDefinitionException e = InvalidDefinitionException.from(getGenerator(), msg, type);
+        e.initCause(cause);
+        throw e;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public <T> T reportBadDefinition(Class<?> raw, String msg, Throwable cause)
+            throws JsonMappingException {
+        InvalidDefinitionException e = InvalidDefinitionException.from(getGenerator(), msg, constructType(raw));
+        e.initCause(cause);
+        throw e;
+    }
+
+    /**
+     * Helper method called to indicate problem; default behavior is to construct and
+     * throw a {@link JsonMappingException}, but in future may collect more than one
+     * and only throw after certain number, or at the end of serialization.
+     *
+     * @since 2.8
+     */
+    public void reportMappingProblem(Throwable t, String message, Object... msgArgs) throws JsonMappingException {
+        message = _format(message, msgArgs);
+        throw JsonMappingException.from(getGenerator(), message, t);
+    }
+
+    @Override
+    public JsonMappingException invalidTypeIdException(JavaType baseType, String typeId,
+            String extraDesc) {
+        String msg = String.format("Could not resolve type id '%s' as a subtype of %s",
+                typeId, baseType);
+        return InvalidTypeIdException.from(null, _colonConcat(msg, extraDesc), baseType, typeId);
+    }
+
+    /*
+    /********************************************************
+    /* Error reporting, deprecated methods
+    /********************************************************
+     */
+
+    /**
+     * Factory method for constructing a {@link JsonMappingException};
+     * usually only indirectly used by calling
+     * {@link #reportMappingProblem(String, Object...)}.
+     *
+     * @since 2.6
+     *
+     * @deprecated Since 2.9
+     */
+    @Deprecated // since 2.9
+    public JsonMappingException mappingException(String message, Object... msgArgs) {
+        return JsonMappingException.from(getGenerator(), _format(message, msgArgs));
+    }
+
+    /**
+     * Factory method for constructing a {@link JsonMappingException};
+     * usually only indirectly used by calling
+     * {@link #reportMappingProblem(Throwable, String, Object...)}
+     * 
+     * @since 2.8
+     *
+     * @deprecated Since 2.9
+     */
+    @Deprecated // since 2.9
+    protected JsonMappingException mappingException(Throwable t, String message, Object... msgArgs) {
+        return JsonMappingException.from(getGenerator(), _format(message, msgArgs), t);
     }
 
     /*
@@ -1112,15 +1281,15 @@ public abstract class SerializerProvider
                 return;
             }
         }
-        throw JsonMappingException.from(this,
-                "Incompatible types: declared root type ("+rootType+") vs "
-                +value.getClass().getName());
+        reportBadDefinition(rootType, String.format(
+                "Incompatible types: declared root type (%s) vs %s",
+                rootType, ClassUtil.classNameOf(value)));
     }
-    
+
     /**
      * Method that will try to find a serializer, either from cache
      * or by constructing one; but will not return an "unknown" serializer
-     * if this can not be done but rather returns null.
+     * if this cannot be done but rather returns null.
      *
      * @return Serializer if one can be found, null if not.
      */
@@ -1169,7 +1338,8 @@ public abstract class SerializerProvider
             /* We better only expose checked exceptions, since those
              * are what caller is expected to handle
              */
-            throw JsonMappingException.from(this, iae.getMessage(), iae);
+            ser = null; // doesn't matter but compiler whines otherwise
+            reportMappingProblem(iae, iae.getMessage());
         }
 
         if (ser != null) {
@@ -1186,10 +1356,10 @@ public abstract class SerializerProvider
         try {
             ser = _createUntypedSerializer(type);
         } catch (IllegalArgumentException iae) {
-            /* We better only expose checked exceptions, since those
-             * are what caller is expected to handle
-             */
-            throw JsonMappingException.from(this, iae.getMessage(), iae);
+            // We better only expose checked exceptions, since those
+            // are what caller is expected to handle
+            ser = null;
+            reportMappingProblem(iae, iae.getMessage());
         }
     
         if (ser != null) {
@@ -1252,7 +1422,7 @@ public abstract class SerializerProvider
         if (_dateFormat != null) {
             return _dateFormat;
         }
-        /* At this point, all timezone configuration should have occured, with respect
+        /* At this point, all timezone configuration should have occurred, with respect
          * to default dateformat configuration. But we still better clone
          * an instance as formatters are stateful, not thread-safe.
          */

@@ -64,15 +64,12 @@ public class PathTemplateMatcher<T> {
                     }
                 }
             } else if (pathLength < length) {
-                char c = path.charAt(pathLength);
-                if (c == '/') {
-                    String part = path.substring(0, pathLength);
-                    Set<PathTemplateHolder> entry = pathTemplateMap.get(part);
-                    if (entry != null) {
-                        PathMatchResult<T> res = handleStemMatch(entry, path, params);
-                        if (res != null) {
-                            return res;
-                        }
+                String part = path.substring(0, pathLength);
+                Set<PathTemplateHolder> entry = pathTemplateMap.get(part);
+                if (entry != null) {
+                    PathMatchResult<T> res = handleStemMatch(entry, path, params);
+                    if (res != null) {
+                        return res;
                     }
                 }
             }
@@ -118,10 +115,15 @@ public class PathTemplateMatcher<T> {
     }
 
     private String trimBase(PathTemplate template) {
+        String retval = template.getBase();
+
         if (template.getBase().endsWith("/") && !template.getParameterNames().isEmpty()) {
-            return template.getBase().substring(0, template.getBase().length() - 1);
+            return retval.substring(0, retval.length() - 1);
         }
-        return template.getBase();
+        if (retval.endsWith("*")) {
+            return retval.substring(0, retval.length() - 1);
+        }
+        return retval;
     }
 
     private void buildLengths() {
@@ -236,6 +238,21 @@ public class PathTemplateMatcher<T> {
         private PathTemplateHolder(T value, PathTemplate template) {
             this.value = value;
             this.template = template;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null) return false;
+            if (!PathTemplateHolder.class.equals(o.getClass())) return false;
+
+            PathTemplateHolder that = (PathTemplateHolder) o;
+            return template.equals(that.template);
+        }
+
+        @Override
+        public int hashCode() {
+            return template.hashCode();
         }
 
         @Override

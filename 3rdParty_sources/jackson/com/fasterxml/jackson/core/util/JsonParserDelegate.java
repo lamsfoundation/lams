@@ -2,6 +2,7 @@ package com.fasterxml.jackson.core.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -106,7 +107,10 @@ public class JsonParserDelegate extends JsonParser
     /* Public API, token accessors
     /**********************************************************
      */
- 
+
+    @Override public JsonToken currentToken() { return delegate.currentToken(); }
+    @Override public int currentTokenId() { return delegate.currentTokenId(); }
+    
     @Override public JsonToken getCurrentToken() { return delegate.getCurrentToken(); }
     @Override public int getCurrentTokenId() { return delegate.getCurrentTokenId(); }
     @Override public boolean hasCurrentToken() { return delegate.hasCurrentToken(); }
@@ -118,6 +122,7 @@ public class JsonParserDelegate extends JsonParser
     @Override public JsonStreamContext getParsingContext() { return delegate.getParsingContext(); }
     @Override public boolean isExpectedStartArrayToken() { return delegate.isExpectedStartArrayToken(); }
     @Override public boolean isExpectedStartObjectToken() { return delegate.isExpectedStartObjectToken(); }
+    @Override public boolean isNaN() throws IOException { return delegate.isNaN(); }
 
     /*
     /**********************************************************
@@ -140,6 +145,7 @@ public class JsonParserDelegate extends JsonParser
     @Override public char[] getTextCharacters() throws IOException { return delegate.getTextCharacters(); }
     @Override public int getTextLength() throws IOException { return delegate.getTextLength(); }
     @Override public int getTextOffset() throws IOException { return delegate.getTextOffset(); }
+    @Override public int getText(Writer writer) throws IOException, UnsupportedOperationException { return delegate.getText(writer);  }
 
     /*
     /**********************************************************
@@ -207,8 +213,12 @@ public class JsonParserDelegate extends JsonParser
     @Override public byte[] getBinaryValue(Base64Variant b64variant) throws IOException { return delegate.getBinaryValue(b64variant); }
     @Override public int readBinaryValue(Base64Variant b64variant, OutputStream out) throws IOException { return delegate.readBinaryValue(b64variant, out); }
     @Override public JsonLocation getTokenLocation() { return delegate.getTokenLocation(); }
+
     @Override public JsonToken nextToken() throws IOException { return delegate.nextToken(); }
+
     @Override public JsonToken nextValue() throws IOException { return delegate.nextValue(); }
+
+    @Override public void finishToken() throws IOException { delegate.finishToken(); }
     
     @Override
     public JsonParser skipChildren() throws IOException {

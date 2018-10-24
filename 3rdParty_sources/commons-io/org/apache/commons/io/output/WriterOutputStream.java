@@ -45,8 +45,8 @@ import java.nio.charset.CodingErrorAction;
  * of the {@link WriterOutputStream}.
  * <p>
  * {@link WriterOutputStream} implements the inverse transformation of {@link java.io.OutputStreamWriter};
- * in the following example, writing to <tt>out2</tt> would have the same result as writing to
- * <tt>out</tt> directly (provided that the byte sequence is legal with respect to the
+ * in the following example, writing to {@code out2} would have the same result as writing to
+ * {@code out} directly (provided that the byte sequence is legal with respect to the
  * charset encoding):
  * <pre>
  * OutputStream out = ...
@@ -100,7 +100,7 @@ public class WriterOutputStream extends OutputStream {
      * @param decoder the charset decoder
      * @since 2.1
      */
-    public WriterOutputStream(Writer writer, CharsetDecoder decoder) {
+    public WriterOutputStream(final Writer writer, final CharsetDecoder decoder) {
         this(writer, decoder, DEFAULT_BUFFER_SIZE, false);
     }
 
@@ -110,14 +110,16 @@ public class WriterOutputStream extends OutputStream {
      * @param writer the target {@link Writer}
      * @param decoder the charset decoder
      * @param bufferSize the size of the output buffer in number of characters
-     * @param writeImmediately If <tt>true</tt> the output buffer will be flushed after each
+     * @param writeImmediately If {@code true} the output buffer will be flushed after each
      *                         write operation, i.e. all available data will be written to the
-     *                         underlying {@link Writer} immediately. If <tt>false</tt>, the
+     *                         underlying {@link Writer} immediately. If {@code false}, the
      *                         output buffer will only be flushed when it overflows or when
      *                         {@link #flush()} or {@link #close()} is called.
      * @since 2.1
      */
-    public WriterOutputStream(Writer writer, CharsetDecoder decoder, int bufferSize, boolean writeImmediately) {
+    public WriterOutputStream(final Writer writer, final CharsetDecoder decoder, final int bufferSize,
+                              final boolean writeImmediately) {
+        checkIbmJdkWithBrokenUTF16( decoder.charset());
         this.writer = writer;
         this.decoder = decoder;
         this.writeImmediately = writeImmediately;
@@ -130,13 +132,14 @@ public class WriterOutputStream extends OutputStream {
      * @param writer the target {@link Writer}
      * @param charset the charset encoding
      * @param bufferSize the size of the output buffer in number of characters
-     * @param writeImmediately If <tt>true</tt> the output buffer will be flushed after each
+     * @param writeImmediately If {@code true} the output buffer will be flushed after each
      *                         write operation, i.e. all available data will be written to the
-     *                         underlying {@link Writer} immediately. If <tt>false</tt>, the
+     *                         underlying {@link Writer} immediately. If {@code false}, the
      *                         output buffer will only be flushed when it overflows or when
      *                         {@link #flush()} or {@link #close()} is called.
      */
-    public WriterOutputStream(Writer writer, Charset charset, int bufferSize, boolean writeImmediately) {
+    public WriterOutputStream(final Writer writer, final Charset charset, final int bufferSize,
+                              final boolean writeImmediately) {
         this(writer,
              charset.newDecoder()
                     .onMalformedInput(CodingErrorAction.REPLACE)
@@ -154,7 +157,7 @@ public class WriterOutputStream extends OutputStream {
      * @param writer the target {@link Writer}
      * @param charset the charset encoding
      */
-    public WriterOutputStream(Writer writer, Charset charset) {
+    public WriterOutputStream(final Writer writer, final Charset charset) {
         this(writer, charset, DEFAULT_BUFFER_SIZE, false);
     }
 
@@ -164,13 +167,14 @@ public class WriterOutputStream extends OutputStream {
      * @param writer the target {@link Writer}
      * @param charsetName the name of the charset encoding
      * @param bufferSize the size of the output buffer in number of characters
-     * @param writeImmediately If <tt>true</tt> the output buffer will be flushed after each
+     * @param writeImmediately If {@code true} the output buffer will be flushed after each
      *                         write operation, i.e. all available data will be written to the
-     *                         underlying {@link Writer} immediately. If <tt>false</tt>, the
+     *                         underlying {@link Writer} immediately. If {@code false}, the
      *                         output buffer will only be flushed when it overflows or when
      *                         {@link #flush()} or {@link #close()} is called.
      */
-    public WriterOutputStream(Writer writer, String charsetName, int bufferSize, boolean writeImmediately) {
+    public WriterOutputStream(final Writer writer, final String charsetName, final int bufferSize,
+                              final boolean writeImmediately) {
         this(writer, Charset.forName(charsetName), bufferSize, writeImmediately);
     }
 
@@ -182,7 +186,7 @@ public class WriterOutputStream extends OutputStream {
      * @param writer the target {@link Writer}
      * @param charsetName the name of the charset encoding
      */
-    public WriterOutputStream(Writer writer, String charsetName) {
+    public WriterOutputStream(final Writer writer, final String charsetName) {
         this(writer, charsetName, DEFAULT_BUFFER_SIZE, false);
     }
 
@@ -192,8 +196,10 @@ public class WriterOutputStream extends OutputStream {
      * be flushed when it overflows or when {@link #flush()} or {@link #close()} is called.
      * 
      * @param writer the target {@link Writer}
+     * @deprecated 2.5 use {@link #WriterOutputStream(Writer, Charset)} instead
      */
-    public WriterOutputStream(Writer writer) {
+    @Deprecated
+    public WriterOutputStream(final Writer writer) {
         this(writer, Charset.defaultCharset(), DEFAULT_BUFFER_SIZE, false);
     }
 
@@ -206,9 +212,9 @@ public class WriterOutputStream extends OutputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(final byte[] b, int off, int len) throws IOException {
         while (len > 0) {
-            int c = Math.min(len, decoderIn.remaining());
+            final int c = Math.min(len, decoderIn.remaining());
             decoderIn.put(b, off, c);
             processInput(false);
             len -= c;
@@ -226,7 +232,7 @@ public class WriterOutputStream extends OutputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public void write(byte[] b) throws IOException {
+    public void write(final byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
@@ -237,7 +243,7 @@ public class WriterOutputStream extends OutputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
     }
 
@@ -272,7 +278,7 @@ public class WriterOutputStream extends OutputStream {
      * @param endOfInput indicates end of input
      * @throws IOException if an I/O error occurs
      */
-    private void processInput(boolean endOfInput) throws IOException {
+    private void processInput(final boolean endOfInput) throws IOException {
         // Prepare decoderIn for reading
         decoderIn.flip();
         CoderResult coderResult;
@@ -302,5 +308,33 @@ public class WriterOutputStream extends OutputStream {
             writer.write(decoderOut.array(), 0, decoderOut.position());
             decoderOut.rewind();
         }
+    }
+
+    private static void checkIbmJdkWithBrokenUTF16(Charset charset){
+        if (!"UTF-16".equals(charset.name())) return;
+        final String TEST_STRING_2 = "v\u00e9s";
+        byte[] bytes = TEST_STRING_2.getBytes(charset);
+
+        final CharsetDecoder charsetDecoder2 = charset.newDecoder();
+        ByteBuffer bb2 = ByteBuffer.allocate(16);
+        CharBuffer cb2 = CharBuffer.allocate(TEST_STRING_2.length());
+        final int len = bytes.length;
+        for (int i = 0; i < len; i++) {
+            bb2.put(bytes[i]);
+            bb2.flip();
+            try {
+                charsetDecoder2.decode(bb2, cb2, i == (len - 1));
+            } catch ( IllegalArgumentException e){
+                throw new UnsupportedOperationException("UTF-16 requested when runninng on an IBM JDK with broken UTF-16 support. " +
+                        "Please find a JDK that supports UTF-16 if you intend to use UF-16 with WriterOutputStream");
+            }
+            bb2.compact();
+        }
+        cb2.rewind();
+        if (!TEST_STRING_2.equals(cb2.toString())){
+            throw new UnsupportedOperationException("UTF-16 requested when runninng on an IBM JDK with broken UTF-16 support. " +
+                    "Please find a JDK that supports UTF-16 if you intend to use UF-16 with WriterOutputStream");
+        };
+
     }
 }

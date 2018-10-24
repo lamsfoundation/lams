@@ -1,9 +1,12 @@
 package com.fasterxml.jackson.databind.ext;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.fasterxml.jackson.databind.ser.Serializers;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Helper class used for isolating details of handling optional+external types
@@ -37,8 +40,6 @@ public class OptionalHandlerFactory implements java.io.Serializable
     private final static String DESERIALIZER_FOR_DOM_DOCUMENT = "com.fasterxml.jackson.databind.ext.DOMDeserializer$DocumentDeserializer";
     private final static String DESERIALIZER_FOR_DOM_NODE = "com.fasterxml.jackson.databind.ext.DOMDeserializer$NodeDeserializer";
 
-    private final static String DESERIALIZER_FOR_PATH = "com.fasterxml.jackson.databind.ext.PathDeserializer";
-
     // // Since 2.7, we will assume DOM classes are always found, both due to JDK 1.6 minimum
     // // and because Android (and presumably GAE) have these classes
 
@@ -52,7 +53,8 @@ public class OptionalHandlerFactory implements java.io.Serializable
             doc = org.w3c.dom.Document.class;
         } catch (Exception e) {
             // not optimal but will do
-            System.err.println("WARNING: could not load DOM Node and/or Document classes");
+            Logger.getLogger(OptionalHandlerFactory.class.getName())
+                .log(Level.INFO, "Could not load DOM `Node` and/or `Document` classes: no DOM support");
         }
         CLASS_DOM_NODE = node;
         CLASS_DOM_DOCUMENT = doc;
@@ -61,17 +63,14 @@ public class OptionalHandlerFactory implements java.io.Serializable
     // // But Java7 type(s) may or may not be; dynamic lookup should be fine, still
     // // (note: also assume it comes from JDK so that ClassLoader issues with OSGi
     // // can, I hope, be avoided?)
-    
-    private final static Class<?> CLASS_JAVA7_PATH;
+
+    private static final Java7Support _jdk7Helper;
     static {
-        Class<?> cls = null;
+        Java7Support x = null;
         try {
-            cls = Class.forName("java.nio.file.Path");
-        } catch (Exception e) {
-            // not optimal but will do
-            System.err.println("WARNING: could not load Java7 Path class");
-        }
-        CLASS_JAVA7_PATH = cls;
+            x = Java7Support.instance();
+        } catch (Throwable t) { }
+        _jdk7Helper = x;
     }
     
     public final static OptionalHandlerFactory instance = new OptionalHandlerFactory();
@@ -89,8 +88,11 @@ public class OptionalHandlerFactory implements java.io.Serializable
     {
         final Class<?> rawType = type.getRawClass();
 
-        if ((CLASS_JAVA7_PATH != null) && CLASS_JAVA7_PATH.isAssignableFrom(rawType)) {
-            return ToStringSerializer.instance;
+        if (_jdk7Helper != null) {
+            JsonSerializer<?> ser = _jdk7Helper.getSerializerForJavaNioFilePath(rawType);
+            if (ser != null) {
+                return ser;
+            }
         }
         if ((CLASS_DOM_NODE != null) && CLASS_DOM_NODE.isAssignableFrom(rawType)) {
             return (JsonSerializer<?>) instantiate(SERIALIZER_FOR_DOM_NODE);
@@ -116,8 +118,11 @@ public class OptionalHandlerFactory implements java.io.Serializable
     {
         final Class<?> rawType = type.getRawClass();
 
-        if ((CLASS_JAVA7_PATH != null) && CLASS_JAVA7_PATH.isAssignableFrom(rawType)) {
-            return (JsonDeserializer<?>) instantiate(DESERIALIZER_FOR_PATH);
+        if (_jdk7Helper != null) {
+            JsonDeserializer<?> deser = _jdk7Helper.getDeserializerForJavaNioFilePath(rawType);
+            if (deser != null) {
+                return deser;
+            }
         }
         if ((CLASS_DOM_NODE != null) && CLASS_DOM_NODE.isAssignableFrom(rawType)) {
             return (JsonDeserializer<?>) instantiate(DESERIALIZER_FOR_DOM_NODE);
@@ -149,7 +154,7 @@ public class OptionalHandlerFactory implements java.io.Serializable
     private Object instantiate(String className)
     {
         try {
-            return Class.forName(className).newInstance();
+            return ClassUtil.createInstance(Class.forName(className), false);
         } catch (LinkageError e) { }
         // too many different kinds to enumerate here:
         catch (Exception e) { }

@@ -35,8 +35,8 @@ class Http2HeadersParser extends Http2HeaderBlockParser {
     private boolean headersEndStream = false;
     private boolean exclusive;
 
-    Http2HeadersParser(int frameLength, HpackDecoder hpackDecoder) {
-        super(frameLength, hpackDecoder);
+    Http2HeadersParser(int frameLength, HpackDecoder hpackDecoder, boolean client,int maxHeaders, int streamId, int maxHeaderListSize) {
+        super(frameLength, hpackDecoder, client, maxHeaders, streamId, maxHeaderListSize);
     }
 
     @Override
@@ -69,7 +69,7 @@ class Http2HeadersParser extends Http2HeaderBlockParser {
         return true;
     }
 
-    int getPaddingLength() {
+    protected int getPaddingLength() {
         return paddingLength;
     }
 

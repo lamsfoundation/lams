@@ -90,8 +90,9 @@ import io.undertow.util.MimeMappings;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
-
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -148,18 +149,31 @@ public class DeploymentManagerImpl implements DeploymentManager {
         final DeploymentImpl deployment = new DeploymentImpl(this, deploymentInfo, servletContainer);
         this.deployment = deployment;
 
+        final ServletContextImpl servletContext = new ServletContextImpl(servletContainer, deployment);
+        deployment.setServletContext(servletContext);
+        handleExtensions(deploymentInfo, servletContext);
+
         final List<ThreadSetupHandler> setup = new ArrayList<>();
         setup.add(ServletRequestContextThreadSetupAction.INSTANCE);
         setup.add(new ContextClassLoaderSetupAction(deploymentInfo.getClassLoader()));
         setup.addAll(deploymentInfo.getThreadSetupActions());
         deployment.setThreadSetupActions(setup);
 
-        final ServletContextImpl servletContext = new ServletContextImpl(servletContainer, deployment);
-        deployment.setServletContext(servletContext);
-        handleExtensions(deploymentInfo, servletContext);
         deployment.getServletPaths().setWelcomePages(deploymentInfo.getWelcomePages());
 
-        deployment.setDefaultCharset(Charset.forName(deploymentInfo.getDefaultEncoding()));
+        if (deploymentInfo.getDefaultEncoding() != null) {
+            deployment.setDefaultCharset(Charset.forName(deploymentInfo.getDefaultEncoding()));
+        }
+        if(deploymentInfo.getDefaultRequestEncoding() != null) {
+            deployment.setDefaultRequestCharset(Charset.forName(deploymentInfo.getDefaultRequestEncoding()));
+        } else if (deploymentInfo.getDefaultEncoding() != null) {
+            deployment.setDefaultRequestCharset(Charset.forName(deploymentInfo.getDefaultEncoding()));
+        }
+        if(deploymentInfo.getDefaultResponseEncoding() != null) {
+            deployment.setDefaultResponseCharset(Charset.forName(deploymentInfo.getDefaultResponseEncoding()));
+        } else if (deploymentInfo.getDefaultEncoding() != null) {
+            deployment.setDefaultResponseCharset(Charset.forName(deploymentInfo.getDefaultEncoding()));
+        }
 
         handleDeploymentSessionConfig(deploymentInfo, servletContext);
 
@@ -179,7 +193,10 @@ public class DeploymentManagerImpl implements DeploymentManager {
                     //now create the servlets and filters that we know about. We can still get more later
                     createServletsAndFilters(deployment, deploymentInfo);
 
-                    //first run the SCI's
+                    //first initialize the temp dir
+                    initializeTempDir(servletContext, deploymentInfo);
+
+                    //then run the SCI's
                     for (final ServletContainerInitializerInfo sci : deploymentInfo.getServletContainerInitializers()) {
                         final InstanceHandle<? extends ServletContainerInitializer> instance = sci.getInstanceFactory().createInstance();
                         try {
@@ -196,7 +213,6 @@ public class DeploymentManagerImpl implements DeploymentManager {
 
                     initializeErrorPages(deployment, deploymentInfo);
                     initializeMimeMappings(deployment, deploymentInfo);
-                    initializeTempDir(servletContext, deploymentInfo);
                     listeners.contextInitialized();
                     //run
 
@@ -235,6 +251,12 @@ public class DeploymentManagerImpl implements DeploymentManager {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        //any problems with the paths won't get detected until the data is initialize
+        //so we force initialization here
+        deployment.getServletPaths().initData();
+        for(ServletContextListener listener : deploymentInfo.getDeploymentCompleteListeners()) {
+            listener.contextInitialized(new ServletContextEvent(servletContext));
+        }
         state = State.DEPLOYED;
     }
 
@@ -255,7 +277,7 @@ public class DeploymentManagerImpl implements DeploymentManager {
             extension.handleDeployment(deploymentInfo, servletContext);
         }
 
-        if (!ServletExtension.class.getClassLoader().equals(deploymentInfo.getClassLoader())) {
+        if (ServletExtension.class.getClassLoader() != null && !ServletExtension.class.getClassLoader().equals(deploymentInfo.getClassLoader())) {
             for (ServletExtension extension : ServiceLoader.load(ServletExtension.class)) {
 
                 // Note: If the CLs are different, but can the see the same extensions and extension might get loaded
@@ -266,6 +288,13 @@ public class DeploymentManagerImpl implements DeploymentManager {
                 }
             }
         }
+
+        for (ServletExtension extension : ServletExtensionHolder.getServletExtensions()) {
+            if (!loadedExtensions.contains(extension.getClass())) {
+                extension.handleDeployment(deploymentInfo, servletContext);
+            }
+        }
+
         for(ServletExtension extension : deploymentInfo.getServletExtensions()) {
             extension.handleDeployment(deploymentInfo, servletContext);
         }
@@ -286,6 +315,7 @@ public class DeploymentManagerImpl implements DeploymentManager {
         current = new SSLInformationAssociationHandler(current);
 
         final SecurityPathMatches securityPathMatches = buildSecurityConstraints();
+        securityPathMatches.logWarningsAboutUncoveredMethods();
         current = new ServletAuthenticationCallHandler(current);
 
         for(HandlerWrapper wrapper : deploymentInfo.getSecurityWrappers()) {
@@ -310,31 +340,41 @@ public class DeploymentManagerImpl implements DeploymentManager {
             final Map<String, AuthenticationMechanismFactory> factoryMap = new HashMap<>(deploymentInfo.getAuthenticationMechanisms());
             final IdentityManager identityManager = deploymentInfo.getIdentityManager();
             if(!factoryMap.containsKey(BASIC_AUTH)) {
-                factoryMap.put(BASIC_AUTH, new BasicAuthenticationMechanism.Factory(identityManager));
+                factoryMap.put(BASIC_AUTH, BasicAuthenticationMechanism.FACTORY);
             }
             if(!factoryMap.containsKey(FORM_AUTH)) {
-                factoryMap.put(FORM_AUTH, new ServletFormAuthenticationMechanism.Factory(identityManager));
+                factoryMap.put(FORM_AUTH, ServletFormAuthenticationMechanism.FACTORY);
             }
             if(!factoryMap.containsKey(DIGEST_AUTH)) {
-                factoryMap.put(DIGEST_AUTH, new DigestAuthenticationMechanism.Factory(identityManager));
+                factoryMap.put(DIGEST_AUTH, DigestAuthenticationMechanism.FACTORY);
             }
             if(!factoryMap.containsKey(CLIENT_CERT_AUTH)) {
-                factoryMap.put(CLIENT_CERT_AUTH, new ClientCertAuthenticationMechanism.Factory(identityManager));
+                factoryMap.put(CLIENT_CERT_AUTH, ClientCertAuthenticationMechanism.FACTORY);
             }
             if(!factoryMap.containsKey(ExternalAuthenticationMechanism.NAME)) {
-                factoryMap.put(ExternalAuthenticationMechanism.NAME, new ExternalAuthenticationMechanism.Factory(identityManager));
+                factoryMap.put(ExternalAuthenticationMechanism.NAME, ExternalAuthenticationMechanism.FACTORY);
             }
             if(!factoryMap.containsKey(GenericHeaderAuthenticationMechanism.NAME)) {
-                factoryMap.put(GenericHeaderAuthenticationMechanism.NAME, new GenericHeaderAuthenticationMechanism.Factory(identityManager));
+                factoryMap.put(GenericHeaderAuthenticationMechanism.NAME, GenericHeaderAuthenticationMechanism.FACTORY);
             }
             List<AuthenticationMechanism> authenticationMechanisms = new LinkedList<>();
-            authenticationMechanisms.add(new CachedAuthenticatedSessionMechanism(identityManager)); //TODO: does this really need to be hard coded?
 
+            if(deploymentInfo.isUseCachedAuthenticationMechanism()) {
+                authenticationMechanisms.add(new CachedAuthenticatedSessionMechanism(identityManager));
+            }
             if (loginConfig != null || deploymentInfo.getJaspiAuthenticationMechanism() != null) {
 
-                //we don't allow multipart requests, and always use the default encoding
+                //we don't allow multipart requests, and use the default encoding when it's set
+                FormEncodedDataDefinition formEncodedDataDefinition = new FormEncodedDataDefinition();
+                String reqEncoding = deploymentInfo.getDefaultRequestEncoding();
+                if(reqEncoding == null) {
+                    deploymentInfo.getDefaultEncoding();
+                }
+                if (reqEncoding != null) {
+                    formEncodedDataDefinition.setDefaultEncoding(reqEncoding);
+                }
                 FormParserFactory parser = FormParserFactory.builder(false)
-                        .addParser(new FormEncodedDataDefinition().setDefaultEncoding(deploymentInfo.getDefaultEncoding()))
+                        .addParser(formEncodedDataDefinition)
                         .build();
 
                 List<AuthMethodConfig> authMethods = Collections.<AuthMethodConfig>emptyList();
@@ -366,13 +406,10 @@ public class DeploymentManagerImpl implements DeploymentManager {
                     name = name.equals(DIGEST_AUTH) ? DIGEST_AUTH : name;
                     name = name.equals(CLIENT_CERT_AUTH) ? CLIENT_CERT_AUTH : name;
 
-                    authenticationMechanisms.add(factory.create(name, parser, properties));
+                    authenticationMechanisms.add(factory.create(name, identityManager, parser, properties));
                 }
             }
 
-            if(deploymentInfo.isUseCachedAuthenticationMechanism()) {
-                authenticationMechanisms.add(new CachedAuthenticatedSessionMechanism(identityManager));
-            }
 
             deployment.setAuthenticationMechanisms(authenticationMechanisms);
             //if the JASPI auth mechanism is set then it takes over
@@ -497,7 +534,7 @@ public class DeploymentManagerImpl implements DeploymentManager {
     private ApplicationListeners createListeners() {
         final List<ManagedListener> managedListeners = new ArrayList<>();
         for (final ListenerInfo listener : deployment.getDeploymentInfo().getListeners()) {
-            managedListeners.add(new ManagedListener(listener, false));
+            managedListeners.add(new ManagedListener(listener, listener.isProgramatic()));
         }
         return new ApplicationListeners(managedListeners, deployment.getServletContext());
     }
@@ -573,8 +610,8 @@ public class DeploymentManagerImpl implements DeploymentManager {
                     for (Lifecycle object : deployment.getLifecycleObjects()) {
                         try {
                             object.stop();
-                        } catch (Exception e) {
-                            UndertowServletLogger.ROOT_LOGGER.failedToDestroy(object, e);
+                        } catch (Throwable t) {
+                            UndertowServletLogger.ROOT_LOGGER.failedToDestroy(object, t);
                         }
                     }
                     deployment.getSessionManager().stop();
@@ -627,6 +664,13 @@ public class DeploymentManagerImpl implements DeploymentManager {
             deployment.createThreadSetupAction(new ThreadSetupHandler.Action<Void, Object>() {
                 @Override
                 public Void call(HttpServerExchange exchange, Object ignore) throws ServletException {
+                    for(ServletContextListener listener : deployment.getDeploymentInfo().getDeploymentCompleteListeners()) {
+                        try {
+                            listener.contextDestroyed(new ServletContextEvent(deployment.getServletContext()));
+                        } catch (Throwable t) {
+                            UndertowServletLogger.REQUEST_LOGGER.failedToDestroy(listener, t);
+                        }
+                    }
                     deployment.destroy();
                     deployment = null;
                     state = State.UNDEPLOYED;

@@ -1,8 +1,11 @@
 package com.fasterxml.jackson.databind.ser.impl;
 
 import java.io.IOException;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -47,7 +50,7 @@ public class BeanAsArraySerializer
 
     /**
      * Serializer that would produce JSON Object version; used in
-     * cases where array output can not be used.
+     * cases where array output cannot be used.
      */
     protected final BeanSerializerBase _defaultSerializer;
     
@@ -62,7 +65,7 @@ public class BeanAsArraySerializer
         _defaultSerializer = src;
     }
 
-    protected BeanAsArraySerializer(BeanSerializerBase src, String[] toIgnore) {
+    protected BeanAsArraySerializer(BeanSerializerBase src, Set<String> toIgnore) {
         super(src, toIgnore);
         _defaultSerializer = src;
     }
@@ -102,9 +105,9 @@ public class BeanAsArraySerializer
     public BeanSerializerBase withFilterId(Object filterId) {
         return new BeanAsArraySerializer(this, _objectIdWriter, filterId);
     }
-    
+
     @Override
-    protected BeanAsArraySerializer withIgnorals(String[] toIgnore) {
+    protected BeanAsArraySerializer withIgnorals(Set<String> toIgnore) {
         return new BeanAsArraySerializer(this, toIgnore);
     }
 
@@ -133,18 +136,11 @@ public class BeanAsArraySerializer
             _serializeWithObjectId(bean, gen, provider, typeSer);
             return;
         }
-        String typeStr = (_typeId == null) ? null : _customTypeId(bean);
-        if (typeStr == null) {
-            typeSer.writeTypePrefixForArray(bean, gen);
-        } else {
-            typeSer.writeCustomTypePrefixForArray(bean, gen, typeStr);
-        }
+        gen.setCurrentValue(bean);
+        WritableTypeId typeIdDef = _typeIdDef(typeSer, bean, JsonToken.START_ARRAY);
+        typeSer.writeTypePrefix(gen, typeIdDef);
         serializeAsArray(bean, gen, provider);
-        if (typeStr == null) {
-            typeSer.writeTypeSuffixForArray(bean, gen);
-        } else {
-            typeSer.writeCustomTypeSuffixForArray(bean, gen, typeStr);
-        }
+        typeSer.writeTypeSuffix(gen, typeIdDef);
     }
 
     /**
@@ -208,7 +204,7 @@ public class BeanAsArraySerializer
                     prop.serializeAsElement(bean, gen, provider);
                 }
             }
-            // NOTE: any getters can not be supported either
+            // NOTE: any getters cannot be supported either
             //if (_anyGetterWriter != null) {
             //    _anyGetterWriter.getAndSerialize(bean, gen, provider);
             //}

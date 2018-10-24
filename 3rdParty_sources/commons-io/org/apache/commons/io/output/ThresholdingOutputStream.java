@@ -34,7 +34,7 @@ import java.io.OutputStream;
  * is actually reached, since it triggers when a pending write operation would
  * cause the threshold to be exceeded.
  *
- *
+ * @version $Id: ThresholdingOutputStream.java 1687815 2015-06-26 17:18:56Z krosenvold $
  */
 public abstract class ThresholdingOutputStream
     extends OutputStream
@@ -70,7 +70,7 @@ public abstract class ThresholdingOutputStream
      *
      * @param threshold The number of bytes at which to trigger an event.
      */
-    public ThresholdingOutputStream(int threshold)
+    public ThresholdingOutputStream(final int threshold)
     {
         this.threshold = threshold;
     }
@@ -87,7 +87,7 @@ public abstract class ThresholdingOutputStream
      * @exception IOException if an error occurs.
      */
     @Override
-    public void write(int b) throws IOException
+    public void write(final int b) throws IOException
     {
         checkThreshold(1);
         getStream().write(b);
@@ -104,7 +104,7 @@ public abstract class ThresholdingOutputStream
      * @exception IOException if an error occurs.
      */
     @Override
-    public void write(byte b[]) throws IOException
+    public void write(final byte b[]) throws IOException
     {
         checkThreshold(b.length);
         getStream().write(b);
@@ -123,7 +123,7 @@ public abstract class ThresholdingOutputStream
      * @exception IOException if an error occurs.
      */
     @Override
-    public void write(byte b[], int off, int len) throws IOException
+    public void write(final byte b[], final int off, final int len) throws IOException
     {
         checkThreshold(len);
         getStream().write(b, off, len);
@@ -157,7 +157,7 @@ public abstract class ThresholdingOutputStream
         {
             flush();
         }
-        catch (IOException ignored)
+        catch (final IOException ignored)
         {
             // ignore
         }
@@ -216,7 +216,7 @@ public abstract class ThresholdingOutputStream
      *
      * @exception IOException if an error occurs.
      */
-    protected void checkThreshold(int count) throws IOException
+    protected void checkThreshold(final int count) throws IOException
     {
         if (!thresholdExceeded && written + count > threshold)
         {
@@ -234,6 +234,20 @@ public abstract class ThresholdingOutputStream
         this.thresholdExceeded = false;
         this.written = 0;
     }
+
+    /**
+     * Sets the byteCount to count.  Usefull for re-opening an output stream
+     * that been previously written to.
+     *
+     * @param count The number of bytes that have already been written to the
+     * output stream
+     *
+     * @since 2.5
+     */
+    protected void setByteCount(final long count) {
+        this.written = count;
+    }
+
 
     // ------------------------------------------------------- Abstract methods
 

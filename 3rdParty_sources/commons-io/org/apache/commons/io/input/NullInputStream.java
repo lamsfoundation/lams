@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +52,7 @@ import java.io.InputStream;
  *          return ... // return required value here
  *      }
  *      protected void processBytes(byte[] bytes, int offset, int length) {
- *          for (int i = offset; i < length; i++) {
+ *          for (int i = offset; i &lt; length; i++) {
  *              bytes[i] = ... // set array value here
  *          }
  *      }
@@ -58,7 +60,7 @@ import java.io.InputStream;
  * </pre>
  *
  * @since 1.3
- *
+ * @version $Id: NullInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
  */
 public class NullInputStream extends InputStream {
 
@@ -76,7 +78,7 @@ public class NullInputStream extends InputStream {
      *
      * @param size The size of the input stream to emulate.
      */
-    public NullInputStream(long size) {
+    public NullInputStream(final long size) {
        this(size, true, false);
     }
 
@@ -91,7 +93,7 @@ public class NullInputStream extends InputStream {
      * will throw an {@link EOFException} or return -1 when the
      * end of file is reached.
      */
-    public NullInputStream(long size, boolean markSupported, boolean throwEofException) {
+    public NullInputStream(final long size, final boolean markSupported, final boolean throwEofException) {
        this.size = size;
        this.markSupported = markSupported;
        this.throwEofException = throwEofException;
@@ -122,7 +124,7 @@ public class NullInputStream extends InputStream {
      */
     @Override
     public int available() {
-        long avail = size - position;
+        final long avail = size - position;
         if (avail <= 0) {
             return 0;
         } else if (avail > Integer.MAX_VALUE) {
@@ -153,7 +155,7 @@ public class NullInputStream extends InputStream {
      * @throws UnsupportedOperationException if mark is not supported.
      */
     @Override
-    public synchronized void mark(int readlimit) {
+    public synchronized void mark(final int readlimit) {
         if (!markSupported) {
             throw new UnsupportedOperationException("Mark not supported");
         }
@@ -205,7 +207,7 @@ public class NullInputStream extends InputStream {
      * @throws IOException if trying to read past the end of file.
      */
     @Override
-    public int read(byte[] bytes) throws IOException {
+    public int read(final byte[] bytes) throws IOException {
         return read(bytes, 0, bytes.length);
     }
 
@@ -223,7 +225,7 @@ public class NullInputStream extends InputStream {
      * @throws IOException if trying to read past the end of file.
      */
     @Override
-    public int read(byte[] bytes, int offset, int length) throws IOException {
+    public int read(final byte[] bytes, final int offset, final int length) throws IOException {
         if (eof) {
             throw new IOException("Read after end of file");
         }
@@ -277,7 +279,7 @@ public class NullInputStream extends InputStream {
      * @throws IOException if trying to read past the end of file.
      */
     @Override
-    public long skip(long numberOfBytes) throws IOException {
+    public long skip(final long numberOfBytes) throws IOException {
         if (eof) {
             throw new IOException("Skip after end of file");
         }
@@ -315,7 +317,7 @@ public class NullInputStream extends InputStream {
      * @param offset The offset to start at.
      * @param length The number of bytes.
      */
-    protected void processBytes(byte[] bytes, int offset, int length) {
+    protected void processBytes(final byte[] bytes, final int offset, final int length) {
         // do nothing - overridable by subclass
     }
 
@@ -332,7 +334,7 @@ public class NullInputStream extends InputStream {
         if (throwEofException) {
             throw new EOFException();
         }
-        return -1;
+        return EOF;
     }
 
 }

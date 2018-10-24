@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,11 +27,11 @@ import java.io.OutputStream;
  * that accept an output stream and acting as a sentinel value instead of
  * a {@code null} output stream.
  *
- *
+ * @version $Id: ClosedOutputStream.java 1471767 2013-04-24 23:24:19Z sebb $
  * @since 1.4
  */
 public class ClosedOutputStream extends OutputStream {
-    
+
     /**
      * A singleton.
      */
@@ -44,7 +44,7 @@ public class ClosedOutputStream extends OutputStream {
      * @throws IOException always thrown
      */
     @Override
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         throw new IOException("write(" + b + ") failed: stream is closed");
     }
 

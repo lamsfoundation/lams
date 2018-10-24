@@ -18,14 +18,6 @@ public class EnumSetSerializer
         super(EnumSet.class, elemType, true, null, null);
     }
 
-    /**
-     * @deprecated since 2.6
-     */
-    @Deprecated // since 2.6
-    public EnumSetSerializer(JavaType elemType, BeanProperty property) {
-        this(elemType);
-    }
-
     public EnumSetSerializer(EnumSetSerializer src,
             BeanProperty property, TypeSerializer vts, JsonSerializer<?> valueSerializer,
             Boolean unwrapSingle) {
@@ -47,7 +39,7 @@ public class EnumSetSerializer
     
     @Override
     public boolean isEmpty(SerializerProvider prov, EnumSet<? extends Enum<?>> value) {
-        return (value == null) || value.isEmpty();
+        return value.isEmpty();
     }
 
     @Override
@@ -59,7 +51,7 @@ public class EnumSetSerializer
     public final void serialize(EnumSet<? extends Enum<?>> value, JsonGenerator gen,
             SerializerProvider provider) throws IOException
     {
-    	final int len = value.size();
+        final int len = value.size();
         if (len == 1) {
             if (((_unwrapSingle == null)
                     && provider.isEnabled(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED))
@@ -85,7 +77,7 @@ public class EnumSetSerializer
          */
         for (Enum<?> en : value) {
             if (enumSer == null) {
-                /* 12-Jan-2010, tatu: Since enums can not be polymorphic, let's
+                /* 12-Jan-2010, tatu: Since enums cannot be polymorphic, let's
                  *   not bother with typed serializer variant here
                  */
                 enumSer = provider.findValueSerializer(en.getDeclaringClass(), _property);

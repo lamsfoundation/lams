@@ -19,6 +19,7 @@
 package io.undertow.attribute;
 
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.AttachmentKey;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,9 +30,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class ResponseTimeAttribute implements ExchangeAttribute {
 
+    private static final AttachmentKey<Long> FIRST_RESPONSE_TIME_NANOS = AttachmentKey.create(Long.class);
+
     public static final String RESPONSE_TIME_MILLIS_SHORT = "%D";
     public static final String RESPONSE_TIME_SECONDS_SHORT = "%T";
     public static final String RESPONSE_TIME_MILLIS = "%{RESPONSE_TIME}";
+    public static final String RESPONSE_TIME_MICROS = "%{RESPONSE_TIME_MICROS}";
     public static final String RESPONSE_TIME_NANOS = "%{RESPONSE_TIME_NANOS}";
 
     private final TimeUnit timeUnit;
@@ -46,7 +50,17 @@ public class ResponseTimeAttribute implements ExchangeAttribute {
         if(requestStartTime == -1) {
             return null;
         }
-        final long nanos = System.nanoTime() - requestStartTime;
+        final long nanos;
+        Long first = exchange.getAttachment(FIRST_RESPONSE_TIME_NANOS);
+        if(first != null) {
+            nanos = first;
+        } else {
+            nanos = System.nanoTime() - requestStartTime;
+            if(exchange.isResponseComplete()) {
+                //save the response time so it is consistent
+                exchange.putAttachment(FIRST_RESPONSE_TIME_NANOS, nanos);
+            }
+        }
         if(timeUnit == TimeUnit.SECONDS) {
             StringBuilder buf = new StringBuilder();
             long milis = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
@@ -82,6 +96,9 @@ public class ResponseTimeAttribute implements ExchangeAttribute {
             }
             if (token.equals(RESPONSE_TIME_SECONDS_SHORT)) {
                 return new ResponseTimeAttribute(TimeUnit.SECONDS);
+            }
+            if(token.equals(RESPONSE_TIME_MICROS)) {
+                return new ResponseTimeAttribute(TimeUnit.MICROSECONDS);
             }
             if(token.equals(RESPONSE_TIME_NANOS)) {
                 return new ResponseTimeAttribute(TimeUnit.NANOSECONDS);

@@ -99,18 +99,18 @@ public abstract class JsonNode
     }
 
     @Override
-    public final boolean isMissingNode() {
-        return getNodeType() == JsonNodeType.MISSING;
+    public boolean isMissingNode() {
+        return false;
     }
 
     @Override
-    public final boolean isArray() {
-        return getNodeType() == JsonNodeType.ARRAY;
+    public boolean isArray() {
+        return false;
     }
 
     @Override
-    public final boolean isObject() {
-        return getNodeType() == JsonNodeType.OBJECT;
+    public boolean isObject() {
+        return false;
     }
 
     /**
@@ -508,9 +508,24 @@ public abstract class JsonNode
      */
     public double doubleValue() { return 0.0; }
 
+    /**
+     * Returns floating point value for this node (as {@link BigDecimal}), <b>if and only if</b>
+     * this node is numeric ({@link #isNumber} returns true). For other
+     * types returns <code>BigDecimal.ZERO</code>.
+     *
+     * @return {@link BigDecimal} value this node contains, if numeric node; <code>BigDecimal.ZERO</code> for non-number nodes.
+     */
     public BigDecimal decimalValue() { return BigDecimal.ZERO; }
+
+    /**
+     * Returns integer value for this node (as {@link BigDecimal}), <b>if and only if</b>
+     * this node is numeric ({@link #isNumber} returns true). For other
+     * types returns <code>BigInteger.ZERO</code>.
+     *
+     * @return {@link BigInteger} value this node contains, if numeric node; <code>BigInteger.ZERO</code> for non-number nodes.
+     */
     public BigInteger bigIntegerValue() { return BigInteger.ZERO; }
-    
+
     /*
     /**********************************************************
     /* Public API, value access with conversion(s)/coercion(s)
@@ -544,7 +559,7 @@ public abstract class JsonNode
      * and 1 (true), and Strings are parsed using default Java language integer
      * parsing rules.
      *<p>
-     * If representation can not be converted to an int (including structured types
+     * If representation cannot be converted to an int (including structured types
      * like Objects and Arrays),
      * default value of <b>0</b> will be returned; no exceptions are thrown.
      */
@@ -558,7 +573,7 @@ public abstract class JsonNode
      * and 1 (true), and Strings are parsed using default Java language integer
      * parsing rules.
      *<p>
-     * If representation can not be converted to an int (including structured types
+     * If representation cannot be converted to an int (including structured types
      * like Objects and Arrays),
      * specified <b>defaultValue</b> will be returned; no exceptions are thrown.
      */
@@ -572,7 +587,7 @@ public abstract class JsonNode
      * and 1 (true), and Strings are parsed using default Java language integer
      * parsing rules.
      *<p>
-     * If representation can not be converted to an long (including structured types
+     * If representation cannot be converted to an long (including structured types
      * like Objects and Arrays),
      * default value of <b>0</b> will be returned; no exceptions are thrown.
      */
@@ -586,7 +601,7 @@ public abstract class JsonNode
      * and 1 (true), and Strings are parsed using default Java language integer
      * parsing rules.
      *<p>
-     * If representation can not be converted to an long (including structured types
+     * If representation cannot be converted to an long (including structured types
      * like Objects and Arrays),
      * specified <b>defaultValue</b> will be returned; no exceptions are thrown.
      */
@@ -600,7 +615,7 @@ public abstract class JsonNode
      * and 1.0 (true), and Strings are parsed using default Java language integer
      * parsing rules.
      *<p>
-     * If representation can not be converted to an int (including structured types
+     * If representation cannot be converted to an int (including structured types
      * like Objects and Arrays),
      * default value of <b>0.0</b> will be returned; no exceptions are thrown.
      */
@@ -614,7 +629,7 @@ public abstract class JsonNode
      * and 1.0 (true), and Strings are parsed using default Java language integer
      * parsing rules.
      *<p>
-     * If representation can not be converted to an int (including structured types
+     * If representation cannot be converted to an int (including structured types
      * like Objects and Arrays),
      * specified <b>defaultValue</b> will be returned; no exceptions are thrown.
      */
@@ -628,7 +643,7 @@ public abstract class JsonNode
      * 0 maps to false
      * and Strings 'true' and 'false' map to corresponding values.
      *<p>
-     * If representation can not be converted to a boolean value (including structured types
+     * If representation cannot be converted to a boolean value (including structured types
      * like Objects and Arrays),
      * default value of <b>false</b> will be returned; no exceptions are thrown.
      */
@@ -642,20 +657,20 @@ public abstract class JsonNode
      * 0 maps to false
      * and Strings 'true' and 'false' map to corresponding values.
      *<p>
-     * If representation can not be converted to a boolean value (including structured types
+     * If representation cannot be converted to a boolean value (including structured types
      * like Objects and Arrays),
      * specified <b>defaultValue</b> will be returned; no exceptions are thrown.
      */
     public boolean asBoolean(boolean defaultValue) {
         return defaultValue;
     }
-    
+
     /*
     /**********************************************************
     /* Public API, value find / existence check methods
     /**********************************************************
      */
-    
+
     /**
      * Method that allows checking whether this node is JSON Object node
      * and contains value for specified property. If this is the case
@@ -881,7 +896,7 @@ public abstract class JsonNode
      */
     public JsonNode with(String propertyName) {
         throw new UnsupportedOperationException("JsonNode not of type ObjectNode (but "
-                +getClass().getName()+"), can not call with() on it");
+                +getClass().getName()+"), cannot call with() on it");
     }
 
     /**
@@ -894,7 +909,7 @@ public abstract class JsonNode
      */
     public JsonNode withArray(String propertyName) {
         throw new UnsupportedOperationException("JsonNode not of type ObjectNode (but "
-                +getClass().getName()+"), can not call withArray() on it");
+                +getClass().getName()+"), cannot call withArray() on it");
     }
 
     /*

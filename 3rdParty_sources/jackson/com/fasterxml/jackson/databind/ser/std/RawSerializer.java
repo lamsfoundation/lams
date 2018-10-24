@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
@@ -18,7 +19,7 @@ public class RawSerializer<T>
 {
     /**
      * Constructor takes in expected type of values; but since caller
-     * typically can not really provide actual type parameter, we will
+     * typically cannot really provide actual type parameter, we will
      * just take wild card and coerce type.
      */
     public RawSerializer(Class<?> cls) {
@@ -31,13 +32,14 @@ public class RawSerializer<T>
     }
 
     @Override
-    public void serializeWithType(T value, JsonGenerator jgen, SerializerProvider provider,
+    public void serializeWithType(T value, JsonGenerator g, SerializerProvider provider,
             TypeSerializer typeSer)
         throws IOException
     {
-        typeSer.writeTypePrefixForScalar(value, jgen);
-        serialize(value, jgen, provider);
-        typeSer.writeTypeSuffixForScalar(value, jgen);
+        WritableTypeId typeIdDef = typeSer.writeTypePrefix(g,
+                typeSer.typeId(value, JsonToken.VALUE_EMBEDDED_OBJECT));
+        serialize(value, g, provider);
+        typeSer.writeTypeSuffix(g, typeIdDef);
     }
     
     @Override

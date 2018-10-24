@@ -104,7 +104,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
         int res = 0;
         try {
             return res = next.write(src);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         } finally {
@@ -146,7 +146,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
         long res = 0L;
         try {
             return res = next.write(srcs, offset, length);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         } finally {
@@ -163,7 +163,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
     public long writeFinal(ByteBuffer[] srcs, int offset, int length) throws IOException {
         try {
             return Conduits.writeFinalBasic(this, srcs, offset, length);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         }
@@ -173,7 +173,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
     public int writeFinal(ByteBuffer src) throws IOException {
         try {
             return Conduits.writeFinalBasic(this, src);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         }
@@ -191,7 +191,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
         long res = 0L;
         try {
             return res = next.transferFrom(src, position, min(count, (val & MASK_COUNT)));
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         } finally {
@@ -211,7 +211,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
         long res = 0L;
         try {
             return res = next.transferFrom(source, min(count, (val & MASK_COUNT)), throughBuffer);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         } finally {
@@ -227,7 +227,7 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
         boolean flushed = false;
         try {
             return flushed = next.flush();
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
             broken = true;
             throw e;
         } finally {
@@ -252,7 +252,14 @@ public abstract class AbstractFixedLengthStreamSinkConduit extends AbstractStrea
         final long val = enterShutdown();
         if (anyAreSet(val, MASK_COUNT) && !broken) {
             UndertowLogger.REQUEST_IO_LOGGER.debugf("Fixed length stream closed with with %s bytes remaining", val & MASK_COUNT);
-            next.truncateWrites();
+            try {
+                next.truncateWrites();
+            } finally {
+                if (!anyAreSet(state, FLAG_FINISHED_CALLED)) {
+                    state |= FLAG_FINISHED_CALLED;
+                    channelFinished();
+                }
+            }
         } else if (allAreSet(config, CONF_FLAG_PASS_CLOSE)) {
             next.terminateWrites();
         }

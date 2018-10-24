@@ -24,19 +24,19 @@ import java.io.OutputStream;
  * command. It allows a stream to be branched off so there 
  * are now two streams.
  *
- *
+ * @version $Id: TeeOutputStream.java 1686503 2015-06-19 21:32:13Z sebb $
  */
 public class TeeOutputStream extends ProxyOutputStream {
 
     /** the second OutputStream to write to */
-    protected OutputStream branch;
+    protected OutputStream branch; //TODO consider making this private
 
     /**
      * Constructs a TeeOutputStream.
      * @param out the main OutputStream
      * @param branch the second OutputStream
      */
-    public TeeOutputStream(OutputStream out, OutputStream branch) {
+    public TeeOutputStream(final OutputStream out, final OutputStream branch) {
         super(out);
         this.branch = branch;
     }
@@ -47,7 +47,7 @@ public class TeeOutputStream extends ProxyOutputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public synchronized void write(byte[] b) throws IOException {
+    public synchronized void write(final byte[] b) throws IOException {
         super.write(b);
         this.branch.write(b);
     }
@@ -60,7 +60,7 @@ public class TeeOutputStream extends ProxyOutputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public synchronized void write(byte[] b, int off, int len) throws IOException {
+    public synchronized void write(final byte[] b, final int off, final int len) throws IOException {
         super.write(b, off, len);
         this.branch.write(b, off, len);
     }
@@ -71,7 +71,7 @@ public class TeeOutputStream extends ProxyOutputStream {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public synchronized void write(int b) throws IOException {
+    public synchronized void write(final int b) throws IOException {
         super.write(b);
         this.branch.write(b);
     }

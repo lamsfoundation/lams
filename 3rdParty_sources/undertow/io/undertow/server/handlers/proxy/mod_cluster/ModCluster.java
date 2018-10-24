@@ -53,6 +53,10 @@ public class ModCluster {
 
     private final XnioWorker xnioWorker;
     private final ModClusterContainer container;
+    private final int maxRetries;
+    private final boolean deterministicFailover;
+
+    private final boolean reuseXForwarded;
 
     private final String serverID = UUID.randomUUID().toString(); // TODO
 
@@ -64,10 +68,13 @@ public class ModCluster {
         this.queueNewRequests = builder.queueNewRequests;
         this.healthCheckInterval = builder.healthCheckInterval;
         this.removeBrokenNodes = builder.removeBrokenNodes;
+        this.deterministicFailover = builder.deterministicFailover;
         this.healthChecker = builder.healthChecker;
         this.maxRequestTime = builder.maxRequestTime;
         this.ttl = builder.ttl;
         this.useAlias = builder.useAlias;
+        this.maxRetries = builder.maxRetries;
+        this.reuseXForwarded = builder.reuseXForwarded;
         this.container = new ModClusterContainer(this, builder.xnioSsl, builder.client, builder.clientOptions);
     }
 
@@ -119,6 +126,10 @@ public class ModCluster {
         return useAlias;
     }
 
+    public boolean isDeterministicFailover() {
+        return deterministicFailover;
+    }
+
     /**
      * Get the handler proxying the requests.
      *
@@ -134,7 +145,12 @@ public class ModCluster {
      * @return the proxy handler
      */
     public HttpHandler createProxyHandler() {
-        return new ProxyHandler(container.getProxyClient(), maxRequestTime, NEXT_HANDLER);
+        return ProxyHandler.builder()
+                .setProxyClient(container.getProxyClient())
+                .setMaxRequestTime(maxRequestTime)
+                .setMaxConnectionRetries(maxRetries)
+                .setReuseXForwarded(reuseXForwarded)
+                .build();
     }
 
     /**
@@ -143,7 +159,13 @@ public class ModCluster {
      * @return the proxy handler
      */
     public HttpHandler createProxyHandler(HttpHandler next) {
-        return new ProxyHandler(container.getProxyClient(), maxRequestTime, next);
+        return ProxyHandler.builder()
+                .setProxyClient(container.getProxyClient())
+                .setNext(next)
+                .setMaxRequestTime(maxRequestTime)
+                .setMaxConnectionRetries(maxRetries)
+                .setReuseXForwarded(reuseXForwarded)
+                .build();
     }
     /**
      * Start
@@ -193,18 +215,22 @@ public class ModCluster {
 
         // Fairly restrictive connection pool defaults
         private int maxConnections = 16;
-        private int cacheConnections = 8;
+        private int cacheConnections = 1;
         private int requestQueueSize = 0;
         private boolean queueNewRequests = false;
 
         private int maxRequestTime = -1;
-        private long ttl;
+        private long ttl = TimeUnit.SECONDS.toMillis(60);
         private boolean useAlias = false;
 
         private NodeHealthChecker healthChecker = NodeHealthChecker.NO_CHECK;
         private long healthCheckInterval = TimeUnit.SECONDS.toMillis(10);
         private long removeBrokenNodes = TimeUnit.MINUTES.toMillis(1);
-        public OptionMap clientOptions = OptionMap.EMPTY;
+        private OptionMap clientOptions = OptionMap.EMPTY;
+        private int maxRetries;
+        private boolean deterministicFailover = false;
+
+        private boolean reuseXForwarded;
 
         private Builder(XnioWorker xnioWorker, UndertowClient client, XnioSsl xnioSsl) {
             this.xnioSsl = xnioSsl;
@@ -261,8 +287,14 @@ public class ModCluster {
             return this;
         }
 
-        public long getTtl() {
-            return ttl;
+        public Builder setMaxRetries(int maxRetries) {
+            this.maxRetries = maxRetries;
+            return this;
+        }
+
+        public Builder setDeterministicFailover(boolean deterministicFailover) {
+            this.deterministicFailover = deterministicFailover;
+            return this;
         }
 
         public Builder setTtl(long ttl) {
@@ -272,6 +304,11 @@ public class ModCluster {
 
         public Builder setClientOptions(OptionMap clientOptions) {
             this.clientOptions = clientOptions;
+            return this;
+        }
+
+        public Builder setReuseXForwarded(boolean reuseXForwarded) {
+            this.reuseXForwarded = reuseXForwarded;
             return this;
         }
     }

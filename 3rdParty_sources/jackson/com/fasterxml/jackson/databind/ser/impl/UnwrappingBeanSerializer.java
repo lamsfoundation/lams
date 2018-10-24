@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.databind.ser.impl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import com.fasterxml.jackson.databind.util.NameTransformer;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class UnwrappingBeanSerializer
     extends BeanSerializerBase
@@ -49,7 +49,7 @@ public class UnwrappingBeanSerializer
         _nameTransformer = src._nameTransformer;
     }
 
-    protected UnwrappingBeanSerializer(UnwrappingBeanSerializer src, String[] toIgnore) {
+    protected UnwrappingBeanSerializer(UnwrappingBeanSerializer src, Set<String> toIgnore) {
         super(src, toIgnore);
         _nameTransformer = src._nameTransformer;
     }
@@ -82,12 +82,12 @@ public class UnwrappingBeanSerializer
     }
 
     @Override
-    protected BeanSerializerBase withIgnorals(String[] toIgnore) {
+    protected BeanSerializerBase withIgnorals(Set<String> toIgnore) {
         return new UnwrappingBeanSerializer(this, toIgnore);
     }
 
     /**
-     * JSON Array output can not be done if unwrapping operation is
+     * JSON Array output cannot be done if unwrapping operation is
      * requested; so implementation will simply return 'this'.
      */
     @Override
@@ -126,10 +126,9 @@ public class UnwrappingBeanSerializer
     		TypeSerializer typeSer) throws IOException
     {
         if (provider.isEnabled(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS)) {
-            throw JsonMappingException.from(gen,
-                    "Unwrapped property requires use of type information: can not serialize without disabling `SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS`");
+            provider.reportBadDefinition(handledType(),
+                    "Unwrapped property requires use of type information: cannot serialize without disabling `SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS`");
         }
-
         gen.setCurrentValue(bean); // [databind#631]
         if (_objectIdWriter != null) {
             _serializeWithObjectId(bean, gen, provider, typeSer);

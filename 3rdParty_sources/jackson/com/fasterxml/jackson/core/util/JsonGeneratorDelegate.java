@@ -1,12 +1,13 @@
 package com.fasterxml.jackson.core.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.CharacterEscapes;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class JsonGeneratorDelegate extends JsonGenerator
 {
@@ -200,16 +201,43 @@ public class JsonGeneratorDelegate extends JsonGenerator
 
     @Override
     public void writeStartObject() throws IOException { delegate.writeStartObject(); }
-    
+
+    @Override
+    public void writeStartObject(Object forValue) throws IOException { delegate.writeStartObject(forValue); }
+
     @Override
     public void writeEndObject() throws IOException { delegate.writeEndObject(); }
 
     @Override
-    public void writeFieldName(String name) throws IOException { delegate.writeFieldName(name); }
+    public void writeFieldName(String name) throws IOException {
+        delegate.writeFieldName(name);
+    }
 
     @Override
-    public void writeFieldName(SerializableString name) throws IOException { delegate.writeFieldName(name); }
-    
+    public void writeFieldName(SerializableString name) throws IOException {
+        delegate.writeFieldName(name);
+    }
+
+    @Override
+    public void writeFieldId(long id) throws IOException {
+        delegate.writeFieldId(id);
+    }
+
+    @Override
+    public void writeArray(int[] array, int offset, int length) throws IOException {
+        delegate.writeArray(array, offset, length);
+    }
+
+    @Override
+    public void writeArray(long[] array, int offset, int length) throws IOException {
+        delegate.writeArray(array, offset, length);
+    }
+
+    @Override
+    public void writeArray(double[] array, int offset, int length) throws IOException {
+        delegate.writeArray(array, offset, length);
+    }
+
     /*
     /**********************************************************
     /* Public API, write methods, text/String values
@@ -218,6 +246,11 @@ public class JsonGeneratorDelegate extends JsonGenerator
 
     @Override
     public void writeString(String text) throws IOException { delegate.writeString(text); }
+
+    @Override
+    public void writeString(Reader reader, int len) throws IOException {
+        delegate.writeString(reader, len);
+    }
 
     @Override
     public void writeString(char[] text, int offset, int len) throws IOException { delegate.writeString(text, offset, len); }
@@ -326,6 +359,9 @@ public class JsonGeneratorDelegate extends JsonGenerator
     
     @Override
     public void writeTypeId(Object id) throws IOException { delegate.writeTypeId(id); }
+
+    @Override
+    public void writeEmbeddedObject(Object object) throws IOException { delegate.writeEmbeddedObject(object); }
     
     /*
     /**********************************************************
@@ -334,17 +370,17 @@ public class JsonGeneratorDelegate extends JsonGenerator
      */
     
     @Override
-    public void writeObject(Object pojo) throws IOException,JsonProcessingException {
+    public void writeObject(Object pojo) throws IOException {
         if (delegateCopyMethods) {
             delegate.writeObject(pojo);
             return;
         }
-        // NOTE: copied from 
         if (pojo == null) {
             writeNull();
         } else {
-            if (getCodec() != null) {
-                getCodec().writeValue(this, pojo);
+            ObjectCodec c = getCodec();
+            if (c != null) {
+                c.writeValue(this, pojo);
                 return;
             }
             _writeSimpleObject(pojo);
@@ -352,19 +388,20 @@ public class JsonGeneratorDelegate extends JsonGenerator
     }
     
     @Override
-    public void writeTree(TreeNode rootNode) throws IOException {
+    public void writeTree(TreeNode tree) throws IOException {
         if (delegateCopyMethods) {
-            delegate.writeTree(rootNode);
+            delegate.writeTree(tree);
             return;
         }
         // As with 'writeObject()', we are not check if write would work
-        if (rootNode == null) {
+        if (tree == null) {
             writeNull();
         } else {
-            if (getCodec() == null) {
+            ObjectCodec c = getCodec();
+            if (c == null) {
                 throw new IllegalStateException("No ObjectCodec defined");
             }
-            getCodec().writeValue(this, rootNode);
+            c.writeTree(this, tree);
         }
     }
 
@@ -383,15 +420,15 @@ public class JsonGeneratorDelegate extends JsonGenerator
      */
 
     @Override
-    public void copyCurrentEvent(JsonParser jp) throws IOException {
-        if (delegateCopyMethods) delegate.copyCurrentEvent(jp);
-        else super.copyCurrentEvent(jp);
+    public void copyCurrentEvent(JsonParser p) throws IOException {
+        if (delegateCopyMethods) delegate.copyCurrentEvent(p);
+        else super.copyCurrentEvent(p);
     }
 
     @Override
-    public void copyCurrentStructure(JsonParser jp) throws IOException {
-        if (delegateCopyMethods) delegate.copyCurrentStructure(jp);
-        else super.copyCurrentStructure(jp);
+    public void copyCurrentStructure(JsonParser p) throws IOException {
+        if (delegateCopyMethods) delegate.copyCurrentStructure(p);
+        else super.copyCurrentStructure(p);
     }
 
     /*

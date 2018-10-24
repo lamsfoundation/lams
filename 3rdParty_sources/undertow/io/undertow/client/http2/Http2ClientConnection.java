@@ -18,22 +18,35 @@
 
 package io.undertow.client.http2;
 
+import static io.undertow.protocols.http2.Http2Channel.AUTHORITY;
+import static io.undertow.protocols.http2.Http2Channel.METHOD;
+import static io.undertow.protocols.http2.Http2Channel.PATH;
+import static io.undertow.protocols.http2.Http2Channel.SCHEME;
+import static io.undertow.protocols.http2.Http2Channel.STATUS;
 import static io.undertow.util.Headers.CONTENT_LENGTH;
 import static io.undertow.util.Headers.TRANSFER_ENCODING;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.ClosedChannelException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import io.undertow.client.ClientStatistics;
+import io.undertow.protocols.http2.Http2DataStreamSinkChannel;
 import io.undertow.protocols.http2.Http2GoAwayStreamSourceChannel;
 import io.undertow.protocols.http2.Http2PushPromiseStreamSourceChannel;
+import io.undertow.server.protocol.http.HttpAttachments;
+import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
-import io.undertow.util.NetworkUtils;
+import io.undertow.util.Methods;
 import io.undertow.util.Protocols;
 import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
@@ -53,7 +66,6 @@ import io.undertow.client.ClientCallback;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientExchange;
 import io.undertow.client.ClientRequest;
-import io.undertow.client.ProxiedRequestAttachments;
 import io.undertow.protocols.http2.AbstractHttp2StreamSourceChannel;
 import io.undertow.protocols.http2.Http2Channel;
 import io.undertow.protocols.http2.Http2HeadersStreamSinkChannel;
@@ -68,55 +80,57 @@ import io.undertow.util.HttpString;
  */
 public class Http2ClientConnection implements ClientConnection {
 
-
-    static final HttpString METHOD = new HttpString(":method");
-    static final HttpString PATH = new HttpString(":path");
-    static final HttpString SCHEME = new HttpString(":scheme");
-    static final HttpString AUTHORITY = new HttpString(":authority");
-    static final HttpString STATUS = new HttpString(":status");
-
     private final Http2Channel http2Channel;
     private final ChannelListener.SimpleSetter<ClientConnection> closeSetter = new ChannelListener.SimpleSetter<>();
 
     private final Map<Integer, Http2ClientExchange> currentExchanges = new ConcurrentHashMap<>();
 
+    private static final AtomicLong PING_COUNTER = new AtomicLong();
+
+
     private boolean initialUpgradeRequest;
     private final String defaultHost;
     private final ClientStatistics clientStatistics;
     private final List<ChannelListener<ClientConnection>> closeListeners = new CopyOnWriteArrayList<>();
+    private final boolean secure;
 
-    public Http2ClientConnection(Http2Channel http2Channel, boolean initialUpgradeRequest, String defaultHost, ClientStatistics clientStatistics) {
+    private final Map<PingKey, PingListener> outstandingPings = new HashMap<>();
+
+    private final ChannelListener<Http2Channel> closeTask = new ChannelListener<Http2Channel>() {
+        @Override
+        public void handleEvent(Http2Channel channel) {
+            ChannelListeners.invokeChannelListener(Http2ClientConnection.this, closeSetter.get());
+            for (ChannelListener<ClientConnection> listener : closeListeners) {
+                listener.handleEvent(Http2ClientConnection.this);
+            }
+            for (Map.Entry<Integer, Http2ClientExchange> entry : currentExchanges.entrySet()) {
+                entry.getValue().failed(new ClosedChannelException());
+            }
+            currentExchanges.clear();
+        }
+    };
+
+    public Http2ClientConnection(Http2Channel http2Channel, boolean initialUpgradeRequest, String defaultHost, ClientStatistics clientStatistics, boolean secure) {
 
         this.http2Channel = http2Channel;
         this.defaultHost = defaultHost;
         this.clientStatistics = clientStatistics;
+        this.secure = secure;
         http2Channel.getReceiveSetter().set(new Http2ReceiveListener());
         http2Channel.resumeReceives();
-        http2Channel.addCloseTask(new ChannelListener<Http2Channel>() {
-            @Override
-            public void handleEvent(Http2Channel channel) {
-                ChannelListeners.invokeChannelListener(Http2ClientConnection.this, closeSetter.get());
-                for(ChannelListener<ClientConnection> listener : closeListeners) {
-                    listener.handleEvent(Http2ClientConnection.this);
-                }
-            }
-        });
+        http2Channel.addCloseTask(closeTask);
         this.initialUpgradeRequest = initialUpgradeRequest;
     }
 
-    public Http2ClientConnection(Http2Channel http2Channel, ClientCallback<ClientExchange> upgradeReadyCallback, ClientRequest clientRequest, String defaultHost, ClientStatistics clientStatistics) {
+    public Http2ClientConnection(Http2Channel http2Channel, ClientCallback<ClientExchange> upgradeReadyCallback, ClientRequest clientRequest, String defaultHost, ClientStatistics clientStatistics, boolean secure) {
 
         this.http2Channel = http2Channel;
         this.defaultHost = defaultHost;
         this.clientStatistics = clientStatistics;
+        this.secure = secure;
         http2Channel.getReceiveSetter().set(new Http2ReceiveListener());
         http2Channel.resumeReceives();
-        http2Channel.addCloseTask(new ChannelListener<Http2Channel>() {
-            @Override
-            public void handleEvent(Http2Channel channel) {
-                ChannelListeners.invokeChannelListener(Http2ClientConnection.this, closeSetter.get());
-            }
-        });
+        http2Channel.addCloseTask(closeTask);
         this.initialUpgradeRequest = false;
 
         Http2ClientExchange exchange = new Http2ClientExchange(this, null, clientRequest);
@@ -126,9 +140,16 @@ public class Http2ClientConnection implements ClientConnection {
 
     @Override
     public void sendRequest(ClientRequest request, ClientCallback<ClientExchange> clientCallback) {
-        request.getRequestHeaders().put(PATH, request.getPath());
-        request.getRequestHeaders().put(SCHEME, "https");
+        if(!http2Channel.isOpen()) {
+            clientCallback.failed(new ClosedChannelException());
+            return;
+        }
         request.getRequestHeaders().put(METHOD, request.getMethod().toString());
+        boolean connectRequest = request.getMethod().equals(Methods.CONNECT);
+        if(!connectRequest) {
+            request.getRequestHeaders().put(PATH, request.getPath());
+            request.getRequestHeaders().put(SCHEME, secure ? "https" : "http");
+        }
         final String host = request.getRequestHeaders().getFirst(Headers.HOST);
         if(host != null) {
             request.getRequestHeaders().put(AUTHORITY, host);
@@ -150,7 +171,7 @@ public class Http2ClientConnection implements ClientConnection {
                 handleError(new IOException(e));
                 return;
             }
-        } else if (transferEncodingString == null) {
+        } else if (transferEncodingString == null && !connectRequest) {
             hasContent = false;
         }
 
@@ -158,37 +179,37 @@ public class Http2ClientConnection implements ClientConnection {
         request.getRequestHeaders().remove(Headers.KEEP_ALIVE);
         request.getRequestHeaders().remove(Headers.TRANSFER_ENCODING);
 
-        //setup the X-Forwarded-* headers
-        String peer = request.getAttachment(ProxiedRequestAttachments.REMOTE_HOST);
-        if(peer != null) {
-            request.getRequestHeaders().put(Headers.X_FORWARDED_FOR, peer);
-        }
-        Boolean proto = request.getAttachment(ProxiedRequestAttachments.IS_SSL);
-        if(proto == null || !proto) {
-            request.getRequestHeaders().put(Headers.X_FORWARDED_PROTO, "http");
-        } else {
-            request.getRequestHeaders().put(Headers.X_FORWARDED_PROTO, "https");
-        }
-        String hn = request.getAttachment(ProxiedRequestAttachments.SERVER_NAME);
-        if(hn != null) {
-            request.getRequestHeaders().put(Headers.X_FORWARDED_HOST, NetworkUtils.formatPossibleIpv6Address(hn));
-        }
-        Integer port = request.getAttachment(ProxiedRequestAttachments.SERVER_PORT);
-        if(port != null) {
-            request.getRequestHeaders().put(Headers.X_FORWARDED_PORT, port);
-        }
-
-
         Http2HeadersStreamSinkChannel sinkChannel;
         try {
             sinkChannel = http2Channel.createStream(request.getRequestHeaders());
-        } catch (IOException e) {
+        } catch (Throwable t) {
+            IOException e = t instanceof IOException ? (IOException) t : new IOException(t);
             clientCallback.failed(e);
             return;
         }
         Http2ClientExchange exchange = new Http2ClientExchange(this, sinkChannel, request);
         currentExchanges.put(sinkChannel.getStreamId(), exchange);
 
+        sinkChannel.setTrailersProducer(new Http2DataStreamSinkChannel.TrailersProducer() {
+            @Override
+            public HeaderMap getTrailers() {
+                HeaderMap attachment = exchange.getAttachment(HttpAttachments.RESPONSE_TRAILERS);
+                Supplier<HeaderMap> supplier = exchange.getAttachment(HttpAttachments.RESPONSE_TRAILER_SUPPLIER);
+                if(attachment != null && supplier == null) {
+                    return attachment;
+                } else if(attachment == null && supplier != null) {
+                    return supplier.get();
+                } else if(attachment != null) {
+                    HeaderMap supplied = supplier.get();
+                    for(HeaderValues k : supplied) {
+                        attachment.putAll(k.getHeaderName(), k);
+                    }
+                    return attachment;
+                } else {
+                    return null;
+                }
+            }
+        });
 
         if(clientCallback != null) {
             clientCallback.completed(exchange);
@@ -207,35 +228,14 @@ public class Http2ClientConnection implements ClientConnection {
                     }));
                     sinkChannel.resumeWrites();
                 }
-            } catch (IOException e) {
-                handleError(e);
-            }
-        } else if (!sinkChannel.isWriteResumed()) {
-            try {
-                //TODO: this needs some more thought
-                if (!sinkChannel.flush()) {
-                    sinkChannel.getWriteSetter().set(new ChannelListener<StreamSinkChannel>() {
-                        @Override
-                        public void handleEvent(StreamSinkChannel channel) {
-                            try {
-                                if (channel.flush()) {
-                                    channel.suspendWrites();
-                                }
-                            } catch (IOException e) {
-                                handleError(e);
-                            }
-                        }
-                    });
-                    sinkChannel.resumeWrites();
-                }
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 handleError(e);
             }
         }
     }
 
-    private void handleError(IOException e) {
-
+    private void handleError(Throwable t) {
+        IOException e = t instanceof IOException ? (IOException) t : new IOException(t);
         UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
         IoUtils.safeClose(Http2ClientConnection.this);
         for (Map.Entry<Integer, Http2ClientExchange> entry : currentExchanges.entrySet()) {
@@ -354,6 +354,36 @@ public class Http2ClientConnection implements ClientConnection {
         closeListeners.add(listener);
     }
 
+    @Override
+    public boolean isPingSupported() {
+        return true;
+    }
+
+    @Override
+    public void sendPing(PingListener listener, long timeout, TimeUnit timeUnit) {
+        long count = PING_COUNTER.incrementAndGet();
+        byte[] data = new byte[8];
+        data[0] = (byte) count;
+        data[1] = (byte)(count << 8);
+        data[2] = (byte)(count << 16);
+        data[3] = (byte)(count << 24);
+        data[4] = (byte)(count << 32);
+        data[5] = (byte)(count << 40);
+        data[6] = (byte)(count << 48);
+        data[7] = (byte)(count << 54);
+        final PingKey key = new PingKey(data);
+        outstandingPings.put(key, listener);
+        if(timeout > 0) {
+            http2Channel.getIoThread().executeAfter(() -> {
+                PingListener listener1 = outstandingPings.remove(key);
+                if(listener1 != null) {
+                    listener1.failed(UndertowMessages.MESSAGES.pingTimeout());
+                }
+            }, timeout, timeUnit);
+        }
+        http2Channel.sendPing(data, (channel, exception) -> listener.failed(exception));
+    }
+
     private class Http2ReceiveListener implements ChannelListener<Http2Channel> {
 
         @Override
@@ -374,6 +404,12 @@ public class Http2ClientConnection implements ClientConnection {
                         Channels.drain(result, Long.MAX_VALUE);
                         return;
                     }
+                    ((Http2StreamSourceChannel) result).setTrailersHandler(new Http2StreamSourceChannel.TrailersHandler() {
+                        @Override
+                        public void handleTrailers(HeaderMap headerMap) {
+                            request.putAttachment(HttpAttachments.REQUEST_TRAILERS, headerMap);
+                        }
+                    });
 
                     result.addCloseTask(new ChannelListener<AbstractHttp2StreamSourceChannel>() {
                         @Override
@@ -403,7 +439,7 @@ public class Http2ClientConnection implements ClientConnection {
                     Http2RstStreamStreamSourceChannel rstStream = (Http2RstStreamStreamSourceChannel) result;
                     int stream = rstStream.getStreamId();
                     UndertowLogger.REQUEST_LOGGER.debugf("Client received RST_STREAM for stream %s", stream);
-                    Http2ClientExchange exchange = currentExchanges.get(stream);
+                    Http2ClientExchange exchange = currentExchanges.remove(stream);
 
                     if(exchange != null) {
                         //if we have not yet received a response we treat this as an error
@@ -439,19 +475,18 @@ public class Http2ClientConnection implements ClientConnection {
 
                 } else if (result instanceof Http2GoAwayStreamSourceChannel) {
                     close();
-                } else if(!channel.isOpen()) {
-                    throw UndertowMessages.MESSAGES.channelIsClosed();
                 } else if(result != null) {
                     Channels.drain(result, Long.MAX_VALUE);
                 }
 
-            } catch (IOException e) {
+            } catch (Throwable t) {
+                IOException e = t instanceof IOException ? (IOException) t : new IOException(t);
                 UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
                 IoUtils.safeClose(Http2ClientConnection.this);
                 for (Map.Entry<Integer, Http2ClientExchange> entry : currentExchanges.entrySet()) {
                     try {
                         entry.getValue().failed(e);
-                    } catch (Exception ex) {
+                    } catch (Throwable ex) {
                         UndertowLogger.REQUEST_IO_LOGGER.ioException(new IOException(ex));
                     }
                 }
@@ -464,8 +499,36 @@ public class Http2ClientConnection implements ClientConnection {
             if (!frame.isAck()) {
                 //server side ping, return it
                 frame.getHttp2Channel().sendPing(id);
+            } else {
+                PingListener listener = outstandingPings.remove(new PingKey(id));
+                if(listener != null) {
+                    listener.acknowledged();
+                }
             }
         }
 
+    }
+
+    private static final class PingKey{
+        private final byte[] data;
+
+        private PingKey(byte[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            PingKey pingKey = (PingKey) o;
+
+            return Arrays.equals(data, pingKey.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(data);
+        }
     }
 }

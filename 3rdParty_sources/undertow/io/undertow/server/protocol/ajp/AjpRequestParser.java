@@ -48,15 +48,18 @@ import static io.undertow.util.Methods.VERSION_CONTROL;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.util.TreeMap;
 
+import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.security.impl.ExternalAuthenticationMechanism;
+import io.undertow.server.Connectors;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import io.undertow.util.ParameterLimitException;
+import io.undertow.util.BadRequestException;
 import io.undertow.util.URLUtils;
 
 /**
@@ -67,6 +70,11 @@ public class AjpRequestParser {
 
     private final String encoding;
     private final boolean doDecode;
+    private final boolean allowEncodedSlash;
+    private final int maxParameters;
+    private final int maxHeaders;
+    private StringBuilder decodeBuffer;
+    private final boolean allowUnescapedCharactersInUrl;
 
     private static final HttpString[] HTTP_HEADERS;
 
@@ -169,13 +177,17 @@ public class AjpRequestParser {
         ATTRIBUTES[13] = STORED_METHOD;
     }
 
-    public AjpRequestParser(String encoding, boolean doDecode) {
+    public AjpRequestParser(String encoding, boolean doDecode, int maxParameters, int maxHeaders, boolean allowEncodedSlash, boolean allowUnescapedCharactersInUrl) {
         this.encoding = encoding;
         this.doDecode = doDecode;
+        this.maxParameters = maxParameters;
+        this.maxHeaders = maxHeaders;
+        this.allowEncodedSlash = allowEncodedSlash;
+        this.allowUnescapedCharactersInUrl = allowUnescapedCharactersInUrl;
     }
 
 
-    public void parse(final ByteBuffer buf, final AjpRequestParseState state, final HttpServerExchange exchange) throws IOException {
+    public void parse(final ByteBuffer buf, final AjpRequestParseState state, final HttpServerExchange exchange) throws IOException, BadRequestException {
         if (!buf.hasRemaining()) {
             return;
         }
@@ -186,7 +198,7 @@ public class AjpRequestParser {
                     return;
                 } else {
                     if (result.value != 0x1234) {
-                        throw UndertowMessages.MESSAGES.wrongMagicNumber(result.value);
+                        throw new BadRequestException(UndertowMessages.MESSAGES.wrongMagicNumber(result.value));
                     }
                 }
             }
@@ -221,7 +233,7 @@ public class AjpRequestParser {
                     if (method > 0 && method < 28) {
                         exchange.setRequestMethod(HTTP_METHODS[method]);
                     } else if((method & 0xFF) != 0xFF) {
-                        throw new IllegalArgumentException("Unknown method type " + method);
+                        throw new BadRequestException("Unknown method type " + method);
                     }
                 }
             }
@@ -241,16 +253,31 @@ public class AjpRequestParser {
                     int colon = result.value.indexOf(';');
                     if (colon == -1) {
                         String res = decode(result.value, result.containsUrlCharacters);
-                        exchange.setRequestURI(result.value);
+                        if(result.containsUnencodedCharacters) {
+                            //we decode if the URL was non-compliant, and contained incorrectly encoded characters
+                            //there is not really a 'correct' thing to do in this situation, but this seems the least incorrect
+                            exchange.setRequestURI(res);
+                        } else {
+                            exchange.setRequestURI(result.value);
+                        }
                         exchange.setRequestPath(res);
                         exchange.setRelativePath(res);
                     } else {
                         final String url = result.value.substring(0, colon);
                         String res = decode(url, result.containsUrlCharacters);
-                        exchange.setRequestURI(result.value);
+                        if(result.containsUnencodedCharacters) {
+                            exchange.setRequestURI(res);
+                        } else {
+                            exchange.setRequestURI(result.value);
+                        }
                         exchange.setRequestPath(res);
                         exchange.setRelativePath(res);
-                        URLUtils.parsePathParms(result.value.substring(colon + 1), exchange, encoding, doDecode && result.containsUrlCharacters);
+                        try {
+                            URLUtils.parsePathParams(result.value.substring(colon + 1), exchange, encoding, doDecode && result.containsUrlCharacters, maxParameters);
+                        } catch (ParameterLimitException e) {
+                            UndertowLogger.REQUEST_IO_LOGGER.failedToParseRequest(e);
+                            state.badRequest = true;
+                        }
                     }
                 } else {
                     state.state = AjpRequestParseState.READING_REQUEST_URI;
@@ -313,6 +340,10 @@ public class AjpRequestParser {
                     return;
                 } else {
                     state.numHeaders = result.value;
+                    if(state.numHeaders > maxHeaders) {
+                        UndertowLogger.REQUEST_IO_LOGGER.failedToParseRequest(new BadRequestException(UndertowMessages.MESSAGES.tooManyHeaders(maxHeaders)));
+                        state.badRequest = true;
+                    }
                 }
             }
             case AjpRequestParseState.READING_HEADERS: {
@@ -329,6 +360,7 @@ public class AjpRequestParser {
                             state.currentHeader = result.header;
                         } else {
                             state.currentHeader = HttpString.tryFromString(result.value);
+                            Connectors.verifyToken(state.currentHeader);
                         }
                     }
                     StringHolder result = parseString(buf, state, StringType.OTHER);
@@ -337,7 +369,9 @@ public class AjpRequestParser {
                         state.readHeaders = readHeaders;
                         return;
                     }
-                    exchange.getRequestHeaders().add(state.currentHeader, result.value);
+                    if(!state.badRequest) {
+                        exchange.getRequestHeaders().add(state.currentHeader, result.value);
+                    }
                     state.currentHeader = null;
                     ++readHeaders;
                 }
@@ -392,14 +426,22 @@ public class AjpRequestParser {
                     }
                     //query string.
                     if (state.currentAttribute.equals(QUERY_STRING)) {
-                        exchange.setQueryString(result == null ? "" : result);
-                        URLUtils.parseQueryString(result, exchange, encoding, doDecode);
+                        String resultAsQueryString = result == null ? "" : result;
+                        exchange.setQueryString(resultAsQueryString);
+                        try {
+                            URLUtils.parseQueryString(resultAsQueryString, exchange, encoding, doDecode, maxParameters);
+                        } catch (ParameterLimitException e) {
+                            UndertowLogger.REQUEST_IO_LOGGER.failedToParseRequest(e);
+                            state.badRequest = true;
+                        }
                     } else if (state.currentAttribute.equals(REMOTE_USER)) {
                         exchange.putAttachment(ExternalAuthenticationMechanism.EXTERNAL_PRINCIPAL, result);
                     } else if (state.currentAttribute.equals(AUTH_TYPE)) {
                         exchange.putAttachment(ExternalAuthenticationMechanism.EXTERNAL_AUTHENTICATION_TYPE, result);
                     } else if (state.currentAttribute.equals(STORED_METHOD)) {
-                        exchange.setRequestMethod(new HttpString(result));
+                        HttpString requestMethod = new HttpString(result);
+                        Connectors.verifyToken(requestMethod);
+                        exchange.setRequestMethod(requestMethod);
                     } else if (state.currentAttribute.equals(AJP_REMOTE_PORT)) {
                         state.remotePort = Integer.parseInt(result);
                     } else if (state.currentAttribute.equals(SSL_SESSION)) {
@@ -427,7 +469,10 @@ public class AjpRequestParser {
     private String decode(String url, final boolean containsUrlCharacters) throws UnsupportedEncodingException {
         if (doDecode && containsUrlCharacters) {
             try {
-                return URLDecoder.decode(url, encoding);
+                if(decodeBuffer == null) {
+                    decodeBuffer = new StringBuilder();
+                }
+                return URLUtils.decode(url, this.encoding, allowEncodedSlash, false, decodeBuffer);
             } catch (Exception e) {
                 throw UndertowMessages.MESSAGES.failedToDecodeURL(url, encoding, e);
             }
@@ -460,10 +505,11 @@ public class AjpRequestParser {
         }
     }
 
-    protected StringHolder parseString(ByteBuffer buf, AjpRequestParseState state, StringType type) throws UnsupportedEncodingException {
+    protected StringHolder parseString(ByteBuffer buf, AjpRequestParseState state, StringType type) throws UnsupportedEncodingException, BadRequestException {
         boolean containsUrlCharacters = state.containsUrlCharacters;
+        boolean containsUnencodedUrlCharacters = state.containsUnencodedUrlCharacters;
         if (!buf.hasRemaining()) {
-            return new StringHolder(null, false, false);
+            return new StringHolder(null, false, false, false);
         }
         int stringLength = state.stringLength;
         if (stringLength == -1) {
@@ -473,7 +519,7 @@ public class AjpRequestParser {
                 stringLength = ((0xFF & number) << 8) + (b & 0xFF);
             } else {
                 state.stringLength = number | STRING_LENGTH_MASK;
-                return new StringHolder(null, false, false);
+                return new StringHolder(null, false, false, false);
             }
         } else if ((stringLength & STRING_LENGTH_MASK) != 0) {
             int number = stringLength & ~STRING_LENGTH_MASK;
@@ -486,19 +532,27 @@ public class AjpRequestParser {
         if (stringLength == 0xFFFF) {
             //OxFFFF means null
             state.stringLength = -1;
-            return new StringHolder(null, true, false);
+            return new StringHolder(null, true, false, false);
         }
         int length = state.getCurrentStringLength();
         while (length < stringLength) {
             if (!buf.hasRemaining()) {
                 state.stringLength = stringLength;
                 state.containsUrlCharacters = containsUrlCharacters;
-                return new StringHolder(null, false, false);
+                state.containsUnencodedUrlCharacters = containsUnencodedUrlCharacters;
+                return new StringHolder(null, false, false, false);
             }
             byte c = buf.get();
             if(type == StringType.QUERY_STRING && (c == '+' || c == '%')) {
                     containsUrlCharacters = true;
-            } else if(type == StringType.URL && c == '%') {
+            } else if(type == StringType.URL && (c == '%' || c < 0 )) {
+                if(c < 0 ) {
+                    if(!allowUnescapedCharactersInUrl) {
+                        throw new BadRequestException();
+                    } else {
+                        containsUnencodedUrlCharacters = true;
+                    }
+                }
                 containsUrlCharacters = true;
             }
             state.addStringByte(c);
@@ -507,14 +561,16 @@ public class AjpRequestParser {
 
         if (buf.hasRemaining()) {
             buf.get(); //null terminator
-            String value = state.getStringAndClear(encoding);
+            String value = state.getStringAndClear();
             state.stringLength = -1;
             state.containsUrlCharacters = false;
-            return new StringHolder(value, true, containsUrlCharacters);
+            state.containsUnencodedUrlCharacters = containsUnencodedUrlCharacters;
+            return new StringHolder(value, true, containsUrlCharacters, containsUnencodedUrlCharacters);
         } else {
             state.stringLength = stringLength;
             state.containsUrlCharacters = containsUrlCharacters;
-            return new StringHolder(null, false, false);
+            state.containsUnencodedUrlCharacters = containsUnencodedUrlCharacters;
+            return new StringHolder(null, false, false, false);
         }
     }
 
@@ -531,13 +587,15 @@ public class AjpRequestParser {
     protected static class StringHolder {
         public final String value;
         public final HttpString header;
-        public final boolean readComplete;
-        public final boolean containsUrlCharacters;
+        final boolean readComplete;
+        final boolean containsUrlCharacters;
+        final boolean containsUnencodedCharacters;
 
-        private StringHolder(String value, boolean readComplete, boolean containsUrlCharacters) {
+        private StringHolder(String value, boolean readComplete, boolean containsUrlCharacters, boolean containsUnencodedCharacters) {
             this.value = value;
             this.readComplete = readComplete;
             this.containsUrlCharacters = containsUrlCharacters;
+            this.containsUnencodedCharacters = containsUnencodedCharacters;
             this.header = null;
         }
 
@@ -546,6 +604,7 @@ public class AjpRequestParser {
             this.readComplete = true;
             this.header = value;
             this.containsUrlCharacters = false;
+            this.containsUnencodedCharacters = false;
         }
     }
 
@@ -554,6 +613,6 @@ public class AjpRequestParser {
         URL,
         QUERY_STRING,
         OTHER
-
     }
+
 }

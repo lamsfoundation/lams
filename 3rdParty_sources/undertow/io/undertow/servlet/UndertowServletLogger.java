@@ -19,9 +19,8 @@
 package io.undertow.servlet;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Date;
-import javax.servlet.ServletException;
+import java.util.Set;
 import javax.servlet.UnavailableException;
 
 import org.jboss.logging.BasicLogger;
@@ -32,6 +31,7 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * log messages start at 15000
@@ -44,14 +44,14 @@ public interface UndertowServletLogger extends BasicLogger {
     UndertowServletLogger ROOT_LOGGER = Logger.getMessageLogger(UndertowServletLogger.class, UndertowServletLogger.class.getPackage().getName());
 
     UndertowServletLogger REQUEST_LOGGER = Logger.getMessageLogger(UndertowServletLogger.class, UndertowServletLogger.class.getPackage().getName() + ".request");
-
-    @LogMessage(level = ERROR)
-    @Message(id = 15000, value = "IOException handling request")
-    void ioExceptionHandingRequest(@Cause IOException e);
-
-    @LogMessage(level = ERROR)
-    @Message(id = 15001, value = "ServletException handling request")
-    void servletExceptionHandlingRequest(@Cause ServletException e);
+//
+//    @LogMessage(level = ERROR)
+//    @Message(id = 15000, value = "IOException handling request")
+//    void ioExceptionHandingRequest(@Cause IOException e);
+//
+//    @LogMessage(level = ERROR)
+//    @Message(id = 15001, value = "ServletException handling request")
+//    void servletExceptionHandlingRequest(@Cause ServletException e);
 
     @LogMessage(level = ERROR)
     @Message(id = 15002, value = "Stopping servlet %s due to permanent unavailability")
@@ -60,14 +60,14 @@ public interface UndertowServletLogger extends BasicLogger {
     @LogMessage(level = ERROR)
     @Message(id = 15003, value = "Stopping servlet %s till %s due to temporary unavailability")
     void stoppingServletUntilDueToTemporaryUnavailability(String name, Date till, @Cause UnavailableException e);
-
-    @LogMessage(level = ERROR)
-    @Message(id = 15004, value = "Malformed URL exception reading resource %s")
-    void malformedUrlException(String relativePath, @Cause MalformedURLException e);
+//
+//    @LogMessage(level = ERROR)
+//    @Message(id = 15004, value = "Malformed URL exception reading resource %s")
+//    void malformedUrlException(String relativePath, @Cause MalformedURLException e);
 
     @LogMessage(level = ERROR)
     @Message(id = 15005, value = "Error invoking method %s on listener %s")
-    void errorInvokingListener(final String method, Class<?> listenerClass, @Cause Exception e);
+    void errorInvokingListener(final String method, Class<?> listenerClass, @Cause Throwable t);
 
     @LogMessage(level = ERROR)
     @Message(id = 15006, value = "IOException dispatching async event")
@@ -89,17 +89,17 @@ public interface UndertowServletLogger extends BasicLogger {
     @LogMessage(level = Logger.Level.WARN)
     @Message(id = 15010, value = "Failed to persist sessions")
     void failedToPersistSessions(@Cause Exception e);
-
-    @LogMessage(level = Logger.Level.WARN)
-    @Message(id = 15011, value = "Non standard filter mapping '*' for filter %s. Portable application should use '/*' instead.")
-    void nonStandardFilterMapping(String filterName);
+//
+//    @LogMessage(level = Logger.Level.WARN)
+//    @Message(id = 15011, value = "Non standard filter mapping '*' for filter %s. Portable application should use '/*' instead.")
+//    void nonStandardFilterMapping(String filterName);
 
     @LogMessage(level = ERROR)
     @Message(id = 15012, value = "Failed to generate error page %s for original exception: %s. Generating error page resulted in a %s.")
     void errorGeneratingErrorPage(String originalErrorPage, Object originalException, int code,  @Cause Throwable cause);
-
-    @Message(id = 15013, value = "Error opening rewrite configuration")
-    String errorOpeningRewriteConfiguration();
+//
+//    @Message(id = 15013, value = "Error opening rewrite configuration")
+//    String errorOpeningRewriteConfiguration();
 
     @Message(id = 15014, value = "Error reading rewrite configuration")
     @LogMessage(level = ERROR)
@@ -119,5 +119,13 @@ public interface UndertowServletLogger extends BasicLogger {
 
     @LogMessage(level = ERROR)
     @Message(id = 15019, value = "Failed to destroy %s")
-    void failedToDestroy(Object object, @Cause Exception e);
+    void failedToDestroy(Object object, @Cause Throwable t);
+
+    @LogMessage(level = WARN)
+    @Message(id = 15020, value = "Path %s is secured for some HTTP methods, however it is not secured for %s")
+    void unsecuredMethodsOnPath(String path, Set<String> missing);
+
+    @LogMessage(level = ERROR)
+    @Message(id = 15021, value = "Failure dispatching async event")
+    void failureDispatchingAsyncEvent(@Cause Throwable t);
 }

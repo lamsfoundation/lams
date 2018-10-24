@@ -16,16 +16,9 @@ public class PropertyBuilder
 {
     // @since 2.7
     private final static Object NO_DEFAULT_MARKER = Boolean.FALSE;
-    
+
     final protected SerializationConfig _config;
     final protected BeanDescription _beanDesc;
-
-    /**
-     * Default inclusion mode for properties of the POJO for which
-     * properties are collected; possibly overridden on
-     * per-property basis.
-     */
-    final protected JsonInclude.Value _defaultInclusion;
 
     final protected AnnotationIntrospector _annotationIntrospector;
 
@@ -40,11 +33,43 @@ public class PropertyBuilder
      */
     protected Object _defaultBean;
 
+    /**
+     * Default inclusion mode for properties of the POJO for which
+     * properties are collected; possibly overridden on
+     * per-property basis. Combines global inclusion defaults and
+     * per-type (annotation and type-override) inclusion overrides.
+     */
+    final protected JsonInclude.Value _defaultInclusion;
+
+    /**
+     * Marker flag used to indicate that "real" default values are to be used
+     * for properties, as per per-type value inclusion of type <code>NON_DEFAULT</code>
+     *
+     * @since 2.8
+     */
+    final protected boolean _useRealPropertyDefaults;
+
     public PropertyBuilder(SerializationConfig config, BeanDescription beanDesc)
     {
         _config = config;
         _beanDesc = beanDesc;
-        _defaultInclusion = beanDesc.findPropertyInclusion(config.getDefaultPropertyInclusion());
+        // 08-Sep-2016, tatu: This gets tricky, with 3 levels of definitions:
+        //  (a) global default inclusion
+        //  (b) per-type default inclusion (from annotation or config overrides;
+        //     config override having precedence)
+        //  (c) per-property override (from annotation on specific property or
+        //     config overrides per type of property;
+        //     annotation having precedence)
+        //
+        //  and not only requiring merging, but also considering special handling
+        //  for NON_DEFAULT in case of (b) (vs (a) or (c))
+        JsonInclude.Value inclPerType = JsonInclude.Value.merge(
+                beanDesc.findPropertyInclusion(JsonInclude.Value.empty()),
+                config.getDefaultPropertyInclusion(beanDesc.getBeanClass(),
+                        JsonInclude.Value.empty()));
+        _defaultInclusion = JsonInclude.Value.merge(config.getDefaultPropertyInclusion(),
+                inclPerType);
+        _useRealPropertyDefaults = inclPerType.getValueInclusion() == JsonInclude.Include.NON_DEFAULT;
         _annotationIntrospector = _config.getAnnotationIntrospector();
     }
 
@@ -70,14 +95,21 @@ public class PropertyBuilder
         throws JsonMappingException
     {
         // do we have annotation that forces type to use (to declared type or its super type)?
-        JavaType serializationType = findSerializationType(am, defaultUseStaticTyping, declaredType);
+        JavaType serializationType;
+        try {
+            serializationType = findSerializationType(am, defaultUseStaticTyping, declaredType);
+        } catch (JsonMappingException e) {
+            if (propDef == null) {
+                return prov.reportBadDefinition(declaredType, e.getMessage());
+            }
+            return prov.reportBadPropertyDefinition(_beanDesc, propDef, e.getMessage());
+        }
 
         // Container types can have separate type serializers for content (value / element) type
         if (contentTypeSer != null) {
-            /* 04-Feb-2010, tatu: Let's force static typing for collection, if there is
-             *    type information for contents. Should work well (for JAXB case); can be
-             *    revisited if this causes problems.
-             */
+            // 04-Feb-2010, tatu: Let's force static typing for collection, if there is
+            //    type information for contents. Should work well (for JAXB case); can be
+            //    revisited if this causes problems.
             if (serializationType == null) {
 //                serializationType = TypeFactory.type(am.getGenericType(), _beanDesc.getType());
                 serializationType = declaredType;
@@ -85,44 +117,68 @@ public class PropertyBuilder
             JavaType ct = serializationType.getContentType();
             // Not exactly sure why, but this used to occur; better check explicitly:
             if (ct == null) {
-                throw new IllegalStateException("Problem trying to create BeanPropertyWriter for property '"
-                        +propDef.getName()+"' (of type "+_beanDesc.getType()+"); serialization type "+serializationType+" has no content");
+                prov.reportBadPropertyDefinition(_beanDesc, propDef,
+                        "serialization type "+serializationType+" has no content");
             }
             serializationType = serializationType.withContentTypeHandler(contentTypeSer);
             ct = serializationType.getContentType();
         }
-        
+
         Object valueToSuppress = null;
         boolean suppressNulls = false;
 
-        JsonInclude.Value inclV = _defaultInclusion.withOverrides(propDef.findInclusion());
+        // 12-Jul-2016, tatu: [databind#1256] Need to make sure we consider type refinement
+        JavaType actualType = (serializationType == null) ? declaredType : serializationType;
+        
+        // 17-Mar-2017: [databind#1522] Allow config override per property type
+        AnnotatedMember accessor = propDef.getAccessor();
+        if (accessor == null) {
+            // neither Setter nor ConstructorParameter are expected here
+            return prov.reportBadPropertyDefinition(_beanDesc, propDef,
+                    "could not determine property type");
+        }
+        Class<?> rawPropertyType = accessor.getRawType();
+
+        // 17-Aug-2016, tatu: Default inclusion covers global default (for all types), as well
+        //   as type-default for enclosing POJO. What we need, then, is per-type default (if any)
+        //   for declared property type... and finally property annotation overrides
+        JsonInclude.Value inclV = _config.getDefaultInclusion(actualType.getRawClass(),
+                rawPropertyType, _defaultInclusion);
+
+        // property annotation override
+        
+        inclV = inclV.withOverrides(propDef.findInclusion());
+
         JsonInclude.Include inclusion = inclV.getValueInclusion();
         if (inclusion == JsonInclude.Include.USE_DEFAULTS) { // should not occur but...
             inclusion = JsonInclude.Include.ALWAYS;
         }
-
-        /*
-        JsonInclude.Include inclusion = propDef.findInclusion().getValueInclusion();
-        if (inclusion == JsonInclude.Include.USE_DEFAULTS) { // since 2.6
-            inclusion = _defaultInclusion;
-            if (inclusion == null) {
-                inclusion = JsonInclude.Include.ALWAYS;
-            }
-        }
-        */
-
         switch (inclusion) {
         case NON_DEFAULT:
             // 11-Nov-2015, tatu: This is tricky because semantics differ between cases,
-            //    so that if enclosing class has this, we may need to values of property,
+            //    so that if enclosing class has this, we may need to access values of property,
             //    whereas for global defaults OR per-property overrides, we have more
             //    static definition. Sigh.
-            // First: case of class specifying it; try to find POJO property defaults
-            JavaType t = (serializationType == null) ? declaredType : serializationType;
-            if (_defaultInclusion.getValueInclusion() == JsonInclude.Include.NON_DEFAULT) {
-                valueToSuppress = getPropertyDefaultValue(propDef.getName(), am, t);
+            // First: case of class/type specifying it; try to find POJO property defaults
+            Object defaultBean;
+
+            // 16-Oct-2016, tatu: Note: if we cannot for some reason create "default instance",
+            //    revert logic to the case of general/per-property handling, so both
+            //    type-default AND null are to be excluded.
+            //    (as per [databind#1417]
+            if (_useRealPropertyDefaults && (defaultBean = getDefaultBean()) != null) {
+                // 07-Sep-2016, tatu: may also need to front-load access forcing now
+                if (prov.isEnabled(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS)) {
+                    am.fixAccess(_config.isEnabled(MapperFeature.OVERRIDE_PUBLIC_ACCESS_MODIFIERS));
+                }
+                try {
+                    valueToSuppress = am.getValue(defaultBean);
+                } catch (Exception e) {
+                    _throwWrapped(e, propDef.getName(), defaultBean);
+                }
             } else {
-                valueToSuppress = getDefaultValue(t);
+                valueToSuppress = BeanUtil.getDefaultValue(actualType);
+                suppressNulls = true;
             }
             if (valueToSuppress == null) {
                 suppressNulls = true;
@@ -131,13 +187,12 @@ public class PropertyBuilder
                     valueToSuppress = ArrayBuilders.getArrayComparator(valueToSuppress);
                 }
             }
-
             break;
         case NON_ABSENT: // new with 2.6, to support Guava/JDK8 Optionals
             // always suppress nulls
             suppressNulls = true;
             // and for referential types, also "empty", which in their case means "absent"
-            if (declaredType.isReferenceType()) {
+            if (actualType.isReferenceType()) {
                 valueToSuppress = BeanPropertyWriter.MARKER_FOR_EMPTY;
             }
             break;
@@ -147,21 +202,33 @@ public class PropertyBuilder
             // but possibly also 'empty' values:
             valueToSuppress = BeanPropertyWriter.MARKER_FOR_EMPTY;
             break;
+        case CUSTOM: // new with 2.9
+            valueToSuppress = prov.includeFilterInstance(propDef, inclV.getValueFilter());
+            if (valueToSuppress == null) { // is this legal?
+                suppressNulls = true;
+            } else {
+                suppressNulls = prov.includeFilterSuppressNulls(valueToSuppress);
+            }
+            break;
         case NON_NULL:
             suppressNulls = true;
             // fall through
         case ALWAYS: // default
         default:
-            // we may still want to suppress empty collections, as per [JACKSON-254]:
-            if (declaredType.isContainerType()
+            // we may still want to suppress empty collections
+            if (actualType.isContainerType()
                     && !_config.isEnabled(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)) {
                 valueToSuppress = BeanPropertyWriter.MARKER_FOR_EMPTY;
             }
             break;
         }
+        Class<?>[] views = propDef.findViews();
+        if (views == null) {
+            views = _beanDesc.findDefaultViews();
+        }
         BeanPropertyWriter bpw = new BeanPropertyWriter(propDef,
                 am, _beanDesc.getClassAnnotations(), declaredType,
-                ser, typeSer, serializationType, suppressNulls, valueToSuppress);
+                ser, typeSer, serializationType, suppressNulls, valueToSuppress, views);
 
         // How about custom null serializer?
         Object serDef = _annotationIntrospector.findNullSerializer(am);
@@ -192,6 +259,7 @@ public class PropertyBuilder
         throws JsonMappingException
     {
         JavaType secondary = _annotationIntrospector.refineSerializationType(_config, a, declaredType);
+
         // 11-Oct-2015, tatu: As of 2.7, not 100% sure following checks are needed. But keeping
         //    for now, just in case
         if (secondary != declaredType) {
@@ -249,7 +317,7 @@ public class PropertyBuilder
                 // 06-Nov-2015, tatu: As per [databind#998], do not fail.
                 /*
                 Class<?> cls = _beanDesc.getClassInfo().getAnnotated();
-                throw new IllegalArgumentException("Class "+cls.getName()+" has no default constructor; can not instantiate default bean value to support 'properties=JsonSerialize.Inclusion.NON_DEFAULT' annotation");
+                throw new IllegalArgumentException("Class "+cls.getName()+" has no default constructor; cannot instantiate default bean value to support 'properties=JsonSerialize.Inclusion.NON_DEFAULT' annotation");
                  */
 
                 // And use a marker
@@ -263,15 +331,19 @@ public class PropertyBuilder
     /**
      * Accessor used to find out "default value" for given property, to use for
      * comparing values to serialize, to determine whether to exclude value from serialization with
-     * inclusion type of {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_EMPTY}.
+     * inclusion type of {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_DEFAULT}.
      * This method is called when we specifically want to know default value within context
      * of a POJO, when annotation is within containing class, and not for property or
      * defined as global baseline.
      *<p>
-     * Note that returning of pseudo-type 
+     * Note that returning of pseudo-type
+     * {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_EMPTY} requires special handling.
      *
      * @since 2.7
+     * @deprecated Since 2.9 since this will not allow determining difference between "no default instance"
+     *    case and default being `null`.
      */
+    @Deprecated // since 2.9
     protected Object getPropertyDefaultValue(String name, AnnotatedMember member,
             JavaType type)
     {
@@ -287,37 +359,13 @@ public class PropertyBuilder
     }
 
     /**
-     * Accessor used to find out "default value" to use for comparing values to
-     * serialize, to determine whether to exclude value from serialization with
-     * inclusion type of {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_DEFAULT}.
-     *<p>
-     * Default logic is such that for primitives and wrapper types for primitives, expected
-     * defaults (0 for `int` and `java.lang.Integer`) are returned; for Strings, empty String,
-     * and for structured (Maps, Collections, arrays) and reference types, criteria
-     * {@link com.fasterxml.jackson.annotation.JsonInclude.Include#NON_DEFAULT}
-     * is used.
-     *
-     * @since 2.7
+     * @deprecated Since 2.9
      */
-    protected Object getDefaultValue(JavaType type)
-    {
-        // 06-Nov-2015, tatu: Returning null is fine for Object types; but need special
-        //   handling for primitives since they are never passed as nulls.
-        Class<?> cls = type.getRawClass();
-
-        Class<?> prim = ClassUtil.primitiveType(cls);
-        if (prim != null) {
-            return ClassUtil.defaultValue(prim);
-        }
-        if (type.isContainerType() || type.isReferenceType()) {
-            return JsonInclude.Include.NON_EMPTY;
-        }
-        if (cls == String.class) {
-            return "";
-        }
-        return null;
+    @Deprecated // since 2.9
+    protected Object getDefaultValue(JavaType type) {
+        return BeanUtil.getDefaultValue(type);
     }
-    
+
     /*
     /**********************************************************
     /* Helper methods for exception handling
@@ -330,8 +378,8 @@ public class PropertyBuilder
         while (t.getCause() != null) {
             t = t.getCause();
         }
-        if (t instanceof Error) throw (Error) t;
-        if (t instanceof RuntimeException) throw (RuntimeException) t;
+        ClassUtil.throwIfError(t);
+        ClassUtil.throwIfRTE(t);
         throw new IllegalArgumentException("Failed to get property '"+propName+"' of default "+defaultBean.getClass().getName()+" instance");
     }
 }

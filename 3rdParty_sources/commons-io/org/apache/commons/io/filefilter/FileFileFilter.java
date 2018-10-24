@@ -34,11 +34,12 @@ import java.io.Serializable;
  * </pre>
  *
  * @since 1.3
- *
+ * @version $Id: FileFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @see FileFilterUtils#fileFileFilter()
  */
 public class FileFileFilter extends AbstractFileFilter implements Serializable {
 
+    private static final long serialVersionUID = 5345244090827540862L;
     /** Singleton instance of file filter */
     public static final IOFileFilter FILE = new FileFileFilter();
 
@@ -55,7 +56,7 @@ public class FileFileFilter extends AbstractFileFilter implements Serializable {
      * @return true if the file is a file
      */
     @Override
-    public boolean accept(File file) {
+    public boolean accept(final File file) {
         return file.isFile();
     }
 

@@ -20,23 +20,56 @@ public class JsonParserSequence extends JsonParserDelegate
      * as delegate)
      */
     protected final JsonParser[] _parsers;
-    
+
+    /**
+     * Configuration that determines whether state of parsers is first verified
+     * to see if parser already points to a token (that is,
+     * {@link JsonParser#hasCurrentToken()} returns <code>true</code>), and if so
+     * that token is first return before {@link JsonParser#nextToken} is called.
+     * If enabled, this check is made; if disabled, no check is made and
+     * {@link JsonParser#nextToken} is always called for all parsers.
+     *<p>
+     * Default setting is <code>false</code> (for backwards-compatibility)
+     * so that possible existing token is not considered for parsers.
+     * 
+     * @since 2.8
+     */
+    protected final boolean _checkForExistingToken;
+
     /**
      * Index of the next parser in {@link #_parsers}.
      */
-    protected int _nextParser;
-    
+    protected int _nextParserIndex;
+
+    /**
+     * Flag used to indicate that `JsonParser.nextToken()` should not be called,
+     * due to parser already pointing to a token.
+     *
+     * @since 2.8
+     */
+    protected boolean _hasToken;
+
     /*
      *******************************************************
      * Construction
      *******************************************************
      */
 
-    protected JsonParserSequence(JsonParser[] parsers)
+    @Deprecated // since 2.8
+    protected JsonParserSequence(JsonParser[] parsers) {
+        this(false, parsers);
+    }
+
+    /**
+     * @since 2.8
+     */
+    protected JsonParserSequence(boolean checkForExistingToken, JsonParser[] parsers)
     {
         super(parsers[0]);
+        _checkForExistingToken = checkForExistingToken;
+        _hasToken = checkForExistingToken && delegate.hasCurrentToken();
         _parsers = parsers;
-        _nextParser = 1;
+        _nextParserIndex = 1;
     }
 
     /**
@@ -48,11 +81,12 @@ public class JsonParserSequence extends JsonParserDelegate
      * within sequences. This is done to minimize delegation depth,
      * ideally only having just a single level of delegation.
      */
-    public static JsonParserSequence createFlattened(JsonParser first, JsonParser second)
+    public static JsonParserSequence createFlattened(boolean checkForExistingToken,
+            JsonParser first, JsonParser second)
     {
         if (!(first instanceof JsonParserSequence || second instanceof JsonParserSequence)) {
-            // simple:
-            return new JsonParserSequence(new JsonParser[] { first, second });
+            return new JsonParserSequence(checkForExistingToken,
+                    new JsonParser[] { first, second });
         }
         ArrayList<JsonParser> p = new ArrayList<JsonParser>();
         if (first instanceof JsonParserSequence) {
@@ -65,44 +99,90 @@ public class JsonParserSequence extends JsonParserDelegate
         } else {
             p.add(second);
         }
-        return new JsonParserSequence(p.toArray(new JsonParser[p.size()]));
+        return new JsonParserSequence(checkForExistingToken,
+                p.toArray(new JsonParser[p.size()]));
     }
 
+    /**
+     * @deprecated Since 2.8 use {@link #createFlattened(boolean, JsonParser, JsonParser)}
+     *    instead
+     */
+    @Deprecated // since 2.8
+    public static JsonParserSequence createFlattened(JsonParser first, JsonParser second) {
+        return createFlattened(false, first, second);
+    }
+    
     @SuppressWarnings("resource")
-    protected void addFlattenedActiveParsers(List<JsonParser> result)
+    protected void addFlattenedActiveParsers(List<JsonParser> listToAddIn)
     {
-        for (int i = _nextParser-1, len = _parsers.length; i < len; ++i) {
+        for (int i = _nextParserIndex-1, len = _parsers.length; i < len; ++i) {
             JsonParser p = _parsers[i];
             if (p instanceof JsonParserSequence) {
-                ((JsonParserSequence) p).addFlattenedActiveParsers(result);
+                ((JsonParserSequence) p).addFlattenedActiveParsers(listToAddIn);
             } else {
-                result.add(p);
+                listToAddIn.add(p);
             }
         }
     }
-    
+
     /*
-     *******************************************************
-     * Overridden methods, needed: cases where default
-     * delegation does not work
-     *******************************************************
+    /*******************************************************
+    /* Overridden methods, needed: cases where default
+    /* delegation does not work
+    /*******************************************************
      */
-    
+
     @Override
     public void close() throws IOException {
         do { delegate.close(); } while (switchToNext());
     }
 
     @Override
-    public JsonToken nextToken() throws IOException, JsonParseException
+    public JsonToken nextToken() throws IOException
     {
-        JsonToken t = delegate.nextToken();
-        if (t != null) return t;
-        while (switchToNext()) {
-            t = delegate.nextToken();
-            if (t != null) return t;
+        if (delegate == null) {
+            return null;
         }
-        return null;
+        if (_hasToken) {
+            _hasToken = false;
+           return delegate.currentToken();
+        }
+        JsonToken t = delegate.nextToken();
+        if (t == null) {
+            return switchAndReturnNext();
+        }
+        return t;
+    }
+
+    /**
+     * Need to override, re-implement similar to how method defined in
+     * {@link com.fasterxml.jackson.core.base.ParserMinimalBase}, to keep
+     * state correct here.
+     */
+    @Override
+    public JsonParser skipChildren() throws IOException
+    {
+        if ((delegate.currentToken() != JsonToken.START_OBJECT)
+            && (delegate.currentToken() != JsonToken.START_ARRAY)) {
+            return this;
+        }
+        int open = 1;
+
+        // Since proper matching of start/end markers is handled
+        // by nextToken(), we'll just count nesting levels here
+        while (true) {
+            JsonToken t = nextToken();
+            if (t == null) { // not ideal but for now, just return
+                return this;
+            }
+            if (t.isStructStart()) {
+                ++open;
+            } else if (t.isStructEnd()) {
+                if (--open == 0) {
+                    return this;
+                }
+            }
+        }
     }
 
     /*
@@ -119,7 +199,7 @@ public class JsonParserSequence extends JsonParserDelegate
     public int containedParsersCount() {
         return _parsers.length;
     }
-    
+
     /*
     /*******************************************************
     /* Helper methods
@@ -127,19 +207,35 @@ public class JsonParserSequence extends JsonParserDelegate
      */
 
     /**
-     * Method that will switch active parser from the current one
-     * to next parser in sequence, if there is another parser left,
-     * making this the new delegate. Old delegate is returned if
-     * switch succeeds.
+     * Method that will switch active delegate parser from the current one
+     * to the next parser in sequence, if there is another parser left:
+     * if so, the next parser will become the active delegate parser.
      * 
      * @return True if switch succeeded; false otherwise
+     *
+     * @since 2.8
      */
     protected boolean switchToNext()
     {
-        if (_nextParser >= _parsers.length) {
-            return false;
+        if (_nextParserIndex < _parsers.length) {
+            delegate = _parsers[_nextParserIndex++];
+            return true;
         }
-        delegate = _parsers[_nextParser++];
-        return true;
+        return false;
+    }
+
+    protected JsonToken switchAndReturnNext() throws IOException
+    {
+        while (_nextParserIndex < _parsers.length) {
+            delegate = _parsers[_nextParserIndex++];
+            if (_checkForExistingToken && delegate.hasCurrentToken()) {
+                return delegate.getCurrentToken();
+            }
+            JsonToken t = delegate.nextToken();
+            if (t != null) {
+                return t;
+            }
+        }
+        return null;
     }
 }

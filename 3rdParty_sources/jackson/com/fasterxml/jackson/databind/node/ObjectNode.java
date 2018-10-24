@@ -1,12 +1,14 @@
 package com.fasterxml.jackson.databind.node;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.util.RawValue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -76,6 +78,11 @@ public class ObjectNode
         return JsonNodeType.OBJECT;
     }
 
+    @Override
+    public final boolean isObject() {
+        return true;
+    }
+    
     @Override public JsonToken asToken() { return JsonToken.START_OBJECT; }
 
     @Override
@@ -279,33 +286,58 @@ public class ObjectNode
      * all of its descendants using specified JSON generator.
      */
     @Override
-    public void serialize(JsonGenerator jg, SerializerProvider provider)
-        throws IOException, JsonProcessingException
+    public void serialize(JsonGenerator g, SerializerProvider provider)
+        throws IOException
     {
-        jg.writeStartObject();
+        @SuppressWarnings("deprecation")
+        boolean trimEmptyArray = (provider != null) &&
+                !provider.isEnabled(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
+        g.writeStartObject(this);
         for (Map.Entry<String, JsonNode> en : _children.entrySet()) {
-            jg.writeFieldName(en.getKey());
-                /* 17-Feb-2009, tatu: Can we trust that all nodes will always
-                 *   extend BaseJsonNode? Or if not, at least implement
-                 *   JsonSerializable? Let's start with former, change if
-                 *   we must.
-                 */
-            ((BaseJsonNode) en.getValue()).serialize(jg, provider);
+            /* 17-Feb-2009, tatu: Can we trust that all nodes will always
+             *   extend BaseJsonNode? Or if not, at least implement
+             *   JsonSerializable? Let's start with former, change if
+             *   we must.
+             */
+            BaseJsonNode value = (BaseJsonNode) en.getValue();
+
+            // as per [databind#867], see if WRITE_EMPTY_JSON_ARRAYS feature is disabled,
+            // if the feature is disabled, then should not write an empty array
+            // to the output, so continue to the next element in the iteration
+            if (trimEmptyArray && value.isArray() && value.isEmpty(provider)) {
+            	continue;
+            }
+            g.writeFieldName(en.getKey());
+            value.serialize(g, provider);
         }
-        jg.writeEndObject();
+        g.writeEndObject();
     }
 
     @Override
-    public void serializeWithType(JsonGenerator jg, SerializerProvider provider,
+    public void serializeWithType(JsonGenerator g, SerializerProvider provider,
             TypeSerializer typeSer)
-        throws IOException, JsonProcessingException
+        throws IOException
     {
-        typeSer.writeTypePrefixForObject(this, jg);
+        @SuppressWarnings("deprecation")
+        boolean trimEmptyArray = (provider != null) &&
+                !provider.isEnabled(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
+
+        WritableTypeId typeIdDef = typeSer.writeTypePrefix(g,
+                typeSer.typeId(this, JsonToken.START_OBJECT));
         for (Map.Entry<String, JsonNode> en : _children.entrySet()) {
-            jg.writeFieldName(en.getKey());
-            ((BaseJsonNode) en.getValue()).serialize(jg, provider);
+            BaseJsonNode value = (BaseJsonNode) en.getValue();
+
+            // check if WRITE_EMPTY_JSON_ARRAYS feature is disabled,
+            // if the feature is disabled, then should not write an empty array
+            // to the output, so continue to the next element in the iteration
+            if (trimEmptyArray && value.isArray() && value.isEmpty(provider)) {
+                continue;
+            }
+            
+            g.writeFieldName(en.getKey());
+            value.serialize(g, provider);
         }
-        typeSer.writeTypeSuffixForObject(this, jg);
+        typeSer.writeTypeSuffix(g, typeIdDef);
     }
 
     /*
@@ -733,6 +765,18 @@ public class ObjectNode
      * @return This node (to allow chaining)
      */
     public ObjectNode put(String fieldName, BigDecimal v) {
+        return _put(fieldName, (v == null) ? nullNode()
+                : numberNode(v));
+    }
+
+    /**
+     * Method for setting value of a field to specified numeric value.
+     * 
+     * @return This node (to allow chaining)
+     *
+     * @since 2.9
+     */
+    public ObjectNode put(String fieldName, BigInteger v) {
         return _put(fieldName, (v == null) ? nullNode()
                 : numberNode(v));
     }

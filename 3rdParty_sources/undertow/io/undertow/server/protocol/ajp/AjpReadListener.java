@@ -34,6 +34,8 @@ import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.xnio.ChannelListener;
 import io.undertow.connector.PooledByteBuffer;
+import io.undertow.util.StatusCodes;
+import io.undertow.util.BadRequestException;
 import org.xnio.StreamConnection;
 import org.xnio.channels.StreamSinkChannel;
 import org.xnio.channels.StreamSourceChannel;
@@ -105,6 +107,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
             channel.suspendReads();
             return;
         }
+
         PooledByteBuffer existing = connection.getExtraBytes();
 
         final PooledByteBuffer pooled = existing == null ? connection.getByteBufferPool().allocate() : existing;
@@ -223,6 +226,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                 if(state.attributes != null) {
                     httpServerExchange.putAttachment(HttpServerExchange.REQUEST_ATTRIBUTES, state.attributes);
                 }
+                AjpRequestParseState oldState = state;
                 state = null;
                 this.httpServerExchange = null;
                 httpServerExchange.setPersistent(true);
@@ -234,13 +238,29 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
                 if(connectorStatistics != null) {
                     connectorStatistics.setup(httpServerExchange);
                 }
-                Connectors.executeRootHandler(connection.getRootHandler(), httpServerExchange);
+                if(!Connectors.areRequestHeadersValid(httpServerExchange.getRequestHeaders())) {
+                    oldState.badRequest = true;
+                    UndertowLogger.REQUEST_IO_LOGGER.debugf("Invalid AJP request from %s, request contained invalid headers", connection.getPeerAddress());
+                }
+
+                if(oldState.badRequest) {
+                    httpServerExchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                    httpServerExchange.endExchange();
+                    safeClose(connection);
+                } else {
+                    Connectors.executeRootHandler(connection.getRootHandler(), httpServerExchange);
+                }
 
             } catch (Throwable t) {
                 //TODO: we should attempt to return a 500 status code in this situation
                 UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(t);
                 safeClose(connection);
             }
+        } catch (BadRequestException e) {
+            UndertowLogger.REQUEST_IO_LOGGER.failedToParseRequest(e);
+            httpServerExchange.setStatusCode(StatusCodes.BAD_REQUEST);
+            httpServerExchange.endExchange();
+            safeClose(connection);
         } catch (Exception e) {
             UndertowLogger.REQUEST_LOGGER.exceptionProcessingRequest(e);
             safeClose(connection);
@@ -300,7 +320,7 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
         }
     }
 
-    private StreamSourceConduit createSourceConduit(StreamSourceConduit underlyingConduit, AjpServerResponseConduit responseConduit, final HttpServerExchange exchange) {
+    private StreamSourceConduit createSourceConduit(StreamSourceConduit underlyingConduit, AjpServerResponseConduit responseConduit, final HttpServerExchange exchange) throws BadRequestException {
 
         ReadDataStreamSourceConduit conduit = new ReadDataStreamSourceConduit(underlyingConduit, (AbstractServerConnection) exchange.getConnection());
 
@@ -316,14 +336,18 @@ final class AjpReadListener implements ChannelListener<StreamSourceChannel> {
         if (hasTransferEncoding && !transferEncoding.equals(Headers.IDENTITY)) {
             length = null; //unknown length
         } else if (requestContentLength != null) {
-            final long contentLength = Long.parseLong(requestContentLength);
-            if (contentLength == 0L) {
-                UndertowLogger.REQUEST_LOGGER.trace("No content, starting next request");
-                // no content - immediately start the next request, returning an empty stream for this one
-                Connectors.terminateRequest(httpServerExchange);
-                return new EmptyStreamSourceConduit(conduit.getReadThread());
-            } else {
-                length = contentLength;
+            try {
+                final long contentLength = Long.parseLong(requestContentLength);
+                if (contentLength == 0L) {
+                    UndertowLogger.REQUEST_LOGGER.trace("No content, starting next request");
+                    // no content - immediately start the next request, returning an empty stream for this one
+                    Connectors.terminateRequest(httpServerExchange);
+                    return new EmptyStreamSourceConduit(conduit.getReadThread());
+                } else {
+                    length = contentLength;
+                }
+            } catch (NumberFormatException e) {
+                throw new BadRequestException("Invalid Content-Length header", e);
             }
         } else {
             UndertowLogger.REQUEST_LOGGER.trace("No content length or transfer coding, starting next request");

@@ -86,7 +86,7 @@ public class CollectionLikeType extends TypeBase
         if (baseType instanceof TypeBase) {
             return new CollectionLikeType((TypeBase) baseType, elementType);
         }
-        throw new IllegalArgumentException("Can not upgrade from an instance of "+baseType.getClass());
+        throw new IllegalArgumentException("Cannot upgrade from an instance of "+baseType.getClass());
     }
 
     @Override
@@ -134,6 +134,19 @@ public class CollectionLikeType extends TypeBase
     }
 
     @Override
+    public JavaType withHandlersFrom(JavaType src) {
+        JavaType type = super.withHandlersFrom(src);
+        JavaType srcCt = src.getContentType();
+        if (srcCt != null) {
+            JavaType ct = _elementType.withHandlersFrom(srcCt);
+            if (ct != _elementType) {
+                type = type.withContentType(ct);
+            }
+        }
+        return type;
+    }
+    
+    @Override
     public CollectionLikeType withStaticTyping() {
         if (_asStatic) {
             return this;
@@ -175,6 +188,11 @@ public class CollectionLikeType extends TypeBase
     public Object getContentTypeHandler() {
         return _elementType.getTypeHandler();
     }    
+
+    @Override
+    public boolean hasHandlers() {
+        return super.hasHandlers() || _elementType.hasHandlers();
+    }
 
     @Override
     public StringBuilder getErasedSignature(StringBuilder sb) {

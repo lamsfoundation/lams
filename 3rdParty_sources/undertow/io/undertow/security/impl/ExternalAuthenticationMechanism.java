@@ -42,6 +42,8 @@ import java.util.Map;
  */
 public class ExternalAuthenticationMechanism implements AuthenticationMechanism {
 
+    public static final AuthenticationMechanismFactory FACTORY = new Factory();
+
     public static final String NAME = "EXTERNAL";
 
     private final String name;
@@ -85,19 +87,18 @@ public class ExternalAuthenticationMechanism implements AuthenticationMechanism 
 
     @Override
     public ChallengeResult sendChallenge(HttpServerExchange exchange, SecurityContext securityContext) {
-        return new ChallengeResult(false);
+        return ChallengeResult.NOT_SENT;
     }
 
     public static final class Factory implements AuthenticationMechanismFactory {
 
-        private final IdentityManager identityManager;
+        @Deprecated
+        public Factory(IdentityManager identityManager) {}
 
-        public Factory(IdentityManager identityManager) {
-            this.identityManager = identityManager;
-        }
+        public Factory() {}
 
         @Override
-        public AuthenticationMechanism create(String mechanismName, FormParserFactory formParserFactory, Map<String, String> properties) {
+        public AuthenticationMechanism create(String mechanismName,IdentityManager identityManager, FormParserFactory formParserFactory, Map<String, String> properties) {
             return new ExternalAuthenticationMechanism(mechanismName, identityManager);
         }
     }

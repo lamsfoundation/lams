@@ -241,7 +241,8 @@ public class ExtendedAccessLogParser {
             if (tokenizer.hasSubToken()) {
                 String nextToken = tokenizer.getToken();
                 if ("taken".equals(nextToken)) {
-                    return new ResponseTimeAttribute(TimeUnit.SECONDS);
+                    //if response timing are not enabled we just print a '-'
+                    return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(new ResponseTimeAttribute(TimeUnit.SECONDS), "-");
                 }
             } else {
                 return new DateTimeAttribute("HH:mm:ss", "GMT");
@@ -321,7 +322,7 @@ public class ExtendedAccessLogParser {
                     if ("stem".equals(token)) {
                         return RequestURLAttribute.INSTANCE;
                     } else if ("query".equals(token)) {
-                        return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(QueryStringAttribute.INSTANCE, "-");
+                        return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(QueryStringAttribute.BARE_INSTANCE, "-");
                     }
                 } else {
                     return new ExchangeAttribute() {
@@ -385,7 +386,7 @@ public class ExtendedAccessLogParser {
             throws IOException {
         String token = null;
         if (tokenizer.hasSubToken()) {
-            token = tokenizer.getToken();
+            tokenizer.getToken();
             return new ConstantExchangeAttribute("-");
         } else if (tokenizer.hasParameter()) {
             tokenizer.getParameter();
@@ -412,22 +413,22 @@ public class ExtendedAccessLogParser {
             return null;
         }
         if ("A".equals(token)) {
-            parser.parse("%{sc," + parameter + "}");
+            return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(parser.parse("%{sc," + parameter + "}"),"-");
         } else if ("C".equals(token)) {
-            return new QuotingExchangeAttribute(new CookieAttribute(parameter));
+            return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(new CookieAttribute(parameter),"-");
         } else if ("R".equals(token)) {
-            parser.parse("%{r," + parameter + "}");
+            return parser.parse("%{r," + parameter + "}");
         } else if ("S".equals(token)) {
-            parser.parse("%{s," + parameter + "}");
+            return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(parser.parse("%{s," + parameter + "}"),"-");
         } else if ("H".equals(token)) {
             return getServletRequestElement(parameter);
         } else if ("P".equals(token)) {
-            parser.parse("%{rp," + parameter + "}");
+            return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(parser.parse("%{rp," + parameter + "}"),"-");
         } else if ("O".equals(token)) {
             return new QuotingExchangeAttribute(new ExchangeAttribute() {
                 @Override
                 public String readAttribute(HttpServerExchange exchange) {
-                    HeaderValues values = exchange.getResponseHeaders().get(token);
+                    HeaderValues values = exchange.getResponseHeaders().get(parameter);
                     if (values != null && values.size() > 0) {
                         StringBuilder buffer = new StringBuilder();
                         for (int i = 0; i < values.size(); i++) {
@@ -453,9 +454,9 @@ public class ExtendedAccessLogParser {
 
     protected ExchangeAttribute getServletRequestElement(String parameter) {
         if ("authType".equals(parameter)) {
-            return AuthenticationTypeExchangeAttribute.INSTANCE;
+            return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(AuthenticationTypeExchangeAttribute.INSTANCE,"-");
         } else if ("remoteUser".equals(parameter)) {
-            return RemoteUserAttribute.INSTANCE;
+            return new SubstituteEmptyWrapper.SubstituteEmptyAttribute(RemoteUserAttribute.INSTANCE,"-");
         } else if ("requestedSessionId".equals(parameter)) {
             return parser.parse("%{REQUESTED_SESSION_ID}");
         } else if ("requestedSessionIdFromCookie".equals(parameter)) {

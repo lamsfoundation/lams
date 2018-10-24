@@ -24,11 +24,12 @@ import java.util.Comparator;
  * Reverses the result of comparing two objects using
  * the delegate {@link Comparator}.
  *
- *
+ * @version $Id: ReverseComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 class ReverseComparator extends AbstractFileComparator implements Serializable {
 
+    private static final long serialVersionUID = -4808255005272229056L;
     private final Comparator<File> delegate;
 
     /**
@@ -36,7 +37,7 @@ class ReverseComparator extends AbstractFileComparator implements Serializable {
      *
      * @param delegate The comparator to delegate to
      */
-    public ReverseComparator(Comparator<File> delegate) {
+    public ReverseComparator(final Comparator<File> delegate) {
         if (delegate == null) {
             throw new IllegalArgumentException("Delegate comparator is missing");
         }
@@ -51,7 +52,7 @@ class ReverseComparator extends AbstractFileComparator implements Serializable {
      * @return the result from the delegate {@link Comparator#compare(Object, Object)}
      * reversing the value (i.e. positive becomes negative and vice versa)
      */
-    public int compare(File file1, File file2) {
+    public int compare(final File file1, final File file2) {
         return delegate.compare(file2, file1); // parameters switched round
     }
 

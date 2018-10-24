@@ -1,8 +1,8 @@
 package com.fasterxml.jackson.core.util;
 
+import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 import com.fasterxml.jackson.core.io.NumberInput;
 
@@ -168,6 +168,26 @@ public final class TextBuffer
     }
 
     /**
+     * @since 2.9
+     */
+    public void resetWith(char ch)
+    {
+        _inputStart = -1;
+        _inputLen = 0;
+
+        _resultString = null;
+        _resultArray = null;
+
+        if (_hasSegments) {
+            clearSegments();
+        } else if (_currentSegment == null) {
+            _currentSegment = buf(1);
+        }
+        _currentSegment[0] = ch;
+        _currentSize = _segmentSize = 1;
+    }
+    
+    /**
      * Method called to initialize the buffer with a shared copy of data;
      * this means that buffer will just have pointers to actual data. It
      * also means that if anything is to be appended to the buffer, it
@@ -209,6 +229,27 @@ public final class TextBuffer
         append(buf, start, len);
     }
 
+    /**
+     * @since 2.9
+     */
+    public void resetWithCopy(String text, int start, int len)
+    {
+        _inputBuffer = null;
+        _inputStart = -1;
+        _inputLen = 0;
+
+        _resultString = null;
+        _resultArray = null;
+
+        if (_hasSegments) {
+            clearSegments();
+        } else if (_currentSegment == null) {
+            _currentSegment = buf(len);
+        }
+        _currentSize = _segmentSize = 0;
+        append(text, start, len);
+    }
+
     public void resetWithString(String value)
     {
         _inputBuffer = null;
@@ -224,7 +265,14 @@ public final class TextBuffer
         _currentSize = 0;
         
     }
-    
+
+    /**
+     * @since 2.9
+     */
+    public char[] getBufferWithoutReset() {
+        return _currentSegment;
+    }
+
     /**
      * Helper method used to find a buffer to use, ideally one
      * recycled earlier.
@@ -399,6 +447,87 @@ public final class TextBuffer
         return NumberInput.parseDouble(contentsAsString());
     }
 
+    /**
+     * Specialized convenience method that will decode a 32-bit int,
+     * of at most 9 digits (and possible leading minus sign).
+     *
+     * @param neg Whether contents start with a minus sign
+     *
+     * @since 2.9
+     */
+    public int contentsAsInt(boolean neg) {
+        if ((_inputStart >= 0) && (_inputBuffer != null)) {
+            if (neg) {
+                return -NumberInput.parseInt(_inputBuffer, _inputStart+1, _inputLen-1);
+            }
+            return NumberInput.parseInt(_inputBuffer, _inputStart, _inputLen);
+        }
+        if (neg) {
+            return -NumberInput.parseInt(_currentSegment, 1, _currentSize-1);
+        }
+        return NumberInput.parseInt(_currentSegment, 0, _currentSize);
+    }
+
+    /**
+     * Specialized convenience method that will decode a 64-bit int,
+     * of at most 18 digits (and possible leading minus sign).
+     *
+     * @param neg Whether contents start with a minus sign
+     *
+     * @since 2.9
+     */
+    public long contentsAsLong(boolean neg) {
+        if ((_inputStart >= 0) && (_inputBuffer != null)) {
+            if (neg) {
+                return -NumberInput.parseLong(_inputBuffer, _inputStart+1, _inputLen-1);
+            }
+            return NumberInput.parseLong(_inputBuffer, _inputStart, _inputLen);
+        }
+        if (neg) {
+            return -NumberInput.parseLong(_currentSegment, 1, _currentSize-1);
+        }
+        return NumberInput.parseLong(_currentSegment, 0, _currentSize);
+    }
+
+    /**
+     * @since 2.8
+     */
+    public int contentsToWriter(Writer w) throws IOException
+    {
+        if (_resultArray != null) {
+            w.write(_resultArray);
+            return _resultArray.length;
+        }
+        if (_resultString != null) { // Can take a shortcut...
+            w.write(_resultString);
+            return _resultString.length();
+        }
+        // Do we use shared array?
+        if (_inputStart >= 0) {
+            final int len = _inputLen;
+            if (len > 0) {
+                w.write(_inputBuffer, _inputStart, len);
+            }
+            return len;
+        }
+        // nope, not shared
+        int total = 0;
+        if (_segments != null) {
+            for (int i = 0, end = _segments.size(); i < end; ++i) {
+                char[] curr = _segments.get(i);
+                int currLen = curr.length;
+                w.write(curr, 0, currLen);
+                total += currLen;
+            }
+        }
+        int len = _currentSize;
+        if (len > 0) {
+            w.write(_currentSegment, 0, len);
+            total += len;
+        }
+        return total;
+    }
+
     /*
     /**********************************************************
     /* Public mutators:
@@ -455,10 +584,8 @@ public final class TextBuffer
             start += max;
             len -= max;
         }
-        /* And then allocate new segment; we are guaranteed to now
-         * have enough room in segment.
-         */
-        // Except, as per [Issue-24], not for HUGE appends... so:
+        // And then allocate new segment; we are guaranteed to now
+        // have enough room in segment.
         do {
             expand(len);
             int amount = Math.min(_currentSegment.length, len);
@@ -492,10 +619,8 @@ public final class TextBuffer
             len -= max;
             offset += max;
         }
-        /* And then allocate new segment; we are guaranteed to now
-         * have enough room in segment.
-         */
-        // Except, as per [Issue-24], not for HUGE appends... so:
+        // And then allocate new segment; we are guaranteed to now
+        // have enough room in segment.
         do {
             expand(len);
             int amount = Math.min(_currentSegment.length, len);

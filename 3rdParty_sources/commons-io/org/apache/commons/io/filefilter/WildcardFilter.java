@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,12 +39,12 @@ import org.apache.commons.io.FilenameUtils;
  * File dir = new File(".");
  * FileFilter fileFilter = new WildcardFilter("*test*.java~*~");
  * File[] files = dir.listFiles(fileFilter);
- * for (int i = 0; i < files.length; i++) {
+ * for (int i = 0; i &lt; files.length; i++) {
  *   System.out.println(files[i]);
  * }
  * </pre>
  *
- *
+ * @version $Id: WildcardFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.1
  * @deprecated Use WilcardFileFilter. Deprecated as this class performs directory
  * filtering which it shouldn't do, but that can't be removed due to compatability.
@@ -52,6 +52,7 @@ import org.apache.commons.io.FilenameUtils;
 @Deprecated
 public class WildcardFilter extends AbstractFileFilter implements Serializable {
 
+    private static final long serialVersionUID = -5037645902506953517L;
     /** The wildcards that will be used to match filenames. */
     private final String[] wildcards;
 
@@ -61,7 +62,7 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
      * @param wildcard  the wildcard to match
      * @throws IllegalArgumentException if the pattern is null
      */
-    public WildcardFilter(String wildcard) {
+    public WildcardFilter(final String wildcard) {
         if (wildcard == null) {
             throw new IllegalArgumentException("The wildcard must not be null");
         }
@@ -74,7 +75,7 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
      * @param wildcards  the array of wildcards to match
      * @throws IllegalArgumentException if the pattern array is null
      */
-    public WildcardFilter(String[] wildcards) {
+    public WildcardFilter(final String[] wildcards) {
         if (wildcards == null) {
             throw new IllegalArgumentException("The wildcard array must not be null");
         }
@@ -89,7 +90,7 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
      * @throws IllegalArgumentException if the pattern list is null
      * @throws ClassCastException if the list does not contain Strings
      */
-    public WildcardFilter(List<String> wildcards) {
+    public WildcardFilter(final List<String> wildcards) {
         if (wildcards == null) {
             throw new IllegalArgumentException("The wildcard list must not be null");
         }
@@ -105,17 +106,17 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
      * @return true if the filename matches one of the wildcards
      */
     @Override
-    public boolean accept(File dir, String name) {
+    public boolean accept(final File dir, final String name) {
         if (dir != null && new File(dir, name).isDirectory()) {
             return false;
         }
 
-        for (String wildcard : wildcards) {
+        for (final String wildcard : wildcards) {
             if (FilenameUtils.wildcardMatch(name, wildcard)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -126,17 +127,17 @@ public class WildcardFilter extends AbstractFileFilter implements Serializable {
      * @return true if the filename matches one of the wildcards
      */
     @Override
-    public boolean accept(File file) {
+    public boolean accept(final File file) {
         if (file.isDirectory()) {
             return false;
         }
 
-        for (String wildcard : wildcards) {
+        for (final String wildcard : wildcards) {
             if (FilenameUtils.wildcardMatch(file.getName(), wildcard)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 

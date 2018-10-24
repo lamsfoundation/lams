@@ -18,16 +18,18 @@
 
 package io.undertow.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 /**
  * Utilities for dealing with URLs
  *
  * @author Stuart Douglas
+ * @author Andre Schaefer
  */
 public class URLUtils {
 
@@ -50,12 +52,17 @@ public class URLUtils {
 
     }
 
-    public static void parseQueryString(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode) {
-        QUERY_STRING_PARSER.parse(string, exchange, charset, doDecode);
+    public static void parseQueryString(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode, int maxParameters) throws ParameterLimitException {
+        QUERY_STRING_PARSER.parse(string, exchange, charset, doDecode, maxParameters);
     }
 
-    public static void parsePathParms(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode) {
-        PATH_PARAM_PARSER.parse(string, exchange, charset, doDecode);
+    @Deprecated
+    public static void parsePathParms(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode, int maxParameters) throws ParameterLimitException {
+        parsePathParams(string, exchange, charset, doDecode, maxParameters);
+    }
+
+    public static void parsePathParams(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode, int maxParameters) throws ParameterLimitException {
+        PATH_PARAM_PARSER.parse(string, exchange, charset, doDecode, maxParameters);
     }
 
     /**
@@ -68,42 +75,77 @@ public class URLUtils {
      * @return The decoded URL
      */
     public static String decode(String s, String enc, boolean decodeSlash, StringBuilder buffer) {
+        return decode(s, enc, decodeSlash, true, buffer);
+    }
+
+    /**
+     * Decodes a URL. If the decoding fails for any reason then an IllegalArgumentException will be thrown.
+     *
+     * @param s           The string to decode
+     * @param enc         The encoding
+     * @param decodeSlash If slash characters should be decoded
+     * @param buffer      The string builder to use as a buffer.
+     * @return The decoded URL
+     */
+    public static String decode(String s, String enc, boolean decodeSlash, boolean formEncoding, StringBuilder buffer) {
         buffer.setLength(0);
         boolean needToChange = false;
         int numChars = s.length();
         int i = 0;
-        boolean mightRequireSlashEscape = false;
 
-        char c;
-        byte[] bytes = null;
         while (i < numChars) {
-            c = s.charAt(i);
-            switch (c) {
-                case '+':
+            char c = s.charAt(i);
+            if (c == '+') {
+                if (formEncoding) {
                     buffer.append(' ');
                     i++;
                     needToChange = true;
-                    break;
-                case '%':
+                } else {
+                    i++;
+                    buffer.append(c);
+                }
+            } else if (c == '%' || c > 127) {
                 /*
-                 * Starting with this instance of %, process all
+                 * Starting with this instance of a character
+                 * that needs to be encoded, process all
                  * consecutive substrings of the form %xy. Each
                  * substring %xy will yield a byte. Convert all
                  * consecutive  bytes obtained this way to whatever
                  * character(s) they represent in the provided
                  * encoding.
+                 *
+                 * Note that we need to decode the whole rest of the value, we can't just decode
+                 * three characters. For multi code point characters there if the code point can be
+                 * represented as an alphanumeric
                  */
-                    try {
-                        // (numChars-i)/3 is an upper bound for the number
-                        // of remaining bytes
-                        if (bytes == null) {
-                            bytes = new byte[(numChars - i) / 3];
-                        }
-                        int pos = 0;
+                try {
+                    // guess the size of the remaining bytes
+                    // of remaining bytes
+                    // this works for percent encoded characters,
+                    // not so much for unencoded bytes
+                    byte[] bytes = new byte[numChars - i + 1];
 
-                        while (((i + 2) < numChars) && (c == '%')) {
+                    int pos = 0;
+
+                    while ((i < numChars)) {
+                        if (c == '%') {
                             char p1 = Character.toLowerCase(s.charAt(i + 1));
                             char p2 = Character.toLowerCase(s.charAt(i + 2));
+                            if (!decodeSlash && ((p1 == '2' && p2 == 'f') || (p1 == '5' && p2 == 'c'))) {
+                                if(pos + 2 >= bytes.length) {
+                                    bytes = expandBytes(bytes);
+                                }
+                                bytes[pos++] = (byte) c;
+                                // should be copied with preserved upper/lower case
+                                bytes[pos++] = (byte) s.charAt(i + 1);
+                                bytes[pos++] = (byte) s.charAt(i + 2);
+                                i += 3;
+
+                                if (i < numChars) {
+                                    c = s.charAt(i);
+                                }
+                                continue;
+                            }
                             int v = 0;
                             if (p1 >= '0' && p1 <= '9') {
                                 v = (p1 - '0') << 4;
@@ -122,81 +164,73 @@ public class URLUtils {
                             if (v < 0) {
                                 throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, null);
                             }
-                            if(v == '/' || v== '\\') {
-                                mightRequireSlashEscape = true;
-                            }
 
+                            if(pos == bytes.length) {
+                                bytes = expandBytes(bytes);
+                            }
                             bytes[pos++] = (byte) v;
                             i += 3;
                             if (i < numChars) {
                                 c = s.charAt(i);
                             }
-                        }
-
-                        // A trailing, incomplete byte encoding such as
-                        // "%x" will cause an exception to be thrown
-
-                        if ((i < numChars) && (c == '%')) {
-                            throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, null);
-                        }
-
-                        String decoded = new String(bytes, 0, pos, enc);
-                        if (!decodeSlash && mightRequireSlashEscape) {
-                            //we need to re-encode slash characters
-                            //this is yuck, but a corner case
-                            int decPos = 0;
-                            for (int j = 0; j < decoded.length(); ++j) {
-                                char decChar = decoded.charAt(j);
-                                if (decChar == '/') {
-                                    buffer.append(decoded.substring(decPos, j));
-                                    buffer.append("%2F");
-                                    decPos = j + 1;
-                                } else if (decChar == '\\') {
-                                    buffer.append(decoded.substring(decPos, j));
-                                    buffer.append("%5C");
-                                    decPos = j + 1;
+                        } else if (c == '+' && formEncoding) {
+                            if(pos == bytes.length) {
+                                bytes = expandBytes(bytes);
+                            }
+                            bytes[pos++] = (byte) ' ';
+                            ++i;
+                            if (i < numChars) {
+                                c = s.charAt(i);
+                            }
+                        } else {
+                            if (pos == bytes.length) {
+                                bytes = expandBytes(bytes);
+                            }
+                            ++i;
+                            if(c >> 8 != 0) {
+                                bytes[pos++] = (byte) (c >> 8);
+                                if (pos == bytes.length) {
+                                    bytes = expandBytes(bytes);
+                                }
+                                bytes[pos++] = (byte) c;
+                            } else {
+                                bytes[pos++] = (byte) c;
+                                if (i < numChars) {
+                                    c = s.charAt(i);
                                 }
                             }
-                            buffer.append(decoded.substring(decPos));
-                        } else {
-                            buffer.append(decoded);
-                        }
-                        mightRequireSlashEscape = false;
-                    } catch (NumberFormatException e) {
-                        throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, e);
-                    } catch (UnsupportedEncodingException e) {
-                        throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, e);
-                    }
-                    needToChange = true;
-                    break;
-                default:
-                    buffer.append(c);
-                    i++;
-                    if(c > 127 && !needToChange) {
-                        //we have non-ascii data in our URL, which sucks
-                        //its hard to know exactly what to do with this, but we assume that because this data
-                        //has not been properly encoded none of the other data is either
-                        try {
-                            char[] carray = s.toCharArray();
-                            byte[] buf = new byte[carray.length];
-                            for(int l = 0;l < buf.length; ++l) {
-                                buf[l] = (byte) carray[l];
-                            }
-                            return new String(buf, enc);
-                        } catch (UnsupportedEncodingException e) {
-                            throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, e);
+
                         }
                     }
-                    break;
+
+                    String decoded = new String(bytes, 0, pos, enc);
+                    buffer.append(decoded);
+                } catch (NumberFormatException e) {
+                    throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, e);
+                } catch (UnsupportedEncodingException e) {
+                    throw UndertowMessages.MESSAGES.failedToDecodeURL(s, enc, e);
+                }
+                needToChange = true;
+                break;
+            } else {
+                buffer.append(c);
+                i++;
             }
         }
 
         return (needToChange ? buffer.toString() : s);
     }
 
+    private static byte[] expandBytes(byte[] bytes) {
+        byte[] newBytes = new byte[bytes.length + 10];
+        System.arraycopy(bytes, 0, newBytes, 0, bytes.length);
+        return newBytes;
+    }
+
     private abstract static class QueryStringParser {
 
-        void parse(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode) {
+        void parse(final String string, final HttpServerExchange exchange, final String charset, final boolean doDecode, int max) throws ParameterLimitException {
+            int count = 0;
             try {
                 int stringStart = 0;
                 String attrName = null;
@@ -208,8 +242,14 @@ public class URLUtils {
                     } else if (c == '&') {
                         if (attrName != null) {
                             handle(exchange, decode(charset, attrName, doDecode), decode(charset, string.substring(stringStart, i), doDecode));
+                            if(++count > max) {
+                                throw UndertowMessages.MESSAGES.tooManyParameters(max);
+                            }
                         } else {
                             handle(exchange, decode(charset, string.substring(stringStart, i), doDecode), "");
+                            if(++count > max) {
+                                throw UndertowMessages.MESSAGES.tooManyParameters(max);
+                            }
                         }
                         stringStart = i + 1;
                         attrName = null;
@@ -217,8 +257,14 @@ public class URLUtils {
                 }
                 if (attrName != null) {
                     handle(exchange, decode(charset, attrName, doDecode), decode(charset, string.substring(stringStart, string.length()), doDecode));
+                    if(++count > max) {
+                        throw UndertowMessages.MESSAGES.tooManyParameters(max);
+                    }
                 } else if (string.length() != stringStart) {
                     handle(exchange, decode(charset, string.substring(stringStart, string.length()), doDecode), "");
+                    if(++count > max) {
+                        throw UndertowMessages.MESSAGES.tooManyParameters(max);
+                    }
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
@@ -227,7 +273,7 @@ public class URLUtils {
 
         private String decode(String charset, String attrName, final boolean doDecode) throws UnsupportedEncodingException {
             if (doDecode) {
-                return URLDecoder.decode(attrName, charset);
+                return URLUtils.decode(attrName, charset, true, true, new StringBuilder());
             }
             return attrName;
         }
@@ -266,5 +312,24 @@ public class URLUtils {
         }
 
         return path;
+    }
+
+
+    /**
+     * Test if provided location is an absolute URI or not.
+     *
+     * @param location location to check, null = relative, having scheme = absolute
+     * @return true if location is considered absolute
+     */
+    public static boolean isAbsoluteUrl(String location) {
+        if (location != null && location.length() > 0 && location.contains(":")) {
+            try {
+                URI uri = new URI(location);
+                return uri.getScheme() != null;
+            } catch (URISyntaxException e) {
+                // ignore invalid locations and consider not absolute
+            }
+        }
+        return false;
     }
 }

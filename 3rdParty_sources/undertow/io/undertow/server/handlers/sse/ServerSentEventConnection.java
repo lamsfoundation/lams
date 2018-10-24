@@ -195,6 +195,44 @@ public class ServerSentEventConnection implements Channel, Attachable {
     }
 
     /**
+     * Sends the 'retry' message to the client, instructing it how long to wait before attempting a reconnect.
+     *
+     * @param retry The retry time in milliseconds
+     */
+    public void sendRetry(long retry) {
+        sendRetry(retry, null);
+    }
+
+
+    /**
+     * Sends the 'retry' message to the client, instructing it how long to wait before attempting a reconnect.
+     *
+     * @param retry The retry time in milliseconds
+     * @param callback The callback that is notified on success or failure
+     */
+    public synchronized void sendRetry(long retry, EventCallback callback) {
+
+        if (open == 0 || shutdown) {
+            if (callback != null) {
+                callback.failed(this, null, null, null, new ClosedChannelException());
+            }
+            return;
+        }
+        queue.add(new SSEData(retry, callback));
+        sink.getIoThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (ServerSentEventConnection.this) {
+                    if (pooled == null) {
+                        fillBuffer();
+                        writeListener.handleEvent(sink);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * Sends an event to the remote client
      *
      * @param data The event data
@@ -205,7 +243,7 @@ public class ServerSentEventConnection implements Channel, Attachable {
     public synchronized void send(String data, String event, String id, EventCallback callback) {
         if (open == 0 || shutdown) {
             if (callback != null) {
-                callback.failed(this, event, data, id, new ClosedChannelException());
+                callback.failed(this, data, event, id, new ClosedChannelException());
             }
             return;
         }
@@ -304,27 +342,33 @@ public class ServerSentEventConnection implements Channel, Attachable {
             buffered.add(data);
             if (data.leftOverData == null) {
                 StringBuilder message = new StringBuilder();
-                if (data.id != null) {
-                    message.append("id:");
-                    message.append(data.id);
+                if(data.retry > 0) {
+                    message.append("retry:");
+                    message.append(data.retry);
                     message.append('\n');
-                }
-                if (data.event != null) {
-                    message.append("event:");
-                    message.append(data.event);
-                    message.append('\n');
-                }
-                if (data.data != null) {
-                    message.append("data:");
-                    for(int i = 0; i < data.data.length(); ++i) {
-                        char c = data.data.charAt(i);
-                        if(c == '\n') {
-                            message.append("\ndata:");
-                        } else {
-                            message.append(c);
-                        }
+                } else {
+                    if (data.id != null) {
+                        message.append("id:");
+                        message.append(data.id);
+                        message.append('\n');
                     }
-                    message.append('\n');
+                    if (data.event != null) {
+                        message.append("event:");
+                        message.append(data.event);
+                        message.append('\n');
+                    }
+                    if (data.data != null) {
+                        message.append("data:");
+                        for (int i = 0; i < data.data.length(); ++i) {
+                            char c = data.data.charAt(i);
+                            if (c == '\n') {
+                                message.append("\ndata:");
+                            } else {
+                                message.append(c);
+                            }
+                        }
+                        message.append('\n');
+                    }
                 }
                 message.append('\n');
                 byte[] messageBytes = message.toString().getBytes(StandardCharsets.UTF_8);
@@ -370,12 +414,7 @@ public class ServerSentEventConnection implements Channel, Attachable {
 
                 synchronized (ServerSentEventConnection.this) {
                     if (queue.isEmpty() && pooled == null) {
-                        try {
-                            sink.shutdownWrites();
-                        } catch (IOException e) {
-                            //ignore
-                        }
-                        IoUtils.safeClose(ServerSentEventConnection.this);
+                        exchange.endExchange();
                     }
                 }
             }
@@ -454,8 +493,25 @@ public class ServerSentEventConnection implements Channel, Attachable {
 
     public interface EventCallback {
 
+        /**
+         * Notification that is called when a message is sucessfully sent
+         *
+         * @param connection The connection
+         * @param data The message data
+         * @param event The message event
+         * @param id The message id
+         */
         void done(ServerSentEventConnection connection, String data, String event, String id);
 
+        /**
+         * Notification that is called when a message send fails.
+         *
+         * @param connection The connection
+         * @param data The message data
+         * @param event The message event
+         * @param id The message id
+         * @param e The exception
+         */
         void failed(ServerSentEventConnection connection, String data, String event, String id, IOException e);
 
     }
@@ -464,6 +520,7 @@ public class ServerSentEventConnection implements Channel, Attachable {
         final String event;
         final String data;
         final String id;
+        final long retry;
         final EventCallback callback;
         private int endBufferPosition = -1;
         private byte[] leftOverData;
@@ -474,6 +531,15 @@ public class ServerSentEventConnection implements Channel, Attachable {
             this.data = data;
             this.id = id;
             this.callback = callback;
+            this.retry = -1;
+        }
+
+        private SSEData(long retry, EventCallback callback) {
+            this.event = null;
+            this.data = null;
+            this.id = null;
+            this.callback = callback;
+            this.retry = retry;
         }
 
 

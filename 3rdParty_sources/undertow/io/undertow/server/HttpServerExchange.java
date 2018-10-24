@@ -24,6 +24,7 @@ import io.undertow.UndertowOptions;
 import io.undertow.channels.DetachableStreamSinkChannel;
 import io.undertow.channels.DetachableStreamSourceChannel;
 import io.undertow.conduits.EmptyStreamSourceConduit;
+import io.undertow.connector.PooledByteBuffer;
 import io.undertow.io.AsyncReceiverImpl;
 import io.undertow.io.AsyncSenderImpl;
 import io.undertow.io.BlockingReceiverImpl;
@@ -44,6 +45,7 @@ import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import io.undertow.util.NetworkUtils;
 import io.undertow.util.Protocols;
+import io.undertow.util.Rfc6265CookieSupport;
 import io.undertow.util.StatusCodes;
 import org.jboss.logging.Logger;
 import org.xnio.Buffers;
@@ -51,7 +53,6 @@ import org.xnio.ChannelExceptionHandler;
 import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
-import io.undertow.connector.PooledByteBuffer;
 import org.xnio.XnioIoThread;
 import org.xnio.channels.Channels;
 import org.xnio.channels.Configurable;
@@ -96,6 +97,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     private static final RuntimePermission SET_SECURITY_CONTEXT = new RuntimePermission("io.undertow.SET_SECURITY_CONTEXT");
     private static final String ISO_8859_1 = "ISO-8859-1";
+    private static final String HTTPS = "https";
 
     /**
      * The HTTP reason phrase to send. This is an attachment rather than a field as it is rarely used. If this is not set
@@ -112,6 +114,11 @@ public final class HttpServerExchange extends AbstractAttachable {
      * Attachment key that can be used to hold additional request attributes
      */
     public static final AttachmentKey<Map<String, String>> REQUEST_ATTRIBUTES = AttachmentKey.create(Map.class);
+
+    /**
+     * Attachment key that can be used as a flag of secure attribute
+     */
+    public static final AttachmentKey<Boolean> SECURE_REQUEST = AttachmentKey.create(Boolean.class);
 
     private final ServerConnection connection;
     private final HeaderMap requestHeaders;
@@ -376,6 +383,18 @@ public final class HttpServerExchange extends AbstractAttachable {
         return protocol.equals(Protocols.HTTP_1_1);
     }
 
+    public boolean isSecure() {
+        Boolean secure = getAttachment(SECURE_REQUEST);
+        if(secure != null && secure) {
+            return true;
+        }
+        String scheme = getRequestScheme();
+        if (scheme != null && scheme.equalsIgnoreCase(HTTPS)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Get the HTTP request method.  Normally this is one of the strings listed in {@link io.undertow.util.Methods}.
      *
@@ -582,12 +601,11 @@ public final class HttpServerExchange extends AbstractAttachable {
 
     private String extractCharset(HeaderMap headers) {
         String contentType = headers.getFirst(Headers.CONTENT_TYPE);
-        if (contentType == null) {
-            return null;
-        }
-        String value = Headers.extractQuotedValueFromHeader(contentType, "charset");
-        if(value != null) {
-            return value;
+        if (contentType != null) {
+            String value = Headers.extractQuotedValueFromHeader(contentType, "charset");
+            if (value != null) {
+                return value;
+            }
         }
         return ISO_8859_1;
     }
@@ -656,14 +674,16 @@ public final class HttpServerExchange extends AbstractAttachable {
                 colonIndex = host.indexOf(':');
             }
             if (colonIndex != -1) {
-                return Integer.parseInt(host.substring(colonIndex + 1));
-            } else {
-                if (getRequestScheme().equals("https")) {
-                    return 443;
-                } else if (getRequestScheme().equals("http")) {
-                    return 80;
-                }
+                try {
+                    return Integer.parseInt(host.substring(colonIndex + 1));
+                } catch (NumberFormatException ignore) {}
             }
+            if (getRequestScheme().equals("https")) {
+                return 443;
+            } else if (getRequestScheme().equals("http")) {
+                return 80;
+            }
+
         }
         return getDestinationAddress().getPort();
     }
@@ -739,8 +759,13 @@ public final class HttpServerExchange extends AbstractAttachable {
     }
 
     /**
+     * {@link #dispatch(Executor, Runnable)} should be used instead of this method, as it is hard to use safely.
      *
+     * Use {@link io.undertow.util.SameThreadExecutor#INSTANCE} if you do not want to dispatch to another thread.
+     *
+     * @return this exchange
      */
+    @Deprecated
     public HttpServerExchange dispatch() {
         state |= FLAG_DISPATCHED;
         return this;
@@ -774,10 +799,10 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @throws IllegalStateException If this exchange has already been dispatched
      */
     public HttpServerExchange dispatch(final Executor executor, final Runnable runnable) {
-        if (executor != null) {
-            this.dispatchExecutor = executor;
-        }
         if (isInCall()) {
+            if (executor != null) {
+                this.dispatchExecutor = executor;
+            }
             state |= FLAG_DISPATCHED;
             if(anyAreSet(state, FLAG_SHOULD_RESUME_READS | FLAG_SHOULD_RESUME_WRITES)) {
                 throw UndertowMessages.MESSAGES.resumedAndDispatched();
@@ -1114,6 +1139,17 @@ public final class HttpServerExchange extends AbstractAttachable {
      * @param cookie The cookie
      */
     public HttpServerExchange setResponseCookie(final Cookie cookie) {
+        if(getConnection().getUndertowOptions().get(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, UndertowOptions.DEFAULT_ENABLE_RFC6265_COOKIE_VALIDATION)) {
+            if (cookie.getValue() != null && !cookie.getValue().isEmpty()) {
+                Rfc6265CookieSupport.validateCookieValue(cookie.getValue());
+            }
+            if (cookie.getPath() != null && !cookie.getPath().isEmpty()) {
+                Rfc6265CookieSupport.validatePath(cookie.getPath());
+            }
+            if (cookie.getDomain() != null && !cookie.getDomain().isEmpty()) {
+                Rfc6265CookieSupport.validateDomain(cookie.getDomain());
+            }
+        }
         if (responseCookies == null) {
             responseCookies = new TreeMap<>(); //hashmap is slow to allocate in JDK7
         }
@@ -1369,6 +1405,11 @@ public final class HttpServerExchange extends AbstractAttachable {
         if (allAreSet(oldVal, FLAG_RESPONSE_SENT)) {
             throw UndertowMessages.MESSAGES.responseAlreadyStarted();
         }
+        if(statusCode >= 500) {
+            if(UndertowLogger.ERROR_RESPONSE.isDebugEnabled()) {
+                UndertowLogger.ERROR_RESPONSE.debugf(new RuntimeException(), "Setting error code %s for exchange %s", statusCode, this);
+            }
+        }
         this.state = oldVal & ~MASK_RESPONSE_CODE | statusCode & MASK_RESPONSE_CODE;
         return this;
     }
@@ -1514,7 +1555,9 @@ public final class HttpServerExchange extends AbstractAttachable {
             // idempotent
             return this;
         }
-        responseChannel.responseDone();
+        if(responseChannel != null) {
+            responseChannel.responseDone();
+        }
         this.state = oldVal | FLAG_RESPONSE_TERMINATED;
         if (anyAreSet(oldVal, FLAG_REQUEST_TERMINATED)) {
             invokeExchangeCompleteListeners();
@@ -1563,7 +1606,7 @@ public final class HttpServerExchange extends AbstractAttachable {
                         if (listener.handleDefaultResponse(this)) {
                             return this;
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         UndertowLogger.REQUEST_LOGGER.debug("Exception running default response listener", e);
                     }
                 }
@@ -1581,6 +1624,9 @@ public final class HttpServerExchange extends AbstractAttachable {
                 blockingHttpExchange.close();
             } catch (IOException e) {
                 UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                IoUtils.safeClose(connection);
+            } catch (Throwable t) {
+                UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
                 IoUtils.safeClose(connection);
             }
         }
@@ -1634,8 +1680,12 @@ public final class HttpServerExchange extends AbstractAttachable {
                     } else if (read == -1) {
                         break;
                     }
-                } catch (IOException e) {
-                    UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+                } catch (Throwable t) {
+                    if (t instanceof IOException) {
+                        UndertowLogger.REQUEST_IO_LOGGER.ioException((IOException) t);
+                    } else {
+                        UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
+                    }
                     invokeExchangeCompleteListeners();
                     IoUtils.safeClose(connection);
                     return this;
@@ -1673,11 +1723,15 @@ public final class HttpServerExchange extends AbstractAttachable {
                             public void handleEvent(final StreamSinkChannel channel) {
                                 channel.suspendWrites();
                                 channel.getWriteSetter().set(null);
+                                //defensive programming, should never happen
+                                if (anyAreClear(state, FLAG_RESPONSE_TERMINATED)) {
+                                    UndertowLogger.ROOT_LOGGER.responseWasNotTerminated(connection, HttpServerExchange.this);
+                                    IoUtils.safeClose(connection);
+                                }
                             }
                         }, new ChannelExceptionHandler<Channel>() {
                             @Override
                             public void handleException(final Channel channel, final IOException exception) {
-
                                 //make sure the listeners have been invoked
                                 invokeExchangeCompleteListeners();
                                 UndertowLogger.REQUEST_LOGGER.debug("Exception ending request", exception);
@@ -1686,9 +1740,19 @@ public final class HttpServerExchange extends AbstractAttachable {
                         }
                 ));
                 responseChannel.resumeWrites();
+            } else {
+                //defensive programming, should never happen
+                if (anyAreClear(state, FLAG_RESPONSE_TERMINATED)) {
+                    UndertowLogger.ROOT_LOGGER.responseWasNotTerminated(connection, this);
+                    IoUtils.safeClose(connection);
+                }
             }
-        } catch (IOException e) {
-            UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+        } catch (Throwable t) {
+            if (t instanceof IOException) {
+                UndertowLogger.REQUEST_IO_LOGGER.ioException((IOException) t);
+            } else {
+                UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
+            }
             invokeExchangeCompleteListeners();
 
             IoUtils.safeClose(connection);
@@ -1796,8 +1860,11 @@ public final class HttpServerExchange extends AbstractAttachable {
             requestChannel.runResume();
             ret = true;
         }
-        state &= ~(FLAG_SHOULD_RESUME_READS | FLAG_SHOULD_RESUME_WRITES);
         return ret;
+    }
+
+    boolean isResumed() {
+        return anyAreSet(state, FLAG_SHOULD_RESUME_WRITES | FLAG_SHOULD_RESUME_READS);
     }
 
     private static class ExchangeCompleteNextListener implements ExchangeCompletionListener.NextListener {
@@ -1825,7 +1892,7 @@ public final class HttpServerExchange extends AbstractAttachable {
     private static class DefaultBlockingHttpExchange implements BlockingHttpExchange {
 
         private InputStream inputStream;
-        private OutputStream outputStream;
+        private UndertowOutputStream outputStream;
         private Sender sender;
         private final HttpServerExchange exchange;
 
@@ -1840,7 +1907,7 @@ public final class HttpServerExchange extends AbstractAttachable {
             return inputStream;
         }
 
-        public OutputStream getOutputStream() {
+        public UndertowOutputStream getOutputStream() {
             if (outputStream == null) {
                 outputStream = new UndertowOutputStream(exchange);
             }
@@ -1905,6 +1972,12 @@ public final class HttpServerExchange extends AbstractAttachable {
         }
 
         @Override
+        public void suspendWrites() {
+            state &= ~FLAG_SHOULD_RESUME_WRITES;
+            super.suspendWrites();
+        }
+
+        @Override
         public void wakeupWrites() {
             if (isFinished()) {
                 return;
@@ -1932,8 +2005,10 @@ public final class HttpServerExchange extends AbstractAttachable {
                 } else {
                     if (wakeup) {
                         wakeup = false;
+                        state &= ~FLAG_SHOULD_RESUME_WRITES;
                         delegate.wakeupWrites();
                     } else {
+                        state &= ~FLAG_SHOULD_RESUME_WRITES;
                         delegate.resumeWrites();
                     }
                 }
@@ -1945,7 +2020,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         private void invokeListener() {
             if(writeSetter != null) {
-                getIoThread().execute(new Runnable() {
+                super.getIoThread().execute(new Runnable() {
                     @Override
                     public void run() {
                         ChannelListeners.invokeChannelListener(WriteDispatchChannel.this, writeSetter.get());
@@ -1956,7 +2031,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitWritable() throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
+            if(Thread.currentThread() == super.getIoThread()) {
                 throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
             }
             super.awaitWritable();
@@ -1964,7 +2039,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitWritable(long time, TimeUnit timeUnit) throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
+            if(Thread.currentThread() == super.getIoThread()) {
                 throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
             }
             super.awaitWritable(time, timeUnit);
@@ -2088,7 +2163,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         private void invokeListener() {
             if(readSetter != null) {
-                getIoThread().execute(new Runnable() {
+                super.getIoThread().execute(new Runnable() {
                     @Override
                     public void run() {
                         ChannelListeners.invokeChannelListener(ReadDispatchChannel.this, readSetter.get());
@@ -2118,7 +2193,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitReadable() throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
+            if(Thread.currentThread() == super.getIoThread()) {
                 throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
             }
             PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
@@ -2130,6 +2205,7 @@ public final class HttpServerExchange extends AbstractAttachable {
         @Override
         public void suspendReads() {
             readsResumed = false;
+            state &= ~(FLAG_SHOULD_RESUME_READS);
             super.suspendReads();
         }
 
@@ -2175,7 +2251,7 @@ public final class HttpServerExchange extends AbstractAttachable {
 
         @Override
         public void awaitReadable(long time, TimeUnit timeUnit) throws IOException {
-            if(Thread.currentThread() == getIoThread()) {
+            if(Thread.currentThread() == super.getIoThread()) {
                 throw UndertowMessages.MESSAGES.awaitCalledFromIoThread();
             }
             PooledByteBuffer[] buffered = getAttachment(BUFFERED_REQUEST_DATA);
@@ -2299,8 +2375,10 @@ public final class HttpServerExchange extends AbstractAttachable {
                 } else {
                     if (wakeup) {
                         wakeup = false;
+                        state &= ~FLAG_SHOULD_RESUME_READS;
                         delegate.wakeupReads();
                     } else {
+                        state &= ~FLAG_SHOULD_RESUME_READS;
                         delegate.resumeReads();
                     }
                 }

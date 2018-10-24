@@ -20,6 +20,11 @@ import java.util.*;
  * efficient aggregation of output content as a byte array, similar
  * to how {@link java.io.ByteArrayOutputStream} works, but somewhat more
  * efficiently for many use cases.
+ *<p>
+ * NOTE: maximum size limited to Java Array maximum, 2 gigabytes: this
+ * because usage pattern is to collect content for a `byte[]` and so although
+ * theoretically this builder can aggregate more content it will not be usable
+ * as things are. Behavior may be improved if we solve the access problem.
  */
 public final class ByteArrayBuilder extends OutputStream
 {
@@ -42,7 +47,7 @@ public final class ByteArrayBuilder extends OutputStream
     private int _pastLen;
     private byte[] _currBlock;
     private int _currBlockPtr;
-    
+
     public ByteArrayBuilder() { this(null); }
     public ByteArrayBuilder(BufferRecycler br) { this(br, INITIAL_BLOCK_SIZE); }
     public ByteArrayBuilder(int firstBlockSize) { this(null, firstBlockSize); }
@@ -59,6 +64,13 @@ public final class ByteArrayBuilder extends OutputStream
         if (!_pastBlocks.isEmpty()) {
             _pastBlocks.clear();
         }
+    }
+
+    /**
+     * @since 2.9
+     */
+    public int size() {
+        return _pastLen + _currBlockPtr;
     }
 
     /**
@@ -104,6 +116,23 @@ public final class ByteArrayBuilder extends OutputStream
     }
 
     /**
+     * @since 2.9
+     */
+    public void appendFourBytes(int b32) {
+        if ((_currBlockPtr + 3) < _currBlock.length) {
+            _currBlock[_currBlockPtr++] = (byte) (b32 >> 24);
+            _currBlock[_currBlockPtr++] = (byte) (b32 >> 16);
+            _currBlock[_currBlockPtr++] = (byte) (b32 >> 8);
+            _currBlock[_currBlockPtr++] = (byte) b32;
+        } else {
+            append(b32 >> 24);
+            append(b32 >> 16);
+            append(b32 >> 8);
+            append(b32);
+        }
+    }
+    
+    /**
      * Method called when results are finalized and we can get the
      * full aggregated result buffer to return to the caller
      */
@@ -114,7 +143,6 @@ public final class ByteArrayBuilder extends OutputStream
         if (totalLen == 0) { // quick check: nothing aggregated?
             return NO_BYTES;
         }
-        
         byte[] result = new byte[totalLen];
         int offset = 0;
 
@@ -137,7 +165,7 @@ public final class ByteArrayBuilder extends OutputStream
 
     /*
     /**********************************************************
-    /* Non-stream API (similar to TextBuffer), since 1.6
+    /* Non-stream API (similar to TextBuffer)
     /**********************************************************
      */
 
@@ -177,13 +205,13 @@ public final class ByteArrayBuilder extends OutputStream
     public byte[] getCurrentSegment() { return _currBlock; }
     public void setCurrentSegmentLength(int len) { _currBlockPtr = len; }
     public int getCurrentSegmentLength() { return _currBlockPtr; }
-    
+
     /*
     /**********************************************************
     /* OutputStream implementation
     /**********************************************************
      */
-    
+
     @Override
     public void write(byte[] b) {
         write(b, 0, b.length);
@@ -219,10 +247,18 @@ public final class ByteArrayBuilder extends OutputStream
     /* Internal methods
     /**********************************************************
      */
-    
+
     private void _allocMore()
     {
-        _pastLen += _currBlock.length;
+        final int newPastLen = _pastLen + _currBlock.length;
+
+        // 13-Feb-2016, tatu: As per [core#351] let's try to catch problem earlier;
+        //     for now we are strongly limited by 2GB limit of Java arrays        
+        if (newPastLen < 0) {
+            throw new IllegalStateException("Maximum Java array size (2GB) exceeded by `ByteArrayBuilder`");
+        }
+
+        _pastLen = newPastLen;
 
         /* Let's allocate block that's half the total size, except
          * never smaller than twice the initial block size.
@@ -239,6 +275,4 @@ public final class ByteArrayBuilder extends OutputStream
         _currBlock = new byte[newSize];
         _currBlockPtr = 0;
     }
-
 }
-

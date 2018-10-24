@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -83,6 +83,8 @@ public class ServletRequestWrapper implements ServletRequest {
     /**
      * Creates a ServletRequest adaptor wrapping the given request object. 
      * @throws java.lang.IllegalArgumentException if the request is null
+     *
+     * @param request the {@link ServletRequest} to be wrapped
      */
     public ServletRequestWrapper(ServletRequest request) {
         if (request == null) {
@@ -94,6 +96,8 @@ public class ServletRequestWrapper implements ServletRequest {
 
     /**
      * Return the wrapped request object.
+     *
+     * @return the wrapped {@link ServletRequest}
      */
     public ServletRequest getRequest() {
         return this.request;
@@ -102,7 +106,11 @@ public class ServletRequestWrapper implements ServletRequest {
 
     /**
      * Sets the request object being wrapped. 
+     *
+     * @param request the {@link ServletRequest} to be installed
+     *
      * @throws java.lang.IllegalArgumentException if the request is null.
+     * 
      */
     public void setRequest(ServletRequest request) {
         if (request == null) {
@@ -346,6 +354,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * @deprecated As of Version 2.1 of the Java Servlet API,
      * use {@link ServletContext#getRealPath} instead
      */
+    @Deprecated
     public String getRealPath(String path) {
         return this.request.getRealPath(path);
     }

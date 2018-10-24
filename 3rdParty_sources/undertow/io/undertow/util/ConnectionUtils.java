@@ -52,7 +52,7 @@ public class ConnectionUtils {
      * @param connection The connection
      * @param additional Any additional resources to close once the connection has been closed
      */
-    public static void cleanClose(final StreamConnection connection, final Closeable... additional) {
+    public static void cleanClose(StreamConnection connection, Closeable... additional) {
         try {
             connection.getSinkChannel().shutdownWrites();
             if (!connection.getSinkChannel().flush()) {
@@ -74,7 +74,7 @@ public class ConnectionUtils {
                 doDrain(connection, additional);
             }
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (e instanceof IOException) {
                 UndertowLogger.REQUEST_IO_LOGGER.ioException((IOException) e);
             } else {
@@ -96,7 +96,7 @@ public class ConnectionUtils {
             int res = connection.getSourceChannel().read(b);
             b.clear();
             if (res == 0) {
-                final XnioExecutor.Key key = connection.getIoThread().executeAfter(new Runnable() {
+                final XnioExecutor.Key key = WorkerUtils.executeAfter(connection.getIoThread(), new Runnable() {
                     @Override
                     public void run() {
                         IoUtils.safeClose(connection);
@@ -130,7 +130,7 @@ public class ConnectionUtils {
                 IoUtils.safeClose(connection);
                 IoUtils.safeClose(additional);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (e instanceof IOException) {
                 UndertowLogger.REQUEST_IO_LOGGER.ioException((IOException) e);
             } else {

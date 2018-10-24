@@ -18,9 +18,9 @@ import com.fasterxml.jackson.core.sym.CharsToNameCanonicalizer;
  */
 public final class ByteSourceJsonBootstrapper
 {
-    final static byte UTF8_BOM_1 = (byte) 0xEF;
-    final static byte UTF8_BOM_2 = (byte) 0xBB;
-    final static byte UTF8_BOM_3 = (byte) 0xBF;
+    public final static byte UTF8_BOM_1 = (byte) 0xEF;
+    public final static byte UTF8_BOM_2 = (byte) 0xBB;
+    public final static byte UTF8_BOM_3 = (byte) 0xBF;
     
     /*
     /**********************************************************
@@ -28,9 +28,9 @@ public final class ByteSourceJsonBootstrapper
     /**********************************************************
      */
 
-    protected final IOContext _context;
+    private final IOContext _context;
 
-    protected final InputStream _in;
+    private final InputStream _in;
 
     /*
     /**********************************************************
@@ -38,7 +38,7 @@ public final class ByteSourceJsonBootstrapper
     /**********************************************************
      */
 
-    protected final byte[] _inputBuffer;
+    private final byte[] _inputBuffer;
 
     private int _inputPtr;
 
@@ -63,7 +63,7 @@ public final class ByteSourceJsonBootstrapper
      *<p>
      * Note: includes possible BOMs, if those were part of the input.
      */
-    protected int _inputProcessed;
+//    private int _inputProcessed;
 
     /*
     /**********************************************************
@@ -71,9 +71,12 @@ public final class ByteSourceJsonBootstrapper
     /**********************************************************
      */
 
-    protected boolean _bigEndian = true;
+    /**
+     * Whether input has been detected to be in Big-Endian encoding or not.
+     */
+    private boolean _bigEndian = true;
 
-    protected int _bytesPerChar; // 0 means "dunno yet"
+    private int _bytesPerChar; // 0 means "dunno yet"
 
     /*
     /**********************************************************
@@ -86,7 +89,7 @@ public final class ByteSourceJsonBootstrapper
         _in = in;
         _inputBuffer = ctxt.allocReadIOBuffer();
         _inputEnd = _inputPtr = 0;
-        _inputProcessed = 0;
+//        _inputProcessed = 0;
         _bufferRecyclable = true;
     }
 
@@ -97,7 +100,7 @@ public final class ByteSourceJsonBootstrapper
         _inputPtr = inputStart;
         _inputEnd = (inputStart + inputLen);
         // Need to offset this for correct location info
-        _inputProcessed = -inputStart;
+//        _inputProcessed = -inputStart;
         _bufferRecyclable = false;
     }
 
@@ -172,6 +175,34 @@ public final class ByteSourceJsonBootstrapper
         return enc;
     }
 
+    /**
+     * Helper method that may be called to see if given {@link DataInput}
+     * has BOM marker, and if so, to skip it.
+     * @throws IOException 
+     *
+     * @since 2.8
+     */
+    public static int skipUTF8BOM(DataInput input) throws IOException
+    {
+        int b = input.readUnsignedByte();
+        if (b != 0xEF) {
+            return b;
+        }
+        // since this is not legal byte in JSON otherwise, except
+        // that we do get BOM; if not, report error
+        b = input.readUnsignedByte();
+        if (b != 0xBB) {
+            throw new IOException("Unexpected byte 0x"+Integer.toHexString(b)
+                +" following 0xEF; should get 0xBB as part of UTF-8 BOM");
+        }
+        b = input.readUnsignedByte();
+        if (b != 0xBF) {
+            throw new IOException("Unexpected byte 0x"+Integer.toHexString(b)
+                +" following 0xEF 0xBB; should get 0xBF as part of UTF-8 BOM");
+        }
+        return input.readUnsignedByte();
+    }
+
     /*
     /**********************************************************
     /* Constructing a Reader
@@ -215,7 +246,7 @@ public final class ByteSourceJsonBootstrapper
         JsonEncoding enc = detectEncoding();
 
         if (enc == JsonEncoding.UTF8) {
-            /* and without canonicalization, byte-based approach is not performance; just use std UTF-8 reader
+            /* and without canonicalization, byte-based approach is not performant; just use std UTF-8 reader
              * (which is ok for larger input; not so hot for smaller; but this is not a common case)
              */
             if (JsonFactory.Feature.CANONICALIZE_FIELD_NAMES.enabledIn(factoryFeatures)) {
@@ -342,7 +373,7 @@ public final class ByteSourceJsonBootstrapper
         }
         return fullMatchStrength;
     }
-    
+
     private static int skipSpace(InputAccessor acc) throws IOException
     {
         if (!acc.hasMoreBytes()) {
@@ -350,7 +381,7 @@ public final class ByteSourceJsonBootstrapper
         }
         return skipSpace(acc, acc.nextByte());
     }
-    
+
     private static int skipSpace(InputAccessor acc, byte b) throws IOException
     {
         while (true) {
@@ -362,10 +393,9 @@ public final class ByteSourceJsonBootstrapper
                 return -1;
             }
             b = acc.nextByte();
-            ch = (int) b & 0xFF;
         }
     }
-    
+
     /*
     /**********************************************************
     /* Internal methods, parsing
@@ -394,8 +424,11 @@ public final class ByteSourceJsonBootstrapper
             return true;
         case 0x0000FFFE: // UCS-4, in-order...
             reportWeirdUCS4("2143"); // throws exception
+            break; // never gets here
         case 0xFEFF0000: // UCS-4, in-order...
             reportWeirdUCS4("3412"); // throws exception
+            break; // never gets here
+        default:
         }
         // Ok, if not, how about 16-bit encoding BOMs?
         int msw = quad >>> 16;

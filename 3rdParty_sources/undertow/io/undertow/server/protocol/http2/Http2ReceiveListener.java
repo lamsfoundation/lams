@@ -18,18 +18,6 @@
 
 package io.undertow.server.protocol.http2;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-import javax.net.ssl.SSLSession;
-
-import io.undertow.server.ConnectorStatisticsImpl;
-import io.undertow.util.Methods;
-import io.undertow.util.Protocols;
-import org.xnio.ChannelListener;
-import org.xnio.IoUtils;
-import org.xnio.OptionMap;
-
 import io.undertow.UndertowLogger;
 import io.undertow.UndertowOptions;
 import io.undertow.protocols.http2.AbstractHttp2StreamSourceChannel;
@@ -37,14 +25,33 @@ import io.undertow.protocols.http2.Http2Channel;
 import io.undertow.protocols.http2.Http2DataStreamSinkChannel;
 import io.undertow.protocols.http2.Http2HeadersStreamSinkChannel;
 import io.undertow.protocols.http2.Http2StreamSourceChannel;
+import io.undertow.server.ConnectorStatisticsImpl;
 import io.undertow.server.Connectors;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.protocol.http.HttpAttachments;
+import io.undertow.server.protocol.http.HttpContinue;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import io.undertow.util.ImmediatePooledByteBuffer;
+import io.undertow.util.Methods;
+import io.undertow.util.ParameterLimitException;
+import io.undertow.util.Protocols;
+import io.undertow.util.StatusCodes;
+import org.xnio.ChannelListener;
+import org.xnio.IoUtils;
+import org.xnio.OptionMap;
 import org.xnio.channels.Channels;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.function.Supplier;
+
+import javax.net.ssl.SSLSession;
 
 /**
  * The recieve listener for a Http2 connection.
@@ -68,6 +75,8 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
     private final StringBuilder decodeBuffer = new StringBuilder();
     private final boolean allowEncodingSlash;
     private final int bufferSize;
+    private final int maxParameters;
+    private final boolean recordRequestStartTime;
 
 
 
@@ -89,6 +98,8 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
         this.maxEntitySize = undertowOptions.get(UndertowOptions.MAX_ENTITY_SIZE, UndertowOptions.DEFAULT_MAX_ENTITY_SIZE);
         this.allowEncodingSlash = undertowOptions.get(UndertowOptions.ALLOW_ENCODED_SLASH, false);
         this.decode = undertowOptions.get(UndertowOptions.DECODE_URL, true);
+        this.maxParameters = undertowOptions.get(UndertowOptions.MAX_PARAMETERS, UndertowOptions.DEFAULT_MAX_PARAMETERS);
+        this.recordRequestStartTime = undertowOptions.get(UndertowOptions.RECORD_REQUEST_START_TIME, false);
         if (undertowOptions.get(UndertowOptions.DECODE_URL, true)) {
             this.encoding = undertowOptions.get(UndertowOptions.URL_CHARSET, StandardCharsets.UTF_8.name());
         } else {
@@ -113,6 +124,9 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
         } catch (IOException e) {
             UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
             IoUtils.safeClose(channel);
+        } catch (Throwable t) {
+            UndertowLogger.REQUEST_IO_LOGGER.handleUnexpectedFailure(t);
+            IoUtils.safeClose(channel);
         }
     }
 
@@ -121,30 +135,57 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
         final Http2StreamSourceChannel dataChannel = frame;
         final Http2ServerConnection connection = new Http2ServerConnection(channel, dataChannel, undertowOptions, bufferSize, rootHandler);
 
-        if(!dataChannel.getHeaders().contains(SCHEME) ||
-                !dataChannel.getHeaders().contains(METHOD) ||
-                !dataChannel.getHeaders().contains(AUTHORITY) ||
-                !dataChannel.getHeaders().contains(PATH)) {
+        // Check request headers.
+        if (!checkRequestHeaders(dataChannel.getHeaders())) {
             channel.sendRstStream(frame.getStreamId(), Http2Channel.ERROR_PROTOCOL_ERROR);
             try {
                 Channels.drain(frame, Long.MAX_VALUE);
             } catch (IOException e) {
-                //ignore, this is expected because of the RST
+                // ignore, this is expected because of the RST
             }
             return;
         }
 
 
         final HttpServerExchange exchange = new HttpServerExchange(connection, dataChannel.getHeaders(), dataChannel.getResponseChannel().getHeaders(), maxEntitySize);
+        dataChannel.getResponseChannel().setTrailersProducer(new Http2DataStreamSinkChannel.TrailersProducer() {
+            @Override
+            public HeaderMap getTrailers() {
+                Supplier<HeaderMap> supplier = exchange.getAttachment(HttpAttachments.RESPONSE_TRAILER_SUPPLIER);
+                if(supplier != null) {
+                    return supplier.get();
+                }
+                return exchange.getAttachment(HttpAttachments.RESPONSE_TRAILERS);
+            }
+        });
+        dataChannel.setTrailersHandler(new Http2StreamSourceChannel.TrailersHandler() {
+            @Override
+            public void handleTrailers(HeaderMap headerMap) {
+                exchange.putAttachment(HttpAttachments.REQUEST_TRAILERS, headerMap);
+            }
+        });
         connection.setExchange(exchange);
         dataChannel.setMaxStreamSize(maxEntitySize);
         exchange.setRequestScheme(exchange.getRequestHeaders().getFirst(SCHEME));
         exchange.setProtocol(Protocols.HTTP_2_0);
         exchange.setRequestMethod(Methods.fromString(exchange.getRequestHeaders().getFirst(METHOD)));
         exchange.getRequestHeaders().put(Headers.HOST, exchange.getRequestHeaders().getFirst(AUTHORITY));
+        if(!Connectors.areRequestHeadersValid(exchange.getRequestHeaders())) {
+            UndertowLogger.REQUEST_IO_LOGGER.debugf("Invalid headers in HTTP/2 request, closing connection. Remote peer %s", connection.getPeerAddress());
+            channel.sendGoAway(Http2Channel.ERROR_PROTOCOL_ERROR);
+            return;
+        }
 
         final String path = exchange.getRequestHeaders().getFirst(PATH);
-        Connectors.setExchangeRequestPath(exchange, path, encoding, decode, allowEncodingSlash, decodeBuffer);
+        if(path == null || path.isEmpty()) {
+            UndertowLogger.REQUEST_IO_LOGGER.debugf("No :path header sent in HTTP/2 request, closing connection. Remote peer %s", connection.getPeerAddress());
+            channel.sendGoAway(Http2Channel.ERROR_PROTOCOL_ERROR);
+            return;
+        }
+
+        if (recordRequestStartTime) {
+            Connectors.setRequestStartTime(exchange);
+        }
         SSLSession session = channel.getSslSession();
         if(session != null) {
             connection.setSslSessionInfo(new Http2SslSessionInfo(channel));
@@ -169,6 +210,16 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
             connectorStatistics.setup(exchange);
         }
 
+        try {
+            Connectors.setExchangeRequestPath(exchange, path, encoding, decode, allowEncodingSlash, decodeBuffer, maxParameters);
+        } catch (ParameterLimitException e) {
+            //this can happen if max parameters is exceeded
+            UndertowLogger.REQUEST_IO_LOGGER.debug("Failed to set request path", e);
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+            exchange.endExchange();
+            return;
+        }
+
         //TODO: we should never actually put these into the map in the first place
         exchange.getRequestHeaders().remove(AUTHORITY);
         exchange.getRequestHeaders().remove(PATH);
@@ -185,30 +236,59 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
      *
      * @param initial The initial upgrade request that started the HTTP2 connection
      */
-    void handleInitialRequest(HttpServerExchange initial, Http2Channel channel) {
+    void handleInitialRequest(HttpServerExchange initial, Http2Channel channel, byte[] data) {
 
         //we have a request
         Http2HeadersStreamSinkChannel sink = channel.createInitialUpgradeResponseStream();
         final Http2ServerConnection connection = new Http2ServerConnection(channel, sink, undertowOptions, bufferSize, rootHandler);
+
 
         HeaderMap requestHeaders = new HeaderMap();
         for(HeaderValues hv : initial.getRequestHeaders()) {
             requestHeaders.putAll(hv.getHeaderName(), hv);
         }
         final HttpServerExchange exchange = new HttpServerExchange(connection, requestHeaders, sink.getHeaders(), maxEntitySize);
+        if(initial.getRequestHeaders().contains(Headers.EXPECT)) {
+            HttpContinue.markContinueResponseSent(exchange);
+        }
+        if(initial.getAttachment(HttpAttachments.REQUEST_TRAILERS) != null) {
+            exchange.putAttachment(HttpAttachments.REQUEST_TRAILERS, initial.getAttachment(HttpAttachments.REQUEST_TRAILERS));
+        }
+        Connectors.setRequestStartTime(initial, exchange);
         connection.setExchange(exchange);
         exchange.setRequestScheme(initial.getRequestScheme());
         exchange.setProtocol(initial.getProtocol());
         exchange.setRequestMethod(initial.getRequestMethod());
         exchange.setQueryString(initial.getQueryString());
+        if(data != null) {
+            Connectors.ungetRequestBytes(exchange, new ImmediatePooledByteBuffer(ByteBuffer.wrap(data)));
+        } else {
+            Connectors.terminateRequest(exchange);
+        }
         String uri = exchange.getQueryString().isEmpty() ? initial.getRequestURI() : initial.getRequestURI() + '?' + exchange.getQueryString();
-        Connectors.setExchangeRequestPath(exchange, uri, encoding, decode, allowEncodingSlash, decodeBuffer);
+        try {
+            Connectors.setExchangeRequestPath(exchange, uri, encoding, decode, allowEncodingSlash, decodeBuffer, maxParameters);
+        } catch (ParameterLimitException e) {
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+            exchange.endExchange();
+            return;
+        }
+        sink.setTrailersProducer(new Http2DataStreamSinkChannel.TrailersProducer() {
+            @Override
+            public HeaderMap getTrailers() {
+                Supplier<HeaderMap> supplier = exchange.getAttachment(HttpAttachments.RESPONSE_TRAILER_SUPPLIER);
+                if(supplier != null) {
+                    return supplier.get();
+                }
+                return exchange.getAttachment(HttpAttachments.RESPONSE_TRAILERS);
+            }
+        });
+
 
         SSLSession session = channel.getSslSession();
         if(session != null) {
             connection.setSslSessionInfo(new Http2SslSessionInfo(channel));
         }
-        Connectors.terminateRequest(exchange);
         sink.setCompletionListener(new ChannelListener<Http2DataStreamSinkChannel>() {
             @Override
             public void handleEvent(Http2DataStreamSinkChannel channel) {
@@ -218,4 +298,40 @@ public class Http2ReceiveListener implements ChannelListener<Http2Channel> {
         Connectors.executeRootHandler(rootHandler, exchange);
     }
 
+    /**
+     * Performs HTTP2 specification compliance check for headers and pseudo-headers of a current request.
+     *
+     * @param headers map of the request headers
+     * @return true if check was successful, false otherwise
+     */
+    private boolean checkRequestHeaders(HeaderMap headers) {
+        // :method pseudo-header must be present always exactly one time;
+        // HTTP2 request MUST NOT contain 'connection' header
+        if (headers.count(METHOD) != 1 || headers.contains(Headers.CONNECTION)) {
+            return false;
+        }
+
+        // if CONNECT type is used, then we expect :method and :authority to be present only;
+        // :scheme and :path must not be present
+        if (headers.get(METHOD).contains(Methods.CONNECT_STRING)) {
+            if (headers.contains(SCHEME) || headers.contains(PATH) || headers.count(AUTHORITY) != 1) {
+                return false;
+            }
+        // For other HTTP methods we expect that :scheme, :method, and :path pseudo-headers are
+        // present exactly one time.
+        } else if (headers.count(SCHEME) != 1 || headers.count(PATH) != 1) {
+            return false;
+        }
+
+        // HTTP2 request MAY contain TE header but if so, then only with 'trailers' value.
+        if (headers.contains(Headers.TE)) {
+            for (String value : headers.get(Headers.TE)) {
+                if (!value.equals("trailers")) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

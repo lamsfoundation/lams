@@ -30,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Handler that sets the peer address to the value of the X-Forwarded-For header.
@@ -41,6 +42,10 @@ import java.util.Set;
  */
 public class ProxyPeerAddressHandler implements HttpHandler {
 
+    private static final Pattern IP4_EXACT = Pattern.compile("(?:\\d{1,3}\\.){3}\\d{1,3}");
+
+    private static final Pattern IP6_EXACT = Pattern.compile("(?:[a-zA-Z0-9]{1,4}:){7}[a-zA-Z0-9]{1,4}");
+
     private final HttpHandler next;
 
     public ProxyPeerAddressHandler(HttpHandler next) {
@@ -51,61 +56,77 @@ public class ProxyPeerAddressHandler implements HttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String forwardedFor = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_FOR);
         if (forwardedFor != null) {
-            int index = forwardedFor.indexOf(',');
-            final String value;
-            if (index == -1) {
-                value = forwardedFor;
-            } else {
-                value = forwardedFor.substring(0, index);
-            }
+            String remoteClient = mostRecent(forwardedFor);
             //we have no way of knowing the port
-            exchange.setSourceAddress(InetSocketAddress.createUnresolved(value, 0));
+            if(IP4_EXACT.matcher(forwardedFor).matches()) {
+                exchange.setSourceAddress(new InetSocketAddress(NetworkUtils.parseIpv4Address(remoteClient), 0));
+            } else if(IP6_EXACT.matcher(forwardedFor).matches()) {
+                exchange.setSourceAddress(new InetSocketAddress(NetworkUtils.parseIpv6Address(remoteClient), 0));
+            } else {
+                exchange.setSourceAddress(InetSocketAddress.createUnresolved(remoteClient, 0));
+            }
         }
         String forwardedProto = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PROTO);
         if (forwardedProto != null) {
-            exchange.setRequestScheme(forwardedProto);
+            exchange.setRequestScheme(mostRecent(forwardedProto));
         }
         String forwardedHost = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_HOST);
         String forwardedPort = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PORT);
         if (forwardedHost != null) {
-            int index = forwardedHost.indexOf(',');
-            String value;
-            if (index == -1) {
-                value = forwardedHost;
-            } else {
-                value = forwardedHost.substring(0, index);
-            }
+            String value = mostRecent(forwardedHost);
             if(value.startsWith("[")) {
                 int end = value.lastIndexOf("]");
                 if(end == -1 ) {
                     end = 0;
                 }
-                index = value.indexOf(":", end);
+                int index = value.indexOf(":", end);
                 if(index != -1) {
                     forwardedPort = value.substring(index + 1);
                     value = value.substring(0, index);
                 }
             } else {
-                index = value.lastIndexOf(":");
+                int index = value.lastIndexOf(":");
                 if(index != -1) {
                     forwardedPort = value.substring(index + 1);
                     value = value.substring(0, index);
                 }
             }
-            int port = 80;
+            int port = 0;
+            String hostHeader = NetworkUtils.formatPossibleIpv6Address(value);
             if(forwardedPort != null) {
                 try {
-                    port = Integer.parseInt(forwardedPort);
+                    port = Integer.parseInt(mostRecent(forwardedPort));
+                    if(port > 0) {
+                        String scheme = exchange.getRequestScheme();
+
+                        if (!standardPort(port, scheme)) {
+                            hostHeader += ":" + port;
+                        }
+                    } else {
+                        UndertowLogger.REQUEST_LOGGER.debugf("Ignoring negative port: %s", forwardedPort);
+                    }
                 } catch (NumberFormatException ignore) {
                     UndertowLogger.REQUEST_LOGGER.debugf("Cannot parse port: %s", forwardedPort);
                 }
             }
+            exchange.getRequestHeaders().put(Headers.HOST, hostHeader);
             exchange.setDestinationAddress(InetSocketAddress.createUnresolved(value, port));
-            exchange.getRequestHeaders().put(Headers.HOST, NetworkUtils.formatPossibleIpv6Address(value) + ":" + port);
         }
         next.handleRequest(exchange);
     }
 
+    private String mostRecent(String header) {
+        int index = header.indexOf(',');
+        if (index == -1) {
+            return header;
+        } else {
+            return header.substring(0, index);
+        }
+    }
+
+    private static boolean standardPort(int port, String scheme) {
+        return (port == 80 && "http".equals(scheme)) || (port == 443 && "https".equals(scheme));
+    }
 
     public static class Builder implements HandlerBuilder {
 

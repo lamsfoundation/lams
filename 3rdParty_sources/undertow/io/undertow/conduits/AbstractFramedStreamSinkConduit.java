@@ -127,15 +127,12 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
                 buffers[count++] = frame.data[i];
             }
         }
-        long totalData = queuedData;
-        long userData = 0;
+
         if (additionalData != null) {
             for (int i = offs; i < offs + len; ++i) {
                 buffers[count++] = additionalData[i];
-                userData += additionalData[i].remaining();
             }
         }
-        totalData += userData;
         try {
             long written = next.write(buffers, 0, buffers.length);
             if (written > this.queuedData) {
@@ -164,13 +161,14 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
             }
             return toAllocate;
 
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException | Error e) {
+            IOException ioe = e instanceof IOException ? (IOException) e : new IOException(e);
             //on exception we fail every item in the frame queue
             try {
                 for (Frame frame : frameQueue) {
                     FrameCallBack cb = frame.callback;
                     if (cb != null) {
-                        cb.failed(e);
+                        cb.failed(ioe);
                     }
                 }
                 frameQueue.clear();
@@ -262,7 +260,7 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
 
     }
 
-    private class Frame {
+    private static class Frame {
 
         final FrameCallBack callback;
         final ByteBuffer[] data;
@@ -279,7 +277,7 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
         }
     }
 
-    protected class PooledBufferFrameCallback implements FrameCallBack {
+    protected static class PooledBufferFrameCallback implements FrameCallBack {
 
         private final PooledByteBuffer buffer;
 
@@ -299,7 +297,7 @@ public class AbstractFramedStreamSinkConduit extends AbstractStreamSinkConduit<S
     }
 
 
-    protected class PooledBuffersFrameCallback implements FrameCallBack {
+    protected static class PooledBuffersFrameCallback implements FrameCallBack {
 
         private final PooledByteBuffer[] buffers;
 

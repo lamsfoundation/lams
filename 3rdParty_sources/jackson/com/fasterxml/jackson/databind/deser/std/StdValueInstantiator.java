@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 import com.fasterxml.jackson.databind.deser.*;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedWithParams;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 /**
  * Default {@link ValueInstantiator} implementation, which supports
@@ -26,6 +27,11 @@ public class StdValueInstantiator
      * for error reporting purposes.
      */
     protected final String _valueTypeDesc;
+
+    /**
+     * @since 2.8
+     */
+    protected final Class<?> _valueClass;
 
     // // // Default (no-args) construction
 
@@ -69,12 +75,18 @@ public class StdValueInstantiator
     /**********************************************************
      */
 
+    /**
+     * @deprecated Since 2.7 use constructor that takes {@link JavaType} instead
+     */
+    @Deprecated
     public StdValueInstantiator(DeserializationConfig config, Class<?> valueType) {
-        _valueTypeDesc = (valueType == null) ? "UNKNOWN TYPE" : valueType.getName();
+        _valueTypeDesc = ClassUtil.nameOf(valueType);
+        _valueClass = (valueType == null) ? Object.class : valueType;
     }
 
     public StdValueInstantiator(DeserializationConfig config, JavaType valueType) {
         _valueTypeDesc = (valueType == null) ? "UNKNOWN TYPE" : valueType.toString();
+        _valueClass = (valueType == null) ? Object.class : valueType.getRawClass();
     }
 
     /**
@@ -84,6 +96,7 @@ public class StdValueInstantiator
     protected StdValueInstantiator(StdValueInstantiator src)
     {
         _valueTypeDesc = src._valueTypeDesc;
+        _valueClass = src._valueClass;
 
         _defaultCreator = src._defaultCreator;
 
@@ -166,7 +179,12 @@ public class StdValueInstantiator
     public String getValueTypeDesc() {
         return _valueTypeDesc;
     }
-    
+
+    @Override
+    public Class<?> getValueClass() {
+        return _valueClass;
+    }
+
     @Override
     public boolean canCreateFromString() {
         return (_fromStringCreator != null);
@@ -191,7 +209,7 @@ public class StdValueInstantiator
     public boolean canCreateFromBoolean() {
         return (_fromBooleanCreator != null);
     }
-    
+
     @Override
     public boolean canCreateUsingDefault() {
         return (_defaultCreator != null);
@@ -199,17 +217,26 @@ public class StdValueInstantiator
 
     @Override
     public boolean canCreateUsingDelegate() {
-        return _delegateType != null;
+        return (_delegateType != null);
     }
 
     @Override
     public boolean canCreateUsingArrayDelegate() {
-        return _arrayDelegateType != null;
+        return (_arrayDelegateType != null);
     }
-    
+
     @Override
     public boolean canCreateFromObjectWith() {
         return (_withArgsCreator != null);
+    }
+
+    @Override
+    public boolean canInstantiate() {
+        return canCreateUsingDefault()
+                || canCreateUsingDelegate() || canCreateUsingArrayDelegate()
+                || canCreateFromObjectWith() || canCreateFromString()
+                || canCreateFromInt() || canCreateFromLong()
+                || canCreateFromDouble() || canCreateFromBoolean();
     }
 
     @Override
@@ -237,44 +264,52 @@ public class StdValueInstantiator
     public Object createUsingDefault(DeserializationContext ctxt) throws IOException
     {
         if (_defaultCreator == null) { // sanity-check; caller should check
-            throw new IllegalStateException("No default constructor for "+getValueTypeDesc());
+            return super.createUsingDefault(ctxt);
         }
         try {
             return _defaultCreator.call();
-        } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
+        } catch (Exception e) { // 19-Apr-2017, tatu: Let's not catch Errors, just Exceptions
+            return ctxt.handleInstantiationProblem(_valueClass, null, rewrapCtorProblem(ctxt, e));
         }
     }
-    
+
     @Override
     public Object createFromObjectWith(DeserializationContext ctxt, Object[] args) throws IOException
     {
         if (_withArgsCreator == null) { // sanity-check; caller should check
-            throw new IllegalStateException("No with-args constructor for "+getValueTypeDesc());
+            return super.createFromObjectWith(ctxt, args);
         }
         try {
             return _withArgsCreator.call(args);
-        } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
+        } catch (Exception e) { // 19-Apr-2017, tatu: Let's not catch Errors, just Exceptions
+            return ctxt.handleInstantiationProblem(_valueClass, args, rewrapCtorProblem(ctxt, e));
         }
     }
 
     @Override
     public Object createUsingDelegate(DeserializationContext ctxt, Object delegate) throws IOException
     {
+        // 04-Oct-2016, tatu: Need delegation to work around [databind#1392]...
+        if (_delegateCreator == null) {
+            if (_arrayDelegateCreator != null) {
+                return _createUsingDelegate(_arrayDelegateCreator, _arrayDelegateArguments, ctxt, delegate);
+            }
+        }
         return _createUsingDelegate(_delegateCreator, _delegateArguments, ctxt, delegate);
     }
 
     @Override
     public Object createUsingArrayDelegate(DeserializationContext ctxt, Object delegate) throws IOException
     {
-        if (_arrayDelegateCreator == null) { // sanity-check; caller should check
-            // fallback to the classic delegate creator
-            return createUsingDelegate(ctxt, delegate);
+        if (_arrayDelegateCreator == null) {
+            if (_delegateCreator != null) { // sanity-check; caller should check
+                // fallback to the classic delegate creator
+                return createUsingDelegate(ctxt, delegate);
+            }
         }
         return _createUsingDelegate(_arrayDelegateCreator, _arrayDelegateArguments, ctxt, delegate);
     }
-    
+
     /*
     /**********************************************************
     /* Public API implementation; instantiation from JSON scalars
@@ -290,41 +325,49 @@ public class StdValueInstantiator
         try {
             return _fromStringCreator.call1(value);
         } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
+            return ctxt.handleInstantiationProblem(_fromStringCreator.getDeclaringClass(),
+                    value, rewrapCtorProblem(ctxt, t));
         }
     }
     
     @Override
     public Object createFromInt(DeserializationContext ctxt, int value) throws IOException
     {
-        try {
-            // First: "native" int methods work best:
-            if (_fromIntCreator != null) {
-                return _fromIntCreator.call1(Integer.valueOf(value));
+        // First: "native" int methods work best:
+        if (_fromIntCreator != null) {
+            Object arg = Integer.valueOf(value);
+            try {
+                return _fromIntCreator.call1(arg);
+            } catch (Throwable t0) {
+                return ctxt.handleInstantiationProblem(_fromIntCreator.getDeclaringClass(),
+                        arg, rewrapCtorProblem(ctxt, t0));
             }
-            // but if not, can do widening conversion
-            if (_fromLongCreator != null) {
-                return _fromLongCreator.call1(Long.valueOf(value));
-            }
-        } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
         }
-        throw ctxt.mappingException("Can not instantiate value of type %s from Integral number (%s); no single-int-arg constructor/factory method",
-                getValueTypeDesc(), value);
+        // but if not, can do widening conversion
+        if (_fromLongCreator != null) {
+            Object arg = Long.valueOf(value);
+            try {
+                return _fromLongCreator.call1(arg);
+            } catch (Throwable t0) {
+                return ctxt.handleInstantiationProblem(_fromLongCreator.getDeclaringClass(),
+                        arg, rewrapCtorProblem(ctxt, t0));
+            }
+        }
+        return super.createFromInt(ctxt, value);
     }
 
     @Override
     public Object createFromLong(DeserializationContext ctxt, long value) throws IOException
     {
         if (_fromLongCreator == null) {
-            throw ctxt.mappingException("Can not instantiate value of type %s"
-                    +" from Long integral number (%s); no single-long-arg constructor/factory method",
-                    getValueTypeDesc(), value);
+            return super.createFromLong(ctxt, value);
         }
+        Object arg = Long.valueOf(value);
         try {
-            return _fromLongCreator.call1(Long.valueOf(value));
-        } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
+            return _fromLongCreator.call1(arg);
+        } catch (Throwable t0) {
+            return ctxt.handleInstantiationProblem(_fromLongCreator.getDeclaringClass(),
+                    arg, rewrapCtorProblem(ctxt, t0));
         }
     }
 
@@ -332,14 +375,14 @@ public class StdValueInstantiator
     public Object createFromDouble(DeserializationContext ctxt, double value) throws IOException
     {
         if (_fromDoubleCreator == null) {
-            throw ctxt.mappingException("Can not instantiate value of type %s"
-                    +" from Floating-point number (%s); no one-double/Double-arg constructor/factory method",
-                    getValueTypeDesc(), value);
+            return super.createFromDouble(ctxt, value);
         }
+        Object arg = Double.valueOf(value);
         try {
-            return _fromDoubleCreator.call1(Double.valueOf(value));
-        } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
+            return _fromDoubleCreator.call1(arg);
+        } catch (Throwable t0) {
+            return ctxt.handleInstantiationProblem(_fromDoubleCreator.getDeclaringClass(),
+                    arg, rewrapCtorProblem(ctxt, t0));
         }
     }
 
@@ -347,14 +390,14 @@ public class StdValueInstantiator
     public Object createFromBoolean(DeserializationContext ctxt, boolean value) throws IOException
     {
         if (_fromBooleanCreator == null) {
-            throw ctxt.mappingException("Can not instantiate value of type %s"
-                    +" from Boolean value (%s); no single-boolean/Boolean-arg constructor/factory method",
-                    getValueTypeDesc(), value);
+            return super.createFromBoolean(ctxt, value);
         }
+        final Boolean arg = Boolean.valueOf(value);
         try {
-            return _fromBooleanCreator.call1(Boolean.valueOf(value));
-        } catch (Throwable t) {
-            throw rewrapCtorProblem(ctxt, t);
+            return _fromBooleanCreator.call1(arg);
+        } catch (Throwable t0) {
+            return ctxt.handleInstantiationProblem(_fromBooleanCreator.getDeclaringClass(),
+                    arg, rewrapCtorProblem(ctxt, t0));
         }
     }
     
@@ -425,9 +468,7 @@ public class StdValueInstantiator
                 return (JsonMappingException) curr;
             }
         }
-        String msg = String.format("Instantiation of %s value failed (%s): %s",
-                getValueTypeDesc(), t.getClass().getName(), t.getMessage());
-        return JsonMappingException.from(ctxt.getParser(), msg, t);
+        return ctxt.instantiationException(getValueClass(), t);
     }
 
     /**
@@ -440,9 +481,7 @@ public class StdValueInstantiator
         if (t instanceof JsonMappingException) {
             return (JsonMappingException) t;
         }
-        String msg = String.format("Instantiation of %s value failed (%s): %s",
-                getValueTypeDesc(), t.getClass().getName(), t.getMessage());
-        return JsonMappingException.from(ctxt.getParser(), msg, t);
+        return ctxt.instantiationException(getValueClass(), t);
     }
 
     /**

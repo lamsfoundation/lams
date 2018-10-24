@@ -30,13 +30,15 @@ import java.util.List;
  * {@code false}.
  *
  * @since 1.0
- *
+ * @version $Id: AndFileFilter.java 1642757 2014-12-01 21:09:30Z sebb $
  *
  * @see FileFilterUtils#and(IOFileFilter...)
  */
 public class AndFileFilter
         extends AbstractFileFilter
         implements ConditionalFileFilter, Serializable {
+
+    private static final long serialVersionUID = 7215974688563965257L;
 
     /** The list of file filters. */
     private final List<IOFileFilter> fileFilters;
@@ -72,7 +74,7 @@ public class AndFileFilter
      * @param filter2  the second filter, must not be null
      * @throws IllegalArgumentException if either filter is null
      */
-    public AndFileFilter(IOFileFilter filter1, IOFileFilter filter2) {
+    public AndFileFilter(final IOFileFilter filter1, final IOFileFilter filter2) {
         if (filter1 == null || filter2 == null) {
             throw new IllegalArgumentException("The filters must not be null");
         }
@@ -118,7 +120,7 @@ public class AndFileFilter
         if (this.fileFilters.isEmpty()) {
             return false;
         }
-        for (IOFileFilter fileFilter : fileFilters) {
+        for (final IOFileFilter fileFilter : fileFilters) {
             if (!fileFilter.accept(file)) {
                 return false;
             }
@@ -134,7 +136,7 @@ public class AndFileFilter
         if (this.fileFilters.isEmpty()) {
             return false;
         }
-        for (IOFileFilter fileFilter : fileFilters) {
+        for (final IOFileFilter fileFilter : fileFilters) {
             if (!fileFilter.accept(file, name)) {
                 return false;
             }
@@ -149,7 +151,7 @@ public class AndFileFilter
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(super.toString());
         buffer.append("(");
         if (fileFilters != null) {
@@ -157,7 +159,7 @@ public class AndFileFilter
                 if (i > 0) {
                     buffer.append(",");
                 }
-                Object filter = fileFilters.get(i);
+                final Object filter = fileFilters.get(i);
                 buffer.append(filter == null ? "null" : filter.toString());
             }
         }

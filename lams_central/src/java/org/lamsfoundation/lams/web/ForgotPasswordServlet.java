@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDGenerator;
@@ -276,10 +277,11 @@ public class ForgotPasswordServlet extends HttpServlet {
      * Generates the unique key used for the forgot password request
      *
      * @return a unique key
+     * @throws HibernateException 
      * @throws FileUtilException
      * @throws IOException
      */
-    public static String generateUniqueKey() {
+    public static String generateUniqueKey() throws HibernateException {
 	Properties props = new Properties();
 
 	IdentifierGenerator uuidGen = new UUIDGenerator();

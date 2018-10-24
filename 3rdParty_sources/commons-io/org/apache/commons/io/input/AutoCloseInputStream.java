@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,7 +33,7 @@ import java.io.InputStream;
  * closing the stream when no longer needed) or the underlying stream (by not
  * releasing resources once the last byte has been read) do not do that.
  *
- *
+ * @version $Id: AutoCloseInputStream.java 1586350 2014-04-10 15:57:20Z ggregory $
  * @since 1.4
  */
 public class AutoCloseInputStream extends ProxyInputStream {
@@ -41,7 +43,7 @@ public class AutoCloseInputStream extends ProxyInputStream {
      *
      * @param in underlying input stream
      */
-    public AutoCloseInputStream(InputStream in) {
+    public AutoCloseInputStream(final InputStream in) {
         super(in);
     }
 
@@ -72,8 +74,8 @@ public class AutoCloseInputStream extends ProxyInputStream {
      * @since 2.0
      */
     @Override
-    protected void afterRead(int n) throws IOException {
-        if (n == -1) {
+    protected void afterRead(final int n) throws IOException {
+        if (n == EOF) {
             close();
         }
     }

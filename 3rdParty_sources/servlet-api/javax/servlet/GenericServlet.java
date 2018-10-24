@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -230,7 +230,7 @@ public abstract class GenericServlet
      * <code>super.init(config)</code>.
      *
      * @param config 			the <code>ServletConfig</code> object
-     *					that contains configutation
+     *					that contains configuration
      *					information for this servlet
      *
      * @exception ServletException 	if an exception occurs that

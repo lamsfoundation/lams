@@ -27,7 +27,7 @@ import org.apache.commons.io.IOCase;
  * <p>
  * This comparator can be used to sort lists or arrays of files
  * by their name either in a case-sensitive, case-insensitive or
- * system dependant case sensitive way. A number of singleton instances
+ * system dependent case sensitive way. A number of singleton instances
  * are provided for the various case sensitivity options (using {@link IOCase})
  * and the reverse of those options.
  * <p>
@@ -35,21 +35,23 @@ import org.apache.commons.io.IOCase;
  * {@link #NAME_COMPARATOR} singleton instance:
  * <pre>
  *       List&lt;File&gt; list = ...
- *       NameFileComparator.NAME_COMPARATOR.sort(list);
+ *       ((AbstractFileComparator) NameFileComparator.NAME_COMPARATOR).sort(list);
  * </pre>
  * <p>
  * Example of a <i>reverse case-insensitive</i> file name sort using the
  * {@link #NAME_INSENSITIVE_REVERSE} singleton instance:
  * <pre>
  *       File[] array = ...
- *       NameFileComparator.NAME_INSENSITIVE_REVERSE.sort(array);
+ *       ((AbstractFileComparator) NameFileComparator.NAME_INSENSITIVE_REVERSE).sort(array);
  * </pre>
  * <p>
  *
- *
+ * @version $Id: NameFileComparator.java 1642757 2014-12-01 21:09:30Z sebb $
  * @since 1.4
  */
 public class NameFileComparator extends AbstractFileComparator implements Serializable {
+
+    private static final long serialVersionUID = 8397947749814525798L;
 
     /** Case-sensitive name comparator instance (see {@link IOCase#SENSITIVE}) */
     public static final Comparator<File> NAME_COMPARATOR = new NameFileComparator();
@@ -84,7 +86,7 @@ public class NameFileComparator extends AbstractFileComparator implements Serial
      *
      * @param caseSensitivity  how to handle case sensitivity, null means case-sensitive
      */
-    public NameFileComparator(IOCase caseSensitivity) {
+    public NameFileComparator(final IOCase caseSensitivity) {
         this.caseSensitivity = caseSensitivity == null ? IOCase.SENSITIVE : caseSensitivity;
     }
 
@@ -98,7 +100,7 @@ public class NameFileComparator extends AbstractFileComparator implements Serial
      * same and a positive value if the first files name
      * is greater than the second file.
      */
-    public int compare(File file1, File file2) {
+    public int compare(final File file1, final File file2) {
         return caseSensitivity.checkCompareTo(file1.getName(), file2.getName());
     }
 

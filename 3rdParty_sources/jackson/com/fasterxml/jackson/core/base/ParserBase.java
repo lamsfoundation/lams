@@ -3,6 +3,7 @@ package com.fasterxml.jackson.core.base;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.IOContext;
@@ -170,59 +171,6 @@ public abstract class ParserBase extends ParserMinimalBase
      */
     protected byte[] _binaryValue;
 
-    /*
-    /**********************************************************
-    /* Constants and fields of former 'JsonNumericParserBase'
-    /**********************************************************
-     */
-
-    final protected static int NR_UNKNOWN = 0;
-
-    // First, integer types
-
-    final protected static int NR_INT = 0x0001;
-    final protected static int NR_LONG = 0x0002;
-    final protected static int NR_BIGINT = 0x0004;
-
-    // And then floating point types
-
-    final protected static int NR_DOUBLE = 0x008;
-    final protected static int NR_BIGDECIMAL = 0x0010;
-
-    // Also, we need some numeric constants
-
-    final static BigInteger BI_MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
-    final static BigInteger BI_MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
-
-    final static BigInteger BI_MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
-    final static BigInteger BI_MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
-    
-    final static BigDecimal BD_MIN_LONG = new BigDecimal(BI_MIN_LONG);
-    final static BigDecimal BD_MAX_LONG = new BigDecimal(BI_MAX_LONG);
-
-    final static BigDecimal BD_MIN_INT = new BigDecimal(BI_MIN_INT);
-    final static BigDecimal BD_MAX_INT = new BigDecimal(BI_MAX_INT);
-
-    final static long MIN_INT_L = (long) Integer.MIN_VALUE;
-    final static long MAX_INT_L = (long) Integer.MAX_VALUE;
-
-    // These are not very accurate, but have to do... (for bounds checks)
-
-    final static double MIN_LONG_D = (double) Long.MIN_VALUE;
-    final static double MAX_LONG_D = (double) Long.MAX_VALUE;
-
-    final static double MIN_INT_D = (double) Integer.MIN_VALUE;
-    final static double MAX_INT_D = (double) Integer.MAX_VALUE;
-
-    // Digits, numeric
-    final protected static int INT_0 = '0';
-    final protected static int INT_9 = '9';
-
-    final protected static int INT_MINUS = '-';
-    final protected static int INT_PLUS = '+';
-
-    final protected static char CHAR_NULL = '\0';
-    
     // Numeric value holders: multiple fields used for
     // for efficiency
 
@@ -410,9 +358,11 @@ public abstract class ParserBase extends ParserMinimalBase
             throw new IllegalStateException(e);
         }
     }
-    
+
     @Override public void close() throws IOException {
         if (!_closed) {
+            // 19-Jan-2018, tatu: as per [core#440] need to ensure no more data assumed available
+            _inputPtr = Math.max(_inputPtr, _inputEnd);
             _closed = true;
             try {
                 _closeInput();
@@ -434,7 +384,7 @@ public abstract class ParserBase extends ParserMinimalBase
      */
     @Override
     public JsonLocation getTokenLocation() {
-        return new JsonLocation(_ioContext.getSourceReference(),
+        return new JsonLocation(_getSourceReference(),
                 -1L, getTokenCharacterOffset(), // bytes, chars
                 getTokenLineNr(),
                 getTokenColumnNr());
@@ -447,7 +397,7 @@ public abstract class ParserBase extends ParserMinimalBase
     @Override
     public JsonLocation getCurrentLocation() {
         int col = _inputPtr - _currInputRowStart + 1; // 1-based
-        return new JsonLocation(_ioContext.getSourceReference(),
+        return new JsonLocation(_getSourceReference(),
                 -1L, _currInputProcessed + _inputPtr, // bytes, chars
                 _currInputRow, col);
     }
@@ -464,9 +414,6 @@ public abstract class ParserBase extends ParserMinimalBase
         if (_currToken == JsonToken.FIELD_NAME) { return _nameCopied; }
         return false;
     }
-
-    // No embedded objects with base impl...
-    @Override public Object getEmbeddedObject() throws IOException { return null; }
 
     @SuppressWarnings("resource")
     @Override // since 2.7
@@ -499,22 +446,10 @@ public abstract class ParserBase extends ParserMinimalBase
 
     /*
     /**********************************************************
-    /* Low-level reading, other
+    /* Abstract methods for sub-classes to implement
     /**********************************************************
      */
 
-    protected final void loadMoreGuaranteed() throws IOException {
-        if (!loadMore()) { _reportInvalidEOF(); }
-    }
-    
-    /*
-    /**********************************************************
-    /* Abstract methods needed from sub-classes
-    /**********************************************************
-     */
-
-    protected abstract boolean loadMore() throws IOException;
-    protected abstract void _finishString() throws IOException;
     protected abstract void _closeInput() throws IOException;
     
     /*
@@ -546,7 +481,12 @@ public abstract class ParserBase extends ParserMinimalBase
     @Override
     protected void _handleEOF() throws JsonParseException {
         if (!_parsingContext.inRoot()) {
-            _reportInvalidEOF(": expected close marker for "+_parsingContext.getTypeDesc()+" (from "+_parsingContext.getStartLocation(_ioContext.getSourceReference())+")");
+            String marker = _parsingContext.inArray() ? "Array" : "Object";
+            _reportInvalidEOF(String.format(
+                    ": expected close marker for %s (start marker at %s)",
+                    marker,
+                    _parsingContext.getStartLocation(_getSourceReference())),
+                    null);
         }
     }
 
@@ -556,17 +496,6 @@ public abstract class ParserBase extends ParserMinimalBase
     protected final int _eofAsNextChar() throws JsonParseException {
         _handleEOF();
         return -1;
-    }
-    
-    /*
-    /**********************************************************
-    /* Internal/package methods: Error reporting
-    /**********************************************************
-     */
-    
-    protected void _reportMismatchedEndMarker(int actCh, char expCh) throws JsonParseException {
-        String startDesc = ""+_parsingContext.getStartLocation(_ioContext.getSourceReference());
-        _reportError("Unexpected close marker '"+((char) actCh)+"': expected '"+expCh+"' (for "+_parsingContext.getTypeDesc()+" starting at "+startDesc+")");
     }
 
     /*
@@ -628,7 +557,19 @@ public abstract class ParserBase extends ParserMinimalBase
         _numTypesValid = NR_DOUBLE;
         return JsonToken.VALUE_NUMBER_FLOAT;
     }
-    
+
+    @Override
+    public boolean isNaN() {
+        if (_currToken == JsonToken.VALUE_NUMBER_FLOAT) {
+            if ((_numTypesValid & NR_DOUBLE) != 0) {
+                // 10-Mar-2017, tatu: Alas, `Double.isFinite(d)` only added in JDK 8
+                double d = _numberDouble;
+                return Double.isNaN(d) || Double.isInfinite(d);              
+            }
+        }
+        return false;
+    }
+
     /*
     /**********************************************************
     /* Numeric accessors of public API
@@ -800,24 +741,17 @@ public abstract class ParserBase extends ParserMinimalBase
     {
         // Int or float?
         if (_currToken == JsonToken.VALUE_NUMBER_INT) {
-            char[] buf = _textBuffer.getTextBuffer();
-            int offset = _textBuffer.getTextOffset();
             int len = _intLength;
-            if (_numberNegative) {
-                ++offset;
-            }
-            if (len <= 9) { // definitely fits in int
-                int i = NumberInput.parseInt(buf, offset, len);
-                _numberInt = _numberNegative ? -i : i;
+            // First: optimization for simple int
+            if (len <= 9) { 
+                int i = _textBuffer.contentsAsInt(_numberNegative);
+                _numberInt = i;
                 _numTypesValid = NR_INT;
                 return;
             }
             if (len <= 18) { // definitely fits AND is easy to parse using 2 int parse calls
-                long l = NumberInput.parseLong(buf, offset, len);
-                if (_numberNegative) {
-                    l = -l;
-                }
-                // [JACKSON-230] Could still fit in int, need to check
+                long l = _textBuffer.contentsAsLong(_numberNegative);
+                // Might still fit in int, need to check
                 if (len == 10) {
                     if (_numberNegative) {
                         if (l >= MIN_INT_L) {
@@ -837,14 +771,14 @@ public abstract class ParserBase extends ParserMinimalBase
                 _numTypesValid = NR_LONG;
                 return;
             }
-            _parseSlowInt(expType, buf, offset, len);
+            _parseSlowInt(expType);
             return;
         }
         if (_currToken == JsonToken.VALUE_NUMBER_FLOAT) {
             _parseSlowFloat(expType);
             return;
         }
-        _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
+        _reportError("Current token (%s) not numeric, can not use numeric value accessors", _currToken);
     }
 
     /**
@@ -853,24 +787,15 @@ public abstract class ParserBase extends ParserMinimalBase
     protected int _parseIntValue() throws IOException
     {
         // Inlined variant of: _parseNumericValue(NR_INT)
-
         if (_currToken == JsonToken.VALUE_NUMBER_INT) {
-            char[] buf = _textBuffer.getTextBuffer();
-            int offset = _textBuffer.getTextOffset();
-            int len = _intLength;
-            if (_numberNegative) {
-                ++offset;
-            }
-            if (len <= 9) {
-                int i = NumberInput.parseInt(buf, offset, len);
-                if (_numberNegative) {
-                    i = -i;
-                }
+            if (_intLength <= 9) {
+                int i = _textBuffer.contentsAsInt(_numberNegative);
                 _numberInt = i;
                 _numTypesValid = NR_INT;
                 return i;
             }
         }
+        // if not optimizable, use more generic
         _parseNumericValue(NR_INT);
         if ((_numTypesValid & NR_INT) == 0) {
             convertNumberToInt();
@@ -902,11 +827,17 @@ public abstract class ParserBase extends ParserMinimalBase
         }
     }
     
-    private void _parseSlowInt(int expType, char[] buf, int offset, int len) throws IOException
+    private void _parseSlowInt(int expType) throws IOException
     {
         String numStr = _textBuffer.contentsAsString();
         try {
-            // [JACKSON-230] Some long cases still...
+            int len = _intLength;
+            char[] buf = _textBuffer.getTextBuffer();
+            int offset = _textBuffer.getTextOffset();
+            if (_numberNegative) {
+                ++offset;
+            }
+            // Some long cases still...
             if (NumberInput.inLongRange(buf, offset, len, _numberNegative)) {
                 // Probably faster to construct a String, call parse, than to use BigInteger
                 _numberLong = Long.parseLong(numStr);
@@ -1038,9 +969,8 @@ public abstract class ParserBase extends ParserMinimalBase
          */
     
         if ((_numTypesValid & NR_DOUBLE) != 0) {
-            /* Let's actually parse from String representation,
-             * to avoid rounding errors that non-decimal floating operations
-             * would incur
+            /* Let's actually parse from String representation, to avoid
+             * rounding errors that non-decimal floating operations could incur
              */
             _numberBigDecimal = NumberInput.parseBigDecimal(getText());
         } else if ((_numTypesValid & NR_BIGINT) != 0) {
@@ -1054,32 +984,19 @@ public abstract class ParserBase extends ParserMinimalBase
         }
         _numTypesValid |= NR_BIGDECIMAL;
     }
-    
+
     /*
     /**********************************************************
-    /* Number handling exceptions
+    /* Internal/package methods: Error reporting
     /**********************************************************
-     */    
-    
-    protected void reportUnexpectedNumberChar(int ch, String comment) throws JsonParseException {
-        String msg = "Unexpected character ("+_getCharDesc(ch)+") in numeric value";
-        if (comment != null) {
-            msg += ": "+comment;
-        }
-        _reportError(msg);
-    }
-    
-    protected void reportInvalidNumber(String msg) throws JsonParseException {
-        _reportError("Invalid numeric value: "+msg);
-    }
+     */
 
-    protected void reportOverflowInt() throws IOException {
-        _reportError("Numeric value ("+getText()+") out of range of int ("+Integer.MIN_VALUE+" - "+Integer.MAX_VALUE+")");
+    protected void _reportMismatchedEndMarker(int actCh, char expCh) throws JsonParseException {
+        JsonReadContext ctxt = getParsingContext();
+        _reportError(String.format(
+                "Unexpected close marker '%s': expected '%c' (for %s starting at %s)",
+                (char) actCh, expCh, ctxt.typeDesc(), ctxt.getStartLocation(_getSourceReference())));
     }
-    
-    protected void reportOverflowLong() throws IOException {
-        _reportError("Numeric value ("+getText()+") out of range of long ("+Long.MIN_VALUE+" - "+Long.MAX_VALUE+")");
-    }    
 
     /*
     /**********************************************************
@@ -1119,7 +1036,6 @@ public abstract class ParserBase extends ParserMinimalBase
     
     protected final int _decodeBase64Escape(Base64Variant b64variant, char ch, int index) throws IOException
     {
-        // 17-May-2011, tatu: As per [JACKSON-xxx], need to handle escaped chars
         if (ch != '\\') {
             throw reportInvalidBase64Char(b64variant, ch, index);
         }
@@ -1149,7 +1065,8 @@ public abstract class ParserBase extends ParserMinimalBase
     protected IllegalArgumentException reportInvalidBase64Char(Base64Variant b64variant, int ch, int bindex, String msg) throws IllegalArgumentException {
         String base;
         if (ch <= INT_SPACE) {
-            base = "Illegal white space character (code 0x"+Integer.toHexString(ch)+") as character #"+(bindex+1)+" of 4-char base64 unit: can only used between units";
+            base = String.format("Illegal white space character (code 0x%s) as character #%d of 4-char base64 unit: can only used between units",
+                    Integer.toHexString(ch), (bindex+1));
         } else if (b64variant.usesPaddingChar(ch)) {
             base = "Unexpected padding character ('"+b64variant.getPaddingChar()+"') as character #"+(bindex+1)+" of 4-char base64 unit: padding only legal as 3rd or 4th character";
         } else if (!Character.isDefined(ch) || Character.isISOControl(ch)) {
@@ -1163,4 +1080,49 @@ public abstract class ParserBase extends ParserMinimalBase
         }
         return new IllegalArgumentException(base);
     }
+
+    /*
+    /**********************************************************
+    /* Internal/package methods: other
+    /**********************************************************
+     */
+
+    /**
+     * Helper method used to encapsulate logic of including (or not) of
+     * "source reference" when constructing {@link JsonLocation} instances.
+     *
+     * @since 2.9
+     */
+    protected Object _getSourceReference() {
+        if (JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION.enabledIn(_features)) {
+            return _ioContext.getSourceReference();
+        }
+        return null;
+    }
+
+    protected static int[] growArrayBy(int[] arr, int more)
+    {
+        if (arr == null) {
+            return new int[more];
+        }
+        return Arrays.copyOf(arr, arr.length + more);
+    }
+    
+    /*
+    /**********************************************************
+    /* Stuff that was abstract and required before 2.8, but that
+    /* is not mandatory in 2.8 or above.
+    /**********************************************************
+     */
+
+    @Deprecated // since 2.8
+    protected void loadMoreGuaranteed() throws IOException {
+        if (!loadMore()) { _reportInvalidEOF(); }
+    }
+
+    @Deprecated // since 2.8
+    protected boolean loadMore() throws IOException { return false; }
+
+    // Can't declare as deprecated, for now, but shouldn't be needed
+    protected void _finishString() throws IOException { }
 }

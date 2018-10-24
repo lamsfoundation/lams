@@ -3,7 +3,12 @@ package com.fasterxml.jackson.databind.introspect;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.databind.*;
+
 import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.util.BeanUtil;
@@ -52,6 +57,11 @@ public class POJOPropertiesCollector
     protected final AnnotationIntrospector _annotationIntrospector;
 
     /**
+     * @since 2.9
+     */
+    protected final boolean _useAnnotations;
+
+    /**
      * Prefix used by auto-detected mutators ("setters"): usually "set",
      * but differs for builder objects ("with" by default).
      */
@@ -78,16 +88,20 @@ public class POJOPropertiesCollector
      */
     protected LinkedHashMap<String, POJOPropertyBuilder> _properties;
 
-    protected LinkedList<POJOPropertyBuilder> _creatorProperties ;
+    protected LinkedList<POJOPropertyBuilder> _creatorProperties;
     
     protected LinkedList<AnnotatedMember> _anyGetters;
 
     protected LinkedList<AnnotatedMethod> _anySetters;
+    
+    protected LinkedList<AnnotatedMember> _anySetterField;
 
     /**
      * Method(s) marked with 'JsonValue' annotation
+     *<p>
+     * NOTE: before 2.9, was `AnnotatedMethod`; with 2.9 allows fields too
      */
-    protected LinkedList<AnnotatedMethod> _jsonValueGetters;
+    protected LinkedList<AnnotatedMember> _jsonValueAccessors;
 
     /**
      * Lazily collected list of properties that can be implicitly
@@ -118,16 +132,17 @@ public class POJOPropertiesCollector
         _type = type;
         _classDef = classDef;
         _mutatorPrefix = (mutatorPrefix == null) ? "set" : mutatorPrefix;
-        _annotationIntrospector = config.isAnnotationProcessingEnabled() ?
-                _config.getAnnotationIntrospector() : null;
-        if (_annotationIntrospector == null) {
-            _visibilityChecker = _config.getDefaultVisibilityChecker();
+        if (config.isAnnotationProcessingEnabled()) {
+            _useAnnotations = true;
+            _annotationIntrospector = _config.getAnnotationIntrospector();
         } else {
-            _visibilityChecker = _annotationIntrospector.findAutoDetectVisibility(classDef,
-                    _config.getDefaultVisibilityChecker());
+            _useAnnotations = false;
+            _annotationIntrospector = AnnotationIntrospector.nopInstance();
         }
+        _visibilityChecker = _config.getDefaultVisibilityChecker(type.getRawClass(),
+                classDef);
     }
-    
+
     /*
     /**********************************************************
     /* Public API
@@ -162,20 +177,33 @@ public class POJOPropertiesCollector
         }
         return _injectables;
     }
-    
-    public AnnotatedMethod getJsonValueMethod()
+
+    @Deprecated // since 2.9
+    public AnnotatedMethod getJsonValueMethod() {
+        AnnotatedMember m = getJsonValueAccessor();
+        if (m instanceof AnnotatedMethod) {
+            return (AnnotatedMethod) m;
+        }
+        return null;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public AnnotatedMember getJsonValueAccessor()
     {
         if (!_collected) {
             collectAll();
         }
         // If @JsonValue defined, must have a single one
-        if (_jsonValueGetters != null) {
-            if (_jsonValueGetters.size() > 1) {
-                reportProblem("Multiple value properties defined ("+_jsonValueGetters.get(0)+" vs "
-                        +_jsonValueGetters.get(1)+")");
+        if (_jsonValueAccessors != null) {
+            if (_jsonValueAccessors.size() > 1) {
+                reportProblem("Multiple 'as-value' properties defined (%s vs %s)",
+                        _jsonValueAccessors.get(0),
+                        _jsonValueAccessors.get(1));
             }
             // otherwise we won't greatly care
-            return _jsonValueGetters.get(0);
+            return _jsonValueAccessors.get(0);
         }
         return null;
     }
@@ -187,11 +215,26 @@ public class POJOPropertiesCollector
         }
         if (_anyGetters != null) {
             if (_anyGetters.size() > 1) {
-                reportProblem("Multiple 'any-getters' defined ("+_anyGetters.get(0)+" vs "
-                        +_anyGetters.get(1)+")");
+                reportProblem("Multiple 'any-getters' defined (%s vs %s)",
+                        _anyGetters.get(0), _anyGetters.get(1));
             }
             return _anyGetters.getFirst();
         }        
+        return null;
+    }
+
+    public AnnotatedMember getAnySetterField()
+    {
+        if (!_collected) {
+            collectAll();
+        }
+        if (_anySetterField != null) {
+            if (_anySetterField.size() > 1) {
+                reportProblem("Multiple 'any-setter' fields defined (%s vs %s)",
+                        _anySetterField.get(0), _anySetterField.get(1));
+            }
+            return _anySetterField.getFirst();
+        }
         return null;
     }
 
@@ -202,8 +245,8 @@ public class POJOPropertiesCollector
         }
         if (_anySetters != null) {
             if (_anySetters.size() > 1) {
-                reportProblem("Multiple 'any-setters' defined ("+_anySetters.get(0)+" vs "
-                        +_anySetters.get(1)+")");
+                reportProblem("Multiple 'any-setter' methods defined (%s vs %s)",
+                        _anySetters.get(0), _anySetters.get(1));
             }
             return _anySetters.getFirst();
         }
@@ -224,9 +267,6 @@ public class POJOPropertiesCollector
      */
     public ObjectIdInfo getObjectIdInfo()
     {
-        if (_annotationIntrospector == null) {
-            return null;
-        }
         ObjectIdInfo info = _annotationIntrospector.findObjectIdInfo(_classDef);
         if (info != null) { // 2.1: may also have different defaults for refs:
             info = _annotationIntrospector.findObjectReferenceInfo(_classDef, info);
@@ -237,8 +277,7 @@ public class POJOPropertiesCollector
     /**
      * Method for finding Class to use as POJO builder, if any.
      */
-    public Class<?> findPOJOBuilderClass()
-    {
+    public Class<?> findPOJOBuilderClass() {
         return _annotationIntrospector.findPOJOBuilder(_classDef);
     }
     
@@ -257,20 +296,6 @@ public class POJOPropertiesCollector
      */
 
     /**
-     * Method that orchestrates collection activities, and needs to be called
-     * after creating the instance.
-     *<p>
-     * Since 2.6 has become a no-op and actual collection is done more lazily
-     * at point where properties are actually needed.
-     * 
-     * @deprecated Since 2.6; no need to call
-     */
-    @Deprecated
-    public POJOPropertiesCollector collect() {
-        return this;
-    }
-
-    /**
      * Internal method that will collect actual property information.
      *
      * @since 2.6
@@ -282,23 +307,28 @@ public class POJOPropertiesCollector
         // First: gather basic data
         _addFields(props);
         _addMethods(props);
-        _addCreators(props);
+        // 25-Jan-2016, tatu: Avoid introspecting (constructor-)creators for non-static
+        //    inner classes, see [databind#1502]
+        if (!_classDef.isNonStaticInnerClass()) {
+            _addCreators(props);
+        }
         _addInjectables(props);
 
         // Remove ignored properties, first; this MUST precede annotation merging
         // since logic relies on knowing exactly which accessor has which annotation
         _removeUnwantedProperties(props);
-
-        // then merge annotations, to simplify further processing
-        for (POJOPropertyBuilder property : props.values()) {
-            property.mergeAnnotations(_forSerialization);
-        }
-        
         // and then remove unneeded accessors (wrt read-only, read-write)
         _removeUnwantedAccessor(props);
 
         // Rename remaining properties
         _renameProperties(props);
+
+        // then merge annotations, to simplify further processing
+        // 26-Sep-2017, tatu: Before 2.9.2 was done earlier but that prevented some of
+        //   annotations from getting properly merged
+        for (POJOPropertyBuilder property : props.values()) {
+            property.mergeAnnotations(_forSerialization);
+        }
 
         // And use custom naming strategy, if applicable...
         PropertyNamingStrategy naming = _findNamingStrategy();
@@ -320,11 +350,10 @@ public class POJOPropertiesCollector
         if (_config.isEnabled(MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME)) {
             _renameWithWrappers(props);
         }
-        
+
         // well, almost last: there's still ordering...
         _sortProperties(props);
         _properties = props;
-
         _collected = true;
     }
 
@@ -348,16 +377,29 @@ public class POJOPropertiesCollector
         final boolean transientAsIgnoral = _config.isEnabled(MapperFeature.PROPAGATE_TRANSIENT_MARKER);
         
         for (AnnotatedField f : _classDef.fields()) {
-            String implName = (ai == null) ? null : ai.findImplicitPropertyName(f);
+            String implName = ai.findImplicitPropertyName(f);
+            // @JsonValue?
+            if (Boolean.TRUE.equals(ai.hasAsValue(f))) {
+                if (_jsonValueAccessors == null) {
+                    _jsonValueAccessors = new LinkedList<>();
+                }
+                _jsonValueAccessors.add(f);
+                continue;
+            }
+            // @JsonAnySetter?
+            if (Boolean.TRUE.equals(ai.hasAnySetter(f))) {
+                if (_anySetterField == null) {
+                    _anySetterField = new LinkedList<AnnotatedMember>();
+                }
+                _anySetterField.add(f);
+                continue;
+            }
             if (implName == null) {
                 implName = f.getName();
             }
-
             PropertyName pn;
 
-            if (ai == null) {
-                pn = null;
-            } else if (_forSerialization) {
+            if (_forSerialization) {
                 /* 18-Aug-2011, tatu: As per existing unit tests, we should only
                  *   use serialization annotation (@JsonSerialize) when serializing
                  *   fields, and similarly for deserialize-only annotations... so
@@ -367,7 +409,8 @@ public class POJOPropertiesCollector
             } else {
                 pn = ai.findNameForDeserialization(f);
             }
-            boolean nameExplicit = (pn != null);
+            boolean hasName = (pn != null);
+            boolean nameExplicit = hasName;
 
             if (nameExplicit && pn.isEmpty()) { // empty String meaning "use default name", here just means "same as field name"
                 pn = _propNameFromSimple(implName);
@@ -379,13 +422,17 @@ public class POJOPropertiesCollector
                 visible = _visibilityChecker.isFieldVisible(f);
             }
             // and finally, may also have explicit ignoral
-            boolean ignored = (ai != null) && ai.hasIgnoreMarker(f);
+            boolean ignored = ai.hasIgnoreMarker(f);
 
             // 13-May-2015, tatu: Moved from earlier place (AnnotatedClass) in 2.6
             if (f.isTransient()) {
-                visible = false;
-                if (transientAsIgnoral) {
-                    ignored = true;
+                // 20-May-2016, tatu: as per [databind#1184] explicit annotation should override
+                //    "default" `transient`
+                if (!hasName) {
+                    visible = false;
+                    if (transientAsIgnoral) {
+                        ignored = true;
+                    }
                 }
             }
             /* [databind#190]: this is the place to prune final fields, if they are not
@@ -393,7 +440,8 @@ public class POJOPropertiesCollector
              *  Also: if 'ignored' is set, need to included until a later point, to
              *  avoid losing ignoral information.
              */
-            if (pruneFinalFields && (pn == null) && !ignored && Modifier.isFinal(f.getModifiers())) {
+            if (pruneFinalFields && (pn == null) && !ignored
+                    && Modifier.isFinal(f.getModifiers())) {
                 continue;
             }
             _property(props, implName).addField(f, pn, nameExplicit, visible, ignored);
@@ -406,22 +454,23 @@ public class POJOPropertiesCollector
     protected void _addCreators(Map<String, POJOPropertyBuilder> props)
     {
         // can be null if annotation processing is disabled...
-        if (_annotationIntrospector != null) {
-            for (AnnotatedConstructor ctor : _classDef.getConstructors()) {
-                if (_creatorProperties == null) {
-                    _creatorProperties = new LinkedList<POJOPropertyBuilder>();
-                }
-                for (int i = 0, len = ctor.getParameterCount(); i < len; ++i) {
-                    _addCreatorParam(props, ctor.getParameter(i));
-                }
+        if (!_useAnnotations) {
+            return;
+        }
+        for (AnnotatedConstructor ctor : _classDef.getConstructors()) {
+            if (_creatorProperties == null) {
+                _creatorProperties = new LinkedList<POJOPropertyBuilder>();
             }
-            for (AnnotatedMethod factory : _classDef.getStaticMethods()) {
-                if (_creatorProperties == null) {
-                    _creatorProperties = new LinkedList<POJOPropertyBuilder>();
-                }
-                for (int i = 0, len = factory.getParameterCount(); i < len; ++i) {
-                    _addCreatorParam(props, factory.getParameter(i));
-                }
+            for (int i = 0, len = ctor.getParameterCount(); i < len; ++i) {
+                _addCreatorParam(props, ctor.getParameter(i));
+            }
+        }
+        for (AnnotatedMethod factory : _classDef.getFactoryMethods()) {
+            if (_creatorProperties == null) {
+                _creatorProperties = new LinkedList<POJOPropertyBuilder>();
+            }
+            for (int i = 0, len = factory.getParameterCount(); i < len; ++i) {
+                _addCreatorParam(props, factory.getParameter(i));
             }
         }
     }
@@ -441,14 +490,14 @@ public class POJOPropertiesCollector
         boolean expl = (pn != null && !pn.isEmpty());
         if (!expl) {
             if (impl.isEmpty()) {
-                /* Important: if neither implicit nor explicit name, can not make use
-                 * of this creator parameter -- may or may not be a problem, verified
-                 * at a later point.
-                 */
+                // Important: if neither implicit nor explicit name, cannot make use of
+                // this creator parameter -- may or may not be a problem, verified at a later point.
                 return;
             }
             // Also: if this occurs, there MUST be explicit annotation on creator itself
-            if (!_annotationIntrospector.hasCreatorAnnotation(param.getOwner())) {
+            JsonCreator.Mode creatorMode = _annotationIntrospector.findCreatorAnnotation(_config,
+                    param.getOwner());
+            if ((creatorMode == null) || (creatorMode == JsonCreator.Mode.DISABLED)) {
                 return;
             }
             pn = PropertyName.construct(impl);
@@ -466,14 +515,13 @@ public class POJOPropertiesCollector
         prop.addCtor(param, pn, expl, true, false);
         _creatorProperties.add(prop);
     }
-    
+
     /**
      * Method for collecting basic information on all fields found
      */
     protected void _addMethods(Map<String, POJOPropertyBuilder> props)
     {
         final AnnotationIntrospector ai = _annotationIntrospector;
-        
         for (AnnotatedMethod m : _classDef.memberMethods()) {
             /* For methods, handling differs between getters and setters; and
              * we will also only consider entries that either follow the bean
@@ -486,11 +534,13 @@ public class POJOPropertiesCollector
             } else if (argCount == 1) { // setters
             	_addSetterMethod(props, m, ai);
             } else if (argCount == 2) { // any getter?
-                if (ai != null  && ai.hasAnySetterAnnotation(m)) {
-                    if (_anySetters == null) {
-                        _anySetters = new LinkedList<AnnotatedMethod>();
+                if (ai != null) {
+                    if (Boolean.TRUE.equals(ai.hasAnySetter(m))) {
+                        if (_anySetters == null) {
+                            _anySetters = new LinkedList<AnnotatedMethod>();
+                        }
+                        _anySetters.add(m);
                     }
-                    _anySetters.add(m);
                 }
             }
         }
@@ -505,31 +555,30 @@ public class POJOPropertiesCollector
         }
         
         // any getter?
-        if (ai != null) {
-            if (ai.hasAnyGetterAnnotation(m)) {
-                if (_anyGetters == null) {
-                    _anyGetters = new LinkedList<AnnotatedMember>();
-                }
-                _anyGetters.add(m);
-                return;
+        // @JsonAnyGetter?
+        if (Boolean.TRUE.equals(ai.hasAnyGetter(m))) {
+            if (_anyGetters == null) {
+                _anyGetters = new LinkedList<AnnotatedMember>();
             }
-            // @JsonValue?
-            if (ai.hasAsValueAnnotation(m)) {
-                if (_jsonValueGetters == null) {
-                    _jsonValueGetters = new LinkedList<AnnotatedMethod>();
-                }
-                _jsonValueGetters.add(m);
-                return;
+            _anyGetters.add(m);
+            return;
+        }
+        // @JsonValue?
+        if (Boolean.TRUE.equals(ai.hasAsValue(m))) {
+            if (_jsonValueAccessors == null) {
+                _jsonValueAccessors = new LinkedList<>();
             }
+            _jsonValueAccessors.add(m);
+            return;
         }
         String implName; // from naming convention
         boolean visible;
 
-        PropertyName pn = (ai == null) ? null : ai.findNameForSerialization(m);
+        PropertyName pn = ai.findNameForSerialization(m);
         boolean nameExplicit = (pn != null);
 
         if (!nameExplicit) { // no explicit name; must consider implicit
-            implName = (ai == null) ? null : ai.findImplicitPropertyName(m);
+            implName = ai.findImplicitPropertyName(m);
             if (implName == null) {
                 implName = BeanUtil.okNameForRegularGetter(m, m.getName(), _stdBeanNaming);
             }
@@ -544,7 +593,7 @@ public class POJOPropertiesCollector
             }
         } else { // explicit indication of inclusion, but may be empty
             // we still need implicit name to link with other pieces
-            implName = (ai == null) ? null : ai.findImplicitPropertyName(m);
+            implName = ai.findImplicitPropertyName(m);
             if (implName == null) {
                 implName = BeanUtil.okNameForGetter(m, _stdBeanNaming);
             }
@@ -559,7 +608,7 @@ public class POJOPropertiesCollector
             }
             visible = true;
         }
-        boolean ignore = (ai == null) ? false : ai.hasIgnoreMarker(m);
+        boolean ignore = ai.hasIgnoreMarker(m);
         _property(props, implName).addGetter(m, pn, nameExplicit, visible, ignore);
     }
 
@@ -599,43 +648,41 @@ public class POJOPropertiesCollector
         boolean ignore = (ai == null) ? false : ai.hasIgnoreMarker(m);
         _property(props, implName).addSetter(m, pn, nameExplicit, visible, ignore);
     }
-    
+
     protected void _addInjectables(Map<String, POJOPropertyBuilder> props)
     {
         final AnnotationIntrospector ai = _annotationIntrospector;
-        if (ai == null) {
-            return;
-        }
-        
-        // first fields, then methods
+        // first fields, then methods, to allow overriding
         for (AnnotatedField f : _classDef.fields()) {
-            _doAddInjectable(ai.findInjectableValueId(f), f);
+            _doAddInjectable(ai.findInjectableValue(f), f);
         }
         
         for (AnnotatedMethod m : _classDef.memberMethods()) {
-            /* for now, only allow injection of a single arg
-             * (to be changed in future)
-             */
+            // for now, only allow injection of a single arg (to be changed in future?)
             if (m.getParameterCount() != 1) {
                 continue;
             }
-            _doAddInjectable(ai.findInjectableValueId(m), m);
+            _doAddInjectable(ai.findInjectableValue(m), m);
         }
     }
 
-    protected void _doAddInjectable(Object id, AnnotatedMember m)
+    protected void _doAddInjectable(JacksonInject.Value injectable, AnnotatedMember m)
     {
-        if (id == null) {
+        if (injectable == null) {
             return;
         }
+        Object id = injectable.getId();
         if (_injectables == null) {
             _injectables = new LinkedHashMap<Object, AnnotatedMember>();
         }
         AnnotatedMember prev = _injectables.put(id, m);
         if (prev != null) {
-            String type = id.getClass().getName();
-            throw new IllegalArgumentException("Duplicate injectable value with id '"
-                    +String.valueOf(id)+"' (of type "+type+")");
+            // 12-Apr-2017, tatu: Let's allow masking of Field by Method
+            if (prev.getClass() == m.getClass()) {
+                String type = id.getClass().getName();
+                throw new IllegalArgumentException("Duplicate injectable value with id '"
+                        +String.valueOf(id)+"' (of type "+type+")");
+            }
         }
     }
 
@@ -656,7 +703,6 @@ public class POJOPropertiesCollector
     protected void _removeUnwantedProperties(Map<String, POJOPropertyBuilder> props)
     {
         Iterator<POJOPropertyBuilder> it = props.values().iterator();
-
         while (it.hasNext()) {
             POJOPropertyBuilder prop = it.next();
 
@@ -675,7 +721,7 @@ public class POJOPropertiesCollector
                 }
                 // otherwise just remove ones marked to be ignored
                 prop.removeIgnored();
-                if (!_forSerialization && !prop.couldDeserialize()) {
+                if (!prop.couldDeserialize()) {
                     _collectIgnorals(prop.getName());
                 }
             }
@@ -694,10 +740,14 @@ public class POJOPropertiesCollector
 
         while (it.hasNext()) {
             POJOPropertyBuilder prop = it.next();
-            prop.removeNonVisible(inferMutators);
+            // 26-Jan-2017, tatu: [databind#935]: need to denote removal of
+            JsonProperty.Access acc = prop.removeNonVisible(inferMutators);
+            if (acc == JsonProperty.Access.READ_ONLY) {
+                _collectIgnorals(prop.getName());
+            }
         }
     }
-        
+
     /**
      * Helper method called to add explicitly ignored properties to a list
      * of known ignored properties; this helps in proper reporting of
@@ -831,9 +881,8 @@ public class POJOPropertiesCollector
 
     protected void _renameWithWrappers(Map<String, POJOPropertyBuilder> props)
     {
-        /* 11-Sep-2012, tatu: To support 'MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME',
-         *   need another round of renaming...
-         */
+        // 11-Sep-2012, tatu: To support 'MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME',
+        //   need another round of renaming...
         Iterator<Map.Entry<String,POJOPropertyBuilder>> it = props.entrySet().iterator();
         LinkedList<POJOPropertyBuilder> renamed = null;
         while (it.hasNext()) {
@@ -844,7 +893,7 @@ public class POJOPropertiesCollector
                 continue;
             }
             PropertyName wrapperName = _annotationIntrospector.findWrapperName(member);
-            // One trickier part (wrt [Issue#24] of JAXB annotations: wrapper that
+            // One trickier part (wrt [#24] of JAXB annotations: wrapper that
             // indicates use of actual property... But hopefully has been taken care
             // of previously
             if (wrapperName == null || !wrapperName.hasSimpleName()) {
@@ -886,15 +935,15 @@ public class POJOPropertiesCollector
     {
         // Then how about explicit ordering?
         AnnotationIntrospector intr = _annotationIntrospector;
+        Boolean alpha = intr.findSerializationSortAlphabetically((Annotated) _classDef);
         boolean sort;
-        Boolean alpha = (intr == null) ? null : intr.findSerializationSortAlphabetically((Annotated) _classDef);
         
         if (alpha == null) {
             sort = _config.shouldSortPropertiesAlphabetically();
         } else {
             sort = alpha.booleanValue();
         }
-        String[] propertyOrder = (intr == null) ? null : intr.findSerializationPropertyOrder(_classDef);
+        String[] propertyOrder = intr.findSerializationPropertyOrder(_classDef);
         
         // no sorting? no need to shuffle, then
         if (!sort && (_creatorProperties == null) && (propertyOrder == null)) {
@@ -917,7 +966,7 @@ public class POJOPropertiesCollector
         if (propertyOrder != null) {
             for (String name : propertyOrder) {
                 POJOPropertyBuilder w = all.get(name);
-                if (w == null) { // also, as per [JACKSON-268], we will allow use of "implicit" names
+                if (w == null) { // will also allow use of "implicit" names for sorting
                     for (POJOPropertyBuilder prop : props.values()) {
                         if (name.equals(prop.getInternalName())) {
                             w = prop;
@@ -951,12 +1000,16 @@ public class POJOPropertiesCollector
                 cr = _creatorProperties;
             }
             for (POJOPropertyBuilder prop : cr) {
-                ordered.put(prop.getName(), prop);
+                // 16-Jan-2016, tatu: Related to [databind#1317], make sure not to accidentally
+                //    add back pruned creator properties!
+                String name = prop.getName();
+                if (all.containsKey(name)) {
+                    ordered.put(name, prop);
+                }
             }
         }
         // And finally whatever is left (trying to put again will not change ordering)
         ordered.putAll(all);
-        
         props.clear();
         props.putAll(ordered);
     }        
@@ -967,13 +1020,23 @@ public class POJOPropertiesCollector
     /**********************************************************
      */
 
-    protected void reportProblem(String msg) {
+    protected void reportProblem(String msg, Object... args) {
+        if (args.length > 0) {
+            msg = String.format(msg, args);
+        }
         throw new IllegalArgumentException("Problem with definition of "+_classDef+": "+msg);
     }
 
     protected POJOPropertyBuilder _property(Map<String, POJOPropertyBuilder> props,
             PropertyName name) {
-        return _property(props, name.getSimpleName());
+        String simpleName = name.getSimpleName();
+        POJOPropertyBuilder prop = props.get(simpleName);
+        if (prop == null) {
+            prop = new POJOPropertyBuilder(_config, _annotationIntrospector,
+                    _forSerialization, name);
+            props.put(simpleName, prop);
+        }
+        return prop;
     }
     
     // !!! TODO: deprecate, require use of PropertyName
@@ -991,8 +1054,7 @@ public class POJOPropertiesCollector
 
     private PropertyNamingStrategy _findNamingStrategy()
     {
-        Object namingDef = (_annotationIntrospector == null)? null
-                : _annotationIntrospector.findNamingStrategy(_classDef);
+        Object namingDef = _annotationIntrospector.findNamingStrategy(_classDef);
         if (namingDef == null) {
             return _config.getPropertyNamingStrategy();
         }

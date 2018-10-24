@@ -23,6 +23,7 @@ import io.undertow.UndertowMessages;
 import io.undertow.UndertowOptions;
 import io.undertow.conduits.BytesReceivedStreamSourceConduit;
 import io.undertow.conduits.BytesSentStreamSinkConduit;
+import io.undertow.conduits.IdleTimeoutConduit;
 import io.undertow.conduits.ReadTimeoutStreamSourceConduit;
 import io.undertow.conduits.WriteTimeoutStreamSinkConduit;
 import io.undertow.server.ConnectorStatistics;
@@ -60,7 +61,7 @@ public class AjpOpenListener implements OpenListener {
 
     private volatile OptionMap undertowOptions;
 
-    private final AjpRequestParser parser;
+    private volatile AjpRequestParser parser;
 
     private volatile boolean statisticsEnabled;
     private final ConnectorStatisticsImpl connectorStatistics;
@@ -90,7 +91,7 @@ public class AjpOpenListener implements OpenListener {
         PooledByteBuffer buf = pool.allocate();
         this.bufferSize = buf.getBuffer().remaining();
         buf.close();
-        parser = new AjpRequestParser(undertowOptions.get(URL_CHARSET, StandardCharsets.UTF_8.name()), undertowOptions.get(DECODE_URL, true));
+        parser = new AjpRequestParser(undertowOptions.get(URL_CHARSET, StandardCharsets.UTF_8.name()), undertowOptions.get(DECODE_URL, true), undertowOptions.get(UndertowOptions.MAX_PARAMETERS, UndertowOptions.DEFAULT_MAX_PARAMETERS), undertowOptions.get(UndertowOptions.MAX_HEADERS, UndertowOptions.DEFAULT_MAX_HEADERS), undertowOptions.get(UndertowOptions.ALLOW_ENCODED_SLASH, false), undertowOptions.get(UndertowOptions.ALLOW_UNESCAPED_CHARACTERS_IN_URL, false));
         connectorStatistics = new ConnectorStatisticsImpl();
         statisticsEnabled = undertowOptions.get(UndertowOptions.ENABLE_CONNECTOR_STATISTICS, false);
     }
@@ -104,21 +105,16 @@ public class AjpOpenListener implements OpenListener {
         //set read and write timeouts
         try {
             Integer readTimeout = channel.getOption(Options.READ_TIMEOUT);
-            Integer idleTimeout = undertowOptions.get(UndertowOptions.IDLE_TIMEOUT);
-            if ((readTimeout == null || readTimeout <= 0) && idleTimeout != null) {
-                readTimeout = idleTimeout;
-            } else if (readTimeout != null && idleTimeout != null && idleTimeout > 0) {
-                readTimeout = Math.min(readTimeout, idleTimeout);
+            Integer idle = undertowOptions.get(UndertowOptions.IDLE_TIMEOUT);
+            if(idle != null) {
+                IdleTimeoutConduit conduit = new IdleTimeoutConduit(channel);
+                channel.getSourceChannel().setConduit(conduit);
+                channel.getSinkChannel().setConduit(conduit);
             }
             if (readTimeout != null && readTimeout > 0) {
                 channel.getSourceChannel().setConduit(new ReadTimeoutStreamSourceConduit(channel.getSourceChannel().getConduit(), channel, this));
             }
             Integer writeTimeout = channel.getOption(Options.WRITE_TIMEOUT);
-            if ((writeTimeout == null || writeTimeout <= 0) && idleTimeout != null) {
-                writeTimeout = idleTimeout;
-            } else if (writeTimeout != null && idleTimeout != null && idleTimeout > 0) {
-                writeTimeout = Math.min(writeTimeout, idleTimeout);
-            }
             if (writeTimeout != null && writeTimeout > 0) {
                 channel.getSinkChannel().setConduit(new WriteTimeoutStreamSinkConduit(channel.getSinkChannel().getConduit(), channel, this));
             }
@@ -165,6 +161,7 @@ public class AjpOpenListener implements OpenListener {
         }
         this.undertowOptions = undertowOptions;
         statisticsEnabled = undertowOptions.get(UndertowOptions.ENABLE_CONNECTOR_STATISTICS, false);
+        parser = new AjpRequestParser(undertowOptions.get(URL_CHARSET, StandardCharsets.UTF_8.name()), undertowOptions.get(DECODE_URL, true), undertowOptions.get(UndertowOptions.MAX_PARAMETERS, UndertowOptions.DEFAULT_MAX_PARAMETERS), undertowOptions.get(UndertowOptions.MAX_HEADERS, UndertowOptions.DEFAULT_MAX_HEADERS), undertowOptions.get(UndertowOptions.ALLOW_ENCODED_SLASH, false), undertowOptions.get(UndertowOptions.ALLOW_UNESCAPED_CHARACTERS_IN_URL, false));
     }
 
     @Override

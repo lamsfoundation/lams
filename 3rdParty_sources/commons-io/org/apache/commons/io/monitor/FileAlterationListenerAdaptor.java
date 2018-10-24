@@ -22,7 +22,7 @@ import java.io.File;
  * Convenience {@link FileAlterationListener} implementation that does nothing.
  * 
  * @see FileAlterationObserver
- *
+ * @version $Id: FileAlterationListenerAdaptor.java 1304062 2012-03-22 21:10:46Z sebb $
  * @since 2.0
  */
 public class FileAlterationListenerAdaptor implements FileAlterationListener {

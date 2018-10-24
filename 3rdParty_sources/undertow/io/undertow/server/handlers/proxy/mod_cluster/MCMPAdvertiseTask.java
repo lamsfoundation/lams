@@ -18,6 +18,13 @@
 
 package io.undertow.server.handlers.proxy.mod_cluster;
 
+import io.undertow.UndertowLogger;
+import io.undertow.util.NetworkUtils;
+import org.xnio.OptionMap;
+import org.xnio.Options;
+import org.xnio.XnioWorker;
+import org.xnio.channels.MulticastMessageChannel;
+
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -30,12 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
-import io.undertow.UndertowLogger;
-import io.undertow.util.NetworkUtils;
-import org.xnio.OptionMap;
-import org.xnio.XnioWorker;
-import org.xnio.channels.MulticastMessageChannel;
 
 /**
  * @author Emanuel Muckenhuber
@@ -67,26 +68,32 @@ class MCMPAdvertiseTask implements Runnable {
 
     static void advertise(final ModClusterContainer container, final MCMPConfig.AdvertiseConfig config, final XnioWorker worker) throws IOException {
         InetSocketAddress bindAddress;
-        final InetAddress group = InetAddress.getByName(config.getAdvertiseAddress());
-        if (group == null) {
+        final InetAddress address = InetAddress.getByName(config.getAdvertiseAddress());
+
+        if (address == null) {
             bindAddress = new InetSocketAddress(config.getAdvertisePort());
         } else {
-            bindAddress = new InetSocketAddress(group, config.getAdvertisePort());
+            bindAddress = new InetSocketAddress(address, config.getAdvertisePort());
         }
+
         MulticastMessageChannel channel;
         try {
-            channel = worker.createUdpServer(bindAddress, null, OptionMap.EMPTY);
+            channel = worker.createUdpServer(bindAddress, OptionMap.EMPTY);
         } catch (IOException e) {
-            if(group != null && (linuxLike || windows)) {
-                //try again with no group
+            if (address != null && (linuxLike || windows)) {
+                //try again with no address
                 //see UNDERTOW-454
-                UndertowLogger.ROOT_LOGGER.potentialCrossTalking(group, (group instanceof Inet4Address) ? "IPv4" : "IPv6", e.getLocalizedMessage());
+                UndertowLogger.ROOT_LOGGER.potentialCrossTalking(address, (address instanceof Inet4Address) ? "IPv4" : "IPv6", e.getLocalizedMessage());
                 bindAddress = new InetSocketAddress(config.getAdvertisePort());
-                channel = worker.createUdpServer(bindAddress, null, OptionMap.EMPTY);
+                channel = worker.createUdpServer(bindAddress, OptionMap.EMPTY);
             } else {
                 throw e;
             }
         }
+
+        // multicast ttl can only be set after the channel has been created
+        channel.setOption(Options.MULTICAST_TTL, config.getAdvertiseTtl());
+
         final MCMPAdvertiseTask task = new MCMPAdvertiseTask(container, config, channel);
         //execute immediately, so there is no delay before load balancing starts working
         channel.getIoThread().execute(task);
@@ -187,7 +194,7 @@ class MCMPAdvertiseTask implements Runnable {
     }
 
     private void digestString(MessageDigest md, String securityKey) {
-        byte[] buf = securityKey.getBytes();
+        byte[] buf = securityKey.getBytes(StandardCharsets.UTF_8);
         md.update(buf);
     }
 

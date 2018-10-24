@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import java.lang.reflect.Proxy;
  * <p>
  * This is useful in dynamic container environments.
  *
- *
+ * @version $Id: ClassLoaderObjectInputStream.java 1471767 2013-04-24 23:24:19Z sebb $
  * @since 1.1
  */
 public class ClassLoaderObjectInputStream extends ObjectInputStream {
@@ -46,7 +46,7 @@ public class ClassLoaderObjectInputStream extends ObjectInputStream {
      * @throws StreamCorruptedException if the stream is corrupted
      */
     public ClassLoaderObjectInputStream(
-            ClassLoader classLoader, InputStream inputStream)
+            final ClassLoader classLoader, final InputStream inputStream)
             throws IOException, StreamCorruptedException {
         super(inputStream);
         this.classLoader = classLoader;
@@ -62,16 +62,13 @@ public class ClassLoaderObjectInputStream extends ObjectInputStream {
      * @throws ClassNotFoundException if the Class cannot be found
      */
     @Override
-    protected Class<?> resolveClass(ObjectStreamClass objectStreamClass)
+    protected Class<?> resolveClass(final ObjectStreamClass objectStreamClass)
             throws IOException, ClassNotFoundException {
-        
-        Class<?> clazz = Class.forName(objectStreamClass.getName(), false, classLoader);
 
-        if (clazz != null) {
-            // the classloader knows of the class
-            return clazz;
-        } else {
-            // classloader knows not of class, let the super classloader do it
+        try {
+            return Class.forName(objectStreamClass.getName(), false, classLoader);
+        } catch (ClassNotFoundException cnfe) {
+            // delegate to super class loader which can resolve primitives
             return super.resolveClass(objectStreamClass);
         }
     }
@@ -88,17 +85,17 @@ public class ClassLoaderObjectInputStream extends ObjectInputStream {
      * @since 2.1
      */
     @Override
-    protected Class<?> resolveProxyClass(String[] interfaces) throws IOException,
+    protected Class<?> resolveProxyClass(final String[] interfaces) throws IOException,
             ClassNotFoundException {
-        Class<?>[] interfaceClasses = new Class[interfaces.length];
+        final Class<?>[] interfaceClasses = new Class[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
             interfaceClasses[i] = Class.forName(interfaces[i], false, classLoader);
         }
         try {
             return Proxy.getProxyClass(classLoader, interfaceClasses);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             return super.resolveProxyClass(interfaces);
         }
     }
-    
+
 }

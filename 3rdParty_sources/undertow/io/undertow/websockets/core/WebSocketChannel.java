@@ -19,6 +19,7 @@ package io.undertow.websockets.core;
 
 import io.undertow.conduits.IdleTimeoutConduit;
 import io.undertow.server.protocol.framed.AbstractFramedChannel;
+import io.undertow.server.protocol.framed.AbstractFramedStreamSourceChannel;
 import io.undertow.server.protocol.framed.FrameHeaderData;
 import io.undertow.websockets.extensions.ExtensionFunction;
 import org.xnio.ChannelExceptionHandler;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,8 +114,16 @@ public abstract class WebSocketChannel extends AbstractFramedChannel<WebSocketCh
     }
 
     @Override
+    protected Collection<AbstractFramedStreamSourceChannel<WebSocketChannel, StreamSourceFrameChannel, StreamSinkFrameChannel>> getReceivers() {
+        if(fragmentedChannel == null) {
+            return Collections.emptyList();
+        }
+        return Collections.<AbstractFramedStreamSourceChannel<WebSocketChannel, StreamSourceFrameChannel, StreamSinkFrameChannel>>singleton(fragmentedChannel);
+    }
+
+    @Override
     protected IdleTimeoutConduit createIdleTimeoutChannel(final StreamConnection connectedStreamChannel) {
-        return new IdleTimeoutConduit(connectedStreamChannel.getSinkChannel().getConduit(), connectedStreamChannel.getSourceChannel().getConduit()) {
+        return new IdleTimeoutConduit(connectedStreamChannel) {
             @Override
             protected void doClose() {
                 WebSockets.sendClose(CloseMessage.GOING_AWAY, null, WebSocketChannel.this, null);
