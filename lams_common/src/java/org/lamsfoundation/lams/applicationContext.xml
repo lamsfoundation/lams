@@ -20,7 +20,7 @@
             <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
             <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
             <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
-            <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>   
+            <prop key="hibernate.transaction.coordinator_class">jta</prop>   
             <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>
              
             <!-- 
