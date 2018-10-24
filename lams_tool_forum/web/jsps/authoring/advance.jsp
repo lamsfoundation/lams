@@ -7,33 +7,33 @@
 <lams:SimplePanel titleKey="label.posting.options">
 
 	<div class="checkbox">
-		<label for="rich-editor"><html:checkbox
-				property="forum.allowRichEditor" styleId="rich-editor" /> <fmt:message
+		<label for="rich-editor"><form:checkbox
+				path="forum.allowRichEditor" id="rich-editor" /> <fmt:message
 				key="label.authoring.advance.use.richeditor" /></label>
 	</div>
 
 	<div class="checkbox">
-		<label for="allow-upload"><html:checkbox
-				property="forum.allowUpload" styleId="allow-upload" /> <fmt:message
+		<label for="allow-upload"><form:checkbox
+				path="forum.allowUpload" id="allow-upload" /> <fmt:message
 				key="label.authoring.advance.allow.upload" /></label>
 	</div>
 
 	<div class="checkbox">
-		<label for="allowEdit"><html:checkbox
-				property="forum.allowEdit" styleId="allowEdit" /> <fmt:message
+		<label for="allowEdit"><form:checkbox
+				path="forum.allowEdit" id="allowEdit" /> <fmt:message
 				key="label.authoring.advance.allow.edit" /></label>
 	</div>
 
 	<div class="checkbox">
-		<label for="allow-anon"><html:checkbox
-				property="forum.allowAnonym" styleId="allowAnonym" /> <fmt:message
+		<label for="allow-anon"><form:checkbox
+				path="forum.allowAnonym" id="allowAnonym" /> <fmt:message
 				key="label.authoring.advance.enable.anonymous.posts" /></label>
 	</div>
 
 	<div class="checkbox">
-		<label for="limited-min-characters"><html:checkbox
-				property="forum.limitedMinCharacters"
-				styleId="limited-min-characters" /> <fmt:message
+		<label for="limited-min-characters"><form:checkbox
+				path="forum.limitedMinCharacters"
+				id="limited-min-characters" /> <fmt:message
 				key="label.authoring.advance.min.limited.input" /> </label> <input
 			type="number" name="forum.minCharacters" id="min-characters"
 			onchange="validatePostings(true);"
@@ -42,9 +42,9 @@
 	</div>
 
 	<div class="checkbox">
-		<label for="limited-max-characters"><html:checkbox
-				property="forum.limitedMaxCharacters"
-				styleId="limited-max-characters" /> <fmt:message
+		<label for="limited-max-characters"><form:checkbox
+				path="forum.limitedMaxCharacters"
+				id="limited-max-characters" /> <fmt:message
 				key="label.authoring.advance.limited.input" /></label> <input type="number"
 			name="forum.maxCharacters" id="max-characters"
 			onchange="validatePostings(true);"
@@ -54,8 +54,8 @@
 
 	<lams:SimplePanel panelBodyClass="panel-body-sm">
 		<div class="checkbox">
-			<label for="allowRateMessages"><html:checkbox
-					property="forum.allowRateMessages" styleId="allowRateMessages"
+			<label for="allowRateMessages"><form:checkbox
+					path="forum.allowRateMessages" id="allowRateMessages"
 					onclick="checkRating()" /> <fmt:message
 					key="label.authoring.advance.allow.rate.postings" /></label>
 		</div>
@@ -83,17 +83,17 @@
 	<lams:SimplePanel panelBodyClass="panel-body-sm">
 		<fmt:message key="message.posting.limiting" />
 		<div class="radio">
-			<label for="allowNewTopic1"> <html:radio
-					property="forum.allowNewTopic" value="true"
-					onclick="allowNewTopic()" styleId="allowNewTopic1" /> <fmt:message
+			<label for="allowNewTopic1"> <form:radiobutton
+					path="forum.allowNewTopic" value="true"
+					onclick="allowNewTopic()" id="allowNewTopic1" /> <fmt:message
 					key="label.authoring.advance.allow.new.topics" />
 			</label>
 		</div>
 
 		<div class="radio">
-			<label for="allowNewTopic2"> <html:radio
-					property="forum.allowNewTopic" value="false"
-					onclick="allowNewTopic()" styleId="allowNewTopic2" /> <fmt:message
+			<label for="allowNewTopic2"> <form:radiobutton
+					path="forum.allowNewTopic" value="false"
+					onclick="allowNewTopic()" id="allowNewTopic2" /> <fmt:message
 					key="label.authoring.advance.number.reply" />
 			</label>
 		</div>
@@ -125,24 +125,24 @@
 				key="label.authoring.advanced.send.emails.to" /></label>
 		<div class="form-inline">
 			<div class="checkbox loffset20">
-				<label for="notifyLearnersOnForumPosting"><html:checkbox
-						property="forum.notifyLearnersOnForumPosting"
-						styleId="notifyLearnersOnForumPosting" />&nbsp; <fmt:message
+				<label for="notifyLearnersOnForumPosting"><form:checkbox
+						path="forum.notifyLearnersOnForumPosting"
+						id="notifyLearnersOnForumPosting" />&nbsp; <fmt:message
 						key="label.authoring.advanced.learners" /></label>
 			</div>
 			<div class="checkbox loffset10">
-				<label for="notifyTeachersOnForumPosting"><html:checkbox
-						property="forum.notifyTeachersOnForumPosting"
-						styleId="notifyTeachersOnForumPosting" />&nbsp; <fmt:message
+				<label for="notifyTeachersOnForumPosting"><form:checkbox
+						path="forum.notifyTeachersOnForumPosting"
+						id="notifyTeachersOnForumPosting" />&nbsp; <fmt:message
 						key="label.authoring.advanced.teachers" /></label>
 			</div>
 		</div>
 	</div>
 
 	<div class="checkbox">
-		<label for="notifyLearnersOnMarkRelease"><html:checkbox
-				property="forum.notifyLearnersOnMarkRelease"
-				styleId="notifyLearnersOnMarkRelease" /> <fmt:message
+		<label for="notifyLearnersOnMarkRelease"><form:checkbox
+				path="forum.notifyLearnersOnMarkRelease"
+				id="notifyLearnersOnMarkRelease" /> <fmt:message
 				key="label.authoring.advanced.notify.mark.release" /></label>
 	</div>
 </lams:SimplePanel>
@@ -151,20 +151,20 @@
 
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
-		<label for="lockWhenFinished"><html:checkbox
-				property="forum.lockWhenFinished" styleId="lockWhenFinished" /> <fmt:message
+		<label for="lockWhenFinished"><form:checkbox
+				path="forum.lockWhenFinished" id="lockWhenFinished" /> <fmt:message
 				key="label.authoring.advance.lock.on.finished" /></label>
 	</div>
 
 	<div class="checkbox">
-		<label for="reflectOn"><html:checkbox
-				property="forum.reflectOnActivity" styleId="reflectOn" /> <fmt:message
+		<label for="reflectOn"><form:checkbox
+				path="forum.reflectOnActivity" id="reflectOn" /> <fmt:message
 				key="advanced.reflectOnActivity" /></label>
 	</div>
 	<div class="form-group">
-		<html:textarea property="forum.reflectInstructions"
-			styleId="reflectInstructions" styleClass="form-control" rows="3"
-			onkeyup="javascript:turnOnReflect()" />
+		<textarea name="forum.reflectInstructions"
+			id="reflectInstructions" class="form-control" rows="3"
+			onkeyup="javascript:turnOnReflect()" >${forumForm.forum.reflectInstructions}</textarea>
 	</div>
 
 	<script type="text/javascript">

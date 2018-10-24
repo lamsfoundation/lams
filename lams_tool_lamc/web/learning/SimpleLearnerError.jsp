@@ -14,7 +14,7 @@
 <body class="stripes">
 	<lams:Page type="learner" title="${title}">
 		<div class="voffset10 pull-right">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		</div>
 		<div id="footer"></div>
 	</lams:Page>

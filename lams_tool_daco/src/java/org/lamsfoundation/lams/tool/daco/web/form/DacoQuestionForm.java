@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.daco.web.form;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  * Daco Question Form.
  *
@@ -33,7 +31,7 @@ import org.apache.struts.action.ActionForm;
  *
  * @version $Revision$
  */
-public class DacoQuestionForm extends ActionForm {
+public class DacoQuestionForm {
     private String questionIndex;
     private String sessionMapID;
 

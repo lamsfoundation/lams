@@ -23,18 +23,16 @@
 
 </lams:head>
 <body class="stripes">
-<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<html:hidden property="mode" value="${sessionMap.mode}" />
-	<html:hidden property="dispatch" value="updateContent" />
-	<html:hidden property="sessionMapID" />
-	<html:hidden property="toolContentID" />
-	<html:hidden property="contentFolderID" />
+	<input type="hidden" name="mode" value="${mode}" />
+	<form:hidden path="sessionMapID" />
+	<form:hidden path="toolContentID" />
+	<form:hidden path="contentFolderID" />
 	
-	<lams:Page title="${title}" type="navbar">
+	<lams:Page title="${title}" type="navbar" formID="authoringForm">
 		
 		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
@@ -42,7 +40,7 @@
 		</lams:Tabs> 
 		
 		<lams:TabBodyArea>
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 	
 		     <lams:TabBodys>
 				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
@@ -54,14 +52,14 @@
 				toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>"
 				accessMode="${sessionMap.mode}"
 				defineLater="${sessionMap.mode == 'teacher'}"
-				toolContentID="${formBean.toolContentID}"
-				customiseSessionID="${formBean.sessionMapID}" 
-				contentFolderID="${formBean.contentFolderID}" />
+				toolContentID="${authoringForm.toolContentID}"
+				customiseSessionID="${authoringForm.sessionMapID}" 
+				contentFolderID="${authoringForm.contentFolderID}" />
 		</lams:TabBodyArea>
 		
 		<div id="footer"></div>
 		
 	</lams:Page>
-</html:form>
+</form:form>
 </body>
 </lams:html>

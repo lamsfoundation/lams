@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
 	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -20,29 +18,15 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript">
-		function submitMessage() {
-			var formData = new FormData(document.getElementById("newForm"));
-
-			$.ajax({ // create an AJAX call...
-				data : formData,
-				processData : false, // tell jQuery not to process the data
-				contentType : false, // tell jQuery not to set contentType
-				type : $("#newForm").attr('method'),
-				url : $("#newForm").attr('action'),
-				success : function(data) {
-					if ( data.indexOf('profileRestrictions') > 0)
-						$("html").html(data);
-					else
-						window.parent.location.reload();
-				}
-			});
-		}
-		
 		$(document).ready( function() {
+			if ('${submitted}' == true && $('#error').length == 0) {
+				window.parent.location.reload();
+			} 
+			
 			//update dialog's height and title
 			updateMyProfileDialogSettings(
 				'<fmt:message key="title.profile.edit.screen" />',
@@ -53,16 +37,12 @@
 </lams:head>
 
 <body>
-	<html:form action="/saveprofile.do" method="post" styleId='newForm'>
-		<html:hidden property="userId" />
-		<html:hidden property="login" />
-		<html:hidden property="password" />
+	<form:form action="/lams/saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
+		<form:hidden path="userId" />
+		<form:hidden path="login" />
+		<form:hidden path="password" />
 
-		<logic:messagesPresent>
-			<lams:Alert type="warning" id="profileRestrictions" close="false">
-				<html:errors />
-			</lams:Alert>
-		</logic:messagesPresent>
+		<lams:errors path="*"/>
 
 		<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
 		<c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
@@ -80,292 +60,289 @@
 							<c:if test="${authenticationMethodId eq dbId}">
 
 								<div class="form-group">
-									<span class="lead">
-										<label><fmt:message key="label.username" /></label>: 
-										<bean:write name="UserForm" property="login" />
-									</span>
+									<span class="lead"><label><fmt:message
+												key="label.username" /></label>: ${UserForm.login}</span>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.title" />:</label>
-									<html:text property="title" size="32" maxlength="32"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="title" size="32" maxlength="32"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.first_name" /> *:</label>
-									<html:text property="firstName" size="50" maxlength="128"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="firstName" size="50" maxlength="128"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.last_name" /> *:</label>
-									<html:text property="lastName" size="50" maxlength="128"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="lastName" size="50" maxlength="128"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<c:if test="${!profileEditEnabled}">
-									<html:hidden property="firstName" />
-									<html:hidden property="lastName" />
+									<form:hidden path="firstName" />
+									<form:hidden path="lastName" />
 								</c:if>
 								<div class="form-group">
 									<label><fmt:message key="label.email" /> *:</label>
-									<html:text property="email" size="50" maxlength="128"
+									<form:input path="email" size="50" maxlength="128"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
-										styleClass="form-control" />
+										cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_1" />:</label>
-									<html:text property="addressLine1" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="addressLine1" size="50" maxlength="64"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_2" />:</label>
-									<html:text property="addressLine2" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="addressLine2" size="50" maxlength="64"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_3" />:</label>
-									<html:text property="addressLine3" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="addressLine3" size="50" maxlength="64"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.city" />:</label>
-									<html:text property="city" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="city" size="50" maxlength="64"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.state" />:</label>
-									<html:text property="state" size="50" maxlength="64"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="state" size="50" maxlength="64"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.postcode" />:</label>
-									<html:text property="postcode" size="10" maxlength="10"
-										disabled="${!profileEditEnabled}" styleClass="form-control" />
+									<form:input path="postcode" size="10" maxlength="10"
+										disabled="${!profileEditEnabled}" cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.country" /> *:</label>
 
-									<html:select property="country" disabled="${!profileEditEnabled}" styleClass="form-control">
-										<html:option value="0">
+									<form:select path="country" disabled="${!profileEditEnabled}" cssClass="form-control">
+										<form:option value="0">
 											<fmt:message key="label.select.country" />
-										</html:option>
+										</form:option>
 										<c:forEach items="${countryCodes}" var="countryCode">
-											<html:option value="${countryCode.key}">
+											<form:option value="${countryCode.key}">
 												${countryCode.value}
-											</html:option>
+											</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.day_phone" />:</label>
-									<html:text property="dayPhone" size="50" maxlength="64"
+									<form:input path="dayPhone" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
-										styleClass="form-control" />
+										cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.evening_phone" />:</label>
-									<html:text property="eveningPhone" size="50" maxlength="64"
+									<form:input path="eveningPhone" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
-										styleClass="form-control" />
+										cssClass="form-control" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.mobile_phone" />:</label>
-									<html:text property="mobilePhone" size="50" maxlength="64"
+									<form:input path="mobilePhone" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
-										styleClass="form-control" />
+										cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.fax" />:</label>
-									<html:text property="fax" size="50" maxlength="64"
+									<form:input path="fax" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
-										styleClass="form-control" />
+										cssClass="form-control" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.language" />:</label>
-									<html:select property="localeId"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+									<form:select path="localeId"
+										disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${locales}" var="locale">
-											<html:option value="${locale.localeId}">
+											<form:option value="${locale.localeId}">
 												<c:out value="${locale.description}" />
-											</html:option>
+											</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
-									<html:select property="timeZone" disabled="${!profileEditEnabled}" styleClass="form-control">
+									<form:select path="timeZone" disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
-											<html:option value="${timezoneDto.timeZoneId}">
+											<form:option value="${timezoneDto.timeZoneId}">
 												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-											</html:option>
+											</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.theme" />:</label>
-									<html:select property="userTheme" disabled="${!profileEditEnabled}" styleClass="form-control">
+									<form:select path="userTheme" disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${themes}" var="theme">
-											<html:option value="${theme.themeId}">${theme.name}</html:option>
+											<form:option value="${theme.themeId}">${theme.name}</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 								
 							</c:if>
 							<br />
 
 							<c:if test="${authenticationMethodId != dbId}">
-								<html:hidden property="title" />
-								<html:hidden property="firstName" />
-								<html:hidden property="lastName" />
-								<html:hidden property="email" />
-								<html:hidden property="addressLine1" />
-								<html:hidden property="addressLine2" />
-								<html:hidden property="addressLine3" />
-								<html:hidden property="city" />
-								<html:hidden property="state" />
-								<html:hidden property="postcode" />
-								<html:hidden property="country" />
-								<html:hidden property="dayPhone" />
-								<html:hidden property="eveningPhone" />
-								<html:hidden property="mobilePhone" />
-								<html:hidden property="fax" />
+								<form:hidden path="title" />
+								<form:hidden path="firstName" />
+								<form:hidden path="lastName" />
+								<form:hidden path="email" />
+								<form:hidden path="addressLine1" />
+								<form:hidden path="addressLine2" />
+								<form:hidden path="addressLine3" />
+								<form:hidden path="city" />
+								<form:hidden path="state" />
+								<form:hidden path="postcode" />
+								<form:hidden path="country" />
+								<form:hidden path="dayPhone" />
+								<form:hidden path="eveningPhone" />
+								<form:hidden path="mobilePhone" />
+								<form:hidden path="fax" />
 
 								<div class="form-group">
 									<label><fmt:message key="label.username" /></label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="login" />>
+										value="${UserForm.login}">
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.username" /></label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="login" />>
+										value="${UserForm.login}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.title" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="title" />>
+										value="${UserForm.title}"/>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.first_name" /> *:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="firstName" />>
+										value="${UserForm.firstName}"/>
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.last_name" /> *:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="lastName" />>
+										value="${UserForm.lastName}"/>
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.email" /> *:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="email" />>
+										value="${UserForm.email}"/>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_1" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="addressLine1" />>
+										value="${UserForm.addressLine1}"/>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_2" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="addressLine2" />>
+										value="${UserForm.addressLine2}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.address_line_3" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="addressLine3" />>
+										value="${UserForm.addressLine3}" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.city" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="city" />>
+										value="${UserForm.city}" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.state" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="state" />>
+										value="${UserForm.state}" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.postcode" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="postcode" />>
+										value="${UserForm.postcode}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.country" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="country" />>
+										value="${UserForm.country}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.day_phone" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="dayPhone" />>
+										value="${UserForm.dayPhone}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.evening_phone" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="eveningPhone" />>
+										value="${UserForm.eveningPhone}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.mobile_phone" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="mobilePhone" />>
+										value="${UserForm.mobilePhone}" />
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.fax" />:</label> <input
 										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="fax" />>
+										value="${UserForm.fax}" />
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.theme" />:</label>
-									<html:select property="userTheme"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+									<form:select path="userTheme"
+										disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${themes}" var="theme">
-											<html:option value="${theme.themeId}">${theme.name}</html:option>
+											<form:option value="${theme.themeId}">${theme.name}</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.language" />:</label>
-									<html:select property="localeId"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+									<form:select path="localeId"
+										disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${locales}" var="locale">
-											<html:option value="${locale.localeId}">
+											<form:option value="${locale.localeId}">
 												<c:out value="${locale.description}" />
-											</html:option>
+											</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
-									<html:select property="timeZone" disabled="${!profileEditEnabled}" styleClass="form-control">
+									<form:select path="timeZone" disabled="${!profileEditEnabled}" cssClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
-											<html:option value="${timezoneDto.timeZoneId}">
+											<form:option value="${timezoneDto.timeZoneId}">
 												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-											</html:option>
+											</form:option>
 										</c:forEach>
-									</html:select>
+									</form:select>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
 									<c:set var="timeZone">
-										<input type="text" class="form-control"
-											value=<bean:write name="UserForm" property="timeZone" />>
+										<input type="text" class="form-control" value="${UserForm.timeZone}" />
 									</c:set>
 									${timeZone}
 								</div>
@@ -375,23 +352,18 @@
 					</div>
 				</div>
 			</div>
-	</html:form>
-	<div class="form-group" align="right">
-		<html:cancel styleClass="btn btn-sm btn-default voffset5">
-			<fmt:message key="button.cancel" />
-		</html:cancel>
-		&nbsp;&nbsp;
-		<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
-			<html:button styleClass="btn btn-sm btn-primary voffset5"
-				property="submit" onclick="submitMessage()">
-				<fmt:message key="button.save" />
-			</html:button>
-		</c:if>
-	</div>
-	</div>
+		<div class="form-group" align="right">
+			<button type="button" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+				<fmt:message key="button.cancel" />
+			</button>
+			&nbsp;&nbsp;
+			<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
+				<button type="submit" class="btn btn-sm btn-primary voffset5" 
+						name="submit"> 
+					<fmt:message key="button.save" />
+				</button>
+			</c:if>
+		</div>
+	</form:form>
 </body>
 </lams:html>
-
-
-
-

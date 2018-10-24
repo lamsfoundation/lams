@@ -39,12 +39,12 @@ public class ToolContentRestServlet extends RestServlet {
 	    throws Exception {
 	// find out which Tool to create
 	String toolSignature = JsonUtil.optString(requestJSON, "toolSignature");
-	Tool tool = getToolDAO().getToolBySignature(toolSignature);
-	Long toolContentID = getAuthoringService().insertToolContentID(tool.getToolId());
+	Tool tool = toolDAO.getToolBySignature(toolSignature);
+	Long toolContentID = authoringService.insertToolContentID(tool.getToolId());
 
 	ObjectNode toolContentJSON = JsonUtil.optObject(requestJSON, "toolContent");
 	// Tools' services implement an interface for processing REST requests
-	ToolRestManager toolRestService = (ToolRestManager) getLamsCoreToolService().findToolService(tool);
+	ToolRestManager toolRestService = (ToolRestManager) lamsCoreToolService.findToolService(tool);
 	toolRestService.createRestToolContent(userDTO.getUserID(), toolContentID, toolContentJSON);
 
 	response.setContentType("application/json;charset=utf-8");

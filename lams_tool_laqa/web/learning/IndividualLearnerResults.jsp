@@ -13,8 +13,8 @@
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.QaLearningForm.method.value = actionMethod;
-			document.QaLearningForm.submit();
+			document.forms.qaLearningForm.action = actionMethod+".do";
+			document.forms.qaLearningForm.submit();
 		}
 	</script>
 </lams:head>
@@ -22,7 +22,7 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	<form:form action="/lams/tool/laqa11/learning/learning.do" method="POST" modelAttribute="qaLearningForm" target="_self">
 
 		<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -51,11 +51,10 @@
 		</c:if>
 		<!-- End announcements -->
 
-			<html:hidden property="method" value="storeAllResults" />
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="userID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="totalQuestionCount" />
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="totalQuestionCount" />
 
 			<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 
@@ -123,23 +122,23 @@
 
 			<div class="voffset10">
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<html:button property="redoQuestions" styleClass="btn btn-default pull-left"
+					<button type="button" name="redoQuestions" class="btn btn-default pull-left"
 						onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
-					</html:button>
+					</button>
 				</c:if>
 
 				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
-					<html:button property="viewAllResults" onclick="submitMethod('storeAllResults');"
-						styleClass="btn btn-default pull-right">
+					<button name="viewAllResults" type="button" onclick="submitMethod('storeAllResults');"
+						class="btn btn-default pull-right">
 						<fmt:message key="label.allResponses" />
-					</html:button>
+					</button>
 				</c:if>
 
 				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 						<div class="space-bottom-top align-right">
-							<button type="submit" id="finishButton" 
+							<button type="button" id="finishButton" 
 								onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
 								<c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
@@ -155,10 +154,10 @@
 					</c:if>
 
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-						<html:button property="forwardtoReflection" onclick="javascript:submitMethod('storeAllResults');"
-							styleClass="btn btn-primary pull-right">
+						<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
+							class="btn btn-primary pull-right">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:if>
 				</c:if>
 
@@ -169,7 +168,7 @@
 
 		</lams:Page>
 
-	</html:form>
+	</form:form>
 	<!-- end form -->
 
 </body>

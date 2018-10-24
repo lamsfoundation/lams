@@ -21,14 +21,10 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.scribe.web.forms;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -36,11 +32,10 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class LearningForm extends ActionForm {
+public class LearningForm {
 
     private static final long serialVersionUID = -4728946254882237144L;
 
-    private String dispatch;
     private Long scribeUserUID;
     private Long toolSessionID;
     private String mode;
@@ -62,14 +57,6 @@ public class LearningForm extends ActionForm {
 
     public void setScribeUserUID(Long scribeUserUID) {
 	this.scribeUserUID = scribeUserUID;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

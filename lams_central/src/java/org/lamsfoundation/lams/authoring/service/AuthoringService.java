@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -104,6 +103,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -808,7 +808,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName, String customCSV) {
 	String newTitle = newDesignName;
 	if (newTitle == null) {
-	    newTitle = getUniqueNameForLearningDesign(originalLearningDesign.getTitle(),
+	    newTitle = learningDesignService.getUniqueNameForLearningDesign(originalLearningDesign.getTitle(),
 		    workspaceFolder != null ? workspaceFolder.getWorkspaceFolderId() : null);
 	}
 
@@ -1333,7 +1333,17 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    throw new UserException("User with ID " + userID
 		    + " is not authorized to store a design in this workspace folder " + workspaceFolderID);
 	}
-
+	if (existingLearningDesign == null) {
+	    // check the user has given it a unique name in this folder, and make it unique if needed
+	    String title = JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE);
+	    if ( title != null ) {
+		title = learningDesignService.getUniqueNameForLearningDesign(title, workspaceFolderID);
+	    } else {
+		title = messageService.getMessage("authoring.fla.page.ld.title");
+	    }
+	    ldJSON.put(AuthoringJsonTags.TITLE, title);
+	}
+		
 	IObjectExtractor extractor = (IObjectExtractor) beanFactory
 		.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
 	LearningDesign design = extractor.extractSaveLearningDesign(ldJSON, existingLearningDesign, workspaceFolder,
@@ -1409,46 +1419,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    licenseDTOList.add(element.getLicenseDTO(Configuration.get(ConfigurationKeys.SERVER_URL)));
 	}
 	return licenseDTOList;
-    }
-
-    /**
-     * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
-     * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
-     * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
-     * quite intensive as it gets all the learning designs in a folder.
-     *
-     * @param originalLearningDesign
-     * @param workspaceFolder
-     * @param copyType
-     * @return
-     */
-    @Override
-    public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId) {
-
-	String newName = originalTitle;
-	if (workspaceFolderId != null) {
-	    List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId,
-		    originalTitle);
-	    int idx = 1;
-
-	    Calendar calendar = Calendar.getInstance();
-	    int mth = calendar.get(Calendar.MONTH) + 1;
-	    String mthStr = new Integer(mth).toString();
-	    if (mth < 10) {
-		mthStr = "0" + mthStr;
-	    }
-	    int day = calendar.get(Calendar.DAY_OF_MONTH);
-	    String dayStr = new Integer(day).toString();
-	    if (day < 10) {
-		dayStr = "0" + dayStr;
-	    }
-	    String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
-	    while (ldTitleList.contains(newName)) {
-		newName = originalTitle + "_" + nameMid + "_" + idx;
-		idx++;
-	    }
-	}
-	return newName;
     }
 
     /**

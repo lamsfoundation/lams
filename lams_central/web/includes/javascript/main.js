@@ -30,7 +30,7 @@ $(document).ready(function () {
             cssPageDisplay: '.pagedisplay',
             cssPageSize: '.pagesize',
             cssDisabled: 'disabled',
-            ajaxUrl : LAMS_URL + "/index.do?dispatch=getOrgs&page={page}&size={size}&{sortList:column}&{filterList:fcol}",
+            ajaxUrl : LAMS_URL + "/index/getOrgs.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}",
 			ajaxProcessing: function (data, table) {
 		    	if (data && data.hasOwnProperty('rows')) {
 		    		var rows = [],
@@ -121,9 +121,8 @@ function selectOrganisation(newOrgId) {
 	
 	//store last visited organisation
 	$.ajax({
-		url : "index.do",
+		url : "index/storeLastVisitedOrganisation.do",
 		data : {
-			dispatch : "storeLastVisitedOrganisation",
 			orgId   : activeOrgId
 		}
 	});
@@ -156,9 +155,8 @@ function loadOrganisation() {
 
 function toggleFavoriteOrganisation(orgId) {
 	$("#favorite-organisations-container").load(
-		"index.do",
+		"index/toggleFavoriteOrganisation.do",
 		{
-			dispatch: "toggleFavoriteOrganisation",
 			orgId   : orgId,
 			activeOrgId : activeOrgId
 		},
@@ -182,7 +180,7 @@ function showMyProfileDialog() {
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=profile');
+			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?redirect=profile');
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -286,7 +284,7 @@ function showMonitorLessonDialog(lessonID) {
 			'open' : function() {
 				// load contents after opening the dialog
 				$('iframe', this).attr('src', LAMS_URL
-					+ 'home.do?method=monitorLesson&lessonID='
+					+ 'home/monitorLesson.do?lessonID='
 					+ $(this).data('lessonID'));
 			},
 
@@ -330,7 +328,7 @@ function showAddLessonDialog(orgID) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'home.do?method=addLesson&organisationID='
+						+ 'home/addLesson.do?organisationID='
 						+ dialog.data('orgID'));
 			
 			// in case of mobile devices allow iframe scrolling
@@ -354,7 +352,7 @@ function showOrgGroupingDialog(orgID, activityID) {
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID=' + orgID
+			$('iframe', this).attr('src', LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID
 												   + (activityID ? '&activityID=' + activityID : ''));
 		}
 	}, true);
@@ -389,10 +387,9 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 			$.ajax({
 				async : false,
 				cache : false,
-				url : LAMS_URL + "authoring/author.do",
+				url : LAMS_URL + "authoring/createToolContent.do",
 				dataType : 'json',
 				data : {
-					'method' : 'createToolContent',
 					'toolID' : toolID
 				},
 				success : function(response) {
@@ -447,10 +444,9 @@ function showPrivateNotificationsDialog(){
 function refreshPrivateNotificationCount(){
 	$.ajax({
 		cache : false,
-		url : LAMS_URL + "notification.do",
+		url : LAMS_URL + "notification/getPendingNotificationCount.do",
 		dataType : 'text',
 		data : {
-			'method' : 'getPendingNotificationCount'
 		},
 		success : function(count) {
 			$('#notificationsPendingCount').text(count == 0 ? '0' : count);
@@ -476,7 +472,7 @@ function showGradebookCourseDialog(orgID){
 			console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
+				+ 'gradebook/gradebookMonitoring/courseMonitor.do?organisationID=' + orgID);
 		}
 	}, true);
 }
@@ -494,7 +490,7 @@ function showGradebookLearnerDialog(orgID){
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
+				+ 'gradebook/gradebookLearning/courseLearner.do?organisationID=' + orgID);
 		}
 	}, true);
 }
@@ -512,7 +508,7 @@ function showConditionsDialog(lessonID){
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
+				+ 'lessonConditions/getIndexLessonConditions.do?lsId=' + lessonID);
 		}
 	}, true);
 }
@@ -530,7 +526,7 @@ function showSearchLessonDialog(orgID){
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
-				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
+				+ 'findUserLessons/getResults.do?courseID=' + orgID);
 		}
 	}, true);
 }
@@ -547,7 +543,7 @@ function showKumaliveRubricsDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getRubrics&organisationID=' + orgID);
+			$('iframe', this).attr('src', LAMS_URL	+ 'learning/kumalive/getRubrics.do?organisationID=' + orgID);
 		}
 	}, false);
 }
@@ -564,7 +560,7 @@ function showKumaliveReportDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL	+ '/learning/kumalive.do?method=getReport&organisationID=' + orgID);
+			$('iframe', this).attr('src', LAMS_URL	+ 'learning/kumalive/getReport.do?organisationID=' + orgID);
 		}
 	}, false);
 }
@@ -594,10 +590,9 @@ function closeAddSingleActivityLessonDialog(action) {
 		$.ajax({
 			async : false,
 			cache : false,
-			url : LAMS_URL + "authoring/author.do",
+			url : LAMS_URL + "authoring/createSingleActivityLesson.do",
 			dataType : 'text',
 			data : {
-				'method' : 'createSingleActivityLesson',
 				'organisationID'  : dialog.data('orgID'),
 				'toolID' : dialog.data('toolID'),
 				'toolContentID' : dialog.data('toolContentID'),
@@ -624,7 +619,7 @@ function closeAddSingleActivityLessonDialog(action) {
 						closeDialog(id, true);
 					});
 					// load svgGenerator.jsp to render LD SVG
-					frame.attr('src', LAMS_URL + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+					frame.attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false&learningDesignID='
 											   + learningDesignID);
 				}
 			}
@@ -654,8 +649,8 @@ function removeLesson(lessonID) {
 		if (confirm(LABELS.REMOVE_LESSON_CONFIRM2)) {
 			$.ajax({
 				async : false,
-				url : LAMS_URL + "monitoring/monitoring.do",
-				data : "method=removeLesson&lessonID=" + lessonID,
+				url : LAMS_URL + "monitoring/monitoring/removeLesson.do",
+				data : "lessonID=" + lessonID,
 				type : "POST",
 				success : function(json) {
 					if (json.removeLesson == true) {

@@ -17,6 +17,7 @@
 package org.apache.poi.ss.format;
 
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.util.LocaleUtil;
 
 import javax.swing.*;
 
@@ -34,12 +35,12 @@ import static org.apache.poi.ss.format.CellFormatter.quote;
  * Objects of this class represent a single part of a cell format expression.
  * Each cell can have up to four of these for positive, zero, negative, and text
  * values.
- * <p/>
+ * <p>
  * Each format part can contain a color, a condition, and will always contain a
  * format specification.  For example <tt>"[Red][>=10]#"</tt> has a color
  * (<tt>[Red]</tt>), a condition (<tt>>=10</tt>) and a format specification
  * (<tt>#</tt>).
- * <p/>
+ * <p>
  * This class also contains patterns for matching the subparts of format
  * specification.  These are used internally, but are made public in case other
  * code has use for them.
@@ -173,6 +174,16 @@ public class CellFormatPart {
      * @param desc The string to parse.
      */
     public CellFormatPart(String desc) {
+        this(LocaleUtil.getUserLocale(), desc);
+    }
+    
+    /**
+     * Create an object to represent a format part.
+     *
+     * @param locale The locale to use.
+     * @param desc The string to parse.
+     */
+    public CellFormatPart(Locale locale, String desc) {
         Matcher m = FORMAT_PAT.matcher(desc);
         if (!m.matches()) {
             throw new IllegalArgumentException("Unrecognized format: " + quote(
@@ -181,7 +192,7 @@ public class CellFormatPart {
         color = getColor(m);
         condition = getCondition(m);
         type = getCellFormatType(m);
-        format = getFormatter(m);
+        format = getFormatter(locale, m);
     }
 
     /**
@@ -287,7 +298,7 @@ public class CellFormatPart {
      *
      * @return The formatter.
      */
-    private CellFormatter getFormatter(Matcher matcher) {
+    private CellFormatter getFormatter(Locale locale, Matcher matcher) {
         String fdesc = matcher.group(SPECIFICATION_GROUP);
         
         // For now, we don't support localised currencies, so simplify if there
@@ -305,7 +316,7 @@ public class CellFormatPart {
         }
         
         // Build a formatter for this simplified string
-        return type.formatter(fdesc);
+        return type.formatter(locale, fdesc);
     }
 
     /**

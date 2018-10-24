@@ -77,6 +77,10 @@ var oConnector = new Object() ;
 oConnector.CurrentFolder	= '/' ;
 //LDEV-4497 split content folder ID into dir structure of 2 characters each
 var designFolder = GetUrlParam( 'CurrentFolder' ).replace(new RegExp("[/\\-]", 'g'), "");
+//if trimmedFolder length is less than 12, supplement it with missing characters
+if (designFolder.length < 12) {
+	designFolder += "123456789012".substring(0, 12-designFolder.length);
+}
 var splitDesignFolder = "/";
 for (var charIndex = 0; charIndex < 6; charIndex++){
 	splitDesignFolder += designFolder[charIndex * 2] + designFolder[charIndex * 2  + 1] + "/";

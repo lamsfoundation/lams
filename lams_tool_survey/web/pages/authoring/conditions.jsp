@@ -1,6 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script type="text/javascript">
 	
 	function showConditionMessage(url) {
@@ -16,25 +14,25 @@
 	}
 	
 	function editCondition(orderId,sessionMapID){
-		var url = "<c:url value="/authoring/editCondition.do?orderId="/>" + orderId +"&sessionMapID="+sessionMapID;
+		var url = "<c:url value="/authoringCondition/editCondition.do?orderId="/>" + orderId +"&sessionMapID="+sessionMapID;
 		showConditionMessage(url);
 	}
 	
 	function deleteCondition(orderId, sessionMapID){
-		$("#conditionsArea").load("<c:url value='/authoring/removeCondition.do'/>",{
+		$("#conditionsArea").load("<c:url value='/authoringCondition/removeCondition.do'/>",{
 			'orderId' : orderId,
 			'sessionMapID' : sessionMapID
 		});
 	}
 	
 	function upCondition(orderId,sessionMapID){
-		$("#conditionsArea").load("<c:url value='/authoring/upCondition.do'/>",{
+		$("#conditionsArea").load("<c:url value='/authoringCondition/upCondition.do'/>",{
 			'orderId' : orderId,
 			'sessionMapID' : sessionMapID
 		});
 	}
 	function downCondition(orderId,sessionMapID){
-		$("#conditionsArea").load("<c:url value='/authoring/downCondition.do'/>",{
+		$("#conditionsArea").load("<c:url value='/authoringCondition/downCondition.do'/>",{
 			'orderId' : orderId,
 			'sessionMapID' : sessionMapID
 		});
@@ -51,12 +49,12 @@
 <!-- Conditions Tab Content -->
 
 <div id="conditionsArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 	<%@ include file="conditionList.jsp"%>
 </div>
   
  <div class="form-inline">
-	<a href="javascript:showConditionMessage('<html:rewrite page="/authoring/newConditionInit.do?sessionMapID=${formBean.sessionMapID}"/>');" 
+	<a href="javascript:showConditionMessage('<lams:WebAppURL/>authoringCondition/newConditionInit.do?sessionMapID=${authoringForm.sessionMapID}');" 
 		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
 </div>
 

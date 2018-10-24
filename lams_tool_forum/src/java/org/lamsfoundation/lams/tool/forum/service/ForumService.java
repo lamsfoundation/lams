@@ -41,7 +41,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -104,6 +103,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -281,7 +281,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	
 	// send marks to gradebook, if marks are released for that session
 	ForumUser user = message.getCreatedBy();
-	ForumToolSession session = user.getSession();
+	ForumToolSession session = message.getToolSession();
 	if (session.isMarkReleased()) {
 	    sendMarksToGradebook(user, session.getSessionId());
 	}
@@ -398,8 +398,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
+    public Attachment uploadAttachment(MultipartFile uploadFile) throws PersistenceException {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getOriginalFilename())) {
 	    throw new ForumException("Could not find upload file: " + uploadFile);
 	}
 
@@ -407,7 +407,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Attachment file = new Attachment();
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
+	file.setFileName(uploadFile.getOriginalFilename());
 
 	return file;
     }
@@ -553,14 +553,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public List getAuthoredTopics(Long forumUid) {
-	List list = messageDao.getTopicsFromAuthor(forumUid);
+    public List<MessageDTO> getAuthoredTopics(Long forumUid) {
+	List<Message> list = messageDao.getTopicsFromAuthor(forumUid);
 
 	TreeMap<Date, Message> map = new TreeMap<>(new DateComparator());
 	// get all the topics skipping ones with a tool session (we may be editing in monitor) and sort by create date
-	Iterator iter = list.iterator();
+	Iterator<Message> iter = list.iterator();
 	while (iter.hasNext()) {
-	    Message topic = (Message) iter.next();
+	    Message topic = iter.next();
 	    if (topic.getToolSession() == null) {
 		map.put(topic.getCreated(), topic);
 	    }
@@ -668,9 +668,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    messageRating.setUser(imageGalleryUser);
 	    messageRating.setMessage(message);
 	}
-	
+
 	// LDEV-4590 Star Rating can never be more than 5 stars
-	if ( Float.compare(rating, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
+	if (Float.compare(rating, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
 	    rating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
 	}
 	messageRating.setRating(rating);
@@ -732,10 +732,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file) {
+    private NodeKey processFile(MultipartFile file) {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
+	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
+	    String fileName = file.getOriginalFilename();
 	    try {
 		node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {

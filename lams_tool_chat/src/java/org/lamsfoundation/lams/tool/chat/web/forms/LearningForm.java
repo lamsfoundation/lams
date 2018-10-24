@@ -21,11 +21,7 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.chat.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -33,11 +29,10 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class LearningForm extends ActionForm {
+public class LearningForm {
 
     private static final long serialVersionUID = -4728946254882237144L;
 
-    String dispatch;
     Long chatUserUID;
     Long toolSessionID;
     String mode;
@@ -57,14 +52,6 @@ public class LearningForm extends ActionForm {
 
     public void setChatUserUID(Long chatUserUID) {
 	this.chatUserUID = chatUserUID;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

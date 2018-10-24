@@ -1,4 +1,4 @@
-<%@ include file="/template/taglibs.jsp"%>
+<%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.CommonConstants"%>
 <script>
 	$(document).ready(function(){

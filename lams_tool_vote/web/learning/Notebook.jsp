@@ -16,8 +16,8 @@
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.VoteLearningForm.dispatch.value = actionMethod;
-			document.VoteLearningForm.submit();
+			document.forms.voteLearningForm.action = actionMethod + '.do';
+			document.forms.voteLearningForm.submit();
 		}
 	</script>
 
@@ -25,23 +25,22 @@
 
 <body class="stripes">
 
-		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+		<form:form modelAttribute="voteLearningForm" method="POST">
 
 		<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
 
-			<html:hidden property="dispatch" />
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="userID" />
-			<html:hidden property="userLeader" />
-			<html:hidden property="groupLeaderName" />
-			<html:hidden property="groupLeaderUserId" />
-			<html:hidden property="useSelectLeaderToolOuput" />
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="userID" />
+			<form:hidden path="userLeader" />
+			<form:hidden path="groupLeaderName" />
+			<form:hidden path="groupLeaderUserId" />
+			<form:hidden path="useSelectLeaderToolOuput" />
 
 			<div class="panel">
 				<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</div>
 
-			<html:textarea rows="5" property="entryText" styleClass="form-control" styleId="focused"></html:textarea>
+			<form:textarea rows="5" path="entryText" cssClass="form-control" styleId="focused" />
 			<button type="submit" onclick="javascript:submitMethod('submitReflection')"
 				class="btn btn-primary voffset10 pull-right na" id="finishButton">
 				<fmt:message key="button.endLearning" />
@@ -49,7 +48,7 @@
 
 		</lams:Page>
 
-		</html:form>
+		</form:form>
 
 	<script type="text/javascript">
 		window.onload = function() {

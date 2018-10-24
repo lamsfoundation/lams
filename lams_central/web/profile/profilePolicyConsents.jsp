@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <lams:html>
 <lams:head>
@@ -17,12 +15,9 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="loadVars.jsp"></script>
-	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
@@ -51,7 +46,7 @@
 						<c:forEach items="${policyDtos}" var="policyDto">
 							<tr>
 								<td>
-									<a href="profile.do?method=displayPolicyDetails&policyUid=${policyDto.uid}" target="_new"
+									<a href="displayPolicyDetails.do?policyUid=${policyDto.uid}" target="_new"
 											title="<fmt:message key="label.policy.details"/>">
 										<c:out value="${policyDto.policyName}" />
 									</a>
@@ -93,9 +88,9 @@
 					</table>
 					
 					<div class="pull-right">
-						<input class="btn btn-sm btn-default offset5" type="button"
-							value="<fmt:message key="label.return.to.myprofile" />"
-							onclick="javascript:document.location='index.do?method=profile'" />
+						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+							<fmt:message key="label.return.to.myprofile" />
+						</button>
 					</div>
 
 				</div>

@@ -17,13 +17,24 @@
 
 package org.apache.poi.hpsf;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
 import org.apache.poi.hpsf.wellknown.PropertyIDMap;
+import org.apache.poi.util.CodePageUtil;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
 
 /**
  * Maintains the instances of {@link CustomProperty} that belong to a
@@ -53,9 +64,14 @@ import org.apache.poi.hpsf.wellknown.PropertyIDMap;
  * internal representation. To external calls, it should appear as
  * HashMap&lt;String,Object&gt; mapping between Names and Custom Property Values.
  */
-@SuppressWarnings("serial")
-public class CustomProperties extends HashMap<Long,CustomProperty> {
-
+public class CustomProperties implements Map<String,Object> {
+    private static final POILogger LOG = POILogFactory.getLogger(CustomProperties.class);
+    
+    /**
+     * The custom properties
+     */
+    private final HashMap<Long,CustomProperty> props = new HashMap<Long,CustomProperty>();
+    
     /**
      * Maps property IDs to property names and vice versa.
      */
@@ -66,6 +82,7 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
      */
     private boolean isPure = true;
 
+    private int codepage = -1;
 
     /**
      * Puts a {@link CustomProperty} into this map. It is assumed that the
@@ -90,151 +107,144 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
                     ") do not match.");
         }
 
+        checkCodePage(name);
+        
         /* Register name and ID in the dictionary. Mapping in both directions is possible. If there is already a  */
-        super.remove(dictionary.getKey(name));
+        props.remove(dictionary.getKey(name));
         dictionary.put(cp.getID(), name);
 
         /* Put the custom property into this map. */
-        return super.put(cp.getID(), cp);
+        return props.put(cp.getID(), cp);
     }
 
-
-
     /**
-     * Puts a {@link CustomProperty} that has not yet a valid ID into this
-     * map. The method will allocate a suitable ID for the custom property:
+     * Adds a named property.
      *
-     * <ul>
-     * <li>If there is already a property with the same name, take the ID
-     * of that property.
-     *
-     * <li>Otherwise find the highest ID and use its value plus one.
-     * </ul>
-     *
-     * @param customProperty
-     * @return If there was already a property with the same name, the old property
-     * @throws ClassCastException
+     * @param key The property's name.
+     * @param value The property's value.
+     * @return the property that was stored under the specified name before, or
+     *         {@code null} if there was no such property before.
      */
-    private Object put(final CustomProperty customProperty) throws ClassCastException {
-        final String name = customProperty.getName();
-
-        /* Check whether a property with this name is in the map already. */
-        final Long oldId = (name == null) ? null :  dictionary.getKey(name);
-        if (oldId != null) {
-            customProperty.setID(oldId);
+    @Override
+    public Object put(String key, Object value) {
+        int variantType;
+        if (value instanceof String) {
+            variantType = Variant.VT_LPSTR;
+        } else if (value instanceof Short) {
+            variantType = Variant.VT_I2;
+        } else if (value instanceof Integer) {
+            variantType = Variant.VT_I4;
+        } else if (value instanceof Long) {
+            variantType = Variant.VT_I8;
+        } else if (value instanceof Float) {
+            variantType = Variant.VT_R4;
+        } else if (value instanceof Double) {
+            variantType = Variant.VT_R8;
+        } else if (value instanceof Boolean) {
+            variantType = Variant.VT_BOOL;
+        } else if (value instanceof BigInteger
+            && ((BigInteger)value).bitLength() <= 64
+            && ((BigInteger)value).compareTo(BigInteger.ZERO) >= 0) {
+            variantType = Variant.VT_UI8;
+        } else if (value instanceof Date) {
+            variantType = Variant.VT_FILETIME;
         } else {
-            long lastKey = (dictionary.isEmpty()) ? 0 : dictionary.lastKey();
-            customProperty.setID(Math.max(lastKey,PropertyIDMap.PID_MAX) + 1);
+            throw new IllegalStateException("unsupported datatype - currently String,Short,Integer,Long,Float,Double,Boolean,BigInteger(unsigned long),Date can be processed.");
         }
-        return this.put(name, customProperty);
+        final Property p = new MutableProperty(-1, variantType, value);
+        return put(new CustomProperty(p, key));
     }
-
-
-
+    
     /**
-     * Removes a custom property.
-     * @param name The name of the custom property to remove
-     * @return The removed property or {@code null} if the specified property was not found.
+     * Gets a named value from the custom properties - only works for keys of type String
      *
-     * @see java.util.HashSet#remove(java.lang.Object)
-     */
-    public Object remove(final String name) {
-        final Long id = dictionary.removeValue(name);
-        return super.remove(id);
-    }
-
-    /**
-     * Adds a named string property.
-     *
-     * @param name The property's name.
-     * @param value The property's value.
-     * @return the property that was stored under the specified name before, or
-     *         {@code null} if there was no such property before.
-     */
-    public Object put(final String name, final String value) {
-        final Property p = new Property(-1, Variant.VT_LPWSTR, value);
-        return put(new CustomProperty(p, name));
-    }
-
-    /**
-     * Adds a named long property.
-     *
-     * @param name The property's name.
-     * @param value The property's value.
-     * @return the property that was stored under the specified name before, or
-     *         {@code null} if there was no such property before.
-     */
-    public Object put(final String name, final Long value) {
-        final Property p = new Property(-1, Variant.VT_I8, value);
-        return put(new CustomProperty(p, name));
-    }
-
-    /**
-     * Adds a named double property.
-     *
-     * @param name The property's name.
-     * @param value The property's value.
-     * @return the property that was stored under the specified name before, or
-     *         {@code null} if there was no such property before.
-     */
-    public Object put(final String name, final Double value) {
-        final Property p = new Property(-1, Variant.VT_R8, value);
-        return put(new CustomProperty(p, name));
-    }
-
-    /**
-     * Adds a named integer property.
-     *
-     * @param name The property's name.
-     * @param value The property's value.
-     * @return the property that was stored under the specified name before, or
-     *         {@code null} if there was no such property before.
-     */
-    public Object put(final String name, final Integer value) {
-        final Property p = new Property(-1, Variant.VT_I4, value);
-        return put(new CustomProperty(p, name));
-    }
-
-    /**
-     * Adds a named boolean property.
-     *
-     * @param name The property's name.
-     * @param value The property's value.
-     * @return the property that was stored under the specified name before, or
-     *         {@code null} if there was no such property before.
-     */
-    public Object put(final String name, final Boolean value) {
-        final Property p = new Property(-1, Variant.VT_BOOL, value);
-        return put(new CustomProperty(p, name));
-    }
-
-
-    /**
-     * Gets a named value from the custom properties.
-     *
-     * @param name the name of the value to get
+     * @param key the name of the value to get
      * @return the value or {@code null} if a value with the specified
      *         name is not found in the custom properties.
      */
-    public Object get(final String name) {
-        final Long id = dictionary.getKey(name);
-        final CustomProperty cp = super.get(id);
+    @Override
+    public Object get(final Object key) {
+        final Long id = dictionary.getKey(key);
+        final CustomProperty cp = props.get(id);
         return cp != null ? cp.getValue() : null;
     }
 
+    /**
+     * Removes a custom property - only works for keys of type String
+     * @param key The name of the custom property to remove
+     * @return The removed property or {@code null} if the specified property was not found.
+     */
+    @Override
+    public CustomProperty remove(Object key) {
+        final Long id = dictionary.removeValue(key);
+        return props.remove(id);
+    }
 
+    @Override
+    public int size() {
+        return props.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return props.isEmpty();
+    }
+
+    @Override
+    public void clear() {
+        props.clear();
+    }
+    
+    @Override
+    public int hashCode() {
+        return props.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CustomProperties)) {
+            return false;
+        }
+        return props.equals(((CustomProperties)obj).props);
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ? extends Object> m) {
+        for (Map.Entry<? extends String, ? extends Object> me : m.entrySet()) {
+            put(me.getKey(), me.getValue());
+        }
+    }
 
     /**
-     * Adds a named date property.
-     *
-     * @param name The property's name.
-     * @param value The property's value.
-     * @return the property that was stored under the specified name before, or
-     *         {@code null} if there was no such property before.
+     * @return the list of properties
      */
-    public Object put(final String name, final Date value) {
-        final Property p = new Property(-1, Variant.VT_FILETIME, value);
-        return put(new CustomProperty(p, name));
+    public List<CustomProperty> properties() {
+        List<CustomProperty> list = new ArrayList<CustomProperty>(props.size());
+        for (Long l : dictionary.keySet()) {
+            list.add(props.get(l));
+        }
+        return Collections.unmodifiableList(list);
+    }
+    
+    /**
+     * @return the list of property values - use {@link #properties()} for the wrapped values 
+     */
+    @Override
+    public Collection<Object> values() {
+        List<Object> list = new ArrayList<Object>(props.size());
+        for (Long l : dictionary.keySet()) {
+            list.add(props.get(l).getValue());
+        }
+        return Collections.unmodifiableCollection(list);
+    }
+
+    @Override
+    public Set<Entry<String, Object>> entrySet() {
+        Map<String,Object> set = new LinkedHashMap<String,Object>(props.size());
+        for (Entry<Long,String> se : dictionary.entrySet()) {
+            set.put(se.getValue(), props.get(se.getKey()).getValue());
+        }
+        return Collections.unmodifiableSet(set.entrySet());
     }
 
     /**
@@ -246,7 +256,7 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Set keySet() {
-        return dictionary.values();
+        return Collections.unmodifiableSet(dictionary.values());
     }
 
     /**
@@ -255,7 +265,7 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
      * @return a set of all the names of our custom properties
      */
     public Set<String> nameSet() {
-        return dictionary.values();
+        return Collections.unmodifiableSet(dictionary.values());
     }
 
     /**
@@ -263,8 +273,8 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
      * 
      * @return a set of all the IDs of our custom properties
      */
-    public Set<String> idSet() {
-        return dictionary.values();
+    public Set<Long> idSet() {
+        return Collections.unmodifiableSet(dictionary.keySet());
     }
 
 
@@ -274,11 +284,17 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
      * @param codepage the codepage
      */
     public void setCodepage(final int codepage) {
-        Property p = new Property(PropertyIDMap.PID_CODEPAGE, Variant.VT_I2, codepage);
-        put(new CustomProperty(p));
+        this.codepage = codepage;
     }
 
-
+    /**
+     * Gets the codepage.
+     *
+     * @return the codepage or -1 if the codepage is undefined.
+     */
+    public int getCodepage() {
+        return codepage;
+    }
 
     /**
      * <p>Gets the dictionary which contains IDs and names of the named custom
@@ -305,26 +321,16 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
     @Override
     public boolean containsValue(Object value) {
         if(value instanceof CustomProperty) {
-            return super.containsValue(value);
+            return props.containsValue(value);
         }
       
-        for(CustomProperty cp : super.values()) {
+        for(CustomProperty cp : props.values()) {
             if(cp.getValue() == value) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Gets the codepage.
-     *
-     * @return the codepage or -1 if the codepage is undefined.
-     */
-    public int getCodepage() {
-        CustomProperty cp = get(PropertyIDMap.PID_CODEPAGE);
-        return (cp == null) ? -1 : (Integer)cp.getValue();
     }
 
     /**
@@ -346,5 +352,56 @@ public class CustomProperties extends HashMap<Long,CustomProperty> {
      */
     public void setPure(final boolean isPure) {
         this.isPure = isPure;
+    }
+
+    /**
+     * Puts a {@link CustomProperty} that has not yet a valid ID into this
+     * map. The method will allocate a suitable ID for the custom property:
+     *
+     * <ul>
+     * <li>If there is already a property with the same name, take the ID
+     * of that property.
+     *
+     * <li>Otherwise find the highest ID and use its value plus one.
+     * </ul>
+     *
+     * @param customProperty
+     * @return If there was already a property with the same name, the old property
+     * @throws ClassCastException
+     */
+    private Object put(final CustomProperty customProperty) throws ClassCastException {
+        final String name = customProperty.getName();
+
+        /* Check whether a property with this name is in the map already. */
+        final Long oldId = (name == null) ? null :  dictionary.getKey(name);
+        if (oldId != null) {
+            customProperty.setID(oldId);
+        } else {
+            long lastKey = (dictionary.isEmpty()) ? 0 : dictionary.lastKey();
+            long nextKey = Math.max(lastKey,PropertyIDMap.PID_MAX)+1;
+            customProperty.setID(nextKey);
+        }
+        return this.put(name, customProperty);
+    }
+
+    private void checkCodePage(String value) {
+        int cp = getCodepage();
+        if (cp == -1) {
+            cp = Property.DEFAULT_CODEPAGE;
+        }
+        if (cp == CodePageUtil.CP_UNICODE) {
+            return;
+        }
+        String cps = "";
+        try {
+            cps = CodePageUtil.codepageToEncoding(cp, false);
+        } catch (UnsupportedEncodingException e) {
+            LOG.log(POILogger.ERROR, "Codepage '"+cp+"' can't be found.");
+        }
+        if (!cps.isEmpty() && Charset.forName(cps).newEncoder().canEncode(value)) {
+            return;
+        }
+        LOG.log(POILogger.DEBUG, "Charset '"+cps+"' can't encode '"+value+"' - switching to unicode.");
+        setCodepage(CodePageUtil.CP_UNICODE);
     }
 }

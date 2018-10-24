@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -15,54 +15,48 @@ import java.io.Writer;
 
 
 /**
- * A simple writer that outputs JSON in a pretty-printed indented stream. Arrays, Lists and Sets rely on you NOT using
- * XStream.addImplicitCollection(..)
+ * A simple writer that outputs JSON in a pretty-printed indented stream. Arrays, Lists and Sets
+ * rely on you NOT using XStream.addImplicitCollection(..)
  * 
  * @author Paul Hammant
  * @author J&ouml;rg Schaible
  * @since 1.2
  * @deprecated As of 1.3.1, use JsonWriter instead
  */
-@Deprecated
 public class JsonHierarchicalStreamWriter extends JsonWriter {
 
     /**
      * @deprecated As of 1.3.1, use JsonWriter instead
      */
-    @Deprecated
-    public JsonHierarchicalStreamWriter(final Writer writer, final char[] lineIndenter, final String newLine) {
+    public JsonHierarchicalStreamWriter(Writer writer, char[] lineIndenter, String newLine) {
         super(writer, lineIndenter, newLine);
     }
 
     /**
      * @deprecated As of 1.3.1, use JsonWriter instead
      */
-    @Deprecated
-    public JsonHierarchicalStreamWriter(final Writer writer, final char[] lineIndenter) {
+    public JsonHierarchicalStreamWriter(Writer writer, char[] lineIndenter) {
         this(writer, lineIndenter, "\n");
     }
 
     /**
      * @deprecated As of 1.3.1, use JsonWriter instead
      */
-    @Deprecated
-    public JsonHierarchicalStreamWriter(final Writer writer, final String lineIndenter, final String newLine) {
+    public JsonHierarchicalStreamWriter(Writer writer, String lineIndenter, String newLine) {
         this(writer, lineIndenter.toCharArray(), newLine);
     }
 
     /**
      * @deprecated As of 1.3.1, use JsonWriter instead
      */
-    @Deprecated
-    public JsonHierarchicalStreamWriter(final Writer writer, final String lineIndenter) {
+    public JsonHierarchicalStreamWriter(Writer writer, String lineIndenter) {
         this(writer, lineIndenter.toCharArray());
     }
 
     /**
      * @deprecated As of 1.3.1, use JsonWriter instead
      */
-    @Deprecated
-    public JsonHierarchicalStreamWriter(final Writer writer) {
+    public JsonHierarchicalStreamWriter(Writer writer) {
         this(writer, new char[]{' ', ' '});
     }
 }

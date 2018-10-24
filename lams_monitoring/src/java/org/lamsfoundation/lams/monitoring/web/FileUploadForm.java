@@ -21,45 +21,48 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
-public class FileUploadForm extends ActionForm {
+public class FileUploadForm {
 
     private static final long serialVersionUID = -2841551690414943725L;
-    
+
     private Integer organisationID;
     private Long lessonID;
     private Long activityID;
-    private FormFile attachmentFile;
+    private MultipartFile groupUploadFile;
+
     public Integer getOrganisationID() {
-        return organisationID;
+	return organisationID;
     }
+
     public void setOrganisationID(Integer organisationID) {
-        this.organisationID = organisationID;
+	this.organisationID = organisationID;
     }
+
     public Long getLessonID() {
-        return lessonID;
+	return lessonID;
     }
+
     public void setLessonID(Long lessonID) {
-        this.lessonID = lessonID;
+	this.lessonID = lessonID;
     }
+
     public Long getActivityID() {
-        return activityID;
+	return activityID;
     }
+
     public void setActivityID(Long activityID) {
-        this.activityID = activityID;
+	this.activityID = activityID;
     }
-    public FormFile getAttachmentFile() {
-        return attachmentFile;
-    }
-    public void setAttachmentFile(FormFile attachmentFile) {
-        this.attachmentFile = attachmentFile;
-    }
-    
 
+    public MultipartFile getGroupUploadFile() {
+	return groupUploadFile;
+    }
 
+    public void setGroupUploadFile(MultipartFile groupUploadFile) {
+	this.groupUploadFile = groupUploadFile;
+    }
 }

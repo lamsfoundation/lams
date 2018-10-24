@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,20 +11,18 @@
  */
 package com.thoughtworks.xstream.io;
 
+import com.thoughtworks.xstream.core.util.FastStack;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.thoughtworks.xstream.core.util.FastStack;
-
 
 /**
  * An wrapper for all {@link HierarchicalStreamWriter} implementations, that keeps the state.
- * <p>
- * Writing in a wrong state will throw a {@link StreamException}, that wraps either an {@link IOException} (writing to a
- * closed writer) or an {@link IllegalStateException}. The implementation will also track unbalanced nodes or multiple
- * attributes with the same name.
- * </p>
+ * Writing in a wrong state will throw a {@link StreamException}, that wraps either an
+ * {@link IOException} (writing to a closed writer) or an {@link IllegalStateException}. The
+ * implementation will also track unbalanced nodes or multiple attributes with the same name.
  * 
  * @author J&ouml;rg Schaible
  * @since 1.2
@@ -64,7 +62,7 @@ public class StatefulWriter extends WriterWrapper {
 
     private transient int state = STATE_OPEN;
     private transient int balance;
-    private transient FastStack<Set<String>> attributes;
+    private transient FastStack attributes;
 
     /**
      * Constructs a StatefulWriter.
@@ -74,17 +72,15 @@ public class StatefulWriter extends WriterWrapper {
      */
     public StatefulWriter(final HierarchicalStreamWriter wrapped) {
         super(wrapped);
-        attributes = new FastStack<Set<String>>(16);
+        attributes = new FastStack(16);
     }
 
-    @Override
     public void startNode(final String name) {
         startNodeCommon();
         super.startNode(name);
     }
 
-    @Override
-    public void startNode(final String name, final Class<?> clazz) {
+    public void startNode(final String name, final Class clazz) {
         startNodeCommon();
         super.startNode(name, clazz);
     }
@@ -97,37 +93,37 @@ public class StatefulWriter extends WriterWrapper {
         }
         state = STATE_NODE_START;
         ++balance;
-        attributes.push(new HashSet<String>());
+        attributes.push(new HashSet());
     }
 
-    @Override
-    public void addAttribute(final String name, final String value) {
+    public void addAttribute(String name, String value) {
         checkClosed();
         if (state != STATE_NODE_START) {
             throw new StreamException(new IllegalStateException("Writing attribute '"
-                + name
-                + "' without an opened node"));
+                    + name
+                    + "' without an opened node"));
         }
-        final Set<String> currentAttributes = attributes.peek();
+        Set currentAttributes = (Set)attributes.peek();
         if (currentAttributes.contains(name)) {
-            throw new StreamException(new IllegalStateException("Writing attribute '" + name + "' twice"));
+            throw new StreamException(new IllegalStateException("Writing attribute '"
+                    + name
+                    + "' twice"));
         }
         currentAttributes.add(name);
         super.addAttribute(name, value);
     }
 
-    @Override
-    public void setValue(final String text) {
+    public void setValue(String text) {
         checkClosed();
         if (state != STATE_NODE_START) {
             // STATE_NODE_END is legal XML, but not in XStream ... ?
-            throw new StreamException(new IllegalStateException("Writing text without an opened node"));
+            throw new StreamException(new IllegalStateException(
+                    "Writing text without an opened node"));
         }
         state = STATE_VALUE;
         super.setValue(text);
     }
 
-    @Override
     public void endNode() {
         checkClosed();
         if (balance-- == 0) {
@@ -138,13 +134,11 @@ public class StatefulWriter extends WriterWrapper {
         super.endNode();
     }
 
-    @Override
     public void flush() {
         checkClosed();
         super.flush();
     }
 
-    @Override
     public void close() {
         if (state != STATE_NODE_END && state != STATE_OPEN) {
             // calling close in a finally block should not throw again
@@ -176,7 +170,7 @@ public class StatefulWriter extends WriterWrapper {
     }
 
     private Object readResolve() {
-        attributes = new FastStack<Set<String>>(16);
+        attributes = new FastStack(16);
         return this;
     }
 }

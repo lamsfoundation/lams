@@ -59,16 +59,16 @@
 			
 			<!-- Actions columns -->
 			<td>
-				<html:link page="/policyManagement.do?method=edit&policyUid=${policy.uid}">
+				<a href="<lams:WebAppURL />policyManagement/edit.do?policyUid=${policy.uid}">
 					<fmt:message key="admin.edit"/>
-				</html:link>
+				</a>
 			</td>
 						
 			<td>
 				<c:if test="${!viewPreviousVersions && policy.hasPreviousVersions()}">
-					<html:link page="/policyManagement.do?method=viewPreviousVersions&policyId=${policy.policyId}">
+					<a href="<lams:WebAppURL />policyManagement/viewPreviousVersions.do?policyId=${policy.policyId}">
 						<fmt:message key="label.view.previous.versions"/>
-					</html:link>
+					</a>
 				</c:if>	
 			</td>
 

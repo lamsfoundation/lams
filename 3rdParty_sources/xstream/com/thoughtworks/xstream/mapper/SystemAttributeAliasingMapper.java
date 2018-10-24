@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2014 XStream Committers.
+ * Copyright (C) 2008 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,6 +10,7 @@
  */
 package com.thoughtworks.xstream.mapper;
 
+
 /**
  * Mapper that allows aliasing of system attribute names.
  * 
@@ -18,13 +19,12 @@ package com.thoughtworks.xstream.mapper;
  */
 public class SystemAttributeAliasingMapper extends AbstractAttributeAliasingMapper {
 
-    public SystemAttributeAliasingMapper(final Mapper wrapped) {
+    public SystemAttributeAliasingMapper(Mapper wrapped) {
         super(wrapped);
     }
 
-    @Override
-    public String aliasForSystemAttribute(final String attribute) {
-        String alias = nameToAlias.get(attribute);
+    public String aliasForSystemAttribute(String attribute) {
+        String alias = (String)nameToAlias.get(attribute);
         if (alias == null && !nameToAlias.containsKey(attribute)) {
             alias = super.aliasForSystemAttribute(attribute);
             if (alias == attribute) {

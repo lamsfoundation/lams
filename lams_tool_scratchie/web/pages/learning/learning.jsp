@@ -22,21 +22,23 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/scratchie-learning.css'/>" />
+	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 	<style type="text/css">
 		.burning-question-container {
 			padding: 0 15px;
 		}
-		#user-confidence-levels {
-			margin-left: 20px;
+		.answer-description {
+			margin-right: 20px;
 		}
 		.answer-with-confidence-level-portrait {
 			display: flex;
+			flex-wrap: wrap;
    			align-items: center;
 		}
 		.c100.small {
 			font-size: 41px;
 			margin-right: 5px;
+			margin-bottom: 23px;
 		}
 		.confidence-level-percentage {
 			font-size: 13px;
@@ -69,11 +71,11 @@
 	    			// show static image after animation
 	    			setTimeout(
 	    	    			function(){
-	    					image.attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + ".png'/>");
+	    					image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
 	    				}, 
 	    				1300
 	    			);
-	    		}).attr("src", "<html:rewrite page='/includes/images/scratchie-" + imageSuffix + "-animation.gif'/>");
+	    		}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
 		}
 
 		function scratchItem(itemUid, answerUid){
@@ -195,7 +197,7 @@
 					
 					//ajax form submit
 					$('#burning-questions').ajaxSubmit({
-						url: "<c:url value='/learning/autosaveBurningQuestions.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
+						url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 		                success: function() {
 			                	$.jGrowl(
 			                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.burning.questions.autosaved" />",
@@ -222,7 +224,7 @@
 				document.getElementById("finishButton").disabled = true;
 
 		        	var myForm = $('#burning-questions');
-		        	myForm.attr("action", '<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>&date=' + new Date().getTime());
+		        	myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
 		        	myForm.submit();
 			}
 			
@@ -255,13 +257,13 @@
 		        <h4>
 		        	<fmt:message key='label.are.you.ready' />
 		        </h4>
-		        <html:button property="ok" styleId="timelimit-start-ok" styleClass="button">
+		        <button name="ok" id="timelimit-start-ok" class="button">
 					<fmt:message key='label.ok' />
-				</html:button>
+				</button>
 			</div>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div id="questionListArea">
 			<%@ include file="questionlist.jsp"%>

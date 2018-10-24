@@ -1,10 +1,7 @@
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
@@ -26,20 +23,25 @@
 	mustHaveSymbols   = ${mustHaveSymbols};
 
 	$.validator.addMethod("pwcheck", function(value) {
-		 return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
-			(!mustHaveNumerics || /\d/.test(value)) && // has a digit
-			(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
-			(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+	 return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+	(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+	(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+	(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
 	});
+
 	$.validator.addMethod("charactersAllowed", function(value) {
 		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
 				.test(value)
+
 	});
 	$.validator.addMethod("charactersNotAllowed", function(value) {
 		return /^[^<>^!#&()/\\|\"?,:{}= ~`*%$]*$/.test(value)
+
 	});
+
 	$.validator.addMethod("charactersNotAllowedName", function(value) {
 		return /^[^<>^*@%$]*$/.test(value)
+
 	});
 	$.validator.addMethod("emailCheck", function(value) {
 		return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -137,19 +139,14 @@
 							invalidHandler : function(){
 								$('#submitButton').button('reset');
 							}
-		});
+						});
+
 	});
 </script>
 <div>
-
-	<form id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
-		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
-	
-		<html:hidden property="method" value="register" />
-		<html:hidden property="submitted" value="1" />
-		<html:hidden property="context" value="${signupOrganisation.context}" />
-		<html:hidden property="selectedTab" value="0" />
-
+	<form:form modelAttribute="SignupForm" id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
+		<form:hidden path="submitted" value="1" />
+		<form:hidden path="context" value="${signupOrganisation.context}" />
 		<div class="container">
 			<div class="row vertical-center-row">
 				<div
@@ -159,9 +156,9 @@
 
 							<div class="form-group">
 								<label for="username"><fmt:message key="signup.username" /></label>:
-								<html:text property="username" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="username" />
+								<form:input path="username" size="40" maxlength="255"
+									cssClass="form-control" />
+								<lams:errors path="username"/>
 								<span style="display: none;'" class="msg error"> <fmt:message
 										key="error.username.invalid.characters" /></span>
 							</div>
@@ -197,25 +194,25 @@
 							<div class="form-group">
 								<label for="password"><fmt:message key="signup.password" /></label>:
 
-								<html:password property="password" size="40"
-									styleClass="form-control" maxlength="25" />
-								<html:errors property="password" />
+								<form:password path="password" size="40"
+									cssClass="form-control" maxlength="25" />
+								<lams:errors path="password"/>
 							</div>
 
 							<div class="form-group">
 								<label for="confirmPassword"><fmt:message key="signup.confirm.password" /></label>:
 
-								<html:password property="confirmPassword" size="40"
-									maxlength="25" styleClass="form-control" />
+								<form:password path="confirmPassword" size="40"
+									maxlength="25" cssClass="form-control" />
 								<span style="display: none;'" class="confirmPassword error"><fmt:message
 										key="error.passwords.unequal" /></span>
 							</div>
 							<div class="form-group">
 								<label for="firstName"><fmt:message key="signup.first.name" /></label>:
 
-								<html:text property="firstName" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="firstName" />
+								<form:input path="firstName" size="40" maxlength="255"
+									cssClass="form-control" />
+								<lams:errors path="firstName"/>
 								<span style="display: none;'" class="first error"><fmt:message
 										key="error.firstname.invalid.characters" /></span>
 							</div>
@@ -223,18 +220,18 @@
 							<div class="form-group">
 								<label for="lastName"><fmt:message key="signup.last.name" /></label>:
 
-								<html:text property="lastName" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="lastName" />
+								<form:input path="lastName" size="40" maxlength="255"
+									cssClass="form-control" />
+								<lams:errors path="lastName"/>
 								<span style="display: none;'" class="last error"><fmt:message
 										key="error.lastname.invalid.characters" /></span>
 							</div>
 							<div class="form-group">
 								<label for="email"><fmt:message key="signup.email" /></label>:
 
-								<html:text property="email" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="email" />
+								<form:input path="email" size="40" maxlength="255"
+									cssClass="form-control" />
+								<lams:errors path="email"/>
 								<span style="display: none;'" class="email error"><fmt:message
 										key="error.email.invalid.format" /></span>
 							</div>
@@ -242,38 +239,37 @@
 							<div class="form-group">
 								<label for="confirmEmail"><fmt:message key="signup.confirm.email" /></label>:
 
-								<html:text property="confirmEmail" size="40" maxlength="255"
-									styleClass="form-control" />
+								<form:input path="confirmEmail" size="40" maxlength="255"
+									cssClass="form-control" />
 								<span style="display: none;'" class="confirmEmail error"><fmt:message
 										key="error.emails.unequal" /></span>
 							</div>
-							
+
 							<div class="form-group">
 								<label for="country">
 									<fmt:message key="label.country" />
 								</label>:
 
-								<html:select property="country" styleClass="form-control">
-									<html:option value="0">
+								<form:select path="country" cssClass="form-control">
+									<form:option value="0">
 										<fmt:message key="label.select.country" />
-									</html:option>
+									</form:option>
 									
 									<c:forEach items="${countryCodes}" var="countryCode">
-										<html:option value="${countryCode.key}">
+										<form:option value="${countryCode.key}">
 											${countryCode.value}
-										</html:option>
+										</form:option>
 									</c:forEach>
-								</html:select>
-								<html:errors property="country" />
+								</form:select>
+								<lams:errors path="country"/>
 							</div>
-
-
+							
 							<div class="form-group">
 								<label for="courseKey"><fmt:message key="signup.course.key" /></label>:
 
-								<html:text property="courseKey" size="40" maxlength="255"
-									styleClass="form-control" />
-								<html:errors property="courseKey" />
+								<form:input path="courseKey" size="40" maxlength="255"
+									cssClass="form-control" />
+								<lams:errors path="courseKey"/>
 							</div>
 
 							<div class="form-group" align="right">
@@ -290,5 +286,5 @@
 				</div>
 			</div>
 		</div>
-	</form>
+	</form:form>
 </div>

@@ -25,8 +25,8 @@
 			</fmt:message>
 		</lams:Alert>
 	
-		<html:link href="#nogo" property="FinishButton" styleId="finishButton"
-				onclick="return finishSession()" styleClass="btn btn-primary voffset10 pull-right na">
+		<a href="#nogo" name="FinishButton" id="finishButton"
+				onclick="return finishSession()" class="btn btn-primary voffset10 pull-right na">
 			<c:choose>
 				<c:when test="${sessionMap.activityPosition.last}">
 					<fmt:message key="label.submit" />
@@ -35,7 +35,7 @@
 					<fmt:message key="label.finished" />
 				</c:otherwise>
 			</c:choose>
-		</html:link>
+		</a>
 	
 	</lams:Page>
 </body>

@@ -63,8 +63,8 @@
 			var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
 			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 		</script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/uploadImageLearning.js'/>"></script>
+		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/imageGalleryitem.js"></script>
+		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/uploadImageLearning.js"></script>
     	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -115,7 +115,6 @@
 				});
 				
 				$(".toggle-image-visibility").click(function() {
-					debugger;
 					var imageToggleLink = $(this);
 					var imageUid = $(this).data("image-uid");
 					

@@ -21,20 +21,20 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.web.forms;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.upload.FormFile;
-import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -44,7 +44,7 @@ import org.lamsfoundation.lams.util.FileValidatorUtil;
  *
  * User: conradb Date: 10/06/2005 Time: 15:44:47
  */
-public class MessageForm extends ValidatorForm {
+public class MessageForm {
     private static final long serialVersionUID = -9054365604649146734L;
     private static Logger logger = Logger.getLogger(MessageForm.class.getName());
 
@@ -58,7 +58,7 @@ public class MessageForm extends ValidatorForm {
     // attachment file name
     private String attachmentName;
     // Message attachment file
-    private FormFile attachmentFile;
+    private MultipartFile attachmentFile;
 
     public MessageForm() {
 	message = new Message();
@@ -68,37 +68,35 @@ public class MessageForm extends ValidatorForm {
      * MessageForm validation method from STRUCT interface.
      *
      */
-    @Override
-    public ActionErrors validate(ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
-	ActionErrors errors = new ActionErrors();
+    public MultiValueMap<String, String> validate(HttpServletRequest request, MessageService messageService) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
+
 	try {
 	    if (StringUtils.isBlank(message.getSubject())) {
-		ActionMessage error = new ActionMessage("error.subject.required");
-		errors.add("message.subject", error);
+		errorMap.add("message.subject", messageService.getMessage("error.subject.required"));
 	    }
 	    boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	    if (!isTestHarness && StringUtils.isBlank(message.getBody())) {
-		ActionMessage error = new ActionMessage("error.body.required");
-		errors.add("message.body", error);
+		errorMap.add("message.body", messageService.getMessage("error.body.required"));
 	    }
 
 	    // validate item size
 	    boolean largeFile = true;
 	    if (request.getRequestURI().indexOf("/learning/") != -1) {
 		if ((this.getAttachmentFile() != null)
-			&& FileUtil.isExecutableFile(this.getAttachmentFile().getFileName())) {
-		    ActionMessage error = new ActionMessage("error.attachment.executable");
-		    errors.add("message.attachment", error);
+			&& FileUtil.isExecutableFile(this.getAttachmentFile().getOriginalFilename())) {
+		    errorMap.add("message.attachments", messageService.getMessage("error.attachment.executable"));
 		}
 		largeFile = false;
 	    }
 
-	    FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile, "message.attachment", errors);
+	    FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile);
 
 	} catch (Exception e) {
 	    MessageForm.logger.error("", e);
 	}
-	return errors;
+	return errorMap;
     }
 
     // -------------------------get/set methods----------------
@@ -151,11 +149,11 @@ public class MessageForm extends ValidatorForm {
 	this.attachmentName = attachmentName;
     }
 
-    public FormFile getAttachmentFile() {
+    public MultipartFile getAttachmentFile() {
 	return attachmentFile;
     }
 
-    public void setAttachmentFile(FormFile attachmentFile) {
+    public void setAttachmentFile(MultipartFile attachmentFile) {
 	this.attachmentFile = attachmentFile;
     }
 

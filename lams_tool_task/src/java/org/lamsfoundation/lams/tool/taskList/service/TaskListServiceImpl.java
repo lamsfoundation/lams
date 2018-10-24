@@ -37,7 +37,6 @@ import java.util.SortedMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -82,6 +81,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Class implements <code>org.lamsfoundation.lams.tool.taskList.service.ITaskListService</code>.
@@ -140,9 +140,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     }
 
     @Override
-    public TaskListItemAttachment uploadTaskListItemFile(FormFile uploadFile, TaskListUser user)
+    public TaskListItemAttachment uploadTaskListItemFile(MultipartFile uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getOriginalFilename())) {
 	    throw new UploadTaskListFileException(
 		    messageService.getMessage("error.msg.upload.file.not.found", new Object[] { uploadFile }));
 	}
@@ -154,7 +154,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	TaskListItemAttachment file = new TaskListItemAttachment();
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getFileName());
+	file.setFileName(uploadFile.getOriginalFilename());
 	file.setCreated(new Timestamp(new Date().getTime()));
 	file.setCreateBy(user);
 
@@ -961,10 +961,10 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file) throws UploadTaskListFileException {
+    private NodeKey processFile(MultipartFile file) throws UploadTaskListFileException {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
+	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
+	    String fileName = file.getName();
 	    try {
 		node = taskListToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
@@ -1002,4 +1002,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	else
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED,(Date) dates[0], null);
     }
+
+
 }

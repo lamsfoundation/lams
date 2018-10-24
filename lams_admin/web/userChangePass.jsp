@@ -2,7 +2,6 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ page import="org.apache.struts.action.ActionMessages"%>
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
@@ -35,7 +34,7 @@
 
 	$(function() {
 		// Setup form validation 
-		$("#UserChangePassForm").validate({
+		$("#userForm").validate({
 							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
@@ -86,9 +85,8 @@
 
 
 <body class="stripes">
-	<form id="UserChangePassForm" action="usersave.do?method=changePass"
-		method="post">
-		<input type='hidden' value="${param.userId}" name="userId" />
+	<form id="userForm" modelAttribute="userForm" action="usersave/changePass.do" method="post">
+		<input type="hidden" name="userId" value="${param.userId}" />
 		<div class="panel panel-default">
 			<div
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
@@ -132,14 +130,9 @@
 								</c:if>
 							</ul>
 						</lams:Alert>
-						<logic:messagesPresent>
-							<lams:Alert type="danger" id="form-error" close="false">
-								<html:messages id="error">
-									<c:out value="${error}" escapeXml="false" />
-									<br />
-								</html:messages>
-							</lams:Alert>
-						</logic:messagesPresent>
+						
+						<lams:errors path="password"/>
+						
 						<div>
 							<label for="login"><fmt:message key="admin.user.login" />:</label>
 							<span>${param.login}</span>

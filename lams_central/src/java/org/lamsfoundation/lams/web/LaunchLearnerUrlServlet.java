@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,28 +39,27 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Sends redirect to lams learner. Format: launchlearner.do?lessonID=<encodedLessonId>
- *
- *
- *
  */
 public class LaunchLearnerUrlServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(LaunchLearnerUrlServlet.class);
 
-    private static ILessonService lessonService;
-
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return lessonService;
+    @Autowired
+    private ILessonService lessonService;
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Override
@@ -90,7 +90,7 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 	    return;
 	}
 
-	Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
+	Lesson lesson = lessonId != null ? lessonService.getLesson(lessonId) : null;
 	if (lesson != null) {
 	    // return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
 	}

@@ -250,7 +250,7 @@ var MenuLib = {
 			'modal'	   : true,
 			'title'	   : LABELS.EXPORT_SEQUENCE_DIALOG_TITLE,
 			'open'	   : function() {
-				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&learningDesignID='
+				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent/export.do?learningDesignID='
 									  	  			   + layout.ld.learningDesignID);
 			}
 		}, false)
@@ -342,9 +342,8 @@ var MenuLib = {
 		var result = null;
 			
 		$.ajax({
-			url : LAMS_URL + 'home.do',
+			url : LAMS_URL + 'home/getFolderContents.do',
 			data : {
-				'method' : 'getFolderContents',
 				'folderID' : folderID,
 				'allowInvalidDesigns' : true
 			},
@@ -441,7 +440,7 @@ var MenuLib = {
 						'open' : function() {
 							var dialog = $(this);
 							// load contents after opening the dialog
-							$('iframe', dialog).attr('src', LAMS_URL + 'authoring/importToolContent.do?method=import').load(function(){
+							$('iframe', dialog).attr('src', LAMS_URL + 'authoring/importToolContent/import.do').load(function(){
 								// override the close function so it works with the dialog, not window
 								this.contentWindow.closeWin = function(){
 									dialog.modal('hide');
@@ -529,9 +528,8 @@ var MenuLib = {
 		
 		// initialize, create and enter the preview lesson
 		$.ajax({
-			url : LAMS_URL + 'monitoring/monitoring.do',
+			url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 			data : {
-				'method' : 'initializeLesson',
 				'learningDesignID' : layout.ld.learningDesignID,
 				'copyType' : 3,
 				'lessonName' : LABELS.PREVIEW_LESSON_DEFAULT_TITLE
@@ -546,9 +544,8 @@ var MenuLib = {
 				}
 				
 				$.ajax({
-					url : LAMS_URL + 'monitoring/monitoring.do',
+					url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 					data : {
-						'method' : 'startPreviewLesson',
 						'lessonID' : lessonID
 					},
 					cache : false,
@@ -558,7 +555,7 @@ var MenuLib = {
 						var left = ((screen.width / 2) - (1280 / 2)),
 							// open the window a bit higher than center
 							top = ((screen.height / 2) - (720 / 2)) / 2;
-						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
+						window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID,'Preview',
 									'width=1280,height=720,resizable,scrollbars=yes,status=yes,top=' + top + ',left=' + left);
 						previewButton.button('reset');
 					}
@@ -621,9 +618,8 @@ var MenuLib = {
 			$.ajax({
 				cache : false,
 				async : false,
-				url : LAMS_URL + "authoring/author.do",
+				url : LAMS_URL + "authoring/copyToolContent.do",
 				data : {
-					'method'        : 'copyToolContent',
 					'toolContentID' : activity.toolContentID
 				},
 				dataType : 'text',

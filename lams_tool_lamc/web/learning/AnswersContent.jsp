@@ -40,8 +40,8 @@
           window.setInterval(
             function(){
               //ajax form submit
-              $('#learningForm').ajaxSubmit({
-                url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
+              $('#mcLearningForm').ajaxSubmit({
+                url: "<c:url value='/learning/autoSaveAnswers.do?date='/>" + new Date().getTime(),
                 success: function() {
                   $.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
                 }
@@ -52,22 +52,22 @@
 
         function submitNextQuestionSelected() {
           if (verifyAllQuestionsAnswered()) {
-            ++document.McLearningForm.questionIndex.value;
-            document.McLearningForm.nextQuestionSelected.value = 1;
+            ++document.forms.mcLearningForm.questionIndex.value;
+            document.forms.mcLearningForm.nextQuestionSelected.value = 1;
             disableContinueButton();
-            document.McLearningForm.submit();
+            document.forms.mcLearningForm.submit();
           }
         }
 
         function submitAllAnswers() {
-          document.McLearningForm.continueOptionsCombined.value = 1;			
+          document.forms.mcLearningForm.continueOptionsCombined.value = 1;			
           doSubmit();
         }
 
         function doSubmit() {
           if (verifyAllQuestionsAnswered()) {
             disableContinueButton();
-            document.McLearningForm.submit();
+            document.forms.mcLearningForm.submit();
           }
         }
 
@@ -102,8 +102,8 @@
 
           $.ajax({
             async: false,
-            url: '<c:url value="/learning.do"/>',
-            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
+            url: '<c:url value="/learning/checkLeaderProgress.do"/>',
+            data: 'toolSessionID=' + $("#tool-session-id").val(),
             dataType: 'json',
             type: 'post',
             success: function (json) {
@@ -119,7 +119,7 @@
 
 <body class="stripes">
 
-	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}">
+	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}" formID="mcLearningForm">
 
 		<div class="panel">
 			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
@@ -144,16 +144,16 @@
 		<!-- End announcements and advanced settings -->
 
 		<div class="form-group">
-			<html:form styleId="learningForm" action="/learning?method=displayMc&validate=false" enctype="multipart/form-data"
+			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="displayMc.do" enctype="multipart/form-data"
 				method="POST" target="_self">
-				<html:hidden property="toolContentID" />
-				<html:hidden property="toolSessionID" styleId="tool-session-id" />
-				<html:hidden property="httpSessionID" />
-				<html:hidden property="userID" />
-				<html:hidden property="userOverPassMark" />
-				<html:hidden property="passMarkApplicable" />
+				<form:hidden path="toolContentID" />
+				<form:hidden path="toolSessionID" id="tool-session-id" />
+				<form:hidden path="httpSessionID" />
+				<form:hidden path="userID" />
+				<form:hidden path="userOverPassMark" />
+				<form:hidden path="passMarkApplicable" />
 
-				<%@ include file="/common/messages.jsp"%>
+				<lams:errors/>
 
 				<c:if test="${isLeadershipEnabled}">
 					<h4>
@@ -171,7 +171,7 @@
 						<jsp:include page="/learning/CombinedAnswersContent.jsp" />
 					</c:otherwise>
 				</c:choose>
-			</html:form>
+			</form:form>
 		</div>
 	</lams:Page>
 </body>

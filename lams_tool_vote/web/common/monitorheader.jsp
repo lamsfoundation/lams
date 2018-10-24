@@ -10,8 +10,7 @@
 
 <!-- ********************  CSS ********************** -->
 <lams:css />
-
-<!-- ********************  javascript ********************** -->
+<!DOCTYPE c:set PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
@@ -33,6 +32,6 @@
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet">
 
 

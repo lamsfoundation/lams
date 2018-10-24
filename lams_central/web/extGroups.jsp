@@ -2,7 +2,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-	
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <c:if test="${lessonID == null}">
 	<c:set var="lessonID"  value="${param.lessonID}"/>
 </c:if>
@@ -11,11 +11,11 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/orgGrouping.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/orgGrouping.css" type="text/css" media="screen" />
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 </lams:head>
 <body>
 
@@ -23,15 +23,14 @@
 	<fmt:message key="index.course.groups.title" />
 </div>
 
-<form id="ext-groups-form" action="<lams:LAMSURL/>OrganisationGroup.do?method=viewGroups" method="POST">
+<form id="ext-groups-form" action="<lams:LAMSURL/>organisationGroup/viewGroups.do" method="POST">
 	<input name="lessonID" value="${lessonID}" type="hidden"/>
 	<input name="activityID" value="${param.activityID}" type="hidden"/>
 
 	<c:forEach var="group" items="${extGroups}">
 		<div class="groupingContainer">
-			<input name="extGroupIds" value="${group.groupId}" type="checkbox">
-				<c:out value="${group.groupName}" />
-			</input>
+			<input name="extGroupIds" id="extGroupIds" value="${group.groupId}" type="checkbox">
+			<label for="extGroupIds"><c:out value="${group.groupName}" /></label>
 			
 			<span class="groupCount" title='<fmt:message key="label.course.groups.grouping.count.label" />'>
 				(<fmt:message key='authoring.fla.page.prop.groups.learners' /> ${group.numberUsers})

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2017 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -16,9 +16,9 @@ import java.util.Date;
 
 
 /**
- * A converter for {@link Timestamp} conforming to the ISO8601 standard.
+ * A SqlTimestampConverter conforming to the ISO8601 standard.
+ * http://www.iso.ch/iso/en/CatalogueDetailPage.CatalogueDetail?CSNUMBER=26780
  * 
- * @see <a href="http://www.iso.org/iso/home/store/catalogue_ics/catalogue_detail_ics.htm?csnumber=40874">ISO 8601</a>
  * @author J&ouml;rg Schaible
  * @since 1.1.3
  */
@@ -26,20 +26,17 @@ public class ISO8601SqlTimestampConverter extends ISO8601DateConverter {
 
     private final static String PADDING = "000000000";
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
-        return type.equals(Timestamp.class);
+    public boolean canConvert(Class type) {
+        return type.equals(Timestamp.class) && super.canConvert(Date.class);
     }
 
-    @Override
     public Object fromString(String str) {
         final int idxFraction = str.lastIndexOf('.');
         int nanos = 0;
         if (idxFraction > 0) {
             int idx;
-            for (idx = idxFraction + 1; Character.isDigit(str.charAt(idx)); ++idx) {
+            for (idx = idxFraction + 1; Character.isDigit(str.charAt(idx)); ++idx)
                 ;
-            }
             nanos = Integer.parseInt(str.substring(idxFraction + 1, idx));
             str = str.substring(0, idxFraction) + str.substring(idx);
         }
@@ -49,16 +46,15 @@ public class ISO8601SqlTimestampConverter extends ISO8601DateConverter {
         return timestamp;
     }
 
-    @Override
-    public String toString(final Object obj) {
+    public String toString(Object obj) {
         final Timestamp timestamp = (Timestamp)obj;
-        String str = super.toString(new Date(timestamp.getTime() / 1000 * 1000));
+        String str = super.toString(new Date((timestamp.getTime() / 1000) * 1000));
         final String nanos = String.valueOf(timestamp.getNanos());
         final int idxFraction = str.lastIndexOf('.');
         str = str.substring(0, idxFraction + 1)
-            + PADDING.substring(nanos.length())
-            + nanos
-            + str.substring(idxFraction + 4);
+                + PADDING.substring(nanos.length())
+                + nanos
+                + str.substring(idxFraction + 4);
         return str;
     }
 

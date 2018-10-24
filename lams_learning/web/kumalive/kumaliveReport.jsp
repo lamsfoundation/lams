@@ -25,7 +25,7 @@
 			// Create the organisation view grid with sub grid for users	
 			$("#organisationGrid").jqGrid({
 			    datatype		   : "json",
-			    url				   : "<lams:LAMSURL />learning/kumalive.do?method=getReportOrganisationData&organisationID=${param.organisationID}",
+			    url				   : "<lams:LAMSURL />learning/kumalive/getReportOrganisationData.do?organisationID=${param.organisationID}",
 			    height			   : "100%",
 			    // use new theme
 			    guiStyle 		   : "bootstrap",
@@ -74,9 +74,8 @@
 
 				   // fetch rubrics first so we can build column model
 				   $.ajax({
-						url: "<lams:LAMSURL />learning/kumalive.do",
+						url: "<lams:LAMSURL />learning/kumalive/getReportKumaliveRubrics.do",
 					    data: {
-						    	'method' : 'getReportKumaliveRubrics',
 						        'kumaliveId' : kumaliveId
 						      },
 					    dataType: "json",
@@ -95,7 +94,7 @@
 
 				            $("#" + user_subgrid_table_id).jqGrid({
 				                datatype 	: 'json',
-				                url 		: "<lams:LAMSURL />learning/kumalive.do?method=getReportKumaliveData&kumaliveId="
+				                url 		: "<lams:LAMSURL />learning/kumalive/getReportKumaliveData.do?kumaliveId="
 					                			+ kumaliveId,
 				                colNames 	: ['<fmt:message key="label.kumalive.report.full.name"/>'].concat(columnNames),
 				                colModel 	: [
@@ -128,7 +127,7 @@
 									  
 						            $("#" + score_subgrid_table_id).jqGrid({
 						                datatype 	: 'json',
-						                url 		: "<lams:LAMSURL />learning/kumalive.do?method=getReportUserData&kumaliveId="
+						                url 		: "<lams:LAMSURL />learning/kumalive/getReportUserData.do?kumaliveId="
 							                			+ kumaliveId + "&userId=" + userId,
 						                colNames 	: ['#'].concat(columnNames),
 						                colModel 	: [
@@ -160,11 +159,11 @@
 		});
 
 		function exportAll(){
-			 blockExportButtons('<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&organisationID=${param.organisationID}');
+			 blockExportButtons('<lams:LAMSURL />learning/kumalive/exportKumalives.do?organisationID=${param.organisationID}');
 		}
 
 		function exportSelected(){
-			 blockExportButtons('<lams:LAMSURL />learning/kumalive.do?method=exportKumalives&kumaliveIds='
+			 blockExportButtons('<lams:LAMSURL />learning/kumalive/exportKumalives.do?kumaliveIds='
 				// return an array of IDs of rows (Kumalives) selected on all pages
 				+ JSON.stringify($("#organisationGrid").jqGrid('getGridParam','selarrrow')));
 		}

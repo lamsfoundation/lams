@@ -29,8 +29,7 @@
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-<c:set var="formBean"  value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
 
 	<c:set var="title"><fmt:message key="label.common.heading" /></c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -41,12 +40,12 @@
 		</lams:Tabs>	
 	
 	 	<lams:TabBodyArea>
-			<%@ include file="/common/messages.jsp"%>
-			<html:hidden property="mode" value="${mode}"/>
-			<html:hidden property="daco.contentId" />
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
+			<lams:errors/>
+			<form:hidden path="daco.contentId" />
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="currentTab" id="currentTab" />
+			<form:hidden path="mode" value="${mode}"/>
 	
 	 		<lams:TabBodys>
 				<!-- tab content 1 (Basic) -->
@@ -61,9 +60,9 @@
 			<!-- Button Row -->
 			<div id="saveCancelButtons">
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-				toolSignature="<%=DacoConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.daco.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-				 contentFolderID="${formBean.contentFolderID}"
+				toolSignature="<%=DacoConstants.TOOL_SIGNATURE%>" toolContentID="${authoringForm.daco.contentId}" 
+				 customiseSessionID="${authoringForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+				 contentFolderID="${authoringForm.contentFolderID}"
 				 cancelConfirmMsgKey="message.authoring.cancel.save" />
 			</div>
 		</lams:TabBodyArea>
@@ -73,7 +72,7 @@
 	<!-- end page div -->
 	</lams:Page>
 
-</html:form>
+</form:form>
 
 </body>
 </lams:html>

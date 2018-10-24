@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -41,6 +40,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Andrey Balan
@@ -84,7 +84,7 @@ public interface ICommonCartridgeService {
      * @return
      * @throws UploadCommonCartridgeFileException
      */
-    List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
+    List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, MultipartFile file)
 	    throws UploadCommonCartridgeFileException;
 
     // ********** for user methods *************
@@ -113,10 +113,12 @@ public interface ICommonCartridgeService {
     // ********** Repository methods ***********************
     /**
      * Delete file from repository.
-     * @throws RepositoryCheckedException 
-     * @throws InvalidParameterException 
+     * 
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
      */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws CommonCartridgeApplicationException, InvalidParameterException, RepositoryCheckedException;
+    void deleteFromRepository(Long fileUuid, Long fileVersionId)
+	    throws CommonCartridgeApplicationException, InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Save or update commonCartridge into database.
@@ -279,10 +281,10 @@ public interface ICommonCartridgeService {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);

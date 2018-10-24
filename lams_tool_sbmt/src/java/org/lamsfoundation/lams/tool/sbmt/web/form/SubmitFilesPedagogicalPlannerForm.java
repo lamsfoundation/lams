@@ -20,17 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.web.form;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
-/**
- *
- *
- */
-public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     String instruction;
     String contentFolderID;
 

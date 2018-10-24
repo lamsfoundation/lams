@@ -20,20 +20,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *
  */
-public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     String title;
     String wikiBody;
     String contentFolderID;
@@ -71,16 +67,16 @@ public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	}
     }
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
-	boolean valid = true;
-	if (StringUtils.isEmpty(getTitle())) {
-	    ActionMessage error = new ActionMessage("label.wiki.add.title.required");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	    valid = false;
-	}
-	setValid(valid);
-	return errors;
-    }
+//    @Override
+//    public ActionMessages validate() {
+//	ActionMessages errors = new ActionMessages();
+//	boolean valid = true;
+//	if (StringUtils.isEmpty(getTitle())) {
+//	    ActionMessage error = new ActionMessage("label.wiki.add.title.required");
+//	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+//	    valid = false;
+//	}
+//	setValid(valid);
+//	return errors;
+//    }
 }

@@ -93,7 +93,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	var draggable = initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 	if (draggable) {
 		modalDialog.draggable({
-			'cancel' : '.modal-body'
+			'cancel' : '.modal-body, button.close'
 		});
 	}
 	dialog.data("isDraggable", draggable);
@@ -330,10 +330,10 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 			}
 		},
 		'open' : function() {
-			var url = LAMS_URL + 'authoring/author.do?method=openAuthoring';
+			var url = LAMS_URL + 'authoring/openAuthoring.do';
 			
 			if (learningDesignID) {
-				url += '&learningDesignID=' + learningDesignID;
+				url += '?learningDesignID=' + learningDesignID;
 			}
 			
 			// load contents after opening the dialog
@@ -383,11 +383,11 @@ function showNotificationsDialog(orgID, lessonID) {
 			if (lessonID) {
 				// load contents after opening the dialog
 				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
+					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
 					+ lessonID);
 			} else {
 				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
+					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
 					+ orgID);
 			}
 		}
@@ -404,7 +404,7 @@ function showMyPortraitDialog() {
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=portrait&isReturnButtonHidden=true');
+			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?redirect=portrait&isReturnButtonHidden=true');
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

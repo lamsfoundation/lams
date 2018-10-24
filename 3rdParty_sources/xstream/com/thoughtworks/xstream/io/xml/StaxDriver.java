@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2009, 2011, 2013, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2009, 2011, 2013, 2014, 2015 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -35,10 +35,9 @@ import com.thoughtworks.xstream.io.ReaderWrapper;
 import com.thoughtworks.xstream.io.StreamException;
 import com.thoughtworks.xstream.io.naming.NameCoder;
 
-
 /**
  * A driver using the StAX API to create XML reader and writer.
- * 
+ *
  * @author James Strachan
  * @author J&ouml;rg Schaible
  * @version $Revision$
@@ -53,22 +52,22 @@ public class StaxDriver extends AbstractXmlDriver {
         this(new QNameMap());
     }
 
-    public StaxDriver(final QNameMap qnameMap) {
+    public StaxDriver(QNameMap qnameMap) {
         this(qnameMap, new XmlFriendlyNameCoder());
     }
 
     /**
      * @since 1.4
      */
-    public StaxDriver(final QNameMap qnameMap, final NameCoder nameCoder) {
+    public StaxDriver(QNameMap qnameMap, NameCoder nameCoder) {
         super(nameCoder);
         this.qnameMap = qnameMap;
     }
-
+    
     /**
      * @since 1.4
      */
-    public StaxDriver(final NameCoder nameCoder) {
+    public StaxDriver(NameCoder nameCoder) {
         this(new QNameMap(), nameCoder);
     }
 
@@ -76,131 +75,120 @@ public class StaxDriver extends AbstractXmlDriver {
      * @since 1.2
      * @deprecated As of 1.4, use {@link StaxDriver#StaxDriver(QNameMap, NameCoder)} instead.
      */
-    @Deprecated
-    public StaxDriver(final QNameMap qnameMap, final XmlFriendlyReplacer replacer) {
+    public StaxDriver(QNameMap qnameMap, XmlFriendlyReplacer replacer) {
         this(qnameMap, (NameCoder)replacer);
     }
-
+    
     /**
      * @since 1.2
      * @deprecated As of 1.4, use {@link StaxDriver#StaxDriver(NameCoder)} instead.
      */
-    @Deprecated
-    public StaxDriver(final XmlFriendlyReplacer replacer) {
+    public StaxDriver(XmlFriendlyReplacer replacer) {
         this(new QNameMap(), (NameCoder)replacer);
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final Reader xml) {
+    public HierarchicalStreamReader createReader(Reader xml) {
         try {
             return createStaxReader(createParser(xml));
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamReader createReader(final InputStream in) {
+    public HierarchicalStreamReader createReader(InputStream in) {
         try {
             return createStaxReader(createParser(in));
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new StreamException(e);
         }
     }
 
-    @SuppressWarnings("resource")
-    @Override
-    public HierarchicalStreamReader createReader(final URL in) {
+    public HierarchicalStreamReader createReader(URL in) {
         final InputStream stream;
         try {
             stream = in.openStream();
-            final HierarchicalStreamReader reader = createStaxReader(createParser(new StreamSource(stream, in
-                .toExternalForm())));
+            HierarchicalStreamReader reader = createStaxReader(createParser(new StreamSource(
+                stream, in.toExternalForm())));
             return new ReaderWrapper(reader) {
 
-                @Override
                 public void close() {
                     super.close();
                     try {
                         stream.close();
-                    } catch (final IOException e) {
+                    } catch (IOException e) {
                         // ignore
                     }
                 }
             };
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new StreamException(e);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new StreamException(e);
         }
     }
 
-    @SuppressWarnings("resource")
-    @Override
-    public HierarchicalStreamReader createReader(final File in) {
+    public HierarchicalStreamReader createReader(File in) {
         final InputStream stream;
         try {
             stream = new FileInputStream(in);
-            final HierarchicalStreamReader reader = createStaxReader(createParser(new StreamSource(stream, in
-                .toURI()
-                .toASCIIString())));
+            HierarchicalStreamReader reader = createStaxReader(createParser(new StreamSource(
+                stream, in.toURI().toASCIIString())));
             return new ReaderWrapper(reader) {
 
-                @Override
                 public void close() {
                     super.close();
                     try {
                         stream.close();
-                    } catch (final IOException e) {
+                    } catch (IOException e) {
                         // ignore
                     }
                 }
             };
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new StreamException(e);
-        } catch (final FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamWriter createWriter(final Writer out) {
+    public HierarchicalStreamWriter createWriter(Writer out) {
         try {
             return createStaxWriter(getOutputFactory().createXMLStreamWriter(out));
-        } catch (final XMLStreamException e) {
+        }
+        catch (XMLStreamException e) {
             throw new StreamException(e);
         }
     }
 
-    @Override
-    public HierarchicalStreamWriter createWriter(final OutputStream out) {
+    public HierarchicalStreamWriter createWriter(OutputStream out) {
         try {
             return createStaxWriter(getOutputFactory().createXMLStreamWriter(out));
-        } catch (final XMLStreamException e) {
+        }
+        catch (XMLStreamException e) {
             throw new StreamException(e);
         }
     }
 
-    public AbstractPullReader createStaxReader(final XMLStreamReader in) {
+    public AbstractPullReader createStaxReader(XMLStreamReader in) {
         return new StaxReader(qnameMap, in, getNameCoder());
     }
 
-    public StaxWriter createStaxWriter(final XMLStreamWriter out, final boolean writeStartEndDocument)
-            throws XMLStreamException {
+    public StaxWriter createStaxWriter(XMLStreamWriter out, boolean writeStartEndDocument) throws XMLStreamException {
         return new StaxWriter(qnameMap, out, writeStartEndDocument, isRepairingNamespace(), getNameCoder());
     }
 
-    public StaxWriter createStaxWriter(final XMLStreamWriter out) throws XMLStreamException {
+    public StaxWriter createStaxWriter(XMLStreamWriter out) throws XMLStreamException {
         return createStaxWriter(out, true);
     }
 
+
     // Properties
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     public QNameMap getQnameMap() {
         return qnameMap;
     }
 
-    public void setQnameMap(final QNameMap qnameMap) {
+    public void setQnameMap(QNameMap qnameMap) {
         this.qnameMap = qnameMap;
     }
 
@@ -219,28 +207,30 @@ public class StaxDriver extends AbstractXmlDriver {
     }
 
     public boolean isRepairingNamespace() {
-        return Boolean.TRUE.equals(getOutputFactory().getProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES));
+        return Boolean.TRUE.equals(getOutputFactory().getProperty(
+                XMLOutputFactory.IS_REPAIRING_NAMESPACES));
     }
 
     /**
      * @since 1.2
      */
-    public void setRepairingNamespace(final boolean repairing) {
+    public void setRepairingNamespace(boolean repairing) {
         getOutputFactory().setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES,
-            repairing ? Boolean.TRUE : Boolean.FALSE);
+                repairing ? Boolean.TRUE : Boolean.FALSE);
     }
+
 
     // Implementation methods
-    // -------------------------------------------------------------------------
-    protected XMLStreamReader createParser(final Reader xml) throws XMLStreamException {
+    //-------------------------------------------------------------------------
+    protected XMLStreamReader createParser(Reader xml) throws XMLStreamException {
         return getInputFactory().createXMLStreamReader(xml);
     }
 
-    protected XMLStreamReader createParser(final InputStream xml) throws XMLStreamException {
+    protected XMLStreamReader createParser(InputStream xml) throws XMLStreamException {
         return getInputFactory().createXMLStreamReader(xml);
     }
 
-    protected XMLStreamReader createParser(final Source source) throws XMLStreamException {
+    protected XMLStreamReader createParser(Source source) throws XMLStreamException {
         return getInputFactory().createXMLStreamReader(source);
     }
 
@@ -248,7 +238,9 @@ public class StaxDriver extends AbstractXmlDriver {
      * @since 1.4
      */
     protected XMLInputFactory createInputFactory() {
-        return XMLInputFactory.newInstance();
+        final XMLInputFactory instance = XMLInputFactory.newInstance();
+        instance.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+        return instance;
     }
 
     /**

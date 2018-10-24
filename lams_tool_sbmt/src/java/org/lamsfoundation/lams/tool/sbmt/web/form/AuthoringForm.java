@@ -2,8 +2,6 @@ package org.lamsfoundation.lams.tool.sbmt.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 
 /**
@@ -11,7 +9,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
  * @author Dapeng.Ni
  *
  */
-public class AuthoringForm extends ValidatorForm {
+public class AuthoringForm {
 
     private Long toolContentID;
 
@@ -32,7 +30,7 @@ public class AuthoringForm extends ValidatorForm {
     // file and display fields
 
     private boolean limitUpload;
-    
+
     private boolean useSelectLeaderToolOuput;
 
     private int limitUploadNumber;
@@ -45,13 +43,11 @@ public class AuthoringForm extends ValidatorForm {
 
     private boolean notifyTeachersOnFileSubmit;
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset(HttpServletRequest request) {
 	lockOnFinished = false;
 	useSelectLeaderToolOuput = false;
 	limitUpload = false;
 	reflectOnActivity = false;
-
     }
 
     public void initContentValue(SubmitFilesContent content) {
@@ -180,12 +176,12 @@ public class AuthoringForm extends ValidatorForm {
     public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
 	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
     }
-    
+
     public boolean isUseSelectLeaderToolOuput() {
-   	return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-   	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 }

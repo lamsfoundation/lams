@@ -98,6 +98,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -192,9 +193,12 @@ public class GradebookService implements IGradebookFullService {
 		if ((activityState == LearnerProgress.ACTIVITY_ATTEMPTED)
 			|| (activityState == LearnerProgress.ACTIVITY_COMPLETED)) {
 		    // Set the activityLearner URL for this gradebook activity
-		    activityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
-			    + "&toolSessionID=" + toolSession.getToolSessionId().toString());
+		    String activityUrl = Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + activity.getTool().getLearnerProgressUrl();
+		    activityUrl = WebUtil.appendParameterToURL(activityUrl, "userID", learner.getUserId().toString());
+		    activityUrl = WebUtil.appendParameterToURL(activityUrl, "toolSessionID",
+			    toolSession.getToolSessionId().toString());
+		    activityDTO.setActivityUrl(activityUrl);
 		}
 	    }
 

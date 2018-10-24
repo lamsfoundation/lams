@@ -1,23 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[authoringForm.httpSessionID]}" />
 
 <script type="text/javascript">
 	
 	$(document).ready(function() {
 		
 		$("#useSelectLeaderToolOuput").click(function() {
-			if (document.QaAuthoringForm.useSelectLeaderToolOuput.checked) {
+			if (document.forms.authoringForm.useSelectLeaderToolOuput.checked) {
 				//uncheck checkboxes
-				document.QaAuthoringForm.showOtherAnswers.checked = false;
+				document.forms.authoringForm.showOtherAnswers.checked = false;
 				//disable checkboxes
-				document.QaAuthoringForm.showOtherAnswers.disabled = true;
+				document.forms.authoringForm.showOtherAnswers.disabled = true;
 				
 				$("#show-other-answers-options").hide('slow');
 			} else {
 				//enable checkboxes
-				document.QaAuthoringForm.showOtherAnswers.disabled = false;
+				document.forms.authoringForm.showOtherAnswers.disabled = false;
 			}	
 		});
 		
@@ -38,11 +37,11 @@
 		 
 		//initial state
 		
-		if (${formBean.showOtherAnswers == 0}) {
+		if (${authoringForm.showOtherAnswers == 0}) {
 			$("#show-other-answers-options").hide();
 		}
 		
-		if (${formBean.reflect == 0}) {
+		if (${authoringForm.reflect == 0}) {
 			$("#reflectionInstructions").hide();
 		}
 		
@@ -64,7 +63,7 @@
 <lams:SimplePanel titleKey="label.select.leader">
 	<div class="checkbox">
 		<label for="useSelectLeaderToolOuput">
-			<html:checkbox property="useSelectLeaderToolOuput" styleId="useSelectLeaderToolOuput" value="1" />
+			<form:checkbox path="useSelectLeaderToolOuput" id="useSelectLeaderToolOuput" value="1" />
 			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
 	</div>
@@ -74,28 +73,28 @@
 
 	<div class="checkbox">
 		<label for="questionsSequenced">
-			<html:checkbox property="questionsSequenced" styleId="questionsSequenced" value="1" />
+			<form:checkbox path="questionsSequenced" id="questionsSequenced" value="1" />
 			<fmt:message key="radiobox.questionsSequenced" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="allowRichEditor">
-			<html:checkbox property="allowRichEditor" styleId="allowRichEditor" value="1" />
+			<form:checkbox path="allowRichEditor" id="allowRichEditor" value="1" />
 			<fmt:message key="label.allowRichEditor" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
 		<label for="noReeditAllowed">
-			<html:checkbox property="noReeditAllowed" styleId="noReeditAllowed" value="1" />
+			<form:checkbox path="noReeditAllowed" id="noReeditAllowed" value="1" />
 			<fmt:message key="label.no.reedit.allowed" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="showOtherAnswers">
-			<html:checkbox property="showOtherAnswers" styleId="showOtherAnswers" value="1" disabled="${formBean.useSelectLeaderToolOuput}"/>
+			<form:checkbox path="showOtherAnswers" id="showOtherAnswers" value="1" disabled="${authoringForm.useSelectLeaderToolOuput}"/>
 			<fmt:message key="label.learner.answer" />
 		</label>
 	</div>
@@ -103,19 +102,19 @@
 	<div class="loffset20" id="show-other-answers-options">
 		<div class="checkbox">
 			<label for="usernameVisible">
-				<html:checkbox property="usernameVisible" styleId="usernameVisible" value="1" />
+				<form:checkbox path="usernameVisible" id="usernameVisible" value="1" />
 				<fmt:message key="label.show.names" />
 			</label>
 		</div>
 		
 		<div class="checkbox">
 			<label for="allowRateAnswers">
-				<html:checkbox property="allowRateAnswers" styleId="allowRateAnswers" value="1" />
+				<form:checkbox path="allowRateAnswers" id="allowRateAnswers" value="1" />
 				<fmt:message key="label.authoring.allow.rate.answers" />
 			</label>
 		</div>
 	
-		<div id="criterias-holder" <c:if test="${formBean.allowRateAnswers == 0}"> style="display:none;"</c:if>>
+		<div id="criterias-holder" <c:if test="${authoringForm.allowRateAnswers == 0}"> style="display:none;"</c:if>>
 		<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
 			upLabel="label.authoring.up" downLabel="label.authoring.down" />
 		</div>
@@ -128,31 +127,31 @@
 
 	<div class="checkbox">
 		<label for="notifyTeachersOnResponseSubmit">
-			<html:checkbox property="notifyTeachersOnResponseSubmit" styleId="notifyTeachersOnResponseSubmit" value="1" />
+			<form:checkbox path="notifyTeachersOnResponseSubmit" id="notifyTeachersOnResponseSubmit" value="1" />
 			<fmt:message key="label.notify.teachers.on.response.submit" />
 		</label>
 	</div>
 	
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.toolContentID}" />
+<lams:OutcomeAuthor toolContentId="${authoringForm.toolContentID}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="lockWhenFinished">
-			<html:checkbox property="lockWhenFinished" styleId="lockWhenFinished" value="1" disabled="${formBean.noReeditAllowed == 1}"/>
+			<form:checkbox path="lockWhenFinished" id="lockWhenFinished" value="1" disabled="${authoringForm.noReeditAllowed == 1}"/>
 			<fmt:message key="label.lockWhenFinished" />
 		</label>
 	</div>
 
 	<div class="checkbox">
 		<label for="reflect">
-			<html:checkbox property="reflect" styleId="reflect" value="1" />
+			<form:checkbox path="reflect" id="reflect" value="1" />
 			<fmt:message key="label.reflect" />
 		</label>
 	</div>
 	
 	<div id="reflectionInstructions" class="form-group">
-		<html:textarea property="reflectionSubject" styleId="reflectionSubject" styleClass="form-control" cols="30" rows="3"	/>
+		<form:textarea path="reflectionSubject" id="reflectionSubject" cssClass="form-control" cols="30" rows="3"	/>
 	</div>
 </lams:SimplePanel>

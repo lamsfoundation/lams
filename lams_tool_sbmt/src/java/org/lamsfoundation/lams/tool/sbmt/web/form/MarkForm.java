@@ -20,18 +20,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.web.form;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author lfoxton
  *
  *
  */
-public class MarkForm extends ActionForm {
+public class MarkForm {
 
     private static final long serialVersionUID = -8680214759155659983L;
 
@@ -40,7 +38,7 @@ public class MarkForm extends ActionForm {
     private Long detailID;
     private Long reportID;
     private String marks;
-    private FormFile markFile;
+    private MultipartFile markFile;
     private String comments;
     private String updateMode;
     private Long markFileUUID;
@@ -89,11 +87,11 @@ public class MarkForm extends ActionForm {
 	this.marks = marks;
     }
 
-    public FormFile getMarkFile() {
+    public MultipartFile getMarkFile() {
 	return markFile;
     }
 
-    public void setMarkFile(FormFile markFile) {
+    public void setMarkFile(MultipartFile markFile) {
 	this.markFile = markFile;
     }
 

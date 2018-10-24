@@ -14,7 +14,7 @@
 
 		        var submitUid = currentUid;
 		        $.ajax({
-  					url: '<lams:WebAppURL/>/monitoring.do?dispatch='+actionMethod+'&currentUid='+submitUid,
+  					url: '<lams:WebAppURL/>monitoring/'+actionMethod+'.do?currentUid='+submitUid,
 				}).done(function( data ) {
 					if ( data.currentUid == submitUid ) {
 						$('#entryTable').trigger('pagerUpdate');
@@ -68,9 +68,9 @@
 	            cssDisabled: 'disabled',
 	            <c:choose>
 				<c:when test="${not empty param.sessionUid}">
-				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getOpenTextNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=${param.sessionUid}&toolContentUID=${param.toolContentUID}",
+				ajaxUrl : "<lams:WebAppURL/>monitoring/getOpenTextNominationsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=${param.sessionUid}&toolContentUID=${param.toolContentUID}",
 				</c:when><c:otherwise>
-				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getOpenTextNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolContentUID=${param.toolContentUID}",
+				ajaxUrl : "<lams:WebAppURL/>monitoring/getOpenTextNominationsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolContentUID=${param.toolContentUID}",
 				</c:otherwise>
 				</c:choose>
 				ajaxProcessing: function (data, table) {

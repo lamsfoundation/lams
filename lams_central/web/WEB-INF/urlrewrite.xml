@@ -12,7 +12,7 @@
     
     <rule>
     	<from>^/signup/([a-zA-Z0-9]+)$</from>
-    	<to>/signup/signup.do?context=$1</to>
+    	<to>/signup/init.do?context=$1</to>
     </rule>
 
 </urlrewrite>

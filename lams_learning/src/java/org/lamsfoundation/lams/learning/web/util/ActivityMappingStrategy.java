@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.Serializable;
@@ -37,11 +36,11 @@ public class ActivityMappingStrategy implements Serializable {
 
     private static Logger log = Logger.getLogger(ActivityMappingStrategy.class);
 
-    private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.do";
+    private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.jsp";
 
     /**
      * Returns the struts action used to display the specified activity.
-     * 
+     *
      * @param activity,
      *            Activity to be displayed
      * @param progress,
@@ -70,7 +69,7 @@ public class ActivityMappingStrategy implements Serializable {
      * Returns the struts action for displaying the parallel wait.
      */
     protected String getWaitingAction() {
-	return "/parallelWait.do";
+	return "/partialCompleted.jsp";
     }
 
     /**
@@ -84,7 +83,7 @@ public class ActivityMappingStrategy implements Serializable {
      * Returns the struts action for triggering the window to close.
      */
     protected String getCloseWindowAction() {
-	return "/close.do";
+	return "/close.jsp";
     }
 
     /**

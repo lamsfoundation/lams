@@ -19,17 +19,16 @@
 				<c:set var="reflectionUid" scope="request" value="${currentDto.reflectionUid}"/>
 				<tr>			
 					<td>
-						<c:url value="monitoring.do" var="openNotebook">
-							<c:param name="dispatch" value="openNotebook" />
+						<c:url value="openNotebook.do" var="openNotebook">
 							<c:param name="uid" value="${reflectionUid}" />
 							<c:param name="userId" value="${userId}" />
 							<c:param name="userName" value="${fn:escapeXml(userName)}" />
 							<c:param name="sessionId" value="${sessionId}" />																							
 						</c:url>
 			
-						<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}');" styleClass="btn btn-default btn-sm">
+						<a href="javascript:launchPopup('${fn:escapeXml(openNotebook)}');" class="btn btn-default btn-sm">
 							<fmt:message key="label.view" />
-						</html:link>&nbsp;
+						</a>&nbsp;
 						<lams:Portrait userId="${userId}" hover="true"><c:out value="${userName}" escapeXml="true"/> </lams:Portrait>
 						
 					</td>

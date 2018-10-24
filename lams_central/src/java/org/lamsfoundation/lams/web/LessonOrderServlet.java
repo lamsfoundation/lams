@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +42,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Used by main.jsp to persist the ordering of lessonIds when lessons are
@@ -52,8 +53,20 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author jliew
  */
 public class LessonOrderServlet extends HttpServlet {
-
     private static Logger log = Logger.getLogger(LessonOrderServlet.class);
+    
+    @Autowired
+    private UserManagementService userManagementService;
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -63,16 +76,13 @@ public class LessonOrderServlet extends HttpServlet {
 	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 	String ids = request.getParameter("ids");
 
-	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
-	UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
-
 	if (orgId != null && ids != null) {
-	    Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+	    Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 
 	    if (org != null) {
 		// make sure user has permission to sort org lessons
 		boolean allowSorting = false;
-		List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(orgId,
+		List<UserOrganisationRole> userOrganisationRoles = userManagementService.getUserOrganisationRoles(orgId,
 			request.getRemoteUser());
 		for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
 		    Integer roleId = userOrganisationRole.getRole().getRoleId();
@@ -89,7 +99,7 @@ public class LessonOrderServlet extends HttpServlet {
 
 		// make sure we record lesson ids that belong to this org
 		List<String> idList = Arrays.asList(ids.split(","));
-		List lessons = service.findByProperty(Lesson.class, "organisation", org);
+		List lessons = userManagementService.findByProperty(Lesson.class, "organisation", org);
 		for (String id : idList) {
 		    try {
 			Long l = new Long(Long.parseLong(id));
@@ -106,7 +116,7 @@ public class LessonOrderServlet extends HttpServlet {
 		String oldIds = org.getOrderedLessonIds();
 		String updatedIds = mergeLessonIds((oldIds != null ? oldIds : ""), ids);
 		org.setOrderedLessonIds(updatedIds);
-		service.save(org);
+		userManagementService.save(org);
 	    }
 	}
 

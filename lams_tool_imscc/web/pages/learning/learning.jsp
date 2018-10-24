@@ -14,10 +14,9 @@
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="commonCartridge" value="${sessionMap.commonCartridge}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
 	<script type="text/javascript">
-		function checkNew(checkFinishedLock) {
+		function checkNew() {
 		    var reqIDVar = new Date();
 			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
 		    return false;
@@ -46,19 +45,6 @@
 		<div class="panel">
 			<c:out value="${commonCartridge.instructions}" escapeXml="false"/>
 		</div>
-
-		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<lams:Alert type="danger" id="lock-on-finish" close="false">
-				<c:choose>
-					<c:when test="${sessionMap.userFinished}">
-						<fmt:message key="message.activityLocked" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="message.warnLockOnFinish" />
-					</c:otherwise>
-				</c:choose>
-			</lams:Alert>
-		</c:if>
 		
 		<c:if test="${commonCartridge.miniViewCommonCartridgeNumber > 0}">
 			<lams:Alert type="warning" id="lock-on-finish" close="false">
@@ -66,7 +52,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div class="table-responsive">
 			<table class="table table-hover table-condensed">
@@ -122,9 +108,9 @@
 					</c:choose>
 	
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default loffset10">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default loffset10">
 							<fmt:message key="label.edit" />
-						</html:button>
+						</button>
 					</c:if>
 				</div>
 			</div>
@@ -136,12 +122,12 @@
 			<div class="voffset10 pull-right">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary">
+						<a href="#nogo" name="FinishButton" id="finishButton" onclick="return finishSession()" class="btn btn-primary">
 							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
@@ -152,7 +138,7 @@
 				 					</c:otherwise>
 				 				</c:choose>
 							</span>
-						</html:link>
+						</a>
 					</c:otherwise>
 				</c:choose>
 			</div>

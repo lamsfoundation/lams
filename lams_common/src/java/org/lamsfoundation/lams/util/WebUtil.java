@@ -390,29 +390,6 @@ public class WebUtil {
     }
 
     /**
-     * <p>
-     * This helper method create the struts action forward name using the path. It will chop all path related
-     * characters, such as "/" and ".do".
-     * </p>
-     *
-     * <p>
-     * For example:
-     * <li><code>getStrutsForwardNameFromPath("/DisplayParallelActivity.do")<code>
-     * = displayParallelActivity</li>
-     * </p>
-     *
-     * @param path
-     * @return
-     */
-    public static String getStrutsForwardNameFromPath(String path) {
-	String pathWithoutSlash = StringUtils.substringAfter(path, "/");
-	String orginalForwardName = StringUtils.substringBeforeLast(pathWithoutSlash, ".do");
-
-	return StringUtils.uncapitalize(orginalForwardName);
-
-    }
-
-    /**
      * Append a parameter to a requested url.
      *
      * @param parameterName

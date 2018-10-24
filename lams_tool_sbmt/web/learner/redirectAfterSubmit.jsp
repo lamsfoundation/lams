@@ -1,9 +1,4 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+s<%@ include file="/common/taglibs.jsp"%>
 
 <!-- Triggers redirection to the learner page after a file is submitted, to stop Refresh reloading the file. -->
 
@@ -13,7 +8,7 @@
 <%@ include file="/common/header.jsp"%>
 <script language="JavaScript" type="text/JavaScript">
 	$(document).ready(function(){
-		window.location.href = '<lams:WebAppURL />/learner.do?method=refresh&sessionMapID=${sessionMapID}';
+		window.location.href = '<lams:WebAppURL />learning/refresh.do?sessionMapID=${sessionMapID}';
 	});
 </script>
 </lams:head>

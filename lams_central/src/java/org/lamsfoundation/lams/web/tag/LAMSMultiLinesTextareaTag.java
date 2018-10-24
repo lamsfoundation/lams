@@ -12,23 +12,22 @@ import javax.servlet.jsp.tagext.DynamicAttributes;
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
  * @author steven
- *
  */
 public class LAMSMultiLinesTextareaTag extends BodyTagSupport implements DynamicAttributes {
 
-    private static final String TAG_NAME = "textarea";
-    private List<String> keys = new ArrayList<String>();;
-    private List<Object> values = new ArrayList<Object>();;
+    private static final long serialVersionUID = 7335341412469834337L;
+
+    private final List<String> keys = new ArrayList<String>();
+    private final List<Object> values = new ArrayList<Object>();
 
     private String id;
     private String name;
     private String onchange;
+    private String disabled;
 
     @Override
     public int doStartTag() throws JspException {
-
 	return super.doStartTag();
     }
 
@@ -59,7 +58,8 @@ public class LAMSMultiLinesTextareaTag extends BodyTagSupport implements Dynamic
 	    if (StringUtils.isEmpty(this.getId())) {
 		this.setId(tagName + "__lamstextarea");
 	    }
-	    StringBuffer results = new StringBuffer(renderTextareaElement(getDataNoBr(oldBodyContent.getString())));
+	    StringBuffer results = new StringBuffer(
+		    renderTextareaElement(getDataNoBr(oldBodyContent == null ? null : oldBodyContent.getString())));
 
 	    //construct hidden variable
 	    results.append("<input type=\"hidden\"");
@@ -106,6 +106,13 @@ public class LAMSMultiLinesTextareaTag extends BodyTagSupport implements Dynamic
 	prepareAttribute(results, "name", getName());
 	prepareAttribute(results, "id", this.getId());
 	prepareAttribute(results, "onchange", getOnchange());
+	String disabled = getDisabled();
+	if (StringUtils.isBlank(disabled) || Boolean.FALSE.toString().equalsIgnoreCase(disabled)) {
+	    setDisabled(null);
+	    keys.remove("disabled");
+	} else {
+	    prepareAttribute(results, "disabled", "disabled");
+	}
 
 	appendDynamicParam(results);
 
@@ -163,12 +170,6 @@ public class LAMSMultiLinesTextareaTag extends BodyTagSupport implements Dynamic
 	}
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.servlet.jsp.tagext.DynamicAttributes#setDynamicAttribute(java.lang.String, java.lang.String,
-     * java.lang.Object)
-     */
     @Override
     public void setDynamicAttribute(String url, String localName, Object value) throws JspException {
 	keys.add(localName);
@@ -201,4 +202,11 @@ public class LAMSMultiLinesTextareaTag extends BodyTagSupport implements Dynamic
 	this.id = id;
     }
 
+    public String getDisabled() {
+	return disabled;
+    }
+
+    public void setDisabled(String disabled) {
+	this.disabled = disabled;
+    }
 }

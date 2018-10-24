@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,6 +53,8 @@ import org.apache.poi.ddf.EscherBlipRecord;
 import org.apache.poi.ddf.EscherMetafileBlip;
 import org.apache.poi.ddf.EscherRecord;
 import org.apache.poi.hpsf.ClassID;
+import org.apache.poi.hpsf.DocumentSummaryInformation;
+import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.hssf.model.DrawingManager2;
 import org.apache.poi.hssf.model.HSSFFormulaParser;
@@ -59,6 +62,7 @@ import org.apache.poi.hssf.model.InternalSheet;
 import org.apache.poi.hssf.model.InternalSheet.UnsupportedBOFType;
 import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.model.RecordStream;
+import org.apache.poi.hssf.model.WorkbookRecordList;
 import org.apache.poi.hssf.record.AbstractEscherHolderRecord;
 import org.apache.poi.hssf.record.BackupRecord;
 import org.apache.poi.hssf.record.BoundSheetRecord;
@@ -77,9 +81,13 @@ import org.apache.poi.hssf.record.UnknownRecord;
 import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
 import org.apache.poi.hssf.record.common.UnicodeString;
 import org.apache.poi.hssf.record.crypto.Biff8DecryptingStream;
+import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.poifs.crypt.ChunkedCipherOutputStream;
 import org.apache.poi.poifs.crypt.Decryptor;
+import org.apache.poi.poifs.crypt.EncryptionInfo;
+import org.apache.poi.poifs.crypt.EncryptionMode;
+import org.apache.poi.poifs.crypt.EncryptionVerifier;
 import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
@@ -1017,7 +1025,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     /**
      * Get the HSSFSheet object at the given index.
-     * @param index of the sheet number (0-based physical & logical)
+     * @param index of the sheet number (0-based physical &amp; logical)
      * @return HSSFSheet at the provided index
      * @throws IllegalArgumentException if the index is out of range (index
      *            &lt; 0 || index &gt;= getNumberOfSheets()).
@@ -1053,11 +1061,11 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     }
 
     /**
-     * Removes sheet at the given index.<p/>
+     * Removes sheet at the given index.<p>
      *
      * Care must be taken if the removed sheet is the currently active or only selected sheet in
      * the workbook. There are a few situations when Excel must have a selection and/or active
-     * sheet. (For example when printing - see Bug 40414).<br/>
+     * sheet. (For example when printing - see Bug 40414).<br>
      *
      * This method makes sure that if the removed sheet was active, another sheet will become
      * active in its place.  Furthermore, if the removed sheet was the only selected sheet, another
@@ -1197,39 +1205,6 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         return getFontAt(fontindex);
     }
 
-    /**
-     * Finds a font that matches the one with the supplied attributes
-     * @deprecated 3.15 beta 2. Use {@link #findFont(boolean, short, short, String, boolean, boolean, short, byte)} instead.
-     */
-    @Deprecated
-    @Override
-    public HSSFFont findFont(short boldWeight, short color, short fontHeight,
-                             String name, boolean italic, boolean strikeout,
-                             short typeOffset, byte underline)
-    {
-        short numberOfFonts = getNumberOfFonts();
-        for (short i=0; i<=numberOfFonts; i++) {
-            // Remember - there is no 4!
-            if(i == 4) {
-                continue;
-            }
-
-            HSSFFont hssfFont = getFontAt(i);
-            if (hssfFont.getBoldweight() == boldWeight
-                    && hssfFont.getColor() == color
-                    && hssfFont.getFontHeight() == fontHeight
-                    && hssfFont.getFontName().equals(name)
-                    && hssfFont.getItalic() == italic
-                    && hssfFont.getStrikeout() == strikeout
-                    && hssfFont.getTypeOffset() == typeOffset
-                    && hssfFont.getUnderline() == underline)
-            {
-                return hssfFont;
-            }
-        }
-
-        return null;
-    }
     /**
      * Finds a font that matches the one with the supplied attributes
      */
@@ -1454,12 +1429,20 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
         // Write out our HPFS properties, if we have them
         writeProperties(fs, excepts);
-
+        
         if (preserveNodes) {
             // Don't write out the old Workbook, we'll be doing our new one
             // If the file had an "incorrect" name for the workbook stream,
             // don't write the old one as we'll use the correct name shortly
             excepts.addAll(Arrays.asList(WORKBOOK_DIR_ENTRY_NAMES));
+
+            // summary information has been already written via writeProperties and might go in a
+            // different stream, if the file is cryptoapi encrypted
+            excepts.addAll(Arrays.asList(
+                DocumentSummaryInformation.DEFAULT_STREAM_NAME,
+                SummaryInformation.DEFAULT_STREAM_NAME,
+                getEncryptedPropertyStreamName()
+            ));
 
             // Copy over all the other nodes to our new poifs
             EntryUtils.copyNodes(
@@ -1520,6 +1503,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         HSSFSheet[] sheets = getSheets();
         int nSheets = sheets.length;
 
+        updateEncryptionInfo();
 
         // before getting the workbook size we must tell the sheets that
         // serialization is about to occur.
@@ -1566,22 +1550,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     @SuppressWarnings("resource")
     protected void encryptBytes(byte buf[]) {
-        int initialOffset = 0;
-        FilePassRecord fpr = null;
-        for (Record r : workbook.getRecords()) {
-            initialOffset += r.getRecordSize();
-            if (r instanceof FilePassRecord) {
-                fpr = (FilePassRecord)r;
-                break;
-            }
-        }
-        if (fpr == null) {
+        EncryptionInfo ei = getEncryptionInfo();
+        if (ei == null) {
             return;
         }
-        
+        Encryptor enc = ei.getEncryptor();
+        int initialOffset = 0;
         LittleEndianByteArrayInputStream plain = new LittleEndianByteArrayInputStream(buf, 0); // NOSONAR
         LittleEndianByteArrayOutputStream leos = new LittleEndianByteArrayOutputStream(buf, 0); // NOSONAR
-        Encryptor enc = fpr.getEncryptionInfo().getEncryptor();
         enc.setChunkSize(Biff8DecryptingStream.RC4_REKEYING_INTERVAL);
         byte tmp[] = new byte[1024];
         try {
@@ -1892,7 +1868,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         PrintWriter w = new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()));
         for (EscherRecord escherRecord : escherRecords) {
             if (fat) {
-                System.out.println(escherRecord.toString());
+                System.out.println(escherRecord);
             } else {
                 escherRecord.display(w, 0);
             }
@@ -2305,5 +2281,51 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     @Override
     public SpreadsheetVersion getSpreadsheetVersion() {
         return SpreadsheetVersion.EXCEL97;
+    }
+
+    @Override
+    public EncryptionInfo getEncryptionInfo() {
+        FilePassRecord fpr = (FilePassRecord)workbook.findFirstRecordBySid(FilePassRecord.sid);
+        return (fpr != null) ? fpr.getEncryptionInfo() : null;
+    }
+
+
+    private void updateEncryptionInfo() {
+        // make sure, that we've read all the streams ...
+        readProperties();
+        FilePassRecord fpr = (FilePassRecord)workbook.findFirstRecordBySid(FilePassRecord.sid);
+
+        String password = Biff8EncryptionKey.getCurrentUserPassword();
+        WorkbookRecordList wrl = workbook.getWorkbookRecordList();
+        if (password == null) {
+            if (fpr != null) {
+                // need to remove password data
+                wrl.remove(fpr);
+            }
+        } else {
+            // create password record
+            if (fpr == null) {
+                fpr = new FilePassRecord(EncryptionMode.cryptoAPI);
+                wrl.add(1, fpr);
+            }
+
+            // check if the password has been changed
+            EncryptionInfo ei = fpr.getEncryptionInfo();
+            EncryptionVerifier ver = ei.getVerifier();
+            byte encVer[] = ver.getEncryptedVerifier();
+            Decryptor dec = ei.getDecryptor();
+            Encryptor enc = ei.getEncryptor();
+            try {
+                if (encVer == null || !dec.verifyPassword(password)) {
+                    enc.confirmPassword(password);
+                } else {
+                    byte verifier[] = dec.getVerifier();
+                    byte salt[] = ver.getSalt();
+                    enc.confirmPassword(password, null, null, verifier, salt, null);
+                }
+            } catch (GeneralSecurityException e) {
+                throw new EncryptedDocumentException("can't validate/update encryption setting", e);
+            }
+        }
     }
 }

@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.peerreview.model;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
-
 /**
  * Peerreview Session
  *
@@ -37,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class PeerreviewSession {
 
-    private static Logger log = Logger.getLogger(PeerreviewSession.class);
+//    private static Logger log = Logger.getLogger(PeerreviewSession.class);
 
     private Long uid;
     private Long sessionId;

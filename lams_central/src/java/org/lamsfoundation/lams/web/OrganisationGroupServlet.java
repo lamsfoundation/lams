@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -50,15 +51,16 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class OrganisationGroupServlet extends HttpServlet {
-
     private static final Logger log = Logger.getLogger(OrganisationGroupServlet.class);
 
-    private static IntegrationService integrationService;
-    private static IUserManagementService userManagementService;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     private static final String METHOD_ADD_GROUPING = "addGrouping";
     private static final String METHOD_REMOVE_GROUPING = "removeGrouping";
@@ -66,9 +68,18 @@ public class OrganisationGroupServlet extends HttpServlet {
     private static final String METHOD_REMOVE_GROUP = "removeGroup";
     private static final String METHOD_ADD_LEARNERS = "addLearners";
     private static final String METHOD_REMOVE_LEARNERS = "removeLearners";
-
     private static final String PARAM_GROUPING_NAME = "groupingName";
     private static final String PARAM_GROUP_NAME = "groupName";
+
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -88,68 +99,67 @@ public class OrganisationGroupServlet extends HttpServlet {
 
 	User user = null;
 	Organisation organisation = null;
-	ExtServer extServer = getService().getExtServer(serverId);
+	ExtServer extServer = integrationService.getExtServer(serverId);
 
 	try {
 	    // authenticate the request
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    // get local user and organisation
-	    ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
-		    username);
-	    ExtCourseClassMap orgMap = OrganisationGroupServlet.integrationService.getExtCourseClassMap(extServer,
-		    userMap, courseId, null, LoginRequestDispatcher.METHOD_MONITOR);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, null,
+		    LoginRequestDispatcher.METHOD_MONITOR);
 	    user = userMap.getUser();
 	    organisation = orgMap.getOrganisation();
 
 	    // check if user is allowed to modify course groups for the given organisation
-	    boolean isGroupSuperuser = getUserManagementService().isUserInRole(user.getUserId(),
+	    boolean isGroupSuperuser = userManagementService.isUserInRole(user.getUserId(),
 		    organisation.getOrganisationId(), Role.MONITOR)
-		    || getUserManagementService().isUserInRole(user.getUserId(), organisation.getOrganisationId(),
+		    || userManagementService.isUserInRole(user.getUserId(), organisation.getOrganisationId(),
 			    Role.AUTHOR);
 	    if (!isGroupSuperuser) {
-		OrganisationGroupServlet.log.error("User " + user.getUserId()
-			+ " may not perform group actions for course " + organisation.getOrganisationId());
+		log.error("User " + user.getUserId() + " may not perform group actions for course "
+			+ organisation.getOrganisationId());
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 			"Course group action failed - user may not perform group actions");
 		return;
 	    }
 	} catch (AuthenticationException e) {
-	    OrganisationGroupServlet.log.error(e);
+	    log.error(e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 		    "Course group action failed - authentication error");
 	    return;
 	} catch (UserInfoFetchException e) {
-	    OrganisationGroupServlet.log.error(e);
+	    log.error(e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Course group action failed - user does not exist");
 	    return;
 	} catch (UserInfoValidationException e) {
-	    OrganisationGroupServlet.log.error(e);
+	    log.error(e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Course group action failed." + e.getMessage());
 	    return;
 	}
 
 	try {
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
-	    if (OrganisationGroupServlet.METHOD_ADD_GROUPING.equals(method)) {
+	    if (METHOD_ADD_GROUPING.equals(method)) {
 		addGrouping(request, organisation);
-	    } else if (OrganisationGroupServlet.METHOD_REMOVE_GROUPING.equals(method)) {
+	    } else if (METHOD_REMOVE_GROUPING.equals(method)) {
 		removeGrouping(request, organisation.getOrganisationId());
-	    } else if (OrganisationGroupServlet.METHOD_ADD_GROUP.equals(method)) {
+	    } else if (METHOD_ADD_GROUP.equals(method)) {
 		addGroup(request, organisation.getOrganisationId());
-	    } else if (OrganisationGroupServlet.METHOD_REMOVE_GROUP.equals(method)) {
+	    } else if (METHOD_REMOVE_GROUP.equals(method)) {
 		removeGroup(request, organisation.getOrganisationId());
-	    } else if (OrganisationGroupServlet.METHOD_ADD_LEARNERS.equals(method)) {
+	    } else if (METHOD_ADD_LEARNERS.equals(method)) {
 		addLearners(request, extServer, organisation.getOrganisationId());
-	    } else if (OrganisationGroupServlet.METHOD_REMOVE_LEARNERS.equals(method)) {
+	    } else if (METHOD_REMOVE_LEARNERS.equals(method)) {
 		removeLearners(request, extServer, organisation.getOrganisationId());
 	    }
 	} catch (ServletException e) {
-	    OrganisationGroupServlet.log.error(e);
+	    log.error(e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Course group action failed: " + e.getMessage());
 	    return;
 	} catch (Exception e) {
-	    OrganisationGroupServlet.log.error(e);
+	    log.error(e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 		    "Course group action failed: internal error");
 	    return;
@@ -162,7 +172,7 @@ public class OrganisationGroupServlet extends HttpServlet {
     }
 
     private void addGrouping(HttpServletRequest request, Organisation organisation) throws ServletException {
-	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
+	String groupingName = request.getParameter(PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
 	    throw new ServletException("Missing \"" + CentralConstants.ATTR_NAME + "\" parameter");
 	}
@@ -175,23 +185,23 @@ public class OrganisationGroupServlet extends HttpServlet {
 	}
 
 	grouping = new OrganisationGrouping(organisation.getOrganisationId(), groupingName);
-	getUserManagementService().saveOrganisationGrouping(grouping, null);
+	userManagementService.saveOrganisationGrouping(grouping, null);
 
 	Long groupingId = grouping.getGroupingId();
 	if (groupingId == null) {
 	    throw new ServletException("Grouping could not be created");
 	}
 
-	if (OrganisationGroupServlet.log.isDebugEnabled()) {
-	    OrganisationGroupServlet.log.debug("Created course grouping \"" + groupingName + "\" with ID " + groupingId
+	if (log.isDebugEnabled()) {
+	    log.debug("Created course grouping \"" + groupingName + "\" with ID " + groupingId
 		    + " in organisation with ID " + organisation.getOrganisationId());
 	}
     }
 
     private void removeGrouping(HttpServletRequest request, Integer organisationId) throws ServletException {
-	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
+	String groupingName = request.getParameter(PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUPING_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUPING_NAME + "\" parameter");
 	}
 
 	OrganisationGrouping grouping = findGrouping(organisationId, groupingName);
@@ -200,22 +210,22 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    return;
 	}
 
-	getUserManagementService().delete(grouping);
+	userManagementService.delete(grouping);
 
-	if (OrganisationGroupServlet.log.isDebugEnabled()) {
-	    OrganisationGroupServlet.log.debug(
+	if (log.isDebugEnabled()) {
+	    log.debug(
 		    "Deleted course grouping with ID " + groupingName + " from organisation with ID " + organisationId);
 	}
     }
 
     private void addGroup(HttpServletRequest request, Integer organisationId) throws ServletException {
-	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
+	String groupingName = request.getParameter(PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUPING_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUPING_NAME + "\" parameter");
 	}
-	String groupName = request.getParameter(OrganisationGroupServlet.PARAM_GROUP_NAME);
+	String groupName = request.getParameter(PARAM_GROUP_NAME);
 	if (StringUtils.isBlank(groupName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUP_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUP_NAME + "\" parameter");
 	}
 
 	OrganisationGrouping grouping = findGrouping(organisationId, groupingName);
@@ -237,26 +247,26 @@ public class OrganisationGroupServlet extends HttpServlet {
 	newGroup.setName(groupName);
 	groups.add(newGroup);
 
-	getUserManagementService().saveOrganisationGrouping(grouping, groups);
+	userManagementService.saveOrganisationGrouping(grouping, groups);
 	Long groupId = newGroup.getGroupId();
 	if (groupId == null) {
 	    throw new ServletException("Group could not be created");
 	}
 
-	if (OrganisationGroupServlet.log.isDebugEnabled()) {
-	    OrganisationGroupServlet.log.debug("Created course group \"" + groupName + "\" with ID " + groupId
-		    + " in organisation with ID " + organisationId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Created course group \"" + groupName + "\" with ID " + groupId + " in organisation with ID "
+		    + organisationId);
 	}
     }
 
     private void removeGroup(HttpServletRequest request, Integer organisationId) throws ServletException {
-	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
+	String groupingName = request.getParameter(PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUPING_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUPING_NAME + "\" parameter");
 	}
-	String groupName = request.getParameter(OrganisationGroupServlet.PARAM_GROUP_NAME);
+	String groupName = request.getParameter(PARAM_GROUP_NAME);
 	if (StringUtils.isBlank(groupName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUP_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUP_NAME + "\" parameter");
 	}
 	OrganisationGrouping grouping = findGrouping(organisationId, groupingName);
 	if (grouping == null) {
@@ -271,23 +281,23 @@ public class OrganisationGroupServlet extends HttpServlet {
 
 	Set<OrganisationGroup> groups = new HashSet<OrganisationGroup>(grouping.getGroups());
 	groups.remove(group);
-	getUserManagementService().saveOrganisationGrouping(grouping, groups);
+	userManagementService.saveOrganisationGrouping(grouping, groups);
 
-	if (OrganisationGroupServlet.log.isDebugEnabled()) {
-	    OrganisationGroupServlet.log.debug("Deleted course group with ID " + group.getGroupId()
-		    + " from organisation with ID " + organisationId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Deleted course group with ID " + group.getGroupId() + " from organisation with ID "
+		    + organisationId);
 	}
     }
 
     private void addLearners(HttpServletRequest request, ExtServer extServer, Integer organisationId)
 	    throws ServletException {
-	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
+	String groupingName = request.getParameter(PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUPING_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUPING_NAME + "\" parameter");
 	}
-	String groupName = request.getParameter(OrganisationGroupServlet.PARAM_GROUP_NAME);
+	String groupName = request.getParameter(PARAM_GROUP_NAME);
 	if (StringUtils.isBlank(groupName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUP_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUP_NAME + "\" parameter");
 	}
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	if (StringUtils.isBlank(learnerIds)) {
@@ -310,8 +320,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	for (String learnerLogin : learnerLoginArray) {
 	    User learner = null;
 	    try {
-		ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
-			learnerLogin);
+		ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, learnerLogin);
 		learner = userMap.getUser();
 	    } catch (UserInfoFetchException e) {
 		throw new ServletException("Learner with ID \"" + learnerLogin + "\" does not exist");
@@ -327,11 +336,11 @@ public class OrganisationGroupServlet extends HttpServlet {
 	}
 
 	if (learnersAdded) {
-	    getUserManagementService().saveOrganisationGrouping(grouping, grouping.getGroups());
+	    userManagementService.saveOrganisationGrouping(grouping, grouping.getGroups());
 
-	    if (OrganisationGroupServlet.log.isDebugEnabled()) {
-		OrganisationGroupServlet.log.debug("Added learners " + addedLearnerLogins + " to course group with ID "
-			+ group.getGroupId() + " in organisation with ID " + organisationId);
+	    if (log.isDebugEnabled()) {
+		log.debug("Added learners " + addedLearnerLogins + " to course group with ID " + group.getGroupId()
+			+ " in organisation with ID " + organisationId);
 	    }
 	}
 	return;
@@ -339,13 +348,13 @@ public class OrganisationGroupServlet extends HttpServlet {
 
     private void removeLearners(HttpServletRequest request, ExtServer extServer, Integer organisationId)
 	    throws ServletException {
-	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
+	String groupingName = request.getParameter(PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUPING_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUPING_NAME + "\" parameter");
 	}
-	String groupName = request.getParameter(OrganisationGroupServlet.PARAM_GROUP_NAME);
+	String groupName = request.getParameter(PARAM_GROUP_NAME);
 	if (StringUtils.isBlank(groupName)) {
-	    throw new ServletException("Missing \"" + OrganisationGroupServlet.PARAM_GROUP_NAME + "\" parameter");
+	    throw new ServletException("Missing \"" + PARAM_GROUP_NAME + "\" parameter");
 	}
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	if (StringUtils.isBlank(learnerIds)) {
@@ -367,8 +376,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	for (String learnerLogin : learnerLoginArray) {
 	    User learner = null;
 	    try {
-		ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
-			learnerLogin);
+		ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, learnerLogin);
 		learner = userMap.getUser();
 	    } catch (UserInfoFetchException e) {
 		// if user does not exist, ignore
@@ -387,10 +395,10 @@ public class OrganisationGroupServlet extends HttpServlet {
 	}
 
 	if (learnersRemoved) {
-	    getUserManagementService().saveOrganisationGrouping(grouping, grouping.getGroups());
-	    if (OrganisationGroupServlet.log.isDebugEnabled()) {
-		OrganisationGroupServlet.log.debug("Removed learners " + removedLearnerLogins + " from group with ID "
-			+ group.getGroupId() + " in organisation with ID " + organisationId);
+	    userManagementService.saveOrganisationGrouping(grouping, grouping.getGroups());
+	    if (log.isDebugEnabled()) {
+		log.debug("Removed learners " + removedLearnerLogins + " from group with ID " + group.getGroupId()
+			+ " in organisation with ID " + organisationId);
 	    }
 	}
 	return;
@@ -401,7 +409,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	Map<String, Object> queryProperties = new TreeMap<String, Object>();
 	queryProperties.put("organisationId", organisationId);
 	queryProperties.put("name", groupingName);
-	List<OrganisationGrouping> result = getUserManagementService().findByProperties(OrganisationGrouping.class,
+	List<OrganisationGrouping> result = userManagementService.findByProperties(OrganisationGrouping.class,
 		queryProperties);
 	return (result == null) || result.isEmpty() ? null : result.get(0);
     }
@@ -411,26 +419,8 @@ public class OrganisationGroupServlet extends HttpServlet {
 	Map<String, Object> queryProperties = new TreeMap<String, Object>();
 	queryProperties.put("groupingId", groupingId);
 	queryProperties.put("name", groupName);
-	List<OrganisationGroup> result = getUserManagementService().findByProperties(OrganisationGroup.class,
+	List<OrganisationGroup> result = userManagementService.findByProperties(OrganisationGroup.class,
 		queryProperties);
 	return (result == null) || result.isEmpty() ? null : result.get(0);
-    }
-
-    private IntegrationService getService() {
-	if (OrganisationGroupServlet.integrationService == null) {
-	    OrganisationGroupServlet.integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-	}
-	return OrganisationGroupServlet.integrationService;
-    }
-
-    private IUserManagementService getUserManagementService() {
-	if (OrganisationGroupServlet.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    OrganisationGroupServlet.userManagementService = (IUserManagementService) ctx
-		    .getBean("userManagementService");
-	}
-	return OrganisationGroupServlet.userManagementService;
     }
 }

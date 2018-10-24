@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.util;
 
 /**
@@ -34,8 +33,6 @@ public class GradebookConstants {
     public static final String MODULE_NAME = "gradebook";
 
     // Parameters
-    public static final String PARAM_METHOD = "method";
-    public static final String PARAM_DISPATCH = "dispatch";
     public static final String PARAM_LOGIN = "login";
     public static final String PARAM_ID = "id";
     public static final String PARAM_MARK = "mark";
@@ -71,7 +68,7 @@ public class GradebookConstants {
     public static final String VIEW_LRN_COURSE = "lrnCourse";
     public static final String VIEW_LRN_ACTIVITY = "lrnActivity";
     public static final String VIEW_LIST = "listView";
-    
+
     // XML Elemetns
     public static final String ELEMENT_ROWS = "rows";
     public static final String ELEMENT_PAGE = "page";

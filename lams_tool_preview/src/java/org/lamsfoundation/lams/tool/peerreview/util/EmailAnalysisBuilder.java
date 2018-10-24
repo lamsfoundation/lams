@@ -287,12 +287,13 @@ public class EmailAnalysisBuilder {
      * does a lot of processing that is not needed for the SPA/SAPA calculations so getting the raw data
      * avoids that processing.
      */
+    @SuppressWarnings("unchecked")
     private HashMap<Long, HashMap<Long, SummingData>> processRawRatingData() {
 	Collection<Long> criteriaIds = new ArrayList<Long>();
 	for ( RatingCriteria criteria : criteriaForCriteriaTable ) {
 	    criteriaIds.add(criteria.getRatingCriteriaId());
 	}
-	List rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds, learnerDataMap.keySet());
+	List<Object> rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds, learnerDataMap.keySet());
 	HashMap<Long, HashMap<Long, SummingData>> tally = new HashMap<Long, HashMap<Long, SummingData>>();
 	for ( Object obj : rawRatingsForSession ) {
 	    Rating rating = (Rating) obj;

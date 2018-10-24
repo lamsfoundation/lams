@@ -16,14 +16,13 @@
 	</c:otherwise>
 </c:choose>
 
-<html:form action="/authoring/saveMultipleImages" method="post" styleId="imageGalleryItemsForm" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<form:form action="saveMultipleImages.do" method="post" modelAttribute="multipleImagesForm" id="multipleImagesForm" enctype="multipart/form-data">
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">
 				<fmt:message key="label.authoring.basic.add.multiple.images" />
-				<a href="javascript:showMessage('<html:rewrite page="/authoring/newImageInit.do?sessionMapID=${formBean.sessionMapID}"/>');" 
+				<a href="javascript:showMessage('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${multipleImagesForm.sessionMapID}');" 
 						class="btn btn-default btn-xs pull-right">
 					<fmt:message key="label.authoring.basic.upload.single.image" />
 				</a>
@@ -32,8 +31,8 @@
 			
 		<div class="panel-body">
 	
-			<%@ include file="/common/messages.jsp"%>	
-			<html:hidden property="sessionMapID" styleId="sessionMapID"/>
+			<lams:errors/>	
+			<form:hidden path="sessionMapID" id="sessionMapID"/>
 	
 			<div class="form-group">
 				<label>
@@ -82,4 +81,4 @@
 		</div>
 	</div>
 	
-</html:form>
+</form:form>

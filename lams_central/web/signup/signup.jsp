@@ -1,9 +1,8 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
@@ -29,7 +28,7 @@
 </lams:head>
 
 <body class="stripes">
-	<lams:Page type="admin">
+	<lams:Page type="admin" formID="SignupForm">
 		<div class="page-header">
 			<p class="text-center">
 				<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg"

@@ -33,28 +33,25 @@ json-simple       json-simple-1.1.1.jar                 1.1.1                  A
 
 jsonwebtoken	  jjwt-0.9.0.jar						0.9.0				   JWTK							 Apache
 
-mysql             mysql-connector-java-5.1.46-bin.jar	5.1.46				   GPL							 Oracle 						  Java connector for MySQL                                                                          
+mysql             mysql-connector-java-8.0.11.jar		8.0.11				   GPL							 Oracle 						  Java connector for MySQL                                                                          
 
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
 quartz			  quartz-2.2.3.jar						2.2.3			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
 
-spring            spring-core-4.3.10.RELEASE.jar		4.3.10				   Apache License 2.0			 Pivotal						  programming and configuration model for modern Java-based enterprise applications
-				  spring-beans-4.3.10.RELEASE.jar
-				  spring-context-4.3.10.RELEASE.jar
-				  spring-context-support-4.3.10.RELEASE.jar
-				  spring-expression-4.3.10.RELEASE.jar
-				  spring-jdbc-4.3.10.RELEASE.jar
-				  spring-orm-4.3.10.RELEASE.jar
-				  spring-tx-4.3.10.RELEASE.jar
-				  spring-web-4.3.10.RELEASE.jar
-
-struts            jakarta-oro.jar                       2.0.7                  Apache License 2.0            Apache						      regular expressions
-				  struts.jar                            1.2.7                  Apache License 2.0            Apache						      Struts Framework
-				  struts-el.jar                         1.2.9                  Apache License 2.0            Apache						      Struts extensions
+spring            spring-core-4.3.12.RELEASE.jar		4.3.12				   Apache License 2.0			 Pivotal						  programming and configuration model for modern Java-based enterprise applications
+				  spring-beans-4.3.12.RELEASE.jar
+				  spring-context-4.3.12.RELEASE.jar
+				  spring-context-support-4.3.12.RELEASE.jar
+				  spring-expression-4.3.12.RELEASE.jar
+				  spring-jdbc-4.3.12.RELEASE.jar
+				  spring-orm-4.3.12.RELEASE.jar
+				  spring-tx-4.3.12.RELEASE.jar
+				  spring-web-4.3.12.RELEASE.jar
+				  spring-webmvc-4.3.12.RELEASE.jar
 
 urlrewritefilter urlrewritefilter-4.0.3.jar             4.0.3                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
 
-xstream           xstream-1.5.0-SNAPSHOT.jar            1.5.0																				  XML serializer
+xstream           xstream-1.4.10.jar            		1.4.10																				  XML serializer
 
 yuicompressor	  yuicompressor-2.4.9					2.4.9				   BSD License					YUI								  CSS and JS minifier 

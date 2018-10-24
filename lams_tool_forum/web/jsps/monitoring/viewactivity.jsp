@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
-<html:errors />  
 
+<lams:errors/>
+					        
 <table cellpadding="0">
 	<!-- Title Row -->
 	<tr>
@@ -25,9 +26,9 @@
 
 	<tr>
 		<td colspan="2">
-			<html:link forward="forwardToAuthorPage" styleClass="button">
+			<a href="/learning/viewTopic.do" class="button">
 				<fmt:message key="label.monitoring.edit.activity.edit" />
-			</html:link>
+			</a>
 		</td>
 	</tr>
 </table>

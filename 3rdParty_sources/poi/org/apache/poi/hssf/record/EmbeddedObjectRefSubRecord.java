@@ -31,6 +31,7 @@ import org.apache.poi.util.LittleEndianInputStream;
 import org.apache.poi.util.LittleEndianOutput;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
+import org.apache.poi.util.RecordFormatException;
 import org.apache.poi.util.StringUtil;
 
 /**
@@ -316,7 +317,7 @@ public final class EmbeddedObjectRefSubRecord extends SubRecord implements Clone
 		if (field_2_refPtg == null) {
 			sb.append("    .f3unknown     = ").append(HexDump.toHex(field_2_unknownFormulaData)).append("\n");
 		} else {
-			sb.append("    .formula       = ").append(field_2_refPtg.toString()).append("\n");
+			sb.append("    .formula       = ").append(field_2_refPtg).append("\n");
 		}
 		if (field_4_ole_classname != null) {
 			sb.append("    .unicodeFlag   = ").append(field_3_unicode_flag).append("\n");

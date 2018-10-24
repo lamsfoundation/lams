@@ -37,12 +37,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author pgeorges
- *
- *
- *
  */
 public class GetRecordingServlet extends HttpServlet {
-
     private static Logger logger = Logger.getLogger(GetRecordingServlet.class);
 
     @Override

@@ -23,6 +23,7 @@ import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
 
 /**
+ * See the spec at 2.5.198.76 PtgName
  * 
  * @author andy
  * @author Jason Height (jheight at chariot dot net dot au)
@@ -42,9 +43,8 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	}
 
 	/** Creates new NamePtg */
-
 	public NamePtg(LittleEndianInput in)  {
-		field_1_label_index = in.readShort();
+		field_1_label_index = in.readUShort();
 		field_2_zero = in.readShort();
 	}
 
@@ -55,24 +55,29 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 		return field_1_label_index - 1; // convert to zero based
 	}
 
+	@Override
 	public void write(LittleEndianOutput out) {
 		out.writeByte(sid + getPtgClass());
 		out.writeShort(field_1_label_index);
 		out.writeShort(field_2_zero);
 	}
 
+	@Override
 	public int getSize() {
 		return SIZE;
 	}
 
+	@Override
 	public String toFormulaString(FormulaRenderingWorkbook book) {
 		return book.getNameText(this);
 	}
 
+	@Override
 	public String toFormulaString() {
 		throw new RuntimeException("3D references need a workbook to determine formula text");
 	}
 
+	@Override
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
 	}

@@ -10,7 +10,7 @@
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-		<link type="text/css" href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet">	
+		<link type="text/css" href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet">	
 
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
@@ -153,7 +153,7 @@
 		</div>
 			
 		<div class="panel-body">	
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
 			<table class="table table-condensed">
 				<tr>

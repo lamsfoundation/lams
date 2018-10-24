@@ -23,20 +23,18 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.SortedSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 
 /**
  * Scratchie Form.
  *
  *
  */
-public class ScratchieForm extends ActionForm {
+public class ScratchieForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(ScratchieForm.class.getName());
@@ -44,6 +42,9 @@ public class ScratchieForm extends ActionForm {
     private String sessionMapID;
     private String contentFolderID;
 
+    //tool access mode;
+    private String mode;
+    
     // Forum fields
     private int currentTab;
 
@@ -60,19 +61,6 @@ public class ScratchieForm extends ActionForm {
 	// set Form special varaible from given forum
 	if (scratchie == null) {
 	    logger.error("Initial ScratchieForum failed by null value of Scratchie.");
-	}
-    }
-
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
-	// if it is start page, all data read out from database or current session
-	// so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
-	    scratchie.setDefineLater(false);
-	    scratchie.setReflectOnActivity(false);
-	    scratchie.setExtraPoint(false);
-	    scratchie.setBurningQuestionsEnabled(false);
 	}
     }
 
@@ -103,5 +91,15 @@ public class ScratchieForm extends ActionForm {
     public Scratchie getScratchie() {
 	return scratchie;
     }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+    
+    
 
 }

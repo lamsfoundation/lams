@@ -39,7 +39,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,7 +144,6 @@ import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
-
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -161,11 +159,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
     private Logger log = Logger.getLogger(ExportToolContentService.class);
 
-    public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
-
-    public static final String MESSAGE_SERVICE_BEAN_NAME = "commonMessageService";
-
-    // export tool content zip file prefix
+     // export tool content zip file prefix
     public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
 
     public static final String EXPORT_LDCONTENT_ZIP_PREFIX = "lams_ldcontent_";
@@ -208,9 +202,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     // message keys
     private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
 
-    private static MessageService messageService;
+    private MessageService messageService;
+    private ILearningDesignService learningDesignService;
 
     private ApplicationContext applicationContext;
+        
 
     // save list of all tool file node class information. One tool may have
     // over one file node, such as
@@ -303,7 +299,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     private class FileConverter implements Converter {
 	private Converter defaultConverter;
-	private List<ValueInfo> fileNodes = new ArrayList<ValueInfo>();
+	private List<ValueInfo> fileNodes = new ArrayList<>();
 
 	public FileConverter(XStream xstream) {
 	    this.defaultConverter = new ReflectionConverter(xstream.getMapper(), xstream.getReflectionProvider());
@@ -314,7 +310,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	@Override
-	public boolean canConvert(Class<?> type) {
+	public boolean canConvert(Class type) {
 	    for (NameInfo info : fileHandleClassList) {
 		if (info.className.equals(type.getName())) {
 		    log.debug("XStream will handle [" + info.className + "] as file node class.");
@@ -388,7 +384,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Default contructor method.
      */
     public ExportToolContentService() {
-	fileHandleClassList = new ArrayList<NameInfo>();
+	fileHandleClassList = new ArrayList<>();
     }
 
     /**
@@ -409,15 +405,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    // get learning desing and serialize it to XML file. Update the
 	    // version to reflect the version now, rather than the version when it was saved.
-	    ILearningDesignService service = getLearningDesignService();
-	    LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId, "");
+	    LearningDesignDTO ldDto = learningDesignService.getLearningDesignDTO(learningDesignId, "");
 	    ldDto.setVersion(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 
 	    /*
 	     * learning design DTO is ready to be written into XML, but we need to find out which groupings and
 	     * branching mappings are not supposed to be included into the structure (LDEV-1825)
 	     */
-	    Set<Long> groupingsToSkip = new TreeSet<Long>();
+	    Set<Long> groupingsToSkip = new TreeSet<>();
 
 	    // iterator all activities in this learning design and export
 	    // their content to given folder.
@@ -635,7 +630,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	Object[] ldResults = new Object[3];
 	Long ldId = null;
-	List<String> ldErrorMsgs = new ArrayList<String>();
+	List<String> ldErrorMsgs = new ArrayList<>();
 	String filename = designFile.getName();
 	String extension = (filename != null) && (filename.length() >= 4) ? filename.substring(filename.length() - 4)
 		: "";
@@ -693,8 +688,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    log.debug("Learning design xml deserialize to LearingDesignDTO success.");
 
 	    // begin tool import
-	    Map<Long, ToolContent> toolMapper = new HashMap<Long, ToolContent>();
-	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
+	    Map<Long, ToolContent> toolMapper = new HashMap<>();
+	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 	    // LDs with version 3.0.2 have already correct paths
 	    boolean rewriteResourcePaths = !VersionUtil.isSameOrLaterVersion("3.0.2", importedFileVersion);
@@ -707,7 +702,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ldDto.setDescription(ldDto.getDescription().replaceAll(oldResourcePath, newResourcePath));
 	    }
 	    for (AuthoringActivityDTO activity : activities) {
-		getLearningDesignService().fillLearningLibraryID(activity);
+		learningDesignService.fillLearningLibraryID(activity, activities);
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		    continue;
@@ -723,7 +718,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		// can not find a matching tool
 		if (newTool == null) {
 		    log.warn("An activity can not found matching tool [" + activity.getToolSignature() + "].");
-		    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_TOOL_NOT_FOUND,
+		    toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_TOOL_NOT_FOUND,
 			    new Object[] { activity.getToolSignature() }));
 
 		    // remove this activity from LD
@@ -772,7 +767,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    }
 		    log.debug("Tool content import success.");
 		} catch (Exception e) {
-		    String error = getMessageService().getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
+		    String error = messageService.getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
 			    new Object[] { newTool.getToolDisplayName(), e.toString() });
 		    log.error(error, e);
 		    toolsErrorMsgs.add(error);
@@ -784,7 +779,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    // all activities can not imported, ignore this LD
 	    if (removedActMap.size() == activities.size()) {
-		toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_NO_VALID_TOOL));
+		toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_NO_VALID_TOOL));
 		return -1L;
 	    }
 
@@ -847,13 +842,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		log.warn(
 			"Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"
 				+ title + "\'. Version in import file " + versionString);
-		toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
+		toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 			new Object[] { versionString, currentVersionString }));
 	    }
 	} catch (Exception e) {
 	    log.warn("Unable to properly determine current version from an import file. Design name \'" + title
 		    + "\'. Version in import file " + versionString);
-	    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
+	    toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 		    new Object[] { versionString, currentVersionString }));
 	}
 
@@ -911,8 +906,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     private void badFileType(List<String> ldErrorMsgs, String filename, String errDescription) {
 	log.error("Uploaded file not an expected type. Filename was " + filename + " " + errDescription);
-	MessageService msgService = getMessageService();
-	String msg = msgService.getMessage(ExportToolContentService.KEY_MSG_IMPORT_FILE_FORMAT);
+	String msg = messageService.getMessage(ExportToolContentService.KEY_MSG_IMPORT_FILE_FORMAT);
 	ldErrorMsgs.add(msg != null ? msg : "Uploaded file not an expected type.");
     }
 
@@ -1032,7 +1026,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	File toolFile = new File(toolFilePath);
 	Path path = toolFile.toPath();
 	List<String> oldLines = Files.readAllLines(path);
-	List<String> newLines = new LinkedList<String>();
+	List<String> newLines = new LinkedList<>();
 	for (String oldLine : oldLines) {
 	    String newLine = oldLine.replaceAll(oldPath, newPath);
 	    newLines.add(newLine);
@@ -1083,7 +1077,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	Object filter = filterClass.newInstance();
 	Method[] methods = filterClass.getDeclaredMethods();
-	Map<Float, Method> methodNeeds = new TreeMap<Float, Method>();
+	Map<Float, Method> methodNeeds = new TreeMap<>();
 	for (Method method : methods) {
 	    String name = method.getName();
 	    if (name.startsWith(filterMethodPrefix)) {
@@ -1137,20 +1131,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
     }
 
-    private ILearningDesignService getLearningDesignService() {
-	return (ILearningDesignService) applicationContext
-		.getBean(ExportToolContentService.LEARNING_DESIGN_SERVICE_BEAN_NAME);
-    }
-
-    private MessageService getMessageService() {
-	if (ExportToolContentService.messageService != null) {
-	    return ExportToolContentService.messageService;
-	}
-
-	return ExportToolContentService.messageService = (MessageService) applicationContext
-		.getBean(ExportToolContentService.MESSAGE_SERVICE_BEAN_NAME);
-    }
-
     private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException {
 	return applicationContext.getBean(tool.getServiceName());
     }
@@ -1161,8 +1141,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	// grouping object list
 	List<GroupingDTO> groupingDtoList = dto.getGroupings();
-	Map<Long, Grouping> groupingMapper = new HashMap<Long, Grouping>();
-	Map<Integer, Group> groupByUIIDMapper = new HashMap<Integer, Group>();
+	Map<Long, Grouping> groupingMapper = new HashMap<>();
+	Map<Integer, Group> groupByUIIDMapper = new HashMap<>();
 	for (GroupingDTO groupingDto : groupingDtoList) {
 	    Grouping grouping = getGrouping(groupingDto, groupByUIIDMapper);
 	    groupingMapper.put(grouping.getGroupingId(), grouping);
@@ -1186,8 +1166,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 	Set<Activity> actList = new TreeSet<Activity>(new ActivityOrderComparator());
-	Map<Long, Activity> activityMapper = new HashMap<Long, Activity>();
-	Map<Integer, Activity> activityByUIIDMapper = new HashMap<Integer, Activity>();
+	Map<Long, Activity> activityMapper = new HashMap<>();
+	Map<Integer, Activity> activityByUIIDMapper = new HashMap<>();
 
 	// as we create the activities, we need to record any "default
 	// activities" for the sequence activity
@@ -1196,7 +1176,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// been created yet and if we leave it till later and then find all the
 	// activities we are
 	// going through the activity set over and over again for no reason.
-	Map<Integer, ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<Integer, ComplexActivity>();
+	Map<Integer, ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<>();
 
 	for (AuthoringActivityDTO actDto : actDtoList) {
 	    Activity act = getActivity(actDto, groupingMapper, toolMapper, defaultActivityToParentActivityMapping);
@@ -1367,7 +1347,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	// transition object list
 	List<TransitionDTO> transDtoList = dto.getTransitions();
-	Set<Transition> transList = new HashSet<Transition>();
+	Set<Transition> transList = new HashSet<>();
 	for (TransitionDTO transDto : transDtoList) {
 	    // Any transitions relating with this tool will be removed!
 	    Long fromId = transDto.getFromActivityID();
@@ -1385,7 +1365,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	// Once the learning design is saved, we can import the competences
-	Set<Competence> competenceList = new HashSet<Competence>();
+	Set<Competence> competenceList = new HashSet<>();
 	if (dto.getCompetences() != null) {
 	    for (CompetenceDTO competenceDTO : dto.getCompetences()) {
 		Competence competence = new Competence();
@@ -1398,7 +1378,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// branch mappings - maps groups to branches, map conditions to branches
 	List<BranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
 	if (entryDtoList != null) {
-	    Set<BranchActivityEntry> entryList = new HashSet<BranchActivityEntry>();
+	    Set<BranchActivityEntry> entryList = new HashSet<>();
 	    for (BranchActivityEntryDTO entryDto : entryDtoList) {
 		BranchActivityEntry entry = getBranchActivityEntry(entryDto, groupByUIIDMapper, activityByUIIDMapper);
 		entryList.add(entry);
@@ -1409,7 +1389,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		competenceList);
 
 	// validate learning design
-	Vector listOfValidationErrorDTOs = getLearningDesignService().validateLearningDesign(ld);
+	Vector listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(ld);
 	if (listOfValidationErrorDTOs.size() > 0) {
 	    ld.setValidDesign(false);
 	    log.error(listOfValidationErrorDTOs);
@@ -1426,13 +1406,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// add suffix if configuration is not set or is set to true
 	String addSuffix = Configuration.get(ConfigurationKeys.SUFFIX_IMPORTED_LD);
 	if ((addSuffix == null) || Boolean.valueOf(addSuffix)) {
-	    ld.setTitle(ExportToolContentService.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
+	    String title = ld.getTitle();
+	    if (title == null || title.trim().length() == 0)
+		title = "unknown";
+	    ld.setTitle(learningDesignService.getUniqueNameForLearningDesign(ld.getTitle(), folder.getWorkspaceFolderId()));
 	    learningDesignDAO.update(ld);
 	    // persist
 	}
 
 	// Once we have the competences saved, we can save the competence mappings
-	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>();
+	Set<CompetenceMapping> allCompetenceMappings = new HashSet<>();
 	for (AuthoringActivityDTO actDto : actDtoList) {
 	    if (removedActMap.containsKey(actDto.getActivityID())) {
 		continue;
@@ -1467,8 +1450,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * @return
      */
     private List<AuthoringActivityDTO> getSortedParentList(List<AuthoringActivityDTO> activities) {
-	List<AuthoringActivityDTO> result = new ArrayList<AuthoringActivityDTO>();
-	List<Long> actIdList = new ArrayList<Long>();
+	List<AuthoringActivityDTO> result = new ArrayList<>();
+	List<Long> actIdList = new ArrayList<>();
 
 	// NOTICE: this code can not handle all nodes have their parents, ie,
 	// there is at least one node parent is
@@ -1950,52 +1933,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setEndYcoord(actDto.getEndYCoord());
     }
 
-    private static String generateUniqueLDTitle(WorkspaceFolder folder, String titleFromFile,
-	    ILearningDesignDAO learningDesignDAO) {
-
-	String newTitle = titleFromFile;
-	if ((newTitle == null) || (newTitle.length() == 0)) {
-	    newTitle = "unknown";
-	}
-
-	if (folder != null) {
-	    boolean dupName;
-	    List<LearningDesign> ldList = learningDesignDAO
-		    .getAllLearningDesignsInFolder(folder.getWorkspaceFolderId());
-	    int idx = 1;
-
-	    //contruct middle part of name by timestamp
-	    Calendar calendar = Calendar.getInstance();
-	    int mth = calendar.get(Calendar.MONTH) + 1;
-	    String mthStr = new Integer(mth).toString();
-	    if (mth < 10) {
-		mthStr = "0" + mthStr;
-	    }
-	    int day = calendar.get(Calendar.DAY_OF_MONTH);
-	    String dayStr = new Integer(day).toString();
-	    if (day < 10) {
-		dayStr = "0" + dayStr;
-	    }
-	    String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
-	    while (true) {
-		dupName = false;
-		for (LearningDesign eld : ldList) {
-		    if (StringUtils.equals(eld.getTitle(), newTitle)) {
-			dupName = true;
-			break;
-		    }
-		}
-		if (!dupName) {
-		    break;
-		}
-		newTitle = titleFromFile + "_" + nameMid + "_" + idx;
-		idx++;
-	    }
-	}
-
-	return newTitle;
-    }
-
     /**
      * Convert content folder ID to real path inside secure dir or on server
      */
@@ -2078,5 +2015,21 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
 	this.systemToolDAO = systemToolDAO;
+    }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+
+    public ILearningDesignService getLearningDesignService() {
+        return learningDesignService;
+    }
+
+    public void setLearningDesignService(ILearningDesignService learningDesignService) {
+        this.learningDesignService = learningDesignService;
     }
 }

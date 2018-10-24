@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.mc.service;
 /**
  * <p>
  * This exception wraps all basic exception occured in the mcq tool. It is not suppose to be try and catched in any
- * level. The struts should be taking care of handling this exception.
+ * level.
  * </p>
  *
  * @author Ozgur Demirtas

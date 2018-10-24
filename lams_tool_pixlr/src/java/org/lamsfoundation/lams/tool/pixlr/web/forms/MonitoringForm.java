@@ -21,20 +21,15 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.pixlr.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
  */
-public class MonitoringForm extends ActionForm {
+public class MonitoringForm {
 
     private static final long serialVersionUID = 9096908688391850595L;
 
-    String dispatch;
     boolean teacherVisible;
     Long toolSessionID;
     String contentFolderID;
@@ -61,14 +56,6 @@ public class MonitoringForm extends ActionForm {
 
     public void setMessageUID(Long messageUID) {
 	this.messageUID = messageUID;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

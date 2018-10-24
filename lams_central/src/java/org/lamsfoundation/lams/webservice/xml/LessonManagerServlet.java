@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -68,6 +69,8 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -78,24 +81,34 @@ import org.w3c.dom.ls.LSSerializer;
 
 @SuppressWarnings("serial")
 public class LessonManagerServlet extends HttpServlet {
-
     private static Logger log = Logger.getLogger(LessonManagerServlet.class);
 
-    private static IntegrationService integrationService = null;
-
-    private static IMonitoringService monitoringService = null;
-
-    private static ILessonService lessonService = null;
-
-    private static IExportToolContentService exportService = null;
-
-    private static ILamsCoreToolService toolService = null;
-
-    private static IGradebookService gradebookService = null;
-
-    private static IUserManagementService userManagementService = null;
-
-    private static ISecurityService securityService = null;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IMonitoringService monitoringService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private IExportToolContentService exportToolContentService;
+    @Autowired
+    private ILamsCoreToolService lamsCoreToolService;
+    @Autowired
+    private IGradebookService gradebookService;
+    @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
+    private ISecurityService securityService;
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     /**
      * The doGet method of the servlet. <br>
@@ -180,8 +193,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = new Long(ldIdStr);
-		Long lessonId = LessonManagerServlet.startLesson(serverId, datetime, hashValue, username, ldId,
-			courseId, title, desc, enforceAllowLearnerRestart, country, locale, customCSV, presenceEnable, imEnable,
+		Long lessonId = startLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
+			enforceAllowLearnerRestart, country, locale, customCSV, presenceEnable, imEnable,
 			enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
@@ -380,7 +393,7 @@ public class LessonManagerServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    private static Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
+    private Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String countryIsoCode,
 	    String langIsoCode, String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
 	    throws RemoteException {
@@ -403,7 +416,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
 		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
-	    LessonManagerServlet.createLessonClass(lesson, organisation, user);
+	    createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
 	    monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
 	    // store information which extServer has started the lesson
@@ -435,7 +448,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
 		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
-	    LessonManagerServlet.createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
+	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
 	    Date date = DateUtil.convertFromString(startDate, DateUtil.SCHEDULE_LESSON_FORMAT);
 	    monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId());
@@ -785,7 +798,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    }
 
 	    File designFile = new File(filePath);
-	    Object[] ldResults = exportService.importLearningDesign(designFile, user, workspaceFolderUid,
+	    Object[] ldResults = exportToolContentService.importLearningDesign(designFile, user, workspaceFolderUid,
 		    toolsErrorMsgs, customCSV);
 	    ldId = (Long) ldResults[0];
 	    ldErrorMsgs = (List<String>) ldResults[1];
@@ -803,7 +816,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private static void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
+    private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
 	List<User> staffList = new LinkedList<>();
 	staffList.add(creator);
 	List<User> learnerList = new LinkedList<>();
@@ -813,40 +826,6 @@ public class LessonManagerServlet extends HttpServlet {
 	monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + " learners", learnerList, organisation.getName() + " staff", staffList,
 		creator.getUserId());
-    }
-
-    /**
-     * Initialization of the servlet. <br>
-     *
-     * @throws ServletException
-     *             if an error occured
-     */
-    @Override
-    public void init() throws ServletException {
-
-	integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-
-	monitoringService = (IMonitoringService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("monitoringService");
-
-	lessonService = (ILessonService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
-
-	exportService = (IExportToolContentService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("exportToolContentService");
-
-	toolService = (ILamsCoreToolService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("lamsCoreToolService");
-
-	gradebookService = (IGradebookService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("gradebookService");
-
-	userManagementService = (IUserManagementService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
-
-	securityService = (ISecurityService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("securityService");
     }
 
     private class AddUsersToLessonThread implements Runnable {
@@ -1010,12 +989,6 @@ public class LessonManagerServlet extends HttpServlet {
 	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, null,
 		    method);
 
-	    if (lessonService == null) {
-		lessonService = (ILessonService) WebApplicationContextUtils
-			.getRequiredWebApplicationContext(request.getSession().getServletContext())
-			.getBean("lessonService");
-	    }
-
 	    User user = userMap.getUser();
 	    if (user == null) {
 		String error = "Unable to add user to lesson class as user is missing from the user map";
@@ -1086,7 +1059,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    lessonElement.setAttribute("lessonName", lesson.getLessonName());
 
 	    // calculate lesson's MaxPossibleMark
-	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
+	    Long lessonMaxPossibleMark = lamsCoreToolService.getLessonMaxPossibleMark(lesson);
 	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
 
 	    List<ExtUserUseridMap> allUsers = integrationService.getExtUserUseridMapByExtServer(extServer);
@@ -1243,14 +1216,14 @@ public class LessonManagerServlet extends HttpServlet {
 	toolOutputsElement.setAttribute("name", lesson.getLessonName());
 
 	List<LearnerProgress> learnerProgresses = lessonService.getUserProgressForLesson(lesson.getLessonId());
-	List<ToolSession> toolSessions = toolService.getToolSessionsByLesson(lesson);
+	List<ToolSession> toolSessions = lamsCoreToolService.getToolSessionsByLesson(lesson);
 
 	// map contains pairs toolContentId -> toolOutputDefinitions
 	Map<Long, Map<String, ToolOutputDefinition>> toolOutputDefinitionsMap = new TreeMap<>();
 	for (ToolActivity activity : activities) {
 	    Long toolContentId = activity.getToolContentId();
 	    if (toolOutputDefinitionsMap.get(toolContentId) == null) {
-		SortedMap<String, ToolOutputDefinition> toolOutputDefinitions = toolService
+		SortedMap<String, ToolOutputDefinition> toolOutputDefinitions = lamsCoreToolService
 			.getOutputDefinitionsFromTool(toolContentId,
 				ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
 		toolOutputDefinitionsMap.put(toolContentId, toolOutputDefinitions);
@@ -1431,13 +1404,13 @@ public class LessonManagerServlet extends HttpServlet {
 			ActivityEvaluation evaluation = activity.getEvaluation();
 			if (evaluation != null) {
 			    if (outputName.equals(evaluation.getToolOutputDefinition())) {
-				ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
+				ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(outputName, toolSession,
 					learner.getUserId());
 				activityElement.appendChild(getOutputElement(document, toolOutput, definition));
 			    }
 			}
 		    } else {
-			ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
+			ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(outputName, toolSession,
 				learner.getUserId());
 
 			if (toolOutput != null) {

@@ -1,4 +1,4 @@
-	<%-- 
+<%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
@@ -18,31 +18,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<!DOCTYPE html>
 
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/taglibs.jsp"%>
 
-<div id="content">
-
-	<h1><c:out value="${title}"/></h1>
-
-	<table class="alternative-color" cellspacing="0">
-		<c:forEach items="${learners}" var="learner">
-		<tr>
-			<td>
-				<c:out value="${learner.firstName}"/> <c:out value="${learner.lastName}"/><BR>
-			</td>
-		</tr>
-		</c:forEach>
-	</table>
+<lams:html>
+    <lams:head>
+		<lams:css/>
+    </lams:head>
+    
+    <body class="stripes">
+    
+    <div id="content">
+    
+		<h1><c:out value="${title}"/></h1>
 		
-	<c:if test="${not localFiles}">
-		<%@ include file="../template/finishbutton.jsp" %>
-	</c:if>
-</div>  <!--closes content-->
+			<table class="alternative-color" cellspacing="0">
+				<c:forEach items="${learners}" var="learner">
+				<tr>
+					<td>
+						<c:out value="${learner.firstName}"/> <c:out value="${learner.lastName}"/><BR>
+					</td>
+				</tr>
+				</c:forEach>
+			</table>
+				
+			<c:if test="${not localFiles}">
+				<%@ include file="../template/finishbutton.jsp" %>
+			</c:if>
+		</div>  <!--closes content-->
+
+		<div id="footer">
+		</div><!--closes footer-->
+
+    </body>
+</lams:html>
 
 

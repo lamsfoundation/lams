@@ -23,8 +23,7 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.form;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Form responsible for representing <code>TaskListItem</code> objects on a view layer.
@@ -34,7 +33,7 @@ import org.apache.struts.upload.FormFile;
  *
  *
  */
-public class TaskListItemForm extends ActionForm {
+public class TaskListItemForm {
     private String itemIndex;
     private String sessionMapID;
 
@@ -58,12 +57,12 @@ public class TaskListItemForm extends ActionForm {
 
     private String parentTaskName;
 
-    private FormFile uploadedFile;
+    private MultipartFile uploadedFile;
     private String comment;
 
     /**
      * Returns TaskListItem title.
-     * 
+     *
      * @return TaskListItem title
      */
     public String getTitle() {
@@ -72,7 +71,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets TaskListItem title.
-     * 
+     *
      * @param title
      *            TaskListItem title
      */
@@ -82,7 +81,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns TaskListItem description.
-     * 
+     *
      * @return TaskListItem description
      */
     public String getDescription() {
@@ -91,7 +90,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets TaskListItem description.
-     * 
+     *
      * @param description
      *            TaskListItem description
      */
@@ -101,7 +100,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns TaskListItem order index.
-     * 
+     *
      * @return TaskListItem order index
      */
     public String getItemIndex() {
@@ -110,7 +109,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets TaskListItem order index.
-     * 
+     *
      * @param itemIndex
      *            TaskListItem order index
      */
@@ -120,7 +119,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns current SessionMapID.
-     * 
+     *
      * @return current SessionMapID
      */
     public String getSessionMapID() {
@@ -129,7 +128,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets current SessionMapID.
-     * 
+     *
      * @param sessionMapID
      *            current SessionMapID
      */
@@ -139,7 +138,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns working mode.
-     * 
+     *
      * @return working mode
      */
     public String getMode() {
@@ -148,7 +147,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns working mode.
-     * 
+     *
      * @param mode
      *            working mode
      */
@@ -158,7 +157,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether this <code>TaskLiskItem</code> is required to finish activity.
-     * 
+     *
      * @return true if the <code>TaskLiskItem</code> is required to finish activity, false otherwise.
      */
     public boolean isRequired() {
@@ -167,7 +166,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether this <code>TaskLiskItem</code> is required to finish activity.
-     * 
+     *
      * @param isRequired
      *            true if the <code>TaskLiskItem</code> is required to finish activity, false otherwise.
      */
@@ -177,7 +176,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
      */
     public boolean isCommentsAllowed() {
@@ -186,7 +185,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param isCommentsAllowed
      *            true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
      */
@@ -196,7 +195,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether comments are required to complete this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return true if comments are required to complete this <code>TaskLiskItem</code>, false otherwise.
      */
     public boolean isCommentsRequired() {
@@ -205,7 +204,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether comments are required to complete this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param isCommentsAllowed
      *            true if comments are required to complete this <code>TaskLiskItem</code>, false otherwise.
      */
@@ -215,7 +214,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether files are allowed in this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return true if files are allowed in this <code>TaskLiskItem</code>, false otherwise.
      */
     public boolean isFilesAllowed() {
@@ -224,7 +223,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether files are allowed in this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param isCommentsAllowed
      *            true if files are allowed in this <code>TaskLiskItem</code>, false otherwise.
      */
@@ -234,7 +233,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether files are required to complete this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return true if files are required to complete this <code>TaskLiskItem</code>, false otherwise.
      */
     public boolean isFilesRequired() {
@@ -243,7 +242,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether files are required to complete this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param isCommentsAllowed
      *            true if files are required to complete this <code>TaskLiskItem</code>, false otherwise.
      */
@@ -255,7 +254,7 @@ public class TaskListItemForm extends ActionForm {
     // for the final decision -- if this options will be needed later.
     /**
      * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
      */
     public boolean isCommentsFilesAllowed() {
@@ -264,7 +263,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param isCommentsAllowed
      *            true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
      */
@@ -274,7 +273,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false
      *         otherwise.
      */
@@ -284,7 +283,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
-     * 
+     *
      * @param showCommentsToAll
      *            true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false
      *            otherwise.
@@ -295,7 +294,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns whether this <code>TaskLiskItem</code> is a child task.
-     * 
+     *
      * @return true if this <code>TaskLiskItem</code> is a child task, false otherwise.
      */
     public boolean isChildTask() {
@@ -304,7 +303,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets whether this <code>TaskLiskItem</code> is a child task or not.
-     * 
+     *
      * @param isChildTask
      *            true if this <code>TaskLiskItem</code> is a child task, false otherwise.
      */
@@ -314,7 +313,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * If the <code>TaskLiskItem</code> is a child task then it has a parent. So this method returns its title.
-     * 
+     *
      * @return parent's title
      */
     public String getParentTaskName() {
@@ -323,7 +322,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * If the <code>TaskLiskItem</code> is a child task then it has a parent. So this method sets its title.
-     * 
+     *
      * @param parentTaskName
      *            parent's title
      */
@@ -333,26 +332,26 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Returns attachment for this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return attachment for this <code>TaskLiskItem</code>
      */
-    public FormFile getUploadedFile() {
+    public MultipartFile getUploadedFile() {
 	return uploadedFile;
     }
 
     /**
      * Sets attachment for this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param uploadedFile
      *            attachment for this <code>TaskLiskItem</code>
      */
-    public void setUploadedFile(FormFile uploadedFile) {
+    public void setUploadedFile(MultipartFile uploadedFile) {
 	this.uploadedFile = uploadedFile;
     }
 
     /**
      * Returns comment for this <code>TaskLiskItem</code>.
-     * 
+     *
      * @return comment for this <code>TaskLiskItem</code>
      */
     public String getComment() {
@@ -361,7 +360,7 @@ public class TaskListItemForm extends ActionForm {
 
     /**
      * Sets comment for this <code>TaskLiskItem</code>.
-     * 
+     *
      * @param comment
      *            comment for this <code>TaskLiskItem</code>
      */

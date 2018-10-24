@@ -26,78 +26,72 @@
 			
 		<div class="panel-body">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
-			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="taskListItemForm" focus="title" >
+			<form:form action="saveOrUpdateItem.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm" focus="title" >
 	
-				<html:hidden property="sessionMapID" />
-				<html:hidden property="itemIndex" />
-				
-				<html:hidden property="commentsFilesAllowed" value="${true}"/>
-				<html:hidden property="showCommentsToAll" value="${true}"/>
+				<form:hidden path="sessionMapID" />
+				<form:hidden path="itemIndex" />
+				<form:hidden path="commentsFilesAllowed" value="true"/>
+				<form:hidden path="showCommentsToAll" value="true" />
 				
 				<div class="form-group">
-	            	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
-	       			<html:text property="title" size="55" styleClass="form-control"/>
+	            	<label for="title">
+	            	<fmt:message key="label.authoring.basic.resource.title.input" />
+	            	</label>
+	       			<form:input path="title" size="55" cssClass="form-control"/>
 				</div>
 	
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<c:set var="sessionMap"	value="${sessionScope[formBean.sessionMapID]}" />
+				<c:set var="sessionMap" value="${sessionScope[taskListItemForm.sessionMapID]}" />
 	
 				<div class="form-group">
 					<label for="description"><fmt:message key="label.authoring.basic.resource.description.input" /></label>
-					<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.taskListForm.contentFolderID}"/>
+					<lams:CKEditor id="description" value="${taskListItemForm.description}" contentFolderID="${sessionMap.taskListForm.contentFolderID}"/>
 				</div>
 	
 				<div class="checkbox">
 					<label for="isRequired">
-					<html:checkbox property="required" styleId="isRequired">
-					</html:checkbox>
+					<form:checkbox path="required" id="isRequired"/>
 					<fmt:message key="label.authoring.basic.task.isRequired" />
 					</label>
 				</div>
 				
 				<div class="checkbox">
 					<label for="isCommentsAllowed">
-					<html:checkbox property="commentsAllowed" styleId="isCommentsAllowed"
-						onclick="uncheckIsCommentsRequired(); document.taskListItemForm.commentsRequired.disabled = !document.taskListItemForm.commentsRequired.disabled;">
-					</html:checkbox>
+					<form:checkbox path="commentsAllowed" id="isCommentsAllowed"
+						onclick="uncheckIsCommentsRequired(); document.forms.taskListItemForm.commentsRequired.disabled = !document.forms.taskListItemForm.commentsRequired.disabled;"/>
 					<fmt:message key="label.authoring.basic.task.isCommentsAllowed" />
 					</label>
 				</div>
 						
 				<div class="checkbox loffset10">
 					<label for="isCommentsRequired">
-					<html:checkbox property="commentsRequired" styleId="isCommentsRequired" 
-						disabled="${not formBean.commentsAllowed}" >
-					</html:checkbox>
+					<form:checkbox path="commentsRequired" id="isCommentsRequired" 
+						disabled="${not taskListItemForm.commentsAllowed}"/>
 					<fmt:message key="label.authoring.basic.task.isCommentsRequired" />
 					</label>
 				</div>
 				
 				<div class="checkbox">
 					<label for="isFilesAllowed">
-					<html:checkbox property="filesAllowed" styleId="isFilesAllowed"
-						onclick="uncheckIsFilesRequired(); document.taskListItemForm.filesRequired.disabled = !document.taskListItemForm.filesRequired.disabled; ">
-					</html:checkbox>
+					<form:checkbox path="filesAllowed" id="isFilesAllowed"
+						onclick="uncheckIsFilesRequired(); document.forms.taskListItemForm.filesRequired.disabled = !document.forms.taskListItemForm.filesRequired.disabled; "/>
 					<fmt:message key="label.authoring.basic.task.isFilesAllowed" />
 					</label>
 				</div>
 						
 				<div class="checkbox loffset10">
 					<label for="isFilesRequired">
-					<html:checkbox property="filesRequired" styleId="isFilesRequired"  disabled="${not formBean.filesAllowed}" >
-					</html:checkbox>
+					<form:checkbox path="filesRequired" id="isFilesRequired"  disabled="${not taskListItemForm.filesAllowed}"/>
 					<fmt:message key="label.authoring.basic.task.isFilesRequired" />
 					</label>
 				</div>
 				
 				<div class="checkbox">
 					<label for="isChildTask">
-					<html:checkbox property="childTask" 
-						disabled="${(fn:length(sessionMap.taskListList) == 0) || (fn:length(sessionMap.taskListList) == 1) && (formBean.itemIndex > -1)}"
-						styleId="isChildTask" onclick="document.taskListItemForm.parentTaskName.disabled = !document.taskListItemForm.parentTaskName.disabled;">
-					</html:checkbox>
+					<form:checkbox path="childTask" 
+						disabled="${(fn:length(sessionMap.taskListList) == 0) || (fn:length(sessionMap.taskListList) == 1) && (taskListItemForm.itemIndex > -1)}"
+						id="isChildTask" onclick="document.forms.taskListItemForm.parentTaskName.disabled = !document.forms.taskListItemForm.parentTaskName.disabled;"/>
 					<fmt:message key="label.authoring.basic.task.isChildTask" />
 					</label>
 	
@@ -106,15 +100,15 @@
 						<fmt:message key="label.authoring.basic.task.parent.task.name" />
 					</label>
 	
-					<html:select property="parentTaskName" styleId="parentTaskName" disabled="${!formBean.childTask}" styleClass="form-control form-control-inline input-sm">
+					<form:select path="parentTaskName" id="parentTaskName" disabled="${!taskListForm.childTask}" cssClass="form-control form-control-inline input-sm">
 						<c:forEach var="taskListItem" items="${sessionMap.taskListList}">
 							<c:choose>
-								<c:when	test="${formBean.parentTaskName == taskListItem.title}">
+								<c:when	test="${taskListItemForm.parentTaskName == taskListItem.title}">
 									<option value="${fn:escapeXml(taskListItem.title)}" selected="true">
 										<c:out value="${taskListItem.title}"/>
 									</option>
 								</c:when>
-								<c:when	test="${formBean.title == taskListItem.title}">
+								<c:when	test="${taskListItemForm.title == taskListItem.title}">
 								</c:when>
 								<c:otherwise>
 									<option value="${fn:escapeXml(taskListItem.title)}">
@@ -123,10 +117,10 @@
 								</c:otherwise>
 							</c:choose>
 						</c:forEach>
-					</html:select>
+					</form:select>
 				</div>
 	
-			</html:form>
+			</form:form>
 	
 			<a href="#" onclick="javascript:submitTask();" class="btn btn-default btn-sm pull-right">
 				<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.add" /> 

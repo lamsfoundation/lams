@@ -40,7 +40,7 @@
   		function createQuestion(){
   			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
-  				url: "<c:url value='/pedagogicalPlanner.do?dispatch=createPedagogicalPlannerQuestion' />",
+  				url: "<c:url value='/pedagogicalPlanner/createPedagogicalPlannerQuestion.do' />",
   				data: { 
 					sessionMapId: '${sessionMapId}'
 				},
@@ -97,25 +97,23 @@
   	</script>
 </lams:head>
 <body id="body">
-	<%@ include file="/common/messages.jsp"%>
+	<lams:errors/>
 	<h4 class="space-left"><fmt:message key="label.questions"/></h4>
-	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
+	<form:form action="saveOrUpdatePedagogicalPlannerForm.do" id="plannerForm" modelAttribute="plannerForm" method="post">
 		
-		<html:hidden property="toolContentID" styleId="toolContentID" />
-		<html:hidden property="valid" styleId="valid" />
-		<html:hidden property="callID" styleId="callID" />
-		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<html:hidden property="candidateAnswersString" styleId="candidateAnswersString" />
-		<input type="hidden" id="questionCount" value="${formBean.questionCount}" />
+		<form:hidden path="toolContentID" id="toolContentID" />
+		<form:hidden path="valid" id="valid" />
+		<form:hidden path="callID" id="callID" />
+		<form:hidden path="activityOrderNumber" id="activityOrderNumber" />
+		<form:hidden path="candidateAnswersString" id="candidateAnswersString" />
+		<input type="hidden" id="questionCount" value="${plannerForm.questionCount}" />
 		
 		<table id="questionTable" cellpadding="0" cellspacing="0">
-			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">
+			<c:forEach var="questionIndex"  begin="1" end="${plannerForm.questionCount}">
 				<tr>
 					<td class="FCKcell">
 						<lams:CKEditor id="question[${questionIndex-1}]"
-							value="${formBean.questionList[questionIndex-1]}"
+							value="${plannerForm.questionList[questionIndex-1]}"
 							contentFolderID="${sessionMap.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
 			                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
@@ -129,18 +127,18 @@
 				</tr>
 				<tr>
 					<td class="space-left" colspan="2">
-						<c:forEach var="candidateAnswerIndex" begin="1" end="${formBean.candidateAnswerCount[questionIndex-1]}" >
+						<c:forEach var="candidateAnswerIndex" begin="1" end="${plannerForm.candidateAnswerCount[questionIndex-1]}" >
 							${candidateAnswerIndex}.
 							<input size=90" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
-							<html:radio property="correct[${questionIndex-1}]" value="${candidateAnswerIndex}" />
+							<form:radiobutton path="correct[${questionIndex-1}]" value="${candidateAnswerIndex}" />
 							<br />
 						</c:forEach>
-						<input type="hidden" name="candidateAnswerCount${questionIndex}" value="${formBean.candidateAnswerCount[questionIndex-1]}" />
+						<input type="hidden" name="candidateAnswerCount${questionIndex}" value="${plannerForm.candidateAnswerCount[questionIndex-1]}" />
 					</td>
 				</tr>
 			</c:forEach>
 		</table>
-	</html:form>
+	</form:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.addNewQuestion" /></a>
 </body>
 </lams:html>

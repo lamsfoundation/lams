@@ -26,11 +26,11 @@
 <div class="panel-body">
 
 <!-- Add question form-->
-<%@ include file="/common/messages.jsp"%>
-<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
-	<html:hidden property="sessionMapID" />
+<lams:errors/>
+<form:form action="saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
+	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="3" />
-	<html:hidden property="questionIndex" />
+	<form:hidden path="questionIndex" />
 
 	<p><fmt:message key="label.authoring.basic.number.help" /></p>
 
@@ -42,28 +42,28 @@
 
 			<div class="form-group">
 	    	<label for=min><fmt:message key="label.common.min" />: </label>
-				<html:text styleId="min" property="min" size="5" styleClass="form-control-inline input-sm"/>
+				<form:input id="min" path="min" size="5" cssClass="form-control-inline input-sm"/>
 	    	<label class="roffset10" for="max"><fmt:message key="label.common.max" />: </label>
-				<html:text styleId="max" property="max" size="5" styleClass="form-control-inline input-sm"/>
+				<form:input id="max" path="max" size="5" cssClass="form-control-inline input-sm"/>
 			</div>
 			<div class="form-group">
 	    	<label for="summary"><fmt:message key="label.common.summary" />: </label>
-				<html:select property="summary" styleClass="form-control-inline input-sm">
-					<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
-					<html:option value="1"><fmt:message key="label.common.summary.sum" /></html:option>
-					<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
-					<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
-				</html:select>
+				<form:select path="summary" cssClass="form-control-inline input-sm">
+					<form:option value="0" id="noSummaryOption"><fmt:message key="label.common.summary.none" /></form:option>
+					<form:option value="1"><fmt:message key="label.common.summary.sum" /></form:option>
+					<form:option value="2"><fmt:message key="label.common.summary.average" /></form:option>
+					<form:option value="3"><fmt:message key="label.common.summary.count" /></form:option>
+				</form:select>
 			</div>
 			<div class="checkbox">
 			    <label>
-		 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+		 	      <form:checkbox path="questionRequired" id="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
 			    </label>
 		  </div>
 	</div>	
  	<!--  end options -->
   
- </html:form>
+ </form:form>
 
 <c:set var="addButtonMessageKey" value="label.authoring.basic.number.add" />
 <%@ include file="buttons.jsp"%>

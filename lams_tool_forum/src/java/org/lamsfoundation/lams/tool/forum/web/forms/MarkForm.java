@@ -21,11 +21,7 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -33,7 +29,7 @@ import org.apache.struts.action.ActionForm;
  *
  * @version $Revision$
  */
-public class MarkForm extends ActionForm {
+public class MarkForm {
     private static final long serialVersionUID = -4967675292027554366L;
 
     private String mark;

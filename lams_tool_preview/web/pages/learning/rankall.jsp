@@ -124,7 +124,7 @@
 
     </script>
 
-	<form action="<c:url value="/learning/submitRanking.do?"/>" method="get" id="editForm">
+	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="get" id="editForm">
 
 		<c:if test="${notcomplete}">
 			<span class="alert"><fmt:message key="error.assign.rankAll"/></span><br/>

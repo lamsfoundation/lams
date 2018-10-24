@@ -21,27 +21,21 @@
 		<fmt:message key="activity.title" />
 	</h1>
 	
-	<logic:messagesPresent message="true">
-		<html:messages id="message" message="true">
-			<p>
-				<bean:write name="message" />
-			</p>
-		</html:messages>
-	</logic:messagesPresent>
+	<lams:errors/>
 	
 	<div class="align-right space-bottom-top">
-		<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="messageForm">
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="mode" />
-			<html:hidden property="method" value="finish"/>
+		<form:form modelAttribute="messageForm" action="/learner.do" target="_self" onsubmit="disableFinishButton();" id="messageForm">
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="mode" />
+			<form:hidden path="method" value="finish"/>
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
-					<html:submit property="method" styleClass="button">
+					<button type="submit" name="method" class="btn">
 						<fmt:message key="button.continue" />
-					</html:submit>
+					</button>
 				</c:when>
 				<c:otherwise>
-					<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<a href="#nogo" class="button" id="finishButton" onclick="submitForm('finish')">
 						<span class="nextActivity">
 							<c:choose>
 								<c:when test="${activityPosition.last}">
@@ -52,10 +46,10 @@
 								</c:otherwise>
 							</c:choose>
 						</span>
-					</html:link>
+					</a>
 				</c:otherwise>
 			</c:choose>
-		</html:form>
+		</form:form>
 	</div>
 
 </div>

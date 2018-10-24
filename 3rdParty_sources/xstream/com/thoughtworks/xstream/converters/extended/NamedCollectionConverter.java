@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2014 XStream Committers.
+ * Copyright (C) 2013 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -9,8 +9,6 @@
  * Created on 19. September 2013 by Joerg Schaible
  */
 package com.thoughtworks.xstream.converters.extended;
-
-import java.util.Collection;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -25,7 +23,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
 /**
  * A collection converter that uses predefined names for its items.
  * <p>
- * To be used as local converter. Note, suppress the usage of the implicit type argument, if registered with annotation.
+ * To be used as local converter. Note, suppress the usage of the implicit type argument, if
+ * registered with annotation.
  * </p>
  * 
  * @author J&ouml;rg Schaible
@@ -34,7 +33,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class NamedCollectionConverter extends CollectionConverter {
 
     private final String name;
-    private final Class<?> type;
+    private final Class type;
 
     /**
      * Constructs a NamedCollectionConverter.
@@ -44,7 +43,7 @@ public class NamedCollectionConverter extends CollectionConverter {
      * @param itemType the base type of the items
      * @since 1.4.5
      */
-    public NamedCollectionConverter(final Mapper mapper, final String itemName, final Class<?> itemType) {
+    public NamedCollectionConverter(Mapper mapper, String itemName, Class itemType) {
         this(null, mapper, itemName, itemType);
     }
 
@@ -57,20 +56,17 @@ public class NamedCollectionConverter extends CollectionConverter {
      * @param itemType the base type of the items
      * @since 1.4.5
      */
-    public NamedCollectionConverter(
-            @SuppressWarnings("rawtypes") final Class<? extends Collection> type, final Mapper mapper,
-            final String itemName, final Class<?> itemType) {
+    public NamedCollectionConverter(Class type, Mapper mapper, String itemName, Class itemType) {
         super(mapper, type);
-        name = itemName;
+        this.name = itemName;
         this.type = itemType;
     }
 
-    @Override
-    protected void writeItem(final Object item, final MarshallingContext context, final HierarchicalStreamWriter writer) {
-        final Class<?> itemType = item == null ? Mapper.Null.class : item.getClass();
+    protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
+        Class itemType = item == null ? Mapper.Null.class : item.getClass();
         ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, itemType);
         if (!itemType.equals(type)) {
-            final String attributeName = mapper().aliasForSystemAttribute("class");
+            String attributeName = mapper().aliasForSystemAttribute("class");
             if (attributeName != null) {
                 writer.addAttribute(attributeName, mapper().serializedClass(itemType));
             }
@@ -81,11 +77,9 @@ public class NamedCollectionConverter extends CollectionConverter {
         writer.endNode();
     }
 
-    @Override
-    protected Object readItem(final HierarchicalStreamReader reader, final UnmarshallingContext context,
-            final Object current) {
-        final String className = HierarchicalStreams.readClassAttribute(reader, mapper());
-        final Class<?> itemType = className == null ? type : mapper().realClass(className);
+    protected Object readItem(HierarchicalStreamReader reader, UnmarshallingContext context, Object current) {
+        String className = HierarchicalStreams.readClassAttribute(reader, mapper());
+        Class itemType = className == null ? type : mapper().realClass(className);
         if (Mapper.Null.class.equals(itemType)) {
             return null;
         } else {

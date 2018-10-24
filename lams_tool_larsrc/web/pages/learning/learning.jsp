@@ -164,8 +164,12 @@
 				</c:choose>
 			</lams:Alert>
 		</c:if>
+	
+		<c:if test="${resource.miniViewResourceNumber > 0}">
+			<lams:Alert type="info" id="warn-numResources" close="false">${resource.miniViewNumberStr}</lams:Alert>
+		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<!--  Instructions -->
 		<div class="panel">
@@ -261,14 +265,6 @@
 					</c:if>
 				</tr>
 			</c:forEach>
-
-			<c:if test="${resource.miniViewResourceNumber > 0}">
-				<tr>
-					<td colspan="3" align="left">
-						<b>${resource.miniViewNumberStr}</b>
-					</td>
-				</tr>
-			</c:if>
 			</table>
 
 		</div>
@@ -305,23 +301,23 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5 btn-disable-on-submit">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-sm btn-default voffset5 btn-disable-on-submit">
 						<fmt:message key="label.edit" />
-						</html:button>
+						</button>
 					</c:if>
 				</div>
 			</div>
 		</c:if>
 		<!-- End Reflection -->
 
-		<c:if test="${mode != 'teacher'}">
+		<c:if test="${mode != 'teacher' && sessionMap.hasCompletedMinNumber}">
 				<c:choose>
 					<c:when
 						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton"
-							onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right btn-disable-on-submit">
+						<button name="FinishButton"
+							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right btn-disable-on-submit">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 					<c:otherwise>
 						<button type="submit" id="finishButton"

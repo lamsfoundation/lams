@@ -28,11 +28,11 @@
 <div class="panel-body">
 
 <!-- Add question form-->
-<%@ include file="/common/messages.jsp"%>
-<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
-	<html:hidden property="sessionMapID" />
+<lams:errors/>
+<form:form action="saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
+	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="8" />
-	<html:hidden property="questionIndex" />
+	<form:hidden path="questionIndex" />
 	<input type="hidden" id="answerOptionList" name="answerOptionList" />
 
 	<p><fmt:message key="label.authoring.basic.radio.help" /></p>
@@ -44,23 +44,23 @@
 	<div id="additionalOptionsArea" style="display: none;" class="panel-body">
 		<div class="form-group">
     	<label for="summary"><fmt:message key="label.common.summary" /></label>: 
-			<html:select property="summary" styleClass="form-control-inline input-sm">
-				<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
-				<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
-				<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
-			</html:select>
+			<form:select path="summary" cssClass="form-control-inline input-sm">
+				<form:option value="0" id="noSummaryOption"><fmt:message key="label.common.summary.none" /></form:option>
+				<form:option value="2"><fmt:message key="label.common.summary.average" /></form:option>
+				<form:option value="3"><fmt:message key="label.common.summary.count" /></form:option>
+			</form:select>
 		</div>
 		<div class="form-group">
 			<div class="checkbox">
 			    <label>
-		 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+		 	      <form:checkbox path="questionRequired" id="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
 			    </label>
 		  	</div>
 		</div>
 	</div>	
  	<!--  end options -->
 	
-</html:form>
+</form:form>
 
 <!-- Answer options -->
 

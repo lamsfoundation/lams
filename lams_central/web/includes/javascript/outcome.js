@@ -8,13 +8,13 @@
 
 function removeOutcome(outcomeId) {
 	if (confirm(LABELS.REMOVE_OUTCOME_CONFIRM_LABEL)) {
-		document.location.href = 'outcome.do?method=outcomeRemove&organisationID=' + organisationId + '&outcomeId=' + outcomeId;
+		document.location.href = 'outcome/outcomeRemove.do?organisationID=' + organisationId + '&outcomeId=' + outcomeId;
 	}
 }
 
 function removeScale(scaleId) {
 	if (confirm(LABELS.REMOVE_SCALE_CONFIRM_LABEL)) {
-		document.location.href = 'outcomeScale.do?method=scaleRemove&organisationID=' + organisationId + '&scaleId=' + scaleId;
+		document.location.href = 'outcomeScale/scaleRemove.do?organisationID=' + organisationId + '&scaleId=' + scaleId;
 	}
 }
 
@@ -28,7 +28,7 @@ function openEditOutcomeDialog(outcomeId) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcome.do?method=outcomeEdit&organisationID=' + organisationId
+						+ 'outcome/outcomeEdit.do?organisationID=' + organisationId
 						+ (outcomeId ? "&outcomeId=" + outcomeId : ""));
 		}
 	});
@@ -44,7 +44,7 @@ function openEditScaleDialog(scaleId) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcomeScale.do?method=scaleEdit&organisationID=' + organisationId
+						+ 'outcome/scaleEdit.do?organisationID=' + organisationId
 						+ (scaleId ? "&scaleId=" + scaleId : ""));
 		}
 	});
@@ -60,7 +60,7 @@ function openOutcomeScaleDialog() {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcomeScale.do?method=scaleManage&organisationID='
+						+ 'outcome/scaleManage.do?organisationID='
 						+ organisationId);
 		}
 	});
@@ -88,6 +88,6 @@ function exportOutcome(isScaleExport){
 				exportButton.button('reset');
 			}
 		}, 1000);
-	document.location.href = LAMS_URL + 'outcome.do?method=' + (isScaleExport ? 'scaleExport' : 'outcomeExport') + '&downloadTokenValue=' + token;
+	document.location.href = LAMS_URL + 'outcome/' + (isScaleExport ? 'scaleExport' : 'outcomeExport') + '.do?downloadTokenValue=' + token;
 	return false;
 }

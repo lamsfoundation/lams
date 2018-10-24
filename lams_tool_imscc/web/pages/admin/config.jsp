@@ -16,7 +16,7 @@
 			
 			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		
 			<c:if test="${savedSuccess}">
 				<lams:Alert type="info" id="admin-success" close="false">
@@ -24,7 +24,7 @@
 				</lams:Alert>
 			</c:if>
 			
-			<html:form action="/laimsc11admin/saveContent" styleId="commonCartridgeAdminForm" method="post" enctype="multipart/form-data">
+			<form:form action="saveContent.do" modelAttribute="commonCartridgeAdminForm" id="commonCartridgeAdminForm" method="post" enctype="multipart/form-data">
 				<table class="table table-no-border voffset5">
 					<tr>
 						<td width="30%">
@@ -32,7 +32,7 @@
 						</td>
 						
 						<td width="70%">
-							<html:checkbox property="allowExposeUserName"/>
+							<form:checkbox path="allowExposeUserName"/>
 						</td>
 					</tr>
 					
@@ -42,12 +42,12 @@
 						</td>
 						
 						<td width="70%">
-							<html:checkbox property="allowExposeUserEmail"/>
+							<form:checkbox path="allowExposeUserEmail"/>
 						</td>
 					</tr>					
 				</table>
-				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></html:submit>
-			</html:form>
+				<button class="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></button>
+			</form:form>
 			
 		<div id="footer">
 		</div>

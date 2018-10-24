@@ -20,10 +20,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.web.form;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  * Image star rating Form.
@@ -31,7 +28,7 @@ import org.apache.struts.action.ActionForm;
  *
  * @author Andrey Balan
  */
-public class ImageRatingForm extends ActionForm {
+public class ImageRatingForm {
 
     private static final long serialVersionUID = -8962161058929959289L;
 

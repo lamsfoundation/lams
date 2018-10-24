@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn"%>
 
 <lams:html>
 <lams:head>
@@ -71,7 +69,7 @@
 		<fmt:message key="label.agree.to.policies.before.proceeding" />
 	</lams:Alert>
 	
-	<form action="/lams/policyConsents.do?method=consent" method="post" id="consents-form">
+	<form action="/lams/policyConsents/consent.do" method="post" id="consents-form">
 	<table class="table table-striped table-condensed" >
 		<c:forEach items="${policies}" var="policy">
 			<tr>
@@ -123,9 +121,9 @@
 	</table>
 	
 		<div style="overflow:auto;">
-			<html:submit styleClass="btn btn-primary pull-right">
+			<button type="submit" class="btn btn-primary pull-right">
 				<fmt:message key="label.consent"/>
-			</html:submit>
+			</button>
 		</div>
 	</form>
 	

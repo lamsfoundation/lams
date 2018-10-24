@@ -17,9 +17,9 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" id="messageForm" modelAttribute="messageForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
@@ -27,9 +27,9 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</div>
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
-			<html:textarea rows="5" styleId="focused" property="entryText" styleClass="form-control" />
+			<form:textarea rows="5" id="focused" path="entryText" cssClass="form-control" />
 
 			<div class="voffset10">
 				<button class="btn btn-primary pull-right na" id="finishButton" type="submit">
@@ -41,7 +41,7 @@
 			<div id="footer"></div>
 			<!--closes footer-->
 		</lams:Page>
-	</html:form>
+	</form:form>
 
 	<script type="text/javascript">
 		window.onload = function() {

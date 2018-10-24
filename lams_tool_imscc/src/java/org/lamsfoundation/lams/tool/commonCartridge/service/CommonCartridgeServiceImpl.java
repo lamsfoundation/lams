@@ -40,7 +40,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
@@ -86,6 +85,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -307,8 +307,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     @Override
     public List<List<Summary>> getSummary(Long contentId) {
-	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-	List<Summary> group = new ArrayList<Summary>();
+	List<List<Summary>> groupList = new ArrayList<>();
+	List<Summary> group = new ArrayList<>();
 
 	// get all item which is accessed by user
 	Map<Long, Integer> visitCountMap = commonCartridgeItemVisitDao.getSummary(contentId);
@@ -319,7 +319,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	List<CommonCartridgeSession> sessions = commonCartridgeSessionDao.getByContentId(contentId);
 	for (CommonCartridgeSession session : sessions) {
 	    // one new group for one session.
-	    group = new ArrayList<Summary>();
+	    group = new ArrayList<>();
 	    // firstly, put all initial commonCartridge item into this group.
 	    for (CommonCartridgeItem item : items) {
 		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
@@ -342,13 +342,13 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     @Override
     public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+	Map<Long, Set<ReflectDTO>> map = new HashMap<>();
 
 	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
 	for (CommonCartridgeSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
 	    boolean hasRefection = session.getCommonCartridge().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    Set<ReflectDTO> list = new TreeSet<>(new ReflectDTOComparator());
 	    // get all users in this session
 	    List<CommonCartridgeUser> users = commonCartridgeUserDao.getBySessionID(sessionId);
 	    for (CommonCartridgeUser user : users) {
@@ -462,11 +462,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
+    public List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, MultipartFile file)
 	    throws UploadCommonCartridgeFileException {
 	try {
 	    InputStream is = file.getInputStream();
-	    String fileName = file.getFileName();
+	    String fileName = file.getName();
 	    String fileType = file.getContentType();
 	    // need unzip upload, and parse learning object information from XML file.
 	    String packageDirectory = ZipFileUtil.expandZip(is, fileName);
@@ -653,7 +653,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -848,19 +848,19 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return new TreeMap<>();
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
@@ -923,12 +923,12 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	CommonCartridgeUser learner = getUserByIDAndSession(learnerId, toolSessionId);
@@ -937,10 +937,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
 
 	Object[] dates = commonCartridgeItemVisitDao.getDateRangeOfAccesses(learner.getUid());
-	if (learner.isSessionFinished())
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date)dates[0], (Date)dates[1]);
-	else
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED,(Date) dates[0], null);
+	if (learner.isSessionFinished()) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date) dates[0], (Date) dates[1]);
+	} else {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, (Date) dates[0], null);
+	}
     }
-    
+
 }

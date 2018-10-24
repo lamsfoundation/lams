@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.qa.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -35,13 +34,11 @@ import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 
@@ -242,61 +239,6 @@ public interface IQaService extends ToolRatingManager {
     String createConditionName(Collection<QaCondition> existingConditions);
 
     void deleteCondition(QaCondition condition);
-
-    /**
-     * Gets the qa config item with the given key
-     *
-     * @param configKey
-     * @return
-     */
-    QaConfigItem getConfigItem(String configKey);
-
-    /**
-     * Saves or updates a qa config item
-     *
-     * @param configItem
-     */
-    void saveOrUpdateConfigItem(QaConfigItem configItem);
-
-    /**
-     * Gets the set of wizard categories from the database
-     *
-     * @return
-     */
-    SortedSet<QaWizardCategory> getWizardCategories();
-
-    /**
-     * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
-     *
-     * @param categories
-     */
-    void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories);
-
-    /**
-     * Deletes a wizard category from the db
-     *
-     * @param uid
-     */
-    void deleteWizardCategoryByUID(Long uid);
-
-    /**
-     * Deletes a wizard cognitive skill from the db
-     *
-     * @param uid
-     */
-    void deleteWizardSkillByUID(Long uid);
-
-    /**
-     * Deletes a wizard question from the db
-     *
-     * @param uid
-     */
-    void deleteWizardQuestionByUID(Long uid);
-
-    /**
-     * Deletes all categories, sub skills and sub questions
-     */
-    void deleteAllWizardCategories();
 
     void removeQuestionsFromCache(QaContent qaContent);
 

@@ -13,17 +13,18 @@
 				</td>
 				
 				<td style="width: 100px;">
-					<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${!hasEditRight}">
-						<html:option value="-1">
+					<select name="question${status.index}_${option.sequenceId}" <c:if test="${!hasEditRight}">disabled="disabled"</c:if>>
+						<option value="-1">
 							<fmt:message key="label.learning.matching.pairs.choose" />
-						</html:option>
+						</option>
 						
 						<c:forEach var="selectOption" items="${question.matchingPairOptions}">
-							<html:option value="${selectOption.uid}">
+							<option value="${selectOption.uid}"
+								<c:if test="${option.answerInt == selectOption.uid}">selected="selected"</c:if>>
 								${selectOption.optionString}
-							</html:option>
+							</option>
 						</c:forEach>
-					</html:select>
+					</select>
 				</td>
 			</tr>
 		</c:forEach>

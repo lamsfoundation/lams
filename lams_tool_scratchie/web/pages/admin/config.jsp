@@ -13,9 +13,9 @@
 		<c:set var="title"><fmt:message key="admin.page.title" /></c:set>
 		<lams:Page type="admin" title="${title}">
 			
-			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 			
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		
 			<c:if test="${savedSuccess}">
 				<lams:Alert type="info" id="admin-success" close="false">
@@ -23,19 +23,18 @@
 				</lams:Alert>
 			</c:if>
 			
-			<html:form action="/admin/saveContent" styleId="scratchieAdminForm" method="post" enctype="multipart/form-data">
+			<form:form action="/lams/tool/lascrt11/admin/saveContent.do" modelAttribute="scratchieAdminForm" id="scratchieAdminForm" method="post" enctype="multipart/form-data">
 				<div class="checkbox">
 					<label for="enabledExtraPointOption">
-					<html:checkbox property="enabledExtraPointOption"/>
+					<form:checkbox path="enabledExtraPointOption"/>
 					<fmt:message key="admin.extra.mark" /></label>
 				</div>
 				<div class="form-group">
 					<label for="presetMarks"><fmt:message key="admin.preset.marks" /></label>
-					<html:text property="presetMarks" size="50" maxlength="255" styleClass="form-control form-control-inline">
-					</html:text>
+					<form:input path="presetMarks" size="50" maxlength="255" cssClass="form-control form-control-inline" />
 				</div>
-				<html:submit styleClass="btn btn-primary  pull-right"><fmt:message key="admin.button.save" /></html:submit>
-			</html:form>
+				<button class="btn btn-primary  pull-right"><fmt:message key="admin.button.save" /></button>
+			</form:form>
 			
 		<div id="footer"></div>
 		</lams:Page>

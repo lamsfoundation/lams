@@ -1,7 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
@@ -66,23 +63,23 @@
 <!-- Basic Tab Content -->
 <div class="form-group">
     <label for="survey.title"><fmt:message key="label.authoring.basic.title"/></label>
-    <html:text property="survey.title" styleClass="form-control"></html:text>
+    <form:input path="survey.title" cssClass="form-control"></form:input>
 </div>
 <div class="form-group">
     <label for="survey.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
-    <lams:CKEditor id="survey.instructions" value="${formBean.survey.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+    <lams:CKEditor id="survey.instructions" value="${authoringForm.survey.instructions}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
 </div>
 
 <div id="surveyListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
-<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');"
+<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newItemInit.do?itemType=1&contentFolderID=${authoringForm.contentFolderID}&sessionMapID=${authoringForm.sessionMapID}');"
 	class="btn btn-default">
 	<i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.authoring.basic.add.survey.question"/> </a>
 
-<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');"
+<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newItemInit.do?itemType=3&contentFolderID=${authoringForm.contentFolderID}&sessionMapID=${authoringForm.sessionMapID}');"
 	class="btn btn-default"> <i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.authoring.basic.add.survey.open.question" /> </a>
 
 <div id="questionInputArea" class="voffset10"></div>

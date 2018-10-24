@@ -19,44 +19,74 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ include file="/common/taglibs.jsp"%>
 
-<%@ include file="gateDescription.jsp"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 
-<lams:Alert type="info" close="false" id="whenOpens">
-<fmt:message key="label.schedule.gate.open.remaining" />&nbsp;<strong><lams:Date value="${GateForm.map.startingTime}" timeago="true"/></strong>
-</lams:Alert>
+<!DOCTYPE html>
+<lams:html xhtml="true">
 
-<c:choose>
-	<c:when test="${not empty GateForm.map.reachDate}">
-		<p>
-			<fmt:message key="label.schedule.gate.reach" />&nbsp;
-			<strong><lams:Date value="${GateForm.map.reachDate}" /></strong>
-		</p>
-	</c:when>
-	<c:otherwise>
-		<c:if test="${GateForm.map.startingTime!=null}">
-			<p>
-				<fmt:message key="label.schedule.gate.open.message" />&nbsp;<strong><lams:Date value="${GateForm.map.startingTime}" /></strong>
-			</p>
-		</c:if>
-		<c:if test="${GateForm.map.endingTime!=null}">
-			<p>
-				<fmt:message key="label.schedule.gate.close.message" />
-				<lams:Date value="${GateForm.map.endingTime}" />
-			</p>
-		</c:if>
-	</c:otherwise>
-</c:choose>
+<lams:head>
 
-  <script type="text/javascript">
-    jQuery(document).ready(function() {
-    	jQuery.timeago.settings.allowFuture = true;
-    	jQuery("time.timeago").timeago();
-    });
-  </script>
+	<c:set var="title"><fmt:message key="label.synch.gate.title"/></c:set>
+	
+	<title><c:out value="${title}" /></title>
+	<lams:css />
+	<META HTTP-EQUIV="Refresh"
+		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+		
+		
+</lams:head>
+
+<body class="stripes">
+
+
+	<lams:Page type="learner" title="${title}">
+
+		<%@ include file="gateDescription.jsp"%>
+		
+		<lams:Alert type="info" close="false" id="whenOpens">
+		<fmt:message key="label.schedule.gate.open.remaining" />&nbsp;<strong><lams:Date value="${gateForm.startingTime}" timeago="true"/></strong>
+		</lams:Alert>
+		
+		<c:choose>
+			<c:when test="${not empty gateForm.reachDate}">
+				<p>
+					<fmt:message key="label.schedule.gate.reach" />&nbsp;
+					<strong><lams:Date value="${gateForm.reachDate}" /></strong>
+				</p>
+			</c:when>
+			<c:otherwise>
+				<c:if test="${gateForm.startingTime!=null}">
+					<p>
+						<fmt:message key="label.schedule.gate.open.message" />&nbsp;<strong><lams:Date value="${gateForm.startingTime}" /></strong>
+					</p>
+				</c:if>
+				<c:if test="${gateForm.endingTime!=null}">
+					<p>
+						<fmt:message key="label.schedule.gate.close.message" />
+						<lams:Date value="${gateForm.endingTime}" />
+					</p>
+				</c:if>
+			</c:otherwise>
+		</c:choose>
+		
+		  <script type="text/javascript">
+		    jQuery(document).ready(function() {
+		    	jQuery.timeago.settings.allowFuture = true;
+		    	jQuery("time.timeago").timeago();
+		    });
+		  </script>
+
+		<%@ include file="../gate/gateNext.jsp"%>
+
+	</lams:Page>
+</body>
+
+</lams:html>
+
+

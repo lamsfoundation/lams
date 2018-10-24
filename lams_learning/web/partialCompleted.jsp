@@ -19,20 +19,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<!DOCTYPE html>
+
+<%@ include file="/common/taglibs.jsp"%>
+
+<lams:html>
+
+<lams:head>
+	<title><fmt:message key="learner.title" />
+	</title>
+
+	<lams:css />
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
+
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript"
+		src="${lams}includes/javascript/common.js"></script>
+</lams:head>
 
 
-<lams:Page type="admin" title="">
-	<p>
-		<fmt:message key="message.activity.parallel.partialComplete" />
-	</p>
+<body class="stripes">
+	<lams:Page type="admin" title="">
+		<p>
+			<fmt:message key="message.activity.parallel.partialComplete" />
+		</p>
+	
+	</lams:Page>
 
-</lams:Page>
+</body>
 
 
+</lams:html>

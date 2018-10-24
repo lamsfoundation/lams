@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <div id="itemList">
-
 <div class="panel panel-default voffset5">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.survey.list.title" />

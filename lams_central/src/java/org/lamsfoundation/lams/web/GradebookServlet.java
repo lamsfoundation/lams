@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  *
@@ -55,15 +57,26 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 @SuppressWarnings("serial")
 public class GradebookServlet extends HttpServlet {
-
     private static Logger log = Logger.getLogger(GradebookServlet.class);
 
-    private static IntegrationService integrationService = null;
-    private static IUserManagementService userManagementService;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     private static final String GRADEBOOK_MONITOR_LESSON_URL = "gradebook/gradebookMonitoring.do?lessonID=";
-    private static final String GRADEBOOK_MONITOR_ORGANISATION_URL = "gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=";
-    private static final String GRADEBOOK_LEARNER_ORGANISATION_URL = "gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=";
+    private static final String GRADEBOOK_MONITOR_ORGANISATION_URL = "gradebook/gradebookMonitoring/courseMonitor.do?organisationID=";
+    private static final String GRADEBOOK_LEARNER_ORGANISATION_URL = "gradebook/gradebookLearning/courseLearner.do?organisationID=";
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     /**
      * The doGet method of the servlet. <br>
@@ -81,8 +94,6 @@ public class GradebookServlet extends HttpServlet {
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	getIntegrationService();
-	getUserManagementService();
 	HttpSession hses = request.getSession(true);
 
 	String username = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
@@ -116,7 +127,7 @@ public class GradebookServlet extends HttpServlet {
 		    // translate external course ID to internal organisation ID and then get the gradebook for it
 		    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 		    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, extCourseId,
-			    courseName, getUserManagementService().getRootOrganisation().getOrganisationId().toString(),
+			    courseName, userManagementService.getRootOrganisation().getOrganisationId().toString(),
 			    isTeacher, false);
 		    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
 		    
@@ -169,23 +180,5 @@ public class GradebookServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
-    }
-
-    private IntegrationService getIntegrationService() {
-	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-	}
-	return integrationService;
-    }
-
-    protected IUserManagementService getUserManagementService() {
-	if (userManagementService == null) {
-	    userManagementService = (IUserManagementService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext())
-		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
-
-	}
-	return userManagementService;
     }
 }

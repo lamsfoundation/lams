@@ -27,10 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -40,7 +38,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
  *
  * User: Andrey Balan
  */
-public class ImageGalleryForm extends ActionForm {
+public class ImageGalleryForm {
     private static final long serialVersionUID = 3599879328307492312L;
 
     private static Logger logger = Logger.getLogger(ImageGalleryForm.class.getName());
@@ -49,8 +47,8 @@ public class ImageGalleryForm extends ActionForm {
     private String sessionMapID;
     private String contentFolderID;
     private int currentTab;
-    private FormFile offlineFile;
-    private FormFile onlineFile;
+    private MultipartFile offlineFile;
+    private MultipartFile onlineFile;
 
     private ImageGallery imageGallery;
     private boolean allowRatingsOrVote;
@@ -69,12 +67,11 @@ public class ImageGalleryForm extends ActionForm {
 	}
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
-	String param = mapping.getParameter();
+    public void reset(HttpServletRequest request) {
+	String param = (String) request.getAttribute("action");
 	// if it is start page, all data read out from database or current session
 	// so need not reset checkbox to refresh value!
-	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
+	if (!StringUtils.equals(param, "start.do") && !StringUtils.equals(param, "initPage.do")) {
 	    imageGallery.setAllowShareImages(false);
 	    imageGallery.setLockWhenFinished(false);
 	    imageGallery.setDefineLater(false);
@@ -91,19 +88,19 @@ public class ImageGalleryForm extends ActionForm {
 	this.currentTab = currentTab;
     }
 
-    public FormFile getOfflineFile() {
+    public MultipartFile getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(FormFile offlineFile) {
+    public void setOfflineFile(MultipartFile offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
-    public FormFile getOnlineFile() {
+    public MultipartFile getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
+    public void setOnlineFile(MultipartFile onlineFile) {
 	this.onlineFile = onlineFile;
     }
 

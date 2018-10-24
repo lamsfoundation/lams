@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,13 +30,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
-import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -45,8 +45,10 @@ import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -81,9 +83,21 @@ public class LAMSConnectorServlet extends HttpServlet {
 
     private String realBaseDir;
     private String lamsContextPath;
+
+    @Autowired
+    @Qualifier("centralMessageService")
+    private MessageService centralMessageService;
     
-    private static MessageService messageService;
-    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
+
     /**
      * Initialize the servlet.<br>
      * Retrieve from the servlet configuration the "baseDir" which is the root of the file repository:<br>
@@ -91,10 +105,6 @@ public class LAMSConnectorServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServletContext());
-	messageService = (MessageService) ctx.getBean("centralMessageService");
-
 	LAMSConnectorServlet.baseDir = getInitParameter("baseDir");
 	debug = (new Boolean(getInitParameter("debug"))).booleanValue() && log.isDebugEnabled();
 
@@ -306,15 +316,15 @@ public class LAMSConnectorServlet extends HttpServlet {
 	if (LAMSConnectorServlet.debug) {
 	    log.debug("File save started");
 	}
-	String newName = "";
-	DiskFileUpload upload = new DiskFileUpload();
-	List<FileItem> items = upload.parseRequest(request);
 
-	Map fields = new HashMap();
+	DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+	ServletFileUpload fileUpload = new ServletFileUpload(fileItemFactory);
+	List<FileItem> items = fileUpload.parseRequest(request);
 
-	Iterator iter = items.iterator();
+	Map<String, Object> fields = new HashMap<>();
+	Iterator<FileItem> iter = items.iterator();
 	while (iter.hasNext()) {
-	    FileItem item = (FileItem) iter.next();
+	    FileItem item = iter.next();
 	    if (item.isFormField()) {
 		fields.put(item.getFieldName(), item.getString());
 	    } else {
@@ -327,16 +337,16 @@ public class LAMSConnectorServlet extends HttpServlet {
 	fileNameLong = fileNameLong.replace('\\', '/');
 	String[] pathParts = fileNameLong.split("/");
 	String fileName = pathParts[pathParts.length - 1];
-	
+
 	// validate file size
-	ActionMessage maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile, true);
-	if (maxFilesizeExceededMessage != null) {
+	boolean maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile.getSize(), true);
+	if (!maxFilesizeExceededMessage) {
 	    //assign fileName an error message to be shown on a client side
-	    fileName = messageService.getMessage(maxFilesizeExceededMessage.getKey(),
-		    maxFilesizeExceededMessage.getValues());
+	    fileName = centralMessageService.getMessage("errors.maxfilesize",
+		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
 	    retVal.append("1");
 
-	// validate file extension
+	    // validate file extension
 	} else if (!FileUtil.isExtensionAllowed(fileType, fileName)) {
 	    if (LAMSConnectorServlet.debug) {
 		log.debug("File extension is prohibited for upload " + fileName);
@@ -344,8 +354,8 @@ public class LAMSConnectorServlet extends HttpServlet {
 
 	    //will generate client-side alert message 'Invalid file type'
 	    retVal.append("204");
-	    
-	} else {  
+
+	} else {
 	    File pathToSave = new File(validCurrentDirPath, fileName);
 
 	    int counter = 1;
@@ -357,7 +367,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		counter++;
 	    }
 
-	    uplFile.write(pathToSave);
+	    FileCopyUtils.copy(uplFile.getInputStream(), new FileOutputStream(pathToSave));
 
 	    if (counter > 1) {
 		retVal.append("201");

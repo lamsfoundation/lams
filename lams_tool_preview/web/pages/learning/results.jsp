@@ -20,7 +20,7 @@
 	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
+	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/learning.css">
 
 	<script type="text/javascript">
 		//var for jquery.jRating.js
@@ -135,29 +135,29 @@
 	</c:if>
 				
 	<!-- Reflection -->
-	<c:if test="${sessionMap.isSessionCompleted and sessionMap.reflectOn}">
+	<c:if test="${sessionMap.reflectOn and not empty sessionMap.reflectEntry}">
 		<%@ include file="notebookdisplay.jsp"%>
 	</c:if>
 	<!-- End Reflection -->
 
 	<c:if test="${!peerreview.lockWhenFinished}">
-		<html:button property="redoRatings" styleClass="btn btn-default voffset5 pull-left" onclick="redoRatings();">
+		<a href="#nogo" class="btn btn-default voffset5 pull-left" onclick="redoRatings();">
 			<fmt:message key="label.redo" />
-		</html:button>
+		</a>
 	</c:if>	
 
 	<c:if test="${mode != 'teacher'}">
 		<div>
 			<c:choose>			
-				<c:when test="${(not sessionMap.isSessionCompleted) and sessionMap.reflectOn}">
-					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">
+				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
+					<a href="#nogo" id="finishButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 						<fmt:message key="label.continue" />
-					</html:button>
+					</a>
 				</c:when>
 				<c:otherwise>
-					<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
+					<a href="#nogo" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
 						<fmt:message key="label.finished" />
-					</html:link>
+					</a>
 				</c:otherwise>
 			</c:choose>
 		</div>

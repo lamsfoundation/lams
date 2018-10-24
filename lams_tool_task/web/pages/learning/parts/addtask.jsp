@@ -28,31 +28,34 @@
 <body>
 
 
-	<html:form action="/learning/saveNewTask" method="post" styleId="taskListItemForm">
-		<html:hidden property="mode" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="saveNewTask.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
+		<form:hidden path="mode" />
+		<form:hidden path="sessionMapID" />
 
 		<h5>
 			<fmt:message key="label.learning.new.task.details" />
 		</h5>
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div class="form-group">
-			<label for="taskTitle"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
-			<html:text styleId="taskTitle" property="title" styleClass="form-control" tabindex="1" />
+			<label for="taskTitle">
+			<fmt:message key="label.authoring.basic.resource.title.input" />
+			</label>
+			<form:input id="taskTitle" path="title" cssClass="form-control" tabindex="1" />
 		</div>
 		<div class="form-group">
 			<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<lams:STRUTS-textarea rows="5" tabindex="2" styleId="description" styleClass="form-control" property="description" />
+			<lams:textarea irows="5" tabindex="2" id="description" class="form-control" name="description"></lams:textarea>
 		</div>
-	</html:form>
+	</form:form>
 
 	<div class="form-group">
 		<lams:ImgButtonWrapper>
-			<button onclick="cancel();" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message
-					key="label.cancel" />
+			<button onclick="cancel();" class="btn btn-sm btn-default btn-disable-on-submit"> 
+				<fmt:message key="label.cancel" />
 			</button>
-			<button onclick="saveTask()" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message key="button.add" />
+			<button onclick="saveTask()" class="btn btn-sm btn-default btn-disable-on-submit"> 
+				<fmt:message key="button.add" />
 			</button>
 		</lams:ImgButtonWrapper>
 	</div>

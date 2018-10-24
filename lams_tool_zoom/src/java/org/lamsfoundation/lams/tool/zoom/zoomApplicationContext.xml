@@ -5,11 +5,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-	<!-- ========================= GENERAL DEFINITIONS ========================= -->
-
-	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-
-	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="zoomMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.zoom.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+	
 	<bean id="zoomService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="preInterceptors">

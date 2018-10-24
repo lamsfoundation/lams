@@ -13,17 +13,11 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
+ * A servlet that loads at startup to do some maintainence like removing
+ * temp directories
  *
  * @author lfoxton
- *
- *         A servlet that loads at startup to do some maintainence like removing
- *         temp directories
- *
- *
- *
- *
  */
-
 public class LamsStartupServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(LamsStartupServlet.class);

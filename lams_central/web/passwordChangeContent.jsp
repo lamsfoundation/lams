@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ page import="org.apache.struts.action.ActionMessages"
-	import="org.lamsfoundation.lams.web.PasswordChangeActionForm"%>
+<%@ page import="org.lamsfoundation.lams.web.PasswordChangeActionForm"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
@@ -16,15 +13,16 @@
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 	
 <lams:html>
 <lams:head>
 	<lams:css/>
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
 		 var mustHaveUppercase = ${mustHaveUppercase},
 	     mustHaveNumerics  = ${mustHaveNumerics},
@@ -97,27 +95,20 @@
 </lams:head>
 
 <body>
-<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
+<form:form modelAttribute="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
 	<div style="clear: both"></div>
 	<div class="container">
 		<div class="row vertical-center-row">
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel voffset20">
-					<logic:messagesPresent message="true">
-						<p class="warning">
-							<html:messages message="true" id="errMsg">
-								<bean:write name="errMsg" />
-								<br>
-							</html:messages>
-						</p>
-					</logic:messagesPresent>
+					<lams:errors/>
 					<div class="panel-body">
-					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
-							<html:hidden name="<%=PasswordChangeActionForm.formName%>"
-								property="login" />
+						<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
+						<form:hidden name="<%=PasswordChangeActionForm.formName%>" path="login" />
 							<div class="form-group">
 								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
-								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
+ 								<lams:errors path="oldPassword"/>	
+ 								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
 							</div>
 							
 							<div class="col-xs-12">
@@ -141,31 +132,33 @@
 								 </lams:Alert> 
 							</div>
 							
-
-							<div class="input-group voffset5">
-								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-								<input class="form-control" type="password"  
+						<lams:errors path="password"/>	
+ 						<div class="input-group voffset5">
+							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							<input class="form-control" type="password"  
 									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="25"/> 			
-							</div>
-							<div class="input-group voffset5">
-								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-								<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm"
+						</div>
+						<div class="input-group voffset5">
+							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm"
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
-							</div>
-							<div class="form-group" align="right">
-							<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="button.cancel"/>" formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-sm btn-default voffset5"/>
-								&nbsp;&nbsp;
-								<html:submit styleClass="btn btn-sm btn-primary voffset5">
-									<fmt:message key="button.save" />
-								</html:submit>
-
-							</div>
+						</div>
+							
+						<div class="form-group" align="right">
+							<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+								<fmt:message key="button.cancel"/>
+							</button>
+							&nbsp;&nbsp;
+							<button type="submit" class="btn btn-sm btn-primary voffset5">
+								<fmt:message key="button.save" />
+							</button>
+						</div>
 					</div>
 
 				</div>
 			</div>
 		</div>
 	</div>
-</form>
+</form:form>
 </body>
 </lams:html>

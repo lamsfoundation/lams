@@ -20,10 +20,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -33,7 +30,7 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class EmailForm extends ActionForm {
+public class EmailForm {
     private static final long serialVersionUID = 7775887425863041037L;
 
     private Long userId;

@@ -28,7 +28,7 @@
  			</c:if>
 			<!-- Don't display down icon if last line -->
 			<c:if test="${not status.last}">
-				<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.answeroption.down'/>" onclick="javascript:downItem('${status.index+1}','${listSize}')"/>
+				<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.answeroption.down'/>" onclick="javascript:downItem('${status.index+1}','${listSize+1}')"/>
  			</c:if>
 			</td>
 			<!-- Don't display remove icon if there is less than 2 answer options -->

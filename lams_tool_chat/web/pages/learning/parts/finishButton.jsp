@@ -1,8 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:form action="/learning" method="post">
-	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
-	<html:hidden property="dispatch" value="openNotebook" />
+<form action="openNotebook.do" method="post">
+	<input type="hidden" name="chatUserUID" value="${chatUserDTO.uid}" />
 
 	<c:if
 		test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
@@ -24,12 +23,10 @@
 				</c:choose>
 			</p>
 
-			<html:submit styleClass="button">
-				<fmt:message key="button.edit" />
-			</html:submit>
+			<input type="submit" class="button" value="<fmt:message key="button.edit" />">
 		</div>
 	</c:if>
-</html:form>
+</form>
 
 <script type="text/javascript">
 	function disableFinishButton() {
@@ -38,40 +35,41 @@
 			finishButton.disabled = true;
 		}
 	}
-         function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
+    function submitForm(metodName){
+        var f = document.getElementById("learningForm");
+        f.submit();
+    }
 </script>
 
-<html:form action="/learning" method="post"
-	onsubmit="disableFinishButton();"  styleId="messageForm">
-	<html:hidden property="chatUserUID" value="${chatUserDTO.uid}" />
+<c:choose>
+		<c:when test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
+	
+			<form:form action="openNotebook.do" method="post"
+			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+			<input type="submit" value="<fmt:message key="button.continue" />" class="btn btn-responsive btn-primary pull-right voffset10"/>
+			</form:form>
+		
+		</c:when>
+		<c:otherwise>
+		
+			<form:form action="finishActivity.do" method="post"
+			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+			<a href="#nogo" type="button" class="btn btn-primary pull-right voffset10 na btn-autoresize" id="finishButton"  onclick="submitForm('finishActivity')">
+						 <span class="nextActivity">
+							 <c:choose>
+							 	<c:when test="${activityPosition.last}">
+							 		 <fmt:message key="button.submit" />
+							 	</c:when>
+							 	<c:otherwise>
+							 		 <fmt:message key="button.finish" />
+							 	</c:otherwise>
+							 </c:choose>
+						 </span>
+					</a>
+			</form:form>
+		</c:otherwise>
+</c:choose>
 
-		<c:choose>
-			<c:when
-				test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
-				<html:hidden property="dispatch" value="openNotebook" />
 
-				<html:submit styleClass="btn btn-responsive btn-primary pull-right voffset10">
-					<fmt:message key="button.continue" />
-				</html:submit>
-			</c:when>
-			<c:otherwise>
-				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10 na btn-autoresize" styleId="finishButton"  onclick="submitForm('finish')">
-					 <span class="nextActivity">
-						 <c:choose>
-						 	<c:when test="${activityPosition.last}">
-						 		 <fmt:message key="button.submit" />
-						 	</c:when>
-						 	<c:otherwise>
-						 		 <fmt:message key="button.finish" />
-						 	</c:otherwise>
-						 </c:choose>
-					 </span>
-				</html:link>
-			</c:otherwise>
-		</c:choose>
-	</div>
-</html:form>

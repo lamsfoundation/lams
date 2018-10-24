@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
 
 /* ActionForm for the Monitoring environment */
@@ -33,8 +32,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
  *
  */
 public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants {
-    //controls which method is called by the Lookup map */
-    protected String method;
 
     protected String hideResponse;
     protected String showResponse;
@@ -85,23 +82,6 @@ public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants 
      */
     public void setShowResponse(String showResponse) {
 	this.showResponse = showResponse;
-    }
-
-    /**
-     * @return Returns the method.
-     */
-    @Override
-    public String getMethod() {
-	return method;
-    }
-
-    /**
-     * @param method
-     *            The method to set.
-     */
-    @Override
-    public void setMethod(String method) {
-	this.method = method;
     }
 
     /**

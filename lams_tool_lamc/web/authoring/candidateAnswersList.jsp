@@ -9,12 +9,12 @@
 				${candidateIndex}
 			</c:when>
 			<c:otherwise>
-				${formBean.candidateIndex}
+				${mcAuthoringForm.candidateIndex}
 			</c:otherwise>
 		</c:choose>
 	</c:set>
 	<input type="hidden" name="candidateIndex" value="${candidateIndex}"/>
-	<%@ include file="/common/messages.jsp"%>
+	<lams:errors/>
 
 	<table id="caTable" class="table table-condensed table-no-border">
 	

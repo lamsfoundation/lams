@@ -25,7 +25,7 @@
 
 package org.lamsfoundation.lams.tool.sbmt;
 
-public class SbmtConstants {
+public interface SbmtConstants {
 
     public static final String TOOL_SIGNATURE = "lasbmt11";
 

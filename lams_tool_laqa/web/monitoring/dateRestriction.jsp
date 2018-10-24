@@ -25,7 +25,7 @@
 		}
 		
 		$.ajax({
-			url : '<c:url value="/monitoring.do?dispatch=setShowOtherAnswersAfterDeadline"/>',
+			url : '<c:url value="setShowOtherAnswersAfterDeadline.do"/>',
 			async: false,
 			data: {
 				toolContentID:'${content.qaContentId}',
@@ -47,11 +47,11 @@
 	<div id="datetimeDiv" <c:if test='${not empty submissionDeadline}'> style="display: none;" </c:if>>
 		<div class="form-group">
 		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;
-		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline"/>
+		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline">
 		</label>							
-		<html:link	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" styleClass="btn btn-default">
+		<a	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.set.restriction" />
-		</html:link>
+		</a>
 		</div>
 	</div>
 
@@ -60,9 +60,9 @@
 		<span id="dateInfo">
 		</span>
 		</label>
-		<html:link	href="javascript:$('#show-other-answers-after-deadline').prop('checked', false); removeSubmissionDeadline();" styleClass="btn btn-default">
+		<a	href="javascript:$('#show-other-answers-after-deadline').prop('checked', false); removeSubmissionDeadline();" class="btn btn-default">
 			<fmt:message key="monitor.summary.unset.restriction" />
-		</html:link>
+		</a>
 	</div>
 	
 	<div class="checkbox">
@@ -70,7 +70,7 @@
 			<input type="checkbox" name="showOtherAnswersAfterDeadline" id="show-other-answers-after-deadline" value="1" 
 				<c:if test="${empty submissionDeadline}">disabled="disabled"</c:if>
 				<c:if test="${content.showOtherAnswersAfterDeadline}">checked="checked"</c:if>
-			></input>
+			>
 			<fmt:message key="label.allow.review.other.responses" />
 		</label>
 	</div>

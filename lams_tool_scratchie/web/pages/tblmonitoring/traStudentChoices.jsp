@@ -2,7 +2,7 @@
 
 <script>
 	function exportExcel(){
-		location.href = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do?method=exportExcel&toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+		location.href = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
 	};
 </script>
 

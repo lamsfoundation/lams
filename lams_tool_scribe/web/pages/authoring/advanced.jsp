@@ -8,20 +8,20 @@
 	
 	<div class="radio">
 		<label for="autoSelectScribe1">
-			<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1"/>
+			<form:radiobutton path="autoSelectScribe" checked="checked" value="true" id="autoSelectScribe1"/>
 			<fmt:message key="advanced.firstLearner" />
 		</label>
 	</div>
 	<div class="radio">
 		<label for="autoSelectScribe2">
-			<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2"/>
+			<form:radiobutton path="autoSelectScribe" value="false" id="autoSelectScribe2"/>
 			<fmt:message key="advanced.selectInMonitor" />
 		</label>
 	</div>
 	
 	<div class="checkbox voffset20">
 		<label for="showAggregatedReports">
-		<html:checkbox property="showAggregatedReports" value="1" styleId="showAggregatedReports"></html:checkbox>
+		<form:checkbox path="showAggregatedReports" value="true" id="showAggregatedReports"/>
 		<fmt:message key="advanced.showAggregatedReports" />
 		<br/>
 		<span class="help-block"><fmt:message key="advanced.showAggregatedReportsNote"/></span>
@@ -34,12 +34,12 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
 		<label for="reflectOnActivity">
-		<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
+		<form:checkbox path="reflectOnActivity" value="true" id="reflectOnActivity"/>
 		<fmt:message key="advanced.reflectOnActivity" />
 		</label>
 	</div>
 	<div class="form-group">
-		<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
+		<form:textarea path="reflectInstructions" rows="3" id="reflectInstructions" cssClass="form-control"/>
 	</div>
 </lams:SimplePanel>
 

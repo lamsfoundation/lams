@@ -1,24 +1,29 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.notebook.util.NotebookConstants"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<lams:html>
+	<lams:head>
+		<lams:headItems/>
+		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
+	</lams:head>
+	<body class="stripes">
+		<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
+			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
+			<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	
+			<form:hidden path="sessionMapID" />
+	
+		<lams:Page title="${title}" type="navbar" formID="authoringForm">
 
-<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NotebookConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+			<lams:Tab id="1" key="button.basic" />
+			<lams:Tab id="2" key="button.advanced" />
+			<lams:Tab id="3" key="button.conditions" />
+		</lams:Tabs>  
 	
-	<html:hidden property="dispatch" value="updateContent" />
-	<html:hidden property="sessionMapID" />
-	
-<lams:Page title="${title}" type="navbar">
-
-	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NotebookConstants.TOOL_SIGNATURE %>" helpModule="authoring">
-		<lams:Tab id="1" key="button.basic" />
-		<lams:Tab id="2" key="button.advanced" />
-		<lams:Tab id="3" key="button.conditions" />
-	</lams:Tabs>  
-	
-	<lams:TabBodyArea>
-		<%@ include file="/common/messages.jsp"%>
+		<lams:TabBodyArea>
+		<lams:errors/>
 	   
 	    <!--  Set up tabs  -->
 	     <lams:TabBodys>
@@ -43,5 +48,7 @@
 	<div id="footer"></div>
 	
 </lams:Page>
-</html:form>
-
+</form:form>
+		<div class="footer"></div>					
+	</body>
+</lams:html>

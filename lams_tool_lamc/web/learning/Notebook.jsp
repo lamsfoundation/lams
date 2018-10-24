@@ -9,32 +9,32 @@
 
 <body class="stripes">
 
-	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}">
+	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}" formID="reflectionForm">
 
 		<div class="panel">
 			<lams:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 		</div>
 
 		<div class="form-group">
-			<html:form action="/learning?method=displayMc&validate=false" styleId="reflectionForm" method="POST">
-				<html:hidden property="toolContentID" />
-				<html:hidden property="toolSessionID" />
-				<html:hidden property="httpSessionID" />
-				<html:hidden property="userID" />
-				<html:hidden property="submitReflection" />
-				<html:textarea rows="4" property="entryText" styleClass="form-control" styleId="focusedInput">
+			<form:form action="displayMc.do" modelAttribute="mcLearningForm" id="mcLearningForm" method="POST">
+				<form:hidden path="toolContentID" />
+				<form:hidden path="toolSessionID" />
+				<form:hidden path="httpSessionID" />
+				<form:hidden path="userID" />
+				<form:hidden path="submitReflection" />
+				<textarea rows="4" name="entryText" class="form-control" id="focusedInput">
 					<c:if test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
 						<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
 					</c:if>
-				</html:textarea>
+				</textarea>
 
 
-				<html:link href="#" property="submitReflection" styleClass="btn btn-primary pull-right voffset10 na"
-					onclick="javascript:document.McLearningForm.submit();return false">
+				<a href="#" name="submitReflection" class="btn btn-primary pull-right voffset10 na"
+					onclick="javascript:document.forms.mcLearningForm.submit();return false">
 					<fmt:message key="button.endLearning" />
-				</html:link>
+				</a>
 
-			</html:form>
+			</form:form>
 	</lams:Page>
 	
 	<script type="text/javascript">

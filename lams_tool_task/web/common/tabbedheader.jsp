@@ -4,7 +4,7 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/taskList.css'/>" rel="stylesheet" type="text/css">
+	<link href="<lams:WebAppURL/>includes/css/taskList.css" rel="stylesheet" type="text/css">
 	<lams:css/>
 
  	<!-- ********************  javascript ********************** -->
@@ -12,6 +12,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/taskListcommon.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/taskListcommon.js"></script>
 
 	

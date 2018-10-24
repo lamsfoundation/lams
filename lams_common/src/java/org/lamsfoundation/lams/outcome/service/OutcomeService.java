@@ -16,7 +16,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
@@ -30,6 +29,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.multipart.MultipartFile;
 
 public class OutcomeService implements IOutcomeService {
     private IOutcomeDAO outcomeDAO;
@@ -37,19 +37,23 @@ public class OutcomeService implements IOutcomeService {
 
     private static Logger log = Logger.getLogger(OutcomeService.class);
 
+    @Override
     public String getContentFolderId(Integer organisationId) {
 	String contentFolderId = outcomeDAO.getContentFolderID(organisationId);
 	return contentFolderId == null ? FileUtil.generateUniqueContentFolderID() : contentFolderId;
     }
 
+    @Override
     public List<Outcome> getOutcomes(Integer organisationId) {
 	return outcomeDAO.getOutcomesSortedByName(organisationId);
     }
 
+    @Override
     public List<OutcomeScale> getScales(Integer organisationId) {
 	return outcomeDAO.getScalesSortedByName(organisationId);
     }
 
+    @Override
     public List<Outcome> getOutcomes(String search, Set<Integer> organisationIds) {
 	if (organisationIds == null) {
 	    Integer userId = OutcomeService.getUserDTO().getUserID();
@@ -58,26 +62,32 @@ public class OutcomeService implements IOutcomeService {
 	return outcomeDAO.getOutcomesSortedByName(search, organisationIds);
     }
 
+    @Override
     public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
 	return outcomeDAO.getOutcomeMappings(lessonId, toolContentId, itemId);
     }
 
+    @Override
     public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
 	return outcomeDAO.getOutcomeResults(userId, lessonId, toolContentId, itemId);
     }
 
+    @Override
     public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
 	return outcomeDAO.getOutcomeResult(userId, mappingId);
     }
 
+    @Override
     public OutcomeScale getDefaultScale() {
 	return (OutcomeScale) outcomeDAO.find(OutcomeScale.class, DEFAULT_SCALE_ID);
     }
 
+    @Override
     public boolean isDefaultScale(Long scaleId) {
 	return scaleId != null && DEFAULT_SCALE_ID == scaleId;
     }
 
+    @Override
     public void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId,
 	    Long targetLessonId, Long targetToolContentId, Long targetItemId) {
 	List<OutcomeMapping> sourceMappings = getOutcomeMappings(sourceLessonId, sourceToolContentId, sourceItemId);
@@ -91,6 +101,7 @@ public class OutcomeService implements IOutcomeService {
 	}
     }
 
+    @Override
     public LinkedHashMap<String, ExcelCell[][]> exportScales() {
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
@@ -118,6 +129,7 @@ public class OutcomeService implements IOutcomeService {
 	return dataToExport;
     }
 
+    @Override
     public LinkedHashMap<String, ExcelCell[][]> exportOutcomes() {
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
@@ -145,8 +157,9 @@ public class OutcomeService implements IOutcomeService {
 	return dataToExport;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public int importScales(FormFile fileItem) throws IOException {
+    public int importScales(MultipartFile fileItem) throws IOException {
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 	HSSFWorkbook wb = new HSSFWorkbook(fs);
 	HSSFSheet sheet = wb.getSheetAt(0);
@@ -200,8 +213,9 @@ public class OutcomeService implements IOutcomeService {
 	return counter;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public int importOutcomes(FormFile fileItem) throws IOException {
+    public int importOutcomes(MultipartFile fileItem) throws IOException {
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 	HSSFWorkbook wb = new HSSFWorkbook(fs);
 	HSSFSheet sheet = wb.getSheetAt(0);

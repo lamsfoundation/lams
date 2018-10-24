@@ -1,4 +1,3 @@
-
 function init() {
 	// open the current tab    
 	var tag = document.getElementById("currentTab");
@@ -8,6 +7,7 @@ function init() {
 		selectTab(1);
 	}
 }
+
 function doSelectTab(tabId) {
 	var tag = document.getElementById("currentTab");
 	tag.value = tabId;
@@ -25,3 +25,4 @@ function doSelectTab(tabId) {
 		finishButtonDiv.style.display = "block";
 	}
 }
+

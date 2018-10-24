@@ -25,6 +25,8 @@
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 	</bean>
 	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+	
 	<bean id="transactionRetryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target">
@@ -237,6 +239,8 @@
 	</bean>
 	
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
+		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
@@ -493,7 +497,7 @@
 			</props>
 		</property>
 	</bean>
-	
+
 	<!-- Outcome service -->
 	<bean id="outcomeServiceTarget" class="org.lamsfoundation.lams.outcome.service.OutcomeService">
 		<property name="outcomeDAO"><ref bean="outcomeDAO"/></property>
@@ -649,11 +653,11 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
-	<!-- Security check related beans -->
+	<!--  Data flow related beans -->
 	<bean id="securityDAO" class="org.lamsfoundation.lams.security.SecurityDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
+		
 	<!-- Outcome related beans -->
 	<bean id="outcomeDAO" class="org.lamsfoundation.lams.outcome.dao.hibernate.OutcomeDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
@@ -673,5 +677,4 @@
    			<ref bean="userManagementService"/>
    		</property>
     </bean>
-	
 </beans>

@@ -4,13 +4,13 @@
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 	<body class="stripes">
-		<html:form action="/authoring/init.do?mode=${mode}" method="post" styleId="startForm">
-			<html:hidden property="peerreview.contentId"/>
-			<html:hidden property="sessionMapID"/>
-		</html:form>
+		<form:form action="init.do?mode=${mode}" modelAttribute="peerreviewForm" method="post">
+			<form:hidden path="peerreview.contentId"/>
+			<form:hidden path="sessionMapID"/>
+		</form:form>
 		
 		<script type="text/javascript">
-			document.getElementById("startForm").submit();
+			document.getElementById("peerreviewForm").submit();
 		</script>
 	</body>
 </html>

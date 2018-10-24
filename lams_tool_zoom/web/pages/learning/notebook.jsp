@@ -1,41 +1,61 @@
+<!DOCTYPE html>
+
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript">
-	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = true;
-	}
-</script>
+<lams:html>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
-<lams:Page type="learner" title="${contentDTO.title}">
-
-	<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
-
-		<div class="panel">
-			<lams:out value="${contentDTO.reflectInstructions}" escapeHtml="true" />
-		</div>
-
-		<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
-
-		<html:hidden property="dispatch" value="submitReflection" />
-		<html:hidden property="toolSessionID" />
-		<html:submit styleClass="btn btn-primary pull-right voffset10 na" styleId="finishButton">
-			<c:choose>
-				<c:when test="${activityPosition.last}">
-					<fmt:message key="button.submit" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="button.finish" />
-				</c:otherwise>
-			</c:choose>
-		</html:submit>
-
-	</html:form>
+<lams:head>  
+	<title>
+		<fmt:message key="activity.title" />
+	</title>
 	
+	<lams:css/>
+	
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		window.onload = function() {
-			document.getElementById("focused").focus();
+		function disableFinishButton() {
+			document.getElementById("finishButton").disabled = true;
 		}
-	</script>
+	</script>	
+</lams:head>
+<body class="stripes">
+	<lams:Page type="learner" title="${contentDTO.title}">
 
-</lams:Page>
-
+		<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm">
+	
+			<div class="panel">
+				<lams:out value="${contentDTO.reflectInstructions}" escapeHtml="true" />
+			</div>
+	
+			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control" />
+	
+			<form:hidden path="toolSessionID" />
+			<button type="submit" class="btn btn-primary pull-right voffset10 na" id="finishButton">
+				<c:choose>
+					<c:when test="${activityPosition.last}">
+						<fmt:message key="button.submit" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="button.finish" />
+					</c:otherwise>
+				</c:choose>
+			</button>
+		</form:form>
+		
+		<script type="text/javascript">
+			window.onload = function() {
+				document.getElementById("focused").focus();
+			}
+		</script>
+	
+	</lams:Page>
+</body>
+</lams:html>

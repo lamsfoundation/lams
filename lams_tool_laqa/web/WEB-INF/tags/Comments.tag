@@ -72,7 +72,7 @@
 
 <script>
 $(document).ready(function(){
-	var url='<lams:LAMSURL/>comments/comments.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
+	var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
 	$.ajaxSetup({ cache: true });
 	$('#commentFrame').load(url);
 });

@@ -1,6 +1,7 @@
-<%@ include file="/template/taglibs.jsp"%>
-
 <!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
+
 <lams:html>
 <lams:head>
     <title><fmt:message key="label.tbl.monitor"/></title>
@@ -38,8 +39,8 @@
 			//hide burning-questions if it's disabled in a tool
 			if ("${traToolContentId}" != "") {
 		        $.ajax({
-		            url: '<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do',
-		            data: 'method=isBurningQuestionsEnabled&toolContentID=${traToolContentId}',
+		            url: '<lams:LAMSURL/>tool/lascrt11/tblmonitoring/isBurningQuestionsEnabled.do',
+		            data: 'toolContentID=${traToolContentId}',
 		            type: 'post',
 		            success: function (json) {
 			            if (!json.isBurningQuestionsEnabled) {
@@ -51,23 +52,23 @@
 		});
 
 		function loadTab(method, toolContentID) {
-			var url = "<c:url value='tblmonitor.do'/>";
+			var url = "<lams:LAMSURL/>monitoring/tblmonitor/"
 			var options = {};
 			
 			if (method == "tra" || method == "traStudentChoices" || method == "burningQuestions") {
 				toolContentID = "${traToolContentId}";
-				url = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/";
 				
 			} else if (method == "iraMcq" || method == "mcqStudentChoices") {
 				toolContentID = "${iraToolContentId}";
-				url = "<lams:LAMSURL/>tool/lamc11/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/lamc11/tblmonitoring/";
 				
 			} else if (method == "iraAssessment" || method == "iraAssessmentStudentChoices") {
 				toolContentID = "${iraToolContentId}";
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 	
 			} else if (method == "aes" || method == "aesStudentChoices") {
-				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
 				options = {
 					assessmentToolContentIds: "${assessmentToolContentIds}",
 					assessmentActivityTitles: "${assessmentActivityTitles}"
@@ -80,12 +81,12 @@
 				
 			} else if (method == "peerreview") {
 				toolContentID = "${peerreviewToolContentId}";
-				url = "<lams:LAMSURL/>tool/laprev11/tblmonitoring.do";
+				url = "<lams:LAMSURL/>tool/laprev11/tblmonitoring/";
 			}
 
-			// Merge additional options into existing options object
+			// Merge additional options into existing options object, convert method to url call
+			url = url+method+".do";
 			$.extend( options, {
-				method: method,
 				lessonID: ${lesson.lessonId},
 				toolContentID: toolContentID
 			});
@@ -142,7 +143,7 @@
 		}
 
         function switchToRegularMonitor() {
-        	location.href = "<lams:LAMSURL/>home.do?method=monitorLesson&lessonID=${lesson.lessonId}";
+        	location.href = "<lams:LAMSURL/>home/monitorLesson.do?lessonID=${lesson.lessonId}";
     	}
 	</script>
 </lams:head>
@@ -166,7 +167,6 @@
 			</div>
 
 			<table class="tablesorter">
-				<c:set var="actionUrl"><c:url value='tblmonitor.do'/></c:set>
 				<tr>
 					<td id="menu-item-teams">
 						<a id="tab-link-teams" class="tab-link" href="#teams" data-method="teams">
@@ -292,7 +292,7 @@
 						<i class="fa fa-refresh"></i><span class="hidden-xs">  <fmt:message key="button.refresh"/></span>
 					</button>
 					
-					<button id="timer-button" type="button" class="btn btn-sm btn-default pull-right"  onclick="javascript:openPopUp('timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;" style="margin-right: 10px;">
+					<button id="timer-button" type="button" class="btn btn-sm btn-default pull-right"  onclick="javascript:openPopUp('<lams:LAMSURL/>monitoring/timer.jsp', '<fmt:message key="label.countdown.timer"/>', 648, 1152, true);return false;" style="margin-right: 10px;">
 							<i class="fa fa-hourglass-half"></i><span class="hidden-xs"> <fmt:message key="label.countdown.timer"/></span>
 					</button>		
 				</div>

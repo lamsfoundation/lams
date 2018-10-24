@@ -2,7 +2,6 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="dto" value="${mindmapDTO}" />
 
-<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
@@ -13,7 +12,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -110,13 +109,13 @@
 								</td>
 						
 								<td >
-									<a href="./monitoring.do?dispatch=showMindmap&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+									<a href="showMindmap.do?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
 									</a>		
 								</td>
 						
 								<td width="30%">
-									<a href="./monitoring.do?dispatch=reflect&userUID=${user.uid}&toolContentID=${dto.toolContentId}">
+									<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}">
 										<fmt:message key="label.view" />
 									</a>
 								</td>
@@ -131,7 +130,7 @@
 							</td>
 					
 							<td>
-								<a href="./monitoring.do?dispatch=showMindmap&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+								<a href="showMindmap.do?toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 									<fmt:message key="label.view" />
 								</a>		
 							</td>
@@ -155,7 +154,7 @@
 									<fmt:message key="label.notAvailable" />
 								</c:when>
 								<c:otherwise>
-									<a href="./monitoring.do?dispatch=showMindmap&userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+									<a href="showMindmap.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
 										<fmt:message key="label.view" />
 									</a>									
 								</c:otherwise>
@@ -164,7 +163,7 @@
 						
 						<c:if test="${dto.reflectOnActivity}">
 						<td>
-							<a href="./monitoring.do?dispatch=reflect&userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
+							<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
 						</td>
 						</c:if>
 						

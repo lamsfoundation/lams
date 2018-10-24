@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
 import java.util.ArrayList;
@@ -28,22 +27,23 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  */
-public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> title;
     private List<String> url;
-    private List<FormFile> file;
+    private List<MultipartFile> file;
     private List<String> fileName;
     private List<Long> fileUuid;
     private List<Long> fileVersion;
@@ -52,9 +52,10 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
     private String contentFolderID;
 
     @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate(MessageService messageService) {
+	boolean valid = true;
 	boolean allEmpty = true;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (title != null && !title.isEmpty()) {
 	    for (int index = 0; index < title.size(); index++) {
 		if (!StringUtils.isEmpty(title.get(index))) {
@@ -62,27 +63,29 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 		    allEmpty = false;
 		    Short itemType = type.get(index);
 		    // URL should not be blank
+
 		    if (itemType.equals(ResourceConstants.RESOURCE_TYPE_URL) && StringUtils.isEmpty(url.get(index))) {
-			ActionMessage error = new ActionMessage("error.planner.url.blank", index + 1);
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			errorMap.add("GLOBAL",
+				messageService.getMessage("error.planner.url.blank", new Object[] { index + 1 }));
 
 		    } else if (itemType.equals(ResourceConstants.RESOURCE_TYPE_FILE)) {
 			/*
 			 * File should be saved already or it should be provided. This functionality required some
 			 * changes in pedagogicalPlanner.js in lams_central (see prepareFormData() there)
 			 */
-			FileValidatorUtil.validateFileSize(file.get(index), true, errors);
-			if (fileUuid.get(index) == null && file.get(index) == null) {
-			    ActionMessage error = new ActionMessage("error.planner.file.blank", index + 1);
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+			boolean fileSizeValid = FileValidatorUtil.validateFileSize(file.get(index), true);
+			if (!fileSizeValid) {
+			    if (fileUuid.get(index) == null && file.get(index) == null) {
+				errorMap.add("GLOBAL", messageService.getMessage("error.planner.file.blank",
+					new Object[] { index + 1 }));
+			    }
 			}
 		    }
 		}
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("error.planner.no.resource.save");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.planner.no.resource.save"));
 	    title = null;
 	    url = null;
 	    fileName = null;
@@ -91,8 +94,9 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	    type = null;
 	}
 
-	setValid(errors.isEmpty());
-	return errors;
+	setValid(valid);
+	return errorMap;
+
     }
 
     public void fillForm(Resource resource) {
@@ -100,11 +104,11 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	    setToolContentID(resource.getContentId());
 	    setInstructions(resource.getInstructions());
 
-	    title = new ArrayList<String>();
-	    url = new ArrayList<String>();
-	    fileName = new ArrayList<String>();
-	    file = new ArrayList<FormFile>();
-	    type = new ArrayList<Short>();
+	    title = new ArrayList<>();
+	    url = new ArrayList<>();
+	    fileName = new ArrayList<>();
+	    file = new ArrayList<>();
+	    type = new ArrayList<>();
 	    Set<ResourceItem> items = resource.getResourceItems();
 	    if (items != null) {
 		int topicIndex = 0;
@@ -127,7 +131,7 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 
     public void setTitle(int number, String formTitle) {
 	if (title == null) {
-	    title = new ArrayList<String>();
+	    title = new ArrayList<>();
 	}
 	while (number >= title.size()) {
 	    title.add(null);
@@ -148,7 +152,7 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 
     public void setUrl(int number, String formUrl) {
 	if (url == null) {
-	    url = new ArrayList<String>();
+	    url = new ArrayList<>();
 	}
 	while (number >= url.size()) {
 	    url.add(null);
@@ -165,7 +169,7 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 
     public void setType(int number, Short formType) {
 	if (type == null) {
-	    type = new ArrayList<Short>();
+	    type = new ArrayList<>();
 	}
 	while (number >= type.size()) {
 	    type.add(null);
@@ -180,31 +184,31 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	return type.get(number);
     }
 
-    public void setFile(int number, FormFile formFile) {
+    public void setFile(int number, MultipartFile MultipartFile) {
 	if (file == null) {
-	    file = new ArrayList<FormFile>();
+	    file = new ArrayList<>();
 	}
 	while (number >= file.size()) {
 	    file.add(null);
 	}
-	file.set(number, formFile);
+	file.set(number, MultipartFile);
     }
 
-    public FormFile getFile(int number) {
+    public MultipartFile getFile(int number) {
 	if (file == null || number >= file.size()) {
 	    return null;
 	}
 	return file.get(number);
     }
 
-    public void setFileName(int number, String formFileName) {
+    public void setFileName(int number, String multipartFileName) {
 	if (fileName == null) {
-	    fileName = new ArrayList<String>();
+	    fileName = new ArrayList<>();
 	}
 	while (number >= fileName.size()) {
 	    fileName.add(null);
 	}
-	fileName.set(number, formFileName);
+	fileName.set(number, multipartFileName);
     }
 
     public String getFileName(int number) {
@@ -214,14 +218,14 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	return fileName.get(number);
     }
 
-    public void setFileVersion(int number, Long formFileVersion) {
+    public void setFileVersion(int number, Long multipartFileVersion) {
 	if (fileVersion == null) {
-	    fileVersion = new ArrayList<Long>();
+	    fileVersion = new ArrayList<>();
 	}
 	while (number >= fileVersion.size()) {
 	    fileVersion.add(null);
 	}
-	fileVersion.set(number, formFileVersion);
+	fileVersion.set(number, multipartFileVersion);
     }
 
     public Long getFileVersion(int number) {
@@ -231,17 +235,17 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 	return fileVersion.get(number);
     }
 
-    public void setFileUuid(int number, Long formFileUuid) {
+    public void setFileUuid(int number, Long multipartFileUuid) {
 	if (fileUuid == null) {
-	    fileUuid = new ArrayList<Long>();
+	    fileUuid = new ArrayList<>();
 	}
 	while (number >= fileUuid.size()) {
 	    fileUuid.add(null);
 	}
-	if (new Long(0).equals(formFileUuid)) {
+	if (new Long(0).equals(multipartFileUuid)) {
 	    fileUuid.set(number, null);
 	} else {
-	    fileUuid.set(number, formFileUuid);
+	    fileUuid.set(number, multipartFileUuid);
 	}
     }
 

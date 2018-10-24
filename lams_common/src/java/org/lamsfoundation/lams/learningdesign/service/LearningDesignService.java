@@ -26,12 +26,15 @@ package org.lamsfoundation.lams.learningdesign.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -40,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
@@ -84,10 +88,6 @@ public class LearningDesignService implements ILearningDesignService {
 
     protected ILearningLibraryDAO learningLibraryDAO;
     protected ILoadedMessageSourceService toolActMessageService;
-
-    // words found both in current complex learning library descriptions and in old exported LD XML files
-    private static final String[][] COMPLEX_LEARNING_LIBRARY_KEY_WORDS = { { "Share", "Forum" }, { "Chat", "Scribe" },
-	    { "Forum", "Scribe" } };
 
     /*
      * Default constructor
@@ -148,7 +148,7 @@ public class LearningDesignService implements ILearningDesignService {
     /**********************************************
      * Service Methods
      *******************************************/
-    
+
     @Override
     public LearningDesign getLearningDesign(Long learningDesignID) {
 	return learningDesignDAO.getLearningDesignById(learningDesignID);
@@ -334,29 +334,55 @@ public class LearningDesignService implements ILearningDesignService {
      * Guess missing Learning Library ID based on other activity details. Old LDs may not contain this value.
      */
     @Override
-    public void fillLearningLibraryID(AuthoringActivityDTO activity) {
+    public void fillLearningLibraryID(AuthoringActivityDTO activity, Collection<AuthoringActivityDTO> activities)
+	    throws ImportToolContentException {
 	if (activity.getLearningLibraryID() == null) {
 	    switch (activity.getActivityTypeID()) {
 		case Activity.PARALLEL_ACTIVITY_TYPE:
-		    String description = activity.getDescription();
-		    // recognise learning libraries by their word description
-		    for (LearningLibrary library : learningLibraryDAO.getAllLearningLibraries()) {
-			for (String[] keyWords : COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
-			    boolean found = false;
-			    for (String keyWord : keyWords) {
-				found = description.contains(keyWord) && library.getDescription().contains(keyWord);
-				if (!found) {
-				    break;
-				}
-			    }
-			    if (found) {
-				activity.setLearningLibraryID(library.getLearningLibraryId());
-				return;
+		    // find child activities referring to the imported parallel activity
+		    List<AuthoringActivityDTO> components = new LinkedList<>();
+		    for (AuthoringActivityDTO componentCandidate : activities) {
+			if (componentCandidate.getParentUIID() != null
+				&& componentCandidate.getParentUIID().equals(activity.getActivityUIID())) {
+			    components.add(componentCandidate);
+			    if (components.size() == 2) {
+				break;
 			    }
 			}
 		    }
+		    // find matching parallel activity in existing DB
+		    for (LearningLibrary library : learningLibraryDAO.getAllLearningLibraries()) {
+			Activity libraryActivity = (Activity) activityDAO
+				.getActivitiesByLibraryID(library.getLearningLibraryId()).get(0);
+			if (!libraryActivity.isParallelActivity()) {
+			    continue;
+			}
+			short componentsFound = 0;
+			for (Activity libraryComponent : (Set<Activity>) ((ParallelActivity) libraryActivity)
+				.getActivities()) {
+			    ToolActivity toolLibraryCompoment = (ToolActivity) libraryComponent;
+			    for (AuthoringActivityDTO component : components) {
+				// match with tool signature of children
+				if (toolLibraryCompoment.getTool().getToolSignature()
+					.equals(component.getToolSignature())) {
+				    componentsFound++;
+				}
+			    }
+			}
+			if (componentsFound == 2) {
+			    activity.setLearningLibraryID(library.getLearningLibraryId());
+			    break;
+			}
+		    }
+		    if (activity.getLearningLibraryID() == null) {
+			throw new ImportToolContentException(
+				"Could not recognise learning library ID for parallel activity with UIID "
+					+ activity.getActivityUIID());
+		    }
 		    break;
 		case Activity.TOOL_ACTIVITY_TYPE:
+		    // when importing a LD, it will overwritten by the import process
+		    // when opening an old DB, this should work correctly
 		    Tool tool = toolDAO.getToolByID(activity.getToolID());
 		    if (tool != null) {
 			activity.setLearningLibraryID(tool.getLearningLibraryId());
@@ -467,4 +493,51 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 	return FileUtil.getFullPath(thumbnailDir.getAbsolutePath(), thumbnailFileName);
     }
+    
+    /**
+     * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
+     * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
+     * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
+     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the 
+     * Import code can use it.
+     *
+     * @param originalLearningDesign
+     * @param workspaceFolder
+     * @param copyType
+     * @return
+     */
+    @Override
+    public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId) {
+
+	String newName = originalTitle;
+	if (workspaceFolderId != null) {
+	    List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId,
+		    originalTitle);
+
+	    if ( ldTitleList.size() == 0 ) {
+		return originalTitle;
+	    }
+	    
+	    Calendar calendar = Calendar.getInstance();
+	    int mth = calendar.get(Calendar.MONTH) + 1;
+	    String mthStr = new Integer(mth).toString();
+	    if (mth < 10) {
+		mthStr = "0" + mthStr;
+	    }
+	    int day = calendar.get(Calendar.DAY_OF_MONTH);
+	    String dayStr = new Integer(day).toString();
+	    if (day < 10) {
+		dayStr = "0" + dayStr;
+	    }
+	    String nameMid = dayStr + mthStr + calendar.get(Calendar.YEAR);
+
+	    int idx = 1;
+	    while (ldTitleList.contains(newName)) {
+		newName = originalTitle + "_" + nameMid + "_" + idx;
+		idx++;
+	    }
+	}
+	return newName;
+    }
+
 }

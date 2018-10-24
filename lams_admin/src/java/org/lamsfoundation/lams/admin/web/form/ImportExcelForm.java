@@ -20,21 +20,19 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
  *
  *
  */
-public class ImportExcelForm extends ActionForm {
+public class ImportExcelForm {
 
     private Integer orgId;
-    private FormFile file;
+    private MultipartFile file;
 
     public Integer getOrgId() {
 	return orgId;
@@ -44,11 +42,11 @@ public class ImportExcelForm extends ActionForm {
 	this.orgId = orgId;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 

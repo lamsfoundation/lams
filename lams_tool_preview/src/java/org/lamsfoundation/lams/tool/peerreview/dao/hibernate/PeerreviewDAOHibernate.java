@@ -50,6 +50,7 @@ public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO
 	    + " LEFT JOIN tl_laprev11_user u ON u.session_uid = s.uid "
 	    + " GROUP BY session_id";
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Peerreview getByContentId(Long contentId) {
 	List list = find(GET_RESOURCE_BY_CONTENTID, contentId);

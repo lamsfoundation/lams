@@ -87,7 +87,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    ret.add(portraitId != null ? portraitId.toString() : "");
 	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>");
+		ret.add("javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\")'>");
 	    }
 	    ret.add(String.valueOf(hasArchivedMarks));
 

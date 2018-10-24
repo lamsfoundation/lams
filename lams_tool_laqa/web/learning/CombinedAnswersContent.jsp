@@ -1,6 +1,3 @@
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -84,11 +81,12 @@
 
 <c:if test="${hasEditRight}">
 	<div class="right-buttons">
-		<html:button property="btnCombined"
+		<button name="btnCombined"
+			type="button"
 			onclick="javascript:submitMethod('submitAnswersContent');"
-			styleClass="btn btn-default pull-right voffset5">
+			class="btn btn-default pull-right voffset5">
 			<fmt:message key="button.submitAllContent" />
-		</html:button>
+		</button>
 	</div>
 </c:if>
 

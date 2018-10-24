@@ -21,18 +21,17 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -40,6 +39,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 public class AuthoringForm extends WikiPageForm {
 
     private static final long serialVersionUID = 353256767734345767L;
+
+    @Autowired
+    @Qualifier("wikiMessageService")
+    private MessageService messageService;
 
     // Properties
 
@@ -65,13 +68,11 @@ public class AuthoringForm extends WikiPageForm {
 
     Integer maximumEdits;
 
-    FormFile onlineFile;
+    MultipartFile onlineFile;
 
-    FormFile offlineFile;
+    MultipartFile offlineFile;
 
     String currentTab;
-
-    String dispatch;
 
     String sessionMapID;
 
@@ -84,14 +85,6 @@ public class AuthoringForm extends WikiPageForm {
     String mode;
 
     SessionMap sessionMap;
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-
-	return ac;
-    }
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -109,14 +102,6 @@ public class AuthoringForm extends WikiPageForm {
 	this.currentTab = currentTab;
     }
 
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
-    }
-
     public boolean isLockOnFinished() {
 	return lockOnFinished;
     }
@@ -125,11 +110,11 @@ public class AuthoringForm extends WikiPageForm {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    public FormFile getOfflineFile() {
+    public MultipartFile getOfflineFile() {
 	return offlineFile;
     }
 
-    public void setOfflineFile(FormFile offlineFile) {
+    public void setOfflineFile(MultipartFile offlineFile) {
 	this.offlineFile = offlineFile;
     }
 
@@ -141,11 +126,11 @@ public class AuthoringForm extends WikiPageForm {
 	this.offlineInstruction = offlineInstruction;
     }
 
-    public FormFile getOnlineFile() {
+    public MultipartFile getOnlineFile() {
 	return onlineFile;
     }
 
-    public void setOnlineFile(FormFile onlineFile) {
+    public void setOnlineFile(MultipartFile onlineFile) {
 	this.onlineFile = onlineFile;
     }
 

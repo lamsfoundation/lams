@@ -65,6 +65,7 @@
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
 	
+	
 		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= TaskListConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.edit.activity" />			

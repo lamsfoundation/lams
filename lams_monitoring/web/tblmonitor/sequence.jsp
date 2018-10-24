@@ -1,4 +1,4 @@
-<%@ include file="/template/taglibs.jsp"%>
+<%@ include file="/taglibs.jsp"%>
 
 <lams:css webapp="monitoring" suffix="monitorLesson"/>
 <style>
@@ -168,13 +168,12 @@
 
 		//Disable sequence button handler 
 		$('#disable-sequence-button').click(function () {
-	        var method = (lessonStateId == 3) ? "suspendLesson" : "unsuspendLesson";
+	        var method = (lessonStateId == 3) ? "suspendLesson.do" : "unsuspendLesson.do";
 			$.ajax({
 				dataType : 'xml',
-				url : LAMS_URL + 'monitoring/monitoring.do',
+				url : LAMS_URL + 'monitoring/monitoring/'+method,
 				cache : false,
 				data : {
-					'method'    : method,
 					'lessonID'  : '${lesson.lessonId}'
 				},
 				success : function() {

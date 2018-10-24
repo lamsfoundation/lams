@@ -20,6 +20,7 @@ import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndianInput;
 import org.apache.poi.util.LittleEndianOutput;
+import org.apache.poi.util.RecordFormatException;
 import org.apache.poi.util.StringUtil;
 
 /**
@@ -271,14 +272,14 @@ public class LbsDataSubRecord extends SubRecord {
         sb.append("    .unknownShort1 =").append(HexDump.shortToHex(_cbFContinued)).append("\n");
         sb.append("    .formula        = ").append('\n');
         if(_linkPtg != null) {
-            sb.append(_linkPtg.toString()).append(_linkPtg.getRVAType()).append('\n');
+            sb.append(_linkPtg).append(_linkPtg.getRVAType()).append('\n');
         }
         sb.append("    .nEntryCount   =").append(HexDump.shortToHex(_cLines)).append("\n");
         sb.append("    .selEntryIx    =").append(HexDump.shortToHex(_iSel)).append("\n");
         sb.append("    .style         =").append(HexDump.shortToHex(_flags)).append("\n");
         sb.append("    .unknownShort10=").append(HexDump.shortToHex(_idEdit)).append("\n");
         if(_dropData != null) {
-            sb.append('\n').append(_dropData.toString());
+            sb.append('\n').append(_dropData);
         }
         sb.append("[/ftLbsData]\n");
         return sb.toString();

@@ -1,8 +1,11 @@
+<!DOCTYPE html>
+
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
@@ -10,23 +13,22 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/orgGroup.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/orgGroup.css" type="text/css" media="screen" />
 
 	<c:set var="lessonMode" value="${not empty param.activityID}" />
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
-	<script type="text/javascript" src="includes/javascript/orgGroup.js"></script>
-	<script type="text/javascript" src="includes/javascript/portrait.js"></script>
-	<script type="text/javascript" src="includes/javascript/upload.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/orgGroup.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript">;
 		var grouping = ${grouping},
 			organisationId = grouping.organisationId,
@@ -153,7 +155,7 @@
 			<div class="userContainerTitle">
 				<fmt:message key="label.course.groups.unassigned" />
 				<span class="sortUsersButton"
-				      title="<fmt:message key='label.course.groups.sort.tooltip' />">▲</span>
+				      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
 			</div>
 			<div class="userContainer"></div>
 		</td>
@@ -179,7 +181,7 @@
 			</c:if>
 		/>
 		<span class="sortUsersButton"
-		      title="<fmt:message key='label.course.groups.sort.tooltip' />">▲</span>
+		      title="<fmt:message key='label.course.groups.sort.tooltip' />">?</span>
 	</div>
 	<div class="userContainer"></div>
 </div>
@@ -234,17 +236,15 @@
 				</button>
 			</div>
 			<div class="voffset5">
-				<html:form action="groupingUpload.do?method=importLearnersForGrouping" enctype="multipart/form-data" styleId="uploadForm">
-				<html:hidden property="activityID" styleId="activityID" value="${param.activityID}"/>
-				<html:hidden property="lessonID" styleId="lessonID" value="${lessonID}"/>
-				<%-- <html:hidden property="organisationID" styleId="organisationID"/> Value is set in Javascript as it comes in the JSON --%>
-				<%-- <thml:hidden property="groupingId" styleId="groupingId" value="${groupingId}"/> Value is set in Javascript as only used for some modes  --%>
-				<button id="import" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
-					<fmt:message key="button.import" />
-				</button>
-				<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
-					uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-				</html:form>
+				<form action="../monitoring/groupingUpload/importLearnersForGrouping.do" enctype="multipart/form-data" id="uploadForm">
+					<input type="hidden" name="activityID" value="${param.activityID}"/>
+					<input type="hidden" name="lessonID" value="${lessonID}"/>
+					<button id="import" type="button" class="pull-right btn btn-sm btn-primary btn-disable-on-downupload" onClick="javascript:importGroupsFromSpreadsheet();return false;">
+						<fmt:message key="button.import" />
+					</button>
+					<lams:FileUpload fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
+						uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+				</form>
 			</div>
 			<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</div>

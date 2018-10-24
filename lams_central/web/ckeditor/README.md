@@ -13,7 +13,6 @@ http://ckeditor.com - See LICENSE.md for license information.
 3. Copy plugins developed by LAMS from the old instance of CKEditor
 /ckeditor/plugins/jlatexmath
 /ckeditor/plugins/bootstrapTabs
-/ckeditor/plugins/kaltura
 /ckeditor/plugins/bootsnippets
 
 4. Apply all customizations listed below in ## LAMS Customizations

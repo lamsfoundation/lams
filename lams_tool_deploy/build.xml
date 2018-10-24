@@ -35,8 +35,8 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="src/java"
 			   compiler="modern"
-               source="1.8"
-			   target="1.8"
+               source="11"
+			   target="11"
                debug="on"
 			   includeantruntime="false"
 			   debuglevel="lines,vars,source"

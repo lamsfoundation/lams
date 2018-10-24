@@ -17,8 +17,8 @@
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.VoteLearningForm.dispatch.value=actionMethod; 
-			document.VoteLearningForm.submit();
+			document.forms.voteLearningForm.action=actionMethod + '.do'; 
+			document.forms.voteLearningForm.submit();
 		}
 	</script>
 
@@ -32,10 +32,9 @@
 
 <lams:Page type="learner" title="${title}">
 
-	<html:form action="/learning?validate=false" method="POST">
-		<html:hidden property="dispatch" />
-		<html:hidden property="toolSessionID" />
-		<html:hidden property="userID" />
+	<form:form modelAttribute="voteLearningForm" method="POST">
+		<form:hidden path="toolSessionID" />
+		<form:hidden path="userID" />
 			
 			<lams:Alert id="submissionDeadline" type="danger" close="false">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
@@ -61,14 +60,13 @@
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
-					<html:submit property="forwardtoReflection"
+					<input type="submit" name="forwardtoReflection"
 						onclick="javascript:submitMethod('forwardtoReflection');"
-						styleClass="btn btn-primary voffset10 pull-right">
-						<fmt:message key="label.continue" />
-					</html:submit>
+						class="btn btn-primary voffset10 pull-right"
+						value='<fmt:message key="label.continue" />' />
 				</c:if>
 
-	</html:form>
+	</form:form>
 </lams:Page>
 </body>
 </lams:html>

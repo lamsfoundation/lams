@@ -99,7 +99,7 @@ $(document).ready(function(){
 
 					<td align="center">
 						<c:set var="thumbnailPath">
-						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
+						   	<lams:WebAppURL />download/?uuid=${image.thumbnailFileUuid}&preferDownload=false
 						</c:set>
 						<c:set var="url" >
 							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&toolSessionID=${sessionId}&KeepThis=true&TB_iframe=true&modal=true
@@ -218,9 +218,9 @@ $(document).ready(function(){
 						<c:set var="viewReflection">
 							<c:url value="/monitoring/viewReflection.do?toolSessionID=${sessionId}&userUid=${user.userUid}"/>
 						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')" styleClass="btn btn-default btn-xs loffset5">
+						<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-xs loffset5">
 							<fmt:message key="label.view" />
-						</html:link>
+						</a>
 					</td>
 				</tr>
 			</c:forEach>
@@ -244,7 +244,7 @@ $(document).ready(function(){
 <div id="manage-image-buttons">
 	<div class="panel panel-default" >
 		<div class="panel-heading">
-			<button onclick="javascript:newImageInit('<html:rewrite page='/authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
+			<button onclick="javascript:newImageInit('<c:url value="/authoring/newImageInit.do?sessionMapID=${sessionMapID}&saveUsingLearningAction=true"/>');"
 					class="btn btn-default btn-xs loffset5  " id="">  
 				<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
 			</button>

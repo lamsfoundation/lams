@@ -20,16 +20,16 @@
 				});
 				
 				$.ajaxSetup({ cache: true });
-	    		$('#newQuestionForm').ajaxSubmit({
+	    		$('#mcAuthoringForm').ajaxSubmit({
+		    		url: "<lams:WebAppURL />authoring/"+actionMethod+".do",
 	    			data: { 
 						sessionMapId: '${sessionMapId}',
-						dispatch: actionMethod
 					},
 					cache: true,
     	    		target:  $('#candidateArea')
     		    });
 			}
-			
+				
 			function saveQuestion() {
 				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
 				$("textarea[name^=ca],textarea[name=feedback]").each(function() {
@@ -39,10 +39,10 @@
 				});
 				
 				if (validateSingleCorrectAnswer()) { 
-					$('#newQuestionForm').ajaxSubmit({
+					$('#mcAuthoringForm').ajaxSubmit({
+						url: "<c:url value='/authoring/saveQuestion.do' />",
 						data: { 
 							sessionMapId: '${sessionMapId}',
-							dispatch: 'saveQuestion'
 						},
 	    	    		target:  parent.jQuery('#resourceListArea'), 
 	    	    		success: function() { 
@@ -54,13 +54,13 @@
 			}
 				
 			function submitModifyCandidate(candidateIndexValue, actionMethod) {
-				document.McAuthoringForm.candidateIndex.value=candidateIndexValue;
+				document.forms.mcAuthoringForm.candidateIndex.value=candidateIndexValue;
 				submitMethod(actionMethod);
 			}
 
 			function removeCandidate(candidateIndexValue) {
 				if (validateMinumumCandidateCount()) {
-					document.McAuthoringForm.candidateIndex.value=candidateIndexValue;
+					document.forms.mcAuthoringForm.candidateIndex.value=candidateIndexValue;
 					submitMethod("removeCandidate");
 				}
 			}
@@ -75,7 +75,7 @@
 				}
 				
 				var singleCorrectEntry = 0;
-				var radioCorrect=document.McAuthoringForm.correct;
+				var radioCorrect=document.forms.mcAuthoringForm.correct;
 				if ((radioCorrect == 'null') || (radioCorrect == 'undefined')) {
 					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
 					alert(msg);
@@ -124,7 +124,7 @@
 			}
 
 			function validateMinumumCandidateCount() {
-				var radioCorrect=document.McAuthoringForm.correct;
+				var radioCorrect=document.forms.mcAuthoringForm.correct;
 				if ((radioCorrect == 'undefined') || (radioCorrect == null)) {
 					var msg = "<fmt:message key="candidates.unremovable.groupSize"/>";
 					alert(msg);
@@ -146,11 +146,11 @@
 
 <body class="stripes">
 
-	<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
-		<html:hidden property="questionIndex" />
+	<form:form action="saveQuestion.do" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST">
+		<form:hidden path="questionIndex" />
 
 		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
-		<lams:Page title="${title}" type="learner">
+		<lams:Page title="${title}" type="learner" formID="mcAuthoringForm">
 
 			<div class="form-group">
 				<lams:CKEditor id="newQuestion"
@@ -164,9 +164,9 @@
 			</div>
 			
 			<div class="form-group">
-				<html:button property="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" styleClass="btn btn-default btn-sm">
+				<button name="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" type="button" class="btn btn-default btn-sm">
 					<fmt:message key="label.add.candidates" />
-				</html:button>
+				</button>
 			</div>
 			
 			<div id="questions-worth" class="form-group">
@@ -196,13 +196,13 @@
 				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 
 					<fmt:message key="label.cancel" />
 				</a>
-				<a href="#" onclick="saveQuestion();"
+				<a href="#" onclick="javascript:saveQuestion();"
 					onmousedown="self.focus();" class="btn btn-default btn-sm"> 
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save" />
 				</a>
 			</div>
 
 		</lams:Page>
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

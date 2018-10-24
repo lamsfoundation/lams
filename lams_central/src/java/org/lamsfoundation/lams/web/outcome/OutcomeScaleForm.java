@@ -22,11 +22,7 @@
 
 package org.lamsfoundation.lams.web.outcome;
 
-import org.apache.struts.action.ActionForm;
-
-public class OutcomeScaleForm extends ActionForm {
-    private static final long serialVersionUID = -2985243667102883631L;
-
+public class OutcomeScaleForm {
     private Long scaleId;
     private Integer organisationId;
     private String name;

@@ -1,15 +1,15 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ include file="/taglibs.jsp"%>
 
-<c:if test="${not empty GateForm.map.gate.description}">
+<c:if test="${not empty gateForm.gate.description}">
 	<!-- general information section-->
 	<p>
-		<lams:out value="${GateForm.map.gate.description}" escapeHtml="true" />
+		<lams:out value="${gateForm.gate.description}" escapeHtml="true" />
 	</p>
 </c:if>
 
 <!--waiting learner information table-->
 
-<c:if test="${not GateForm.map.gate.gateOpen}">
+<c:if test="${not gateForm.gate.gateOpen}">
 	<div id="gateStatus" class="alert alert-danger" style="margin-bottom: 10px; padding: 8px">
 				<div class="media">
 					<div class="media-left">
@@ -24,8 +24,8 @@
 <p>
 <span><fmt:message key="label.grouping.status"/></span> 
 	<strong> <fmt:message key="label.gate.waiting.learners">
-			<fmt:param value="${GateForm.map.waitingLearners}" />
-			<fmt:param value="${GateForm.map.totalLearners}" />
+			<fmt:param value="${gateForm.waitingLearners}" />
+			<fmt:param value="${gateForm.totalLearners}" />
 		</fmt:message>
 	</strong>
 </p>

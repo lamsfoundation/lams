@@ -23,21 +23,12 @@
 
 package org.lamsfoundation.lams.tool.zoom.web.forms;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  *
  */
-public class AuthoringForm extends ActionForm {
-    private static final long serialVersionUID = 3950453134542135495L;
-
+public class AuthoringForm {
     // Fields
 
     private String title;
@@ -59,14 +50,6 @@ public class AuthoringForm extends ActionForm {
     private String sessionMapID;
 
     private SessionMap<String, Object> sessionMap;
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-
-	return ac;
-    }
 
     public String getSessionMapID() {
 	return sessionMapID;

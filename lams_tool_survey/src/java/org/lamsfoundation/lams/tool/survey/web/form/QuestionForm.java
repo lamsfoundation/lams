@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.survey.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 
 /**
@@ -36,7 +34,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
  *
  * @version $Revision$
  */
-public class QuestionForm extends ActionForm {
+public class QuestionForm {
     private String itemIndex;
 
     //1: single or multiple choice question;3:open text question
@@ -53,8 +51,7 @@ public class QuestionForm extends ActionForm {
 	question = new SurveyQuestion();
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset(HttpServletRequest request) {
 	if (question != null) {
 	    question.setAppendText(false);
 	    question.setOptional(false);

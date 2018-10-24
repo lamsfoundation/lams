@@ -44,9 +44,7 @@
 			if (${isLeadershipEnabled}) {
 				$(".mark-hedging-select").on('change keydown keypress keyup paste', function() {
 					
-					//get questionIndex based on whether element is select or textbox
-					var questionIndex = $(this).is("select") ? $(this).data("question-index") : $(this).attr("name").substring(8, $(this).attr("name").indexOf("__"));
-					
+					var questionIndex = $(this).data("question-index");					
 					var selects = $("select[name^=question" + questionIndex + "_]");
 					var grade = selects.length == 0 ? 0 : eval(selects.first().find('option:last-child').val())
 					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
@@ -54,7 +52,7 @@
 					var isButtonEnabled = (totalSelected == grade);
 					
 					//check if hedging justification is enabled
-					var justificationTextarea = $("#question" + questionIndex + "__lamstextarea");
+					var justificationTextarea = $("#justification-question" + questionIndex);
 					if( justificationTextarea.length) {
 						isButtonEnabled = isButtonEnabled && $.trim(justificationTextarea.val());
 					}
@@ -175,14 +173,11 @@
 					if (isWaitingForConfirmation) return;
 					
 					//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
-					$("textarea[id^='question']:not([id$='__lamstextarea'])").each(function()  {
+					$("textarea[id^='question']").each(function()  {
 						var ckeditorData = CKEDITOR.instances[this.name].getData();
 						//skip out empty values
 						this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;						
 					});
-					
-					//fire onchange event for lams:textarea
-					$("[id$=__lamstextarea]").change();
 					
 					//ajax form submit
 					$('#answers').ajaxSubmit({
@@ -337,7 +332,8 @@
 								missingRequiredQuestions.push("${status.index}");
 							}
 						</c:when>
-							
+						
+						
 						<c:when test="${question.type == 5}">
 							//truefalse
 							if ($("input[name=question${status.index}]:checked").length == 0) {
@@ -400,7 +396,7 @@
 						if (totalSelected != grade) {
 							markHedgingWrongTotalQuestions.push("${status.index}");
 						}
-						if(${question.hedgingJustificationEnabled} && !$.trim($("#question" + questionIndex + "__lamstextarea").val())){
+						if(${question.hedgingJustificationEnabled} && !$.trim($("#justification-question" + questionIndex).val())){
 							markHedgingWrongJustification.push("${status.index}");
 						}
 					}
@@ -526,12 +522,12 @@
 	        <h4>
 	        	<fmt:message key='label.learning.blockui.are.you.ready' />
 	        </h4>
-	        <html:button property="ok" styleId="timelimit-start-ok" styleClass="button">
+	        <button type="button" name="ok" id="timelimit-start-ok" class="button">
 				OK
-			</html:button>
+			</button>
 		</div>
 		
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<br>
 		
 		<div class="form-group">
@@ -543,11 +539,11 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:if test="${hasEditRight}">					
-					<html:button property="submitAll"
+					<button type="button" name="submitAll"
 							onclick="return submitAll(false);" 
-							styleClass="btn btn-primary voffset10 pull-right na">
+							class="btn btn-primary voffset10 pull-right na">
 						<fmt:message key="label.learning.submit.all" />
-					</html:button>
+					</button>
 				</c:if>
 			</div>
 		</c:if>

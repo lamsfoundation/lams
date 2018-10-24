@@ -19,37 +19,57 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<!DOCTYPE html>
 
- <script language="JavaScript" type="text/Javascript">
-    function doCloseRedirect() {
-        if ( window.name.match("LearnerActivity") != null ) {
-        	<%-- In popup window (ie have revisited a completed activity. Just the one activity in the window so close --%>
-            window.close();
-        <%-- } else if ( window.parent.name == "LearnerActivity" ) {
-             In a parallel activity in the popup window, so won't actually close the window (btw you would need to 
-              close the parent if you want to close the window. Live with two "close" messages for now. Eventually we 
-	      want to display the wait for the first one, and then close on the second. For that we will need
-              location.href = "<c:out value="${param.waitURL}" escapeXml="false"/>"; --%>
-        } else if ( window.parent.name != "LearnerActivity" ) {        	
-        	<%-- In the main learner window, so want to continue with the main progress --%>
-        	<c:if test="${param.nextURL != null}">
-            	location.href = "<c:out value="${param.nextURL}" escapeXml="false"/>";
-            </c:if>
-        }
-    }
-    
-    window.onload = doCloseRedirect;
-</script>
+<%@ include file="/common/taglibs.jsp"%>
 
-<lams:Page type="admin">
+<lams:html>
 
-	<div class="voffset10"><fmt:message key="message.window.closing"/></div>
+<lams:head>
+	<title><fmt:message key="learner.title" />
+	</title>
 
-</lams:Page>
+	<lams:css />
+	<c:set var="lams">
+		<lams:LAMSURL />
+	</c:set>
 
-<c:if test="${not empty lessonFinishUrl}">
-	<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />
-</c:if>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript"
+		src="${lams}includes/javascript/common.js"></script>
+</lams:head>
+
+<body class="stripes">
+	<script language="JavaScript" type="text/Javascript">
+	    function doCloseRedirect() {
+	        if ( window.name.match("LearnerActivity") != null ) {
+	        	<%-- In popup window (ie have revisited a completed activity. Just the one activity in the window so close --%>
+	            window.close();
+	        <%-- } else if ( window.parent.name == "LearnerActivity" ) {
+	             In a parallel activity in the popup window, so won't actually close the window (btw you would need to 
+	              close the parent if you want to close the window. Live with two "close" messages for now. Eventually we 
+		      want to display the wait for the first one, and then close on the second. For that we will need
+	              location.href = "<c:out value="${param.waitURL}" escapeXml="false"/>"; --%>
+	        } else if ( window.parent.name != "LearnerActivity" ) {        	
+	        	<%-- In the main learner window, so want to continue with the main progress --%>
+	        	<c:if test="${param.nextURL != null}">
+	            	location.href = "<c:out value="${param.nextURL}" escapeXml="false"/>";
+	            </c:if>
+	        }
+	    }
+	    
+	    window.onload = doCloseRedirect;
+	</script>
+	
+	<lams:Page type="admin">
+	
+		<div class="voffset10"><fmt:message key="message.window.closing"/></div>
+	
+	</lams:Page>
+	
+	<c:if test="${not empty lessonFinishUrl}">
+		<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />
+	</c:if>
+</body>
+
+</lams:html>

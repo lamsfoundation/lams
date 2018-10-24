@@ -2,8 +2,8 @@
 
 <div class="form-group">
     <label><fmt:message key="message.label.subject" />&nbsp;</label>
-	<html:text size="50" tabindex="1" property="message.subject" maxlength="60"/> &nbsp;
-	<html:errors property="message.subject" />
+    <form:input size="50" tabindex="1" value="${message.subject}" path="message.subject" maxlength="60"/> &nbsp;
+    <lams:errors path="message.subject"/>
 </div>
 
 <div class="form-group">
@@ -15,17 +15,16 @@
 	<div class="form-group">
 		<label><fmt:message key="message.label.attachment" /></label><BR/>
 		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
-		<html:errors property="message.attachment" />
+		<lams:errors path="message.attachments"/>
 	</div>
 </c:if>
 
 <c:set var="backToForum">
-	<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
+	<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}
 </c:set>
-<html:submit styleClass="btn btn-primary voffset5 pull-right" styleId="submitButton">
-	<fmt:message key="button.submit" />
-</html:submit>
-<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="btn btn-default voffset5 pull-right" styleId="cancelButton">
+<input type="submit" value="<fmt:message key="button.submit" />" class="btn btn-primary voffset5 pull-right" id="submitButton"/>
+
+<button name="goback" onclick="javascript:location.href='${backToForum}';" class="btn btn-default voffset5 pull-right" id="cancelButton">
 	<fmt:message key="button.cancel" />
-</html:button>&nbsp;
+</button>&nbsp;
 

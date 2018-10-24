@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
@@ -35,7 +34,6 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 
 /**
@@ -96,7 +94,6 @@ public class HtmlTag extends TagSupport {
 
 	if (this.xhtml) {
 	    // for struts compatibility
-	    this.pageContext.setAttribute(Globals.XHTML_KEY, "true", PageContext.PAGE_SCOPE);
 
 	    sb.append(" xmlns=\"http://www.w3.org/1999/xhtml\"");
 	}

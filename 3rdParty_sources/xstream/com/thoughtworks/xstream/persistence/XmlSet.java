@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2007, 2008, 2014 XStream Committers.
+ * Copyright (C) 2007, 2008 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -14,47 +14,43 @@ package com.thoughtworks.xstream.persistence;
 import java.util.AbstractSet;
 import java.util.Iterator;
 
-
 /**
  * A persistent set implementation.
  * 
  * @author Guilherme Silveira
  */
-public class XmlSet<V> extends AbstractSet<V> {
+public class XmlSet extends AbstractSet {
 
-    private final XmlMap<Long, V> map;
+	private final XmlMap map;
 
-    public XmlSet(final PersistenceStrategy<Long, V> persistenceStrategy) {
-        this.map = new XmlMap<Long, V>(persistenceStrategy);
-    }
+	public XmlSet(PersistenceStrategy persistenceStrategy) {
+		this.map = new XmlMap(persistenceStrategy);
+	}
 
-    @Override
-    public Iterator<V> iterator() {
-        return map.values().iterator();
-    }
+	public Iterator iterator() {
+		return map.values().iterator();
+	}
 
-    @Override
-    public int size() {
-        return map.size();
-    }
+	public int size() {
+		return map.size();
+	}
 
-    @Override
-    public boolean add(final V o) {
-        if (map.containsValue(o)) {
-            return false;
-        } else {
-            // not-synchronized!
-            map.put(findEmptyKey(), o);
-            return true;
-        }
-    }
+	public boolean add(Object o) {
+		if (map.containsValue(o)) {
+			return false;
+		} else {
+			// not-synchronized!
+			map.put(findEmptyKey(), o);
+			return true;
+		}
+	}
 
-    private Long findEmptyKey() {
-        long i = System.currentTimeMillis();
-        while (map.containsKey(Long.valueOf(i))) {
-            i++;
-        }
-        return Long.valueOf(i);
-    }
+	private Long findEmptyKey() {
+		long i = System.currentTimeMillis();
+		while (map.containsKey(new Long(i))) {
+			i++;
+		}
+		return new Long(i);
+	}
 
 }

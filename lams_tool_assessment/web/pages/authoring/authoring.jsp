@@ -45,18 +45,17 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data"
+	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" enctype="multipart/form-data"
 			onsubmit="return validateQuestionBankIsNotEmpty();">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">
 		
-			<html:hidden property="assessment.contentId" />
-			<html:hidden property="mode" value="${mode}"/>
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
+			<form:hidden path="assessment.contentId" />
+			<input type="hidden" name="mode" value="${mode}">
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="currentTab" id="currentTab" />
 	
 			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= AssessmentConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
@@ -64,7 +63,7 @@
 			</lams:Tabs>	
 		
 		 	<lams:TabBodyArea>
-		 		<%@ include file="/common/messages.jsp"%>
+		 		<lams:errors/>
 		 		
 				<!--  Set up tabs  -->
 		 		<lams:TabBodys>
@@ -76,9 +75,9 @@
 				<div id="saveCancelButtons">
 					<lams:AuthoringButton formID="authoringForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
-						toolContentID="${formBean.assessment.contentId}"
+						toolContentID="${assessmentForm.assessment.contentId}"
 						accessMode="${mode}" defineLater="${mode=='teacher'}"
-						contentFolderID="${formBean.contentFolderID}" />
+						contentFolderID="${assessmentForm.contentFolderID}" />
 				</div>
 			</lams:TabBodyArea>
 	
@@ -87,6 +86,6 @@
 		<!-- end page div -->
 		</lams:Page>
 	
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

@@ -48,7 +48,6 @@
 			    		var rows = [],
 			            json = {};
 			    		
-			    		debugger;
 			    		
 						for (i = 0; i < data.rows.length; i++){
 							var userData = data.rows[i];
@@ -162,25 +161,25 @@
 			
 			<c:if test="${spreadsheet.markingEnabled}">	
 				<p>
-					<html:link href="javascript:viewAllMarks(${summary.sessionId});"
-						property="viewAllMarks" styleClass="btn btn-default voffset10 loffset5">
+					<a href="javascript:viewAllMarks(${summary.sessionId});"
+						name="viewAllMarks" class="btn btn-default voffset10 loffset5">
 						<fmt:message key="label.monitoring.summary.viewAllMarks.button" />
-					</html:link>
-					<html:link href="javascript:releaseMarks(${summary.sessionId});"
-						property="releaseMarks" styleClass="btn btn-default voffset10 loffset5">
+					</a>
+					<a href="javascript:releaseMarks(${summary.sessionId});"
+						name="releaseMarks" class="btn btn-default voffset10 loffset5">
 						<fmt:message key="label.monitoring.summary.releaseMarks.button" />
-					</html:link>
-	 				<html:link href="javascript:downloadMarks(${summary.sessionId});"
-						property="downloadMarks" styleClass="btn btn-default voffset10 loffset5">
+					</a>
+	 				<a href="javascript:downloadMarks(${summary.sessionId});"
+						name="downloadMarks" class="btn btn-default voffset10 loffset5">
 						<fmt:message key="label.monitoring.summary.downloadMarks.button" />
-					</html:link>
+					</a>
 					<c:url value="/monitoring/summary.do" var="refreshMonitoring">
 						<c:param name="contentFolderID" value="${sessionMap.contentFolderID}"/>
 						<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 					</c:url>
-					<html:link href="${refreshMonitoring}" styleClass="btn btn-default loffset5 voffset10" >
+					<a href="${refreshMonitoring}" class="btn btn-default loffset5 voffset10" >
 						<fmt:message key="label.refresh" />
-					</html:link>
+					</a>
 				</p>
 			</c:if>
 		

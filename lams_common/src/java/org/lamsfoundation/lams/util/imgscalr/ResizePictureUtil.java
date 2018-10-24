@@ -102,7 +102,7 @@ public class ResizePictureUtil {
 	    return outputBuffer.getInputStream();
 
 	} catch (IOException e) {
-	    log.error(e.getStackTrace());
+	    log.error(e);
 	    return null;
 	}
     }

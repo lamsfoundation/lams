@@ -11,41 +11,40 @@
 	
 	<c:set var="title"><fmt:message key="label.monitoring.summary.marking.marking" /></c:set>
 
-	<html:form action="/monitoring/saveMark" method="post" styleId="markForm" focus="marks">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" /> 
+	<form:form action="saveMark.do" method="post" modelAttribute="markForm" id="markForm" focus="marks">
 
-	<lams:Page type="learner" title="${title}">
+	<lams:Page type="learner" title="${title}" formID="markForm">
 	
 		<!-- Basic Info Form-->
- 		<%@ include file="/common/messages.jsp"%>
+ 		<lams:errors/>
 
-		<p><fmt:message key="label.reviewitem.spreadsheet.sent.by" />&nbsp;<strong>${formBean.userName}</strong></p>
+		<p><fmt:message key="label.reviewitem.spreadsheet.sent.by" />&nbsp;<strong>${markForm.userName}</strong></p>
 		
-		<c:set var="sessionMapID" value="${formBean.sessionMapID}" />				
+		<c:set var="sessionMapID" value="${markForm.sessionMapID}" />				
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="userUid" />
-		<html:hidden property="code" />
-		<html:hidden property="userName" />
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="userUid" />
+		<form:hidden path="code" />
+		<form:hidden path="userName" />
 		
 		<div class="form-group">
 			<label for="marks"><fmt:message key="label.monitoring.summary.marking.marks" /></label>
-        		<html:text property="marks" size="10" style="form-control form-control-inline"/>
+        		<input type="text" name="marks" size="10" value="${markForm.marks}" style="form-control form-control-inline"/>
 		</div>
 
 		<div class="form-group">
            	<label for="comments"><fmt:message key="label.monitoring.summary.marking.comments" /></label>
-           	<lams:CKEditor id="comments" value="${formBean.comments}" contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
+           	<lams:CKEditor id="comments" value="${markForm.comments}" contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 		</div>
 	
 		<c:choose>
-			<c:when test="${empty formBean.code}">
+			<c:when test="${empty markForm.code}">
 				<lams:Alert type="info" id="no-spreadsheet" close="false">
 					<fmt:message key="label.reviewitem.user.hasnot.sent.spreadsheet" />
 				</lams:Alert>
 			</c:when>
 			<c:otherwise>
-			    <html:hidden property="spreadsheetCode" styleId="spreadsheet-code" value="${formBean.code}"/>	
+			    <input type="hidden" name="spreadsheetCode" id="spreadsheet-code" value="<c:out value='${markForm.code}' />" />	
 				<iframe
 					id="externalSpreadsheet" name="externalSpreadsheet" src="${spreadsheetURL}"
 					style="width:99%" frameborder="no" height="385px"
@@ -67,7 +66,7 @@
 		
 	</lams:Page>
 	
-	</html:form> 
+	</form:form> 
 
 	
 	</body>

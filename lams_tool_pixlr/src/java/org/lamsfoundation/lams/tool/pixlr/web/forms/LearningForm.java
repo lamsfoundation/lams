@@ -21,11 +21,7 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.pixlr.web.forms;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  *
@@ -33,16 +29,25 @@ import org.apache.struts.action.ActionForm;
  *
  *
  */
-public class LearningForm extends ActionForm {
+public class LearningForm {
 
     private static final long serialVersionUID = -4728946254882237144L;
 
     String title;
     String instructions;
 
-    String dispatch;
     Long toolSessionID;
     String mode;
+    
+    boolean redoQuestion = false;
+    
+    public boolean isRedoQuestion() {
+        return redoQuestion;
+    }
+
+    public void setRedoQuestion(boolean redoQuestion) {
+        this.redoQuestion = redoQuestion;
+    }
 
     String entryText;
 
@@ -52,14 +57,6 @@ public class LearningForm extends ActionForm {
 
     public void setMode(String mode) {
 	this.mode = mode;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

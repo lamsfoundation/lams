@@ -17,19 +17,19 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<lams:Page type="learner" title="${sessionMap.title}">
+	<lams:Page type="learner" title="${sessionMap.title}" formID="refForm">
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<div class="panel">
 			<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 		</div>
 
 		<div class="form-group">
-			<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-				<html:hidden property="userID" />
-				<html:hidden property="sessionMapID" />
-				<html:textarea property="entryText" styleClass="form-control" styleId="focused" rows="5" />
+			<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="refForm">
+				<form:hidden path="userID" />
+				<form:hidden path="sessionMapID" />
+				<form:textarea path="entryText" cssClass="form-control" id="focused" rows="5"></form:textarea>
 
 
 				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit">
@@ -45,7 +45,7 @@
 
 				</button>
 
-			</html:form>
+			</form:form>
 
 		</div>
 

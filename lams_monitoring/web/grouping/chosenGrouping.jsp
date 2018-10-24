@@ -18,13 +18,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
 <!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
+
 <lams:html>
 <lams:head>
     <title><c:out value="${title}"/></title>
@@ -63,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><fmt:message key="label.grouping.general.instructions.branching"/></p>
 	</c:if>
 	
-	<iframe src="<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&lessonID=${param.lessonID}&activityID=${param.activityID}"></iframe>
+	<iframe src="<lams:LAMSURL/>organisationGroup/viewGroupings.do?lessonID=${param.lessonID}&activityID=${param.activityID}"></iframe>
 
 	</lams:Page>
 </body>

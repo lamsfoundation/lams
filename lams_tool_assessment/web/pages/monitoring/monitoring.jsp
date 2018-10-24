@@ -13,7 +13,7 @@
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css">		
  		<lams:css suffix="chart"/>
  		<link href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet" type="text/css">
- 		<link href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet" type="text/css">	
+ 		<link href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet" type="text/css">	
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 		<script>

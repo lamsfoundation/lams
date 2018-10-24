@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <lams:html>
 <lams:head>
 	<lams:css/>
 	
-	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="loadVars.jsp"></script>
-	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="${lams}loadVars.jsp"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
@@ -76,9 +74,9 @@
 					</div>
 					
 					<div align="center">
-						<input class="btn btn-sm btn-default offset5" type="button"
-							value="<fmt:message key="label.return.to.myprofile" />"
-							onclick="javascript:document.location='index.do?method=profile'" />
+						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+							<fmt:message key="label.return.to.myprofile" />
+						</button>
 					</div>
 
 				</div>

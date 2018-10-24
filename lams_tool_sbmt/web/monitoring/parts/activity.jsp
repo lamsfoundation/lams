@@ -1,7 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<html:errors />
-
 <c:if test="${isContentInUse}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
@@ -29,11 +27,11 @@
 	</tr>
 </table>
 
-<c:url value="/authoring.do" var="authoringUrl">
+<c:url value="/authoring/authoring.do" var="authoringUrl">
 	<c:param name="mode" value="teacher" />
 	<c:param name="contentFolderID" value="${contentFolderID}" />
 	<c:param name="toolContentID" value="${toolContentID}" />
 </c:url>
-<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 	<fmt:message key="label.monitoring.edit.activity.edit" />
-</html:link>
+</a>

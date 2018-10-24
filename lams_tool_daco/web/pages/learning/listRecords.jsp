@@ -180,16 +180,16 @@
 											<c:out value="${question.description}" escapeXml="false"/>
 											<c:choose>
 												<c:when test="${question.type==1}">
-													<input type="text" size="60" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
+													<input type="text" size="60" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 												</c:when>
 												<c:when test="${question.type==2}">
 													<textarea  cols="60" rows="3" readonly="readonly">${answer.answer}</textarea>
 												</c:when>
 												<c:when test="${question.type==3}">
-													<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
+													<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 												</c:when>
 												<c:when test="${question.type==4}">
-													<input type="text" size="20" readonly="readonly" value="<c:out  value='${answer.answer}'/>" />
+													<input type="text" size="20" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 												</c:when>
 												<c:when test="${question.type==5 || question.type==6}">
 													<c:choose>
@@ -205,11 +205,11 @@
 												<c:when test="${question.type==7}">
 													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 														<input type="radio" readonly="readonly" 
-														<c:if test="${answer.answer==status.index+1}">
-														checked="checked"
-														</c:if>
-														>&nbsp;
-														<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
+																<c:if test="${answer.answer==status.index+1}">
+																	checked="checked"
+																</c:if>>
+														&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+														<br />
 													</c:forEach>
 												</c:when>
 												<c:when test="${question.type==8}">
@@ -228,7 +228,9 @@
 												</c:when>
 												<c:when test="${question.type==9}">
 													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></input><br />
+														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">
+														&nbsp;<label for="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></label>
+														<br />
 													</c:forEach>
 												</c:when>
 												<c:when test="${question.type==10}">
@@ -239,7 +241,7 @@
 															</td>
 															<td>
 																<c:set var="longitude"><c:out  value='${answer.answer}'/></c:set>
-																<input type="text" size="10" readonly="readonly" value="${longitude}"/>
+																<input type="text" size="10" readonly="readonly" value="${longitude}">
 																<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
 															</td>
 															<c:if test="${not empty question.answerOptions and not empty longitude}">
@@ -253,8 +255,9 @@
 																<label><fmt:message key="label.learning.longlat.latitude" /></label>
 															</td>
 															<td>
-																<input type="text" size="10" readonly="readonly" id="${elementIdPrefix}latitude-record${recordStatus.index+1}-question${questionStatus.index+1}" />
-																<label><fmt:message key="label.learning.longlat.latitude.unit" /></label><br />
+																<input type="text" size="10" readonly="readonly" id="${elementIdPrefix}latitude-record${recordStatus.index+1}-question${questionStatus.index+1}">
+																<label><fmt:message key="label.learning.longlat.latitude.unit" /></label>
+																<br />
 															</td>
 														</tr>
 													</table>

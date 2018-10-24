@@ -42,9 +42,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 
 public class RuntimeStatsServlet extends HttpServlet {
-
     private static final long serialVersionUID = 6834774025623257743L;
-
     private static Logger log = Logger.getLogger(RuntimeStatsServlet.class);
 
     @Override
@@ -52,15 +50,15 @@ public class RuntimeStatsServlet extends HttpServlet {
 	boolean isLongStats = WebUtil.readBooleanParam(request, "long", false);
 	String stats = null;
 	if (isLongStats) {
-	    if (RuntimeStatsServlet.log.isDebugEnabled()) {
-		RuntimeStatsServlet.log.debug("Getting long runtime stats");
+	    if (log.isDebugEnabled()) {
+		log.debug("Getting long runtime stats");
 	    }
-	    stats = RuntimeStatsServlet.getLongStats();
+	    stats = getLongStats();
 	} else {
-	    if (RuntimeStatsServlet.log.isDebugEnabled()) {
-		RuntimeStatsServlet.log.debug("Getting short runtime stats");
+	    if (log.isDebugEnabled()) {
+		log.debug("Getting short runtime stats");
 	    }
-	    stats = RuntimeStatsServlet.getShortStats();
+	    stats = getShortStats();
 	}
 
 	if (stats != null) {
@@ -111,7 +109,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    resp.append("Current Sessions : ").append(SessionManager.getSessionCount()).append("\n");
 	    resp.append("Time of Request : ").append(date);
 	} catch (Exception e) {
-	    RuntimeStatsServlet.log.error("Error while getting short runtime stats", e);
+	    log.error("Error while getting short runtime stats", e);
 	}
 
 	return resp.toString();
@@ -164,7 +162,7 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    resp.append("Connections [in use/active/total]: ").append(inUseConnections).append("/")
 		    .append(activeConnections).append("/").append(availConnections).append("\n");
 	} catch (Exception e) {
-	    RuntimeStatsServlet.log.error("Error while getting long runtime stats", e);
+	    log.error("Error while getting long runtime stats", e);
 	}
 
 	return resp.toString();

@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @SuppressWarnings("serial")
@@ -60,23 +63,29 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(RepopulateProgressMarksServlet.class);
 
-    private static ILogEventService logEventService;
-    private static ILessonService lessonService;
-    private static ILearnerFullService learnerService;
+    @Autowired
+    private ILogEventService logEventService;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private ILearnerFullService learnerService;
 
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
     @Override
-    public void init() throws ServletException {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	RepopulateProgressMarksServlet.logEventService = (ILogEventService) ctx.getBean("logEventService");
-	RepopulateProgressMarksServlet.lessonService = (ILessonService) ctx.getBean("lessonService");
-	RepopulateProgressMarksServlet.learnerService = (ILearnerFullService) ctx.getBean("learnerService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
-	String header="";
+	String header = "";
 	StringBuilder errorBuilder = new StringBuilder("");
 	StringBuilder auditLogBuilder = new StringBuilder("");
 	UserDTO userDTO = null;
@@ -98,10 +107,10 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 		return;
 	    }
 
-	    header = new StringBuilder(
-		    "Learner progress and gradebook marks to be repopulated for lesson ").append(lessonId).append(" ")
-		    .append(lesson.getLessonName())
-		    .append(".\n----------------------------------------------------------------------------------\n\n").toString();
+	    header = new StringBuilder("Learner progress and gradebook marks to be repopulated for lesson ")
+		    .append(lessonId).append(" ").append(lesson.getLessonName())
+		    .append(".\n----------------------------------------------------------------------------------\n\n")
+		    .toString();
 
 	    ActivitiesToCheckProcessor processor = new ActivitiesToCheckProcessor(lesson.getLearningDesign(),
 		    learnerService.getActivityDAO());
@@ -115,7 +124,7 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 	    auditLogBuilder.append("\n\n");
 
 	    if (restrictToLearnerId == null) {
-		Set<LearnerProgress> progresses = (Set<LearnerProgress>) lesson.getLearnerProgresses();
+		Set<LearnerProgress> progresses = lesson.getLearnerProgresses();
 		for (LearnerProgress learnerProgress : progresses) {
 		    processLearner(errorBuilder, auditLogBuilder, lesson, activityList, learnerProgress, gradebookAll);
 		}
@@ -139,11 +148,14 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 	String errors = errorBuilder.append("\n").toString();
 	String msg;
 	if (errors.length() > 1) {
-	    msg =  new StringBuilder(header).append("Errors occured. Some data may be been updated.\n").append(errors).append(auditLogBuilder.toString()).toString();
+	    msg = new StringBuilder(header).append("Errors occured. Some data may be been updated.\n").append(errors)
+		    .append(auditLogBuilder.toString()).toString();
 	} else {
-	    msg =  new StringBuilder(header).append("Successful run, no errors\n").append(auditLogBuilder.toString()).toString();
+	    msg = new StringBuilder(header).append("Successful run, no errors\n").append(auditLogBuilder.toString())
+		    .toString();
 	}
-	logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, userDTO != null ? userDTO.getUserID() : null, null, lessonId, null, msg);
+	logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, userDTO != null ? userDTO.getUserID() : null, null,
+		lessonId, null, msg);
 	out.println(msg);
 	return;
     }
@@ -151,23 +163,25 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
     private void processLearner(StringBuilder errorBuilder, StringBuilder auditLogBuilder, Lesson lesson,
 	    ArrayList<Activity> activityList, LearnerProgress learnerProgress, boolean updateGradebookForAll) {
 	try {
-	    String messages[] = learnerService.recalcProgressForLearner(lesson, activityList, learnerProgress, updateGradebookForAll);
+	    String messages[] = learnerService.recalcProgressForLearner(lesson, activityList, learnerProgress,
+		    updateGradebookForAll);
 	    auditLogBuilder.append(messages[0]);
 	    errorBuilder.append(messages[1]);
-	} catch ( Throwable e ) {
-	    log.error("Error thrown while processing "+learnerProgress.getUser().getLogin(), e);
+	} catch (Throwable e) {
+	    log.error("Error thrown while processing " + learnerProgress.getUser().getLogin(), e);
 	    String msg = new StringBuilder("Error occured while processing user ")
-	    	.append(learnerProgress.getUser().getLogin()).append(" ").append(learnerProgress.getUser().getFullName()).append(". Proceeding entries in log for this user may or may not have worked. Error was ")
-	    	.append(e.getMessage()).append("\n")
-	    	.toString();
+		    .append(learnerProgress.getUser().getLogin()).append(" ")
+		    .append(learnerProgress.getUser().getFullName())
+		    .append(". Proceeding entries in log for this user may or may not have worked. Error was ")
+		    .append(e.getMessage()).append("\n").toString();
 	    auditLogBuilder.append(msg);
 	    errorBuilder.append(msg);
 	}
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	doGet(request, response);
     }
 
@@ -177,7 +191,7 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 
 	public ActivitiesToCheckProcessor(LearningDesign design, IActivityDAO activityDAO) {
 	    super(design, activityDAO);
-	    activityList = new ArrayList<Activity>();
+	    activityList = new ArrayList<>();
 	}
 
 	@Override

@@ -102,7 +102,7 @@
 			<h3>
 				<c:out value="${item.description}" escapeXml="false"/>
 			</h3>	
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
 			<c:forEach var="summary" items="${summaryList}" varStatus="status">
 				<div class="panel panel-default" >

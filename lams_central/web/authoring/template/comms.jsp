@@ -71,7 +71,7 @@
        		
              var jqxhr = $.ajax( {
 	        		method: $(form).attr('method'),
-					url: getSubmissionURL(),
+					url: getSubmissionURL() + '.do',
                 	data: $(form).serialize()
 	            	})
 				.done(function(data) {
@@ -103,7 +103,7 @@
 		}
 		
 		function getSubmissionURL() {
-			return '<lams:WebAppURL />/authoring/template/'+$('#template').val().toLowerCase()+'.do';
+			return '<lams:WebAppURL />authoring/template/'+$('#template').val().toLowerCase();
 		}
 		
 		function doGotoList() {
@@ -130,7 +130,7 @@
 			var newDiv = document.createElement("div");
 			newDiv.id = 'divassess'+nextNum;
 			newDiv.className = 'space-top';
-			var url=getSubmissionURL()+"?method=createAssessment&questionNumber="+nextNum+"&questionType="+type;
+			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type;
 			$('#divassessments').append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
@@ -150,7 +150,7 @@
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
 			newDiv.id = newDivPrefix+nextNum;
-			var url=getSubmissionURL()+"?method=createQuestion&questionNumber="+nextNum;
+			var url=getSubmissionURL()+"/createQuestion.do?questionNumber="+nextNum;
 			if ( forward && forward.length > 0) {
 				url = url + "&forward=" + forward;
 			}
@@ -180,7 +180,7 @@
 			var lastChild=optionsDiv.children().filter(':last');
 			$(lastChild).after(newDiv);
 
-			var url=getSubmissionURL()+"?method=createOption&questionNumber="+questionNum+"&optionNumber="+nextNum;
+			var url=getSubmissionURL()+"/createOption.do?questionNumber="+questionNum+"&optionNumber="+nextNum;
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
@@ -209,7 +209,7 @@
 			var lastChild=optionsDiv.children().filter(':last');
 			$(lastChild).after(newDiv);
 
-			var url=getSubmissionURL()+"?method=createOption&questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true";
+			var url=getSubmissionURL()+"/createOption.do?questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true";
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
@@ -248,7 +248,7 @@
 		
 		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, assessment) {
 			refreshCKEditors() ;
-			var url=getSubmissionURL()+"?method=swapOption&questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2;
+			var url=getSubmissionURL()+"/swapOption.do?questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2;
 			if ( assessment ) {
 				url += "&assess=true";
 			}
@@ -266,7 +266,7 @@
 
 		function removeOption(questionNum, optionNum, divToLoad, assessment) {
 			refreshCKEditors() ;
-			var url=getSubmissionURL()+"?method=deleteOption&questionNumber="+questionNum+"&optionNumber="+optionNum;
+			var url=getSubmissionURL()+"/deleteOption.do?questionNumber="+questionNum+"&optionNumber="+optionNum;
 			if ( assessment ) 
 				url += "&assess=true";
 			var data = getOptionData(questionNum, assessment);
@@ -289,7 +289,7 @@
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
 			newDiv.id = newDivPrefix+nextNum;
-			var url=getSubmissionURL()+"?method=createForum&topicNumber="+nextNum;
+			var url=getSubmissionURL()+"/createForum.do?topicNumber="+nextNum;
 			if ( forward && forward.length > 0) {
 				url = url + "&forward=" + forward;
 			}
@@ -313,7 +313,7 @@
 			var nextNumURLS = +currNumURLS + 1;
 			var urlDiv = document.createElement("div");
 			urlDiv.id = newDivPrefix+nextNumURLS;
-			var url=getSubmissionURL()+"?method=createResource&urlNumber="+nextNumURLS;
+			var url=getSubmissionURL()+"/createResource.do?urlNumber="+nextNumURLS;
 			if ( extraParam ) {
 				url = url + extraParam;
 			}
@@ -333,7 +333,7 @@
 			var nextNum = +currNum + 1;
 			var branchDiv = document.createElement("div");
 			branchDiv.id = 'divbranch'+nextNum;
-			var url=getSubmissionURL()+"?method=createBranch&branchNumber="+nextNum;
+			var url=getSubmissionURL()+"/createBranch.do?branchNumber="+nextNum;
 			$('#divbranches').append(branchDiv);
 			$.ajaxSetup({ cache: true });
 			$(branchDiv).load(url, function( response, status, xhr ) {
@@ -352,7 +352,7 @@
 			var newDiv = document.createElement("div");
 			newDiv.id = 'divrating'+nextNum;
 			newDiv.className = 'space-top';
-			var url=getSubmissionURL()+"?method=createRatingCriteria&criteriaNumber="+nextNum;
+			var url=getSubmissionURL()+"/createRatingCriteria.do?criteriaNumber="+nextNum;
 			$('#divratings').append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {

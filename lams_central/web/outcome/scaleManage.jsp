@@ -2,22 +2,20 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-html" prefix="html" %>
 
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/outcome.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/outcome.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		var organisationId = '${param.organisationID}',
 			LAMS_URL = '<lams:LAMSURL/>',
@@ -35,14 +33,9 @@
 </lams:head>
 <body class="stripes">
 <lams:Page type="admin" >
-	<logic:messagesPresent>
-		<lams:Alert id="error" close="false" type="danger">
-			<html:messages id="error">
-				<c:out value="${error}" escapeXml="false" />
-			</html:messages>
-		</lams:Alert>
-	</logic:messagesPresent>
-	
+
+	<lams:errors/>	
+
 	<div class="outcomeContainer">
 		<div class="row">
 			<div class="col-xs-5">
@@ -111,8 +104,7 @@
 			<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
 				<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
 			</div>
-			<form id="importForm" action="outcomeScale.do" method="post" enctype="multipart/form-data">
-				<input type="hidden" name="method" value="scaleImport" />
+			<form id="importForm" action="outcome/scaleImport.do" method="post" enctype="multipart/form-data">
 				<input type="file" id="importInput" name="file"/>
 			</form>
 		</c:if>

@@ -20,10 +20,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.spreadsheet.web.form;
-
-import org.apache.struts.action.ActionForm;
 
 /**
  * Mark Form.
@@ -31,7 +28,7 @@ import org.apache.struts.action.ActionForm;
  *
  * User: Andrey Balan
  */
-public class MarkForm extends ActionForm {
+public class MarkForm {
 
     private static final long serialVersionUID = -6028705988278223361L;
 
@@ -76,19 +73,19 @@ public class MarkForm extends ActionForm {
     }
 
     public String getCode() {
-        return code;
+	return code;
     }
 
     public void setCode(String code) {
-        this.code = code;
+	this.code = code;
     }
 
     public String getUserName() {
-        return userName;
+	return userName;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+	this.userName = userName;
     }
 
 }

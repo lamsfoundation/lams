@@ -22,13 +22,13 @@
       <module name="net.fckeditor" export="true" />
       <module name="org.apache.commons.beanutils" export="true" />
       <module name="org.apache.commons.collections" export="true" />
+      <module name="org.apache.commons.collections4" export="true" />
       <module name="org.apache.commons.io" export="true" />
       <module name="org.apache.commons.lang" export="true" />
       <module name="org.apache.commons.codec" export="true" />
       <module name="org.apache.commons.pool" export="true" />
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.validator" export="true" />
-      <module name="org.apache.httpcomponents" export="true" />
       <module name="org.apache.xmlcommons" export="true" />
       <module name="org.infinispan" export="true" />
       <module name="org.imsglobal" export="true" />
@@ -40,8 +40,6 @@
       <module name="org.json.simple" export="true" />
       <module name="org.quartz" export="true" />
       <module name="org.springframework" export="true" meta-inf="export" />
-      <module name="org.apache.struts" export="true" />
-      <module name="org.apache.strutsel" export="true" />
       <module name="org.tuckey.urlrewritefilter" export="true" />
       <module name="com.thoughtworks.xstream" export="true" />
       <module name="com.warrenstrange.googleauth" export="true" />

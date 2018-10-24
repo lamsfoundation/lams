@@ -5,7 +5,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-function" prefix="fn"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
@@ -31,10 +31,10 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="loadVars.jsp"></script>
-	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
 	
 </lams:head>
 
@@ -50,7 +50,7 @@
     
 		<c:if test="${isDisplayDesignImage}">
 			<div id="sequence-preview">
-				<img src="<lams:LAMSURL/>home.do?method=getLearningDesignThumbnail&ldId=${ldId}" alt="Sequence Preview" />
+				<img src="<lams:LAMSURL/>home/getLearningDesignThumbnail.do?ldId=${ldId}" alt="Sequence Preview" />
 			</div>
 		</c:if>
     

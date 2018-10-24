@@ -23,27 +23,27 @@
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="reflectionForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<lams:Page type="learner" title="${sessionMap.title}">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<p>
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 			</p>
 			
-			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
+			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
 					<fmt:message key="label.finished" />
-				</html:link>
+				</a>
 			</div>
 		</lams:Page>
-	</html:form>
+	</form:form>
 
 	<div id="footer">
 	</div>

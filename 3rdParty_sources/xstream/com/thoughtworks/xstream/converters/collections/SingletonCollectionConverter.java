@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, 2014 XStream Committers.
+ * Copyright (C) 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,7 +10,6 @@
  */
 package com.thoughtworks.xstream.converters.collections;
 
-import java.util.Collection;
 import java.util.Collections;
 
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -19,7 +18,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
 
 
 /**
- * Converts singleton collections (list and set) to XML, specifying a nested element for the item.
+ * Converts singleton collections (list and set) to XML, specifying a nested element for the
+ * item.
  * <p>
  * Supports Collections.singleton(Object) and Collections.singletonList(Object).
  * </p>
@@ -29,8 +29,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
  */
 public class SingletonCollectionConverter extends CollectionConverter {
 
-    private static final Class<?> LIST = Collections.singletonList(Boolean.TRUE).getClass();
-    private static final Class<?> SET = Collections.singleton(Boolean.TRUE).getClass();
+    private static final Class LIST = Collections.singletonList(Boolean.TRUE).getClass();
+    private static final Class SET = Collections.singleton(Boolean.TRUE).getClass();
 
     /**
      * Construct a SingletonCollectionConverter.
@@ -38,20 +38,20 @@ public class SingletonCollectionConverter extends CollectionConverter {
      * @param mapper the mapper
      * @since 1.4.2
      */
-    public SingletonCollectionConverter(final Mapper mapper) {
+    public SingletonCollectionConverter(Mapper mapper) {
         super(mapper);
     }
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return LIST == type || SET == type;
     }
 
-    @Override
-    public Collection<?> unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         reader.moveDown();
-        final Object item = readItem(reader, context, null);
+        Object item = readItem(reader, context, null);
         reader.moveUp();
-        return context.getRequiredType() == LIST ? Collections.singletonList(item) : Collections.singleton(item);
+        return context.getRequiredType() == LIST
+            ? (Object)Collections.singletonList(item)
+            : (Object)Collections.singleton(item);
     }
 }

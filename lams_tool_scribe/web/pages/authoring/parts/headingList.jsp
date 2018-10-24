@@ -23,8 +23,8 @@
  			<td class="arrows" style="width:5%">
 				<c:if test="${index ne 0}">
 					<c:set var="moveUpURL">
-						<html:rewrite
-							page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
+						<c:url
+							value="authoring/moveHeading.do?sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
 					</c:set>
 					<lams:Arrow state="up" title="<fmt:message key='link.moveUp'/>" 
 	 						onclick="runUrl('${moveUpURL}')"/>
@@ -32,8 +32,8 @@
 
 				<c:if test="${index ne fn:length(sessionMap.headings)-1}">
 					<c:set var="moveDownURL">
-						<html:rewrite
-							page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
+						<c:url
+							value="authoring/moveHeading.do?sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
 					</c:set>
 					<lams:Arrow state="down" title="<fmt:message key='link.moveDown'/>"  
 								onclick="runUrl('${moveDownURL}')"/>
@@ -42,16 +42,16 @@
 
 			<td class="text-center" style="width:3%">
 				<c:set var="editURL">
-					<html:rewrite
-						page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
+					<c:url
+						value="authoring/loadHeadingForm.do?sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
 				</c:set>
 				<i class="fa fa-pencil" title="<fmt:message key='link.edit'/>" onclick="showMessage('${editURL}')"></i>
 			</td>
 
 			<td class="text-center"  style="width:3%">
 				<c:set var="deleteURL">
-					<html:rewrite
-						page="/authoring.do?dispatch=deleteHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
+					<c:url
+						value="authoring/deleteHeading.do?sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
 				</c:set>
 				<i class="fa fa-times"	title="<fmt:message key="link.delete"/>" onclick="runUrl('${deleteURL}')"></img>
 			</td> 

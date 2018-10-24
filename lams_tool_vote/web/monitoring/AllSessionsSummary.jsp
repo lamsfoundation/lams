@@ -17,9 +17,9 @@
 	<c:set var="buttonbar">
 		<div class="pull-right">
 			<c:if test="${not empty viewReflectionsURL}">
-				<html:link href="javascript:launchPopup('${viewReflectionsURL}')" styleClass="btn btn-default btn-sm">
+				<a href="javascript:launchPopup('${viewReflectionsURL}')" class="btn btn-default btn-sm">
 					<fmt:message key="label.notebook.entries" />
-				</html:link>
+				</a>
 			</c:if>			
 			&nbsp;
 			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.toolSessionId}&toolContentID=${toolContentID}" />

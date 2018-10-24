@@ -16,7 +16,7 @@
 		}
 
 		function submitForm(methodName) {
-			var f = document.getElementById('messageForm');
+			var f = document.getElementById('mcLearningForm');
 			f.submit();
 		}
 	</script>
@@ -28,14 +28,14 @@
 		<fmt:message key="activity.title" />
 	</c:set>
 
-	<lams:Page type="learner" title="${title}">
+	<lams:Page type="learner" title="${title}" formID="mcLearningForm">
 
-		<html:form action="/learning?method=displayMc&validate=false" method="POST" onsubmit="disableFinishButton();"
-			styleId="messageForm">
-			<html:hidden property="toolContentID" />
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="userID" />
+		<form:form action="displayMc.do" method="POST" onsubmit="disableFinishButton();"
+			modelAttribute="mcLearningForm" id="mcLearningForm">
+			<form:hidden path="toolContentID" />
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="userID" />
 
 			<lams:Alert id="submissionDeadline" type="danger" close="false">
 				<fmt:message key="authoring.info.teacher.set.restriction">
@@ -46,9 +46,9 @@
 			</lams:Alert>
 
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-				<html:hidden property="learnerFinished" value="Finished" />
+				<form:hidden path="learnerFinished" value="Finished" />
 
-				<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10 na" styleId="finishButton"
+				<a href="#nogo" class="btn btn-primary pull-right voffset10 na" id="finishButton"
 					onclick="javascript:submitForm('finish');return false">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
@@ -58,17 +58,17 @@
 							<fmt:message key="label.finished" />
 						</c:otherwise>
 					</c:choose>
-				</html:link>
+				</a>
 			</c:if>
 
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
-				<html:submit property="forwardtoReflection" styleClass="button">
+				<button type="submit" name="forwardtoReflection" class="btn">
 					<fmt:message key="label.continue" />
-				</html:submit>
+				</button>
 			</c:if>
 			</div>
 			<div id="footer"></div>
-		</html:form>
+		</form:form>
 	</lams:Page>
 </body>
 </lams:html>

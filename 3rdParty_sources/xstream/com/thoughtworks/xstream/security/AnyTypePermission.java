@@ -18,17 +18,14 @@ public class AnyTypePermission implements TypePermission {
      */
     public static final TypePermission ANY = new AnyTypePermission();
 
-    @Override
-    public boolean allows(Class<?> type) {
+    public boolean allows(Class type) {
         return true;
     }
 
-    @Override
     public int hashCode() {
         return 3;
     }
 
-    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == AnyTypePermission.class;
     }

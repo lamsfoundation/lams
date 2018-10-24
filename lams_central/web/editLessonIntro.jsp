@@ -4,15 +4,15 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
 <lams:html>
 <lams:head>
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script language="JavaScript" type="text/javascript">
 		$(function() {
 			$('#lessonForm').ajaxForm( {
@@ -37,7 +37,7 @@
 <body class="stripes">
 	
 	<lams:Page type="admin">		
-		<form action="editLessonIntro.do?method=save" method="post" id="lessonForm">
+		<form action="editLessonIntro/save.do" method="post" id="lessonForm">
 			<input type="hidden" name="lessonID" value="${lesson.lessonId}"/>
 	
 			<div class="field-group">

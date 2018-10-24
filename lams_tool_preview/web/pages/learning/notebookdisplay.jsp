@@ -23,9 +23,9 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5">
-						<fmt:message key="label.edit" />
-						</html:button>
+						<a href="#nogo" id="finishButton" onclick="return continueReflect()" cssClass="btn btn-sm btn-default voffset5">
+							<fmt:message key="label.edit" />
+						</a>
 					</c:if>
 				</div>
 			</div>

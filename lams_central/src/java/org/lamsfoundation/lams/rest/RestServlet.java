@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.rest;
 
 import java.io.IOException;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,6 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -49,8 +49,8 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,11 +65,26 @@ public abstract class RestServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(RestServlet.class);
 
-    private static IToolDAO toolDAO;
-    private static ILamsCoreToolService lamsCoreToolService;
-    private static IIntegrationService integrationService;
-    private static IAuthoringFullService authoringFullService;
-    private static IUserManagementService userManagementService;
+    @Autowired
+    protected IToolDAO toolDAO;
+    @Autowired
+    protected ILamsCoreToolService lamsCoreToolService;
+    @Autowired
+    protected IIntegrationService integrationService;
+    @Autowired
+    protected IAuthoringFullService authoringService;
+    @Autowired
+    protected IUserManagementService userManagementService;
+    
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
 
     /**
      * Checks if the provided auth JSON is valid.
@@ -78,7 +93,7 @@ public abstract class RestServlet extends HttpServlet {
 	User user = null;
 	try {
 	    String serverName = authenticationJSON.get(LoginRequestDispatcher.PARAM_SERVER_ID).asText();
-	    ExtServer extServer = getIntegrationService().getExtServer(serverName);
+	    ExtServer extServer = integrationService.getExtServer(serverName);
 	    String userName = authenticationJSON.get(LoginRequestDispatcher.PARAM_USER_ID).asText();
 	    String method = authenticationJSON.get(LoginRequestDispatcher.PARAM_METHOD).asText().toLowerCase();
 	    String timestamp = authenticationJSON.get(LoginRequestDispatcher.PARAM_TIMESTAMP).asText();
@@ -87,28 +102,20 @@ public abstract class RestServlet extends HttpServlet {
 	    // Throws AuthenticationException if it fails
 	    Authenticator.authenticateLoginRequest(extServer, timestamp, userName, method, null, hash);
 
-	    ExtUserUseridMap userMap = getIntegrationService().getExtUserUseridMap(extServer, userName);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, userName);
 	    user = userMap.getUser();
 	    // get concrete user
-	    user = (User) getUserManagementService().findById(User.class, user.getUserId());
+	    user = (User) userManagementService.findById(User.class, user.getUserId());
 	    return user.getUserDTO();
 	} catch (AuthenticationException e) {
-	    RestServlet.log.error("The user was not authenticated", e);
+	    log.error("The user was not authenticated", e);
 	} catch (UserInfoFetchException e) {
-	    RestServlet.log.error("Could not fetch new user information from integration server", e);
+	    log.error("Could not fetch new user information from integration server", e);
 	} catch (UserInfoValidationException e) {
-	    RestServlet.log.error("User data is not valid", e);
+	    log.error("User data is not valid", e);
 	}
 
 	return null;
-    }
-
-    private IIntegrationService getIntegrationService() {
-	if (RestServlet.integrationService == null) {
-	    RestServlet.integrationService = (IntegrationService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-	}
-	return RestServlet.integrationService;
     }
 
     @Override
@@ -157,40 +164,4 @@ public abstract class RestServlet extends HttpServlet {
 
     protected abstract void doPostInternal(ObjectNode requestJSON, UserDTO userDTO, HttpServletResponse response)
 	    throws Exception;
-
-    protected final IAuthoringFullService getAuthoringService() {
-	if (RestServlet.authoringFullService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    RestServlet.authoringFullService = (IAuthoringFullService) ctx.getBean("authoringFullService");
-	}
-	return RestServlet.authoringFullService;
-    }
-
-    protected ILamsCoreToolService getLamsCoreToolService() {
-	if (RestServlet.lamsCoreToolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    RestServlet.lamsCoreToolService = (ILamsCoreToolService) ctx.getBean("lamsCoreToolService");
-	}
-	return RestServlet.lamsCoreToolService;
-    }
-
-    protected IToolDAO getToolDAO() {
-	if (RestServlet.toolDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    RestServlet.toolDAO = (IToolDAO) ctx.getBean("toolDAO");
-	}
-	return RestServlet.toolDAO;
-    }
-
-    protected final IUserManagementService getUserManagementService() {
-	if (RestServlet.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext());
-	    RestServlet.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return RestServlet.userManagementService;
-    }
 }

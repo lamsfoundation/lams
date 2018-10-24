@@ -27,7 +27,7 @@
 				autoencode:false,
 				caption: "${organisationName}",
 			    datatype: "json",
-			    url: "<lams:LAMSURL />/admin/policyManagement.do?method=getConsentsGridData&policyUid=${policy.uid}",
+			    url: "<lams:LAMSURL />/admin/policyManagement/getConsentsGridData.do?policyUid=${policy.uid}",
 				height: 'auto',
 				width: $(window).width() - 100,
 				shrinkToFit: false,

@@ -14,17 +14,16 @@ package com.thoughtworks.xstream.security;
  */
 public class TypeHierarchyPermission implements TypePermission {
 
-    private Class<?> type;
+    private Class type;
 
     /**
      * @since 1.4.7
      */
-    public TypeHierarchyPermission(Class<?> type) {
+    public TypeHierarchyPermission(Class type) {
         this.type = type;
     }
 
-    @Override
-    public boolean allows(Class<?> type) {
+    public boolean allows(Class type) {
         if (type == null)
             return false;
         return this.type.isAssignableFrom(type);

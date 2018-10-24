@@ -36,7 +36,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String removeAllContent;
     protected String submitAllContent;
     protected String submitTabDone;
-    protected String dispatch;
     protected String currentTab;
 
     protected String choice;
@@ -550,21 +549,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setEdit(String edit) {
 	this.edit = edit;
-    }
-
-    /**
-     * @return Returns the dispatch.
-     */
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    /**
-     * @param dispatch
-     *            The dispatch to set.
-     */
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     /**

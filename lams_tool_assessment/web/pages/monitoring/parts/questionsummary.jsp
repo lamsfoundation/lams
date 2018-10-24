@@ -12,7 +12,7 @@
 		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-		<link type="text/css" href="<html:rewrite page='/includes/css/monitoring.css'/>" rel="stylesheet">	
+		<link type="text/css" href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet">	
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
@@ -52,7 +52,7 @@
 							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
 							{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
+			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 			  			   	{name:'response', index:'response', width:427, sortable:false, search:false},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
@@ -153,61 +153,50 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">
-				<fmt:message key="label.monitoring.question.summary.history.responses" />
+				<fmt:message key="label.monitoring.question.summary.question" />: <c:out value="${questionSummary.question.title}" escapeXml="true"/>
 			</div>
 		</div>
 			
 		<div class="panel-body">
-			<%@ include file="/common/messages.jsp"%>
-			
+			<lams:errors/>
+                
+            <c:out value="${questionSummary.question.question}" escapeXml="false"/>
+
+
+            <div class="row"><div class="col-xs-12 col-sm-6">
+            <h5><fmt:message key="label.question.options"/></h5>    
 			<table class="table table-condensed table-striped">
-				<tr>
-					<th style="width: 180px;" >
-						<fmt:message key="label.monitoring.question.summary.title" />
-					</th>
-					<td >
-						<c:out value="${questionSummary.question.title}" escapeXml="true"/>
-					</td>
-				</tr>
-				
-				<tr>
-					<th>
-						<fmt:message key="label.monitoring.question.summary.question" />
-					</th>
-					<td>
-						<c:out value="${questionSummary.question.question}" escapeXml="false"/>
-					</td>
-				</tr>
-				
 				<c:if test="${questionSummary.question.type == 1}">
 					<tr>
-						<th>
-							<fmt:message key="label.incorrect.answer.nullifies.mark" />
-						</th>
 						<td>
+							<fmt:message key="label.incorrect.answer.nullifies.mark" />:
+						</td>
+						<td style="text-align: right;">
 							<c:out value="${questionSummary.question.incorrectAnswerNullifiesMark}" escapeXml="false"/>
 						</td>
 					</tr>
 				</c:if>
-					
 				<tr>
-					<th>
-						<fmt:message key="label.monitoring.question.summary.default.mark" />
-					</th>
 					<td>
+						<fmt:message key="label.monitoring.question.summary.default.mark" />:
+					</td>
+					<td style="text-align: right;">
 						<c:out value="${questionSummary.question.defaultGrade}" escapeXml="true"/>
 					</td>
 				</tr>
 					
 				<tr>
-					<th>
-						<fmt:message key="label.monitoring.question.summary.penalty" />
-					</th>
 					<td>
+						<fmt:message key="label.monitoring.question.summary.penalty" />:
+					</td>
+					<td style="text-align: right;">
 						<c:out value="${questionSummary.question.penaltyFactor}" escapeXml="true"/>
 					</td>
 				</tr>			
 			</table>
+            </div></div>
+            
+            <h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
 			
 			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 				<div class="voffset20">
@@ -216,7 +205,7 @@
 				</div>	
 			</c:forEach>
 			
-			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset10 pull-right">
+			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-primary btn-sm voffset10 pull-right">
 				<fmt:message key="label.monitoring.question.summary.ok" /> 
 			</a>
 

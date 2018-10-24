@@ -13,11 +13,10 @@ package com.thoughtworks.xstream.converters;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-
 /**
- * Wrapper to convert a {@link com.thoughtworks.xstream.converters.SingleValueConverter} into a
+ * Wrapper to convert a  {@link com.thoughtworks.xstream.converters.SingleValueConverter} into a
  * {@link com.thoughtworks.xstream.converters.Converter}.
- * 
+ *
  * @author J&ouml;rg Schaible
  * @see com.thoughtworks.xstream.converters.Converter
  * @see com.thoughtworks.xstream.converters.SingleValueConverter
@@ -26,37 +25,31 @@ public class SingleValueConverterWrapper implements Converter, SingleValueConver
 
     private final SingleValueConverter wrapped;
 
-    public SingleValueConverterWrapper(final SingleValueConverter wrapped) {
+    public SingleValueConverterWrapper(SingleValueConverter wrapped) {
         this.wrapped = wrapped;
     }
 
-    @Override
-    public boolean canConvert(final Class<?> type) {
+    public boolean canConvert(Class type) {
         return wrapped.canConvert(type);
     }
 
-    @Override
-    public String toString(final Object obj) {
+    public String toString(Object obj) {
         return wrapped.toString(obj);
     }
 
-    @Override
-    public Object fromString(final String str) {
+    public Object fromString(String str) {
         return wrapped.fromString(str);
     }
 
-    @Override
-    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         writer.setValue(toString(source));
     }
 
-    @Override
-    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         return fromString(reader.getValue());
     }
 
-    @Override
-    public void appendErrors(final ErrorWriter errorWriter) {
+    public void appendErrors(ErrorWriter errorWriter) {
         errorWriter.add("wrapped-converter", wrapped == null ? "(null)" : wrapped.getClass().getName());
         if (wrapped instanceof ErrorReporter) {
             ((ErrorReporter)wrapped).appendErrors(errorWriter);

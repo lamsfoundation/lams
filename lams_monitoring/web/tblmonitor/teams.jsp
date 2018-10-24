@@ -1,4 +1,4 @@
-<%@ include file="/template/taglibs.jsp"%>
+<%@ include file="/taglibs.jsp"%>
 <style>
 	.font-weight-bold {
 		font-weight: bold;
@@ -18,8 +18,8 @@
 			var leaderUserId = $('#change-leader-select-' + groupId).val();
 
 	        $.ajax({
-	            url: '<lams:LAMSURL/>/tool/lalead11/tblmonitoring.do',
-	            data: 'method=changeLeader&userID=' + leaderUserId + "&toolContentID=${leaderselectionToolContentId}",
+	            url: '<lams:LAMSURL/>/tool/lalead11/tblmonitoring/changeLeader.do',
+	            data: 'userID=' + leaderUserId + "&toolContentID=${leaderselectionToolContentId}",
 	            type: 'post',
 	            success: function (json) {
 		            if (json.isSuccessful) {
@@ -110,11 +110,10 @@
 			$('#ira-user-score').html(userScore);
 
 			//load modal dialog content using Ajax
-			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring.do" : "<lams:LAMSURL/>tool/laasse10/tblmonitoring.do";
+			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring/getModalDialogForTeamsTab.do" : "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
 			$('#ira-modal .modal-body').load(
 				url, 
 				{
-					method: "getModalDialogForTeamsTab",
 					toolContentID: "${iraToolContentId}",
 					userID: userId
 				},

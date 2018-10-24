@@ -75,7 +75,7 @@
 <i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="messageArea_Busy"></i>
 <span id="messageArea"></span>
 
-<%@ include file="/common/messages.jsp"%>
+<lams:errors/>
 
 <div id="summariesArea">
 	<%@ include file="/pages/monitoring/parts/summarylist.jsp"%>

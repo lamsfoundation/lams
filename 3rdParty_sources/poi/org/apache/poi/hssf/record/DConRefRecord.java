@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianOutput;
+import org.apache.poi.util.RecordFormatException;
 import org.apache.poi.util.StringUtil;
 
 /**
@@ -90,12 +91,12 @@ public class DConRefRecord extends StandardRecord
     /**
      * The link's path string. This is the <code>rgb</code> field of a
      * <code>XLUnicodeStringNoCch</code>. Therefore it will contain at least one leading special
-     * character (0x01 or 0x02) and probably other ones.<p/>
+     * character (0x01 or 0x02) and probably other ones.<p>
      * @see <A href="http://msdn.microsoft.com/en-us/library/dd923491(office.12).aspx">
      * DConFile [MS-XLS s. 2.5.77]</A> and
      * <A href="http://msdn.microsoft.com/en-us/library/dd950157(office.12).aspx">
      * VirtualPath [MS-XLS s. 2.5.69]</a>
-     * <p/>
+     * <p>
      */
     private byte[] path;
     /**
@@ -129,8 +130,7 @@ public class DConRefRecord extends StandardRecord
         charCount = LittleEndian.getUShort(data, offset);
         offset += LittleEndian.SHORT_SIZE;
         if (charCount < 2)
-            throw new org.apache.poi.hssf.record.RecordFormatException(
-                    "Character count must be >= 2");
+            throw new RecordFormatException("Character count must be >= 2");
 
         charType = LittleEndian.getUByte(data, offset);
         offset += LittleEndian.BYTE_SIZE; //7 bits reserved + 1 bit type

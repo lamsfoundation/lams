@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import java.util.Date;
@@ -29,23 +28,26 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 /**
- * <p>ActionForm which holds the state of the noticeboard form content in the Authoring
- * environment. Stores all values in the session scope.</p>
+ * <p>
+ * ActionForm which holds the state of the noticeboard form content in the Authoring
+ * environment. Stores all values in the session scope.
+ * </p>
  *
- * <p>The validate method does not check whether any of the input from
+ * <p>
+ * The validate method does not check whether any of the input from
  * title, content are empty or not.
  * This is because I have encountered a situation where even though the field is
- * empty, the FCKEditor places a <br/> tag and so the validate method doesnt work.
+ * empty, the FCKEditor places a <br/>
+ * tag and so the validate method doesnt work.
  * However, the validate method checks the length of the file that has been uploaded,
- * the maximum filesize that can be uploaded is a property that is in the UploadFileUtil. </p>
+ * the maximum filesize that can be uploaded is a property that is in the UploadFileUtil.
+ * </p>
  *
  */
-public class NbAuthoringForm extends ActionForm {
+public class NbAuthoringForm {
 
     private static final long serialVersionUID = -8425012664714570196L;
 
@@ -184,7 +186,7 @@ public class NbAuthoringForm extends ActionForm {
     }
 
     /**
-     * 
+     *
      * @return Returns the contentFolderID
      */
     public String getContentFolderID() {
@@ -192,7 +194,7 @@ public class NbAuthoringForm extends ActionForm {
     }
 
     /**
-     * 
+     *
      * @param contentFolderID
      *            The contentFolderID is set
      */
@@ -200,8 +202,7 @@ public class NbAuthoringForm extends ActionForm {
 	this.contentFolderID = contentFolderID;
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset(HttpServletRequest request) {
 	//	this.content = null;
 	//this.title = null;
 	this.method = null;
@@ -211,7 +212,7 @@ public class NbAuthoringForm extends ActionForm {
     /**
      * This method is to prepopulate the form with values from a noticeboard content
      * object. Used in AuthoringStarterAction
-     * 
+     *
      * @param nbContent
      */
     public void populateFormWithNbContentValues(NoticeboardContent nbContent) {
@@ -242,6 +243,5 @@ public class NbAuthoringForm extends ActionForm {
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
     }
-
 
 }

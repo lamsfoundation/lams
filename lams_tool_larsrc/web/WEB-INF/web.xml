@@ -79,25 +79,11 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>action</servlet-name>
-		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-		<init-param>
-			<param-name>config</param-name>
-			<param-value>/WEB-INF/struts-config.xml</param-value>
-		</init-param>
-		<init-param>
-			<param-name>debug</param-name>
-			<param-value>999</param-value>
-		</init-param>
-		<init-param>
-			<param-name>detail</param-name>
-			<param-value>1</param-value>
-		</init-param>
-		<init-param>
-			<param-name>validate</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+				<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet>
@@ -128,7 +114,7 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>action</servlet-name>
+		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 
@@ -148,42 +134,6 @@
 	</servlet-mapping>
 
 	<jsp-config>
-		<!-- ======================================================== -->
-		<!-- Struts Tag Library Descriptors -->
-		<!-- ======================================================== -->
-		<taglib>
-			<taglib-uri>tags-bean</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-html</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-logic</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-tiles</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
-		</taglib>
-
-		<taglib>
-			<taglib-uri>tags-bean-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-html-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-logic-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-tiles-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
-		</taglib>
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
 		<!-- ======================================================== -->

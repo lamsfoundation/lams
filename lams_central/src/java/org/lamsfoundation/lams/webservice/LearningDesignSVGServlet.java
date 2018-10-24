@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,19 +46,20 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class LearningDesignSVGServlet extends HttpServlet {
-
     private static final long serialVersionUID = -1918180868204870617L;
-
     private static Logger log = Logger.getLogger(LearningDesignSVGServlet.class);
 
-    private static IntegrationService integrationService = null;
-
-    private ILearningDesignService learningDesignService = null;
-    
-    private ILessonService lessonService = null;
+    @Autowired
+    private IntegrationService integrationService;
+    @Autowired
+    private ILearningDesignService learningDesignService;
+    @Autowired
+    private ILessonService lessonService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -129,15 +131,13 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	doGet(request, response);
     }
 
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
     @Override
-    public void init() throws ServletException {
-	integrationService = (IntegrationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
-
-	learningDesignService = (ILearningDesignService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("learningDesignService");
-	
-	lessonService = (ILessonService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 }

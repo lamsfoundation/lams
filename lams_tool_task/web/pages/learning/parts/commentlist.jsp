@@ -1,6 +1,7 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/portrait.js"></script>
 
 <c:set var="commentList" value="${itemDTO.comments}" />
 <c:if test="${not empty commentList}">
@@ -17,15 +18,17 @@
 			<div class="col-xs-12">
 				<div class="panel panel-default">
 					<div class="panel-heading-sm panel-title bg-warning">
-						<c:set var="author" value="${comment.createBy.firstName} ${comment.createBy.lastName}" />
-						<c:if test="${empty author}">
-							<c:set var="author">
-								<fmt:message key="label.default.user.name" />
-							</c:set>
+						<c:if test="${not empty comment.createBy.userId}">
+							<lams:Portrait userId="${comment.createBy.userId}"/>&nbsp;
 						</c:if>
-						<div class="user">
-							<c:out value="${author}" escapeXml="true" />
-						</div>
+						<c:choose>
+						<c:when test="${not empty comment.createBy.firstName or not empty comment.createBy.lastName}">
+							<c:out escapeXml="true" value="${comment.createBy.firstName} ${comment.createBy.lastName}"/>
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="label.default.user.name" />
+						</c:otherwise>
+						</c:choose>
 						-
 						<lams:Date value="${comment.createDate}" timeago="true"/>
 					</div>

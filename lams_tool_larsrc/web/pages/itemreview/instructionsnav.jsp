@@ -86,7 +86,7 @@
 				}
 
 				function nextIns(currIns){
-					var nextUrl="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
+					var nextUrl="<c:url value='nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
 					$.ajaxSetup({ cache: true });
 					$('#headerFrame').load(nextUrl);
 				} 
@@ -126,12 +126,12 @@
 								key='label.continue' />" />
 					</c:when>
 					<c:when test="${! reflectOn && runAuto}">
-						<html:link href="#nogo" property="FinishInstruction" styleId="FinishInstruction"
-							onclick="javascript:finishIns()" styleClass="btn btn-sm btn-primary voffset5 pull-right na">
+						<a href="#nogo" name="FinishInstruction" id="FinishInstruction"
+							onclick="javascript:finishIns()" class="btn btn-sm btn-primary voffset5 pull-right na">
 							<span class="nextActivity">
 								<fmt:message key='label.finish' />
 							</span>
-						</html:link>
+						</a>
 					</c:when>
 					<c:otherwise>
 						<input type="button" onClick="javascript:finishIns()" id="FinishInstruction" name="FinishInstruction" 

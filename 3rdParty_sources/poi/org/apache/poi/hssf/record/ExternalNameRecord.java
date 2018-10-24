@@ -47,7 +47,7 @@ public final class ExternalNameRecord extends StandardRecord {
 
 	/**
 	 * 'rgoper' / 'Last received results of the DDE link'
-	 * (seems to be only applicable to DDE links)<br/>
+	 * (seems to be only applicable to DDE links)<br>
 	 * Logically this is a 2-D array, which has been flattened into 1-D array here.
 	 */
 	private Object[] _ddeValues;
@@ -222,7 +222,7 @@ public final class ExternalNameRecord extends StandardRecord {
 		if(field_5_name_definition != null) {
             Ptg[] ptgs = field_5_name_definition.getTokens();
             for (Ptg ptg : ptgs) {
-                sb.append("    .namedef = ").append(ptg.toString()).append(ptg.getRVAType()).append("\n");
+                sb.append("    .namedef = ").append(ptg).append(ptg.getRVAType()).append("\n");
             }
 		}
 		sb.append("[/EXTERNALNAME]\n");

@@ -33,7 +33,7 @@
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 </c:if>
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/uploadImageLearning.js'/>"></script>
+<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/uploadImageLearning.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -74,7 +74,7 @@
 			<%--Voting area--------------%>
 		
 			<c:if test="${imageGallery.allowVote && isImageSelected}">
-				<html:form action="learning/vote" method="post" styleId="voting-form">
+				<form:form action="vote.do" method="post" modelAttribute="imageRatingForm" id="voting-form">
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 					<input type="hidden" name="imageUid" value="${sessionMap.currentImage.uid}"/>
 								
@@ -94,7 +94,7 @@
 							</c:choose>
 						</label>
 					</p>
-				</html:form>							
+				</form:form>							
 			</c:if>
 			
 			<%--"Check for new", "Add new image" and "Delete" buttons---------------%>
@@ -106,7 +106,7 @@
 					</button>
 								
 					<c:if test="${not finishedLock}">
-						<button onclick="javascript:newImageInit('<html:rewrite page='/authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
+						<button onclick="javascript:newImageInit('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
 								class="btn btn-default btn-sm" id="add-new-image-button">  
 							<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
 						</button>

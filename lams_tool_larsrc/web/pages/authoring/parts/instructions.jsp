@@ -3,6 +3,7 @@
 
 <div id="instructionArea">
 	<script></script> <!--  Do not remove empty scripts. They are stopping the form tags from being stripped by the AddInstruction call. http://forum.jquery.com/topic/is-jquery-stripping-form-tags -->
+	<form></form>
 	<form id="instructionForm">
 		<input type="hidden" name="instructionCount" id="instructionCount" value="${listSize}" class="form-control"/>
 
@@ -15,8 +16,10 @@
 						${status.index+1}
 					</td>
 					<td>
-						<lams:STRUTS-textarea property="instructionItemDesc${status.index}" styleClass="form-control"
-							styleId="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" />
+						<lams:textarea name="instructionItemDesc${status.index}" class="form-control"
+									   id="instructionItemDesc${status.index}" rows="3" cols="82">
+							<c:out value="${item}" />
+						</lams:textarea>
 					</td>
 
 					<td class="arrows" style="width:5%">
@@ -40,7 +43,7 @@
 		
 		<button onclick="addInstruction(); return false;" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
-		</a>
+		</button>
 
 	</form>
 </div>

@@ -27,28 +27,28 @@
 	<div id="actionButtons" class="pull-right">
 		<c:choose>
 		<c:when test="${fileInfo.removed and empty updateMode}">
-			<html:link href="javascript:restoreLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" styleClass="btn btn-xs btn-default loffset10">
+			<a href="javascript:restoreLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" class="btn btn-xs btn-default loffset10">
 				<i class="fa fa-life-saver" title="<fmt:message key="label.monitoring.original.learner.file.restore" />"></i> <span class="hidden-xs"><fmt:message key="label.monitoring.original.learner.file.restore" /></span>
-			</html:link>
+			</a>
 		</c:when>
 	
 		<c:otherwise>
 			<c:set var="viewURL">
-				<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=false" />
+				<lams:WebAppURL/>download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=false
 			</c:set>
-			<html:link href="javascript:launchInstructionsPopup('${viewURL}')" styleClass="btn btn-xs btn-default">
+			<a href="javascript:launchInstructionsPopup('${viewURL}')" class="btn btn-xs btn-default">
 				<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i> <span class="hidden-xs"><fmt:message key="label.view" /></span>
-			</html:link>
+			</a>
 			<c:set var="downloadURL">
-				<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=true" />
+				<lams:WebAppURL/>download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=true
 			</c:set>
-			<html:link href="${downloadURL}" styleClass="btn btn-xs btn-default loffset10">
+			<a href="${downloadURL}" class="btn btn-xs btn-default loffset10">
 				<i class="fa fa-download" title="<fmt:message key="label.download" />"></i> <span class="hidden-xs"><fmt:message key="label.download" /></span>
-			</html:link>
+			</a>
 			<c:if test="${empty updateMode}">
-				<html:link href="javascript:removeLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" styleClass="btn btn-xs btn-danger loffset10">
+				<a href="javascript:removeLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" class="btn btn-xs btn-danger loffset10">
 					<i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"><fmt:message key="label.monitoring.original.learner.file.delete" /></span>
-				</html:link>
+				</a>
 			</c:if>
 		</c:otherwise>
 		</c:choose>

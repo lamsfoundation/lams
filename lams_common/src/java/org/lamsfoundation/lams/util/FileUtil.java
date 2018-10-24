@@ -694,6 +694,7 @@ public class FileUtil {
 	XStream conversionXml = xStream != null ? xStream : new XStream(new StaxDriver());
 	// allow parsing all classes
 	conversionXml.addPermission(AnyTypePermission.ANY);
+	conversionXml.ignoreUnknownElements();
 	ConversionException finalException = null;
 	String lastFieldRemoved = "";
 	ToolContentVersionFilter contentFilter = null;
@@ -728,6 +729,13 @@ public class FileUtil {
 		    String message = ce.getMessage();
 		    String classname = FileUtil.extractValue(message, "required-type");
 		    String fieldname = FileUtil.extractValue(message, "message");
+		    /*
+		     * alternative for field extraction
+		     * String path = FileUtil.extractValue(message, "path");
+		     * int classFieldDelimiter = path.indexOf('/', 1);
+		     * String classname = path.substring(1, classFieldDelimiter);
+		     * String fieldname = path.substring(classFieldDelimiter + 1);
+		     */
 		    if ((fieldname == null) || fieldname.equals("")
 			    || lastFieldRemoved.equals(classname + "." + fieldname)) {
 			// can't retry, so get out of here!
@@ -769,7 +777,7 @@ public class FileUtil {
 		startIndex = message.indexOf(":", startIndex + 1);
 		if ((startIndex > -1) && ((startIndex + 2) < message.length())) {
 		    startIndex = startIndex + 2;
-		    int endIndex = message.indexOf(" ", startIndex);
+		    int endIndex = Math.min(message.indexOf(" ", startIndex), message.indexOf("\n", startIndex));
 		    String value = message.substring(startIndex, endIndex);
 		    return value.trim();
 		}

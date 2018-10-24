@@ -53,7 +53,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class LocaleFilter extends OncePerRequestFilter {
 
-    public static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
+    public static final String PREFERRED_LOCALE_KEY = "preferredLocale";
     /** Key used in request to get the required direction. Used by the HTML tag */
     public static final String DIRECTION = "page_direction";
 
@@ -85,12 +85,12 @@ public class LocaleFilter extends OncePerRequestFilter {
 	}
 	// 2. get default locale from client's browser.
 	// 3. get server's default locale
-	// 4. fall back to "en_AU" 
+	// 4. fall back to "en_AU"
 	if (preferredLocale == null) {
 	    Locale browserLocale = request.getLocale();
 	    preferredLocale = LanguageUtil.getSupportedLocaleByNameOrLanguageCode(browserLocale);
 	}
-	
+
 	if (direction == null) {
 	    direction = LanguageUtil.getDefaultDirection();
 	}

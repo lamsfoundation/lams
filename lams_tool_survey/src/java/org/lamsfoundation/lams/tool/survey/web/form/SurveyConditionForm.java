@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.web.form;
 
-import org.apache.struts.util.LabelValueBean;
+import java.util.Map;
+
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
-import org.lamsfoundation.lams.web.form.TextSearchActionForm;
+import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**
  * A text search form with additional parameters for Survey needs.
@@ -35,11 +35,11 @@ import org.lamsfoundation.lams.web.form.TextSearchActionForm;
  * @author Marcin Cieslak
  *
  */
-public class SurveyConditionForm extends TextSearchActionForm {
+public class SurveyConditionForm extends TextSearchForm {
     /**
      * Names of the questions that could be selected by a user.
      */
-    private LabelValueBean[] possibleItems;
+    private Map<String, String> possibleItems;
     /**
      * Numbers of questions that were selected by a user.
      */
@@ -71,11 +71,11 @@ public class SurveyConditionForm extends TextSearchActionForm {
 	setSelectedItems(selectedItems);
     }
 
-    public LabelValueBean[] getPossibleItems() {
+    public Map<String, String> getPossibleItems() {
 	return possibleItems;
     }
 
-    public void setPossibleItems(LabelValueBean[] possibleItems) {
+    public void setPossibleItems(Map<String, String> possibleItems) {
 	this.possibleItems = possibleItems;
     }
 

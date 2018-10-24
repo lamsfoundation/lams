@@ -23,7 +23,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?method=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -59,7 +59,7 @@
 		        output: '{startRow} to {endRow} ({totalRows})',
 		        cssPageDisplay: '.pagedisplay',
 		        cssPageSize: '.pagesize',
-				ajaxUrl : "<c:url value='/monitoring.do'/>?method=getUsers&sessionMapID=${sessionMapID}&toolContentID=${param.toolContentID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
+				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&toolContentID=${param.toolContentID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -122,23 +122,23 @@
 	}
 
 	function viewMark(userId, sessionId) {
-		var act = "<c:url value="/monitoring.do"/>";
-		launchPopup(act + "?method=listMark&userID=" + userId
+		var act = "<c:url value="/monitoring/listMark.do"/>";
+		launchPopup(act + "?userID=" + userId
 				+ "&toolSessionID=" + sessionId, "mark");
 	}
 	function viewAllMarks(sessionId) {
-		var act = "<c:url value="/monitoring.do"/>";
-		launchPopup(act + "?method=listAllMarks&toolSessionID=" + sessionId,
+		var act = "<c:url value="/monitoring/listAllMarks.do"/>";
+		launchPopup(act + "?toolSessionID=" + sessionId,
 				"mark");
 	}
+
 
 	function releaseMarks(sessionId) {
 		$("#messageArea_Busy").show();
 		
 		$.ajax({
-			url: "<c:url value="/monitoring.do"/>",
+			url: "<c:url value="/monitoring/releaseMarks.do"/>",
 			data: {
-				method: "releaseMarks",
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
 			},
@@ -195,8 +195,7 @@
 			</c:if>
 	</lams:TSTable>
 	
-	<P style="display: inline">
-		
+	<P style="display: inline"> 
 		<div id="release-marks-info-${sessionDto.sessionID}" class="loffset5 group-mark-release-label"
 				<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
 			<span class="label label-success">
@@ -204,24 +203,21 @@
 				<fmt:message key="label.marks.released" />
 			</span>
 		</div>
-	
-		<html:button property="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
-					 styleClass="btn btn-default loffset5 voffset10" >
+		
+		<button name="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
+					class="btn btn-default loffset5 voffset10" >
 			<fmt:message key="label.monitoring.viewAllMarks.button" />
-		</html:button>
+		</button>
 		<c:if test="${!sessionDto.marksReleased}">
-			<html:button property="releaseMarks" styleId="release-marks-${sessionDto.sessionID}" onclick="releaseMarks(${sessionDto.sessionID})"
-						 styleClass="btn btn-default loffset5 voffset10" >
+			<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
+					 class="btn btn-default loffset5 voffset10" >
 				<fmt:message key="label.monitoring.releaseMarks.button" />
-			</html:button>
+			</button>
 		</c:if>
-		<html:form action="/monitoring" style="display:inline">
-			<html:hidden property="method" value="downloadMarks" />
-			<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
-			<html:submit property="downloadMarks" styleClass="btn btn-default loffset5 voffset10" >
-				<fmt:message key="label.monitoring.downloadMarks.button" />
-			</html:submit>
-		</html:form>
+		<form action="downloadMarks.do" method="post" style="display:inline">
+			<input type="hidden" name="toolSessionID" value="${sessionDto.sessionID}" />
+			<input type="submit" name="downloadMarks" value="<fmt:message key="label.monitoring.downloadMarks.button" />" class="btn btn-default loffset5 voffset10" />
+		</form>
 	</P>
 		
 	<c:if test="${isGroupedActivity}">

@@ -37,7 +37,6 @@ public class LearningForm extends WikiPageForm {
     String title;
     String instructions;
 
-    String dispatch;
     Long toolSessionID;
     String mode;
 
@@ -49,14 +48,6 @@ public class LearningForm extends WikiPageForm {
 
     public void setMode(String mode) {
 	this.mode = mode;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public Long getToolSessionID() {

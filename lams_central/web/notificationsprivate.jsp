@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
@@ -32,9 +31,8 @@
 	function markPrivateNotificationAsRead(subscriptionUid){
 		$.ajax({
 			cache : false,
-			url : LAMS_URL + "notification.do",
+			url : LAMS_URL + "notification/markNotificationAsRead.do",
 			data : {
-				'method' 		  : 'markNotificationAsRead',
 				'subscriptionUid' : subscriptionUid
 			},
 			success : function() {
@@ -64,10 +62,9 @@
 													 .appendTo(headerRow);
 		$.ajax({
 			cache : false,
-			url : LAMS_URL + "notification.do",
+			url : LAMS_URL + "notification/getNotificationSubscriptions.do",
 			dataType : 'json',
 			data : {
-				'method' : 'getNotificationSubscriptions',
 				'limit'  : 30
 			},
 			success : function(notifications) {

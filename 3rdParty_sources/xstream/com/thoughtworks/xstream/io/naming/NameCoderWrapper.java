@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -26,27 +26,35 @@ public class NameCoderWrapper implements NameCoder {
      * @param inner the wrapped NameCoder
      * @since 1.4
      */
-    public NameCoderWrapper(final NameCoder inner) {
-        wrapped = inner;
+    public NameCoderWrapper(NameCoder inner) {
+        this.wrapped = inner;
     }
-
-    @Override
-    public String decodeAttribute(final String attributeName) {
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String decodeAttribute(String attributeName) {
         return wrapped.decodeAttribute(attributeName);
     }
 
-    @Override
-    public String decodeNode(final String nodeName) {
+    /**
+     * {@inheritDoc}
+     */
+    public String decodeNode(String nodeName) {
         return wrapped.decodeNode(nodeName);
     }
 
-    @Override
-    public String encodeAttribute(final String name) {
+    /**
+     * {@inheritDoc}
+     */
+    public String encodeAttribute(String name) {
         return wrapped.encodeAttribute(name);
     }
 
-    @Override
-    public String encodeNode(final String name) {
+    /**
+     * {@inheritDoc}
+     */
+    public String encodeNode(String name) {
         return wrapped.encodeNode(name);
     }
 

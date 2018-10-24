@@ -25,6 +25,7 @@ import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.LittleEndianByteArrayOutputStream;
 import org.apache.poi.util.LittleEndianInputStream;
+import org.apache.poi.util.RecordFormatException;
 
 /**
  * OBJRECORD (0x005D)<p>
@@ -140,7 +141,7 @@ public final class ObjRecord extends Record implements Cloneable {
 		sb.append("[OBJ]\n");
 		if(subrecords != null) {	// there are special cases where this can be, see comments in constructor above
 			for (final SubRecord record : subrecords) {
-				sb.append("SUBRECORD: ").append(record.toString());
+				sb.append("SUBRECORD: ").append(record);
 			}
 		}
 		sb.append("[/OBJ]\n");

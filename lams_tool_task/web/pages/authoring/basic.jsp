@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
@@ -90,20 +89,20 @@
 <!-- Basic Tab Content -->
 <div class="form-group">
     <label for="taskList"><fmt:message key="label.authoring.basic.title"/></label>
-    <html:text property="taskList.title" styleClass="form-control"></html:text>
+    <form:input path="taskList.title" cssClass="form-control"></form:input>
 </div>
 <div class="form-group">
     <label for="taskList.instructions"><fmt:message key="label.authoring.basic.description" /></label>
-    <lams:CKEditor id="taskList.instructions" value="${formBean.taskList.instructions}" contentFolderID="${formBean.contentFolderID}">
+    <lams:CKEditor id="taskList.instructions" value="${taskListForm.taskList.instructions}" contentFolderID="${taskListForm.contentFolderID}">
     </lams:CKEditor>
 </div>
 
 <div id="taskListListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${taskListForm.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
-<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="btn btn-default btn-sm">
+<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newItemInit.do?sessionMapID=${taskListForm.sessionMapID}');" class="btn btn-default btn-sm">
 	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.task" />
 </a> 
 

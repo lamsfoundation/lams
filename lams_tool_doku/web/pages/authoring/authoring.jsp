@@ -28,13 +28,12 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-	<html:hidden property="dokumaran.contentId" />
-	<html:hidden property="mode" value="${mode}"/>
-	<html:hidden property="sessionMapID" />
-	<html:hidden property="contentFolderID" />
-	<html:hidden property="currentTab" styleId="currentTab" />
+<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
+	<form:hidden path="dokumaran.contentId" />
+	<form:hidden path="mode" value="${mode}"/>
+	<form:hidden path="sessionMapID" />
+	<form:hidden path="contentFolderID" />
+	<form:hidden path="currentTab" styleId="currentTab" />
 
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -45,7 +44,7 @@
 		</lams:Tabs>    
 
 		<lams:TabBodyArea>
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 		   
 		    <!--  Set up tabs  -->
 		    <lams:TabBodys>
@@ -66,14 +65,14 @@
 				accessMode="author"
 			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-				toolSignature="<%=DokumaranConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.dokumaran.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-				 contentFolderID="${formBean.contentFolderID}" />
+				toolSignature="<%=DokumaranConstants.TOOL_SIGNATURE%>" toolContentID="${authoringForm.dokumaran.contentId}" 
+				 customiseSessionID="${authoringForm.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+				 contentFolderID="${authoringForm.contentFolderID}" />
 		</lams:TabBodyArea>
 	
 		<div id="footer"></div>
 
 	</lams:Page>
-</html:form>
+</form:form>
 </body>
 </lams:html>

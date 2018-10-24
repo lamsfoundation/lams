@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2015 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -12,58 +12,64 @@
 package com.thoughtworks.xstream.mapper;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.thoughtworks.xstream.core.util.Primitives;
 
-
 /**
  * Mapper that allows a fully qualified class name to be replaced with an alias.
- * 
+ *
  * @author Joe Walnes
  * @author J&ouml;rg Schaible
  */
 public class ClassAliasingMapper extends MapperWrapper {
 
-    private final Map<Class<?>, String> typeToName = new HashMap<Class<?>, String>();
-    private final Map<String, String> classToName = new HashMap<String, String>();
-    private transient Map<String, String> nameToType = new HashMap<String, String>();
+    private final Map typeToName = new HashMap();
+    private final Map classToName = new HashMap();
+    private transient Map nameToType = new HashMap();
 
-    public ClassAliasingMapper(final Mapper wrapped) {
+    public ClassAliasingMapper(Mapper wrapped) {
         super(wrapped);
     }
 
-    public void addClassAlias(final String name, final Class<?> type) {
+    public void addClassAlias(String name, Class type) {
         nameToType.put(name, type.getName());
         classToName.put(type.getName(), name);
     }
 
-    public void addTypeAlias(final String name, final Class<?> type) {
+    /**
+     * @deprecated As of 1.3, method was a leftover of an old implementation
+     */
+    public void addClassAttributeAlias(String name, Class type) {
+        addClassAlias(name, type);
+    }
+
+    public void addTypeAlias(String name, Class type) {
         nameToType.put(name, type.getName());
         typeToName.put(type, name);
     }
 
-    @Override
-    public String serializedClass(final Class<?> type) {
-        final String alias = classToName.get(type.getName());
+    public String serializedClass(Class type) {
+        String alias = (String) classToName.get(type.getName());
         if (alias != null) {
             return alias;
         } else {
-            for (final Class<?> compatibleType : typeToName.keySet()) {
+            for (final Iterator iter = typeToName.keySet().iterator(); iter.hasNext();) {
+                final Class compatibleType = (Class)iter.next();
                 if (compatibleType.isAssignableFrom(type)) {
-                    return typeToName.get(compatibleType);
+                    return (String)typeToName.get(compatibleType);
                 }
             }
             return super.serializedClass(type);
         }
     }
 
-    @Override
-    public Class<?> realClass(String elementName) {
-        final String mappedName = nameToType.get(elementName);
+    public Class realClass(String elementName) {
+        String mappedName = (String) nameToType.get(elementName);
 
         if (mappedName != null) {
-            final Class<?> type = Primitives.primitiveType(mappedName);
+            Class type = Primitives.primitiveType(mappedName);
             if (type != null) {
                 return type;
             }
@@ -73,20 +79,28 @@ public class ClassAliasingMapper extends MapperWrapper {
         return super.realClass(elementName);
     }
 
-    public boolean itemTypeAsAttribute(final Class<?> clazz) {
-        return classToName.containsKey(clazz);
+    /**
+     * @deprecated As of 1.4.9
+     */
+    public boolean itemTypeAsAttribute(Class clazz) {
+        return classToName.containsKey(clazz.getName());
     }
 
-    public boolean aliasIsAttribute(final String name) {
+    /**
+     * @deprecated As of 1.4.9
+     */
+    public boolean aliasIsAttribute(String name) {
         return nameToType.containsKey(name);
     }
-
+    
     private Object readResolve() {
-        nameToType = new HashMap<String, String>();
-        for (final String type : classToName.keySet()) {
+        nameToType = new HashMap();
+        for (final Iterator iter = classToName.keySet().iterator(); iter.hasNext();) {
+            final Object type = iter.next();
             nameToType.put(classToName.get(type), type);
         }
-        for (final Class<?> type : typeToName.keySet()) {
+        for (final Iterator iter = typeToName.keySet().iterator(); iter.hasNext();) {
+            final Class type = (Class)iter.next();
             nameToType.put(typeToName.get(type), type.getName());
         }
         return this;

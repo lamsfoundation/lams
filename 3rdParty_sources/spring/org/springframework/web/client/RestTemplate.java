@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -583,7 +583,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 	public <T> ResponseEntity<T> exchange(RequestEntity<?> requestEntity, Class<T> responseType)
 			throws RestClientException {
 
-		Assert.notNull(requestEntity, "'requestEntity' must not be null");
+		Assert.notNull(requestEntity, "RequestEntity must not be null");
 
 		RequestCallback requestCallback = httpEntityCallback(requestEntity, responseType);
 		ResponseExtractor<ResponseEntity<T>> responseExtractor = responseEntityExtractor(responseType);
@@ -594,7 +594,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 	public <T> ResponseEntity<T> exchange(RequestEntity<?> requestEntity, ParameterizedTypeReference<T> responseType)
 			throws RestClientException {
 
-		Assert.notNull(requestEntity, "'requestEntity' must not be null");
+		Assert.notNull(requestEntity, "RequestEntity must not be null");
 
 		Type type = responseType.getType();
 		RequestCallback requestCallback = httpEntityCallback(requestEntity, type);
@@ -661,7 +661,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 		catch (IOException ex) {
 			String resource = url.toString();
 			String query = url.getRawQuery();
-			resource = (query != null ? resource.substring(0, resource.indexOf(query) - 1) : resource);
+			resource = (query != null ? resource.substring(0, resource.indexOf('?')) : resource);
 			throw new ResourceAccessException("I/O error on " + method.name() +
 					" request for \"" + resource + "\": " + ex.getMessage(), ex);
 		}

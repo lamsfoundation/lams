@@ -22,12 +22,10 @@
  */
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class OrgManageForm extends ActionForm {
+public class OrgManageForm {
 
     private static final long serialVersionUID = -3960695533993640297L;
 

@@ -20,16 +20,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.web.forms;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *
  */
-public class MindmapPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class MindmapPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     String instructions;
     String contentFolderID;
 

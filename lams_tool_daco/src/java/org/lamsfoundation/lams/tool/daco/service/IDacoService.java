@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.daco.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
@@ -36,6 +35,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Marcin Cieslak
@@ -69,7 +69,7 @@ public interface IDacoService {
      * @param file
      * @throws UploadDacoFileException
      */
-    void uploadDacoAnswerFile(DacoAnswer answer, FormFile file) throws UploadDacoFileException;
+    void uploadDacoAnswerFile(DacoAnswer answer, MultipartFile file) throws UploadDacoFileException;
 
     // ********** for user methods *************
     /**
@@ -93,7 +93,6 @@ public interface IDacoService {
      * @return
      */
     DacoUser getUserByUserIdAndSessionId(Long long1, Long sessionId);
-
 
     /**
      * Save or update daco into database.
@@ -307,10 +306,10 @@ public interface IDacoService {
     int getRecordNum(Long userID, Long sessionId);
 
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);

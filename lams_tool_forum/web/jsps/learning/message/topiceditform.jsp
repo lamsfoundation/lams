@@ -2,8 +2,9 @@
 
 <div class="form-group">
     <label><fmt:message key="message.label.subject" />&nbsp;</label>
-	<html:text size="50" tabindex="1" property="message.subject" maxlength="60"/> &nbsp;
-	<html:errors property="message.subject" />
+    <form:input size="50" tabindex="1" value="${message.subject}" path="message.subject" maxlength="60"/> &nbsp;
+	<form:errors path="message.subject"/>
+	<lams:errors path="message.subject"/>
 </div>
 
 <div class="form-group">
@@ -22,10 +23,9 @@
 </c:if>
 
 <div class="btn-group-xs voffset5 pull-right">
-<html:button property="goback" styleId="cancelButton" onclick="javascript:cancelEdit();" styleClass="btn btn-default">
+<button name="goback" id="cancelButton" onclick="javascript:cancelEdit();" class="btn btn-default">
 	<fmt:message key="button.cancel" />
-</html:button>
-<html:submit styleClass="btn btn-default" styleId="submitButton">
-	<fmt:message key="button.submit" />
-</html:submit>
+</button>
+
+<input type="submit" class="btn btn-default" id="submitButton" value="<fmt:message key="button.submit" />"/>
 </div>

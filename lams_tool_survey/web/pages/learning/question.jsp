@@ -7,15 +7,7 @@
 		</c:if>
 
 		<c:out value="${question.description}" escapeXml="false" />
-
-		<logic:messagesPresent property="questionError${question.uid}">
-			<lams:Alert id="error" type="danger" close="false">
-				<html:messages id="error" property="questionError${question.uid}">
-					<c:out value="${error}" escapeXml="false" />
-				</html:messages>
-			</lams:Alert>
-		</logic:messagesPresent>
-
+		<lams:errors path="questionError${question.uid}"/>
 
 	</div>
 	<div class="sbox-body">
@@ -77,6 +69,5 @@
 	</div>
 
 </div>
-
 
 

@@ -29,9 +29,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -40,18 +38,18 @@ import org.apache.struts.upload.FormFile;
  *
  * @author Marcin Cieslak
  */
-public class RecordForm extends ActionForm {
+public class RecordForm {
 
     private static Logger logger = Logger.getLogger(RecordForm.class.getName());
     private String sessionMapID;
 
     private List<String> answer;
-    private List<FormFile> file;
+    private List<MultipartFile> file;
     private int displayedRecordNumber = 1;
 
     public void setAnswer(int number, String answer) {
 	if (this.answer == null) {
-	    this.answer = new ArrayList<String>();
+	    this.answer = new ArrayList<>();
 	}
 	while (number >= this.answer.size()) {
 	    this.answer.add(null);
@@ -66,10 +64,10 @@ public class RecordForm extends ActionForm {
 	return answer.get(number);
     }
 
-    public void setFile(int number, FormFile file) {
-	if (file.getFileSize() > 0) {
+    public void setFile(int number, MultipartFile file) {
+	if (file.getSize() > 0) {
 	    if (this.file == null) {
-		this.file = new ArrayList<FormFile>();
+		this.file = new ArrayList<>();
 	    }
 	    while (number >= this.file.size()) {
 		this.file.add(null);
@@ -78,15 +76,22 @@ public class RecordForm extends ActionForm {
 	}
     }
 
-    public FormFile getFile(int number) {
+    public MultipartFile getFile(int number) {
 	if (file == null || number >= file.size()) {
 	    return null;
 	}
 	return file.get(number);
     }
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public List<MultipartFile> getFile() {
+	return file;
+    }
+
+    public void setFile(List<MultipartFile> file) {
+	this.file = file;
+    }
+
+    public void reset(HttpServletRequest request) {
 	answer = null;
 	file = null;
 	displayedRecordNumber = 1;
@@ -110,5 +115,13 @@ public class RecordForm extends ActionForm {
 
     public int getFileCount() {
 	return file.size();
+    }
+
+    public List<String> getAnswer() {
+	return answer;
+    }
+
+    public void setAnswer(List<String> answer) {
+	this.answer = answer;
     }
 }

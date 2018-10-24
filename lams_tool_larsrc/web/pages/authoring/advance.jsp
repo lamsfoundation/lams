@@ -1,23 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- Advance Tab Content -->
 
 <lams:SimplePanel titleKey="label.resource.options">
 
 	<div class="checkbox">
-	<label for="runAuto"><html:checkbox property="resource.runAuto" styleId="runAuto" />
+	<label for="runAuto"><form:checkbox path="resource.runAuto" id="runAuto" />
 	<fmt:message key="label.authoring.advance.run.content.auto" /></label>
 	</div>
 	
 	<div class="form-group">
-	<html:select property="resource.miniViewResourceNumber" styleClass="form-control form-control-inline input-sm"
-		styleId="viewNumList" style="width:100px">
+	<form:select path="resource.miniViewResourceNumber" cssClass="form-control form-control-inline input-sm"
+		id="viewNumList" style="width:100px">
 		<c:forEach begin="1" end="${fn:length(resourceList)}"
 			varStatus="status">
 			<c:choose>
 				<c:when
-					test="${formBean.resource.miniViewResourceNumber == status.index}">
+					test="${authoringForm.resource.miniViewResourceNumber == status.index}">
 					<option value="${status.index}" selected="true">
 						${status.index}
 					</option>
@@ -29,18 +28,18 @@
 				</c:otherwise>
 			</c:choose>
 		</c:forEach>
-	</html:select>
+	</form:select>
 	<label for="miniViewResourceNumber">&nbsp;<fmt:message key="label.authoring.advance.mini.number.resources.view" /></label>
 	</div>
 	
 	<div class="checkbox">
-	<label for="allowAddUrls"><html:checkbox property="resource.allowAddUrls" styleId="allowAddUrls"/>
+	<label for="allowAddUrls"><form:checkbox path="resource.allowAddUrls" id="allowAddUrls"/>
 	<fmt:message key="label.authoring.advance.allow.learner.add.urls" />
 	</label>
 	</div>
 	
 	<div class="checkbox">
-	<label for="allowAddFiles"><html:checkbox property="resource.allowAddFiles" styleId="allowAddFiles"/>
+	<label for="allowAddFiles"><form:checkbox path="resource.allowAddFiles" id="allowAddFiles"/>
 	<fmt:message key="label.authoring.advance.allow.learner.add.files" />
 	</label>
 	</div>
@@ -51,37 +50,37 @@
 
 	<div class="checkbox">
 	<label for="notifyTeachersOnAssigmentSumbit">
-	<html:checkbox property="resource.notifyTeachersOnAssigmentSumbit" styleId="notifyTeachersOnAssigmentSumbit"/>
+	<form:checkbox path="resource.notifyTeachersOnAssigmentSumbit" id="notifyTeachersOnAssigmentSumbit"/>
 	<fmt:message key="label.authoring.advanced.notify.onassigmentsubmit" />
 	</label>
 	</div>
 	
 	<div class="checkbox">
 	<label for="notifyTeachersOnFileUpload">
-	<html:checkbox property="resource.notifyTeachersOnFileUpload" styleId="notifyTeachersOnFileUpload"/>
+	<form:checkbox path="resource.notifyTeachersOnFileUpload" id="notifyTeachersOnFileUpload"/>
 	<fmt:message key="label.authoring.advanced.notify.onfileupload" />
 	</label>
 	</div>
 	
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.resource.contentId}" />
+<lams:OutcomeAuthor toolContentId="${authoringForm.resource.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 
 	<div class="checkbox">
-	<label for="lockWhenFinished"><html:checkbox property="resource.lockWhenFinished" styleId="lockWhenFinished" />
+	<label for="lockWhenFinished"><form:checkbox path="resource.lockWhenFinished" id="lockWhenFinished" />
 	<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
 	</div>
 	
 	<div class="checkbox">
-	<label for="reflectOn"><html:checkbox property="resource.reflectOnActivity" styleId="reflectOn"/>
+	<label for="reflectOn"><form:checkbox path="resource.reflectOnActivity" id="reflectOn"/>
 	<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
 	</div>
 	
 	<div class="form-group">
-	<html:textarea property="resource.reflectInstructions" styleClass="form-control" styleId="reflectInstructions" rows="3" />
+	<form:textarea path="resource.reflectInstructions" cssClass="form-control" id="reflectInstructions" rows="3" />
 	</div>
 	
 </lams:SimplePanel>

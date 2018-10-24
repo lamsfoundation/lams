@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/rsrccommon.js"></script>
 
 	<script type="text/javascript">
 	   <%-- used by rsrcresourceitem.js --%>

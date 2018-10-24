@@ -27,9 +27,8 @@ function initLessonTab(){
 	tree.setDynamicLoad(function(node, callback){
 		// load subfolder contents
 		$.ajax({
-			url : LAMS_URL + 'home.do',
+			url : LAMS_URL + 'home/getFolderContents.do',
 			data : {
-				'method' : 'getFolderContents',
 				'folderID' : node.data.folderID
 			},
 			cache : false,
@@ -406,9 +405,8 @@ function previewLesson(){
 	var previewButton = $('#previewButton').button('loading');
 	// initialize, create and enter the preview lesson
 	$.ajax({
-		url : LAMS_URL + 'monitoring/monitoring.do',
+		url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 		data : {
-			'method' : 'initializeLesson',
 			'learningDesignID' : ldNode.data.learningDesignId,
 			'copyType' : 3,
 			'lessonName' : LABEL_PREVIEW_LESSON_DEFAULT_TITLE
@@ -423,16 +421,15 @@ function previewLesson(){
 			}
 			
 			$.ajax({
-				url : LAMS_URL + 'monitoring/monitoring.do',
+				url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 				data : {
-					'method' : 'startPreviewLesson',
 					'lessonID' : lessonID
 				},
 				cache : false,
 				dataType : 'text',
 				success : function() {
 					// open preview pop up window
-					window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
+					window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID,'Preview',
 								'width=' + popupWidth + ',height=' + popupHeight + ',resizable,status=yes');
 					previewButton.button('reset');
 				}
@@ -448,11 +445,10 @@ function loadLearningDesignSVG(ldId) {
 	
 	$.ajax({
 		dataType : 'text',
-		url : LAMS_URL + 'home.do',
+		url : LAMS_URL + 'home/getLearningDesignThumbnail.do',
 		async : false,
 		cache : false,
 		data : {
-			'method'    : 'getLearningDesignThumbnail',
 			'ldId'      : ldId,
 			'_t'		: new Date().getTime()
 			
@@ -495,7 +491,7 @@ function loadLearningDesignSVG(ldId) {
 				// load the image again, avoid caching
 				loadLearningDesignSVG(ldId);
 			}).attr('src', LAMS_URL 
-						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+						   + 'authoring/generateSVG.do?selectable=false&learningDesignID='
 						   + ldId);
 		}
 	});

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
@@ -58,14 +57,8 @@ div#errorArea {
 		<fmt:message key="label.questions.file.title" />
 	</c:set>
 	<lams:Page type="admin" title="${title}">
-
-			<logic:messagesPresent>
-				<lams:Alert id="errorMessages" type="danger" close="false">
-				        <html:messages id="error">
-				            <c:out value="${error}" escapeXml="false"/><br/>
-				        </html:messages>
-				</lams:Alert>
-			</logic:messagesPresent>
+			
+		<lams:errors/>				
 
 			<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post" onsubmit="return verifyAndSubmit();">
 				<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 

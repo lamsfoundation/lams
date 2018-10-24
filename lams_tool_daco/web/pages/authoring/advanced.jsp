@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script type="text/javascript">
 	function turnOnReflect(){
@@ -13,53 +12,53 @@
 <div class="form-group form-inline">
 <!-- Minimum number of records learner must provide -->
 <label for="daco.minRecords"><fmt:message key="label.common.min" /></label> 
-<html:select property="daco.minRecords" styleClass="roffset5 form-control">
-	<html:option value="0">
+<form:select path="daco.minRecords" cssClass="roffset5 form-control">
+	<form:option value="0">
 		<fmt:message key="label.authoring.advanced.record.nolimit" />
-	</html:option>
+	</form:option>
 	<c:forEach begin="1" end="50" var="index">
-		<html:option value="${index}">${index}</html:option>
+		<form:option value="${index}">${index}</form:option>
 	</c:forEach>
-</html:select>
+</form:select>
 <label for="maxRecords" class="loffset10"> <fmt:message key="label.common.max" /> </label> 
 <!-- Maximum number of records learner must provide -->
-<html:select
-	property="daco.maxRecords" styleClass="form-control">
-	<html:option value="0">
+<form:select
+	path="daco.maxRecords" cssClass="form-control">
+	<form:option value="0">
 		<fmt:message key="label.authoring.advanced.record.nolimit" />
-	</html:option>
+	</form:option>
 	<c:forEach begin="1" end="50" var="index">
-		<html:option value="${index}">${index}</html:option>
+		<form:option value="${index}">${index}</form:option>
 	</c:forEach>
-</html:select>
+</form:select>
 </div>
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.notifications">
 <div class="checkbox">
-<label for="notifyTeachersOnLearnerEntry"><html:checkbox property="daco.notifyTeachersOnLearnerEntry" styleId="notifyTeachersOnLearnerEntry" />
+<label for="notifyTeachersOnLearnerEntry"><form:checkbox path="daco.notifyTeachersOnLearnerEntry" id="notifyTeachersOnLearnerEntry" />
 <fmt:message key="label.authoring.advanced.notify.onlearnerentry" /></label>
 </div>
 
 <div class="checkbox">
-<label for="notifyTeachersOnRecordSubmit"><html:checkbox property="daco.notifyTeachersOnRecordSumbit" styleId="notifyTeachersOnRecordSubmit"/> 
+<label for="notifyTeachersOnRecordSubmit"><form:checkbox path="daco.notifyTeachersOnRecordSumbit" id="notifyTeachersOnRecordSubmit"/> 
 <fmt:message key="label.authoring.advanced.notify.onrecordsubmit" /> </label>
 </div>
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.daco.contentId}" />
+<lams:OutcomeAuthor toolContentId="${authoringForm.daco.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
-<label for="lockOnFinished"><html:checkbox property="daco.lockOnFinished" styleId="lockOnFinished" />
+<label for="lockOnFinished"><form:checkbox path="daco.lockOnFinished" id="lockOnFinished" />
 <fmt:message key="label.authoring.advanced.lock.on.finished" /></label>
 </div>
 
 <div class="checkbox">
-<label for="reflectOn"><html:checkbox property="daco.reflectOnActivity" styleId="reflectOn"/>
+<label for="reflectOn"><form:checkbox path="daco.reflectOnActivity" id="reflectOn"/>
 <fmt:message key="label.authoring.advanced.reflectOnActivity" /> </label>
 <div class="form-group">
-<html:textarea property="daco.reflectInstructions" styleId="reflectInstructions"  styleClass="form-control" cols="50" rows="3"
+<form:textarea path="daco.reflectInstructions" id="reflectInstructions"  cssClass="form-control" cols="50" rows="3"
 	onkeyup="javascript:turnOnReflect()"/>
 </div>
 </lams:SimplePanel>

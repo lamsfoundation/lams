@@ -66,17 +66,16 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">
 		
-			<html:hidden property="commonCartridge.contentId" />
-			<html:hidden property="mode" value="${mode}"/>
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
+			<form:hidden path="commonCartridge.contentId" />
+			<form:hidden path="mode" value="${mode}"/>
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="contentFolderID" />
+			<form:hidden path="currentTab" styleId="currentTab" />
 	
 			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= CommonCartridgeConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
@@ -84,7 +83,7 @@
 			</lams:Tabs>	
 		
 		 	<lams:TabBodyArea>
-		 		<%@ include file="/common/messages.jsp"%>
+		 		<lams:errors/>
 		 		
 				<!--  Set up tabs  -->
 		 		<lams:TabBodys>
@@ -96,9 +95,9 @@
 				<div id="saveCancelButtons">
 					<lams:AuthoringButton formID="authoringForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="<%=CommonCartridgeConstants.TOOL_SIGNATURE%>"
-						toolContentID="${formBean.commonCartridge.contentId}"
+						toolContentID="${authoringForm.commonCartridge.contentId}"
 						accessMode="${mode}" defineLater="${mode=='teacher'}"
-						contentFolderID="${formBean.contentFolderID}" />
+						contentFolderID="${authoringForm.contentFolderID}" />
 				</div>
 			</lams:TabBodyArea>
 	
@@ -107,10 +106,10 @@
 		<!-- end page div -->
 		</lams:Page>
 	
-	</html:form>
+	</form:form>
 
 	<script type="text/javascript">
-		changeViewNum(${formBean.commonCartridge.miniViewCommonCartridgeNumber});
+		changeViewNum(${authoringForm.commonCartridge.miniViewCommonCartridgeNumber});
 	</script>
 </body>
 </lams:html>

@@ -2,9 +2,7 @@
 
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -55,7 +53,7 @@
 					<div class="form-group voffset10">
 						<div class="col-sm-12 controls">
 							<input type="submit" class="btn btn-default pull-right" value="Ok"
-								onClick="javascript:document.location='index.do';" tabindex="1"/>
+								onClick="javascript:document.location='<lams:LAMSURL/>index.do';" tabindex="1"/>
 						</div>	
 					</div>
 			</div>		

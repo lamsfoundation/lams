@@ -27,17 +27,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4035785085162811572L;
+public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> nomination;
     private String contentFolderID;
     private String instructions;
@@ -59,8 +56,7 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     }
 
     @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate(MessageService messageService) {
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (nomination != null && !nomination.isEmpty()) {
@@ -71,15 +67,15 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 		}
 	    }
 	}
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("nominations.none.submitted");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("nominations.none.submitted"));
 	    valid = false;
 	    nomination = null;
 	}
 
 	setValid(valid);
-	return errors;
+	return errorMap;
     }
 
     public void fillForm(VoteContent voteContent) {

@@ -1,6 +1,19 @@
-<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<!DOCTYPE html>
 <%@ include file="/includes/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 
+<lams:html>
+<lams:head>
+	<lams:css />
+	<title><fmt:message key="activity.title"/></title>
+	<script src="${lams}includes/javascript/jquery.js"></script>
+	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+</lams:head>
+
+<body class="stripes">
 
 <script type="text/javascript">
 	function disableFinishButton() {
@@ -10,20 +23,20 @@
 		}
 	}
 	function submitForm(methodName) {
-		var f = document.getElementById('learnerForm');
-		f.action += "?method=" + methodName;
+		var f = document.getElementById('nbLearnerForm');
+		f.action = methodName + ".do";
 		f.submit();
 	}
 </script>
 
-<lams:Page type="learner" title="${NbLearnerForm.title}">
+<lams:Page type="learner" title="${nbLearnerForm.title}">
 	<div class="panel">
-		<c:out value="${NbLearnerForm.basicContent}" escapeXml="false" />
+		<c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
 	</div>
 
-	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="learnerForm">
-		<html:hidden property="toolSessionID" />
-		<html:hidden property="mode" />
+	<form:form modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
+		<form:hidden path="mode" />
+		<form:hidden path="toolSessionID" />
 
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="panel">
@@ -44,24 +57,24 @@
 
 		<c:if test="${allowComments}">
 			<hr/>
-			<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}" 
+			<lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}" 
 				toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" anonymous="${anonymous}" />
 		</c:if>
 
 
-		<c:if test="${not NbLearnerForm.readOnly}">
+		<c:if test="${not nbLearnerForm.readOnly}">
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
 
-					<html:button  property="continueButton" styleClass="btn btn-sm btn-primary pull-right"
+					<button  name="continueButton" class="btn btn-sm btn-primary pull-right"
 						onclick="submitForm('reflect')">
 						<fmt:message key="button.continue" />
-					</html:button>
+					</button>
 				</c:when>
 				<c:otherwise>
 
 
-					<html:link href="#nogo" property="finishButton" styleClass="btn btn-primary pull-right voffset10 na"
+					<a href="#nogo" name="finishButton" class="btn btn-primary pull-right voffset10 na"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
@@ -72,11 +85,13 @@
 							</c:otherwise>
 						</c:choose>
 
-					</html:link>
+					</a>
 				</c:otherwise>
 			</c:choose>
 		</c:if>
 
-	</html:form>
+	</form:form>
 
 </lams:Page>
+	
+</lams:html>

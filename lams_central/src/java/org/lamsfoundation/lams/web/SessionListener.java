@@ -49,14 +49,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 
 public class SessionListener implements HttpSessionListener {
-    private static int timeout; //in seconds
     private static CacheableManager<?, Principal> authenticationManager;
 
     private static Logger log = Logger.getLogger(SessionListener.class);
-
-    static {
-	SessionListener.timeout = Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME);
-    }
 
     /** HttpSessionListener interface */
     @Override
@@ -65,7 +60,7 @@ public class SessionListener implements HttpSessionListener {
 	    return;
 	}
 	HttpSession session = sessionEvent.getSession();
-	session.setMaxInactiveInterval(SessionListener.timeout);
+	session.setMaxInactiveInterval(Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME));
 
 	//set server default locale for STURTS and JSTL. This value should be overwrite
 	//LocaleFilter class. But this part code can cope with login.jsp Locale.

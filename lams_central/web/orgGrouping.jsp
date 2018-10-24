@@ -2,22 +2,22 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/orgGrouping.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/orgGrouping.css" type="text/css" media="screen" />
 	
 	<c:set var="lessonMode" value="${not empty param.activityID}" />
 	<c:set var="groupingMethod" value="${usedForBranching eq true ? 'openGroupMappingDialog' : 'viewGroups'}" />
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/orgGrouping.js"></script>
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/orgGrouping.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		var groupingActivityId = '${param.activityID}',
 			lessonMode = ${lessonMode},

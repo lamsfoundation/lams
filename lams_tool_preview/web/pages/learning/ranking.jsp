@@ -135,7 +135,7 @@
 
     </script>
 
-	<form action="<c:url value="/learning/submitRanking.do?"/>" method="get" id="editForm">
+	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="get" id="editForm">
 
 		<c:if test="${notcomplete}">
 			<lams:Alert type="info"  id="warn-assign-more" close="true">

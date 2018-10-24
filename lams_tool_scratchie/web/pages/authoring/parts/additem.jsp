@@ -218,23 +218,22 @@
 				</div>
 			<div class="panel-body panel-${type}-body">
 	
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
-			<html:form action="/authoring/saveItem" method="post" styleId="scratchieItemForm">
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<html:hidden property="sessionMapID" />
+			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
+				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="answerList" id="answerList" />
-				<html:hidden property="itemIndex" />
-				<html:hidden property="contentFolderID" styleId="contentFolderID"/>
+				<form:hidden path="itemIndex" />
+				<form:hidden path="contentFolderID" id="contentFolderID"/>
 	
 				<div class="form-group">
 					<label for="title"><fmt:message key="label.authoring.basic.question.name" /></label>
-					<html:text property="title" styleClass="form-control"/>
+					<form:input path="title" cssClass="form-control"/>
 				</div>
 
 				<div class="form-group">
 					<label for="description"><fmt:message key="label.authoring.basic.question.text" /></label>
-					<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+					<lams:CKEditor id="description" value="${authoringForm.description}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
 				</div>
 
 				<label for="hasAnswerFilled" class="error" style="display: none;"></label>
@@ -244,7 +243,7 @@
 
 				<div class="form-group"><fmt:message key="label.authoring.scratchie.answers" /></div>
 			
-			</html:form>
+			</form:form>
 			
 			<!-- Answers -->
 			<form id="answerForm" name="answerForm">

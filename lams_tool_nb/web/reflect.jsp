@@ -1,32 +1,46 @@
-<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<!DOCTYPE html>
 <%@ include file="/includes/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+
+<lams:html>
+<lams:head>
+	<lams:css />
+	<title><fmt:message key="activity.title"/></title>
+	<script src="${lams}includes/javascript/jquery.js"></script>
+	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
+</lams:head>
+
+<body class="stripes">
 
 <script type="text/javascript">
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
 	function submitForm(methodName) {
-		var f = document.getElementById('learnerForm');
+		var f = document.getElementById('nbLearnerForm');
+		f.action = methodName + ".do";
 		f.submit();
 	}
 </script>
 
-<lams:Page type="learner" title="${title}">
+<lams:Page type="learner" title="${title}" formID="nbLearnerForm">
 
-	<html:form action="/learner" method="post" onsubmit="disableFinishButton();" styleId="learnerForm">
+	<form:form method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
 		<div class="form-group">
 			<div class="panel">
 				<lams:out value="${reflectInstructions}" escapeHtml="true" />
 			</div>
 
-			<html:textarea rows="4" property="reflectionText" value="${reflectEntry}" styleClass="form-control"
-				styleId="focusedInput"></html:textarea>
+			<textarea rows="4" name="reflectionText" value="${reflectEntry}" class="form-control"
+				id="focusedInput"></textarea>
 
-			<html:hidden property="toolSessionID" />
-			<html:hidden property="mode" />
-			<html:hidden property="method" value="finish" />
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="mode" />
 
-			<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
+			<a href="#nogo" class="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
 				<c:choose>
 					<c:when test="${activityPosition.last}">
 						<fmt:message key="button.submit" />
@@ -35,15 +49,15 @@
 						<fmt:message key="button.finish" />
 					</c:otherwise>
 				</c:choose>
-			</html:link>
+			</a>
 		</div>
 
-	</html:form>
+	</form:form>
 
 	<!-- Comments: the extra div counteracts the float -->
 	<c:if test="${allowComments}">
 		<div class="row no-gutter"><div class="col-xs-12"></div></div>
-		<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
+		<lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}"
 			toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" readOnly="true"
 			pageSize="10" sortBy="1" />
 	</c:if>
@@ -56,4 +70,5 @@
 		document.getElementById("focusedInput").focus();
 	}
 </script>
-
+	
+</lams:html>

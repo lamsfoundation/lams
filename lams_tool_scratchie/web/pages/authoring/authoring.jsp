@@ -40,15 +40,13 @@
 </lams:head>
 <body class="stripes" onLoad="init()">
 			
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" >
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="scratchie.contentId" />
-		<html:hidden property="mode" value="${mode}"/>
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="contentFolderID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
+	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" >
+		<form:hidden path="scratchie.contentId" />
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="contentFolderID" />
+		<input type="hidden" name="mode" value="${mode}"/>
+		<form:hidden path="currentTab" id="currentTab" />
 		<input type="hidden" name="itemList" id="itemList" />
-	
 
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">
@@ -59,7 +57,7 @@
 			</lams:Tabs>
 	
 			<lams:TabBodyArea>
-				<%@ include file="/common/messages.jsp"%>
+				<lams:errors/>
 		
 				 <lams:TabBodys>
 					 <!-- tab content 1 (Basic) -->
@@ -79,15 +77,15 @@
 					accessMode="author"
 				--%>
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ScratchieConstants.TOOL_SIGNATURE%>" 
-					toolContentID="${formBean.scratchie.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
-					customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}" />
+					toolContentID="${authoringForm.scratchie.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
+					customiseSessionID="${authoringForm.sessionMapID}" contentFolderID="${authoringForm.contentFolderID}" />
 			</lams:TabBodyArea>
 
 			<div id="footer"></div>
 
 		</lams:Page>
 		
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>

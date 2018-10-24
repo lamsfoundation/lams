@@ -38,39 +38,39 @@
         } 
         
 		function doStatistic(){
-			var url = '<c:url value="monitoring.do"/>?dispatch=statistics&toolContentID=${toolContentID}';
+			var url = 'statistics.do?toolContentID=${toolContentID}';
 			$.ajaxSetup({ cache: true });
 			$("#statisticArea").load(url);
 		}
 
         function doSubmit(method) {
-        	document.VoteMonitoringForm.dispatch.value=method;
-        	document.VoteMonitoringForm.submit();
+        	document.forms.voteMonitoringForm.action=method + '.do';
+        	document.forms.voteMonitoringForm.submit();
         }
 
 		function submitMonitoringMethod(actionMethod) {
-			document.VoteMonitoringForm.dispatch.value=actionMethod; 
-			document.VoteMonitoringForm.submit();
+			document.forms.voteMonitoringForm.action=actionMethod + '.do';
+			document.forms.voteMonitoringForm.submit();
 		}
 		
 		function submitAuthoringMethod(actionMethod) {
-			document.VoteAuthoringForm.dispatch.value=actionMethod; 
-			document.VoteAuthoringForm.submit();
+			document.forms.voteAuthoringForm.action=actionMethod + '.do'; 
+			document.forms.voteAuthoringForm.submit();
 		}
 		
 		function submitModifyQuestion(questionIndexValue, actionMethod) {
-			document.VoteMonitoringForm.questionIndex.value=questionIndexValue; 
+			document.forms.voteMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
 		function submitModifyMonitoringNomination(questionIndexValue, actionMethod) {
-			document.VoteMonitoringForm.questionIndex.value=questionIndexValue; 
+			document.forms.voteMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
 		
 		function submitEditResponse(responseId, actionMethod) {
-			document.VoteMonitoringForm.responseId.value=responseId; 
+			document.forms.voteMonitoringForm.responseId.value=responseId; 
 			submitMethod(actionMethod);
 		}
 		
@@ -79,17 +79,17 @@
 		}
 		
 		function deleteOption(optIndex, actionMethod) {
-			document.VoteMonitoringForm.optIndex.value=optIndex; 
+			document.forms.voteMonitoringForm.optIndex.value=optIndex; 
 			submitMethod(actionMethod);
 		}
 		
 		function submitModifyOption(optionIndexValue, actionMethod) {
-			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
+			document.forms.voteMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 
 		function submitModifyNomination(optionIndexValue, actionMethod) {
-			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
+			document.forms.voteMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
@@ -98,14 +98,13 @@
 </lams:head>
 <body class="stripes" onLoad="init();">
 
-    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="dispatch"/>
-		<html:hidden property="toolContentID"/>
-		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="contentFolderID"/>
-		<html:hidden property="responseId"/>	 
-		<html:hidden property="currentUid"/>
+    <form:form modelAttribute="voteMonitoringForm" method="POST">		
+		<form:hidden path="toolContentID"/>
+		<form:hidden path="httpSessionID"/>		
+		<form:hidden path="currentTab" />
+		<form:hidden path="contentFolderID"/>
+		<form:hidden path="responseId"/>	 
+		<form:hidden path="currentUid"/>
 
         <c:set var="title"><fmt:message key="activity.title" /></c:set>
         <lams:Page title="${title}" type="navbar">
@@ -128,7 +127,7 @@
        
         </lams:Page>
             		
-	</html:form>
+	</form:form>
 	
 </body>
 </lams:html>

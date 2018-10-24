@@ -19,7 +19,7 @@
 	<body>
 	
 	<div class="panel panel-default">
-	<div class="panel-heading">
+		<div class="panel-heading">
 		<div class="panel-title">
 			<fmt:message key="label.authoring.conditions.add.condition" />
 		</div>
@@ -28,17 +28,17 @@
 	<div class="panel-body">
 	
 		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="chatConditionForm" focus="displayName" >
-			<html:hidden property="orderId" />
+		<lams:errors/>
+		<form:form action="../authoringCondition/saveOrUpdateCondition.do" method="post" modelAttribute="chatConditionForm" id="chatConditionForm" focus="displayName" >
+			<form:hidden path="orderId" />
 
 			<div class="form-group">
             	<label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /></label>
-         		<html:text property="displayName" size="51" styleClass="form-control" />
+         		<input type="text" value="${chatConditionForm.displayName}" name="displayName" size="51" class="form-control" />
 			</div>
 			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
-		</html:form>
+			<lams:TextSearch sessionMapID="${sessionMapID}"  />
+		</form:form>
 
 		<div class="voffset5 pull-right">
 		<a href="javascript:;" onclick="hideConditionMessage()" class="btn btn-default btn-xs">

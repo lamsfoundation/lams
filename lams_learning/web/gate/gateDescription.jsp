@@ -1,15 +1,15 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <div class="panel panel-default">
-    <c:if test="${!empty GateForm.map.gate.title}">
+    <c:if test="${!empty gateForm.gate.title}">
         <div class="panel-heading">
          <div class="panel-title">
-            <lams:out value="${GateForm.map.gate.title}" escapeHtml="true" />
+            <lams:out value="${gateForm.gate.title}" escapeHtml="true" />
          </div>
         </div>
     </c:if>
-    <c:if test="${!empty GateForm.map.gate.description}">
+    <c:if test="${!empty gateForm.gate.description}">
         <div class="panel-body">
-            <lams:out value="${GateForm.map.gate.description}" escapeHtml="true" />
+            <lams:out value="${gateForm.gate.description}" escapeHtml="true" />
         </div>
     </c:if>
 </div>

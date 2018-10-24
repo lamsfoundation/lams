@@ -44,9 +44,9 @@
 					<fmt:message key="button.try.again" />
 				</a>
 		
-			<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
+			<a href="#nogo" path="FinishButton" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
 				<fmt:message key="label.finished" />
-			</html:link>
+			</a>
 		</div>
 		
 	</lams:Page>

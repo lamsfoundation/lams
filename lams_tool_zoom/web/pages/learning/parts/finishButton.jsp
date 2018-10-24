@@ -13,14 +13,13 @@
 	<fmt:message key="label.notebookEntry" />
 </c:set>
 
-<html:form action="/learning" method="post">
-	<html:hidden property="toolSessionID" value="${toolSessionID}" />
-	<html:hidden property="dispatch" value="openNotebook" />
+<form:form action="openNotebook.do" method="post" modelAttribute="learningForm">
+	<form:hidden path="toolSessionID" />
 
 	<c:if test="${userDTO.finishedActivity and contentDTO.reflectOnActivity}">
 
 		<div class="panel panel-default">
-			<div class="panel-heading panel-title">${notebookEntry}</div>
+			<div class="panel-heading panel-title">${learningForm.notebookEntry}</div>
 			<div class="panel-body">
 				<div class="panel">
 					<c:out value="${contentDTO.reflectInstructions}" escapeXml="true" />
@@ -38,30 +37,24 @@
 					</c:otherwise>
 				</c:choose>
 				</p>
-
-				<html:submit styleClass="btn btn-sm btn-default">
+				<button type="submit" class="btn btn-sm btn-default">
 					<fmt:message key="button.edit" />
-				</html:submit>
-
+				</button>
 			</div>
 		</div>
 	</c:if>
-</html:form>
+</form:form>
 
-<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
-	<html:hidden property="toolSessionID" value="${toolSessionID}" />
+<form:form action="${!userDTO.finishedActivity and contentDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}"
+		   method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm">
+	<form:hidden path="toolSessionID" />
 	<div class="pull-right voffset10">
 		<c:choose>
 			<c:when test="${!userDTO.finishedActivity and contentDTO.reflectOnActivity}">
-				<html:hidden property="dispatch" value="openNotebook" />
-
-				<html:submit styleClass="btn btn-primary">
-					<fmt:message key="button.continue" />
-				</html:submit>
+				<button type="submit" class="btn btn-primary"><fmt:message key="button.continue" /></button>
 			</c:when>
 			<c:otherwise>
-				<html:hidden property="dispatch" value="finishActivity" />
-				<html:submit styleClass="btn btn-primary na" styleId="finishButton">
+				<button type="submit" class="btn btn-primary na" id="finishButton">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submit" />
@@ -70,8 +63,8 @@
 							<fmt:message key="button.finish" />
 						</c:otherwise>
 					</c:choose>
-				</html:submit>
+				</button>
 			</c:otherwise>
 		</c:choose>
 	</div>
-</html:form>
+</form:form>

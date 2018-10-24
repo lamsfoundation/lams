@@ -33,18 +33,17 @@
 </lams:head>
 
 <body class="stripes" onLoad='init()'>
-	<html:form action="/monitoring" target="_self">
+	<form:form action="monitoring.do" modelAttribute="nbMonitoringForm" id="nbMonitoringForm" target="_self">
 
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" scope="request"/>
-		<html:hidden property="method" />
-		<html:hidden property="currentTab" styleId="currentTab" />
+		<form:hidden path="method"/>
+		<form:hidden path="currentTab" styleId="currentTab" />
 
 		<c:set var="monitoringURL">
-			<html:rewrite page="/monitoring.do" />
+		<lams:WebAppURL/>monitoring.do
 		</c:set>
 			
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
-		<lams:Page title="${title}" type="navbar">
+		<lams:Page title="${title}" type="navbar" formID="nbMonitoringForm">
 
 		 	<lams:Tabs title="${title}" helpToolSignature="<%= NoticeboardConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 				<lams:Tab id="1" key="titleHeading.summary" />
@@ -64,6 +63,6 @@
 			
 		</lams:Page>
 
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

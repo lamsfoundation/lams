@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <c:set var="ENABLE_PORTRAIT_EDITING"><%=Configuration.get(ConfigurationKeys.ENABLE_PORTRAIT_EDITING)%></c:set>
-
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -36,17 +34,17 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/profile.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="includes/javascript/webrtc-capturestill.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/webrtc-capturestill.js"></script>
 	<script type="text/javascript">
 		//constant for croppie.js
 		var PORTRAIT_SIZE = 400;
 	</script>
-	<script type="text/javascript" src="includes/javascript/croppie.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/croppie.js"></script>
 	<script type="text/javascript">
 		//variable defined in croppie.js
 		var croppieWidget;
@@ -130,8 +128,8 @@
 </lams:head>
 
 <body>
-<html:form action="/saveportrait.do" method="post" styleId="PortraitActionForm"	enctype="multipart/form-data">
-	<html:hidden name="PortraitActionForm" property="portraitUuid" />
+<form:form action="saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" >
+	<form:hidden path="portraitUuid" />
 	<div style="clear: both"></div>
 	
 	<div class="container">
@@ -141,16 +139,16 @@
 		<div class="currentPortrait text-center" style="margin:10px">
 			<fmt:message key="label.portrait.current" />:<br/>
 	
-			<logic:notEqual name="PortraitActionForm" property="portraitUuid" value="0">
-				<img class="img-thumbnail" src="/lams/download/?uuid=<bean:write name="PortraitActionForm" 
-						property="portraitUuid" />&version=2&preferDownload=false" />
-			</logic:notEqual>
-	
-			<logic:equal name="PortraitActionForm" property="portraitUuid"	value="0">
-				<em><fmt:message key="msg.portrait.none" /></em>
-			</logic:equal>
+			<c:choose>
+				<c:when test="${PortraitActionForm.portraitUuid == 0}">
+					<em><fmt:message key="msg.portrait.none" /></em>
+				</c:when>
+				<c:otherwise>
+				<img class="img-thumbnail" src="/lams/download?uuid=${PortraitActionForm.portraitUuid}&version=2&preferDownload=false" />
+				</c:otherwise>
+			</c:choose>
 		</div>
-		
+
 		<c:if test="${ENABLE_PORTRAIT_EDITING}">
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			
@@ -229,14 +227,14 @@
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
-				<a class="btn btn-sm btn-file btn-default offset5" role="button" href="<c:url value='/index.do'/>?method=profile">
+				<button type="button" class="btn btn-sm btn-file btn-default offset5" onclick="history.go(-1);">
 					<fmt:message key="label.return.to.myprofile" />
-				</a>
+				</button>
 			</div>
 		</c:if>
 	</div>
 	</div>
 	</div>	
-</html:form>
+</form:form>
 </body>
 </lams:html>

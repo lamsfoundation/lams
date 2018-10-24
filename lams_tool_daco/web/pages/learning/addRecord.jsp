@@ -27,7 +27,7 @@
 	</lams:Alert>
 </c:if>
 
-<%@ include file="/common/messages.jsp"%>
+<lams:errors/>
 <%-- The status of the last add/edit operation. --%>
 <c:if test="${recordOperationSuccess=='add'}">
 	<lams:Alert id="addrecordsuccess" type="info" close="true">
@@ -69,13 +69,13 @@
 	</div>
 
 	<!-- Form to add/edit a record -->
-	<html:form action="learning/saveOrUpdateRecord" method="post" styleId="recordForm" enctype="multipart/form-data">
+	<form:form action="saveOrUpdateRecord.do" modelAttribute="recordForm" method="post" id="recordForm" enctype="multipart/form-data" >
 	
 	<c:set var="fileNumber" value="0" />
 	<c:set var="answerIndex" value="0" />
 	
-	<html:hidden property="sessionMapID" value="${sessionMapID}" />
-	<html:hidden styleId="displayedRecordNumber" property="displayedRecordNumber" value="${displayedRecordNumber}" />
+	<form:hidden path="sessionMapID" value="${sessionMapID}" />
+	<form:hidden id="displayedRecordNumber" path="displayedRecordNumber" value="${displayedRecordNumber}" />
 	
 		<table cellspacing="0" class="table table-striped">
 			<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
@@ -95,10 +95,10 @@
 									depending on the maximum number of characters the teacher provided
 								--%>
 								<c:when test="${question.max!=null}">
-									<html:text property="answer[${answerIndex}]" size="60" maxlength="${question.max}"  styleClass="form-control"/>
+									<form:input path="answer[${answerIndex}]" size="60" maxlength="${question.max}"  cssClass="form-control"/>
 								</c:when>
 								<c:otherwise>
-									<html:text property="answer[${answerIndex}]" size="60"  styleClass="form-control"/>
+									<form:input path="answer[${answerIndex}]" size="60"  cssClass="form-control"/>
 								</c:otherwise>
 							</c:choose>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
@@ -108,7 +108,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:textarea property="answer[${answerIndex}]" cols="60" rows="3"  styleClass="form-control"/>
+							<form:textarea path="answer[${answerIndex}]" cols="60" rows="3"  cssClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==3}"><%-- Number --%>
@@ -126,7 +126,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:text property="answer[${answerIndex}]" size="10"  styleClass="form-control"/>
+							<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==4}"><%-- Date can be entered in three textfields --%>
@@ -137,19 +137,19 @@
 							<span class="form-inline">
 								<div class="form-group">
 								<label><fmt:message key="label.learning.date.day" /></label>
-								<html:text property="answer[${answerIndex}]" size="3"  styleClass="form-control"/>&nbsp;
+								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control"/>&nbsp;
 								</div>
 								
 								<div class="form-group">
 								<c:set var="answerIndex" value="${answerIndex+1}" />
 								<label><fmt:message key="label.learning.date.month" /></label>
-								<html:text property="answer[${answerIndex}]" size="3"  styleClass="form-control"/>&nbsp;
+								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control"/>&nbsp;
 								</div>
 								
 								<div class="form-group">
 								<c:set var="answerIndex" value="${answerIndex+1}" />
 								<label><fmt:message key="label.learning.date.year" /></label>
-								<html:text property="answer[${answerIndex}]" size="5"  styleClass="form-control"/>
+								<form:input path="answer[${answerIndex}]" size="5"  cssClass="form-control"/>
 								</div>
 							</span>							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
@@ -182,7 +182,7 @@
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							<%-- It displays for example A) instead of 1) --%>
 							${fn:substring(ordinal,status.index,status.index+1)}) 
-							<html:radio property="answer[${answerIndex}]" value="${status.index+1}"><label>&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></label></html:radio><br />
+							<form:radiobutton path="answer[${answerIndex}]" value="${status.index+1}" /><label>&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></label><br />
 							</c:forEach>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
@@ -191,12 +191,12 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:select property="answer[${answerIndex}]"  styleClass="form-control">
-							<html:option value="0"><fmt:message key="label.learning.dropdown.select"/></html:option>
+							<form:select path="answer[${answerIndex}]"  cssClass="form-control">
+							<form:option value="0"><fmt:message key="label.learning.dropdown.select"/></form:option>
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-								<html:option value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></html:option>
+								<form:option value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></form:option>
 							</c:forEach>
-							</html:select>
+							</form:select>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 						<c:when test="${question.type==9}"><%-- Checkboxes --%>
@@ -204,7 +204,7 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:hidden  styleId="checkbox-${questionStatus.index+1}" property="answer[${answerIndex}]" />
+							<form:hidden  id="checkbox-${questionStatus.index+1}" path="answer[${answerIndex}]" />
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
 							${fn:substring(ordinal,status.index,status.index+1)}) 
 							<input type="checkbox" id="checkbox-${questionStatus.index+1}-${status.index+1}" value="${status.index+1}"/>
@@ -223,7 +223,7 @@
 									<div class="form-group  no-gutter">
 									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.longitude" /></label>
 									<div class="col-sm-2">
-									<html:text property="answer[${answerIndex}]" size="10"  styleClass="form-control "/>
+									<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control "/>
 									</div>
 									<div class="col-sm-1">
 									<p class="form-control-static"><fmt:message key="label.learning.longlat.longitude.unit" /></p>
@@ -234,7 +234,7 @@
 									<div class="form-group  no-gutter">
 									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.latitude" /></label>
 									<div class="col-sm-2">
-									<html:text property="answer[${answerIndex}]" size="10"  styleClass="form-control"/>
+									<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
 									</div>
 									<div class="col-sm-1">
 									<p class="form-control-static"><fmt:message key="label.learning.longlat.latitude.unit" /></p>
@@ -252,7 +252,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
 		</c:if>
-	</html:form>
+	</form:form>
 </div>
 <!--  end record panel -->
 </c:if>
@@ -279,9 +279,9 @@
 			</div>
 
 			<c:if test="${mode != 'teacher'}">
-				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="btn btn-default pull-left">
+				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default pull-left">
 					<fmt:message key="label.common.edit" />
-				</html:button>
+				</button>
 			</c:if>
 		</div>
 	</div>

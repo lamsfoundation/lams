@@ -14,9 +14,8 @@
 			}
 			$(this).data('previousValue', this.value);
 			$.ajax({
-				url: '<c:url value="/monitoring.do"/>',
+				url: '<c:url value="/monitoring/setActivityEvaluation.do"/>',
 				data: {
-					dispatch: "setActivityEvaluation",
 					toolContentID: "${toolContentID}",
 					activityEvaluation: this.value
 				},
@@ -36,13 +35,13 @@
  		<c:choose>
 		<c:when test="${useSelectLeaderToolOutput}">	
 			drawHistogram('chartDivLeader${sessionMap.toolContentID}', 
-					'<c:url value="/monitoring.do?dispatch=getMarkChartData&toolContentID=${toolContentID}"/>', 
+					'<c:url value="/monitoring/getMarkChartData.do?toolContentID=${toolContentID}"/>', 
 					'<fmt:message key="label.question.marks"/>', '<fmt:message key="label.number.groups.in.mark.range"/>');
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="sessionDto" items="${sessionDtos}">
 			drawHistogram('chartDivSession${sessionDto.sessionId}', 
-					'<c:url value="/monitoring.do?dispatch=getMarkChartData&toolContentID=${toolContentID}&toolSessionID=${sessionDto.sessionId}"/>', 
+					'<c:url value="/monitoring/getMarkChartData.do?toolContentID=${toolContentID}&toolSessionID=${sessionDto.sessionId}"/>', 
 					'<fmt:message key="label.question.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
 			</c:forEach>	
 		</c:otherwise>

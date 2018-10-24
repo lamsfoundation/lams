@@ -58,7 +58,7 @@
 		</c:if>
 		
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		
 		<p>
 			<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
@@ -110,16 +110,16 @@
 				<div class="panel panel-default">
 					<div class="panel-body">
 					<iframe
-						id="externalSpreadsheet" name="externalSpreadsheet" src="<html:rewrite page='/includes/javascript/simple_spreadsheet/spreadsheet_offline.html'/>?lang=${language}"
+						id="externalSpreadsheet" name="externalSpreadsheet" src="<lams:WebAppURL/>includes/javascript/simple_spreadsheet/spreadsheet_offline.html?lang=${language}"
 						style="width:99%;" frameborder="no" height="385px"
 						scrolling="no">
 						</iframe>
 				
 					<c:if test="${!userIsMarked && (mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
 						<div class="space-bottom-top align-right">
-							<html:button property="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" styleClass="btn btn-primary voffset10 pull-right">
+							<button name="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" class="btn btn-primary voffset10 pull-right">
 								<fmt:message key="label.save" />
-							</html:button>
+							</button>
 						</div>
 					</c:if>		
 					</div>
@@ -144,10 +144,10 @@
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<html:button property="forwardtoReflection" styleClass="btn btn-default pull-left"
+								<button name="forwardtoReflection" class="btn btn-default pull-left"
 									onclick="submitMethod('forwardtoReflection');">
 									<fmt:message key="label.edit" />
-								</html:button>
+								</button>
 							</c:if>
 							
 							<c:choose>
@@ -160,9 +160,9 @@
 							</c:choose>
 
 							<c:if test="${mode != 'teacher'}">
-								<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset10 pull-left">
+								<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default voffset10 pull-left">
 								<fmt:message key="label.edit" />
-								</html:button>
+								</button>
 							</c:if>
 							
 						</div>
@@ -175,12 +175,12 @@
 			<div class="space-bottom-top align-right">
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">				
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-primary pull-right">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary pull-right">
 							<fmt:message key="label.continue" />
-						</html:button>
+						</button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="return finishSession()">
+						<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton" onclick="return finishSession()">
 							<c:choose>
 			 					<c:when test="${sessionMap.activityPosition.last}">
 			 						<fmt:message key="label.submit" />
@@ -189,7 +189,7 @@
 			 		 				<fmt:message key="label.finished" />
 			 					</c:otherwise>
 			 				</c:choose>
-						</html:link>
+						</a>
 					</c:otherwise>
 				</c:choose>
 			</div>

@@ -9,22 +9,25 @@
 
 	<div class="panel-body">
 
-		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateCondition" method="post"
-			styleId="notebookConditionForm" focus="displayName">
-			<html:hidden property="orderId" />
+		<!-- Basic Info Form-->		 <%-- For some reason Spring MVC consumes this first form and only renders the second one.
+		  If this redundant form is removed, the other one would be consumed, so this one needs to stay --%>
+		 <form:form modelAttribute="notebookConditionForm">
+		 </form:form>		
+		<form:form action="authoringCondition/saveOrUpdateCondition.do" method="post"
+			modelAttribute="notebookConditionForm" id="notebookConditionForm" focus="displayName">
+			<lams:errors/>
+			<form:hidden path="orderId" />
 
 			<div class="form-group">
 				<label for="displayName"><fmt:message
 						key="label.authoring.conditions.condition.name" /> *</label>
-				<html:text tabindex="1" property="displayName" size="51"
-					styleClass="form-control" />
+				<form:input tabindex="1" path="displayName" size="51"
+					cssClass="form-control" />
 			</div>
 
 			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}" />
-		</html:form>
+			<lams:TextSearch  sessionMapID="${sessionMapID}" />
+		</form:form>
 
 		<div class="voffset5 pull-right">
 		    <a href="#" onclick="hideConditionMessage()"

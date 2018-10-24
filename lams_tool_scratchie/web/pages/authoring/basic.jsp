@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:if test="${itemList == null}">
 	<c:set var="itemList" value="${sessionMap.itemList}"/>
@@ -86,7 +85,7 @@
     function exportQTI(){
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("scratchie.title")[0].value);
-    	frame.src = '<html:rewrite page="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />'
+    	frame.src = '<lams:WebAppURL />/authoring/exportQTI.do?sessionMapID=${sessionMapID}'
     			+ '&title=' + title;
     }
 </script>
@@ -94,15 +93,15 @@
 <!-- Basic Tab Content -->
 <div class="form-group">
     <label for="scratchie.title"><fmt:message key="label.authoring.basic.title"/></label>
-    <html:text property="scratchie.title" styleClass="form-control"></html:text>
+    <form:input path="scratchie.title" cssClass="form-control"/>
 </div>
 <div class="form-group">
     <label for="scratchie.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
-    <lams:CKEditor id="scratchie.instructions" value="${formBean.scratchie.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+    <lams:CKEditor id="scratchie.instructions" value="${authoringForm.scratchie.instructions}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
 </div>
 
 <%-- <div id="resourceListArea">
-	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
  	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
  --%>

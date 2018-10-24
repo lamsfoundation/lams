@@ -26,11 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
@@ -40,7 +36,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
  *
  * @author Ozgur Demirtas
  */
-public class VoteLearningForm extends ActionForm implements VoteAppConstants {
+public class VoteLearningForm implements VoteAppConstants {
     /**
      *
      */
@@ -129,8 +125,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     /** The check boxes selected on the first voting screen */
     protected String[] checkedVotes;
 
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request) {
+    public void reset() {
 	checkedVotes = new String[0];
     }
 
@@ -771,9 +766,11 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 
     /** Get the votes based on the checkboxes as a collection */
     public Collection<String> votesAsCollection() {
-	ArrayList<String> votes = new ArrayList<String>();
-	for (String vote : checkedVotes) {
-	    votes.add(vote);
+	ArrayList<String> votes = new ArrayList<>();
+	if (checkedVotes != null) {
+	    for (String vote : checkedVotes) {
+		votes.add(vote);
+	    }
 	}
 	return votes;
     }

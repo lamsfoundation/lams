@@ -3,10 +3,9 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.0.10.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core">
 		<attributes>
-			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/" />
+			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/4.3/javadocs/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_3.1_spec-1.0.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/servlet-api">
@@ -15,7 +14,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
-	<classpathentry kind="output" path="bin"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.2.Final.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.1.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/websocket"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-core/main/jackson-core-2.7.4.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jackson"/>
@@ -25,4 +23,6 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

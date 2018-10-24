@@ -40,9 +40,6 @@ public class McAuthoringForm extends McLearningForm  {
 
     protected String submitAllContent;
 
-    // dispatch controls which method is called by the Lookup map */
-    protected String dispatch;
-
     protected String submit;
 
     /* basic content */
@@ -223,14 +220,6 @@ public class McAuthoringForm extends McLearningForm  {
      */
     public void setSln(String sln) {
 	this.sln = sln;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String buttonValue) {
-	this.dispatch = buttonValue;
     }
 
     /**

@@ -104,7 +104,7 @@
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 		<br>
 		
 		<%@ include file="results/attemptsummary.jsp"%>
@@ -145,10 +145,10 @@
 						</c:choose>
 			
 						<c:if test="${(mode != 'teacher') && hasEditRight}">
-							<html:button property="FinishButton" onclick="return continueReflect()" 
-									styleClass="btn btn-sm btn-default pull-left voffset10">
+							<button type="button" name="FinishButton" onclick="return continueReflect()" 
+									class="btn btn-sm btn-default pull-left voffset10">
 								<fmt:message key="label.edit" />
-							</html:button>
+							</button>
 						</c:if>
 					</div>
 		
@@ -167,10 +167,10 @@
 				<c:if test="${! sessionMap.isUserFailed}">
 					<c:choose>
 						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
-							<html:button property="FinishButton" onclick="return continueReflect()" 
-									styleClass="btn btn-primary voffset10 pull-right na">
+							<button type="button" name="FinishButton" onclick="return continueReflect()" 
+									class="btn btn-primary voffset10 pull-right na">
 								<fmt:message key="label.continue" />
-							</html:button>
+							</button>
 						</c:when>
 						
 						<c:otherwise>

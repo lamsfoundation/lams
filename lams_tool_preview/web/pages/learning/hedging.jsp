@@ -77,7 +77,7 @@
 		}
     </script>
 
-	<form action="<c:url value="/learning/submitHedging.do?"/>" method="post" id="editForm">
+	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="post" id="editForm">
 
 		<c:if test="${notcomplete}">
 			<lams:Alert type="danger" id="warn-assign-more" close="true">

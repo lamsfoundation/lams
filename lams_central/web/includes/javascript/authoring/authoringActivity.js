@@ -1313,9 +1313,8 @@ ActivityLib = {
 			return;
 		}
 		$.ajax({
-			url : LAMS_URL + 'authoring/author.do',
+			url : LAMS_URL + 'authoring/getToolOutputDefinitions.do',
 			data : {
-				'method' : 'getToolOutputDefinitions',
 				'toolContentID' : activity.toolContentID 
 								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
 			},
@@ -1354,10 +1353,9 @@ ActivityLib = {
 			$.ajax({
 				async : false,
 				cache : false,
-				url : LAMS_URL + "authoring/author.do",
+				url : LAMS_URL + "authoring/createToolContent.do",
 				dataType : 'json',
 				data : {
-					'method'          : 'createToolContent',
 					'toolID'          : activity.toolID,
 					// if toolContentID exists, a new content will not be created, only authorURL will be fetched
 					'toolContentID'   : activity.toolContentID,
@@ -1441,9 +1439,8 @@ ActivityLib = {
 		}
 			
 		$.ajax({
-			url : LAMS_URL + 'authoring/author.do',
+			url : LAMS_URL + 'authoring/getToolOutputDefinitions.do',
 			data : {
-				'method' : 'getToolOutputDefinitions',
 				'toolContentID' : activity.toolContentID 
 								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
 			},

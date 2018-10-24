@@ -4,12 +4,12 @@
 <lams:SimplePanel titleKey="label.chat.options">
 <div class="checkbox">
 	<label for="filteringEnabled">
-	<html:checkbox property="filteringEnabled" value="1" styleId="filteringEnabled"></html:checkbox>
+	<form:checkbox path="filteringEnabled" value="1" id="filteringEnabled"/>
 	<fmt:message key="advanced.filteringEnabled" />
 	</label>
 </div>
 <div class="form-group">
-	<html:textarea property="filterKeywords" rows="3" styleClass="form-control"/>
+	<textarea name="filterKeywords" rows="3" class="form-control">${authoringForm.filterKeywords}</textarea>
 </div>
 </lams:SimplePanel>
 
@@ -18,20 +18,20 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
 	<label for="lockOnFinished">
-	<html:checkbox property="lockOnFinished" value="1"	styleId="lockOnFinished">	</html:checkbox>
+	<form:checkbox path="lockOnFinished" value="1" id="lockOnFinished"/>
 	<fmt:message key="advanced.lockOnFinished" />
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
-	<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
+	<form:checkbox path="reflectOnActivity" value="1" id="reflectOnActivity"/>
 	<fmt:message key="advanced.reflectOnActivity" />
 	</label>
 </div>
 
 <div class="form-group">
-	<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
+	<textarea name="reflectInstructions" rows="3" id="reflectInstructions" class="form-control">${authoringForm.reflectInstructions}</textarea>
 </div>
 </lams:SimplePanel>
 

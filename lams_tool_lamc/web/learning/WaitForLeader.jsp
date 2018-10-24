@@ -32,9 +32,9 @@
 			</c:forEach>
 		</ul>
 
-		<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-primary pull-right">
+		<button name="refreshButton" onclick="refresh();" class="btn btn-primary pull-right">
 			<fmt:message key="label.refresh" />
-		</html:button>
+		</button>
 	</lams:Page>
 </body>
 </lams:html>

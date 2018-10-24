@@ -1,0 +1,71 @@
+div#titleDiv {
+  font-size: small;
+  font-weight: bold;
+  padding: 5px 0;
+  text-align: center;
+  border-bottom: thin dotted #AAAAAA; }
+
+.removeGroupingButton {
+  float: right;
+  cursor: pointer;
+  padding-right: 3px;
+  width: 16px;
+  height: 16px; }
+
+#addGroupingButton {
+  float: right;
+  margin: 20px 10px 10px 0; }
+
+.groupingContainer {
+  padding: 10px 10px 0 10px; }
+
+.groupingName {
+  font-size: 12px;
+  border-bottom: thin dotted #AAAAAA;
+  text-decoration: none; }
+
+.groupingName:hover {
+  border-bottom: none;
+  text-decoration: underline; }
+
+.groupCount {
+  font-size: 12px;
+  padding-left: 10px; }
+
+#gtbDialog .container-fluid {
+  padding-right: 0; }
+
+#gtbDialog table {
+  width: 100%;
+  height: 98%;
+  table-layout: fixed;
+  border-collapse: collapse; }
+
+#gtbDialog td {
+  text-align: center;
+  vertical-align: top; }
+
+#gtbDialog td.branchMappingLabelCell {
+  height: 15px;
+  font-weight: bold; }
+
+#gtbDialog td.branchMappingListCell {
+  border: thin solid black;
+  padding: 3px; }
+
+#gtbDialog td.branchMappingListCell .selected {
+  background-color: #5898d0;
+  color: white; }
+
+#gtbDialog .branchMappingButton {
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 10px; }
+
+#gtbDialog #branchMappingOKButton {
+  margin-top: 5px; }
+
+#gtbDialog td.branchMappingListCell div {
+  text-align: left;
+  cursor: pointer; }

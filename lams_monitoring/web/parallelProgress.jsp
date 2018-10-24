@@ -1,8 +1,6 @@
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-
 <!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
 <lams:html>
    
 <lams:head></lams:head>

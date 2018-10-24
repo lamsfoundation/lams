@@ -20,11 +20,9 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Multiple Images Form.
@@ -32,7 +30,7 @@ import org.apache.struts.upload.FormFile;
  *
  * @author Andrey Balan
  */
-public class MultipleImagesForm extends ActionForm {
+public class MultipleImagesForm {
 
     private static final long serialVersionUID = -5595679171112282994L;
 
@@ -42,11 +40,11 @@ public class MultipleImagesForm extends ActionForm {
     private boolean hasFile;
     private Long fileUuid;
     private String fileName;
-    private FormFile file1;
-    private FormFile file2;
-    private FormFile file3;
-    private FormFile file4;
-    private FormFile file5;
+    private MultipartFile file1;
+    private MultipartFile file2;
+    private MultipartFile file3;
+    private MultipartFile file4;
+    private MultipartFile file5;
 
     //used only in monitoring
     private String imageUid;
@@ -83,43 +81,43 @@ public class MultipleImagesForm extends ActionForm {
 	this.hasFile = hasFile;
     }
 
-    public FormFile getFile1() {
+    public MultipartFile getFile1() {
 	return file1;
     }
 
-    public void setFile1(FormFile file) {
+    public void setFile1(MultipartFile file) {
 	this.file1 = file;
     }
 
-    public FormFile getFile2() {
+    public MultipartFile getFile2() {
 	return file2;
     }
 
-    public void setFile2(FormFile file) {
+    public void setFile2(MultipartFile file) {
 	this.file2 = file;
     }
 
-    public FormFile getFile3() {
+    public MultipartFile getFile3() {
 	return file3;
     }
 
-    public void setFile3(FormFile file) {
+    public void setFile3(MultipartFile file) {
 	this.file3 = file;
     }
 
-    public FormFile getFile4() {
+    public MultipartFile getFile4() {
 	return file4;
     }
 
-    public void setFile4(FormFile file) {
+    public void setFile4(MultipartFile file) {
 	this.file4 = file;
     }
 
-    public FormFile getFile5() {
+    public MultipartFile getFile5() {
 	return file5;
     }
 
-    public void setFile5(FormFile file) {
+    public void setFile5(MultipartFile file) {
 	this.file5 = file;
     }
 

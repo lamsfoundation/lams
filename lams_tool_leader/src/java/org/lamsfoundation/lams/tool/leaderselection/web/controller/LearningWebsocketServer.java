@@ -1,0 +1,164 @@
+package org.lamsfoundation.lams.tool.leaderselection.web.controller;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.OnClose;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
+import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+/**
+ * Sends leader has been selected event to the learners.
+ *
+ * @author Marcin Cieslak
+ * @author Andrey Balan
+ */
+@ServerEndpoint("/learningWebsocket")
+public class LearningWebsocketServer {
+    /**
+     * A singleton which updates Learners with Leader selection.
+     */
+    private static class SendWorker extends Thread {
+	private boolean stopFlag = false;
+	// how ofter the thread runs
+	private static final long CHECK_INTERVAL = 3000;
+
+	@Override
+	public void run() {
+	    while (!stopFlag) {
+		try {
+		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		    HibernateSessionManager.openSession();
+		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
+			    .iterator();
+		    // go through activities and update registered learners with reports and vote count
+		    while (entryIterator.hasNext()) {
+			Entry<Long, Set<Session>> entry = entryIterator.next();
+			Long toolSessionId = entry.getKey();
+			// if all learners left the activity, remove the obsolete mapping
+			Set<Session> sessionWebsockets = entry.getValue();
+			if (sessionWebsockets.isEmpty()) {
+			    entryIterator.remove();
+			    continue;
+			}
+
+			boolean finished = LearningWebsocketServer.getLeaderService()
+				.getSessionBySessionId(toolSessionId).getGroupLeader() != null;
+			if (finished) {
+			    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
+			}
+		    }
+		} catch (Exception e) {
+		    // error caught, but carry on
+		    LearningWebsocketServer.log.error("Error in Leader worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			LearningWebsocketServer.log.warn("Stopping Leader worker thread");
+			stopFlag = true;
+		    }
+		}
+	    }
+	}
+    };
+
+    private static final Logger log = Logger.getLogger(LearningWebsocketServer.class);
+
+    private static final SendWorker sendWorker = new SendWorker();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
+    private static ILeaderselectionService leaderService;
+
+    static {
+	// run the singleton thread
+	LearningWebsocketServer.sendWorker.start();
+    }
+
+    /**
+     * Registeres the Learner for processing.
+     */
+    @OnOpen
+    public void registerUser(Session websocket) throws IOException {
+	Long toolSessionId = Long
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	Set<Session> sessionWebsockets = websockets.get(toolSessionId);
+	if (sessionWebsockets == null) {
+	    sessionWebsockets = ConcurrentHashMap.newKeySet();
+	    websockets.put(toolSessionId, sessionWebsockets);
+	}
+	sessionWebsockets.add(websocket);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User " + websocket.getUserPrincipal().getName()
+		    + " entered Leader Selection with toolSessionId: " + toolSessionId);
+	}
+    }
+
+    /**
+     * When user leaves the activity.
+     */
+    @OnClose
+    public void unregisterUser(Session websocket, CloseReason reason) {
+	Long toolSessionId = Long
+		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	websockets.get(toolSessionId).remove(websocket);
+
+	if (log.isDebugEnabled()) {
+	    // If there was something wrong with the connection, put it into logs.
+	    log.debug("User " + websocket.getUserPrincipal().getName() + " left Leader Selection with Tool Session ID: "
+		    + toolSessionId
+		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
+				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
+					    + reason.getReasonPhrase()
+				    : ""));
+	}
+    }
+
+    /**
+     * This method is called when leader has been selected and all non-leaders should refresh their pages in order
+     * to see new leader name and a Finish button.
+     */
+    public static void sendPageRefreshRequest(Long toolSessionId) throws IOException {
+	Set<Session> sessionWebsockets = websockets.get(toolSessionId);
+	if (sessionWebsockets == null) {
+	    return;
+	}
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("pageRefresh", true);
+	String response = responseJSON.toString();
+
+	for (Session websocket : sessionWebsockets) {
+	    if (websocket.isOpen()) {
+		websocket.getBasicRemote().sendText(response);
+	    }
+	}
+    }
+
+    private static ILeaderselectionService getLeaderService() {
+	if (LearningWebsocketServer.leaderService == null) {
+	    LearningWebsocketServer.leaderService = LeaderselectionServiceProxy
+		    .getLeaderselectionService(SessionManager.getServletContext());
+	}
+	return LearningWebsocketServer.leaderService;
+    }
+}

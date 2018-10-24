@@ -23,8 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Resource Item Form.
@@ -33,7 +32,7 @@ import org.apache.struts.upload.FormFile;
  *
  * @version $Revision$
  */
-public class ResourceItemForm extends ActionForm {
+public class ResourceItemForm {
     private String itemIndex;
     private String sessionMapID;
 
@@ -50,10 +49,9 @@ public class ResourceItemForm extends ActionForm {
     private Long fileUuid;
     private Long fileVersionId;
     private String fileName;
-    private FormFile file;
+    private MultipartFile file;
     private boolean allowRating;
     private boolean allowComments;
-    
 
     public String getDescription() {
 	return description;
@@ -63,11 +61,11 @@ public class ResourceItemForm extends ActionForm {
 	this.description = description;
     }
 
-    public FormFile getFile() {
+    public MultipartFile getFile() {
 	return file;
     }
 
-    public void setFile(FormFile file) {
+    public void setFile(MultipartFile file) {
 	this.file = file;
     }
 
@@ -168,10 +166,10 @@ public class ResourceItemForm extends ActionForm {
     }
 
     public boolean isAllowComments() {
-        return allowComments;
+	return allowComments;
     }
 
     public void setAllowComments(boolean allowComments) {
-        this.allowComments = allowComments;
+	this.allowComments = allowComments;
     }
 }

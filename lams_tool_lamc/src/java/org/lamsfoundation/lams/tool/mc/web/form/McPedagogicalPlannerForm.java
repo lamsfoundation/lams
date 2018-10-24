@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mc.web.form;
 
 import java.io.UnsupportedEncodingException;
@@ -33,27 +32,35 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
+
     private static Logger logger = Logger.getLogger(McPedagogicalPlannerForm.class);
+
+    @Autowired
+    @Qualifier("lamcMessageService")
+    private static MessageService messageService;
 
     private List<String> question;
     private List<Integer> candidateAnswerCount;
     private String candidateAnswersString;
     private List<String> correct;
-    protected String httpSessionID;
 
-    public ActionMessages validate(HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate(HttpServletRequest request) {
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean allEmpty = true;
 
 	if (question != null && !question.isEmpty()) {
@@ -64,35 +71,34 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 			List<McOptionDTO> candidateAnswerList = extractCandidateAnswers(request, questionIndex);
 			if (candidateAnswerList != null) {
 			    boolean answersEmpty = true;
-			    ActionMessage correctAnswerBlankError = null;
+			    String correctAnswerBlankError = null;
 			    for (McOptionDTO answer : candidateAnswerList) {
 				if (answer != null && !StringUtils.isEmpty(answer.getCandidateAnswer())) {
 				    allEmpty = false;
 				    answersEmpty = false;
 				} else if (McAppConstants.CORRECT.equals(answer.getCorrect())) {
-				    correctAnswerBlankError = new ActionMessage(
-					    "error.pedagogical.planner.empty.answer.selected", questionIndex);
+				    correctAnswerBlankError = "error.pedagogical.planner.empty.answer.selected";
 				}
 			    }
 			    if (!answersEmpty && correctAnswerBlankError != null) {
-				errors.add(ActionMessages.GLOBAL_MESSAGE, correctAnswerBlankError);
+				errorMap.add("GLOBAL",
+					messageService.getMessage("error.pedagogical.planner.empty.answer.selected"));
 			    }
 			}
 		    } catch (UnsupportedEncodingException e) {
 			McPedagogicalPlannerForm.logger.error(e.getMessage());
-			return errors;
+			return errorMap;
 		    }
 		    questionIndex++;
 		}
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("questions.none.submitted");
-	    errors.clear();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.clear();
+	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
 	    question = null;
 	    setCandidateAnswersString("");
-	} else if (!errors.isEmpty()) {
+	} else if (!errorMap.isEmpty()) {
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();
 	    Map<String, String[]> paramMap = request.getParameterMap();
 	    setCandidateAnswerCount(new ArrayList<Integer>(getQuestionCount()));
@@ -111,8 +117,8 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    }
 	}
 
-	setValid(errors.isEmpty());
-	return errors;
+	setValid(errorMap.isEmpty());
+	return errorMap;
     }
 
     public void fillForm(McContent mcContent, IMcService mcService) {
@@ -148,7 +154,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
     public void setQuestion(int number, String Questions) {
 	if (question == null) {
-	    question = new ArrayList<String>();
+	    question = new ArrayList<>();
 	}
 	while (number >= question.size()) {
 	    question.add(null);
@@ -190,7 +196,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
 	int count = NumberUtils.toInt(param[0]);
 	int correct = Integer.parseInt(getCorrect(questionIndex - 1));
-	List<McOptionDTO> candidateAnswerList = new ArrayList<McOptionDTO>();
+	List<McOptionDTO> candidateAnswerList = new ArrayList<>();
 	for (int index = 1; index <= count; index++) {
 	    param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_PREFIX + questionIndex + "-" + index);
 	    String answer = param[0];
@@ -215,34 +221,21 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
     public void setCorrect(int number, String correct) {
 	if (this.correct == null) {
-	    this.correct = new ArrayList<String>();
+	    this.correct = new ArrayList<>();
 	}
 	while (number >= this.correct.size()) {
 	    this.correct.add(null);
 	}
 	this.correct.set(number, correct);
     }
-    
-    /**
-     * @return Returns the httpSessionID.
-     */
-    public String getHttpSessionID() {
-	return httpSessionID;
-    }
-
-    /**
-     * @param httpSessionID
-     *            The httpSessionID to set.
-     */
-    public void setHttpSessionID(String httpSessionID) {
-	this.httpSessionID = httpSessionID;
-    }
 
     public List<Integer> getCandidateAnswerCount() {
+
 	return candidateAnswerCount;
     }
 
     public void setCandidateAnswerCount(List<Integer> candidateAnswerCount) {
+
 	this.candidateAnswerCount = candidateAnswerCount;
     }
 

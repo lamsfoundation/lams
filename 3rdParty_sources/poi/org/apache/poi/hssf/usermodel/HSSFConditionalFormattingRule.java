@@ -33,6 +33,7 @@ import org.apache.poi.ss.usermodel.ConditionFilterData;
 import org.apache.poi.ss.usermodel.ConditionFilterType;
 import org.apache.poi.ss.usermodel.ConditionType;
 import org.apache.poi.ss.usermodel.ConditionalFormattingRule;
+import org.apache.poi.ss.usermodel.ExcelNumberFormat;
 
 /**
  *
@@ -90,6 +91,14 @@ public final class HSSFConditionalFormattingRule implements ConditionalFormattin
             return null;
         }
         return (CFRule12Record)cfRuleRecord;
+    }
+    
+    /**
+     * Always null for HSSF records, until someone figures out where to find it
+     * @see org.apache.poi.ss.usermodel.ConditionalFormattingRule#getNumberFormat()
+     */
+    public ExcelNumberFormat getNumberFormat() {
+        return null;
     }
 
     private HSSFFontFormatting getFontFormatting(boolean create) {
@@ -304,5 +313,13 @@ public final class HSSFConditionalFormattingRule implements ConditionalFormattin
             return null;
         }
         return HSSFFormulaParser.toFormulaString(workbook, parsedExpression);
+    }
+    
+    /**
+     * Conditional format rules don't define stripes, so always 0
+     * @see org.apache.poi.ss.usermodel.DifferentialStyleProvider#getStripeSize()
+     */
+    public int getStripeSize() {
+        return 0;
     }
 }

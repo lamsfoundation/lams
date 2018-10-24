@@ -1,9 +1,7 @@
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 
 <!--question content goes here-->
 <c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
@@ -56,7 +54,7 @@
 							</c:choose>
 						</div>
 
-						<html:hidden property="currentQuestionIndex" value="${questionEntry.key}" />
+						<form:hidden path="currentQuestionIndex" value="${questionEntry.key}" />
 	</c:if>
 </c:forEach>
 
@@ -68,14 +66,14 @@
 			test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount != 1) }">
 
-			<button id="btnGetPrevious" onclick="javascript:submitMethod('getPreviousQuestion');"
+			<button id="btnGetPrevious" type="button" onclick="javascript:submitMethod('getPreviousQuestion');"
 				class="btn btn-sm btn-default voffset10">
 				<i class="fa fa-arrow-left"></i>
 				<fmt:message key="button.getPreviousQuestion" />
 			</button>
 
 			<div align="right-buttons">
-				<button id="btnDone" onclick="javascript:submitMethod('submitAnswersContent');"
+				<button id="btnDone" type="button" onclick="javascript:submitMethod('submitAnswersContent');"
 					class="btn btn-primary voffset10 pull-right">
 					<fmt:message key="button.done" />
 				</button>
@@ -87,7 +85,7 @@
 			test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount == 1) }">
 			<div align="right-buttons">
-				<button id="btnDone" onclick="javascript:submitMethod('submitAnswersContent');"
+				<button id="btnDone" type="button" onclick="javascript:submitMethod('submitAnswersContent');"
 					class="btn btn-primary pull-right voffset10">
 					<fmt:message key="button.done" />
 				</button>
@@ -99,12 +97,12 @@
 			test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
 				 				  generalLearnerFlowDTO.currentQuestionIndex > 1}">
 
-			<button id="btnGetPrevious" onclick="javascript:submitMethod('getPreviousQuestion');"
+			<button id="btnGetPrevious" type="button" onclick="javascript:submitMethod('getPreviousQuestion');"
 				class="btn btn-sm btn-default voffset10">
 				<i class="fa fa-arrow-left"></i>&nbsp;
 				<fmt:message key="button.getPreviousQuestion" />
 			</button>
-			<button id="btnGetNext" onclick="javascript:submitMethod('getNextQuestion');"
+			<button id="btnGetNext" type="button" onclick="javascript:submitMethod('getNextQuestion');"
 				class="btn btn-sm btn-default voffset10 pull-right">
 				<fmt:message key="button.getNextQuestion" />
 				&nbsp; <i class="fa fa-arrow-right"></i>
@@ -113,7 +111,7 @@
 		</c:when>
 
 		<c:otherwise>
-			<button id="btnGetNext" onclick="javascript:submitMethod('getNextQuestion');"
+			<button id="btnGetNext" type="button" onclick="javascript:submitMethod('getNextQuestion');"
 				class="btn btn-sm btn-default voffset10 pull-right">
 				<fmt:message key="button.getNextQuestion" />
 				&nbsp; <i class="fa fa-arrow-right"></i>

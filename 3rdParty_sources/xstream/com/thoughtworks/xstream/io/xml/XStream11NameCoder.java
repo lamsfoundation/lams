@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -10,6 +10,7 @@
  */
 package com.thoughtworks.xstream.io.xml;
 
+
 /**
  * A XmlFriendlyNameCoder to support backward compatibility with XStream 1.1.
  * 
@@ -19,18 +20,18 @@ package com.thoughtworks.xstream.io.xml;
 public class XStream11NameCoder extends XmlFriendlyNameCoder {
 
     /**
-     * {@inheritDoc} Noop implementation that does not decode. Used for XStream 1.1 compatibility.
+     * {@inheritDoc} Noop implementation that does not decode. Used for XStream 1.1
+     * compatibility.
      */
-    @Override
-    public String decodeAttribute(final String attributeName) {
+    public String decodeAttribute(String attributeName) {
         return attributeName;
     }
 
     /**
-     * {@inheritDoc} Noop implementation that does not decode. Used for XStream 1.1 compatibility.
+     * {@inheritDoc} Noop implementation that does not decode. Used for XStream 1.1
+     * compatibility.
      */
-    @Override
-    public String decodeNode(final String elementName) {
+    public String decodeNode(String elementName) {
         return elementName;
     }
 }

@@ -6,7 +6,7 @@
 <lams:SimplePanel titleKey="label.editing.options">
 <div class="checkbox">
 	<label for="allowRichEditor">
-		<html:checkbox property="allowRichEditor" styleId="allowRichEditor" value="1" />
+		<form:checkbox path="allowRichEditor" id="allowRichEditor" value="1" />
 		<fmt:message key="advanced.allowRichEditor" />
 	</label>
 </div>
@@ -17,7 +17,7 @@
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
 	<label for="lockOnFinished">
-		<html:checkbox property="lockOnFinished" styleId="lockOnFinished" value="1" />
+		<form:checkbox path="lockOnFinished" id="lockOnFinished" value="1" />
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
 </div>

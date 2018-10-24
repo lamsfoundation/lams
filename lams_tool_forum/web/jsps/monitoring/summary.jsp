@@ -150,6 +150,14 @@
 			 
 			});
 	  	})
+	  	
+	  	function downloadMarks(sessionId){
+		var url = "<c:url value="/monitoring/downloadMarks.do"/>";
+	    var reqIDVar = new Date();
+		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		url = url + param;
+		location.href = url;
+	}
 
 </script>
 
@@ -202,13 +210,13 @@
 		</c:choose>
 		
 		<lams:TSTable numColumns="${numColumns}" dataId="data-session-id='${sessionDto.sessionID}'">
-			<th><fmt:message key="monitoring.user.fullname"/></th>
-			<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
-			<th width="${postingWidth}" align="center"><fmt:message key="label.latest.posting.date"/></th>
-			<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
-			<c:if test="${forum.reflectOnActivity}">
-				<th width="40%" align="center" class="sorter-false"><fmt:message key="monitoring.user.reflection"/></th>
-			</c:if>
+				<th><fmt:message key="monitoring.user.fullname"/></th>
+				<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
+				<th width="${postingWidth}" align="center"><fmt:message key="label.latest.posting.date"/></th>
+				<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
+				<c:if test="${forum.reflectOnActivity}">
+					<th width="40%" align="center" class="sorter-false"><fmt:message key="monitoring.user.reflection"/></th>
+				</c:if>
 		</lams:TSTable>
 
 		<P style="display: inline"> 
@@ -221,32 +229,26 @@
 			</div>
 					
 			<c:set var="viewforum">
-				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true" />
+				<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true
 			</c:set>
-			<html:link href="javascript:launchPopup('${viewforum}');" styleClass="btn btn-default loffset5 voffset10">
+			<a href="javascript:launchPopup('${viewforum}');" class="btn btn-default loffset5 voffset10">
 				<fmt:message key="label.monitoring.summary.view.forum"/>
-			</html:link>
-			
-			<c:if test="${!sessionDto.marksReleased}">
-				<html:button property="releaseMarks" styleId="release-marks-${sessionDto.sessionID}" onclick="releaseMarks(${sessionDto.sessionID})" styleClass="btn btn-default loffset5 voffset10" >
-					<fmt:message key="button.release.mark" />
-				</html:button>
-			</c:if>
-			
-			<html:form action="/monitoring/downloadMarks"  style="display:inline">
-				<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
-				<html:submit property="downloadMarks" styleClass="btn btn-default loffset5 voffset10" >
-					<fmt:message key="message.download.marks" />
-				</html:submit>
-			</html:form>
-			
-			<c:url value="/monitoring.do" var="refreshMonitoring">
+			</a>
+			<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" class="btn btn-default loffset5 voffset10" >
+				<fmt:message key="button.release.mark" />
+			</button>
+			<c:set value="${sessionDto.sessionID}" var="toolSessionID"/>
+			<a href="javascript:downloadMarks(${toolSessionID});"
+				name="downloadMarks" class="btn btn-default voffset10 loffset5">
+				<fmt:message key="message.download.marks" />
+			</a>
+			<c:url value="/monitoring/monitoring.do" var="refreshMonitoring">
 				<c:param name="contentFolderID" value="${contentFolderID}"/>
 				<c:param name="toolContentID" value="${toolContentID}" />
 			</c:url>
-			<html:link href="${refreshMonitoring}" styleClass="btn btn-default loffset5 voffset10" >
-				<fmt:message key="label.refresh" />
-			</html:link>
+			<a href="${refreshMonitoring}" class="btn btn-default loffset5 voffset10" >
+					<fmt:message key="label.refresh" />
+			</a>
 		</P>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">

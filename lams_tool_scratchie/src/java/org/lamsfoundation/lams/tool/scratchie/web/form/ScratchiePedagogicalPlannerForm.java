@@ -20,16 +20,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
 
 /**
  *
  */
-public class ScratchiePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class ScratchiePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private String instructions;
     private String contentFolderID;
 

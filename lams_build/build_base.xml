@@ -50,13 +50,12 @@
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
-			<include name="org/apache/httpcomponents/main/httpclient-*.jar" />
-			<include name="org/apache/httpcomponents/main/httpcore-*.jar" />
 			<include name="javax/websocket/api/main/jboss-websocket-api*.jar" />
 			<include name="org/jboss/as/controller-client/main/wildfly-controller-client-*.jar" />
 			<include name="org/jboss/dmr/main/jboss-dmr-*.jar" />
 			<include name="com/fasterxml/jackson/core/jackson-core/main/jackson-core-*.jar" />
 			<include name="com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-*.jar" />
+			<include name="javax/activation/api/main/activation-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
@@ -168,14 +167,15 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-	           source="1.8"
-			   target="1.8"
+	           source="11"
+			   target="11"
                debug="on"
                includeantruntime="false"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
                destdir="${basedir}/build/classes/java">
                <compilerarg line="-encoding utf-8"/>
+			   <compilerarg line="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED"/>
         </javac>
         
 		<echo>${ant.project.name}: Copying additional non-Java resources</echo>

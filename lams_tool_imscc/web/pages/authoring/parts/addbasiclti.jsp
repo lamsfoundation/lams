@@ -5,7 +5,7 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 		
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/commonCartridgeItem.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
    		function formSubmit(){
@@ -15,56 +15,55 @@
 </lams:head>
 	
 <body class="stripes">
-	<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<form:form action="saveOrUpdateItem.do" modelAttribute="commonCartridgeItemForm" method="post" id="commonCartridgeItemForm">
 	
 		<c:set var="title"><fmt:message key="label.authoring.basic.add.basiclti.tool" /></c:set>
 		<lams:Page title="${title}" type="learner">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
-			<html:hidden property="sessionMapID" />
+			<form:hidden path="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="1" />
-			<html:hidden property="itemIndex" />
+			<form:hidden path="itemIndex" />
 				
 			<div class="form-group">
 			    <label for="title">
 			    	<fmt:message key="label.authoring.basic.resource.title.input"/>
 			    </label>
-			    <html:text property="title" styleClass="form-control" styleId="title" tabindex="1"/>
+			    <form:input path="title" cssClass="form-control" id="title" tabindex="1"/>
 			</div>
 		
 			<div class="form-group">
 			    <label for="url">
 			    	<fmt:message key="label.authoring.basic.bascilti.url" />
 			    </label>
-			    <html:text property="url" styleClass="form-control" styleId="url" tabindex="1"/>
+			    <form:input path="url" cssClass="form-control" id="url" tabindex="1"/>
 			</div>
 					
 			<div class="form-group">
 			    <label for="key">
 			    	<fmt:message key="label.authoring.basic.bascilti.key" />
 			    </label>
-			    <html:text property="key" styleClass="form-control" styleId="key" tabindex="1"/>
+			    <form:input path="key" cssClass="form-control" id="key" tabindex="1"/>
 			</div>
 					
 			<div class="form-group">
 			    <label for="secret">
 			    	<fmt:message key="label.authoring.basic.bascilti.secret" />
 			    </label>
-			    <html:text property="secret" styleClass="form-control" styleId="secret" tabindex="1"/>
+			    <form:input path="secret" cssClass="form-control" id="secret" tabindex="1"/>
 			</div>
 					
 			<div class="form-group">
 			    <label for="buttonText">
 			    	<fmt:message key="label.authoring.basic.bascilti.button.text" />
 			    </label>
-			    <html:text property="buttonText" styleClass="form-control" styleId="buttonText" tabindex="1"/>
+			    <form:input path="buttonText" cssClass="form-control" id="buttonText" tabindex="1"/>
 			</div>
 		
 			<div class="checkbox">
 				<label for="openUrlNewWindow">
-					<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow"/>
+					<form:checkbox path="openUrlNewWindow" id="openUrlNewWindow"/>
 					<fmt:message key="open.in.new.window" />
 				</label>
 			</div>
@@ -73,15 +72,15 @@
 			    <label for="frameHeight">
 			    	<fmt:message key="label.authoring.basic.bascilti.iframe.height" />
 			    </label>
-			    <html:text property="frameHeight" styleClass="form-control" styleId="frameHeight" tabindex="1"/>
+			    <form:input path="frameHeight" cssClass="form-control" id="frameHeight" tabindex="1"/>
 			</div>
 					
-			<c:if test="${not empty formBean.customStr}">
+			<c:if test="${not empty commonCartridgeItemForm.customStr}">
 				<div class="form-group">
 				    <label for="customStr">
 				    	<fmt:message key="label.authoring.basic.bascilti.custom.parameters" />
 				    </label>
-				    <lams:STRUTS-textarea rows="5" property="customStr" styleClass="form-control" styleId="customStr" tabindex="1"/>
+					<lams:textarea rows="5" name="customStr" class="form-control" id="customStr" tabindex="1"></lams:textarea>
 				</div>						
 			</c:if>
 
@@ -96,7 +95,7 @@
 					
 		</lams:Page>
 
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>

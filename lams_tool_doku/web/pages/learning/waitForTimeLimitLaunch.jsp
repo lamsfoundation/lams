@@ -73,9 +73,9 @@
 		</lams:Alert>
 
 		<div class="voffset10">
-			<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-sm btn-default pull-right">
+			<button name="refreshButton" onclick="refresh();" class="btn btn-sm btn-default pull-right">
 				<fmt:message key="label.refresh" />
-			</html:button>
+			</button>
 		</div>
 
 		<div id="footer"></div>

@@ -54,7 +54,9 @@ public class LessonDetailsDTO {
     private Long learningDesignID;
     private Integer numberPossibleLearners;
     private Integer numberStartedLearners;
-    private Boolean locked_for_edit;
+    private Boolean lockedForEdit;
+    private Integer lockedForEditUserId;
+    private String lockedForEditUsername;
     private Boolean learnerPresenceAvailable;
     private Boolean learnerImAvailable;
     private Boolean liveEditEnabled;
@@ -118,7 +120,11 @@ public class LessonDetailsDTO {
 
 	this.liveEditEnabled = lesson.getLiveEditEnabled();
 
-	this.locked_for_edit = lesson.getLockedForEdit();
+	this.lockedForEdit = lesson.getLockedForEdit();
+	if ( this.lockedForEdit && lesson.getLearningDesign().getEditOverrideUser() != null ) {
+	    this.lockedForEditUserId = lesson.getLearningDesign().getEditOverrideUser().getUserId();
+	    this.lockedForEditUsername = lesson.getLearningDesign().getEditOverrideUser().getFullName();
+	}
 
 	this.isPreview = lesson.isPreviewLesson();
 	this.enabledLessonNotifications = lesson.getEnableLessonNotifications();
@@ -279,19 +285,11 @@ public class LessonDetailsDTO {
     }
 
     public Boolean getLockedForEdit() {
-	return locked_for_edit;
+	return lockedForEdit;
     }
 
     public Boolean getLiveEditEnabled() {
 	return liveEditEnabled;
-    }
-
-    public Boolean getLocked_for_edit() {
-	return locked_for_edit;
-    }
-
-    public void setLocked_for_edit(Boolean locked_for_edit) {
-	this.locked_for_edit = locked_for_edit;
     }
 
     public Boolean getIsPreview() {
@@ -391,6 +389,10 @@ public class LessonDetailsDTO {
 	this.learnerImAvailable = learnerImAvailable;
     }
 
+    public void setLockedForEdit(Boolean lockedForEdit) {
+	this.lockedForEdit = lockedForEdit;
+    }
+
     public void setLiveEditEnabled(Boolean liveEditEnabled) {
 	this.liveEditEnabled = liveEditEnabled;
     }
@@ -417,5 +419,21 @@ public class LessonDetailsDTO {
 
     public void setGradebookOnComplete(Boolean gradebookOnComplete) {
         this.gradebookOnComplete = gradebookOnComplete;
+    }
+
+    public Integer getLockedForEditUserId() {
+	return lockedForEditUserId;
+    }
+
+    public void setLockedForEditUserId(Integer lockedForEditUserId) {
+	this.lockedForEditUserId = lockedForEditUserId;
+    }
+
+    public String getLockedForEditUsername() {
+        return lockedForEditUsername;
+    }
+
+    public void setLockedForEditUsername(String lockedForEditUsername) {
+        this.lockedForEditUsername = lockedForEditUsername;
     }
 }

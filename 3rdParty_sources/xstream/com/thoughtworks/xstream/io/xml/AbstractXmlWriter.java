@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -14,31 +14,29 @@ package com.thoughtworks.xstream.io.xml;
 import com.thoughtworks.xstream.io.AbstractWriter;
 import com.thoughtworks.xstream.io.naming.NameCoder;
 
-
 /**
- * Abstract base implementation of HierarchicalStreamWriter that provides common functionality to all XML-based writers.
+ * Abstract base implementation of HierarchicalStreamWriter that provides common functionality
+ * to all XML-based writers.
  * 
  * @author Mauro Talevi
  * @author J&ouml;rg Schaible
  * @since 1.2
  * @deprecated As of 1.4 use {@link AbstractWriter} instead
  */
-@Deprecated
 public abstract class AbstractXmlWriter extends AbstractWriter implements XmlFriendlyWriter {
 
-    protected AbstractXmlWriter() {
+    protected AbstractXmlWriter(){
         this(new XmlFriendlyNameCoder());
     }
 
     /**
      * @deprecated As of 1.4
      */
-    @Deprecated
-    protected AbstractXmlWriter(final XmlFriendlyReplacer replacer) {
+    protected AbstractXmlWriter(XmlFriendlyReplacer replacer) {
         this((NameCoder)replacer);
     }
 
-    protected AbstractXmlWriter(final NameCoder nameCoder) {
+    protected AbstractXmlWriter(NameCoder nameCoder) {
         super(nameCoder);
     }
 
@@ -49,9 +47,7 @@ public abstract class AbstractXmlWriter extends AbstractWriter implements XmlFri
      * @return An escaped name with original characters replaced
      * @deprecated As of 1.4 use {@link #encodeNode(String)} or {@link #encodeAttribute(String)} instead
      */
-    @Deprecated
-    @Override
-    public String escapeXmlName(final String name) {
+    public String escapeXmlName(String name) {
         return super.encodeNode(name);
     }
 

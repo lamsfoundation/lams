@@ -21,7 +21,7 @@
 			}
 			
 			function submitForm(methodName){
-				var f = document.getElementById('messageForm');
+				var f = document.getElementById('learningForm');
 				f.submit();
 			}
 
@@ -34,18 +34,17 @@
 	<body class="stripes">
 		<lams:Page type="learner" title="${pixlrDTO.title}">
 		
-			<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
-				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
-				<html:hidden property="mode" value="${mode}" />
+			<form:form action="submitReflection.do" modelAttribute="learningForm" method="post" onsubmit="disableFinishButton();" id="learningForm">
+				<form:hidden path="toolSessionID" id="toolSessionID"/>
+				<form:hidden path="mode" value="${mode}" />
 				
 				<div class="panel">
 					<lams:out value="${pixlrDTO.reflectInstructions}" escapeHtml="true"/>
 				</div>
 		
-				<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"/>
+				<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"/>
 		
-				<html:hidden property="dispatch" value="submitReflection" />
-				<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right" styleId="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary voffset10 pull-right" id="finishButton" onclick="submitForm('finish')">
 					<span class="na">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
@@ -56,8 +55,8 @@
 							</c:otherwise>
 						</c:choose>
 					</span>
-				</html:link>
-			</html:form>
+				</a>
+			</form:form>
 		
 			<div class="footer"></div>
 				

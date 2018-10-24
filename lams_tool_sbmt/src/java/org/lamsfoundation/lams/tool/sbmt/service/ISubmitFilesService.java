@@ -21,15 +21,12 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -44,6 +41,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Manpreet Minhas
@@ -88,16 +86,17 @@ public interface ISubmitFilesService {
      *
      * @throws SubmitFilesException
      */
-    public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
+    public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
 	    throws SubmitFilesException;
 
-    /** 
+    /**
      * Get a the details for a single file uploaded by a learner
+     * 
      * @param detailId
      * @return SubmissionDetails
      */
     public SubmissionDetails getSubmissionDetail(Long detailId);
-    
+
     /**
      * This method returns a list of files that were uploaded by the given
      * <code>User<code> for given <code>contentID</code>.
@@ -111,10 +110,11 @@ public interface ISubmitFilesService {
      * @param sessionID
      *            The <code>session_id</code> to be looked up
      * @param includeRemovedFiles
-     * 		  Should files removed in monitor be included.
+     *            Should files removed in monitor be included.
      * @return List The list of required objects.
      */
-    public List<FileDetailsDTO> getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale, boolean includeRemovedFiles);
+    public List<FileDetailsDTO> getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale,
+	    boolean includeRemovedFiles);
 
     /**
      * This method returns a SortedMap of all files that were submitted users within a given <code>sessionID</code>.
@@ -135,7 +135,7 @@ public interface ISubmitFilesService {
      * @param marksFileInputStream
      * @param marksFileName
      */
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile file, Long SessionID)	    
+    public void updateMarks(Long reportID, Float marks, String comments, MultipartFile file, Long SessionID)
 	    throws InvalidParameterException, RepositoryCheckedException;
 
     /**
@@ -144,24 +144,27 @@ public interface ISubmitFilesService {
      * @param reportID
      * @param markFileUUID
      * @param markFileVersionID
-     * @throws RepositoryCheckedException 
-     * @throws InvalidParameterException 
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
      */
-    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID) throws InvalidParameterException, RepositoryCheckedException;
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID, Long sessionID)
+	    throws InvalidParameterException, RepositoryCheckedException;
 
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
      * from the content repository.
+     * 
      * @param detailID
      */
     public void removeLearnerFile(Long detailID, UserDTO monitor);
 
     /**
      * Mark a deleted original file as not deleted. Undoes what removeLearnerFile().
+     * 
      * @param detailID
      */
     public void restoreLearnerFile(Long detailID, UserDTO monitor);
-    
+
     public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale);
 
     /**
@@ -298,7 +301,7 @@ public interface ISubmitFilesService {
      * [SubmitUser, Integer1, Integer2, String]>
      * where Integer1 is the number of files uploaded, Integer2 is the number of files marked
      * and String is the notebook entry. No notebook entries needed? Will return null in their place.
-     * 
+     *
      * @return
      */
     List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
@@ -307,22 +310,22 @@ public interface ISubmitFilesService {
     /**
      * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports
      * filtering.
-     * 
+     *
      * @return
      */
     int getCountUsersBySession(Long sessionId, String searchString);
 
     /**
      * Get the basic statistics for all the sessions for one activity.
-     * 
+     *
      * @param contentId
      * @return
      */
-    List<StatisticDTO> getStatisticsBySession(final Long contentId);   
-    
+    List<StatisticDTO> getStatisticsBySession(final Long contentId);
+
     /**
      * Get the leader statistics for all the sessions for one activity.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -348,14 +351,14 @@ public interface ISubmitFilesService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
-    
+
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      *
@@ -363,20 +366,19 @@ public interface ISubmitFilesService {
      * @param toolSessionID
      */
     SubmitUser checkLeaderSelectToolForSessionLeader(SubmitUser user, Long toolSessionID);
-    
+
     /**
      * Create a new user in database.
      */
     void createUser(SubmitUser submitUser);
-    
+
     /**
      * @param user
      * @param toolSessionId
      * @return
      */
     boolean isUserGroupLeader(SubmitUser user, Long toolSessionId);
-    
 
     void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser);
-    
+
 }

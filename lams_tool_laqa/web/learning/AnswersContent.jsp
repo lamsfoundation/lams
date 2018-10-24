@@ -93,8 +93,8 @@
 		
 		function doSubmit(actionMethod) {
 			$('.btn').prop('disabled', true);
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
+			document.forms.qaLearningForm.action=actionMethod+".do"; 
+			document.forms.qaLearningForm.submit();
 		}
 		
 		if (${!hasEditRight && mode != "teacher"}) {
@@ -105,8 +105,8 @@
 			
 	        $.ajax({
 	        	async: false,
-	            url: '<c:url value="/learning.do"/>',
-	            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
+	            url: '<c:url value="checkLeaderProgress.do"/>',
+	            data: 'toolSessionID=' + $("#tool-session-id").val(),
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
@@ -133,8 +133,8 @@
 					}
 					
 					//ajax form submit
-					$('#learningForm').ajaxSubmit({
-						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
+					$('#qaLearningForm').ajaxSubmit({
+						url: '<c:url value="autoSaveAnswers.do?date=" />' + new Date().getTime(),
 			               success: function() {
 			               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
 			               }
@@ -199,8 +199,8 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
-		styleId="learningForm">
+	<form:form action="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential' ? 'getNextQuestion.do' : 'submitAnswersContent.do'}"
+	 method="POST" target="_self" id="qaLearningForm" modelAttribute="qaLearningForm">
 
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -229,20 +229,11 @@
 		<!-- End advanced settings and notices -->
 
 
-			<c:choose>
-				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
-					<html:hidden property="method" value="getNextQuestion" />
-				</c:when>
-				<c:otherwise>
-					<html:hidden property="method" value="submitAnswersContent" />
-				</c:otherwise>
-			</c:choose>
-
-			<html:hidden property="toolSessionID" styleId="tool-session-id" />
-			<html:hidden property="userID" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="questionIndex" />
-			<html:hidden property="totalQuestionCount" />
+			<form:hidden path="toolSessionID" id="tool-session-id" />
+			<form:hidden path="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="questionIndex" />
+			<form:hidden path="totalQuestionCount" />
 
 			
 
@@ -250,14 +241,7 @@
 				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 			</div>
 
-			<logic:messagesPresent>
-			<lams:Alert id="error" type="danger" close="false">
-				<html:messages id="error" message="false">
-						<c:out value="${error}" escapeXml="false" />
-						<BR>
-					</html:messages>
-			</lams:Alert>
-			</logic:messagesPresent>
+			<lams:errors/>
 			
 			<c:choose>
 				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
@@ -298,7 +282,7 @@
 
 	</lams:Page>
 
-	</html:form>
+	</form:form>
 
 </body>
 </lams:html>

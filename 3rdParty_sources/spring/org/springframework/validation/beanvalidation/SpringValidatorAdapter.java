@@ -51,7 +51,7 @@ import org.springframework.validation.SmartValidator;
  * <p>Note that Bean Validation 1.1's {@code #forExecutables} method isn't supported
  * on this adapter: We do not expect that method to be called by application code;
  * consider {@link MethodValidationInterceptor} instead. If you really need programmatic
- * {@code #forExecutables} access, call {@code #unwrap(Validator.class) which will
+ * {@code #forExecutables} access, call {@code #unwrap(Validator.class)} which will
  * provide the native {@link Validator} object with {@code #forExecutables} support.
  *
  * @author Juergen Hoeller
@@ -177,7 +177,9 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
 	 * @see org.springframework.validation.FieldError#getField()
 	 */
 	protected String determineField(ConstraintViolation<Object> violation) {
-		return violation.getPropertyPath().toString();
+		String path = violation.getPropertyPath().toString();
+		int elementIndex = path.indexOf(".<");
+		return (elementIndex >= 0 ? path.substring(0, elementIndex) : path);
 	}
 
 	/**

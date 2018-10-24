@@ -132,6 +132,7 @@ public class CellReference {
         if (rowRef.length() == 0) {
             _rowIndex = -1;
         } else {
+            // throws NumberFormatException if rowRef is not convertable to an int
             _rowIndex = Integer.parseInt(rowRef)-1; // -1 to convert 1-based to zero-based
         }
     }
@@ -184,10 +185,10 @@ public class CellReference {
     /**
      * takes in a column reference portion of a CellRef and converts it from
      * ALPHA-26 number format to 0-based base 10.
-     * 'A' -> 0
-     * 'Z' -> 25
-     * 'AA' -> 26
-     * 'IV' -> 255
+     * 'A' -&gt; 0
+     * 'Z' -&gt; 25
+     * 'AA' -&gt; 26
+     * 'IV' -&gt; 255
      * @return zero based column index
      */
     public static int convertColStringToIndex(String ref) {
@@ -282,9 +283,9 @@ public class CellReference {
      * interpreted as a cell reference.  Names of that form can be also used for sheets and/or
      * named ranges, and in those circumstances, the question of whether the potential cell
      * reference is valid (in range) becomes important.
-     * <p/>
+     * <p>
      * Note - that the maximum sheet size varies across Excel versions:
-     * <p/>
+     * <p>
      * <blockquote><table border="0" cellpadding="1" cellspacing="0"
      *                 summary="Notable cases.">
      *   <tr><th>Version&nbsp;&nbsp;</th><th>File Format&nbsp;&nbsp;</th>
@@ -320,14 +321,6 @@ public class CellReference {
         return isRowWithinRange(rowStr, ssVersion);
     }
 
-    /**
-     * @deprecated 3.15 beta 2. Use {@link #isColumnWithinRange}.
-     */
-    @Deprecated
-    public static boolean isColumnWithnRange(String colStr, SpreadsheetVersion ssVersion) {
-        return isColumnWithinRange(colStr, ssVersion);
-    }
-
     public static boolean isColumnWithinRange(String colStr, SpreadsheetVersion ssVersion) {
         // Equivalent to 0 <= CellReference.convertColStringToIndex(colStr) <= ssVersion.getLastColumnIndex()
 
@@ -351,15 +344,23 @@ public class CellReference {
     }
 
     /**
-     * @deprecated 3.15 beta 2. Use {@link #isRowWithinRange}
+     * Determines whether {@code rowStr} is a valid row number for a given SpreadsheetVersion.
+     * @param rowStr  the numeric portion of an A1-style cell reference (1-based index)
+     * @param ssVersion  the spreadsheet version
+     * @throws NumberFormatException if rowStr is not parseable as an integer
      */
-    @Deprecated
-    public static boolean isRowWithnRange(String rowStr, SpreadsheetVersion ssVersion) {
-        return isRowWithinRange(rowStr, ssVersion);
+    public static boolean isRowWithinRange(String rowStr, SpreadsheetVersion ssVersion) {
+        final int rowNum = Integer.parseInt(rowStr) - 1;
+        return isRowWithinRange(rowNum, ssVersion);
     }
 
-    public static boolean isRowWithinRange(String rowStr, SpreadsheetVersion ssVersion) {
-        int rowNum = Integer.parseInt(rowStr) - 1;
+    /**
+     * Determines whether {@code row} is a valid row number for a given SpreadsheetVersion.
+     * @param rowNum  the row number (0-based index)
+     * @param ssVersion  the spreadsheet version
+     * @since 3.17 beta 1
+     */
+    public static boolean isRowWithinRange(int rowNum, SpreadsheetVersion ssVersion) {
         return 0 <= rowNum && rowNum <= ssVersion.getLastRowIndex();
     }
 
@@ -408,7 +409,7 @@ public class CellReference {
         boolean isQuoted = reference.charAt(0) == SPECIAL_NAME_DELIMITER;
         if(!isQuoted) {
             // sheet names with spaces must be quoted
-            if (reference.indexOf(' ') == -1) {
+            if (! reference.contains(" ")) {
                 return reference.substring(0, indexOfSheetNameDelimiter);
             } else {
                 throw new IllegalArgumentException("Sheet names containing spaces must be quoted: (" + reference + ")");
@@ -448,7 +449,7 @@ public class CellReference {
     /**
      * Takes in a 0-based base-10 column and returns a ALPHA-26
      *  representation.
-     * eg column #3 -> D
+     * eg {@code convertNumToColString(3)} returns {@code "D"}
      */
     public static String convertNumToColString(int col) {
         // Excel counts column A as the 1st column, we
@@ -473,7 +474,7 @@ public class CellReference {
 
     /**
      * Returns a text representation of this cell reference.
-     * <p/>
+     * <p>
      *  Example return values:
      *	<table border="0" cellpadding="1" cellspacing="0" summary="Example return values">
      *	  <tr><th align='left'>Result</th><th align='left'>Comment</th></tr>

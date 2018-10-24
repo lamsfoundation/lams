@@ -8,7 +8,6 @@
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -49,12 +48,12 @@
 		// keep mapped outcome IDs for search result filtering
 		outcomeMappingIds${outcomeTagId} = [],
 		
-		outcomeExistingNoneLabel = '<fmt:message key="advanced.outcome.existing.none" />',
+		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
 		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>';
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({
-			'source' : "<lams:LAMSURL/>outcome.do?method=outcomeSearch&organisationIds=${organisations}",
+			'source' : "<lams:LAMSURL/>outcome/outcomeSearch.do?organisationIds=${organisations}",
 			'delay'  : 700,
 			'minLength' : 2,
 			'response' : function(event, ui) {
@@ -69,9 +68,8 @@
 			'select' : function(event, ui){
 				var input = $(this);
 				$.ajax({
-					'url' : '<lams:LAMSURL/>outcome.do',
+					'url' : '<lams:LAMSURL/>outcome/outcomeMap',
 					'data': $.extend({
-						'method' : 'outcomeMap',
 						'outcomeId' : ui.item.value
 					}, outcomeData${outcomeTagId}),
 					'method' : 'post',
@@ -95,10 +93,8 @@
 	 */
 	function refreshOutcomeMappings(outcomeTagId) {
 		$.ajax({
-			'url' 	   : '<lams:LAMSURL/>outcome.do',
-			'data'	   : $.extend({
-							'method' : 'outcomeGetMappings'
-						 }, outcomeData${outcomeTagId}),
+			'url' 	   : '<lams:LAMSURL/>outcome/outcomeGetMappings.do',
+			'data'	   : outcomeData${outcomeTagId},
 			'cache'    : false,
 			'dataType' : 'json',
 			'success'  : function(outcomeMappings) {
@@ -130,9 +126,8 @@
 	 */
 	function removeOutcomeMapping(button) {
 		$.ajax({
-			'url' : '<lams:LAMSURL/>outcome.do',
+			'url' : '<lams:LAMSURL/>outcome/outcomeRemoveMapping.do',
 			'data': {
-					'method' 	: 'outcomeRemoveMapping',
 					'mappingId' :  $(button).attr('mappingId')
 				}, 
 			'cache' : false,
@@ -143,13 +138,13 @@
 	}
 </script>
 
-<lams:SimplePanel titleKey="advanced.outcome.title">
+<lams:SimplePanel titleKey="outcome.authoring.title">
 	<div class="input-group">
 	    <span class="input-group-addon"><i class="fa fa-search"></i></span>
 	    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
-	    	   placeholder='<fmt:message key="advanced.outcome.input" />'></input>
+	    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
 	</div>
 	<div class="voffset10">
-		<fmt:message key="advanced.outcome.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
+		<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
 	</div>
 </lams:SimplePanel>

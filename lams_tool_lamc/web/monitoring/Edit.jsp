@@ -16,11 +16,11 @@
 	</tr>
 </table>
 
-<c:url  var="authoringUrl" value="/authoringStarter.do">
+<c:url  var="authoringUrl" value="/authoring/authoring.do">
 	<c:param name="toolContentID" value="${mcGeneralMonitoringDTO.toolContentID}" />
 	<c:param name="contentFolderID" value="${contentFolderID}" />
 	<c:param name="mode" value="teacher" />
 </c:url>
-<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
+<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
 	<fmt:message key="label.edit"/>
-</html:link>				 		  					
+</a>				 		  					

@@ -20,38 +20,37 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.web.forms;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeHeading;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  *
  */
-public class ScribePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class ScribePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> headings;
     private String contentFolderID;
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate() {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean valid = true;
 
 	setValid(valid);
-	return errors;
+	return errorMap;
     }
 
     public void fillForm(Scribe scribe) {
 	if (scribe != null) {
 	    setToolContentID(scribe.getToolContentId());
-	    headings = new ArrayList<String>();
+	    headings = new ArrayList<>();
 	    Set<ScribeHeading> scribeHeadings = scribe.getScribeHeadings();
 
 	    if (scribeHeadings != null) {
@@ -65,7 +64,7 @@ public class ScribePedagogicalPlannerForm extends PedagogicalPlannerActivityForm
 
     public void setHeading(int number, String heading) {
 	if (headings == null) {
-	    headings = new ArrayList<String>();
+	    headings = new ArrayList<>();
 	}
 	while (number >= headings.size()) {
 	    headings.add(null);

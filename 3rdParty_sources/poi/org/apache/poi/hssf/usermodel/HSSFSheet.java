@@ -521,7 +521,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * <code>
      * Truncate([numChars*7+5]/7*256)/256 = 8;
      * </code>
-     * <p/>
+     * <p>
      * which gives <code>7.29</code>.
      *
      * @param columnIndex - the column to set (0-based)
@@ -1980,7 +1980,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         List<EscherRecord> escherRecords = r.getEscherRecords();
         for (EscherRecord escherRecord : escherRecords) {
             if (fat) {
-                pw.println(escherRecord.toString());
+                pw.println(escherRecord);
             } else {
                 escherRecord.display(pw, 0);
             }
@@ -2172,18 +2172,6 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             }
             setColumnWidth(column, (int) (width));
         }
-
-    }
-
-    /**
-     * Returns cell comment for the specified row and column
-     *
-     * @return cell comment or <code>null</code> if not found
-     * @deprecated as of 2015-11-23 (circa POI 3.14beta1). Use {@link #getCellComment(CellAddress)} instead.
-     */
-    @Override
-    public HSSFComment getCellComment(int row, int column) {
-        return findCellComment(row, column);
     }
     
     /**

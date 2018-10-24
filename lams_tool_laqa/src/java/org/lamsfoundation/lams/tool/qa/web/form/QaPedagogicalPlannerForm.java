@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.web.form;
 
 import java.util.ArrayList;
@@ -28,13 +27,21 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityForm;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
+
+    @Autowired
+    @Qualifier("qaMessageService")
+    private MessageService messageService;
+
     private List<String> question;
     private String contentFolderID;
 
@@ -46,9 +53,8 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	this.contentFolderID = contentFolderID;
     }
 
-    @Override
-    public ActionMessages validate() {
-	ActionMessages errors = new ActionMessages();
+    public MultiValueMap<String, String> validate() {
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean valid = true;
 	boolean allEmpty = true;
 	if (question != null && !question.isEmpty()) {
@@ -60,21 +66,20 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    }
 	}
 	if (allEmpty) {
-	    ActionMessage error = new ActionMessage("questions.none.submitted");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
 	    valid = false;
 	    question = null;
 	}
 
 	setValid(valid);
-	return errors;
+	return errorMap;
     }
 
     public void fillForm(QaContent qaContent) {
 	if (qaContent != null) {
 	    setToolContentID(qaContent.getQaContentId());
 
-	    question = new ArrayList<String>();
+	    question = new ArrayList<>();
 	    Set questions = qaContent.getQaQueContents();
 	    if (questions != null) {
 		int topicIndex = 0;
@@ -87,7 +92,7 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
     public void setQuestion(int number, String Questions) {
 	if (question == null) {
-	    question = new ArrayList<String>();
+	    question = new ArrayList<>();
 	}
 	while (number >= question.size()) {
 	    question.add(null);

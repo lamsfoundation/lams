@@ -24,8 +24,6 @@ package org.lamsfoundation.lams.tool.mc.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
 /**
@@ -33,7 +31,7 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
  *
  *         ActionForm for the Learning environment
  */
-public class McLearningForm extends ActionForm {
+public class McLearningForm {
     protected String continueOptions;
     protected String nextOptions;
     protected String continueOptionsCombined;
@@ -68,7 +66,7 @@ public class McLearningForm extends ActionForm {
 
     public IMcService mcService;
 
-    public void resetCa(ActionMapping mapping, HttpServletRequest request) {
+    public void resetCa(HttpServletRequest request) {
 	checkedCa = new String[0];
     }
 

@@ -3,14 +3,14 @@
 
 <html>
 	<body class="stripes">
-		<c:url value="authoring/init.do" var="actionURL">
+		<c:url value="init.do" var="actionURL">
 			<c:param name="mode" value="${mode}" />
 			<c:param name="notifyCloseURL" value="${param.notifyCloseURL}" />
 		</c:url>
-		<html:form action="${actionURL}" method="post" styleId="startForm">
-			<html:hidden property="assessment.contentId"/>
-			<html:hidden property="sessionMapID"/>
-		</html:form>
+		<form:form action="${actionURL}" method="post" modelAttribute="assessmentForm" id="startForm">
+			<form:hidden path="assessment.contentId"/>
+			<form:hidden path="sessionMapID"/>
+		</form:form>
 		
 		<script type="text/javascript">
 			document.getElementById("startForm").submit();

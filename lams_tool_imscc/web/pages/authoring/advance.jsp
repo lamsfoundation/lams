@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- Advance Tab Content -->
 
@@ -7,17 +6,17 @@
 
 <div class="checkbox">
 	<label for="run-auto">
-		<html:checkbox property="commonCartridge.runAuto" styleId="run-auto"/>
+		<form:checkbox path="commonCartridge.runAuto" id="run-auto"/>
 		<fmt:message key="label.authoring.advance.run.content.auto" />
 	</label>
 </div>
 
 <div class="select">
-	<html:select property="commonCartridge.miniViewCommonCartridgeNumber"
-			styleId="viewNumList" styleClass="form-control input-sm form-control-inline roffset5">
+	<form:select path="commonCartridge.miniViewCommonCartridgeNumber"
+			id="viewNumList" cssClass="form-control input-sm form-control-inline roffset5">
 		<c:forEach begin="1" end="${fn:length(commonCartridgeList)}" varStatus="status">
 			<c:choose>
-				<c:when test="${formBean.commonCartridge.miniViewCommonCartridgeNumber == status.index}">
+				<c:when test="${authoringForm.commonCartridge.miniViewCommonCartridgeNumber == status.index}">
 					<option value="${status.index}" selected="true">
 						${status.index}
 					</option>
@@ -29,7 +28,7 @@
 				</c:otherwise>
 			</c:choose>
 		</c:forEach>
-	</html:select>
+	</form:select>
 
 	<label for="viewNumList">
 	<fmt:message key="label.authoring.advance.mini.number.resources.view" />
@@ -38,26 +37,19 @@
 
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.commonCartridge.contentId}" />
+<lams:OutcomeAuthor toolContentId="${authoringForm.commonCartridge.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">
-	<label for="lock-when-finished">
-		<html:checkbox property="commonCartridge.lockWhenFinished" styleId="lock-when-finished"/>
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</div>
-
-<div class="checkbox">
 	<label for="reflect-on-activity">
-		<html:checkbox property="commonCartridge.reflectOnActivity" styleId="reflect-on-activity"/>
+		<form:checkbox path="commonCartridge.reflectOnActivity" id="reflect-on-activity"/>
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
 </div>
 
 <div class="form-group">
-	<html:textarea property="commonCartridge.reflectInstructions" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
+	<form:textarea path="commonCartridge.reflectInstructions" rows="3" id="reflect-instructions" cssClass="form-control"/>
 </div>
 
 </lams:SimplePanel>

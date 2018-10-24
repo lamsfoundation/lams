@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2009, 2011, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007, 2009, 2011 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,11 +11,11 @@
  */
 package com.thoughtworks.xstream.io.xml;
 
+import com.thoughtworks.xstream.io.naming.NameCoder;
+
 import org.dom4j.Branch;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
-
-import com.thoughtworks.xstream.io.naming.NameCoder;
 
 
 public class Dom4JWriter extends AbstractDocumentWriter {
@@ -25,7 +25,8 @@ public class Dom4JWriter extends AbstractDocumentWriter {
     /**
      * @since 1.4
      */
-    public Dom4JWriter(final Branch root, final DocumentFactory factory, final NameCoder nameCoder) {
+    public Dom4JWriter(
+        final Branch root, final DocumentFactory factory, final NameCoder nameCoder) {
         super(root, nameCoder);
         documentFactory = factory;
     }
@@ -48,8 +49,8 @@ public class Dom4JWriter extends AbstractDocumentWriter {
      * @since 1.2.1
      * @deprecated As of 1.4 use {@link Dom4JWriter#Dom4JWriter(Branch, DocumentFactory, NameCoder)} instead.
      */
-    @Deprecated
-    public Dom4JWriter(final Branch root, final DocumentFactory factory, final XmlFriendlyReplacer replacer) {
+    public Dom4JWriter(
+        final Branch root, final DocumentFactory factory, final XmlFriendlyReplacer replacer) {
         this(root, factory, (NameCoder)replacer);
     }
 
@@ -57,7 +58,6 @@ public class Dom4JWriter extends AbstractDocumentWriter {
      * @since 1.2.1
      * @deprecated As of 1.4 use {@link Dom4JWriter#Dom4JWriter(DocumentFactory, NameCoder)} instead.
      */
-    @Deprecated
     public Dom4JWriter(final DocumentFactory factory, final XmlFriendlyReplacer replacer) {
         this(null, factory, (NameCoder)replacer);
     }
@@ -73,7 +73,6 @@ public class Dom4JWriter extends AbstractDocumentWriter {
      * @since 1.2.1
      * @deprecated As of 1.4 use {@link Dom4JWriter#Dom4JWriter(Branch, NameCoder)} instead
      */
-    @Deprecated
     public Dom4JWriter(final Branch root, final XmlFriendlyReplacer replacer) {
         this(root, new DocumentFactory(), (NameCoder)replacer);
     }
@@ -89,7 +88,6 @@ public class Dom4JWriter extends AbstractDocumentWriter {
         this(new DocumentFactory(), new XmlFriendlyNameCoder());
     }
 
-    @Override
     protected Object createNode(final String name) {
         final Element element = documentFactory.createElement(encodeNode(name));
         final Branch top = top();
@@ -99,12 +97,10 @@ public class Dom4JWriter extends AbstractDocumentWriter {
         return element;
     }
 
-    @Override
     public void setValue(final String text) {
         top().setText(text);
     }
 
-    @Override
     public void addAttribute(final String key, final String value) {
         ((Element)top()).addAttribute(encodeAttribute(key), value);
     }

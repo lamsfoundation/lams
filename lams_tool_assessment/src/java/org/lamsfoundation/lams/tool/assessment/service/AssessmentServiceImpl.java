@@ -1645,7 +1645,7 @@ public class AssessmentServiceImpl
 		    }
 		} else {
 		    averageRow = new ExcelCell[9];
-		    averageRow[6] = new ExcelCell(getMessage("label.	.average"), true);
+		    averageRow[6] = new ExcelCell(getMessage("label.export.average"), true);
 
 		    if (timeTakenTotal > 0) {
 			averageRow[7] = new ExcelCell(new Long(timeTakenTotal / timeTakenCount), false);

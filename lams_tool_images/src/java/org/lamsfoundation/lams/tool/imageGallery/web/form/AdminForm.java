@@ -20,33 +20,26 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  *
  */
-public class AdminForm extends ActionForm {
+public class AdminForm {
+
+    @Autowired
+    @Qualifier("laimagMessageService")
+    private static MessageService messageService;
+
     private static final long serialVersionUID = 414425664356226L;
 
     private String mediumImageDimensions;
 
     private String thumbnailImageDimensions;
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-	return ac;
-    }
 
     public String getMediumImageDimensions() {
 	return mediumImageDimensions;

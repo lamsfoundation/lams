@@ -15,7 +15,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -84,7 +84,7 @@
 			<c:forEach var="session" items="${dto.sessionDTOs}">
 			<tr>
 				<td>
-					<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
+					<a href='javascript:openViewWindow("<lams:WebAppURL />monitoring/showWiki.do?toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
 				</td>	
 				<td>
 					${session.numberOfLearners}

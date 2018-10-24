@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004 Joe Walnes.
- * Copyright (C) 2006, 2007, 2014 XStream Committers.
+ * Copyright (C) 2006, 2007 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -11,37 +11,33 @@
  */
 package com.thoughtworks.xstream.core;
 
+import com.thoughtworks.xstream.converters.DataHolder;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.thoughtworks.xstream.converters.DataHolder;
-
-
 public class MapBackedDataHolder implements DataHolder {
-    private final Map<Object, Object> map;
+    private final Map map;
 
     public MapBackedDataHolder() {
-        this(new HashMap<Object, Object>());
+        this(new HashMap());
     }
 
-    public MapBackedDataHolder(final Map<Object, Object> map) {
+    public MapBackedDataHolder(Map map) {
         this.map = map;
     }
 
-    @Override
-    public Object get(final Object key) {
+    public Object get(Object key) {
         return map.get(key);
     }
 
-    @Override
-    public void put(final Object key, final Object value) {
+    public void put(Object key, Object value) {
         map.put(key, value);
     }
 
-    @Override
-    public Iterator<Object> keys() {
+    public Iterator keys() {
         return Collections.unmodifiableCollection(map.keySet()).iterator();
     }
 }

@@ -35,6 +35,9 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibraryConfig;
+import org.lamsfoundation.lams.tool.deploy.libraryActivity.LearningLibrary;
+import org.lamsfoundation.lams.tool.deploy.libraryActivity.ToolActivity;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
@@ -119,6 +122,9 @@ public abstract class DeployConfig {
     public DeployConfig(String outputPath) {
 	this.validationError = "";
 	xstream = new XStream(new DomDriver());
+	Class<?>[] classes = new Class[] { DeployToolConfig.class, DeployLibraryConfig.class, LearningLibrary.class,
+		ToolActivity.class };
+	xstream.allowTypes(classes);
 
 	this.outputPath = outputPath != null ? outputPath : "";
     }
@@ -127,7 +133,7 @@ public abstract class DeployConfig {
      * In general, this method should read in the xml configuration file,
      * deserialise the xml string into an object, and copy the properties
      * to the calling object.
-     * 
+     *
      * @param configFilePath
      *            The file location of the configuration file deploy.xml.
      * @throws ParserConfigurationException
@@ -139,7 +145,7 @@ public abstract class DeployConfig {
 
     /**
      * Check that all the properties have a value, will throw an exception if a property does not have a value
-     * 
+     *
      * @throws DeployException
      */
     public abstract void validateProperties() throws DeployException;
@@ -148,7 +154,7 @@ public abstract class DeployConfig {
      * Validates the value of a property. If the property does not exist, or
      * the property doesn't have a value, it will return false.
      * Otherwise return true.
-     * 
+     *
      * @param property
      * @param key
      * @return
@@ -163,7 +169,7 @@ public abstract class DeployConfig {
 
     /**
      * Will return false if the list property is empty or null. *
-     * 
+     *
      * @param property
      * @param key
      * @return
@@ -179,7 +185,7 @@ public abstract class DeployConfig {
     /**
      * Reads in the deploy configuration xml file, and will return the xml
      * as a string.
-     * 
+     *
      * @param configFilePath
      * @return String. The xml contents as a String
      */
@@ -205,13 +211,13 @@ public abstract class DeployConfig {
 
     /**
      * Takes in the xml string and deserialises it to an object
-     * 
+     *
      * @param xml
      *            The xml to deserialise
      * @return the object constructed from the xml
      */
     protected Object deserialiseXML(String xml) {
-	// System.out.println(xml);
+//	System.out.println(xml);
 	return xstream.fromXML(xml);
     }
 
@@ -268,7 +274,7 @@ public abstract class DeployConfig {
 
     /**
      * Serialize an object to the given Writer as pretty-printed XML.
-     * 
+     *
      * @param writer
      */
     protected void writePropertiesToFile(Writer writer) {
@@ -380,7 +386,7 @@ public abstract class DeployConfig {
      * Upon deserialisation of the xml string, a new object will be created.
      * The properties of this object will be copied to the calling object.
      * Only copy properties if the properties are not null
-     * 
+     *
      * @param config
      */
     protected void copyProperties(DeployConfig config) {

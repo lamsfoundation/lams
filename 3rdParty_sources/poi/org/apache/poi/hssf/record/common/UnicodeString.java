@@ -35,11 +35,11 @@ import org.apache.poi.util.POILogger;
 import org.apache.poi.util.StringUtil;
 
 /**
- * Title: Unicode String<p/>
+ * Title: Unicode String<p>
  * Description:  Unicode String - just standard fields that are in several records.
- *               It is considered more desirable then repeating it in all of them.<p/>
- *               This is often called a XLUnicodeRichExtendedString in MS documentation.<p/>
- * REFERENCE:  PG 264 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<p/>
+ *               It is considered more desirable then repeating it in all of them.<p>
+ *               This is often called a XLUnicodeRichExtendedString in MS documentation.<p>
+ * REFERENCE:  PG 264 Microsoft Excel 97 Developer's Kit (ISBN: 1-57231-498-2)<p>
  * REFERENCE:  PG 951 Excel Binary File Format (.xls) Structure Specification v20091214 
  */
 public class UnicodeString implements Comparable<UnicodeString> {
@@ -706,12 +706,12 @@ public class UnicodeString implements Comparable<UnicodeString> {
         if (field_4_format_runs != null) {
           for (int i = 0; i < field_4_format_runs.size();i++) {
             FormatRun r = field_4_format_runs.get(i);
-            buffer.append("      .format_run"+i+"          = ").append(r.toString()).append("\n");
+            buffer.append("      .format_run"+i+"          = ").append(r).append("\n");
           }
         }
         if (field_5_ext_rst != null) {
           buffer.append("    .field_5_ext_rst          = ").append("\n");
-          buffer.append( field_5_ext_rst.toString() ).append("\n");
+          buffer.append(field_5_ext_rst).append("\n");
         }
         buffer.append("[/UNICODESTRING]\n");
         return buffer.toString();

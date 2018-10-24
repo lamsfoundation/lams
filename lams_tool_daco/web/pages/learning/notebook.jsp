@@ -23,18 +23,18 @@
 
 	<lams:Page type="learner" title="${daco.title}">
 
-	<html:form action="/learning/submitReflection" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;" styleId="messageForm">
-		<html:hidden property="userId" />
-		<html:hidden property="sessionId" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" modelAttribute="messageForm" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;" id="messageForm">
+		<form:hidden path="userId" />
+		<form:hidden path="sessionId" />
+		<form:hidden path="sessionMapID" />
 		
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<p>
 				<lams:out value="${daco.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
+			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
 			<div class="space-bottom-top align-right">
 				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
@@ -51,7 +51,7 @@
 				</button>
 			</div>
 		</div>
-	</html:form>
+	</form:form>
 	
 	<div id="footer">
 	</div>

@@ -57,8 +57,8 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
 	if (view == GBGridView.MON_COURSE) {
 	    if (gradebookMonitorURL != null && gradebookMonitorURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradebookMonitorURL + "\",\"" + rowName
-			+ "\",1220,600)'>" + rowName + "</a>");
+		ret.add("<a href='javascript:launchPopup(\"" + gradebookMonitorURL + "\",\"" + rowName + "\")'>"
+			+ rowName + "</a>");
 	    } else {
 		ret.add(rowName);
 	    }
@@ -70,7 +70,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
 	} else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 	    if (gradebookLearnerURL != null && gradebookLearnerURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradebookLearnerURL + "\",\"" + rowName + "\",796,570)'>"
+		ret.add("<a href='javascript:launchPopup(\"" + gradebookLearnerURL + "\",\"" + rowName + "\")'>"
 			+ rowName + "</a>");
 	    } else {
 		ret.add(rowName);

@@ -353,7 +353,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<%@ include file="/common/messages.jsp"%>
+		<lams:errors/>
 
 		<lams:Alert id="score" type="info" close="false">
 			<fmt:message key="label.you.ve.got">
@@ -425,9 +425,9 @@
 						</c:choose>
 						<c:if test="${(mode != 'teacher') && isUserLeader}">
 							<div class="voffset5">
-								<html:button property="finishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default">
+								<button name="finishButton" onclick="return continueReflect()" class="btn btn-sm btn-default">
 									<fmt:message key="label.edit" />
-								</html:button>
+								</button>
 							</div>
 						</c:if>
 
@@ -445,8 +445,8 @@
 		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="voffset10 pull-right">
-				<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finishSession()"
-					styleClass="btn btn-primary na">
+				<a href="#nogo" name="finishButton" id="finishButton" onclick="return finishSession()"
+					class="btn btn-primary na">
 					<c:choose>
 						<c:when test="${sessionMap.activityPosition.last}">
 							<fmt:message key="label.submit" />
@@ -455,7 +455,7 @@
 							<fmt:message key="label.finished" />
 						</c:otherwise>
 					</c:choose>
-				</html:link>
+				</a>
 			</div>
 		</c:if>
 

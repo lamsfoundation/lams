@@ -22,9 +22,7 @@
 
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import org.apache.struts.action.ActionForm;
-
-public class AdminForm extends ActionForm {
+public class AdminForm {
     private static final long serialVersionUID = -9080785256404216422L;
 
     private boolean keepLearnerContent;

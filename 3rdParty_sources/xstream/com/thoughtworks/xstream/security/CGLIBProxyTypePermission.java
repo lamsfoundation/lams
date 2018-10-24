@@ -21,18 +21,15 @@ public class CGLIBProxyTypePermission implements TypePermission {
      */
     public static final TypePermission PROXIES = new CGLIBProxyTypePermission();
 
-    @Override
-    public boolean allows(final Class<?> type) {
+    public boolean allows(final Class type) {
         return type != null && type != Object.class && !type.isInterface()
             && (Proxy.isProxyClass(type) || type.getName().startsWith(Proxy.class.getPackage().getName() + "."));
     }
 
-    @Override
     public int hashCode() {
         return 19;
     }
 
-    @Override
     public boolean equals(final Object obj) {
         return obj != null && obj.getClass() == CGLIBProxyTypePermission.class;
     }

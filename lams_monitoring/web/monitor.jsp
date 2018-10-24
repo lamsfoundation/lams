@@ -1,17 +1,14 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<!DOCTYPE html>
 
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn" %>
+<%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
 <c:set var="ALLOW_DIRECT_LESSON_LAUNCH"><%=Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
 <c:set var="serverURL"><%=Configuration.get(ConfigurationKeys.SERVER_URL)%></c:set>
 <c:if test="${fn:substring(serverURL, fn:length(serverURL)-1, fn:length(serverURL)) != '/'}">
 	<c:set var="serverURL">${serverURL}/</c:set>
 </c:if>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 
@@ -56,6 +53,10 @@
 			createDateTimeStr = '${lesson.createDateTimeStr}',
 			lessonStartDate = '${lesson.scheduleStartDate}',
 			lessonEndDate = '${lesson.scheduleEndDate}',
+			liveEditEnabled = ${enableLiveEdit && lesson.liveEditEnabled},
+			lockedForEdit = '${lesson.lockedForEdit}', 
+			lockedForEditUserId = '${lesson.lockedForEditUserId}', 
+			lockedForEditUsername = '${lesson.lockedForEditUsername}',
 			// settings for progress bar
 			isHorizontalBar = true,
 			hasContentFrame = false,
@@ -215,7 +216,13 @@
 				<fmt:message key="label.reschedule" var="RESCHEDULE_VAR"/>
 				RESCHEDULE : decoderDiv.html('<c:out value="${RESCHEDULE_VAR}" />').text(),
 				<fmt:message key="error.lesson.end.date.must.be.after.start.date" var="LESSON_ERROR_START_END_DATE_VAR"/>
-				LESSON_ERROR_START_END_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_START_END_DATE_VAR}" />').text()
+				LESSON_ERROR_START_END_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_START_END_DATE_VAR}" />').text(),
+				<fmt:message key="button.live.edit" var="LIVE_EDIT_BUTTON_VAR"/>
+				LIVE_EDIT_BUTTON: '<c:out value="${LIVE_EDIT_BUTTON_VAR}" />',
+				<fmt:message key="button.live.edit.tooltip" var="LIVE_EDIT_TOOLTIP_VAR"/>
+				LIVE_EDIT_TOOLTIP: '<c:out value="${LIVE_EDIT_TOOLTIP_VAR}" />',
+				<fmt:message key="label.person.editing.lesson" var="LIVE_EDIT_WARNING_VAR"><fmt:param value="%0"/></fmt:message>
+				LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
 		}
 				
 		$(document).ready(function(){
@@ -260,14 +267,12 @@
         }
 
         function switchToTblMonitor() {
-			$("#content").load(
-				"<c:url value='tblmonitor.do'/>",
-				{
-					lessonID: ${lesson.lessonID}
-				}
-			);
-    		}
-
+        	$("#content").load(LAMS_URL + 'monitoring/tblmonitor/start.do', 
+        	{
+        		lessonID: ${lesson.lessonID}
+        	});
+        }
+        
     	<%@ include file="monitorTour.jsp" %> 
 
 	</script>
@@ -561,6 +566,8 @@
 					</table>
 				</lams:TabBody>
 				<lams:TabBody id="2" titleKey="label.advanced">
+					<span class="pull-left" style="display:none" id="liveEditWarning"></span>
+					
 					<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
 						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
 						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
@@ -569,13 +576,10 @@
 						   href="#" onClick="javascript:refreshMonitor('sequence')">
 							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
 						</a>
-						<c:if test="${enableLiveEdit && lesson.liveEditEnabled}">
-							<a id="liveEditButton" class="btn btn-sm btn-default" title="<fmt:message key='button.live.edit.tooltip'/>"
-						       href="#"
-						  	   onClick="javascript:openLiveEdit()">
-								<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
-							</a>
-						</c:if>
+						<a id="liveEditButton" class="btn btn-sm btn-default style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
+					       href="#" onClick="javascript:openLiveEdit()">
+							<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
+						</a>
 						<span id="sequenceSearchPhraseClear"
 							 class="fa fa-xs fa-times-circle"
 							 onClick="javascript:sequenceClearSearchPhrase(true)"
@@ -639,7 +643,7 @@
 								   <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>
 								<a class="btn btn-sm btn-default" title="<fmt:message key='button.journal.entries.tooltip'/>"
 						   		   href="#" id="journalButton"
-						           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook.do?method=viewAllJournals&lessonID=${lesson.lessonID}', 'JournalEntries', 648, 1152, true)">
+						           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook/viewAllJournals.do?lessonID=${lesson.lessonID}', 'JournalEntries', 648, 1152, true)">
 						           <i class="fa fa-book"></i> <span class="hidden-xs"><fmt:message key="button.journal.entries"/></span></a>
 							</td>
 						</tr>

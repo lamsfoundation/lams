@@ -8,17 +8,21 @@
 		Shared Surveys tool
 	</description>
 	<context-param>
-		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-		<param-value>org.lamsfoundation.lams.tool.survey.ApplicationResources</param-value>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext
+		</param-name>
+		<param-value>org.lamsfoundation.lams.tool.survey.ApplicationResources
+		</param-value>
 	</context-param>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/tool/survey/dbupdates/autopatchContext.xml</param-value>
+		<param-value>classpath:/org/lamsfoundation/lams/tool/survey/dbupdates/autopatchContext.xml
+		</param-value>
 	</context-param>
 	<context-param>
 		<param-name>locatorFactorySelector</param-name>
-		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
+		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml
+		</param-value>
 	</context-param>
 	<context-param>
 		<param-name>parentContextKey</param-name>
@@ -74,30 +78,17 @@
 
 
 	<servlet>
-		<servlet-name>action</servlet-name>
-		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-		<init-param>
-			<param-name>config</param-name>
-			<param-value>/WEB-INF/struts-config.xml</param-value>
-		</init-param>
-		<init-param>
-			<param-name>debug</param-name>
-			<param-value>999</param-value>
-		</init-param>
-		<init-param>
-			<param-name>detail</param-name>
-			<param-value>1</param-value>
-		</init-param>
-		<init-param>
-			<param-name>validate</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet>
 		<servlet-name>Connector</servlet-name>
-		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
+		<servlet-class>net.fckeditor.connector.ConnectorServlet
+		</servlet-class>
 		<init-param>
 			<param-name>baseDir</param-name>
 			<param-value>/UserFiles/</param-value>
@@ -114,7 +105,8 @@
 		<description>Instructions Download</description>
 		<display-name>Instructions Download</display-name>
 		<servlet-name>download</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload
+		</servlet-class>
 		<init-param>
 			<param-name>toolContentHandlerBeanName</param-name>
 			<param-value>lasurvSurveyToolContentHandler</param-value>
@@ -123,13 +115,14 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>action</servlet-name>
+		<servlet-name>spring</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>Connector</servlet-name>
-		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector
+		</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
@@ -139,42 +132,6 @@
 
 
 	<jsp-config>
-		<!-- ======================================================== -->
-		<!-- Struts Tag Library Descriptors -->
-		<!-- ======================================================== -->
-		<taglib>
-			<taglib-uri>tags-bean</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-html</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-logic</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-tiles</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
-		</taglib>
-
-		<taglib>
-			<taglib-uri>tags-bean-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-bean-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-html-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-html-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-logic-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-logic-el.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>tags-tiles-el</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/struts/struts-tiles-el.tld</taglib-location>
-		</taglib>
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library -->
 		<!-- ======================================================== -->
@@ -206,13 +163,13 @@
 
 	<!-- Security Constraint -->
 	<deny-uncovered-http-methods />
-	
+
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Secure content</web-resource-name>
 			<url-pattern>/*</url-pattern>
 			<http-method>GET</http-method>
- 			<http-method>POST</http-method>
+			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>LEARNER</role-name>
@@ -228,7 +185,7 @@
 			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/pages/authoring/*</url-pattern>
 			<http-method>GET</http-method>
- 			<http-method>POST</http-method>
+			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
@@ -243,7 +200,7 @@
 			<url-pattern>/pages/monitoring/*</url-pattern>
 			<url-pattern>/definelater.do</url-pattern>
 			<http-method>GET</http-method>
- 			<http-method>POST</http-method>
+			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>

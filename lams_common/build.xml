@@ -27,7 +27,7 @@
 		
 		<echo>Executing SQL scripts</echo>
 		<sql driver="com.mysql.cj.jdbc.Driver"
-		     url="${db.url.init.build}"
+		     url="${db.url.build}"
 			 userid="${db.username}"
 			 password="${db.password}"
 			 encoding="utf8">

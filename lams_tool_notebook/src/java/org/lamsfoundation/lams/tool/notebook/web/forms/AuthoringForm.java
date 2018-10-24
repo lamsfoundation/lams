@@ -21,23 +21,14 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  *
  */
-public class AuthoringForm extends ActionForm {
+public class AuthoringForm {
 
     private static final long serialVersionUID = 3950453134542135495L;
 
@@ -48,26 +39,16 @@ public class AuthoringForm extends ActionForm {
     String instructions;
 
     boolean lockOnFinished;
-    
+
     boolean forceResponse;
 
     boolean allowRichEditor;
 
     String currentTab;
 
-    String dispatch;
-
     String sessionMapID;
 
     SessionMap sessionMap;
-
-    @Override
-    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-	ActionErrors ac = new ActionErrors();
-	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-
-	return ac;
-    }
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -76,14 +57,13 @@ public class AuthoringForm extends ActionForm {
     public void setSessionMapID(String sessionMapID) {
 	this.sessionMapID = sessionMapID;
     }
-    
 
     public boolean isForceResponse() {
-        return forceResponse;
+	return forceResponse;
     }
 
     public void setForceResponse(boolean forceResponse) {
-        this.forceResponse = forceResponse;
+	this.forceResponse = forceResponse;
     }
 
     public String getCurrentTab() {
@@ -92,14 +72,6 @@ public class AuthoringForm extends ActionForm {
 
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public String getDispatch() {
-	return dispatch;
-    }
-
-    public void setDispatch(String dispatch) {
-	this.dispatch = dispatch;
     }
 
     public String getInstructions() {

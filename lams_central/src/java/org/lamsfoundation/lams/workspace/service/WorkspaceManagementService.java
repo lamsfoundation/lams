@@ -54,7 +54,7 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
-import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+import org.lamsfoundation.lams.workspace.web.WorkspaceController;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -358,7 +358,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
 		FolderContentDTO myGroupsFolder = new FolderContentDTO(messageService.getMessage("organisations"),
 			messageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
-			WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
+			WorkspaceController.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
 
 		folderContents.add(myGroupsFolder);
 
@@ -374,14 +374,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    } // else we want to return an empty JSON, which will be done by falling through to the folderContents loop.
 
 	    // special behaviour for organisation folders
-	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
+	} else if (folderID.equals(WorkspaceController.ORG_FOLDER_ID)) {
 	    folderContents = getAccessibleOrganisationWorkspaceFolders(userID);
 	    Collections.sort(folderContents);
 
 	    if (folderContents.size() == 1) {
 		FolderContentDTO folder = folderContents.firstElement();
-		if (folder.getResourceID().equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
-		    return getFolderContentsJSON(WorkspaceAction.ROOT_ORG_FOLDER_ID, userID, allowInvalidDesigns);
+		if (folder.getResourceID().equals(WorkspaceController.ROOT_ORG_FOLDER_ID)) {
+		    return getFolderContentsJSON(WorkspaceController.ROOT_ORG_FOLDER_ID, userID, allowInvalidDesigns);
 		}
 	    }
 	} else {

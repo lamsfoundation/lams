@@ -6,6 +6,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 package org.lamsfoundation.lams.web;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -13,21 +14,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessage;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.UploadFileUtil;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Servlet to upload files.<br>
@@ -47,13 +52,18 @@ public class LAMSUploadServlet extends HttpServlet {
 
     private static final long serialVersionUID = 7839808388592495717L;
     private static final Logger log = Logger.getLogger(LAMSUploadServlet.class);
+
+    @Autowired
+    private MessageService centralMessageService;
     
-    private static MessageService messageService;
-    
-    public void init() {
-	WebApplicationContext ctx = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(this.getServletContext());
-	messageService = (MessageService) ctx.getBean("centralMessageService");
+    /*
+     * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
+     * available in that applicationContext.
+     */
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+	super.init(config);
+	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     /**
@@ -66,11 +76,10 @@ public class LAMSUploadServlet extends HttpServlet {
      * javascript command in it.
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug("Upload started");
+	if (log.isDebugEnabled()) {
+	    log.debug("Upload started");
 	}
 
 	String currentFolderStr = request.getParameter("CurrentFolder");
@@ -85,18 +94,19 @@ public class LAMSUploadServlet extends HttpServlet {
 	    // get realBaseDir and lamsContextPath at request time from config values in memory
 	    String fileType = request.getParameter("Type");
 
-	    DiskFileUpload upload = new DiskFileUpload();
+	    DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+	    ServletFileUpload fileUpload = new ServletFileUpload(fileItemFactory);
 	    try {
-		List<FileItem> items = upload.parseRequest(request);
-		Map<String, Object> fields = new HashMap<String, Object>();
+		List<FileItem> fileItems = fileUpload.parseRequest(request);
+		Map<String, Object> fields = new HashMap<>();
 
-		Iterator<FileItem> iter = items.iterator();
+		Iterator<FileItem> iter = fileItems.iterator();
 		while (iter.hasNext()) {
-		    FileItem item = iter.next();
-		    if (item.isFormField()) {
-			fields.put(item.getFieldName(), item.getString());
+		    FileItem fileItem = iter.next();
+		    if (fileItem.isFormField()) {
+			fields.put(fileItem.getFieldName(), fileItem.getString());
 		    } else {
-			fields.put(item.getFieldName(), item);
+			fields.put(fileItem.getFieldName(), fileItem);
 		    }
 		}
 		FileItem uplFile = (FileItem) fields.get("NewFile");
@@ -111,15 +121,15 @@ public class LAMSUploadServlet extends HttpServlet {
 		String fileName = pathParts[pathParts.length - 1];
 
 		// validate file size
-		ActionMessage maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile, true);
-		if (maxFilesizeExceededMessage != null) {
-		    returnMessage = messageService.getMessage(maxFilesizeExceededMessage.getKey(),
-			    maxFilesizeExceededMessage.getValues());
+		boolean maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile.getSize(), true);
+		if (!maxFilesizeExceededMessage) {
+		    fileName = centralMessageService.getMessage("errors.maxfilesize",
+			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE) });
 
-		// validate file extension
-		} else if  (!FileUtil.isExtensionAllowed(fileType, fileName)) {
+		    // validate file extension
+		} else if (!FileUtil.isExtensionAllowed(fileType, fileName)) {
 		    returnMessage = "Invalid file type";
-		    
+
 		} else {
 		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
 		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
@@ -129,13 +139,13 @@ public class LAMSUploadServlet extends HttpServlet {
 		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
 		    fileUrl = currentWebPath + '/' + fileName;
 
-		    uplFile.write(destinationFile);
-		    if (LAMSUploadServlet.log.isDebugEnabled()) {
-			LAMSUploadServlet.log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
+		    FileCopyUtils.copy(uplFile.getInputStream(), new FileOutputStream(destinationFile));
+		    if (log.isDebugEnabled()) {
+			log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
 		    }
 		}
 	    } catch (Exception e) {
-		LAMSUploadServlet.log.error(e);
+		log.error(e);
 		returnMessage = "Error while uploading file: " + e.getMessage();
 	    }
 	}
@@ -157,14 +167,13 @@ public class LAMSUploadServlet extends HttpServlet {
 	    out.println("</script>");
 	    out.flush();
 	    out.close();
-	} else if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log
-		    .debug("No CKEditor method found to run after completion, but upload finished with message: "
-			    + returnMessage);
+	} else if (log.isDebugEnabled()) {
+	    log.debug("No CKEditor method found to run after completion, but upload finished with message: "
+		    + returnMessage);
 	}
 
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug("Upload finished");
+	if (log.isDebugEnabled()) {
+	    log.debug("Upload finished");
 	}
     }
 }

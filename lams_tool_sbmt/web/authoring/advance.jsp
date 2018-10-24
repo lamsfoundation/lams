@@ -20,7 +20,7 @@
 <lams:SimplePanel titleKey="label.select.leader">
 <div class="checkbox">
 	<label for="useSelectLeaderToolOuput">
-		<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput"/>
+		<form:checkbox path="useSelectLeaderToolOuput" value="1" id="useSelectLeaderToolOuput"/>
 		<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
 </div>
@@ -29,55 +29,56 @@
 <lams:SimplePanel titleKey="label.file.options">
 <div class="checkbox">
 	<label for="limitUpload">
-		<html:checkbox property="limitUpload" styleId="limitUpload" />
+		<form:checkbox path="limitUpload" id="limitUpload" />
 		<fmt:message key="label.limit.number.upload" />
 	</label>
 
-	<html:select property="limitUploadNumber" styleId="limitUploadNumber" styleClass="loffset5 form-control form-control-inline">
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-	</html:select>
+	<form:select path="limitUploadNumber" id="limitUploadNumber" cssClass="loffset5 form-control form-control-inline">
+		<form:option value="1">1</form:option>
+		<form:option value="2">2</form:option>
+		<form:option value="3">3</form:option>
+		<form:option value="4">4</form:option>
+		<form:option value="5">5</form:option>
+	</form:select>
 </div>
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.notifications">
 <div class="checkbox">
 	<label for="notifyLearnersOnMarkRelease">
-		<html:checkbox property="notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease" />
+		<form:checkbox path="notifyLearnersOnMarkRelease" id="notifyLearnersOnMarkRelease" />
 		<fmt:message key="label.authoring.advanced.notify.mark.release" />
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="notifyTeachersOnFileSubmit">
-		<html:checkbox property="notifyTeachersOnFileSubmit" styleId="notifyTeachersOnFileSubmit" />
+		<form:checkbox path="notifyTeachersOnFileSubmit" id="notifyTeachersOnFileSubmit" />
 		<fmt:message key="label.authoring.advanced.notify.onfilesubmit" />
 	</label>
 </div>
+
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${formBean.toolContentID}" />
+<lams:OutcomeAuthor toolContentId="${authoringForm.toolContentID}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
 <div class="checkbox">
 	<label for="lockOnFinished">
-		<html:checkbox property="lockOnFinished" styleId="lockOnFinished" />
+		<form:checkbox path="lockOnFinished" id="lockOnFinished" />
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
 </div>
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
-		<html:checkbox property="reflectOnActivity" styleId="reflectOnActivity" />
+		<form:checkbox path="reflectOnActivity" id="reflectOnActivity" />
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
 </div>
 
 <div class="form-group">
-	<html:textarea property="reflectInstructions" styleId="reflectInstructions" styleClass="form-control" cols="50" rows="4" />
+	<form:textarea path="reflectInstructions" id="reflectInstructions" cssClass="form-control" cols="50" rows="4"></form:textarea>
 </div>
 </lams:SimplePanel>
 

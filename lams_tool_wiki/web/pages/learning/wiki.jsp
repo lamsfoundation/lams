@@ -1,60 +1,83 @@
+<!DOCTYPE html>
+
 <%@ include file="/common/taglibs.jsp"%>
-  <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
-    <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-    <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-    <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
-    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
-    <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 
-    <script type="text/javascript">
-      <!--
-        var mode = "${mode}";
-      var formName = "learningForm"
+<lams:html>
+	
+	<c:set var="lams"> <lams:LAMSURL /> </c:set>
+	<c:set var="tool"> <lams:WebAppURL /> </c:set>
+	
+	<lams:head>  
+		<title>
+			<fmt:message key="activity.title" />
+		</title>
+		<lams:css/>
+	
+		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		
+		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	    <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	    <script language="JavaScript" type="text/javascript" src="${tool}includes/javascript/validation.js"></script>
+	    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+	    <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+	    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+	
+	    <script type="text/javascript">
+	      <!--
+	        var mode = "${mode}";
+	      var formName = "learningForm"
+	
+	   	  $(document).ready(function() {
+	  			$("time.timeago").timeago();
+	 		});
+	      
+	      function disableFinishButton() {
+	        document.getElementById("finishButton").disabled = true;
+	      }
+	
+	      function validateForm() {
+	
+	        // Validates that there's input from the user. 
+	
+	        // disables the Finish button to avoid double submission 
+	        disableFinishButton();
+	
+	        if (mode == "learner") {
+	          // if this is learner mode, then we add this validation see (LDEV-1319)
+	
+	          if (document.forms.learningForm.entryText.value == "") {
+	
+	            // if the input is blank, then we further inquire to make sure it is correct
+	            if (confirm("<fmt:message>message.learner.blank.input</fmt:message>"))  {
+	              // if correct, submit form
+	              return true;
+	            } else {
+	              // otherwise, focus on the text area
+	              document.forms.learningForm.entryText.focus();
+	              document.getElementById("finishButton").disabled = false;
+	              return false;      
+	            }
+	          } else {
+	            // there was something on the form, so submit the form
+	            return true;
+	          }
+	        }
+	      }
+	
+	      -->
+	    </script>
+	</lams:head>
 
-   	  $(document).ready(function() {
-  			$("time.timeago").timeago();
- 		});
-      
-      function disableFinishButton() {
-        document.getElementById("finishButton").disabled = true;
-      }
-
-      function validateForm() {
-
-        // Validates that there's input from the user. 
-
-        // disables the Finish button to avoid double submission 
-        disableFinishButton();
-
-        if (mode == "learner") {
-          // if this is learner mode, then we add this validation see (LDEV-1319)
-
-          if (document.learningForm.entryText.value == "") {
-
-            // if the input is blank, then we further inquire to make sure it is correct
-            if (confirm("<fmt:message>message.learner.blank.input</fmt:message>"))  {
-              // if correct, submit form
-              return true;
-            } else {
-              // otherwise, focus on the text area
-              document.learningForm.entryText.focus();
-              document.getElementById("finishButton").disabled = false;
-              return false;      
-            }
-          } else {
-            // there was something on the form, so submit the form
-            return true;
-          }
-        }
-      }
-
-      -->
-    </script>
-
-  <lams:Page type="learner" usePanel="false">
+	
+	<body class="stripes">
+	
+ 	<lams:Page type="learner" usePanel="false" formID="learningForm">
      
-    <html:form action="/learning" method="post"styleId="learningForm" enctype="multipart/form-data">
+    <form:form action="learning.do" method="post" id="learningForm" modelAttribute="learningForm" enctype="multipart/form-data">
 
             <div class="panel panel-default">
               <div class="panel-heading panel-learner-title">
@@ -253,13 +276,13 @@
                 </div> <!-- end Wiki main content -->
 
                 <!-- Begin form -->
-                <html:hidden property="toolSessionID" styleId = "toolSessionID"  />
-                <html:hidden property="mode" />
+                <form:hidden path="toolSessionID" id = "toolSessionID"  />
+                <form:hidden path="mode" />
                 <input type="hidden" name="userID" value="${userDTO.userId}"/>
-                <html:hidden property="currentWikiPage" value="${currentWikiPage.uid}" styleId="currentWikiPage" />
+                <input type="hidden" name="currentWikiPage" value="${currentWikiPage.uid}" id="currentWikiPage" />
                 <input type="hidden" id="wikiLinks" />
-                <html:hidden property="newPageName" styleId="newPageName" />
-                <html:hidden property="historyPageContentId" styleId="historyPageContentId" />
+                <form:hidden path="newPageName" id="newPageName" />
+                <form:hidden path="historyPageContentId" id="historyPageContentId" />
 
 
                 <div class="panel panel-default" id="history" style="display: none">
@@ -286,7 +309,7 @@
                               <fmt:message key="label.wiki.history.actions"></fmt:message>
                             </th>
                           </tr>
-                          <c:forEach var="wikiContentPageVersion"items="${wikiPageContentHistory}">
+                          <c:forEach var="wikiContentPageVersion" items="${wikiPageContentHistory}">
                             <c:if test="${wikiContentPageVersion.version != currentWikiPage.currentWikiContentDTO.version}">
                               <tr>
                                 <td>${wikiContentPageVersion.version}</td>
@@ -349,7 +372,7 @@
                             <fmt:message key="label.authoring.basic.title"></fmt:message>
                           </div>
 
-                          <html:text styleClass="form-control" property="title" styleId="title" style="width: 99%;" value="${currentWikiPage.title}"></html:text><span style="display: none;'" class="title error"><fmt:message key="error.title.invalid.characters"/>
+                          <input type="text" class="form-control" name="title" id="title" style="width: 99%;" value="${currentWikiPage.title}"/><span style="display: none;'" class="title error"><fmt:message key="error.title.invalid.characters"/>
                           </td>
                       </tr>
                       <tr>
@@ -391,7 +414,7 @@
                           <div class="field-name">
                             <fmt:message key="label.authoring.basic.title"/>
                           </div>
-                          <html:text property="newPageTitle" styleId="newPageTitle" styleClass="form-control" value=""></html:text><span style="display: none;'" class="newPageTitle error">
+                          <input type="text" name="newPageTitle" id="newPageTitle" class="form-control" value=""/><span style="display: none;'" class="newPageTitle error">
                           <fmt:message key="error.title.invalid.characters"/>
                           </span>
 
@@ -413,7 +436,7 @@
                     </div>
                   </div>
                 </div>
-                </html:form> 
+                </form:form> 
 
               <!-- Wiki pages folders -->
               <h4>
@@ -460,11 +483,11 @@
       document.getElementById("wikiLinks").value = wikiLinkArray.toString();
       }
 
-      function doEditOrAdd(dispatch)
+      function doEditOrAdd(actionMethod)
       {
 
         var title="";
-        if(dispatch == "editPage")
+        if(actionMethod == "editPage")
         {
           title = document.getElementById("title").value;
         }
@@ -483,7 +506,7 @@
 
         for (i=0; i<wikiLinkArray.length; i++)
         {
-          if(dispatch == "editPage" && wikiLinkArray[i] == '${fn:escapeXml(currentWikiPage.javaScriptTitle)}')
+          if(actionMethod == "editPage" && wikiLinkArray[i] == '${fn:escapeXml(currentWikiPage.javaScriptTitle)}')
           {
             continue;
           }
@@ -497,15 +520,14 @@
 
         // if all validation fulfilled, we can continue
         document.getElementById("title").value = trim(title);
-        submitWiki(dispatch);
+        submitWiki(actionMethod);
       }
 
-      function submitWiki(dispatch)
-      {
-        document.getElementById("learningForm").action += "?dispatch=" + dispatch;
-        replaceJavascriptTokenAndSubmit("learningForm");
-      }
-
+      function submitWiki(actionMethod)
+	  	{
+	  		document.forms.learningForm.action=actionMethod+".do"; 
+	  		replaceJavascriptTokenAndSubmit("learningForm");
+	  	}
 
       function hideToolbarItem(editorInstance, itemName) {
 
@@ -531,7 +553,7 @@
       function refreshPage()
       {
     	var toolSessionID = $("#toolSessionID").val();
-        var url = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID="+toolSessionID+"&currentWikiPageId=${currentWikiPage.uid}"
+        var url = "<lams:WebAppURL/>/learning/learning.do?mode=${mode}&toolSessionID="+toolSessionID+"&currentWikiPageId=${currentWikiPage.uid}"
         window.location=url;
       }
 
@@ -543,3 +565,11 @@
         jQuery("time.timeago").timeago();
       });
     </script>
+
+		<div class="footer">
+		</div>					
+	</body>
+</lams:html>
+
+
+    

@@ -25,22 +25,22 @@
 
 	<lams:Page type="learner" title="${sessionMap.title}">
 	
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="reflectionForm">
-		<html:hidden property="userID" />
-		<html:hidden property="sessionMapID" />
+	<form:form action="submitReflection.do" modelAttribute="reflectionForm" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
 
 		<div id="content">
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 
 			<p>
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area" />
+			<form:textarea cols="60" rows="8" path="entryText"
+				cssClass="text-area" />
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
+				<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -51,10 +51,10 @@
 		 					</c:otherwise>
 		 				</c:choose>
 		 			</span>
-				</html:link>
+				</a>
 			</div>
 		</div>
-	</html:form>
+	</form:form>
 
 	<div id="footer">
 	</div>

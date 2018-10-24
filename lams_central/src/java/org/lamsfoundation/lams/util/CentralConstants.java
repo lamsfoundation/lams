@@ -152,6 +152,8 @@ public class CentralConstants {
     public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
 
     public static final String CENTRAL_MESSAGE_SERVICE_BEAN_NAME = "centralMessageService";
+    
+    public static final String TOOL_SERVICE_BEAN_NAME = "lamsToolService";
 
     public static final String ATTR_NODE = "node";
 

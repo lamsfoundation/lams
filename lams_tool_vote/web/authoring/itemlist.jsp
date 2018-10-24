@@ -8,8 +8,6 @@
 		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
 	</div>
 
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
 	<table class="table table-striped table-condensed" id="itemTable">
 		<c:set var="queIndex" scope="request" value="0" />
 
@@ -41,7 +39,7 @@
 				</td>
 
 				<td align="center" style="width:5%"><i class="fa fa-pencil"	title="<fmt:message key="label.tip.editNomination" />"
-						onclick="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newEditableNominationBox&questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}"/>');">
+						onclick="javascript:showMessage('<lams:WebAppURL />authoring/newEditableNominationBox.do?questionIndex=${queIndex}&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}')">
 						</i>
 				</td>
 

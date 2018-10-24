@@ -57,7 +57,7 @@
 			    }
 			});
 		</script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
+		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/rsrcresourceitem.js"></script>
 
 	</lams:head>
 	<body>
@@ -69,24 +69,22 @@
 			
 			<div class="panel-body">
 
-			<%@ include file="/common/messages.jsp"%>
+			<lams:errors/>
 			
-			<html:form action="/authoring/saveOrUpdateItem" method="post"
-				styleId="resourceItemForm" enctype="multipart/form-data">
-				<html:hidden property="sessionMapID" />
+			<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm"	id="resourceItemForm">
+				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="instructionList" id="instructionList" />
 				<input type="hidden" name="itemType" id="itemType" value="3" />
-				<html:hidden property="itemIndex" />
+				<form:hidden path="itemIndex" />
 	
 				<div class="form-group">
 				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-					<html:text property="title" styleId="title"  styleClass="form-control" />
+					<form:input path="title" id="title"  cssClass="form-control" />
 			  	</div>	
 			  
 
 				<div class="form-group">
 					<!--  <label for="file"><fmt:message key="label.authoring.basic.resource.zip.file.input" /></label>: -->
-					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 					</span>
@@ -98,7 +96,7 @@
 					<%@ include file="ratings.jsp"%>	
 				</div>
 				
-			</html:form>
+			</form:form>
 		
 			<!-- Instructions -->
 			<%@ include file="instructions.jsp"%>

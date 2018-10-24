@@ -25,7 +25,7 @@
 		var MONITOR_URL = "<c:url value="/monitoring.do"/>";
 
 		function updateMark(detailId,reportId,sessionId,userId){
-			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
+			location.href="<lams:WebAppURL/>mark/newMark.do?updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
 	</script>
 </lams:head>
@@ -49,9 +49,9 @@
 		<hr width="100%" style="border-top: 2px solid #ddd;"/>
 	</c:forEach>
 
-	<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-primary pull-right">
+	<a href="javascript:window.close();" name="submit" class="btn btn-primary pull-right">
 		<fmt:message key="label.monitoring.done.button" />
-	</html:link>
+	</a>
 	
 <div id="footer"></div>
 	

@@ -14,6 +14,9 @@ Include this jsp in your jqGrid page head to get some jqGrid functionality
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 
 <script type="text/javascript">
+
+	var popupWidth = 1280,
+		popupHeight = 720;
 		
 	// JQGRID LANGUAGE ENTRIES ---------------------------------------------
 	
@@ -64,13 +67,18 @@ Include this jsp in your jqGrid page head to get some jqGrid functionality
 	// ---------------------------------------------------------------------
 	
 	// launches a popup from the page
-	function launchPopup(url,title,width,height) {
+	function launchPopup(url,title) {
 		var wd = null;
 		if(wd && wd.open && !wd.closed){
 			wd.close();
 		}
-		//wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
-		wd = window.open(url,title,'resizable,width='+width+',height='+height+',scrollbars');
+
+		var left = ((screen.width / 2) - (popupWidth / 2));
+		var top = ((screen.height / 2) - (popupHeight / 2));
+
+		wd = window.open(url,title,'resizable,width='+popupWidth+',height='+popupHeight
+				+',scrollbars'
+				+ ",top=" + top + ",left=" + left);
 		wd.window.focus();
 	}
 	

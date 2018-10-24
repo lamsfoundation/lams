@@ -1,14 +1,9 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<!DOCTYPE html>
+
+<%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<c:if test="${not empty param.sessionMapID}">
@@ -37,7 +32,7 @@
 			$("#grid" + notificationUid).jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
-			   	url: "<c:url value='/emailNotifications.do'/>?method=getArchivedRecipients&emailNotificationUid=" + notificationUid,
+			   	url: "<c:url value='/emailNotifications/getArchivedRecipients.do'/>?emailNotificationUid=" + notificationUid,
 				datatype: "json",
 			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
 			   	colModel:[
@@ -58,7 +53,7 @@
 
 		function exportNotification(notificationUid) {
 			$('#downloadFrame').attr('src',
-					"<c:url value='/emailNotifications.do'/>?method=exportArchivedNotification&emailNotificationUid=" + notificationUid);
+					"<c:url value='/emailNotifications/exportArchivedNotification.do'/>?emailNotificationUid=" + notificationUid);
 		}
 	</script>
 
@@ -125,8 +120,8 @@
 		</c:forEach>
 	</table>
 	
-	<a href="<c:url value='/emailNotifications.do'/>${lessonID == null ? '?method=getCourseView&organisationID='.concat(organisationID)
-																	   : '?method=getLessonView&lessonID='.concat(lessonID)}"
+	<a href="<c:url value='/emailNotifications/'/>${lessonID == null ? 'getCourseView.do?organisationID='.concat(organisationID)
+																	   : 'getLessonView.do?lessonID='.concat(lessonID)}"
 	   class="btn btn-primary pull-right">
 		<fmt:message key="email.notifications.scheduled.messages.list.back" />
 	</a>

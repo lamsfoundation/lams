@@ -1,6 +1,12 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
-<script type="text/javascript">
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<lams:html>
+	<lams:head>
+		<lams:headItems/>
+	</lams:head>
+	<body class="stripes">
+		<script type="text/javascript">
 	var mode = "${mode}";
 	var forceResponse = "${notebookDTO.forceResponse}";
 
@@ -9,14 +15,16 @@
 	}
 
 	function textAreaReady() {
-		<c:choose>
-		<c:when test="${notebookDTO.allowRichEditor}">
-			CKEDITOR.instances["entryText"].focus();
-		</c:when>		
-		<c:otherwise>
-			document.learningForm.focusedInput.focus();
-		</c:otherwise>
-		</c:choose>
+		<c:if test="${contentEditable}">
+			<c:choose>
+			<c:when test="${notebookDTO.allowRichEditor}">
+				CKEDITOR.instances["entryText"].focus();
+			</c:when>		
+			<c:otherwise>
+				document.forms.messageForm.focusedInput.focus();
+			</c:otherwise>
+			</c:choose>
+		</c:if>
 		document.getElementById("finishButton").style.visibility = 'visible';
 	}
 	
@@ -44,13 +52,13 @@
 			}
 		</c:when>		
 		<c:otherwise>
-			if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
+			if (forceResponse =="true" && document.forms.messageForm.focusedInput.value == "") {
 
 				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
 				textAreaReady();
 				return retValue;
 				
-			} else if  (forceResponse =="false" && document.learningForm.focusedInput.value == "" && mode == "learner") {
+			} else if  (forceResponse =="false" && document.forms.messageForm.focusedInput.value == "" && mode == "learner") {
 	
 				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
 					// otherwise, focus on the text area
@@ -67,13 +75,9 @@
 	
 </script>
 
-<html:form action="/learning" method="post" styleId="messageForm">
-	<html:hidden property="dispatch" value="finishActivity" />
-	<html:hidden property="toolSessionID" />
-	<html:hidden property="contentEditable" value="${contentEditable}" />
-	<c:set var="lrnForm" value="<%=request
-						.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
+<form:form action="learning/finishActivity.do" method="post" modelAttribute="messageForm" id="messageForm">
+	<form:hidden path="toolSessionID" />
+	<form:hidden path="contentEditable" value="${contentEditable}" />
 
 	<lams:Page type="learner" title="${notebookDTO.title}">
 		<div class="panel">
@@ -118,20 +122,20 @@
 				<c:when test="${contentEditable}">
 					<c:choose>
 						<c:when test="${notebookDTO.allowRichEditor}">
-							<lams:CKEditor id="entryText" value="${lrnForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
+							<lams:CKEditor id="entryText" value="${messageForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
 								toolbarSet="DefaultLearner">
 							</lams:CKEditor>
 						</c:when>
 
 						<c:otherwise>
-							<html:textarea rows="8" property="entryText" styleClass="form-control" styleId="focusedInput"/>
+							<form:textarea rows="8" path="entryText" cssClass="form-control" id="focusedInput"/>
 						</c:otherwise>
 					</c:choose>
 				</c:when>
 
 				<c:otherwise>
 					<div class="sbox sbox-body voffset10 bg-warning">
-						<lams:out value="${lrnForm.entryText}" />
+						<lams:out value="${messageForm.entryText}" />
 					</div>
 				</c:otherwise>
 			</c:choose>
@@ -149,7 +153,7 @@
 
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5">
-					<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
+					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton" type="button"
 						onclick="submitForm('finish')">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
@@ -159,17 +163,13 @@
 								<fmt:message key="button.finish" />
 							</c:otherwise>
 						</c:choose>
-					</html:link>
+					</button>
 				</div>
 			</c:if>
 		</div>
 	</lams:Page>
-</html:form>
+</form:form>
 <!-- end form -->
-
-
-
-
 
 <script type="text/javascript">
 	window.onload = function() {
@@ -181,3 +181,7 @@
 		</c:if>
 	}
 </script>
+		<div class="footer"></div>					
+	</body>
+</lams:html>
+

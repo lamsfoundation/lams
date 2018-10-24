@@ -2,7 +2,7 @@
 		
 
 <%@ include file="/common/taglibs.jsp"%>
-<%@page import="org.lamsfoundation.lams.tool.daco.DacoConstants;"%>
+<%@page import="org.lamsfoundation.lams.tool.daco.DacoConstants"%>
 
 <lams:html>
 <lams:head>
@@ -28,11 +28,11 @@
 <div class="panel-body">
 
 <!-- Add question form-->
-<%@ include file="/common/messages.jsp"%>
-<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="dacoQuestionForm">
-	<html:hidden property="sessionMapID" />
+<lams:errors/>
+<form:form action="saveOrUpdateQuestion.do" modelAttribute="questionForm" method="post" id="dacoQuestionForm">
+	<form:hidden path="sessionMapID" />
 	<input type="hidden" id="questionType" name="questionType" value="10" />
-	<html:hidden property="questionIndex" />
+	<form:hidden path="questionIndex" />
 	<input type="hidden" id="longlatMapsSelected" name="longlatMapsSelected" />
 
 	<p><fmt:message key="label.authoring.basic.longlat.help" /></p>
@@ -45,7 +45,7 @@
  		<div class="form-inline">
 		<div class="checkbox">
 		    <label>
-	 	      <html:checkbox property="questionRequired" styleClass="input-sm form-control" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+	 	      <form:checkbox path="questionRequired" cssClass="input-sm form-control" id="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
 		    </label>
 	  	</div>
 	  	</div>
@@ -70,7 +70,7 @@
 	</form-group>
 	</div>
 
-</html:form>
+</form:form>
 
 <c:set var="addButtonMessageKey" value="label.authoring.basic.longlat.add" />
 <%@ include file="buttons.jsp"%>

@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+  <!-- ========== Data Sources Definitions =================================== -->
+  <!--
+    Define your Struts data sources in a file called struts-data-sources.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Form Bean Definitions =================================== -->
+  <form-beans>
+
+    <form-bean
+      name="TextSearchActionForm"
+      type="org.lamsfoundation.lams.web.TextSearchActionForm"
+    />
+    <form-bean
+      name="PasswordChangeActionForm"
+      type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
+    />
+    <form-bean
+      name="PortraitActionForm"
+      type="org.lamsfoundation.lams.web.PortraitActionForm"
+    />
+    <form-bean
+      name="emailForm"
+      type="org.lamsfoundation.lams.web.EmailForm"
+    />
+   <form-bean
+      name="uploadForm"
+      type="org.lamsfoundation.lams.monitoring.web.FileUploadForm"
+    />
+   <form-bean
+  name="PedagogicalPlannerGroupingForm"
+  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
+/>
+<form-bean
+  name="PedagogicalPlannerSequenceNodeForm"
+  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
+/>
+
+<form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="userId" type="java.lang.Integer" />
+	<form-property name="login" type="java.lang.String" />
+	<form-property name="password" type="java.lang.String" />
+	<form-property name="title" type="java.lang.String" />
+	<form-property name="firstName" type="java.lang.String" />
+	<form-property name="lastName" type="java.lang.String" />
+	<form-property name="addressLine1" type="java.lang.String" />
+	<form-property name="addressLine2" type="java.lang.String" />
+	<form-property name="addressLine3" type="java.lang.String" />
+	<form-property name="city" type="java.lang.String" />
+	<form-property name="state" type="java.lang.String" />
+	<form-property name="postcode" type="java.lang.String" />
+	<form-property name="country" type="java.lang.String" />
+	<form-property name="dayPhone" type="java.lang.String" />
+	<form-property name="eveningPhone" type="java.lang.String" />
+	<form-property name="mobilePhone" type="java.lang.String" />
+	<form-property name="fax" type="java.lang.String" />
+	<form-property name="email" type="java.lang.String" />
+	<form-property name="localeId" type="java.lang.Integer" />
+	<form-property name="timeZone" type="java.lang.String" />
+	<form-property name="tutorialsDisabled" type="java.lang.Boolean" />
+	<form-property name="userTheme" type="java.lang.Long" />
+</form-bean>
+
+<form-bean name="SignupForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="username" type="java.lang.String" />
+	<form-property name="password" type="java.lang.String" />
+	<form-property name="confirmPassword" type="java.lang.String" />
+	<form-property name="firstName" type="java.lang.String" />
+	<form-property name="lastName" type="java.lang.String" />
+	<form-property name="email" type="java.lang.String" />
+	<form-property name="confirmEmail" type="java.lang.String" />
+	<form-property name="courseKey" type="java.lang.String" />
+	<form-property name="submitted" type="java.lang.Boolean" />
+	<form-property name="context" type="java.lang.String" />
+	<form-property name="usernameTab2" type="java.lang.String" />
+	<form-property name="passwordTab2" type="java.lang.String" />
+	<form-property name="courseKeyTab2" type="java.lang.String" />
+</form-bean>
+
+  </form-beans>
+
+  <!-- ========== Global Exceptions Definitions =================================== -->
+  <global-exceptions>
+  <exception
+    handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+    key="error.system"
+    path="/error.jsp"
+    scope="request"
+    type="java.lang.Exception"/>
+</global-exceptions>
+
+  <!-- ========== Global Forward Definitions =================================== -->
+  <!--
+    Define your forwards in a file called global-forwards.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Action Mapping Definitions =================================== -->
+   <action-mappings>
+    <action
+      path="/index"
+      type="org.lamsfoundation.lams.web.IndexAction"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="main"
+        path="/main.jsp"
+        redirect="false"
+      />
+      <forward
+        name="favoriteOrganisations"
+        path="/favoriteOrganisations.jsp"
+        redirect="false"
+      />      
+      <forward
+        name="profile"
+        path="/profile.do?method=view"
+        redirect="false"
+      />
+      <forward
+        name="editprofile"
+        path="/profile.do?method=edit"
+        redirect="false"
+      />
+      <forward
+        name="password"
+        path="/password.do"
+        redirect="false"
+      />
+      <forward
+        name="twoFactorAuthentication"
+        path="/twoFactorAuthentication.do"
+        redirect="false"
+      />
+      <forward
+        name="portrait"
+        path="/portrait.do"
+        redirect="false"
+      />
+      <forward
+        name="lessons"
+        path="/profile.do?method=lessons"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/authoring/importToolContent"
+      type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="upload"
+        path="/toolcontent/import.jsp"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path="/toolcontent/importresult.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/authoring/author"
+      type="org.lamsfoundation.lams.authoring.web.AuthoringAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="openAutoring"
+        path="/authoring/authoring.jsp"
+        redirect="false"
+      />
+      <forward
+        name="svgGenerator"
+        path="/authoring/svgGenerator.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/loginas"
+      type="org.lamsfoundation.lams.web.LoginAsAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="usersearch"
+        path="/admin/usersearch.do"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path="/errorpages/errorWithMessage.jsp"
+        redirect="false"
+      />
+
+    </action>
+    <action
+      path="/Paint"
+      type="org.lamsfoundation.lams.webservice.PaintAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/lessonConditions"
+      type="org.lamsfoundation.lams.web.LessonConditionsAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="indexLessonConditions"
+        path="/indexLessonConditions.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/editLessonIntro"
+      type="org.lamsfoundation.lams.web.action.EditLessonIntroAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="editLessonIntro"
+        path="/editLessonIntro.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/password"
+      type="org.lamsfoundation.lams.web.PasswordAction"
+      name="PasswordChangeActionForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="passwordChange"
+        path="/passwordChangeContent.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/signup/signup"
+      type="org.lamsfoundation.lams.web.action.SignupAction"
+      name="SignupForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="signup"
+        path=".signup"
+        redirect="false"
+      />
+      <forward
+        name="index"
+        path="/"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path=".successfulSignup"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/notification"
+      type="org.lamsfoundation.lams.web.NotificationAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/r"
+      type="org.lamsfoundation.lams.web.RedirectAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
+      name="PedagogicalPlannerSequenceNodeForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="template"
+        path="/pedagogical_planner/templateBase.jsp"
+        redirect="false"
+      />
+      <forward
+        name="preview"
+        path="/home.do?method=learner"
+        redirect="false"
+      />
+      <forward
+        name="sequenceChooser"
+        path="/pedagogical_planner/sequenceChooser.jsp"
+        redirect="false"
+      />
+      <forward
+        name="grouping"
+        path="/pedagogical_planner/grouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="editAuthors"
+        path="/pedagogical_planner/editAuthors.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/pedagogicalPlanner/grouping"
+      type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
+      name="PedagogicalPlannerGroupingForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="template"
+        path="/pedagogical_planner/templateBase.jsp"
+        redirect="false"
+      />
+      <forward
+        name="preview"
+        path="/home.do?method=learner"
+        redirect="false"
+      />
+      <forward
+        name="sequenceChooser"
+        path="/pedagogical_planner/sequenceChooser.jsp"
+        redirect="false"
+      />
+      <forward
+        name="grouping"
+        path="/pedagogical_planner/grouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="editAuthors"
+        path="/pedagogical_planner/editAuthors.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/home"
+      type="org.lamsfoundation.lams.web.HomeAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="sysadmin"
+        path="/sysadmin.jsp"
+        redirect="false"
+      />
+      <forward
+        name="lessonIntro"
+        path="/lessonIntro.jsp"
+        redirect="false"
+      />
+      <forward
+        name="addLesson"
+        path="/addLesson.jsp"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
+        redirect="false"
+      />
+      <forward
+        name="passwordChange"
+        path="/passwordChangeContent.jsp"
+        redirect="false"
+      />
+      <forward
+        name="index"
+        path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/authoring/exportToolContent"
+      type="org.lamsfoundation.lams.authoring.web.ExportToolContentAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="choice"
+        path="/toolcontent/exportchoice.jsp"
+        redirect="false"
+      />
+      <forward
+        name="loading"
+        path="/toolcontent/exportloading.jsp"
+        redirect="false"
+      />
+      <forward
+        name="result"
+        path="/toolcontent/exportresult.jsp"
+        redirect="false"
+      />
+    </action>
+    
+	<!--
+		Learning Design Sequence Templates
+  		-->
+    <action
+      path="/authoring/template/tbl"
+      type="org.lamsfoundation.lams.authoring.template.web.TBLTemplateAction"
+      parameter="method"
+      validate="false"
+      scope="request"
+    >
+    <forward name="init" path="/authoring/template/tbl/tbl.jsp" />
+    <forward name="question" path="/authoring/template/tool/mcquestion.jsp" />
+    <forward name="questionoption" path="/authoring/template/tool/mcoption.jsp" />
+    <forward name="redooption" path="/authoring/template/tool/mcredooption.jsp" />
+    <forward name="assess" path="/authoring/template/tool/assessment.jsp" />
+    <forward name="assessmcq" path="/authoring/template/tool/assessmcq.jsp" />
+    <forward name="assessredooption" path="/authoring/template/tool/assessredooption.jsp" />
+    <forward name="assessoption" path="/authoring/template/tool/assessoption.jsp" />
+    <forward name="peerreviewstar" path="/authoring/template/tool/peerreviewstar.jsp" />
+    </action>
+
+
+    <action
+      path="/portrait"
+      type="org.lamsfoundation.lams.web.PortraitAction"
+      name="PortraitActionForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="portrait"
+        path="/portrait.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/lti"
+      type="org.lamsfoundation.lams.web.action.LtiAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="addLesson"
+        path="/lti/addLesson.jsp"
+        redirect="false"
+      />
+      <forward
+        name="learnerMonitor"
+        path="/lti/learnerMonitor.jsp"
+        redirect="false"
+      />
+      <forward
+        name="learnerMonitorRedirect"
+        path="/lti.do?method=learnerMonitor"
+        redirect="true"
+      />
+      <forward
+        name="error"
+        path="/error.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/saveprofile"
+      type="org.lamsfoundation.lams.web.ProfileSaveAction"
+      name="UserForm"
+      scope="request"
+      input="/editprofile.jsp"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="profile"
+        path="/index.do?method=profile"
+        redirect="true"
+      />
+      <forward
+        name="editprofile"
+        path="/index.do?method=editprofile"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/profile"
+      type="org.lamsfoundation.lams.web.ProfileAction"
+      name="UserForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="view"
+        path="/profile.jsp"
+        redirect="false"
+      />
+      <forward
+        name="lessons"
+        path="/lessons.jsp"
+        redirect="false"
+      />
+      <forward
+        name="edit"
+        path="/editprofile.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/workspace"
+      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/saveportrait"
+      type="org.lamsfoundation.lams.web.PortraitSaveAction"
+      name="PortraitActionForm"
+      scope="request"
+      input="/portrait.jsp"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="profile"
+        path="/index.do?method=profile"
+        redirect="false"
+      />
+      <forward
+        name="errors"
+        path="/index.do?method=portrait"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/displayGroup"
+      type="org.lamsfoundation.lams.web.DisplayGroupAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="group"
+        path="/group.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/findUserLessons"
+      type="org.lamsfoundation.lams.web.FindUserLessonsAction"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success-getResults"
+        path="/findUserLessons.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/questions"
+      type="org.lamsfoundation.lams.web.QuestionsAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="questionChoice"
+        path="/questions/questionChoice.jsp"
+        redirect="false"
+      />
+      <forward
+        name="questionFile"
+        path="/questions/questionFile.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/tutorial"
+      type="org.lamsfoundation.lams.web.TutorialAction"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+    </action>
+    
+    <action
+      path="/twoFactorAuthentication"
+      type="org.lamsfoundation.lams.web.action.TwoFactorAuthenticationAction"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="secret"
+        path="/twoFactorAuthSecret.jsp"
+        redirect="false"
+      />
+    </action>    
+    <action
+      path="/passwordChanged"
+      type="org.lamsfoundation.lams.web.PasswordChangeAction"
+      name="PasswordChangeActionForm"
+      scope="request"
+      input="/passwordChangeContent.jsp"
+      unknown="false"
+      validate="false"
+    >
+    <forward
+        name="okay"
+        path="/passwordChangeOkContent.jsp"
+        redirect="false"
+      />
+      <forward
+        name="cancelled"
+        path="/index.do?method=profile"
+        redirect="false"
+      />
+      <forward
+        name="errors"
+        path="/index.do?method=password"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/OrganisationGroup"
+      type="org.lamsfoundation.lams.web.OrganisationGroupAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="viewGroupings"
+        path="/orgGrouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewGroups"
+        path="/orgGroup.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewExtGroups"
+        path="/extGroups.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/emailUser"
+      type="org.lamsfoundation.lams.web.EmailUserAction"
+      name="emailForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="emailuser"
+        path="/emailuser.jsp"
+        redirect="false"
+      />
+    </action>
+
+     <action
+      path="/comments/comments"
+      type="org.lamsfoundation.lams.comments.web.CommentAction"
+      parameter="init"
+      validate="false"
+      scope="request"
+    >
+    <forward name="success" path="/comments/comments.jsp" />
+    <forward name="successAll" path="/comments/comments.jsp" />
+    </action>
+
+    <action
+      path="/comments/viewTopic"
+      type="org.lamsfoundation.lams.comments.web.CommentAction"
+      parameter="viewTopic"
+      validate="false"
+      scope="request"
+    >
+    <forward name="success" path="/comments/topicviewwrapper.jsp" />
+    <forward name="successAll" path="/comments/allviewwrapper.jsp" />
+    </action>
+    <action
+      path="/comments/viewTopicThread"
+      type="org.lamsfoundation.lams.comments.web.CommentAction"
+      parameter="viewTopicThread"
+      validate="false"
+      scope="request"
+    >
+    <forward name="success" path="/comments/topicviewwrapper.jsp" />
+    </action>
+
+	<action path="/comments/newComment"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="newComment" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+    <action
+      path="/comments/newReplyTopic"
+      type="org.lamsfoundation.lams.comments.web.CommentAction"
+      parameter="newReplyTopic"
+      validate="false"
+      scope="request"
+    >
+    <forward name="success" path="/comments/reply.jsp" />
+    </action>
+	<action path="/comments/replyTopicInline"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="replyTopicInline" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+
+    <action
+      path="/comments/editTopic"
+      type="org.lamsfoundation.lams.comments.web.CommentAction"
+      parameter="editTopic"
+      validate="false"
+      scope="request"
+    >
+    <forward name="success" path="/comments/edit.jsp" />
+    </action>
+	<action path="/comments/updateTopicInline"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="updateTopicInline" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+
+	<action path="/comments/like"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="like" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+	<action path="/comments/dislike"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="dislike" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+	<action path="/comments/hide"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="hide" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+	<action path="/comments/makeSticky"
+		type="org.lamsfoundation.lams.comments.web.CommentAction"
+		parameter="makeSticky" 
+		validate="false" 
+		scope="request">
+		<!--  JSON response on success -->
+	</action>
+	<action
+      path="/groupingUpload"
+      type="org.lamsfoundation.lams.monitoring.web.GroupingUploadAJAXAction"
+      name="uploadForm"
+      parameter="method"
+	  scope="request"
+      validate="false"
+    >
+		<!--  text response on success -->
+    </action>
+
+
+
+  </action-mappings>
+
+   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+    <message-resources    parameter="org.lamsfoundation.lams.central.ApplicationResources"/>
+
+  <plug-in className="org.apache.struts.tiles.TilesPlugin">
+	<set-property property="definitions-config"
+		value="/WEB-INF/tiles-defs.xml" />
+	<set-property property="definitions-debug" value="0" />
+	<set-property property="definitions-parser-details" value="0" />
+	<set-property property="definitions-parser-validate" value="true" />
+</plug-in>
+
+</struts-config>
