@@ -97,7 +97,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -1396,6 +1395,20 @@ public class MonitoringController {
 	    responseJSON.set("transitions", transitions);
 	}
 
+	// check for live edit status
+	if ( lesson.getLiveEditEnabled() ) {
+	    if ( lesson.getLockedForEdit()) {
+		responseJSON.put("lockedForEdit", true);
+		User currentEditor = lesson.getLearningDesign().getEditOverrideUser();
+		if ( currentEditor != null ) {
+		    responseJSON.put("lockedForEditUserId", currentEditor.getUserId());
+		    responseJSON.put("lockedForEditUsername", currentEditor.getFullName());
+		}
+	    } else {
+		responseJSON.put("lockedForEdit", false);
+	    }
+	}
+	
 	response.setContentType("application/json;charset=utf-8");
 
 	return responseJSON.toString();

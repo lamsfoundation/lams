@@ -29,7 +29,6 @@
      <!--  <module name="org.apache.commons.pool" export="true" />  WildFly 14 does not provide this library. It seems not neccessary anymore, though.-->
       <module name="org.apache.commons.fileupload" export="true" />
       <module name="org.apache.commons.validator" export="true" />
-      <module name="org.apache.httpcomponents" export="true" />
       <module name="org.apache.xmlcommons" export="true" />
       <module name="org.infinispan" export="true" />
       <module name="org.imsglobal" export="true" />

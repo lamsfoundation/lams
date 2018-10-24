@@ -89,6 +89,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\")'>");
 	    }
+	    ret.add(String.valueOf(hasArchivedMarks));
 
 	} else if (view == GBGridView.MON_COURSE) {
 	    ret.add(rowName);

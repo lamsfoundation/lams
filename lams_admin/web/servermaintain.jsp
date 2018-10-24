@@ -35,7 +35,6 @@
 					serverkey: "required",
 					servername: "required",
 					prefix: "required",
-					userinfoUrl: "required",
 					timeToLiveLoginRequest: {
 						required: true,
 						min: 1
@@ -46,7 +45,6 @@
 					serverkey: "<c:set var="namev"><fmt:message key='sysadmin.serverkey' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 					servername: "<c:set var="namev"><fmt:message key='sysadmin.servername' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 					prefix: "<c:set var="namev"><fmt:message key='sysadmin.prefix' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
-					userinfoUrl: "<c:set var="namev"><fmt:message key='sysadmin.userinfoUrl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 					timeToLiveLoginRequest: {
 						required: "<c:set var="namev"><fmt:message key='sysadmin.login.request.ttl' /></c:set><fmt:message key="error.required"><fmt:param>${namev}</fmt:param></fmt:message>",
 						min: "<fmt:message key="error.login.request.ttl.negative" />"
@@ -63,7 +61,16 @@
 	<c:set var="help"><fmt:message key="Integrations"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="extServerForm">
-	<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+	
+	<p>
+		<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
+			<fmt:message key="sysadmin.maintain" />
+		</a>
+		
+		<a href="<lams:LAMSURL/>admin/serverlist.do" class="btn btn-default">
+			<fmt:message key="sysadmin.maintain.external.servers" />
+		</a>
+	</p>
 	
 	<lams:errors/>
 			
@@ -111,11 +118,7 @@
 		<div class="form-group">
 		    <label for="lessonFinishUrl"><fmt:message key="sysadmin.lessonFinishUrl" /></label>
 		    <form:input path="lessonFinishUrl" size="70" cssClass="form-control"/>
-		</div> 
-		<div class="form-group">
-		    <label for="lessonFinishUrl"><fmt:message key="sysadmin.lessonFinishUrl" /></label>
-		    <form:input path="lessonFinishUrl" size="70" cssClass="form-control"/>
-		</div> 
+		</div>
 		<div class="form-group">
 		    <label for="extGroupsUrl"><fmt:message key="sysadmin.extGroupsUrl" /></label>
 		    <form:input path="extGroupsUrl" size="70" cssClass="form-control"/>

@@ -142,8 +142,8 @@
 				WEIGHTS_NONE_FOUND_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_NONE_FOUND_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.learning.design.templates" var="TEMPLATES_VAR"/>
 				TEMPLATES : decoderDiv.html('<c:out value="${TEMPLATES_VAR}" />').text(),
-				
-				
+				<fmt:message key="authoring.fla.page.menu.apply.changes" var="LIVE_EDIT_SAVE_VAR"/>
+				LIVE_EDIT_SAVE : decoderDiv.html('<c:out value="${LIVE_EDIT_SAVE_VAR}" />').text(),
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>

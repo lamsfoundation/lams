@@ -609,12 +609,25 @@ function updatePresenceAvailableCount(){
 	}
 }
 
-
 function updateContributeActivities(contributeActivities) {
 	$('.contributeRow').remove();
 	var header = $('#contributeHeader');
-	if (contributeActivities) {
-		var row = header;
+	var row = header;
+	
+	// special case - add a Live Edit option. This does not directly map to an activity
+	if ( lockedForEdit && lockedForEditUserId == userId) {
+		// show Live Edit task only if currently editing myself, not if someone else is editing.
+		// put it at the top of the contribution list
+		var cell = $('<div />').addClass('contributeActivityCell').text(LABELS.LIVE_EDIT_BUTTON);
+		var row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
+		var entryContent = LABELS.LIVE_EDIT_TOOLTIP 
+			+ '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openLiveEdit()" title="' + LABELS.CONTRIBUTE_TOOLTIP
+			+ '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
+		cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
+		row = row.append(cell);
+	}
+	
+	if (contributeActivities ) {
 		$.each(contributeActivities, function(){
 			var cell = $('<div />').addClass('contributeActivityCell').text(this.title);
 			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
@@ -1162,12 +1175,47 @@ function updateSequenceTab() {
 				}
 			});	
 			initializePortraitPopover(LAMS_URL, 'large', 'top');
+
+			// update the cache global values so that the contributions & the Live Edit buttons will update
+			lockedForEdit = response.lockedForEdit;
+			lockedForEditUserId = response.lockedForEditUserId;
+			lockedForEditUsername = response.lockedForEditUsername; 
+			updateLiveEdit();
 			
 			sequenceRefreshInProgress = false;
 		}
 	});
 }
 
+function updateLiveEdit() {
+	if ( liveEditEnabled ) {
+		if ( lockedForEdit ) {
+			if ( userId == lockedForEditUserId ) {
+				$("#liveEditButton").removeClass('btn-default');
+				$("#liveEditButton").addClass('btn-primary');
+				$("#liveEditButton").show();
+				$("#liveEditWarning").hide();
+				$("#liveEditWarning").text("");
+			} else {
+				$("#liveEditButton").removeClass('btn-primary');
+				$("#liveEditButton").addClass('btn-default');
+				$("#liveEditButton").hide();
+				$("#liveEditWarning").text(LABELS.LIVE_EDIT_WARNING.replace("%0",lockedForEditUsername));
+				$("#liveEditWarning").show();
+			}
+		} else {
+			$("#liveEditButton").removeClass('btn-primary');
+			$("#liveEditButton").addClass('btn-default');
+			$("#liveEditButton").show();
+			$("#liveEditWarning").hide();
+			$("#liveEditWarning").text("");
+		}
+	} else {
+		$("#liveEditButton").hide();
+		$("#liveEditWarning").hide();
+	}
+}
+	
 function loadLearningDesignSVG() {
 	var exit = false;
 	// fetch SVG just once, since it is immutable

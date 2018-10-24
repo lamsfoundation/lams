@@ -1,4 +1,4 @@
-<%@ include file="/template/taglibs.jsp"%>
+<%@ include file="/taglibs.jsp"%>
 <style>
 	.font-weight-bold {
 		font-weight: bold;

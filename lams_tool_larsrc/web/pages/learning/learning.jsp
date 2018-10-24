@@ -164,6 +164,10 @@
 				</c:choose>
 			</lams:Alert>
 		</c:if>
+	
+		<c:if test="${resource.miniViewResourceNumber > 0}">
+			<lams:Alert type="info" id="warn-numResources" close="false">${resource.miniViewNumberStr}</lams:Alert>
+		</c:if>
 
 		<lams:errors/>
 
@@ -261,14 +265,6 @@
 					</c:if>
 				</tr>
 			</c:forEach>
-
-			<c:if test="${resource.miniViewResourceNumber > 0}">
-				<tr>
-					<td colspan="3" align="left">
-						<b>${resource.miniViewNumberStr}</b>
-					</td>
-				</tr>
-			</c:if>
 			</table>
 
 		</div>
@@ -314,7 +310,7 @@
 		</c:if>
 		<!-- End Reflection -->
 
-		<c:if test="${mode != 'teacher'}">
+		<c:if test="${mode != 'teacher' && sessionMap.hasCompletedMinNumber}">
 				<c:choose>
 					<c:when
 						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">

@@ -31,10 +31,10 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="loadVars.jsp"></script>
-	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
 	
 </lams:head>
 

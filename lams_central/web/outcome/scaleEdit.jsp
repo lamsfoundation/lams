@@ -9,14 +9,14 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/outcome.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/outcome.js"></script>
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
 		<c:if test="${saved}">
 			var scalesFrame = $('#dialogOutcomeScale iframe', window.parent.document);
@@ -52,12 +52,12 @@
 						
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.name" />:
-								<form:text path="name" size="50" maxlength="255" styleClass="form-control" disabled="${formDisabled}" />
+								<form:input path="name" size="50" maxlength="255" styleClass="form-control" disabled="${formDisabled}" />
 							</label>
 						</div>
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.code" />:
-								<form:text path="code" size="50" maxlength="50" styleClass="form-control" disabled="${formDisabled}" />
+								<form:input path="code" size="50" maxlength="50" styleClass="form-control" disabled="${formDisabled}" />
 							</label>
 						</div>
 						<div class="form-group">

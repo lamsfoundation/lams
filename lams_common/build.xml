@@ -4,6 +4,8 @@
 	
 	<import file="../lams_build/build_base.xml"/>
 	
+	<target name="_compile-java" depends="_compile-java-nocommon" />
+	
 	<target name="build-db" depends="_clean-dirs"
 		description="Rebuilds LAMS database.">
 		
@@ -25,7 +27,7 @@
 		
 		<echo>Executing SQL scripts</echo>
 		<sql driver="com.mysql.cj.jdbc.Driver"
-		     url="${db.url.init.build}"
+		     url="${db.url.build}"
 			 userid="${db.username}"
 			 password="${db.password}"
 			 encoding="utf8">

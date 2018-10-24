@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeService;
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -65,29 +66,16 @@ public class CompleteItemServlet extends HttpServlet {
 	SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
-    /**
-     * The doGet method of the servlet. <br>
-     *
-     *
-     * @param request
-     *            the request send by the client to the server
-     * @param response
-     *            the response send by the server to the client
-     * @throws ServletException
-     *             if an error occurred
-     * @throws IOException
-     *             if an error occurred
-     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long commonCartridgeItemUid = new Long(request.getParameter(CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID));
-
-	HttpSession ss = SessionManager.getSession();
+	Long commonCartridgeItemUid = WebUtil.readLongParam(request, CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID,
+		false);
 
 	// get back login user DTO
+	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	Long sessionId = (Long) sessionMap.get(CommonCartridgeConstants.ATTR_TOOL_SESSION_ID);
@@ -102,21 +90,11 @@ public class CompleteItemServlet extends HttpServlet {
 	    }
 	}
 
-	CommonCartridgeUser rUser = commonCartridgeService.getUserByIDAndSession(new Long(user.getUserID()), sessionId);
-
 	response.setContentType("text/javascript");
 	PrintWriter out = response.getWriter();
-
-	if (!rUser.isSessionFinished()) {
-	    out.println("window.parent.opener.checkNew(false);");
-	    out.println("window.parent.opener=null;");
-	    out.println("window.parent.close();");
-	} else {
-	    out.println("window.parent.opener.checkNew(true);");
-	    out.println("window.parent.opener=null;");
-	    out.println("window.parent.close();");
-	}
-
+	out.println("window.parent.opener.checkNew();");
+	out.println("window.parent.opener=null;");
+	out.println("window.parent.close();");
 	out.println();
 	out.flush();
 	out.close();

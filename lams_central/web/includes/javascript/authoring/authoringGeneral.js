@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -1746,8 +1746,10 @@ GeneralLib = {
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
 					'maxUIID'		   : 0,
-					'readOnly'		   : ld.readOnly,
-					'canModify'		   : ld.copyTypeID == 1 || ld.editOverrideLock
+					'readOnly'		   : ld.readOnly && !ld.editOverrideLock,
+					'canModify'		   : ld.copyTypeID == 1 || ld.editOverrideLock,
+					'editOverrideLock' : ld.editOverrideLock,
+					'copyTypeID'	   : ld.copyTypeID
 				};
 				
 				if (!isReadOnlyMode) {
@@ -2262,6 +2264,7 @@ GeneralLib = {
 					$('#newButton, #openButton').parent().remove();
 					$('#importSequenceButton, #previewButton').remove();
 					$('#saveButton').parent().children('.dropdown-toggle, .dropdown-menu').remove();
+					$('#saveButton').text(LABELS.LIVE_EDIT_SAVE);
 					$('#cancelLiveEditButton').show();
 				}
 				
@@ -2685,10 +2688,10 @@ GeneralLib = {
 	
 		// serialise the sequence
 		return {
-			'copyTypeID'         : 1,
+			'copyTypeID'         : layout.ld.editOverrideLock ? layout.ld.copyTypeID : 1, // don't change the copyTypeId from 2 to 1 if a LiveEdit is in progress
 			'maxID'				 : layout.ld.maxUIID,
 			'readOnly'			 : false,
-			'editOverrideLock'   : false,
+			'editOverrideLock'   : layout.ld.editOverrideLock,
 			'contentFolderID'    : layout.ld.contentFolderID,
 			'licenseID'			 : $('#ldDescriptionLicenseSelect').val(),
 			'licenseText'   	 : $('#ldDescriptionLicenseSelect').val() == "0"

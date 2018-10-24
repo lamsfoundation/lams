@@ -52,7 +52,7 @@
 							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
 							{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-			  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
+			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 			  			   	{name:'response', index:'response', width:427, sortable:false, search:false},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}

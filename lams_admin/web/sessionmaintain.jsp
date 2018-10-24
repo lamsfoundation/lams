@@ -21,13 +21,15 @@
 		<table class="table table-striped">
 			<tr>
 				<th><fmt:message key="sysadmin.maintain.session.login" /></th>
+				<th><fmt:message key="sysadmin.maintain.session.name" /></th>
 				<th><fmt:message key="sysadmin.maintain.session.id" /></th>
 				<th></th>
 			</tr>
 			<c:forEach items="${sessions}" var="ses">
 			<tr>
 				<td><c:out value="${ses.key}" /></td>
-				<td><c:out value="${ses.value}" /></td>
+				<td><c:out value="${ses.value[0]} ${ses.value[1]}" /></td>
+				<td><c:out value="${ses.value[2]}" /></td>
 				<td>
 					<a href="<lams:LAMSURL/>admin/sessionmaintain/delete.do?login=${ses.key}" class="btn btn-default">
 				<fmt:message key="sysadmin.maintain.session.delete" />

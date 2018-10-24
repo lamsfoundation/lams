@@ -69,7 +69,7 @@ public class ServerMaintainController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(true);
 	integrationService.saveExtServer(map);
-	return "forward:/serverlist.do";
+	return "redirect:/serverlist.do";
     }
 
     @RequestMapping(path = "/enable")
@@ -78,14 +78,14 @@ public class ServerMaintainController {
 	ExtServer map = integrationService.getExtServer(sid);
 	map.setDisabled(false);
 	integrationService.saveExtServer(map);
-	return "forward:/serverlist.do";
+	return "redirect:/serverlist.do";
     }
 
     @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	userManagementService.deleteById(ExtServer.class, sid);
-	return "forward:/serverlist.do";
+	return "redirect:/serverlist.do";
     }
 
 }

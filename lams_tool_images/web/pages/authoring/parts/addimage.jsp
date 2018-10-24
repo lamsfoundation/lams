@@ -35,7 +35,7 @@
 			    <label for="file-title">
 			    	<fmt:message key="label.authoring.basic.resource.title.input"/>
 			    </label>
-			    <input type="text" name="title" value="${imageGalleryItemForm.title}" class="form-control input-sm" id="file-title" tabindex="1"/>
+			    <input type="text" name="title" value="${imageGalleryItemForm.title}" class="form-control input-sm" id="file-title" tabindex="1" maxlength="255"/>
 			</div>
 		
 			<div class="form-group">

@@ -1,4 +1,4 @@
-<%@ include file="/template/taglibs.jsp"%>
+<%@ include file="/taglibs.jsp"%>
 
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
