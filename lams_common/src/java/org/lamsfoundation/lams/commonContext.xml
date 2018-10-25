@@ -22,7 +22,7 @@
 				<value>classpath*:org/eucm/lams/**/*.hbm.xml</value>
 			</list>
 		</property>
-		<property name="packagesToScan" value="org.lamsfoundation/lams/**/model/"/>
+		<property name="packagesToScan" value="org.lamsfoundation.lams.tool.**.model/"/>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 	</bean>
 	
