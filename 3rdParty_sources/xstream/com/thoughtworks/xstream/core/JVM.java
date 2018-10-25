@@ -1,24 +1,15 @@
 /*
  * Copyright (C) 2004, 2005, 2006 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
- * 
+ *
  * Created on 09. May 2004 by Joe Walnes
  */
 package com.thoughtworks.xstream.core;
-
-import com.thoughtworks.xstream.converters.reflection.FieldDictionary;
-import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
-import com.thoughtworks.xstream.core.util.CustomObjectOutputStream;
-import com.thoughtworks.xstream.core.util.DependencyInjectionFactory;
-import com.thoughtworks.xstream.core.util.PresortedMap;
-import com.thoughtworks.xstream.core.util.PresortedSet;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -31,6 +22,17 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import com.thoughtworks.xstream.converters.reflection.FieldDictionary;
+import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
+import com.thoughtworks.xstream.core.util.Base64Encoder;
+import com.thoughtworks.xstream.core.util.CustomObjectOutputStream;
+import com.thoughtworks.xstream.core.util.DependencyInjectionFactory;
+import com.thoughtworks.xstream.core.util.PresortedMap;
+import com.thoughtworks.xstream.core.util.PresortedSet;
+
 
 public class JVM implements Caching {
 
@@ -52,6 +54,7 @@ public class JVM implements Caching {
     private static final float DEFAULT_JAVA_VERSION = 1.4f;
     private static final boolean reverseFieldOrder = false;
     private static final Class reflectionProviderType;
+    private static final StringCodec base64Codec;
 
     static class Test {
         private Object o;
@@ -110,7 +113,8 @@ public class JVM implements Caching {
                         cls = null;
                     }
                     if (cls == null) {
-                        cls = loadClassForName("com.thoughtworks.xstream.converters.reflection.SunLimitedUnsafeReflectionProvider");
+                        cls = loadClassForName(
+                            "com.thoughtworks.xstream.converters.reflection.SunLimitedUnsafeReflectionProvider");
                     }
                     type = cls;
                 } catch (ObjectAccessException e) {
@@ -171,6 +175,23 @@ public class JVM implements Caching {
         isAWTAvailable = loadClassForName("java.awt.Color", false) != null;
         isSwingAvailable = loadClassForName("javax.swing.LookAndFeel", false) != null;
         isSQLAvailable = loadClassForName("java.sql.Date") != null;
+
+        StringCodec base64 = null;
+        Class base64Class = loadClassForName(
+            "com.thoughtworks.xstream.core.util.Base64JavaUtilCodec");
+        if (base64Class == null) {
+            base64Class = loadClassForName("com.thoughtworks.xstream.core.util.Base64JAXBCodec");
+        }
+        if (base64Class != null) {
+            try {
+                base64 = (StringCodec)base64Class.newInstance();
+            } catch (final Exception e) {
+            }
+        }
+        if (base64 == null) {
+            base64 = new Base64Encoder();
+        }
+        base64Codec = base64;
     }
     
     /**
@@ -180,8 +201,7 @@ public class JVM implements Caching {
     }
     
     /**
-     * Parses the java version system property to determine the major java version,
-     * i.e. 1.x
+     * Parses the java version system property to determine the major java version, i.e. 1.x
      *
      * @return A float of the form 1.x
      */
@@ -198,21 +218,21 @@ public class JVM implements Caching {
      * @deprecated As of 1.4.4, minimal JDK version is 1.4 already
      */
     public static boolean is14() {
-        return majorJavaVersion >= 1.4f;
+        return isVersion(4);
     }
 
     /**
      * @deprecated As of 1.4.4, minimal JDK version will be 1.7 for next major release
      */
     public static boolean is15() {
-        return majorJavaVersion >= 1.5f;
+        return isVersion(5);
     }
 
     /**
      * @deprecated As of 1.4.4, minimal JDK version will be 1.7 for next major release
      */
     public static boolean is16() {
-        return majorJavaVersion >= 1.6f;
+        return isVersion(6);
     }
 
     /**
@@ -220,19 +240,20 @@ public class JVM implements Caching {
      * @deprecated As of 1.4.10, minimal JDK version will be 1.7 for next major release
      */
     public static boolean is17() {
-        return majorJavaVersion >= 1.7f;
+        return isVersion(7);
     }
 
     /**
      * @since 1.4
+     * @deprecated As of 1.4.11 use {@link #isVersion(int)}.
      */
     public static boolean is18() {
-        return majorJavaVersion >= 1.8f;
+        return isVersion(8);
     }
 
     /**
      * @since 1.4.8
-     * @deprecated As of upcoming use {@link #is9()}
+     * @deprecated As of 1.4.10 use {@link #isVersion(int)}.
      */
     public static boolean is19() {
         return majorJavaVersion >= 1.9f;
@@ -240,9 +261,25 @@ public class JVM implements Caching {
 
     /**
      * @since 1.4.10
+     * @deprecated As of 1.4.11 use {@link #isVersion(int)}
      */
     public static boolean is9() {
-        return majorJavaVersion >= 9f;
+        return isVersion(9);
+    }
+
+    /**
+     * Checks current runtime against provided major Java version.
+     *
+     * @param version the requested major Java version
+     * @return true if current runtime is at least the provided major version
+     * @since 1.4.11
+     */
+    public static boolean isVersion(final int version) {
+        if (version < 1) {
+            throw new IllegalArgumentException("Java version range starts with at least 1.");
+        }
+        final float v = majorJavaVersion < 9 ? 1f + version * 0.1f : version;
+        return majorJavaVersion >= v;
     }
 
     private static boolean isIBM() {
@@ -258,10 +295,11 @@ public class JVM implements Caching {
     
     /**
      * Load a XStream class for the given name.
-     * 
-     * <p>This method is not meant to use loading arbitrary classes. It is used by XStream bootstrap
-     * until it is able to use the user provided or the default {@link ClassLoader}.</p>
-     * 
+     * <p>
+     * This method is not meant to use loading arbitrary classes. It is used by XStream bootstrap until it is able to
+     * use the user provided or the default {@link ClassLoader}.
+     * </p>
+     *
      * @since 1.4.5
      */
     public static Class loadClassForName(String name) {
@@ -277,10 +315,11 @@ public class JVM implements Caching {
 
     /**
      * Load a XStream class for the given name.
-     * 
-     * <p>This method is not meant to use loading arbitrary classes. It is used by XStream bootstrap
-     * until it is able to use the user provided or the default {@link ClassLoader}.</p>
-     * 
+     * <p>
+     * This method is not meant to use loading arbitrary classes. It is used by XStream bootstrap until it is able to
+     * use the user provided or the default {@link ClassLoader}.
+     * </p>
+     *
      * @since 1.4.5
      */
     public static Class loadClassForName(String name, boolean initialize) {
@@ -304,7 +343,7 @@ public class JVM implements Caching {
     
     /**
      * Create the best matching ReflectionProvider.
-     * 
+     *
      * @return a new instance
      * @since 1.4.5
      */
@@ -332,13 +371,13 @@ public class JVM implements Caching {
      * implementations configured in <em>lib/stax.properties</em> or registered with the Service
      * API.
      * </p>
-     * 
+     *
      * @return the XMLInputFactory implementation or null
      * @throws ClassNotFoundException if the standard class cannot be found
      * @since 1.4.5
      */
     public static Class getStaxInputFactory() throws ClassNotFoundException {
-        if (is16()) {
+        if (isVersion(6)) {
             if (isIBM()) {
                 return Class.forName("com.ibm.xml.xlxp.api.stax.XMLInputFactoryImpl");
             } else {
@@ -357,13 +396,13 @@ public class JVM implements Caching {
      * implementations configured in <em>lib/stax.properties</em> or registered with the Service
      * API.
      * </p>
-     * 
+     *
      * @return the XMLOutputFactory implementation or null
      * @throws ClassNotFoundException if the standard class cannot be found
      * @since 1.4.5
      */
     public static Class getStaxOutputFactory() throws ClassNotFoundException {
-        if (is16()) {
+        if (isVersion(6)) {
             if (isIBM()) {
                 return Class.forName("com.ibm.xml.xlxp.api.stax.XMLOutputFactoryImpl");
             } else {
@@ -373,6 +412,17 @@ public class JVM implements Caching {
         return null;
     }
     
+    /**
+     * Get an available Base64 implementation. Prefers java.util.Base64 over DataTypeConverter from JAXB over XStream's
+     * own implementation.
+     *
+     * @return a Base64 codec implementation
+     * @since 1.4.11
+     */
+    public static StringCodec getBase64Codec() {
+        return base64Codec;
+    }
+
     /**
      * @deprecated As of 1.4.5 use {@link #newReflectionProvider()}
      */
@@ -384,7 +434,7 @@ public class JVM implements Caching {
     }
 
     private static boolean canUseSunUnsafeReflectionProvider() {
-        return canAllocateWithUnsafe && is14();
+        return canAllocateWithUnsafe;
     }
 
     private static boolean canUseSunLimitedUnsafeReflectionProvider() {
@@ -400,6 +450,7 @@ public class JVM implements Caching {
 
     /**
      * Checks if AWT is available.
+     *
      * @since 1.4.5
      */
     public static boolean isAWTAvailable() {
@@ -407,7 +458,8 @@ public class JVM implements Caching {
     }
 
     /**
-     * Checks if the jvm supports awt.
+     * Checks if the JVM supports AWT.
+     *
      * @deprecated As of 1.4.5 use {@link #isAWTAvailable()}
      */
     public boolean supportsAWT() {
@@ -416,6 +468,7 @@ public class JVM implements Caching {
 
     /**
      * Checks if Swing is available.
+     *
      * @since 1.4.5
      */
     public static boolean isSwingAvailable() {
@@ -423,7 +476,8 @@ public class JVM implements Caching {
     }
 
     /**
-     * Checks if the jvm supports swing.
+     * Checks if the JVM supports Swing.
+     *
      * @deprecated As of 1.4.5 use {@link #isSwingAvailable()}
      */
     public boolean supportsSwing() {
@@ -432,6 +486,7 @@ public class JVM implements Caching {
 
     /**
      * Checks if SQL is available.
+     *
      * @since 1.4.5
      */
     public static boolean isSQLAvailable() {
@@ -439,7 +494,8 @@ public class JVM implements Caching {
     }
 
     /**
-     * Checks if the jvm supports sql.
+     * Checks if the JVM supports SQL.
+     *
      * @deprecated As of 1.4.5 use {@link #isSQLAvailable()}
      */
     public boolean supportsSQL() {
@@ -448,7 +504,7 @@ public class JVM implements Caching {
 
     /**
      * Checks if TreeSet.addAll is optimized for SortedSet argument.
-     * 
+     *
      * @since 1.4
      */
     public static boolean hasOptimizedTreeSetAddAll() {
@@ -457,7 +513,7 @@ public class JVM implements Caching {
     
     /**
      * Checks if TreeMap.putAll is optimized for SortedMap argument.
-     * 
+     *
      * @since 1.4
      */
     public static boolean hasOptimizedTreeMapPutAll() {
@@ -539,11 +595,13 @@ public class JVM implements Caching {
         System.out.println("Java Beans EventHandler present: " + (loadClassForName("java.beans.EventHandler") != null));
         System.out.println("Standard StAX XMLInputFactory: " + staxInputFactory);
         System.out.println("Standard StAX XMLOutputFactory: " + staxOutputFactory);
+        System.out.println("Standard Base64 Codec: " + getBase64Codec().getClass().toString());
         System.out.println("Optimized TreeSet.addAll: " + hasOptimizedTreeSetAddAll());
         System.out.println("Optimized TreeMap.putAll: " + hasOptimizedTreeMapPutAll());
         System.out.println("Can parse UTC date format: " + canParseUTCDateFormat());
         System.out.println("Can create derive ObjectOutputStream: " + canCreateDerivedObjectOutputStream());
         System.out.println("Reverse field order detected for JDK: " + reverseJDK);
-        System.out.println("Reverse field order detected (only if JVM class itself has been compiled): " + reverseLocal);
+        System.out.println("Reverse field order detected (only if JVM class itself has been compiled): "
+            + reverseLocal);
     }
 }

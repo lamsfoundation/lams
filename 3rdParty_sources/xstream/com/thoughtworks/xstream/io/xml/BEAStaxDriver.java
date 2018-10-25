@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2011, 2014, 2015 XStream Committers.
+ * Copyright (C) 2009, 2011, 2014, 2015, 2018 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -22,9 +22,14 @@ import javax.xml.stream.XMLOutputFactory;
  *
  * @author J&ouml;rg Schaible
  * @since 1.4
+ * @deprecated As of 1.4.11 use {@link StandardStaxDriver} or {@link WstxDriver} instead. BEA StAX implementation is
+ *              outdated, unmaintained and has security issues.
  */
 public class BEAStaxDriver extends StaxDriver {
 
+    /**
+     * @deprecated As of 1.4.11 use {@link StandardStaxDriver} or {@link WstxDriver} instead.
+     */
     public BEAStaxDriver() {
         super();
     }
@@ -38,12 +43,16 @@ public class BEAStaxDriver extends StaxDriver {
 
     /**
      * @since 1.4.6
+     * @deprecated As of 1.4.11 use {@link StandardStaxDriver} or {@link WstxDriver} instead.
      */
     public BEAStaxDriver(QNameMap qnameMap, NameCoder nameCoder) {
         super(qnameMap, nameCoder);
     }
 
-    public BEAStaxDriver(QNameMap qnameMap) {
+    /**
+     * @deprecated As of 1.4.11 use {@link StandardStaxDriver} or {@link WstxDriver} instead.
+     */
+    public BEAStaxDriver(final QNameMap qnameMap) {
         super(qnameMap);
     }
 
@@ -56,6 +65,7 @@ public class BEAStaxDriver extends StaxDriver {
 
     /**
      * @since 1.4.6
+     * @deprecated As of 1.4.11 use {@link StandardStaxDriver} or {@link WstxDriver} instead.
      */
     public BEAStaxDriver(NameCoder nameCoder) {
         super(nameCoder);

@@ -32,7 +32,7 @@
         <archive path="/lams_build/lib/spring/spring-webmvc-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
-        <archive path="/lams_build/lib/xstream/xstream-1.4.10.jar" source="/3rdParty_sources/xstream"/>
         <archive path="/lams_build/lib/hibernate/hibernate-core-5.0.10.Final.jar" source="/3rdParty_sources/hibernate-core"/>
+        <archive path="/lams_build/lib/xstream/xstream-1.4.11.jar" source="/3rdParty_sources/xstream"/>
     </library>
 </eclipse-userlibraries>

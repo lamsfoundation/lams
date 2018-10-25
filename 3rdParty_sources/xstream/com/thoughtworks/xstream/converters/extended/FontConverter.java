@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2013 XStream Committers.
+ * Copyright (C) 2006, 2007, 2013, 2018 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -60,7 +60,8 @@ public class FontConverter implements Converter {
     public boolean canConvert(Class type) {
         // String comparison is used here because Font.class loads the class which in turns instantiates AWT,
         // which is nasty if you don't want it.
-        return type.getName().equals("java.awt.Font") || type.getName().equals("javax.swing.plaf.FontUIResource");
+        return type != null
+            && (type.getName().equals("java.awt.Font") || type.getName().equals("javax.swing.plaf.FontUIResource"));
     }
 
     public void marshal(Object source, HierarchicalStreamWriter writer,
@@ -113,7 +114,7 @@ public class FontConverter implements Converter {
         } else {
             attributes = Collections.EMPTY_MAP;
         }
-        if (!JVM.is16()) {
+        if (!JVM.isVersion(6)) {
             for (Iterator iter = attributes.values().iterator(); iter.hasNext(); ) {
                 if (iter.next() == null) {
                     iter.remove();

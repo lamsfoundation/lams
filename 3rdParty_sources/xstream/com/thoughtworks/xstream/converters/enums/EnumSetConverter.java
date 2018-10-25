@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2008, 2009 XStream Committers.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2018 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -47,7 +47,7 @@ public class EnumSetConverter implements Converter {
     }
 
     public boolean canConvert(Class type) {
-        return typeField != null && EnumSet.class.isAssignableFrom(type);
+        return typeField != null && type != null && EnumSet.class.isAssignableFrom(type);
     }
 
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {

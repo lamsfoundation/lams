@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004, 2005 Joe Walnes.
- * Copyright (C) 2006, 2007, 2010, 2011, 2013 XStream Committers.
+ * Copyright (C) 2006, 2007, 2010, 2011, 2013, 2018 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -13,7 +13,6 @@ package com.thoughtworks.xstream.converters.collections;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.core.JVM;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -64,14 +64,14 @@ public class CollectionConverter extends AbstractCollectionConverter {
             || type.equals(HashSet.class)
             || type.equals(LinkedList.class)
             || type.equals(Vector.class) 
-            || (JVM.is14() && type.getName().equals("java.util.LinkedHashSet"));
+            || type.equals(LinkedHashSet.class);
     }
 
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         Collection collection = (Collection) source;
         for (Iterator iterator = collection.iterator(); iterator.hasNext();) {
             Object item = iterator.next();
-            writeItem(item, context, writer);
+            writeCompleteItem(item, context, writer);
         }
     }
 
@@ -95,7 +95,7 @@ public class CollectionConverter extends AbstractCollectionConverter {
 
     protected void addCurrentElementToCollection(HierarchicalStreamReader reader, UnmarshallingContext context,
         Collection collection, Collection target) {
-        Object item = readItem(reader, context, collection);
+        final Object item = readItem(reader, context, collection); // call readBareItem when deprecated method is removed
         target.add(item);
     }
 
