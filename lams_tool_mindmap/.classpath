@@ -18,6 +18,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/websocket/api/main/jboss-websocket-api_1.1_spec-1.1.3.Final.jar"/>
-	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/persistence-api"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
