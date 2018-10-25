@@ -31,6 +31,8 @@ httpunit 1.7
 
 Jackson 2.9.5
 
+javax.persistence API 2.2
+
 jLaTexMath 1.0.6
 
 jsonwebtoken 0.9.0
