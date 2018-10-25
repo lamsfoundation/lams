@@ -20,6 +20,9 @@ import org.lamsfoundation.lams.tool.chat.dto.ChatConditionDTO;
  *
  * @author Marcin Cieslak
  *
+ * 
+ * @Entity
+ * @Table(name = "tl_lachat11_conditions")
  */
 public class ChatCondition extends TextSearchCondition {
 

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
 import java.util.Date;
