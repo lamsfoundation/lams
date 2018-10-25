@@ -38,7 +38,7 @@ import org.springframework.stereotype.Repository;
  *         Hibernate implementation for database access to Noticeboard users (learners) for the noticeboard tool.
  *         </p>
  */
-@Repository("nbUserDAO")
+@Repository
 public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserDAO {
     private static final String FIND_NB_USER_BY_SESSION = "from " + NoticeboardUser.class.getName()
 	    + " as nb where nb.userId=:userId and nb.nbSession.nbSessionId=:sessionId";

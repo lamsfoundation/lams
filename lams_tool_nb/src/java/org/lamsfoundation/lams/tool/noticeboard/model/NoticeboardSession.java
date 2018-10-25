@@ -40,8 +40,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
 /**
  * <p>
  * The NoticeboardSession class represents a tool session for a noticeboard activity. Each tool session may represent a
@@ -74,15 +72,14 @@ public class NoticeboardSession implements Serializable {
     public static final String COMPLETED = "COMPLETED";
 
     @Id
-    @Column(name = "uid", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", strategy = "native")
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column(name = "nb_session_id", nullable = false)
+    @Column(name = "nb_session_id")
     private Long nbSessionId;
 
-    @Column(name = "nb_session_name", nullable = false)
+    @Column(name = "nb_session_name")
     private String nbSessionName;
 
     @Column(name = "session_start_date")
@@ -94,12 +91,12 @@ public class NoticeboardSession implements Serializable {
     @Column(name = "session_status")
     private String sessionStatus;
 
-    @ManyToOne()
-    @JoinColumn(name = "nb_content_uid", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "nb_content_uid")
     private NoticeboardContent nbContent;
 
     @OneToMany(mappedBy = "nbSession", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<NoticeboardUser> nbUsers = new HashSet<NoticeboardUser>();
+    private Set<NoticeboardUser> nbUsers;
 
     /** default constructor */
     public NoticeboardSession() {

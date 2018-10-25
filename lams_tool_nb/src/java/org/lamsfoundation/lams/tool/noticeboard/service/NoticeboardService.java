@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.JsonUtil;
-import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -73,7 +72,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author mtruong
  */
-@Service(value="nbService")
 public class NoticeboardService
 	implements INoticeboardService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(NoticeboardService.class);

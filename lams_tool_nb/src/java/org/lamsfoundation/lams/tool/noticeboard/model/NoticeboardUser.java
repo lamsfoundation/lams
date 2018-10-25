@@ -34,8 +34,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
 /**
  *
  * @author mtruong
@@ -60,23 +58,23 @@ import org.hibernate.annotations.GenericGenerator;
 public class NoticeboardUser implements Serializable {
 
     @Id
-    @Column(name = "uid", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", strategy = "native")
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne()
-    @JoinColumn(name = "nb_session_uid", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "nb_session_uid")
     private NoticeboardSession nbSession;
 
-    @Column(name = "username")
+    @Column
     private String username;
 
-    @Column(name = "fullname")
+    @Column
     private String fullname;
+    
     @Column(name = "user_status")
     private String userStatus;
 

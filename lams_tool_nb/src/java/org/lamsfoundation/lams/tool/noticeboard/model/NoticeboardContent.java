@@ -31,15 +31,12 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 
@@ -58,20 +55,17 @@ import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedExce
 public class NoticeboardContent implements Serializable {
 
     @Id
-    @Column(name = "uid")
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", strategy = "native")
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
     @Column(name = "nb_content_id")
     private Long nbContentId;
 
-    @Lob
-    @Column(name = "title")
+    @Column
     private String title;
 
-    @Lob
-    @Column(name = "content")
+    @Column
     private String content;
 
     @Column(name = "define_later")
@@ -80,7 +74,6 @@ public class NoticeboardContent implements Serializable {
     @Column(name = "reflect_on_activity")
     private Boolean reflectOnActivity;
 
-    @Lob
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
@@ -107,9 +100,8 @@ public class NoticeboardContent implements Serializable {
 
     @OneToMany(mappedBy = "nbContent",
 	    cascade = CascadeType.ALL,
-	    orphanRemoval = true,
-	    fetch = FetchType.LAZY)
-    private Set<NoticeboardSession> nbSessions = new HashSet<NoticeboardSession>();
+	    orphanRemoval = true)
+    private Set<NoticeboardSession> nbSessions;
     
     /** default constructor */
     public NoticeboardContent() {

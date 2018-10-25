@@ -38,7 +38,7 @@ import org.springframework.stereotype.Repository;
  *         Hibernate implementation for database access to Noticeboard sessions for the noticeboard tool.
  *         </p>
  */
-@Repository("nbSessionDAO")
+@Repository
 public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSessionDAO {
 
     private static final String FIND_NB_SESSION = "from " + NoticeboardSession.class.getName()

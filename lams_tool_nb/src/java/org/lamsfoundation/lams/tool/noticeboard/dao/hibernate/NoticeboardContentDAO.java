@@ -38,7 +38,7 @@ import org.springframework.stereotype.Repository;
  *         Hibernate implementation for database access to Noticeboard content for the noticeboard tool.
  *         </p>
  */
-@Repository("nbContentDAO")
+@Repository
 public class NoticeboardContentDAO extends LAMSBaseDAO implements INoticeboardContentDAO {
 
     private static final String FIND_NB_CONTENT = "from " + NoticeboardContent.class.getName()
