@@ -163,7 +163,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    //skip parameters starting with oath_
 	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
 		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
-		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName, request.getParameter(paramName));
+		String paramValue = request.getParameter(paramName);
+		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName, URLEncoder.encode(paramValue, "UTF-8"));
 	    }
 	}
 
