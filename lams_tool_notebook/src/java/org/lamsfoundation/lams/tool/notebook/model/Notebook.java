@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.model;
 
 import java.util.Date;
@@ -29,55 +28,76 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookService;
 
-/**
- *
- */
+@Entity
+@Table(name = "tl_lantbk11_notebook")
 public class Notebook implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(NotebookService.class.getName());
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
-    
+
+    @Column(name = "force_response")
     private boolean forceResponse;
 
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
+    @Column(name = "allow_rich_editor")
     private boolean allowRichEditor;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
-    private Set notebookSessions;
+    @OneToMany(mappedBy = "notebook")
+    private Set<NotebookSession> notebookSessions = new HashSet<NotebookSession>();
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_uid")
     private Set<NotebookCondition> conditions = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
 
-    // Property accessors
-    /**
-     *
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -86,10 +106,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -98,10 +114,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     *
-     */
     public Date getUpdateDate() {
 	return updateDate;
     }
@@ -109,11 +121,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
     public void setUpdateDate(Date updateDate) {
 	this.updateDate = updateDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Long getCreateBy() {
 	return createBy;
@@ -123,11 +130,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     *
-     */
-
     public String getTitle() {
 	return title;
     }
@@ -135,11 +137,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
     public void setTitle(String title) {
 	this.title = title;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getInstructions() {
 	return instructions;
@@ -149,11 +146,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     */
-
     public boolean isLockOnFinished() {
 	return lockOnFinished;
     }
@@ -161,25 +153,15 @@ public class Notebook implements java.io.Serializable, Cloneable {
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
     }
-    
-    /**
-    *
-    *
-    */
 
     public boolean isForceResponse() {
-        return forceResponse;
+	return forceResponse;
     }
 
     public void setForceResponse(boolean forceResponse) {
-        this.forceResponse = forceResponse;
+	this.forceResponse = forceResponse;
     }
 
-
-    /**
-     *
-     * @return
-     */
     public boolean isAllowRichEditor() {
 	return allowRichEditor;
     }
@@ -188,11 +170,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.allowRichEditor = allowRichEditor;
     }
 
-    /**
-     *
-     *
-     */
-
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -200,11 +177,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
     public void setContentInUse(boolean contentInUse) {
 	this.contentInUse = contentInUse;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isDefineLater() {
 	return defineLater;
@@ -218,21 +190,9 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.submissionDeadline = submissionDeadline;
     }
 
-    /**
-     *
-     *
-     * @return date submissionDeadline
-     *
-     */
-
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
     }
-
-    /**
-     *
-     *
-     */
 
     public Long getToolContentId() {
 	return toolContentId;
@@ -242,28 +202,14 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
-
-    public Set getNotebookSessions() {
+    public Set<NotebookSession> getNotebookSessions() {
 	return notebookSessions;
     }
 
-    public void setNotebookSessions(Set notebookSessions) {
+    public void setNotebookSessions(Set<NotebookSession> notebookSessions) {
 	this.notebookSessions = notebookSessions;
     }
 
-    /**
-     *
-     * sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     *
-     *
-     *
-     */
     public Set<NotebookCondition> getConditions() {
 	return conditions;
     }
@@ -272,11 +218,6 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.conditions = conditions;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -331,7 +272,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	    notebook.setUid(null);
 
 	    // create an empty set for the notebookSession
-	    notebook.notebookSessions = new HashSet();
+	    notebook.notebookSessions = new HashSet<NotebookSession>();
 
 	    if (conditions != null) {
 		Set<NotebookCondition> set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
@@ -346,5 +287,4 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	}
 	return notebook;
     }
-
 }
