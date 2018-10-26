@@ -34,9 +34,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
@@ -100,9 +100,8 @@ public class Chat implements java.io.Serializable, Cloneable {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
     private Set<ChatSession> chatSessions = new HashSet<ChatSession>();
 
-    // @OneToMany(cascade = CascadeType.ALL)
-    // @JoinTable(name = "tl_lachat11_conditions", joinColumns = @JoinColumn(name = "content_uid"), inverseJoinColumns = @JoinColumn(name = "condition_id"))
-    @Transient
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_uid")
     private Set<ChatCondition> conditions = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
 
     public Chat() {
