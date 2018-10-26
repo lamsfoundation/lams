@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteSession;
 import org.springframework.stereotype.Repository;
 
 /**

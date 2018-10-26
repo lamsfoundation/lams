@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote.pojos;
+package org.lamsfoundation.lams.tool.vote.model;
 
 import java.io.Serializable;
 import java.util.HashSet;

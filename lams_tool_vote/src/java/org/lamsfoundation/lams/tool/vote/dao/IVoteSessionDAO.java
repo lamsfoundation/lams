@@ -24,9 +24,9 @@ package org.lamsfoundation.lams.tool.vote.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.model.VoteSession;
 
 /**
  * <p>

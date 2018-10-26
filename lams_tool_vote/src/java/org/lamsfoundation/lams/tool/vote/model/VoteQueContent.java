@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.vote.pojos;
+package org.lamsfoundation.lams.tool.vote.model;
 
 import java.io.Serializable;
 
@@ -51,7 +51,7 @@ public class VoteQueContent implements Serializable, Comparable<VoteQueContent> 
     private Long voteContentId;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent;
+    private org.lamsfoundation.lams.tool.vote.model.VoteContent voteContent;
 
     public VoteQueContent(String question, VoteContent voteContent) {
 	this.question = question;
@@ -99,11 +99,11 @@ public class VoteQueContent implements Serializable, Comparable<VoteQueContent> 
 	this.question = question;
     }
 
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteContent getMcContent() {
+    public org.lamsfoundation.lams.tool.vote.model.VoteContent getMcContent() {
 	return this.voteContent;
     }
 
-    public void setMcContent(org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent) {
+    public void setMcContent(org.lamsfoundation.lams.tool.vote.model.VoteContent voteContent) {
 	this.voteContent = voteContent;
     }
 
@@ -140,7 +140,7 @@ public class VoteQueContent implements Serializable, Comparable<VoteQueContent> 
     /**
      * @return Returns the voteContent.
      */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteContent getVoteContent() {
+    public org.lamsfoundation.lams.tool.vote.model.VoteContent getVoteContent() {
 	return voteContent;
     }
 
@@ -148,7 +148,7 @@ public class VoteQueContent implements Serializable, Comparable<VoteQueContent> 
      * @param voteContent
      *            The voteContent to set.
      */
-    public void setVoteContent(org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent) {
+    public void setVoteContent(org.lamsfoundation.lams.tool.vote.model.VoteContent voteContent) {
 	this.voteContent = voteContent;
     }
 

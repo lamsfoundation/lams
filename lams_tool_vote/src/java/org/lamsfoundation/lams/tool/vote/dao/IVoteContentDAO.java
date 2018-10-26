@@ -22,8 +22,8 @@
 
 package org.lamsfoundation.lams.tool.vote.dao;
 
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteSession;
 
 /**
  * Interface that defines the contract for VoteContent access

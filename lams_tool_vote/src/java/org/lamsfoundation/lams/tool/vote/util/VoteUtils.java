@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.vote.util;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**

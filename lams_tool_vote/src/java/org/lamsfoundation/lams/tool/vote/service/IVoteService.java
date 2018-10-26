@@ -46,11 +46,11 @@ import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.model.VoteSession;
+import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.util.MessageService;
 

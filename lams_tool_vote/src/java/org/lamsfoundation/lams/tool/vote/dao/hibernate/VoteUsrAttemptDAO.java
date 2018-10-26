@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 

@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
