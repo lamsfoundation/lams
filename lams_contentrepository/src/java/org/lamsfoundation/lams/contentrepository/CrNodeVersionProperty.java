@@ -31,33 +31,42 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 
-/**
- *
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_cr_node_version_property")
 public class CrNodeVersionProperty implements IValue, Serializable {
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
+    @Column
     private String value;
 
-    /** persistent field */
+    @Column
     private int type;
 
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "nv_id") 
     private org.lamsfoundation.lams.contentrepository.CrNodeVersion crNodeVersion;
 
     /** full constructor */
@@ -73,15 +82,7 @@ public class CrNodeVersionProperty implements IValue, Serializable {
     public CrNodeVersionProperty() {
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
-    public Long getId() {
+     public Long getId() {
 	return this.id;
     }
 
@@ -89,13 +90,6 @@ public class CrNodeVersionProperty implements IValue, Serializable {
 	this.id = id;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public String getName() {
 	return this.name;
     }
@@ -104,13 +98,6 @@ public class CrNodeVersionProperty implements IValue, Serializable {
 	this.name = name;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public String getValue() {
 	return this.value;
     }
@@ -119,13 +106,6 @@ public class CrNodeVersionProperty implements IValue, Serializable {
 	this.value = value;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     @Override
     public int getType() {
 	return this.type;
@@ -141,14 +121,6 @@ public class CrNodeVersionProperty implements IValue, Serializable {
 	this.type = type;
     }
 
-    /**
-     * bi-directional many-to-one association to CrNodeVersion
-     *
-     *
-     *
-     *
-     * 
-     */
     public org.lamsfoundation.lams.contentrepository.CrNodeVersion getCrNodeVersion() {
 	return this.crNodeVersion;
     }
@@ -185,7 +157,7 @@ public class CrNodeVersionProperty implements IValue, Serializable {
 
     /* ** Implementation of IValue interface ** */
 
-    protected Logger log = Logger.getLogger(CrNodeVersionProperty.class);
+    @Transient protected Logger log = Logger.getLogger(CrNodeVersionProperty.class);
 
     /**
      * Returns a string representation of the value.

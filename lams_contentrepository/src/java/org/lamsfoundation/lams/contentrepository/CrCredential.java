@@ -27,31 +27,41 @@ package org.lamsfoundation.lams.contentrepository;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/**
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_cr_credential")
 public class CrCredential implements Serializable {
 
-    /** identifier field */
+    @Id
+    @Column(name = "credential_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long credentialId;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
+    @Column
     private String password;
 
-    /** persistent field */
-    private Set crWorkspaceCredentials;
+    @OneToMany(mappedBy = "crCredential",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true)
+    private Set<CrWorkspaceCredential> crWorkspaceCredentials;
 
     /** full constructor */
-    public CrCredential(String name, String password, Set crWorkspaceCredentials) {
+    public CrCredential(String name, String password, Set<CrWorkspaceCredential> crWorkspaceCredentials) {
 	this.name = name;
 	this.password = password;
 	this.crWorkspaceCredentials = crWorkspaceCredentials;
@@ -61,14 +71,6 @@ public class CrCredential implements Serializable {
     public CrCredential() {
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     public Long getCredentialId() {
 	return this.credentialId;
     }
@@ -77,14 +79,6 @@ public class CrCredential implements Serializable {
 	this.credentialId = credentialId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     public String getName() {
 	return this.name;
     }
@@ -93,13 +87,6 @@ public class CrCredential implements Serializable {
 	this.name = name;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public String getPassword() {
 	return this.password;
     }
@@ -108,24 +95,11 @@ public class CrCredential implements Serializable {
 	this.password = password;
     }
 
-    /**
-     * bi-directional one-to-many association to CrWorkspaceCredential
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * 
-     */
-    public Set getCrWorkspaceCredentials() {
+    public Set<CrWorkspaceCredential> getCrWorkspaceCredentials() {
 	return this.crWorkspaceCredentials;
     }
 
-    public void setCrWorkspaceCredentials(Set crWorkspaceCredentials) {
+    public void setCrWorkspaceCredentials(Set<CrWorkspaceCredential> crWorkspaceCredentials) {
 	this.crWorkspaceCredentials = crWorkspaceCredentials;
     }
 

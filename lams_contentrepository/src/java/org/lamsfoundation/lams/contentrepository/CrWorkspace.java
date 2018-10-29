@@ -27,49 +27,51 @@ package org.lamsfoundation.lams.contentrepository;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/**
- *
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_cr_workspace")
 public class CrWorkspace implements IWorkspace, Serializable {
 
-    /** identifier field */
+    @Id
+    @Column(name = "workspace_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workspaceId;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
-    private Set crWorkspaceCredentials;
+    @OneToMany(mappedBy = "crWorkspace",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true)
+    private Set<CrWorkspaceCredential> crWorkspaceCredentials;
 
-    /** persistent field */
-    private Set crNodes;
+    @OneToMany(mappedBy = "crWorkspace",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true)
+    private Set<CrNode> crNodes;
 
     /** full constructor */
-    public CrWorkspace(String name, Set crWorkspaceCredentials, Set crNodes) {
+    public CrWorkspace(String name, Set<CrWorkspaceCredential> crWorkspaceCredentials, Set<CrNode> crNodes) {
 	this.name = name;
 	this.crWorkspaceCredentials = crWorkspaceCredentials;
 	this.crNodes = crNodes;
     }
 
-    /** default constructor */
     public CrWorkspace() {
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     @Override
     public Long getWorkspaceId() {
 	return this.workspaceId;
@@ -79,13 +81,6 @@ public class CrWorkspace implements IWorkspace, Serializable {
 	this.workspaceId = workspaceId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     @Override
     public String getName() {
 	return this.name;
@@ -95,39 +90,19 @@ public class CrWorkspace implements IWorkspace, Serializable {
 	this.name = name;
     }
 
-    /**
-     * bi-directional one-to-many association to CrWorkspaceCredential
-     *
-     *
-     *
-     *
-     *
-     *
-     * 
-     */
-    public Set getCrWorkspaceCredentials() {
+    public Set<CrWorkspaceCredential> getCrWorkspaceCredentials() {
 	return this.crWorkspaceCredentials;
     }
 
-    public void setCrWorkspaceCredentials(Set crWorkspaceCredentials) {
+    public void setCrWorkspaceCredentials(Set<CrWorkspaceCredential> crWorkspaceCredentials) {
 	this.crWorkspaceCredentials = crWorkspaceCredentials;
     }
 
-    /**
-     * bi-directional one-to-many association to CrNode
-     *
-     *
-     *
-     *
-     *
-     *
-     * 
-     */
-    public Set getCrNodes() {
+    public Set<CrNode> getCrNodes() {
 	return this.crNodes;
     }
 
-    public void setCrNodes(Set crNodes) {
+    public void setCrNodes(Set<CrNode> crNodes) {
 	this.crNodes = crNodes;
     }
 

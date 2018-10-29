@@ -24,6 +24,7 @@
 		</property>
 		<property name="packagesToScan">
 			<list>
+				<value>org.lamsfoundation.lams.contentrepository</value>
 				<value>org.lamsfoundation.lams.learningdesign</value>
 				<value>org.lamsfoundation.lams.logevent</value>
 				<value>org.lamsfoundation.lams.policies</value>

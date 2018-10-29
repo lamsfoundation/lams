@@ -30,20 +30,30 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
 
-/**
- *
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_cr_node_version")
 public class CrNodeVersion implements Serializable {
 
-    /** identifier field */
+    @Id
+    @Column(name = "nv_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long nvId;
 
     /**
@@ -51,24 +61,24 @@ public class CrNodeVersion implements Serializable {
      * (rather than long), so that we don't have to keep converting
      * it to Long to match UUID.
      */
+    @Column(name = "version_id")
     private Long versionId;
 
-    /** nullable persistent field */
+    @Column(name = "created_date_time")
     private Date createdDateTime;
 
-    /** persistent field */
+    @Column(name = "user_id")
     private Integer userId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "node_id")
     private org.lamsfoundation.lams.contentrepository.CrNode node;
 
-    /*
-     * child Nodes. persistent field
-     * private Set childNodes;
-     */
-
-    /** persistent field */
-    private Set crNodeVersionProperties;
+    @OneToMany(mappedBy = "crNodeVersion",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true,
+	    fetch = FetchType.EAGER)
+    private Set<CrNodeVersionProperty> crNodeVersionProperties;
 
     /* full constructor */
 /*
@@ -108,14 +118,6 @@ public class CrNodeVersion implements Serializable {
      * }
      */
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     public Long getNvId() {
 	return this.nvId;
     }
@@ -124,14 +126,6 @@ public class CrNodeVersion implements Serializable {
 	this.nvId = nvId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     public Long getVersionId() {
 	return this.versionId;
     }
@@ -140,13 +134,6 @@ public class CrNodeVersion implements Serializable {
 	this.versionId = versionId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public Date getCreatedDateTime() {
 	return this.createdDateTime;
     }
@@ -155,12 +142,6 @@ public class CrNodeVersion implements Serializable {
 	this.createdDateTime = createdDateTime;
     }
 
-    /** 
-    *
-    *
-    *
-    *
-    */
     public Integer getUserId() {
 	return userId;
     }
@@ -169,14 +150,6 @@ public class CrNodeVersion implements Serializable {
 	this.userId = userId;
     }
 
-    /**
-     * bi-directional many-to-one association to CrNode
-     *
-     *
-     *
-     *
-     * 
-     */
     public org.lamsfoundation.lams.contentrepository.CrNode getNode() {
 	return this.node;
     }
@@ -185,25 +158,11 @@ public class CrNodeVersion implements Serializable {
 	this.node = node;
     }
 
-    /**
-     * bi-directional one-to-many association to CrNodeVersionProperty
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * usage = "transactional"
-     */
-    public Set getCrNodeVersionProperties() {
+    public Set<CrNodeVersionProperty> getCrNodeVersionProperties() {
 	return this.crNodeVersionProperties;
     }
 
-    public void setCrNodeVersionProperties(Set crNodeVersionProperties) {
+    public void setCrNodeVersionProperties(Set<CrNodeVersionProperty> crNodeVersionProperties) {
 	this.crNodeVersionProperties = crNodeVersionProperties;
     }
 
