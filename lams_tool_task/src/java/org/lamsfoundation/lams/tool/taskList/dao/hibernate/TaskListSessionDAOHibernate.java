@@ -44,9 +44,6 @@ public class TaskListSessionDAOHibernate extends LAMSBaseDAO implements TaskList
     private static final String FIND_BY_CONTENT_ID = "from " + TaskListSession.class.getName()
 	    + " as p where p.taskList.contentId=?";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TaskListSession getSessionBySessionId(Long sessionId) {
 	List list = doFind(FIND_BY_SESSION_ID, sessionId);
@@ -56,26 +53,17 @@ public class TaskListSessionDAOHibernate extends LAMSBaseDAO implements TaskList
 	return (TaskListSession) list.get(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @SuppressWarnings("unchecked")
     public List<TaskListSession> getByContentId(Long toolContentId) {
 	return (List<TaskListSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void delete(TaskListSession session) {
 	getSession().delete(session);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deleteBySessionId(Long toolSessionId) {
 	this.removeObject(TaskListSession.class, toolSessionId);

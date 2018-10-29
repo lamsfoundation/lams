@@ -24,32 +24,56 @@
 package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 /**
- * TaskList
- * 
- * @author Dapeng Ni
- *
- *
- *
+ * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_latask10_session")
 public class TaskListSession {
 
-    private static Logger log = Logger.getLogger(TaskListSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+    
+    @ManyToOne
+    @JoinColumn(name = "taskList_uid")
     private TaskList taskList;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
-    //finish or not
+    
+    @Column
     private int status;
-    //taskList Items
-    private Set taskListItems;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "session_uid")
+    @OrderBy("create_date DESC")
+    private Set<TaskListItem> taskListItems = new HashSet<>();
 
 //  **********************************************************
     //		Get/Set methods
@@ -66,10 +90,6 @@ public class TaskListSession {
 	this.uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -78,11 +98,6 @@ public class TaskListSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     * 
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -91,10 +106,6 @@ public class TaskListSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -103,11 +114,6 @@ public class TaskListSession {
 	this.status = status;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public TaskList getTaskList() {
 	return taskList;
     }
@@ -116,10 +122,6 @@ public class TaskListSession {
 	this.taskList = taskList;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -145,23 +147,11 @@ public class TaskListSession {
 	this.sessionName = sessionName;
     }
 
-    /**
-     * 
-     * 
-     *
-     *
-     *
-     *
-     *
-     *
-     * 
-     * @return
-     */
-    public Set getTaskListItems() {
+    public Set<TaskListItem> getTaskListItems() {
 	return taskListItems;
     }
 
-    public void setTaskListItems(Set taskListItems) {
+    public void setTaskListItems(Set<TaskListItem> taskListItems) {
 	this.taskListItems = taskListItems;
     }
 

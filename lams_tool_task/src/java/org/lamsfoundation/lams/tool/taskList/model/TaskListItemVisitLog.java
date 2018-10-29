@@ -26,26 +26,44 @@ package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
- * TaskList
- *
  * @author Andrey Balan
- *
- *
  */
+@Entity
+@Table(name = "tl_latask10_item_log")
 public class TaskListItemVisitLog {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_uid")
     private TaskListUser user;
+    
+    @ManyToOne
+    @JoinColumn(name = "taskList_item_uid")   
     private TaskListItem taskListItem;
+    
+    @Column
     private boolean complete;
+    
+    @Column(name = "access_date")
     private Date accessDate;
+    
+    @Column(name = "session_id")
     private Long sessionId;
 
-    /**
-     *
-     * @return
-     */
     public Date getAccessDate() {
 	return accessDate;
     }
@@ -54,10 +72,6 @@ public class TaskListItemVisitLog {
 	this.accessDate = accessDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public TaskListItem getTaskListItem() {
 	return taskListItem;
     }
@@ -66,10 +80,6 @@ public class TaskListItemVisitLog {
 	this.taskListItem = item;
     }
 
-    /**
-     *
-     * @return Returns the log Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -78,10 +88,6 @@ public class TaskListItemVisitLog {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public TaskListUser getUser() {
 	return user;
     }
@@ -90,10 +96,6 @@ public class TaskListItemVisitLog {
 	this.user = user;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isComplete() {
 	return complete;
     }
@@ -102,10 +104,6 @@ public class TaskListItemVisitLog {
 	this.complete = complete;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }

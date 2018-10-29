@@ -473,7 +473,7 @@ public class LearningController implements TaskListConstants {
 	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
 	String commentMessage = isTestHarness ? request.getParameter("comment__textarea")
 		: taskListItemForm.getComment();
-	if (commentMessage == null || StringUtils.isBlank(commentMessage)) {
+	if (StringUtils.isBlank(commentMessage)) {
 	    return "pages/learning/learning";
 	}
 

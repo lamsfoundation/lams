@@ -25,43 +25,70 @@ package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- * TaskList
- * 
- * @author Dapeng Ni
- *
- *
- *
+ * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_latask10_user")
 public class TaskListUser implements Cloneable {
-    private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(TaskListUser.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_id")
     private Long userId;
+    
+    @Column(name = "first_name")
     private String firstName;
+    
+    @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "login_name")
     private String loginName;
+    
+    @Column(name = "session_finished")
     private boolean sessionFinished;
+    
+    @Column(name = "is_verified_by_monitor")
     private boolean isVerifiedByMonitor;
 
+    @ManyToOne
+    @JoinColumn(name = "session_uid")
     private TaskListSession session;
+    
+    @ManyToOne
+    @JoinColumn(name = "taskList_uid")
     private TaskList taskList;
 
     //=============== NON Persisit value: for display use ===========
     //the user access some reousrce item date time. Use in monitoring summary page
+    @Transient
     private Date accessDate;
 
     public TaskListUser() {
     }
 
     public TaskListUser(UserDTO user, TaskListSession session) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -71,7 +98,7 @@ public class TaskListUser implements Cloneable {
     }
 
     public TaskListUser(UserDTO user, TaskList content) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -80,9 +107,6 @@ public class TaskListUser implements Cloneable {
 	this.sessionFinished = false;
     }
 
-    /**
-     * Clone method from <code>java.lang.Object</code>
-     */
     @Override
     public Object clone() {
 
@@ -97,115 +121,6 @@ public class TaskListUser implements Cloneable {
 	}
 
 	return user;
-    }
-
-//  **********************************************************
-    //		Get/Set methods
-//  **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
-    public Long getUid() {
-	return uid;
-    }
-
-    /**
-     * @param uid
-     *            The uid to set.
-     */
-    public void setUid(Long userID) {
-	this.uid = userID;
-    }
-
-    /**
-     *
-     * @return Returns the userId.
-     */
-    public Long getUserId() {
-	return userId;
-    }
-
-    /**
-     * @param userId
-     *            The userId to set.
-     */
-    public void setUserId(Long userID) {
-	this.userId = userID;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getLastName() {
-	return lastName;
-    }
-
-    public void setLastName(String lastName) {
-	this.lastName = lastName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getFirstName() {
-	return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-	this.firstName = firstName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getLoginName() {
-	return loginName;
-    }
-
-    public void setLoginName(String loginName) {
-	this.loginName = loginName;
-    }
-
-    /**
-     *
-     *
-     * @return
-     */
-    public TaskListSession getSession() {
-	return session;
-    }
-
-    public void setSession(TaskListSession session) {
-	this.session = session;
-    }
-
-    /**
-     *
-     *
-     * @return
-     */
-    public TaskList getTaskList() {
-	return taskList;
-    }
-
-    public void setTaskList(TaskList content) {
-	this.taskList = content;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isSessionFinished() {
-	return sessionFinished;
-    }
-
-    public void setSessionFinished(boolean sessionFinished) {
-	this.sessionFinished = sessionFinished;
     }
 
     @Override
@@ -229,6 +144,74 @@ public class TaskListUser implements Cloneable {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }
 
+//  **********************************************************
+    //		Get/Set methods
+//  **********************************************************
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long userID) {
+	this.uid = userID;
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userID) {
+	this.userId = userID;
+    }
+
+    public String getLastName() {
+	return lastName;
+    }
+
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+	return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
+
+    public String getLoginName() {
+	return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
+
+    public TaskListSession getSession() {
+	return session;
+    }
+
+    public void setSession(TaskListSession session) {
+	this.session = session;
+    }
+
+    public TaskList getTaskList() {
+	return taskList;
+    }
+
+    public void setTaskList(TaskList content) {
+	this.taskList = content;
+    }
+
+    public boolean isSessionFinished() {
+	return sessionFinished;
+    }
+
+    public void setSessionFinished(boolean sessionFinished) {
+	this.sessionFinished = sessionFinished;
+    }
+
     public Date getAccessDate() {
 	return accessDate;
     }
@@ -237,10 +220,6 @@ public class TaskListUser implements Cloneable {
 	this.accessDate = accessDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isVerifiedByMonitor() {
 	return isVerifiedByMonitor;
     }

@@ -26,44 +26,51 @@ package org.lamsfoundation.lams.tool.taskList.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
  * The main entity class of TaskList tool. Contains all the data related to the whole tool.
  *
  * @author Andrey Balan
- *
- *
  */
+@Entity
+@Table(name = "tl_latask10_condition")
 public class TaskListCondition implements Cloneable {
 
     private static final Logger log = Logger.getLogger(TaskListCondition.class);
 
-    //key 
+    @Id
+    @Column(name = "condition_uid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-//	private TaskList taskList;
-    //unique name
+    @Column
     private String name;
+    
+    @Column(name = "sequence_id")
     private int sequenceId;
+    
+    @ManyToMany
+    @JoinTable(
+	        name = "tl_latask10_condition_tl_item", 
+	        joinColumns = { @JoinColumn(name = "condition_uid") }, 
+	        inverseJoinColumns = { @JoinColumn(name = "uid") }
+	    )
+    private Set<TaskListItem> taskListItems = new HashSet<TaskListItem>();
 
-    //taskList Items
-    private Set taskListItems;
-
-    /**
-     * Default contruction method.
-     */
-    public TaskListCondition() {
-	taskListItems = new HashSet();
-    }
-
-    //  **********************************************************
-    //		Function method for TaskList
-    //  **********************************************************
-
-    /**
-     * {@Override}
-     */
     @Override
     public int hashCode() {
 	final int prime = 31;
@@ -75,9 +82,6 @@ public class TaskListCondition implements Cloneable {
 	return result;
     }
 
-    /**
-     * {@Override}
-     */
     @Override
     public boolean equals(Object obj) {
 	if (this == obj) {
@@ -117,9 +121,6 @@ public class TaskListCondition implements Cloneable {
 	return true;
     }
 
-    /**
-     * {@Override}
-     */
     @Override
     public Object clone() {
 
@@ -163,10 +164,6 @@ public class TaskListCondition implements Cloneable {
      * Returns condition's name.
      * 
      * @return condition's name.
-     *
-     *
-     *
-     *
      */
     public String getName() {
 	return name;
@@ -186,15 +183,8 @@ public class TaskListCondition implements Cloneable {
      * Return set of TaskListItems
      * 
      * @return set of TaskListItems
-     * 
-     *
-     *
-     *
-     *
-     *
-     *
      */
-    public Set getTaskListItems() {
+    public Set<TaskListItem> getTaskListItems() {
 	return taskListItems;
     }
 
@@ -204,31 +194,9 @@ public class TaskListCondition implements Cloneable {
      * @param taskListItems
      *            set of TaskListItems
      */
-    public void setTaskListItems(Set taskListItems) {
+    public void setTaskListItems(Set<TaskListItem> taskListItems) {
 	this.taskListItems = taskListItems;
     }
-
-//
-//	/**
-//	 * Returns taskList to which this condition applies.
-//	 *
-//	 * @return taskList to which this condition applies
-//	 *
-//     *
-//     *
-//     *
-//	 */
-//	public TaskList getTaskList() {
-//		return taskList;
-//	}
-//	/**
-//	 * Sets taskList to which this condition applies.
-//	 *
-//	 * @param taskList taskList to which this condition applies
-//	 */
-//	public void setTaskList(TaskList taskList) {
-//		this.taskList = taskList;
-//	}
 
     /**
      * Returns condition's sequence number. Order is very important for

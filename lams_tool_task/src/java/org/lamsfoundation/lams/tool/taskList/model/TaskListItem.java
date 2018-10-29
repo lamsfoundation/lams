@@ -28,6 +28,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -36,60 +49,85 @@ import org.apache.log4j.Logger;
  * TaskList
  *
  * @author Andrey Balan
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_latask10_tasklist_item")
 public class TaskListItem implements Cloneable {
-
     private static final Logger log = Logger.getLogger(TaskListItem.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private String title;
+    
+    @Column
     private String description;
+    
+    @Column(name = "sequence_id")
     private int sequenceId;
 
+    @Column(name = "init_item")
     private String initialItem;
+    
+    @Column(name = "organization_xml")
     private String organizationXml;
+    
+    @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
-    // general infomation
+    @Column(name = "create_date")
     private Date createDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private TaskListUser createBy;
-    // advanced
+    
+    //************ advanced tab ***************
+    @Column(name = "is_required")
     private boolean isRequired;
+    
+    @Column(name = "is_comments_allowed")
     private boolean isCommentsAllowed;
+    
+    @Column(name = "is_comments_required")
     private boolean isCommentsRequired;
+    
+    @Column(name = "is_files_allowed")
     private boolean isFilesAllowed;
+    
+    @Column(name = "is_files_required")
     private boolean isFilesRequired;
+    
+    @Column(name = "is_child_task")
     private boolean isChildTask;
+    
+    @Column(name = "parent_task_name")
     private String parentTaskName;
+    
     // advanced options that are not used now
+    @Column(name = "is_comments_files_allowed")
     private boolean isCommentsFilesAllowed;
+    
+    @Column(name = "show_comments_to_all")
     private boolean showCommentsToAll;
 
-    // Set of uploaded files
-    private Set attachments;
-    // Set of user comments
-    private Set comments;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "taskList_item_uid")
+    @OrderBy("create_date ASC")
+    private Set<TaskListItemAttachment> attachments = new HashSet<TaskListItemAttachment>();
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "taskList_item_uid")
+    @OrderBy("create_date ASC")
+    private Set<TaskListItemComment> comments = new HashSet<TaskListItemComment>();
 
     // *************** NON Persist Fields ********************
+    @Transient
     private boolean complete;
 
-    /**
-     * Default contruction method.
-     *
-     */
-    public TaskListItem() {
-	attachments = new HashSet();
-	comments = new HashSet();
-    }
-
-    // **********************************************************
-    // Function method for TaskList
-    // **********************************************************
     @Override
     public Object clone() {
 
@@ -100,10 +138,10 @@ public class TaskListItem implements Cloneable {
 
 	    // clone set of taskListItemsAttachment
 	    if (attachments != null) {
-		Iterator iter = attachments.iterator();
-		Set set = new HashSet();
+		Iterator<TaskListItemAttachment> iter = attachments.iterator();
+		Set<TaskListItemAttachment> set = new HashSet<TaskListItemAttachment>();
 		while (iter.hasNext()) {
-		    TaskListItemAttachment file = (TaskListItemAttachment) iter.next();
+		    TaskListItemAttachment file = iter.next();
 		    TaskListItemAttachment newFile = (TaskListItemAttachment) file.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newFile);
@@ -113,10 +151,10 @@ public class TaskListItem implements Cloneable {
 
 	    // clone set of taskListItemsComment
 	    if (comments != null) {
-		Iterator iter = comments.iterator();
-		Set set = new HashSet();
+		Iterator<TaskListItemComment> iter = comments.iterator();
+		Set<TaskListItemComment> set = new HashSet<TaskListItemComment>();
 		while (iter.hasNext()) {
-		    TaskListItemComment comment = (TaskListItemComment) iter.next();
+		    TaskListItemComment comment = iter.next();
 		    TaskListItemComment newComment = (TaskListItemComment) comment.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newComment);
@@ -177,10 +215,6 @@ public class TaskListItem implements Cloneable {
 	this.uid = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -189,10 +223,6 @@ public class TaskListItem implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getInitialItem() {
 	return initialItem;
     }
@@ -201,10 +231,6 @@ public class TaskListItem implements Cloneable {
 	this.initialItem = initialItem;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getOrganizationXml() {
 	return organizationXml;
     }
@@ -213,10 +239,6 @@ public class TaskListItem implements Cloneable {
 	this.organizationXml = organizationXml;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getTitle() {
 	return title;
     }
@@ -225,11 +247,6 @@ public class TaskListItem implements Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public TaskListUser getCreateBy() {
 	return createBy;
     }
@@ -238,10 +255,6 @@ public class TaskListItem implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -250,10 +263,6 @@ public class TaskListItem implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCreateByAuthor() {
 	return isCreateByAuthor;
     }
@@ -274,8 +283,6 @@ public class TaskListItem implements Cloneable {
      * Returns taskListItem sequence number.
      *
      * @return taskListItem sequence number
-     *
-     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -291,10 +298,6 @@ public class TaskListItem implements Cloneable {
 	this.sequenceId = sequenceId;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isRequired() {
 	return isRequired;
     }
@@ -303,10 +306,6 @@ public class TaskListItem implements Cloneable {
 	this.isRequired = isRequired;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCommentsAllowed() {
 	return isCommentsAllowed;
     }
@@ -315,10 +314,6 @@ public class TaskListItem implements Cloneable {
 	this.isCommentsAllowed = isCommentsAllowed;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCommentsRequired() {
 	return isCommentsRequired;
     }
@@ -327,10 +322,6 @@ public class TaskListItem implements Cloneable {
 	this.isCommentsRequired = isCommentsRequired;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isFilesAllowed() {
 	return isFilesAllowed;
     }
@@ -339,10 +330,6 @@ public class TaskListItem implements Cloneable {
 	this.isFilesAllowed = isFilesAllowed;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isFilesRequired() {
 	return isFilesRequired;
     }
@@ -351,10 +338,6 @@ public class TaskListItem implements Cloneable {
 	this.isFilesRequired = isFilesRequired;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isChildTask() {
 	return isChildTask;
     }
@@ -363,10 +346,6 @@ public class TaskListItem implements Cloneable {
 	this.isChildTask = isChildTask;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getParentTaskName() {
 	return parentTaskName;
     }
@@ -375,10 +354,6 @@ public class TaskListItem implements Cloneable {
 	this.parentTaskName = parentTaskName;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean getShowCommentsToAll() {
 	return showCommentsToAll;
     }
@@ -387,10 +362,6 @@ public class TaskListItem implements Cloneable {
 	this.showCommentsToAll = showCommentsToAll;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCommentsFilesAllowed() {
 	// true bacause we can not set it from the UI
 	// TODO get rid of this later
@@ -402,32 +373,24 @@ public class TaskListItem implements Cloneable {
     }
 
     /**
-     *
-     *
-     *
-     *
      * @return a set of Attachments to this TaskListItem.
      */
-    public Set getAttachments() {
+    public Set<TaskListItemAttachment> getAttachments() {
 	return attachments;
     }
 
-    public void setAttachments(Set attachments) {
+    public void setAttachments(Set<TaskListItemAttachment> attachments) {
 	this.attachments = attachments;
     }
 
     /**
-     *
-     *
-     *
-     *
      * @return a set of Comments to this TaskListItem.
      */
-    public Set getComments() {
+    public Set<TaskListItemComment> getComments() {
 	return comments;
     }
 
-    public void setComments(Set comments) {
+    public void setComments(Set<TaskListItemComment> comments) {
 	this.comments = comments;
     }
 }

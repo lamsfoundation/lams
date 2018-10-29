@@ -92,11 +92,10 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) ";
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
     public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString, IUserManagementService userManagementService) {
-
 
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
@@ -143,6 +142,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
     }
 
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
     public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
 
@@ -195,6 +195,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
     }
 
     @Override
+    @SuppressWarnings({ "rawtypes", "deprecation" })
     public int getCountPagedUsersBySession(Long sessionId, String searchString) {
 
 	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + TaskListUser.class.getName() + " user"

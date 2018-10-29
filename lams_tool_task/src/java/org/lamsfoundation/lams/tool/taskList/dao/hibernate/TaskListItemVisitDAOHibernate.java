@@ -87,7 +87,6 @@ public class TaskListItemVisitDAOHibernate extends LAMSBaseDAO implements TaskLi
     @Override
     @SuppressWarnings("unchecked")
     public List<TaskListItemVisitLog> getTaskListItemLogBySession(Long sessionId, Long itemUid) {
-
 	return (List<TaskListItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
