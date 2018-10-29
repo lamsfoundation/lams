@@ -27,6 +27,16 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -35,29 +45,39 @@ import org.apache.log4j.Logger;
  *
  *
  */
-
+@Entity
+@Table(name = "tl_lazoom10_session")
 public class ZoomSession implements java.io.Serializable {
 
     private static final long serialVersionUID = -3248105011578304148L;
 
     private static final Logger logger = Logger.getLogger(ZoomSession.class);
 
-    // Fields
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column(name = "status")
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne
+    @JoinColumn(name = "zoom_uid")
     private Zoom zoom;
 
+    @OneToMany(mappedBy = "zoomSession")
     private Set<ZoomUser> zoomUsers;
 
     public Long getUid() {
@@ -68,10 +88,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
     }
@@ -80,10 +96,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     *
-     */
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
     }
@@ -92,10 +104,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     *
-     */
     public Integer getStatus() {
 	return this.status;
     }
@@ -104,10 +112,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.status = status;
     }
 
-    /**
-     *
-     *
-     */
     public Long getSessionId() {
 	return this.sessionId;
     }
@@ -116,10 +120,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     *
-     */
     public String getSessionName() {
 	return this.sessionName;
     }
@@ -128,11 +128,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.sessionName = sessionName;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Zoom getZoom() {
 	return this.zoom;
     }
@@ -141,12 +136,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.zoom = zoom;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
     public Set<ZoomUser> getZoomUsers() {
 	return this.zoomUsers;
     }
@@ -155,11 +144,6 @@ public class ZoomSession implements java.io.Serializable {
 	this.zoomUsers = zoomUsers;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -211,5 +195,4 @@ public class ZoomSession implements java.io.Serializable {
 	}
 	return session;
     }
-
 }

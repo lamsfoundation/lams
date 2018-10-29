@@ -27,50 +27,77 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
+
+@Entity
+@Table(name = "tl_lazoom10_zoom")
 public class Zoom implements java.io.Serializable, Cloneable {
     private static final long serialVersionUID = -336708242652214225L;
 
     private static final Logger logger = Logger.getLogger(Zoom.class);
 
-    private IToolContentHandler toolContentHandler;
-
-    // Persistent Fields
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "start_in_monitor")
     private boolean startInMonitor;
 
+    @Column
     private Integer duration = 120;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
+    @ManyToOne
+    @JoinColumn(name = "api_id")
     private ZoomApi api;
 
+    @Column(name = "meeting_id")
     private String meetingId;
 
+    @Column(name = "meeting_start_url")
     private String meetingStartUrl;
 
+    @OneToMany(mappedBy = "zoom")
     private Set<ZoomSession> zoomSessions;
 
     public Long getUid() {
@@ -81,11 +108,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
-
     public Date getCreateDate() {
 	return this.createDate;
     }
@@ -93,11 +115,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Date getUpdateDate() {
 	return this.updateDate;
@@ -107,11 +124,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getCreateBy() {
 	return this.createBy;
     }
@@ -120,11 +132,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     *
-     */
-
     public String getTitle() {
 	return this.title;
     }
@@ -132,11 +139,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
     public void setTitle(String title) {
 	this.title = title;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getInstructions() {
 	return this.instructions;
@@ -210,14 +212,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.zoomSessions = zoomSessions;
     }
 
-    public IToolContentHandler getToolContentHandler() {
-	return toolContentHandler;
-    }
-
-    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-	this.toolContentHandler = toolContentHandler;
-    }
-
     public String getMeetingId() {
 	return meetingId;
     }
@@ -259,11 +253,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	return zoom;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -301,9 +290,8 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	return result;
     }
 
-    public static Zoom newInstance(Zoom fromContent, Long toContentId, IToolContentHandler zoomToolContentHandler) {
+    public static Zoom newInstance(Zoom fromContent, Long toContentId) {
 	Zoom toContent = new Zoom();
-	fromContent.toolContentHandler = zoomToolContentHandler;
 	toContent = (Zoom) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
