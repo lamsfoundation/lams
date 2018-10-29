@@ -25,12 +25,28 @@ package org.lamsfoundation.lams.logevent;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "lams_log_event_type")
 public class LogEventType implements Serializable {
 
     private static final long serialVersionUID = 5275008411348257866L;
 
+    @Id 
+    @Column(name = "log_event_type_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Integer id;
+    
+    @Column 
     private String description;
+
+    @Column 
     private String area;
     
     public Integer getId() {

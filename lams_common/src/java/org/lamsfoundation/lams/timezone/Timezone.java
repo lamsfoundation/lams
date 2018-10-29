@@ -25,6 +25,13 @@ package org.lamsfoundation.lams.timezone;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Contains timezone id.
  *
@@ -33,6 +40,8 @@ import java.io.Serializable;
  *
  *
  */
+@Entity
+@Table(name = "lams_timezone")
 public class Timezone implements Serializable {
 
     /**
@@ -43,10 +52,15 @@ public class Timezone implements Serializable {
     private static final long serialVersionUID = 6736816209131888523L;
 
     /** identifier field */
+    @Id 
+    @Column 
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
+    @Column(name="timezone_id")
     private String timezoneId;
 
+    @Column(name="server_timezone")
     private boolean serverTimezone;
 
     /** default constructor */

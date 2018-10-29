@@ -2,17 +2,35 @@ package org.lamsfoundation.lams.policies;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_policy_consent")
 public class PolicyConsent {
     
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
     
+    @Column(name = "date_agreed_on")
     private Date dateAgreedOn;
 
+    @ManyToOne 
+    @JoinColumn(name = "policy_uid")
     private Policy policy;
     
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "user_id")
     private User user;
     
     /** default constructor */
@@ -20,8 +38,6 @@ public class PolicyConsent {
 	dateAgreedOn = new Date(); // default value is set to when the object is created
     }
     
-    /**
-     */
     public Long getUid() {
 	return uid;
     }
@@ -39,8 +55,6 @@ public class PolicyConsent {
 	this.dateAgreedOn = dateAgreedOn != null ? dateAgreedOn : new Date();
     }
 
-    /**
-     */
     public Policy getPolicy() {
 	return policy;
     }

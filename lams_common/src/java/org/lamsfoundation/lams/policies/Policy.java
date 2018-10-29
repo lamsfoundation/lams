@@ -3,8 +3,22 @@ package org.lamsfoundation.lams.policies;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_policy")
 public class Policy {
     
     /** active policy */
@@ -21,42 +35,54 @@ public class Policy {
     /** other policy */
     public static final Integer TYPE_OTHER = new Integer(4);
     
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
     
     /**
      * Shared by all policies created out of one parent one. 
      */
+    @Column(name = "policy_id")
     private Long policyId;
     
-    /** persistent field */
+    @Column(name = "policy_name")
     private String policyName;
     
-    /** persistent field */
+    @Column
     private String version;
     
-    /** persistent field */
+    @Column
     private String summary;
     
-    /** persistent field */
+    @Column(name = "full_policy")
     private String fullPolicy;
     
-    /** persistent field */
+    @Column(name = "policy_state_id")
     private Integer policyStateId;
     
-    /** persistent field */
+    @Column(name = "policy_type_id")
     private Integer policyTypeId;
     
+    @ManyToOne 
+    @JoinColumn(name = "created_by") 
     private User createdBy;
     
     /** Date this policy was modified the last time */
+    @Column(name = "last_modified")
     private Date lastModified;
-    
+
+    // inverse = false
+    @OneToMany(mappedBy = "policy")
+    @OrderBy("dateAgreedOn ASC")
     private Set<PolicyConsent> consents;
     
     // *************** NON Persistent Fields ********************
     
+    @Transient
     private boolean hasPreviousVersions;
+
+    @Transient
     private int userConsentsCount;
     
     /** default constructor */
