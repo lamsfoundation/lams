@@ -792,7 +792,7 @@ public class LearningController implements VoteAppConstants {
 
 	if (mode.equals("teacher")) {
 
-	    Long sessionUid = user.getVoteSessionId();
+	    Long sessionUid = user.getVoteSession().getUid();
 	    putMapQuestionsContentIntoRequest(request, voteService, user);
 	    Set<String> userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(), sessionUid);
 	    request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
@@ -815,7 +815,7 @@ public class LearningController implements VoteAppConstants {
 	 * been already called up by this user
 	 */
 	if (user.isFinalScreenRequested()) {
-	    Long sessionUid = user.getVoteSessionId();
+	    Long sessionUid = user.getVoteSession().getUid();
 	    VoteSession voteUserSession = voteService.getVoteSessionByUID(sessionUid);
 	    String userSessionId = voteUserSession.getVoteSessionId().toString();
 

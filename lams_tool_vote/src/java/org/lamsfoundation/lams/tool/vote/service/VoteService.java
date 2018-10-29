@@ -1114,7 +1114,7 @@ public class VoteService
 
 	if (question != null) {
 	    VoteUsrAttempt existingAttempt = voteUsrAttemptDAO.getAttemptForUserAndQuestionContentAndSession(
-		    user.getQueUsrId(), question.getVoteContentId(), session.getUid());
+		    user.getQueUsrId(), question.getVoteContent().getUid(), session.getUid());
 
 	    if (existingAttempt != null) {
 		existingAttempt.setUserEntry(userEntry);
@@ -1165,8 +1165,7 @@ public class VoteService
 	}
 
 	logEventService.logHideLearnerContent(voteUsrAttempt.getVoteQueUsr().getQueUsrId(),
-		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId,
-		voteUsrAttempt.getUserEntry());
+		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId, voteUsrAttempt.getUserEntry());
 
     }
 
@@ -1181,8 +1180,7 @@ public class VoteService
 	}
 
 	logEventService.logShowLearnerContent(voteUsrAttempt.getVoteQueUsr().getQueUsrId(),
-		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId,
-		voteUsrAttempt.getUserEntry());
+		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId, voteUsrAttempt.getUserEntry());
     }
 
     @Override

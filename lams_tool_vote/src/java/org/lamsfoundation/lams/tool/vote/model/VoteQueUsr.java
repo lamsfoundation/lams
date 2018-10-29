@@ -26,6 +26,17 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -37,50 +48,51 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@Entity
+@Table(name = "tl_lavote11_usr")
 public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
 
     private static final long serialVersionUID = 7303944502340276133L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "user_id")
     private Long queUsrId;
 
-    /** nullable persistent field */
+    @Column
     private String username;
 
-    /** nullable persistent field */
+    @Column
     private String fullname;
 
+    @Column
     private boolean responseFinalised;
 
+    @Column
     private boolean finalScreenRequested;
 
-    private Long voteSessionId;
-
-    /** nullable persistent field */
+    @ManyToOne
+    @JoinColumn(name = "vote_session_id")
     private VoteSession voteSession;
 
-    /** persistent field */
+    @OneToMany(mappedBy = "voteQueUsr", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VoteUsrAttempt> voteUsrAttempts;
 
-    /** full constructor */
     public VoteQueUsr(Long queUsrId, String username, String fullname, VoteSession voteSession,
 	    Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.queUsrId = queUsrId;
 	this.username = username;
 	this.fullname = fullname;
 	this.voteSession = voteSession;
-	this.voteSessionId = voteSession.getUid();
 	this.voteUsrAttempts = voteUsrAttempts;
     }
 
-    /** default constructor */
     public VoteQueUsr() {
     }
 
-    /** minimal constructor */
     public VoteQueUsr(Long queUsrId, Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.queUsrId = queUsrId;
 	this.voteUsrAttempts = voteUsrAttempts;
@@ -134,74 +146,30 @@ public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-    /**
-     * Beware, it references Votesession.uid field (not the Votesession.voteSessionId).
-     *
-     * @return Returns the voteSessionId.
-     */
-    public Long getVoteSessionId() {
-	return voteSessionId;
-    }
-
-    /**
-     * Beware, it references Votesession.uid field (not the Votesession.voteSessionId).
-     *
-     * @param voteSessionId
-     *            The voteSessionId to set.
-     */
-    public void setVoteSessionId(Long voteSessionId) {
-	this.voteSessionId = voteSessionId;
-    }
-
-    /**
-     * @return Returns the voteSession.
-     */
     public VoteSession getVoteSession() {
 	return voteSession;
     }
 
-    /**
-     * @param voteSession
-     *            The voteSession to set.
-     */
     public void setVoteSession(VoteSession voteSession) {
 	this.voteSession = voteSession;
     }
 
-    /**
-     * @param voteUsrAttempts
-     *            The voteUsrAttempts to set.
-     */
     public void setVoteUsrAttempts(Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.voteUsrAttempts = voteUsrAttempts;
     }
 
-    /**
-     * @return Returns the responseFinalised.
-     */
     public boolean isResponseFinalised() {
 	return responseFinalised;
     }
 
-    /**
-     * @param responseFinalised
-     *            The responseFinalised to set.
-     */
     public void setResponseFinalised(boolean responseFinalised) {
 	this.responseFinalised = responseFinalised;
     }
 
-    /**
-     * @return Returns the finalScreenRequested.
-     */
     public boolean isFinalScreenRequested() {
 	return finalScreenRequested;
     }
 
-    /**
-     * @param finalScreenRequested
-     *            The finalScreenRequested to set.
-     */
     public void setFinalScreenRequested(boolean finalScreenRequested) {
 	this.finalScreenRequested = finalScreenRequested;
     }
@@ -215,5 +183,4 @@ public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
 	    return (int) (uid.longValue() - other.uid.longValue());
 	}
     }
-
 }

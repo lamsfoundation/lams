@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
@@ -55,17 +55,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO {
 
-    private static final String LOAD_ATTEMPT_FOR_USER = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId";
+    private static final String LOAD_ATTEMPT_FOR_USER = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueUsr.uid=:queUsrId";
 
     // The following two queries are the same except one loads the attempts, the other counts them
     private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
     private static final String COUNT_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION = "select count(*) from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 
-    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId";
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueUsr.uid=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId";
 
-    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueUsr.uid=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 
-    private static final String LOAD_ATTEMPT_FOR_USER_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueUsr.uid=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 
     private static final String LOAD_USER_ENTRIES = "select distinct voteUsrAttempt.userEntry from VoteUsrAttempt voteUsrAttempt where voteUsrAttempt.voteQueUsr.voteSession.voteContent.uid=:voteContentUid";
 
@@ -80,10 +80,10 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @SuppressWarnings("unchecked")
     @Override
     public VoteUsrAttempt getAttemptByUID(Long uid) {
-	String query = "from VoteUsrAttempt attempt where attempt.uid=?";
+	String query = "from VoteUsrAttempt attempt where attempt.uid=:attemptUid";
 
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(query)
-		.setLong(0, uid.longValue()).list();
+		.setParameter("attemptUid", uid).list();
 
 	if ((list != null) && (list.size() > 0)) {
 	    VoteUsrAttempt attempt = list.get(0);
@@ -101,7 +101,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @Override
     public List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
-		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER).setLong("queUsrId", queUsrId.longValue()).list();
+		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER).setParameter("queUsrId", queUsrId).list();
 	return list;
     }
 
@@ -109,7 +109,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @Override
     public Set<String> getUserEntries(final Long voteContentUid) {
 	List<String> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRIES)
-		.setLong("voteContentUid", voteContentUid).list();
+		.setParameter("voteContentUid", voteContentUid).list();
 
 	Set<String> userEntries = new HashSet<>();
 	if ((list != null) && (list.size() > 0)) {
@@ -128,8 +128,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @Override
     public List<VoteUsrAttempt> getUserAttempts(final Long voteContentUid, final String userEntry) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
-		.createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRY_RECORDS).setLong("voteContentUid", voteContentUid)
-		.setString("userEntry", userEntry).list();
+		.createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRY_RECORDS).setParameter("voteContentUid", voteContentUid)
+		.setParameter("userEntry", userEntry).list();
 	return list;
     }
 
@@ -137,15 +137,15 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @Override
     public List<VoteUsrAttempt> getSessionOpenTextUserEntries(final Long voteSessionUid) {
 	return getSession().createQuery(VoteUsrAttemptDAO.LOAD_OPEN_TEXT_ENTRIES_BY_SESSION_UID)
-		.setLong("voteSessionUid", voteSessionUid).list();
+		.setParameter("voteSessionUid", voteSessionUid).list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid) {
-	String strGetUser = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
+	String strGetUser = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueUsr.uid=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(strGetUser)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid).list();
+		.setParameter("queUsrId", queUsrId.longValue()).setParameter("sessionUid", sessionUid).list();
 
 	if ((list != null) && (list.size() > 0)) {
 	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
@@ -161,8 +161,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @Override
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long sessionUid) {
 	List<Number> list = getSession().createQuery(VoteUsrAttemptDAO.COUNT_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
-		.setLong("voteQueContentId", questionUid.longValue()).setLong("sessionUid", sessionUid.longValue())
-		.list();
+		.setParameter("voteQueContentId", questionUid).setParameter("sessionUid", sessionUid).list();
 
 	if (list == null || list.size() == 0) {
 	    return 0;
@@ -177,8 +176,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    final Long sessionUid) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
-		.setLong("voteQueContentId", questionUid.longValue()).setLong("sessionUid", sessionUid.longValue())
-		.list();
+		.setParameter("voteQueContentId", questionUid).setParameter("sessionUid", sessionUid).list();
 
 	List<VoteUsrAttempt> userEntries = new ArrayList();
 	if ((list != null) && (list.size() > 0)) {
@@ -193,7 +191,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long questionUid) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue()).list();
+		.setParameter("queUsrId", queUsrId).setParameter("voteQueContentId", questionUid).list();
 
 	return list;
     }
@@ -204,8 +202,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    final Long sessionUid) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue())
-		.setLong("sessionUid", sessionUid.longValue()).list();
+		.setParameter("queUsrId", queUsrId).setParameter("voteQueContentId", questionUid)
+		.setParameter("sessionUid", sessionUid).list();
 
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -218,8 +216,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     public Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long sessionUid) {
 
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
-		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
+		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION).setParameter("queUsrId", queUsrId)
+		.setParameter("sessionUid", sessionUid).list();
 
 	Set<String> userEntries = new HashSet<>();
 	if ((list != null) && (list.size() > 0)) {
@@ -241,7 +239,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     public List<VoteUsrAttempt> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid) {
 
 	return getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
+		.setParameter("queUsrId", queUsrId).setParameter("sessionUid", sessionUid).list();
 
     }
 
@@ -249,9 +247,9 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @Override
     public int getSessionEntriesCount(final Long voteSessionUid) {
 	List<Long> result = getSessionFactory().getCurrentSession()
-		.createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID).setLong("voteSessionUid", voteSessionUid)
-		.list();
-	Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
+		.createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID)
+		.setParameter("voteSessionUid", voteSessionUid).list();
+	Long resultLong = result.get(0) != null ? (Long) result.get(0) : 0L;
 	return resultLong.intValue();
     }
 
@@ -305,10 +303,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
 	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_QUESTION_UID_SELECT)
-		.append(portraitStrings[0])
-		.append(FIND_USER_ANSWERS_BY_QUESTION_UID_FROM)
-		.append(portraitStrings[1]);
+	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_QUESTION_UID_SELECT).append(portraitStrings[0])
+		.append(FIND_USER_ANSWERS_BY_QUESTION_UID_FROM).append(portraitStrings[1]);
 
 	if (sessionUid != null) {
 	    queryText.append(FIND_USER_ANSWERS_BY_QUESTION_UID_SESSION_ADDITION);
@@ -320,15 +316,13 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createSQLQuery(queryText.toString());
 	query.addScalar("user_id", IntegerType.INSTANCE).addScalar("username", StringType.INSTANCE)
-		.addScalar("fullname", StringType.INSTANCE)
-		.addScalar("attemptTime", TimestampType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("questionUid", questionUid.longValue())
+		.addScalar("fullname", StringType.INSTANCE).addScalar("attemptTime", TimestampType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE).setParameter("questionUid", questionUid)
 		.setFirstResult(page * size).setMaxResults(size);
 	if (sessionUid != null) {
-	    query.setLong("sessionUid", sessionUid.longValue());
+	    query.setParameter("sessionUid", sessionUid);
 	}
 
 	return query.list();
@@ -356,7 +350,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @SuppressWarnings("rawtypes")
     public int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString) {
 
-	SQLQuery query;
+	NativeQuery query;
 
 	if (questionUid == null) {
 
@@ -364,7 +358,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    StringBuilder queryText = new StringBuilder(COUNT_USERS_BY_SESSION_UID);
 	    buildNameSearch(searchString, queryText, false); // all ready have a WHERE so need an AND
 	    query = getSession().createSQLQuery(queryText.toString());
-	    query.setLong("sessionUid", sessionUid.longValue());
+	    query.setParameter("sessionUid", sessionUid);
 
 	} else {
 
@@ -376,9 +370,9 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    buildNameSearch(searchString, queryText, true);
 
 	    query = getSession().createSQLQuery(queryText.toString());
-	    query.setLong("questionUid", questionUid.longValue());
+	    query.setParameter("questionUid", questionUid);
 	    if (sessionUid != null) {
-		query.setLong("sessionUid", sessionUid.longValue());
+		query.setParameter("sessionUid", sessionUid);
 	    }
 	}
 
@@ -395,7 +389,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
      * Will return List<[login (String), fullname(String), String (notebook entry)]>
      */
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionUid, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService) {
+	    String searchString, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case VoteAppConstants.SORT_BY_NAME_ASC:
@@ -426,18 +421,17 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	// Add the notebook join
 	queryText.append(notebookEntryStrings[1]);
 	queryText.append(portraitStrings[1]);
-	
+
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText, true);
 
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("user_id", IntegerType.INSTANCE)
-		.addScalar("username", StringType.INSTANCE).addScalar("fullname", StringType.INSTANCE)
-		.addScalar("notebookEntry", StringType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("sessionUid", sessionUid.longValue())
+	NativeQuery<Object[]> query = getSession().createSQLQuery(queryText.toString());
+	query.addScalar("user_id", IntegerType.INSTANCE).addScalar("username", StringType.INSTANCE)
+		.addScalar("fullname", StringType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
+		.addScalar("portraitId", IntegerType.INSTANCE).setParameter("sessionUid", sessionUid)
 		.setFirstResult(page * size).setMaxResults(size);
 
 	return query.list();
@@ -445,8 +439,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 
     private static final String FIND_USER_OPEN_TEXT_SELECT = "SELECT user.uid userUid, user.username login, user.fullname fullName, "
 	    + " attempt.uid userEntryUid, attempt.userEntry userEntry, attempt.attempt_time attemptTime, attempt.visible visible ";
-    
-    private static final String FIND_USER_OPEN_TEXT_FROM =  " FROM tl_lavote11_usr user "
+
+    private static final String FIND_USER_OPEN_TEXT_FROM = " FROM tl_lavote11_usr user "
 	    + " JOIN tl_lavote11_usr_attempt attempt ON user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = 1 ";
 
     private static final String FIND_USER_OPEN_TEXT_SESSION_UID_ADD = "AND user.vote_session_id=:sessionUid";
@@ -463,7 +457,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
      * Will return List<OpenTextAnswerDTO>
      */
     public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long toolContentId, int page,
-	    int size, int sorting, String searchStringVote, String searchStringUsername, IUserManagementService userManagementService) {
+	    int size, int sorting, String searchStringVote, String searchStringUsername,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case VoteAppConstants.SORT_BY_NAME_ASC:
@@ -497,8 +492,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
 	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder(FIND_USER_OPEN_TEXT_SELECT)
-		.append(portraitStrings[0])
+	StringBuilder queryText = new StringBuilder(FIND_USER_OPEN_TEXT_SELECT).append(portraitStrings[0])
 		.append(FIND_USER_OPEN_TEXT_FROM);
 
 	if (sessionUid != null) {
@@ -514,7 +508,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<OpenTextAnswerDTO> query = getSession().createSQLQuery(queryText.toString());
 	query.addScalar("userUid", LongType.INSTANCE).addScalar("login", StringType.INSTANCE)
 		.addScalar("fullName", StringType.INSTANCE).addScalar("userEntryUid", LongType.INSTANCE)
 		.addScalar("userEntry", StringType.INSTANCE).addScalar("attemptTime", TimestampType.INSTANCE)
@@ -523,9 +517,9 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 		.setResultTransformer(Transformers.aliasToBean(OpenTextAnswerDTO.class));
 
 	if (sessionUid != null) {
-	    query.setLong("sessionUid", sessionUid);
+	    query.setParameter("sessionUid", sessionUid);
 	} else {
-	    query.setLong("toolContentId", toolContentId);
+	    query.setParameter("toolContentId", toolContentId);
 	}
 
 	return query.list();
@@ -553,7 +547,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     public int getCountUsersForOpenTextEntries(Long sessionUid, Long toolContentId, String searchStringVote,
 	    String searchStringUsername) {
 
-	SQLQuery query;
+	NativeQuery query;
 	StringBuilder queryText = new StringBuilder(COUNT_USERS_OPEN_TEXT_BY_SESSION_UID);
 
 	if (sessionUid != null) {
@@ -561,7 +555,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    queryText.append(FIND_USER_OPEN_TEXT_SESSION_UID_ADD);
 	    buildCombinedSearch(searchStringVote, searchStringUsername, queryText);
 	    query = getSession().createSQLQuery(queryText.toString());
-	    query.setLong("sessionUid", sessionUid);
+	    query.setParameter("sessionUid", sessionUid);
 
 	} else {
 
@@ -569,7 +563,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    queryText.append(FIND_USER_OPEN_TEXT_CONTENT_UID_ADD);
 	    buildCombinedSearch(searchStringVote, searchStringUsername, queryText);
 	    query = getSession().createSQLQuery(queryText.toString());
-	    query.setLong("toolContentId", toolContentId);
+	    query.setParameter("toolContentId", toolContentId);
 
 	}
 
@@ -589,9 +583,9 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @SuppressWarnings("unchecked")
     public List<VoteStatsDTO> getStatisticsBySession(Long toolContentId) {
 
-	SQLQuery query = getSession().createSQLQuery(GET_STATISTICS);
+	NativeQuery<VoteStatsDTO> query = getSession().createSQLQuery(GET_STATISTICS);
 	query.addScalar("sessionUid", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
-		.addScalar("countUsersComplete", IntegerType.INSTANCE).setLong("contentId", toolContentId)
+		.addScalar("countUsersComplete", IntegerType.INSTANCE).setParameter("contentId", toolContentId)
 		.setResultTransformer(Transformers.aliasToBean(VoteStatsDTO.class));
 
 	return query.list();

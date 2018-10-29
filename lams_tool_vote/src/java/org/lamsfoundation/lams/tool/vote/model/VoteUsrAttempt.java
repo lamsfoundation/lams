@@ -25,6 +25,15 @@ package org.lamsfoundation.lams.tool.vote.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -35,37 +44,38 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@Entity
+@Table(name = "tl_lavote11_usr_attempt")
 public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 6756874212158405114L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
-    private Long attemptId;
-
-    /** nullable persistent field */
+    @Column(name = "attempt_time")
     private Date attemptTime;
 
-    /** nullable persistent field */
+    @Column(name = "time_zone")
     private String timeZone;
 
+    @Column
     private String userEntry;
 
-    private Long queUsrId;
-
+    @Column
     private boolean visible;
 
+    @Column
     private boolean singleUserEntry;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "vote_nomination_content_id")
     private VoteQueContent voteQueContent;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "que_usr_id")
     private VoteQueUsr voteQueUsr;
 
     public VoteUsrAttempt(Date attemptTime, String timeZone, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr,
@@ -73,13 +83,11 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
 	this.attemptTime = attemptTime;
 	this.timeZone = timeZone;
 	this.voteQueContent = voteQueContent;
-	//this.voteQueContentId = voteQueContent.getVoteQueContentId();
 	this.voteQueUsr = voteQueUsr;
 	this.userEntry = userEntry;
 	this.visible = visible;
     }
 
-    /** default constructor */
     public VoteUsrAttempt() {
     }
 
@@ -89,14 +97,6 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    public Long getAttemptId() {
-	return this.attemptId;
-    }
-
-    public void setAttemptId(Long attemptId) {
-	this.attemptId = attemptId;
     }
 
     public Date getAttemptTime() {
@@ -121,92 +121,42 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
 		.append("userEntry:", userEntry).toString();
     }
 
-    /**
-     * @return Returns the queUsrId.
-     */
-    public Long getQueUsrId() {
-	return queUsrId;
-    }
-
-    /**
-     * @param queUsrId
-     *            The queUsrId to set.
-     */
-    public void setQueUsrId(Long queUsrId) {
-	this.queUsrId = queUsrId;
-    }
-
-    /**
-     * @return Returns the voteQueContent.
-     */
     public VoteQueContent getVoteQueContent() {
 	return voteQueContent;
     }
 
-    /**
-     * @param voteQueContent
-     *            The voteQueContent to set.
-     */
     public void setVoteQueContent(VoteQueContent voteQueContent) {
 	this.voteQueContent = voteQueContent;
     }
 
-    /**
-     * @return Returns the voteQueUsr.
-     */
     public VoteQueUsr getVoteQueUsr() {
 	return voteQueUsr;
     }
 
-    /**
-     * @param voteQueUsr
-     *            The voteQueUsr to set.
-     */
     public void setVoteQueUsr(VoteQueUsr voteQueUsr) {
 	this.voteQueUsr = voteQueUsr;
     }
 
-    /**
-     * @return Returns the userEntry.
-     */
     public String getUserEntry() {
 	return userEntry;
     }
 
-    /**
-     * @param userEntry
-     *            The userEntry to set.
-     */
     public void setUserEntry(String userEntry) {
 	this.userEntry = userEntry;
     }
 
-    /**
-     * @return Returns the singleUserEntry.
-     */
     public boolean isSingleUserEntry() {
 	return singleUserEntry;
     }
 
-    /**
-     * @param singleUserEntry
-     *            The singleUserEntry to set.
-     */
     public void setSingleUserEntry(boolean singleUserEntry) {
 	this.singleUserEntry = singleUserEntry;
     }
 
-    /**
-     * @return Returns the visible.
-     */
     public boolean isVisible() {
 	return visible;
     }
 
-    /**
-     * @param visible
-     *            The visible to set.
-     */
     public void setVisible(boolean visible) {
 	this.visible = visible;
     }
@@ -220,5 +170,4 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
 	    return (int) (uid.longValue() - other.uid.longValue());
 	}
     }
-
 }

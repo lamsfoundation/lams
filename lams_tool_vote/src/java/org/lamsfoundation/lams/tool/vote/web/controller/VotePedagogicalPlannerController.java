@@ -85,7 +85,7 @@ public class VotePedagogicalPlannerController {
 			VoteQueContent voteQueContent = new VoteQueContent();
 			voteQueContent.setDisplayOrder(nominationIndex);
 			voteQueContent.setVoteContent(voteContent);
-			voteQueContent.setVoteContentId(voteContent.getVoteContentId());
+			voteQueContent.setVoteContent(voteContent);
 			voteQueContent.setQuestion(nomination);
 			voteService.saveOrUpdateVoteQueContent(voteQueContent);
 		    }

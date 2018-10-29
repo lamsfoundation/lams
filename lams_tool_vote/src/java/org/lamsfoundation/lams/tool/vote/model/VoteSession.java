@@ -26,6 +26,17 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -36,44 +47,45 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@Entity
+@Table(name = "tl_lavote11_session")
 public class VoteSession implements Serializable, Comparable<VoteSession> {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 5053800653198292982L;
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
     public static final String COMPLETED = "COMPLETED";
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "vote_session_id")
     private Long voteSessionId;
 
-    /** nullable persistent field */
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
-    /** nullable persistent field */
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
-    /** nullable persistent field */
+    @Column(name = "session_status")
     private String sessionStatus;
 
+    @Column
     private String session_name;
 
-    /** nullable persistent field */
-    private Long voteContentId;
-
-    /** nullable persistent field */
+    @ManyToOne
+    @JoinColumn(name = "vote_content_id")
     private VoteContent voteContent;
 
-    /** persistent field */
+    @OneToMany(mappedBy = "voteSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VoteQueUsr> voteQueUsers;
 
-    /** persistent field */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_leader_uid")
     private VoteQueUsr groupLeader;
 
     public VoteSession(Long voteSessionId, Date sessionStartDate, String sessionStatus, String session_name,
@@ -86,7 +98,6 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
 	this.voteQueUsers = voteQueUsers;
     }
 
-    /** default constructor */
     public VoteSession() {
     }
 
@@ -103,137 +114,66 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-    /**
-     * @return Returns the sessionEndDate.
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
 
-    /**
-     * @param sessionEndDate
-     *            The sessionEndDate to set.
-     */
     public void setSessionEndDate(Date sessionEndDate) {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     * @return Returns the sessionStartDate.
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
 
-    /**
-     * @param sessionStartDate
-     *            The sessionStartDate to set.
-     */
     public void setSessionStartDate(Date sessionStartDate) {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     * @return Returns the sessionStatus.
-     */
     public String getSessionStatus() {
 	return sessionStatus;
     }
 
-    /**
-     * @param sessionStatus
-     *            The sessionStatus to set.
-     */
     public void setSessionStatus(String sessionStatus) {
 	this.sessionStatus = sessionStatus;
     }
 
-    /**
-     * @return Returns the session_name.
-     */
     public String getSession_name() {
 	return session_name;
     }
 
-    /**
-     * @param session_name
-     *            The session_name to set.
-     */
     public void setSession_name(String session_name) {
 	this.session_name = session_name;
     }
 
-    /**
-     * @return Returns the voteSessionId.
-     */
     public Long getVoteSessionId() {
 	return voteSessionId;
     }
 
-    /**
-     * @param voteSessionId
-     *            The voteSessionId to set.
-     */
     public void setVoteSessionId(Long voteSessionId) {
 	this.voteSessionId = voteSessionId;
     }
 
-    /**
-     * @return Returns the voteContentId.
-     */
-    public Long getVoteContentId() {
-	return voteContentId;
-    }
-
-    /**
-     * @param voteContentId
-     *            The voteContentId to set.
-     */
-    public void setVoteContentId(Long voteContentId) {
-	this.voteContentId = voteContentId;
-    }
-
-    /**
-     * @return Returns the voteContent.
-     */
     public VoteContent getVoteContent() {
 	return voteContent;
     }
 
-    /**
-     * @param voteContent
-     *            The voteContent to set.
-     */
     public void setVoteContent(VoteContent voteContent) {
 	this.voteContent = voteContent;
     }
 
-    /**
-     * @return Returns the voteQueUsers.
-     */
     public Set<VoteQueUsr> getVoteQueUsers() {
 	return voteQueUsers;
     }
 
-    /**
-     * @param voteQueUsers
-     *            The voteQueUsers to set.
-     */
     public void setVoteQueUsers(Set<VoteQueUsr> voteQueUsers) {
 	this.voteQueUsers = voteQueUsers;
     }
 
-    /**
-     * @return Returns the groupLeader.
-     */
     public VoteQueUsr getGroupLeader() {
 	return this.groupLeader;
     }
 
-    /**
-     * @param groupLeader
-     *            The groupLeader to set.
-     */
     public void setGroupLeader(VoteQueUsr groupLeader) {
 	this.groupLeader = groupLeader;
     }
@@ -247,5 +187,4 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
 	    return (int) (uid.longValue() - other.uid.longValue());
 	}
     }
-
 }

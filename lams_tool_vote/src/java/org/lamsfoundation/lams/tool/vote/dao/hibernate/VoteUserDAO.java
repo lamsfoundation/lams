@@ -41,7 +41,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 
-    private static final String LOAD_USER_FOR_SESSION = "from voteQueUsr in class VoteQueUsr where  voteQueUsr.voteSessionId= :voteSessionId";
+    private static final String LOAD_USER_FOR_SESSION = "from voteQueUsr in class VoteQueUsr where  voteQueUsr.voteSession.uid= :voteSessionId";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -49,7 +49,7 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 	String query = "from VoteQueUsr user where user.queUsrId=?";
 
 	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query)
-		.setLong(0, userId.longValue()).list();
+		.setParameter("voteSessionId", userId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueUsr voteu = list.get(0);
@@ -62,7 +62,7 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
     @Override
     public int getCompletedVoteUserBySessionUid(final Long voteSessionUid) {
 	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("voteSessionId", voteSessionUid.longValue()).list();
+		.setParameter("voteSessionId", voteSessionUid.longValue()).list();
 
 	int completedSessionUserCount = 0;
 	if (list != null && list.size() > 0) {
@@ -82,9 +82,10 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
     @Override
     public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId) {
 
-	String strGetUser = "from voteQueUsr in class VoteQueUsr where voteQueUsr.queUsrId=:queUsrId and voteQueUsr.voteSessionId=:voteSessionId";
+	String strGetUser = "from voteQueUsr in class VoteQueUsr where voteQueUsr.queUsrId=:queUsrId and voteQueUsr.voteSession.uid=:voteSessionId";
 	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(strGetUser)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("voteSessionId", voteSessionId.longValue()).list();
+		.setParameter("queUsrId", queUsrId.longValue()).setParameter("voteSessionId", voteSessionId.longValue())
+		.list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueUsr usr = list.get(0);
@@ -96,10 +97,10 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
     @SuppressWarnings("unchecked")
     @Override
     public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) {
-	String query = "from VoteQueUsr user where user.queUsrId=?";
+	String query = "from VoteQueUsr user where user.queUsrId=:queUsrId";
 
-	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteQueUsrId)
-		.list();
+	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query)
+		.setParameter("queUsrId", voteQueUsrId).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueUsr qu = list.get(0);
@@ -122,7 +123,7 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
     @Override
     public List<VoteQueUsr> getUserBySessionOnly(final VoteSession voteSession) {
 	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("voteSessionId", voteSession.getUid().longValue()).list();
+		.setParameter("voteSessionId", voteSession.getUid().longValue()).list();
 	return list;
     }
 
@@ -136,5 +137,4 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 	String query = "from obj in class VoteQueUsr";
 	return this.doFind(query).size();
     }
-
 }

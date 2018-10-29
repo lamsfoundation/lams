@@ -28,6 +28,16 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -38,74 +48,84 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@Entity
+@Table(name = "tl_lavote11_content")
 public class VoteContent implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1986729606785509746L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "content_id")
     private Long voteContentId;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** nullable persistent field */
+    @Column
     private String reflectionSubject;
 
+    @Column
     private String instructions;
 
-    /** nullable persistent field */
+    @Column(name = "define_later")
     private boolean defineLater;
 
-    /** nullable persistent field */
+    @Column(name = "creation_date")
     private Date creationDate;
 
-    /** nullable persistent field */
+    @Column(name = "update_date")
     private Date updateDate;
 
-    /** nullable persistent field */
+    @Column(name = "created_by")
     private long createdBy;
 
+    @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
+    @Column
     private boolean reflect;
 
+    @Column
     private boolean allowText;
 
+    @Column
     private String maxNominationCount;
 
+    @Column
     private String minNominationCount;
 
-    /** nullable persistent field */
+    @Column(name = "lock_on_finish")
     private boolean lockOnFinish;
 
+    @Column(name = "show_results")
     private boolean showResults;
 
-    /** persistent field */
+    @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder")
     private Set<VoteQueContent> voteQueContents;
 
-    /** persistent field */
+    @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VoteSession> voteSessions;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
     /**
-     * persistent field This field can be calculated, but introducing it reduces number of DB calls.
+     * This field can be calculated, but introducing it reduces number of DB calls.
      */
+    @Column(name = "assigned_data_flow_object")
     private Boolean assignedDataFlowObject;
 
-    /** persistent field */
+    @Column(name = "max_external_inputs")
     private Short maxExternalInputs;
 
-    /** persistent field */
+    @Column(name = "external_inputs_added")
     private Short externalInputsAdded;
 
-    /** full constructor */
     public VoteContent(Long voteContentId, String title, String instructions, boolean defineLater, Date creationDate,
 	    Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
 	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
@@ -132,15 +152,7 @@ public class VoteContent implements Serializable {
 	this.externalInputsAdded = externalInputsAdded;
     }
 
-    /** default constructor */
     public VoteContent() {
-    }
-
-    /** minimal constructor */
-    public VoteContent(Long voteContentId, Set<VoteQueContent> voteQueContents, Set<VoteSession> voteSessions) {
-	this.voteContentId = voteContentId;
-	this.voteQueContents = voteQueContents;
-	this.voteSessions = voteSessions;
     }
 
     /**
@@ -170,9 +182,6 @@ public class VoteContent implements Serializable {
 
     /**
      * gets called as part of the copyToolContent
-     *
-     * @param newQaContent
-     * @return Set
      */
     public Set<VoteQueContent> deepCopyMcQueContent(VoteContent newMcContent) {
 
@@ -236,9 +245,6 @@ public class VoteContent implements Serializable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     * @return Returns the voteQueContents.
-     */
     public Set<VoteQueContent> getVoteQueContents() {
 	if (voteQueContents == null) {
 	    setVoteQueContents(new HashSet<VoteQueContent>());
@@ -247,17 +253,10 @@ public class VoteContent implements Serializable {
 
     }
 
-    /**
-     * @param voteQueContents
-     *            The voteQueContents to set.
-     */
     public void setVoteQueContents(Set<VoteQueContent> voteQueContents) {
 	this.voteQueContents = voteQueContents;
     }
 
-    /**
-     * @return Returns the voteSessions.
-     */
     public Set<VoteSession> getVoteSessions() {
 	if (voteSessions == null) {
 	    setVoteSessions(new HashSet<VoteSession>());
@@ -265,10 +264,6 @@ public class VoteContent implements Serializable {
 	return voteSessions;
     }
 
-    /**
-     * @param voteSessions
-     *            The voteSessions to set.
-     */
     public void setVoteSessions(Set<VoteSession> voteSessions) {
 	this.voteSessions = voteSessions;
     }
@@ -278,137 +273,74 @@ public class VoteContent implements Serializable {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-    /**
-     * @return Returns the creationDate.
-     */
     public Date getCreationDate() {
 	return creationDate;
     }
 
-    /**
-     * @param creationDate
-     *            The creationDate to set.
-     */
     public void setCreationDate(Date creationDate) {
 	this.creationDate = creationDate;
     }
 
-    /**
-     * @return Returns the lockOnFinish.
-     */
     public boolean isLockOnFinish() {
 	return lockOnFinish;
     }
 
-    /**
-     * @param lockOnFinish
-     *            The lockOnFinish to set.
-     */
     public void setLockOnFinish(boolean lockOnFinish) {
 	this.lockOnFinish = lockOnFinish;
     }
 
-    /**
-     * @return Returns the voteContentId.
-     */
     public Long getVoteContentId() {
 	return voteContentId;
     }
 
-    /**
-     * @param voteContentId
-     *            The voteContentId to set.
-     */
     public void setVoteContentId(Long voteContentId) {
 	this.voteContentId = voteContentId;
     }
 
-    /**
-     * @return Returns the allowText.
-     */
     public boolean isAllowText() {
 	return allowText;
     }
 
-    /**
-     * @param allowText
-     *            The allowText to set.
-     */
     public void setAllowText(boolean allowText) {
 	this.allowText = allowText;
     }
 
-    /**
-     * @return Returns the maxNominationCount.
-     */
     public String getMaxNominationCount() {
 	return maxNominationCount;
     }
 
-    /**
-     * @param maxNominationCount
-     *            The maxNominationCount to set.
-     */
     public void setMaxNominationCount(String maxNominationCount) {
 	this.maxNominationCount = maxNominationCount;
     }
 
-    /**
-     * @return Returns the minNominationCount.
-     */
     public String getMinNominationCount() {
 	return minNominationCount;
     }
 
-    /**
-     * @param minNominationCount
-     *            The minNominationCount to set.
-     */
     public void setMinNominationCount(String minNominationCount) {
 	this.minNominationCount = minNominationCount;
     }
 
-    /**
-     * @return Returns the reflect.
-     */
     public boolean isReflect() {
 	return reflect;
     }
 
-    /**
-     * @param reflect
-     *            The reflect to set.
-     */
     public void setReflect(boolean reflect) {
 	this.reflect = reflect;
     }
 
-    /**
-     * @param useSelectLeaderToolOuput
-     *            The useSelectLeaderToolOuput to set.
-     */
     public boolean isUseSelectLeaderToolOuput() {
 	return useSelectLeaderToolOuput;
     }
 
-    /**
-     * @return Returns the useSelectLeaderToolOuput.
-     */
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
-    /**
-     * @return Returns the reflectionSubject.
-     */
     public String getReflectionSubject() {
 	return reflectionSubject;
     }
 
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;
     }

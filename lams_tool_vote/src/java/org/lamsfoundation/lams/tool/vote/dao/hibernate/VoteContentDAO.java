@@ -42,14 +42,14 @@ import org.springframework.stereotype.Repository;
 public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
 
     private static final String FIND_VOTE_CONTENT = "from " + VoteContent.class.getName()
-	    + " as vote where content_id=?";
+	    + " as vote where content_id=:contentId";
 
     private static final String LOAD_VOTE_BY_SESSION = "select vote from VoteContent vote left join fetch "
 	    + "vote.voteSessions session where session.voteSessionId=:sessionId";
 
     @Override
     public VoteContent getVoteContentByUID(Long uid) {
-	return (VoteContent) this.getSession().get(VoteContent.class, uid);
+	return this.getSession().get(VoteContent.class, uid);
     }
 
     @Override
@@ -60,9 +60,9 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     @SuppressWarnings("unchecked")
     @Override
     public VoteContent getVoteContentByContentId(Long voteContentId) {
-	String query = "from VoteContent as vote where vote.voteContentId = ?";
+	String query = "from VoteContent as vote where vote.voteContentId = :voteContentId";
 	List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(query)
-		.setLong(0, voteContentId.longValue()).list();
+		.setParameter("voteContentId", voteContentId).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteContent vote = list.get(0);
@@ -74,7 +74,7 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     @Override
     public VoteContent getVoteContentBySession(final Long voteSessionId) {
 	return (VoteContent) getSession().createQuery(VoteContentDAO.LOAD_VOTE_BY_SESSION)
-		.setLong("sessionId", voteSessionId.longValue()).uniqueResult();
+		.setParameter("sessionId", voteSessionId).uniqueResult();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     public void removeVoteById(Long voteContentId) {
 	if (voteContentId != null) {
 	    List<VoteContent> list = getSessionFactory().getCurrentSession()
-		    .createQuery(VoteContentDAO.FIND_VOTE_CONTENT).setLong(0, voteContentId.longValue()).list();
+		    .createQuery(VoteContentDAO.FIND_VOTE_CONTENT).setParameter("contentId", voteContentId).list();
 
 	    if (list != null && list.size() > 0) {
 		VoteContent vote = list.get(0);

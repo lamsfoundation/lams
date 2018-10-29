@@ -24,6 +24,15 @@ package org.lamsfoundation.lams.tool.vote.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -32,31 +41,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@Entity
+@Table(name = "tl_lavote11_nomination_content")
 public class VoteQueContent implements Serializable, Comparable<VoteQueContent> {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1598466582549757720L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** nullable persistent field */
+    @Column(name = "nomination")
     private String question;
 
+    @Column(name = "display_order")
     private int displayOrder;
 
-    /** non persistent field */
-    private Long voteContentId;
-
-    /** persistent field */
-    private org.lamsfoundation.lams.tool.vote.model.VoteContent voteContent;
-
-    public VoteQueContent(String question, VoteContent voteContent) {
-	this.question = question;
-	this.voteContent = voteContent;
-    }
+    @ManyToOne
+    @JoinColumn(name = "vote_content_id")
+    private VoteContent voteContent;
 
     public VoteQueContent(String question, int displayOrder, VoteContent voteContent) {
 	this.question = question;
@@ -64,7 +68,6 @@ public class VoteQueContent implements Serializable, Comparable<VoteQueContent> 
 	this.voteContent = voteContent;
     }
 
-    /** default constructor */
     public VoteQueContent() {
     }
 
@@ -122,47 +125,18 @@ public class VoteQueContent implements Serializable, Comparable<VoteQueContent> 
 	}
     }
 
-    /**
-     * @return Returns the voteContentId.
-     */
-    public Long getVoteContentId() {
-	return voteContentId;
-    }
-
-    /**
-     * @param voteContentId
-     *            The voteContentId to set.
-     */
-    public void setVoteContentId(Long voteContentId) {
-	this.voteContentId = voteContentId;
-    }
-
-    /**
-     * @return Returns the voteContent.
-     */
-    public org.lamsfoundation.lams.tool.vote.model.VoteContent getVoteContent() {
+    public VoteContent getVoteContent() {
 	return voteContent;
     }
 
-    /**
-     * @param voteContent
-     *            The voteContent to set.
-     */
-    public void setVoteContent(org.lamsfoundation.lams.tool.vote.model.VoteContent voteContent) {
+    public void setVoteContent(VoteContent voteContent) {
 	this.voteContent = voteContent;
     }
 
-    /**
-     * @return Returns the displayOrder.
-     */
     public int getDisplayOrder() {
 	return displayOrder;
     }
 
-    /**
-     * @param displayOrder
-     *            The displayOrder to set.
-     */
     public void setDisplayOrder(int displayOrder) {
 	this.displayOrder = displayOrder;
     }

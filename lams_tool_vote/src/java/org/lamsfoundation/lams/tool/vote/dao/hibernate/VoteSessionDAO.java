@@ -41,7 +41,7 @@ import org.springframework.stereotype.Repository;
 public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     private static final String FIND_VOTE_SESSION_CONTENT = "from " + VoteSession.class.getName()
-	    + " as votes where vote_session_id=?";
+	    + " as votes where vote_session_id=:voteSessionId";
 
     private static final String LOAD_VOTESESSION_BY_USER = "select votes from VoteSession votes left join fetch "
 	    + "votes.voteQueUsers user where user.queUsrId=:userId";
@@ -52,16 +52,16 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     @Override
     public VoteSession getVoteSessionByUID(Long sessionUid) {
-	return (VoteSession) this.getSession().get(VoteSession.class, sessionUid);
+	return this.getSession().get(VoteSession.class, sessionUid);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public VoteSession getSessionBySessionId(Long voteSessionId) {
-	String query = "from VoteSession votes where votes.voteSessionId=?";
+	String query = "from VoteSession votes where votes.voteSessionId=:voteSessionId";
 
 	List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(query)
-		.setLong(0, voteSessionId.longValue()).list();
+		.setParameter("voteSessionId", voteSessionId).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteSession vote = list.get(0);
@@ -94,7 +94,7 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     @Override
     public void removeVoteSessionByUID(Long uid) {
-	VoteSession votes = (VoteSession) getSession().get(VoteSession.class, uid);
+	VoteSession votes = getSession().get(VoteSession.class, uid);
 	this.getSession().delete(votes);
     }
 
@@ -103,7 +103,7 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
     public void removeVoteSessionById(Long voteSessionId) {
 	if (voteSessionId != null) {
 	    List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT)
-		    .setLong(0, voteSessionId.longValue()).list();
+		    .setParameter("voteSessionId", voteSessionId).list();
 
 	    if (list != null && list.size() > 0) {
 		VoteSession vote = list.get(0);
@@ -121,8 +121,8 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     @Override
     public VoteSession getVoteSessionByUser(final Long userId) {
-	return (VoteSession) getSession().createQuery(LOAD_VOTESESSION_BY_USER).setLong("userId", userId.longValue())
-		.uniqueResult();
+	return (VoteSession) getSession().createQuery(LOAD_VOTESESSION_BY_USER)
+		.setParameter("userId", userId.longValue()).uniqueResult();
     }
 
     @Override
