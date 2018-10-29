@@ -24,46 +24,58 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.model;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- *
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
- *
- *
  */
-
-public class LeaderselectionUser implements java.io.Serializable {
-
-    /**
-     * 
-     */
+@Entity
+@Table(name = "tl_lalead11_user")
+public class LeaderselectionUser implements Serializable {
     private static final long serialVersionUID = -3701664859818409197L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "login_name")
     private String loginName;
-
+    
+    @ManyToOne
+    @JoinColumn(name = "leaderselection_session_uid")
     private LeaderselectionSession leaderselectionSession;
 
+    @Column(name = "finishedActivity")
     private boolean finishedActivity;
-
-    // Constructors
 
     /** default constructor */
     public LeaderselectionUser() {
     }
 
     public LeaderselectionUser(UserDTO user, LeaderselectionSession leaderselectionSession) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -80,10 +92,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.leaderselectionSession = leaderselectionSession;
     }
 
-    // Property accessors
-    /**
-     *
-     */
     public Long getUid() {
 	return this.uid;
     }
@@ -92,10 +100,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Long getUserId() {
 	return this.userId;
     }
@@ -104,10 +108,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.userId = userId;
     }
 
-    /**
-     *
-     *
-     */
     public String getLastName() {
 	return this.lastName;
     }
@@ -116,10 +116,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     *
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -128,10 +124,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     *
-     */
     public String getFirstName() {
 	return this.firstName;
     }
@@ -140,9 +132,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     */
     public boolean isFinishedActivity() {
 	return finishedActivity;
     }
@@ -151,11 +140,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.finishedActivity = finishedActivity;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public LeaderselectionSession getLeaderselectionSession() {
 	return this.leaderselectionSession;
     }
@@ -164,11 +148,6 @@ public class LeaderselectionUser implements java.io.Serializable {
 	this.leaderselectionSession = leaderselectionSession;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

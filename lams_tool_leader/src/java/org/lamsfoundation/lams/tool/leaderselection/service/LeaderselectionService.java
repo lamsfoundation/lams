@@ -98,9 +98,9 @@ public class LeaderselectionService
     /* ************ Methods from ToolSessionManager ************* */
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (LeaderselectionService.logger.isDebugEnabled()) {
-	    LeaderselectionService.logger.debug("entering method createToolSession:" + " toolSessionId = "
-		    + toolSessionId + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	LeaderselectionSession session = new LeaderselectionSession();
@@ -164,9 +164,9 @@ public class LeaderselectionService
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-	if (LeaderselectionService.logger.isDebugEnabled()) {
-	    LeaderselectionService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	if (logger.isDebugEnabled()) {
+	    logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+		    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -201,8 +201,7 @@ public class LeaderselectionService
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Leaderselection content = leaderselectionDAO.getByContentId(toolContentId);
 	if (content == null) {
-	    LeaderselectionService.logger
-		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 	for (LeaderselectionSession session : (Set<LeaderselectionSession>) content.getLeaderselectionSessions()) {
@@ -219,8 +218,8 @@ public class LeaderselectionService
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (LeaderselectionService.logger.isDebugEnabled()) {
-	    LeaderselectionService.logger.debug(
+	if (logger.isDebugEnabled()) {
+	    logger.debug(
 		    "Removing Leader Selection state for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
@@ -331,8 +330,7 @@ public class LeaderselectionService
 	LeaderselectionSession session = getSessionBySessionId(toolSessionId);
 	LeaderselectionUser newLeader = getUserByUID(userUid);
 	if ((session == null) || (newLeader == null)) {
-	    LeaderselectionService.logger
-		    .error("Wrong parameters supplied. SessionId=" + toolSessionId + " UserId=" + userUid);
+	    logger.error("Wrong parameters supplied. SessionId=" + toolSessionId + " UserId=" + userUid);
 	    return false;
 	}
 
@@ -376,11 +374,10 @@ public class LeaderselectionService
 
     @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
-	Long toolContentId = null;
-	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-	if (toolContentId == null) {
+	long toolContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
+	if (toolContentId == 0) {
 	    String error = "Could not retrieve default content id for this tool";
-	    LeaderselectionService.logger.error(error);
+	    logger.error(error);
 	    throw new LeaderselectionException(error);
 	}
 	return toolContentId;
@@ -392,7 +389,7 @@ public class LeaderselectionService
 	Leaderselection defaultContent = getContentByContentId(defaultContentID);
 	if (defaultContent == null) {
 	    String error = "Could not retrieve default content record for this tool";
-	    LeaderselectionService.logger.error(error);
+	    logger.error(error);
 	    throw new LeaderselectionException(error);
 	}
 	return defaultContent;
@@ -403,7 +400,7 @@ public class LeaderselectionService
 
 	if (newContentID == null) {
 	    String error = "Cannot copy the Leaderselection tools default content: + " + "newContentID is null";
-	    LeaderselectionService.logger.error(error);
+	    logger.error(error);
 	    throw new LeaderselectionException(error);
 	}
 
@@ -419,7 +416,7 @@ public class LeaderselectionService
     public Leaderselection getContentByContentId(Long toolContentID) {
 	Leaderselection leaderselection = leaderselectionDAO.getByContentId(toolContentID);
 	if (leaderselection == null) {
-	    LeaderselectionService.logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
 	return leaderselection;
     }
@@ -428,8 +425,7 @@ public class LeaderselectionService
     public LeaderselectionSession getSessionBySessionId(Long toolSessionId) {
 	LeaderselectionSession leaderselectionSession = leaderselectionSessionDAO.getBySessionId(toolSessionId);
 	if (leaderselectionSession == null) {
-	    LeaderselectionService.logger
-		    .debug("Could not find the leaderselection session with toolSessionID:" + toolSessionId);
+	    logger.debug("Could not find the leaderselection session with toolSessionID:" + toolSessionId);
 	}
 	return leaderselectionSession;
     }
