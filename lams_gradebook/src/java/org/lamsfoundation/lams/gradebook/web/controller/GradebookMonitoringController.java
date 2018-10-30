@@ -94,7 +94,7 @@ public class GradebookMonitoringController {
 	    }
 	    UserDTO user = getUser();
 	    if (user == null) {
-		GradebookMonitoringController.log.error("User missing from session. ");
+		log.error("User missing from session. ");
 		return "error";
 	    }
 	    if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "get lesson gradebook", false)) {
@@ -117,7 +117,7 @@ public class GradebookMonitoringController {
 
 	    return "gradebookMonitor";
 	} catch (Exception e) {
-	    GradebookMonitoringController.log.error("Failed to load lesson gradebook", e);
+	    log.error("Failed to load lesson gradebook", e);
 	    return "error";
 	}
     }
@@ -127,13 +127,13 @@ public class GradebookMonitoringController {
 
 	try {
 	    Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	    if (GradebookMonitoringController.log.isDebugEnabled()) {
-		GradebookMonitoringController.log.debug("Getting gradebook for organisation " + organisationID);
+	    if (log.isDebugEnabled()) {
+		log.debug("Getting gradebook for organisation " + organisationID);
 	    }
 
 	    UserDTO user = getUser();
 	    if (user == null) {
-		GradebookMonitoringController.log.error("User missing from session. ");
+		log.error("User missing from session. ");
 		return "error";
 	    }
 	    if (!securityService.hasOrgRole(organisationID, user.getUserID(),
@@ -149,23 +149,15 @@ public class GradebookMonitoringController {
 
 	    return "gradebookCourseMonitor";
 	} catch (Exception e) {
-	    GradebookMonitoringController.log.error("Failed to load course gradebook", e);
+	    log.error("Failed to load course gradebook", e);
 	    return "error";
 	}
     }
 
     /**
-     * Updates a user's mark or feedback for an entire lesson
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * Updates a user's mark or feedback for an entire lesson.
      */
     @RequestMapping(path = "/updateUserLessonGradebookData", method = RequestMethod.POST)
-    @ResponseBody
     public void updateUserLessonGradebookData(HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -176,8 +168,7 @@ public class GradebookMonitoringController {
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
 	User learner = (User) userManagementService.findById(User.class, userID);
 	if (learner == null) {
-	    GradebookMonitoringController.log
-		    .error("User with ID " + userID + " could not be found to update his lesson gradebook");
+	    log.error("User with ID " + userID + " could not be found to update his lesson gradebook");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "User could not be found");
 	}
 
@@ -191,18 +182,10 @@ public class GradebookMonitoringController {
 	if (feedback != null) {
 	    gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
 	}
-
     }
 
     /**
-     * Updates a user's mark or feedback for an activity, then aggregates their total lesson mark
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * Updates a user's mark or feedback for an activity, then aggregates their total lesson mark.
      */
     @RequestMapping(path = "/updateUserActivityGradebookData", method = RequestMethod.POST)
     @ResponseBody
@@ -231,15 +214,13 @@ public class GradebookMonitoringController {
 
 	Activity activity = gradebookService.getActivityById(activityID);
 	if ((activity == null) || !activity.isToolActivity()) {
-	    GradebookMonitoringController.log
-		    .error("Activity with ID " + activityID + " could not be found or it is not a Tool Activity");
+	    log.error("Activity with ID " + activityID + " could not be found or it is not a Tool Activity");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong activity");
 	}
 
 	User learner = (User) userManagementService.findById(User.class, userID);
 	if (learner == null) {
-	    GradebookMonitoringController.log
-		    .error("User with ID " + userID + " could not be found to update his activity gradebook");
+	    log.error("User with ID " + userID + " could not be found to update his activity gradebook");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "User could not be found");
 	}
 
@@ -270,14 +251,7 @@ public class GradebookMonitoringController {
     }
 
     /**
-     * Toggles the release mark flag for a lesson
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * Toggles the release mark flag for a lesson.
      */
     @RequestMapping("/toggleReleaseMarks")
     @ResponseBody
@@ -305,8 +279,8 @@ public class GradebookMonitoringController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
 
-	if (GradebookMonitoringController.log.isDebugEnabled()) {
-	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet lesson: " + lessonID);
+	if (log.isDebugEnabled()) {
+	    log.debug("Exporting to a spreadsheet lesson: " + lessonID);
 	}
 	Lesson lesson = lessonService.getLesson(lessonID);
 	String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xlsx";
@@ -314,7 +288,7 @@ public class GradebookMonitoringController {
 
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-	GradebookMonitoringController.log.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
+	log.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
 	ServletOutputStream out = response.getOutputStream();
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportLessonGradebook(lesson);
@@ -343,8 +317,8 @@ public class GradebookMonitoringController {
 	}
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
-	if (GradebookMonitoringController.log.isDebugEnabled()) {
-	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet course: " + organisationID);
+	if (log.isDebugEnabled()) {
+	    log.debug("Exporting to a spreadsheet course: " + organisationID);
 	}
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportCourseGradebook(user.getUserID(),
 		organisationID);
@@ -384,9 +358,9 @@ public class GradebookMonitoringController {
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
-	if (GradebookMonitoringController.log.isDebugEnabled()) {
-	    GradebookMonitoringController.log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds)
-		    + " from course: " + organisationID);
+	if (log.isDebugEnabled()) {
+	    log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds) + " from course: "
+		    + organisationID);
 	}
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService
 		.exportSelectedLessonsGradebook(user.getUserID(), organisationID, lessonIds, simplified);

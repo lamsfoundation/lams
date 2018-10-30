@@ -101,14 +101,7 @@ public class GradebookController {
      * User view will get the grid data for a specified user, which is all their activity marks/outputs etc
      *
      * Activity view will get the grid data for all activities, without user info, instead there is an average mark for
-     * each activity
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * each activity.
      */
     @RequestMapping("/getActivityGridData")
     @ResponseBody
@@ -291,14 +284,7 @@ public class GradebookController {
      * Activity view will take an extra parameter (activityID) and instead show the user's mark just for one activity
      *
      * Course monitor view gets the same as the user view, but the link is set to the lesson level gradebook instead of
-     * learner
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * learner.
      */
     @RequestMapping("/getUserGridData")
     @ResponseBody
@@ -376,7 +362,7 @@ public class GradebookController {
 
 		} else {
 		    // return null and the grid will report an error
-		    GradebookController.logger.error("No activity found for: " + activityID);
+		    logger.error("No activity found for: " + activityID);
 		    return null;
 		}
 	    }
@@ -416,14 +402,7 @@ public class GradebookController {
      *
      * Learner view will get the data specific to one user
      *
-     * Monitor will get the data average for whole lessons
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * Monitor will get the data average for whole lessons.
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/getCourseGridData")
@@ -500,8 +479,7 @@ public class GradebookController {
 
 	if ((organisation == null) || (user == null) || (viewer == null)) {
 	    // Grid will handle error, just log and return null
-	    GradebookController.logger
-		    .error("Error: request for course gradebook data with null course or user. CourseID: " + courseID);
+	    logger.error("Error: request for course gradebook data with null course or user. CourseID: " + courseID);
 	    return null;
 	}
 	List<GBLessonGridRowDTO> gradebookLessonDTOs = gradebookService.getGBLessonRows(organisation, user, viewer,
@@ -524,14 +502,7 @@ public class GradebookController {
     }
 
     /**
-     * Gets the total mark for a user's lesson and writes the result in the response
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     * Gets the total mark for a user's lesson and writes the result in the response.
      */
     @RequestMapping("/getLessonMarkAggregate")
     @ResponseBody
@@ -563,21 +534,13 @@ public class GradebookController {
 	    }
 	} else {
 	    // Grid will handle error, just log and return null
-	    GradebookController.logger
-		    .error("Error: request for course gradebook data with null user or lesson. lessonID: " + lessonID);
+	    logger.error("Error: request for course gradebook data with null user or lesson. lessonID: " + lessonID);
 	}
 	return null;
     }
 
     /**
      * Gets the average mark for an activity and writes the result in the response
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/getActivityMarkAverage")
@@ -614,26 +577,18 @@ public class GradebookController {
 	Double averageMark = gradebookService.getAverageMarkForActivity(activityID, groupID);
 	response.setContentType("text/plain, charset=utf-8");
 	if (averageMark != null) {
-
 	    return GradebookUtil.niceFormatting(averageMark);
+	    
 	} else {
-
 	    return GradebookConstants.CELL_EMPTY;
 	}
-
     }
 
     /**
      * Gets the average mark for lesson and writes the result in the response
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     @RequestMapping("/getAverageMarkForLesson")
+    @ResponseBody
     public String getAverageMarkForLesson(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average", false)) {
@@ -645,10 +600,9 @@ public class GradebookController {
 
 	response.setContentType("text/plain; charset=utf-8");
 	if (averageMark != null) {
-
 	    return GradebookUtil.niceFormatting(averageMark);
+	    
 	} else {
-
 	    return GradebookConstants.CELL_EMPTY;
 	}
     }
