@@ -29,17 +29,19 @@ import java.util.List;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumConfigItem;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
-import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.model.Attachment;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
+import org.lamsfoundation.lams.tool.forum.model.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.model.ForumConfigItem;
+import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.Message;
+import org.lamsfoundation.lams.tool.forum.model.MessageSeq;
+import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -298,6 +300,9 @@ public interface IForumService {
      * @return
      */
     List<MessageDTO> getAllTopicsFromSession(Long sessionID);
+
+    /** From ToolSessionManager interface */
+    String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
 
     // ************************************************************************************
     // User Method

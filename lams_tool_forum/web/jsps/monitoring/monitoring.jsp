@@ -2,7 +2,7 @@
         
 
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.forum.ForumConstants"%>
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>

@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.tool.forum.web.forms;
 
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**

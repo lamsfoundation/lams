@@ -1,6 +1,6 @@
 package org.lamsfoundation.lams.tool.forum.dto;
 
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
 
 public class UserDTO {
 

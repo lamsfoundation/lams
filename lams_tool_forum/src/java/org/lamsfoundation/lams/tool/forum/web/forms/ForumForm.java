@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.forum.web.forms;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
 
 /**
  *

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.forum.ForumConstants"%>
 
 <%@ include file="/common/taglibs.jsp"%>
 

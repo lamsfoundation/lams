@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.forum.util;
 import java.util.Comparator;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 
 /**
  * For finding topic order in Forum conditions.

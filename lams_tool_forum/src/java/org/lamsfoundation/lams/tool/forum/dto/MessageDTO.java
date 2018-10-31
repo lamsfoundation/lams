@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.ForumReport;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 
 public class MessageDTO {
 

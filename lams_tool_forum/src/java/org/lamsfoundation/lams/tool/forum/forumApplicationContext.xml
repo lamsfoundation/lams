@@ -17,53 +17,53 @@
 	</bean>
 
 	<!-- core beans -->
-	<bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.ForumDao">
+	<bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.dao.hibernate.ForumDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 	<bean id="forumUserDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.ForumUserDao">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.ForumUserDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 
 	<bean id="attachmentDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.AttachmentDao">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.AttachmentDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 
 	<bean id="messageDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.MessageDao">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.MessageDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 
 	<bean id="timestampDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.TimestampDao">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.TimestampDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 
 	<bean id="messageSeqDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.MessageSeqDao">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.MessageSeqDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 	<bean id="messageRatingDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.MessageRatingDAO">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.MessageRatingDAO">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
 	<bean id="forumToolSessionDao"
-		class="org.lamsfoundation.lams.tool.forum.persistence.hibernate.ForumToolSessionDao">
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.ForumToolSessionDao">
 		<property name="sessionFactory">
 			<ref bean="coreSessionFactory" />
 		</property>
@@ -151,9 +151,6 @@
 		</property>
 		<property name="target">
 			<ref bean="forumManagerTarget" />
-		</property>
-		<property name="proxyTargetClass">
-			<value>false</value>
 		</property>
 		<property name="preInterceptors">
 			<list>

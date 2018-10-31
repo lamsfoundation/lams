@@ -25,7 +25,7 @@
 
 package org.lamsfoundation.lams.tool.forum.util;
 
-import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE;
+import static org.lamsfoundation.lams.tool.forum.ForumConstants.OLD_FORUM_STYLE;
 
 import java.util.Comparator;
 import java.util.Date;

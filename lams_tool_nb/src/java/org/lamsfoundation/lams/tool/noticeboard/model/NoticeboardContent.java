@@ -105,6 +105,7 @@ public class NoticeboardContent implements Serializable {
     
     /** default constructor */
     public NoticeboardContent() {
+	this.nbSessions = new HashSet<NoticeboardSession>();
     }
 
     /** full constructor */
@@ -125,6 +126,7 @@ public class NoticeboardContent implements Serializable {
 	this.allowComments = allowComments;
 	this.commentsLikeAndDislike = commentsLikeAndDislike;
 	this.allowAnonymous = allowAnonymous;
+	this.nbSessions = new HashSet<NoticeboardSession>();
     }
 
     /**
@@ -245,9 +247,6 @@ public class NoticeboardContent implements Serializable {
     }
 
     public Set<NoticeboardSession> getNbSessions() {
-	if (this.nbSessions == null) {
-	    setNbSessions(new HashSet<NoticeboardSession>());
-	}
 	return nbSessions;
     }
 

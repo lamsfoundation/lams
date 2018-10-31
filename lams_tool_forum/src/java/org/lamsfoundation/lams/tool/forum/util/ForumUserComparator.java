@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
 
 public class ForumUserComparator implements Comparator<ForumUser> {
     @Override

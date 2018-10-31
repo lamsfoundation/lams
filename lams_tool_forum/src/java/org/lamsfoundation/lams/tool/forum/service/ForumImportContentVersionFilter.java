@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
 
 /**
  * Import filter class for different version of Forum content.

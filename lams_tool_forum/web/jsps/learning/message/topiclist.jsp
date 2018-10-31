@@ -1,4 +1,4 @@
-<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
+<%@ page import="org.lamsfoundation.lams.tool.forum.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>

@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.forum.dto;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
 
 /**
  * @author Anthony Sukkar

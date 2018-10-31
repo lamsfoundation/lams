@@ -29,8 +29,8 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;

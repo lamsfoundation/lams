@@ -100,7 +100,7 @@ public class NoticeboardSession implements Serializable {
 
     /** default constructor */
     public NoticeboardSession() {
-
+	this.nbUsers = new HashSet<NoticeboardUser>();
     }
 
     /** full constructor */
@@ -113,6 +113,7 @@ public class NoticeboardSession implements Serializable {
 	this.sessionStartDate = sessionStartDate;
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStatus = sessionStatus;
+	this.nbUsers = new HashSet<NoticeboardUser>();
     }
 
     /**
@@ -135,6 +136,7 @@ public class NoticeboardSession implements Serializable {
 	this.nbContent = nbContent;
 	this.sessionStartDate = new Date(System.currentTimeMillis());
 	this.sessionStatus = NoticeboardSession.INCOMPLETE;
+	this.nbUsers = new HashSet<NoticeboardUser>();
     }
 
     public NoticeboardSession(Long nbSessionId, String nbSessionName) {
@@ -142,12 +144,14 @@ public class NoticeboardSession implements Serializable {
 	this.nbSessionName = nbSessionName;
 	this.sessionStartDate = new Date(System.currentTimeMillis());
 	this.sessionStatus = NoticeboardSession.INCOMPLETE;
+	this.nbUsers = new HashSet<NoticeboardUser>();
     }
 
     public NoticeboardSession(Long nbSessionId) {
 	this.nbSessionId = nbSessionId;
 	this.sessionStartDate = new Date(System.currentTimeMillis());
 	this.sessionStatus = NoticeboardSession.INCOMPLETE;
+	this.nbUsers = new HashSet<NoticeboardUser>();
     }
 
      public NoticeboardContent getNbContent() {
@@ -207,10 +211,6 @@ public class NoticeboardSession implements Serializable {
     }
 
      public Set<NoticeboardUser> getNbUsers() {
-	if (this.nbUsers == null) {
-	    setNbUsers(new HashSet<NoticeboardUser>());
-	}
-
 	return nbUsers;
     }
 
