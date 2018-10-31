@@ -27,17 +27,51 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class KumalivePoll implements Serializable {
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "lams_kumalive_poll")
+public class KumalivePoll implements Serializable {
     private static final long serialVersionUID = 5154401897739494150L;
 
+    @Id
+    @Column(name = "poll_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pollId;
+    
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "kumalive_id")
     private Kumalive kumalive;
+    
+    @Column
     private String name;
+    
+    @Column(name = "votes_released")
     private Boolean votesReleased;
+    
+    @Column(name = "voters_released")
     private Boolean votersReleased;
+    
+    @Column(name = "start_date")
     private Date startDate;
+    
+    @Column(name = "finish_date")
     private Date finishDate;
+    
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "poll_id")
+    @OrderBy("order_id ASC")
     private Set<KumalivePollAnswer> answers;
 
     public KumalivePoll() {

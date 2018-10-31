@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.learning.kumalive.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learning.kumalive.dao.IKumaliveDAO;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
@@ -83,10 +83,9 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
 	return (List<Kumalive>) doFind(query.toString(), organisationId);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Kumalive> findKumalives(List<Long> kumaliveIds) {
-	Query query = getSession().createQuery(FIND_KUMALIVES_BY_IDS);
+	Query<Kumalive> query = getSession().createQuery(FIND_KUMALIVES_BY_IDS, Kumalive.class);
 	query.setParameterList("ids", kumaliveIds);
 	return query.list();
     }

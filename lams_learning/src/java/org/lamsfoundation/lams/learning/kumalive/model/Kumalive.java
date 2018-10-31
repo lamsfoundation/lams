@@ -23,21 +23,53 @@
 package org.lamsfoundation.lams.learning.kumalive.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_kumalive")
 public class Kumalive implements Serializable {
-
     private static final long serialVersionUID = -7932572065216398930L;
 
+    @Id
+    @Column(name = "kumalive_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long kumaliveId;
+    
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
+    
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private User createdBy;
+    
+    @Column
     private String name;
+    
+    @Column
     private Boolean finished = false;
-    private Set<KumaliveRubric> rubrics;
+    
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "kumalive_id")
+    @OrderBy("order_id ASC")
+    private Set<KumaliveRubric> rubrics = new HashSet<>();
 
     public Kumalive() {
     }

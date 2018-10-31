@@ -24,15 +24,39 @@ package org.lamsfoundation.lams.learning.kumalive.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_kumalive_score")
 public class KumaliveScore implements Serializable {
     private static final long serialVersionUID = -5191089091527630037L;
 
+    @Id
+    @Column(name = "score_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scoreId;
+    
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "rubric_id")
     private KumaliveRubric rubric;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
+    
+    @Column
     private Long batch;
+    
+    @Column
     private Short score;
 
     public KumaliveScore() {

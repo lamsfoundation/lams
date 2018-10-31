@@ -27,25 +27,39 @@ package org.lamsfoundation.lams.learning.presence.model;
 
 import java.util.Date;
 
-/**
- *
- */
-public class PresenceChatMessage implements java.io.Serializable, Cloneable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "lams_presence_chat_msgs")
+public class PresenceChatMessage implements java.io.Serializable, Cloneable {
+    private static final long serialVersionUID = -8892809174427080723L;
+
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "lesson_id")
     private Long lessonId;
 
+    @Column(name = "from_user")
     private String from;
 
+    @Column(name = "to_user")
     private String to;
 
+    @Column(name = "date_sent")
     private Date dateSent;
 
+    @Column
     private String message;
 
     public PresenceChatMessage() {
-
     }
 
     public PresenceChatMessage(Long lessonId, String from, String to, Date dateSent, String message) {
@@ -57,9 +71,6 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	this.message = message;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -68,9 +79,6 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     */
     public Long getLessonId() {
 	return lessonId;
     }
@@ -79,9 +87,6 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	this.lessonId = lessonId;
     }
 
-    /**
-     *
-     */
     public String getFrom() {
 	return from;
     }
@@ -90,9 +95,6 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	this.from = from;
     }
 
-    /**
-     *
-     */
     public String getTo() {
 	return to;
     }
@@ -101,9 +103,6 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	this.to = to;
     }
 
-    /**
-     *
-     */
     public Date getDateSent() {
 	return dateSent;
     }
@@ -112,9 +111,6 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	this.dateSent = dateSent;
     }
 
-    /**
-     *
-     */
     public String getMessage() {
 	return message;
     }

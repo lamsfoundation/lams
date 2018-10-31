@@ -24,16 +24,39 @@ package org.lamsfoundation.lams.learning.kumalive.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
+@Entity
+@Table(name = "lams_kumalive_rubric")
 public class KumaliveRubric implements Serializable {
-
     private static final long serialVersionUID = 1425357203513480609L;
 
+    @Id
+    @Column(name = "rubric_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rubricId;
+    
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
+    
+    @ManyToOne
+    @JoinColumn(name = "kumalive_id")
     private Kumalive kumalive;
+    
+    @Column(name = "order_id")
     private Short orderId;
+    
+    @Column
     private String name;
 
     public KumaliveRubric() {

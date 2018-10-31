@@ -26,19 +26,36 @@ package org.lamsfoundation.lams.learning.command.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Stores a command to be sent to a learner via websocket.
  */
+@Entity
+@Table(name = "lams_learning_command")
 public class Command implements Serializable {
+    private static final long serialVersionUID = 8662126292341034144L;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "lesson_id")
     private Long lessonId;
 
+    @Column(name = "user_name")
     private String userName;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "command_text")
     private String commandText;
 
     public Command() {
