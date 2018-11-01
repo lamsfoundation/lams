@@ -84,7 +84,7 @@ public class QaPedagogicalPlannerController {
 		} else {
 		    if (questionIndex < qaContent.getQaQueContents().size()) {
 			QaQueContent qaQuestion = qaService
-				.getQuestionByContentAndDisplayOrder((long) questionIndex + 1, qaContent.getUid());
+				.getQuestionByContentAndDisplayOrder(questionIndex + 1, qaContent.getUid());
 			qaQuestion.setQuestion(question);
 			qaService.saveOrUpdateQuestion(qaQuestion);
 
@@ -103,7 +103,7 @@ public class QaPedagogicalPlannerController {
 		qaService.removeQuestionsFromCache(qaContent);
 		qaService.removeQaContentFromCache(qaContent);
 		for (; questionIndex < qaContent.getQaQueContents().size(); questionIndex++) {
-		    QaQueContent qaQuestion = qaService.getQuestionByContentAndDisplayOrder((long) questionIndex + 1,
+		    QaQueContent qaQuestion = qaService.getQuestionByContentAndDisplayOrder(questionIndex + 1,
 			    qaContent.getUid());
 		    qaService.removeQuestion(qaQuestion);
 		}

@@ -12,7 +12,7 @@ public class PixlrConfigItemDAO extends LAMSBaseDAO implements IPixlrConfigItemD
 
     @Override
     public PixlrConfigItem getConfigItemByKey(final String configKey) {
-	return (PixlrConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+	return (PixlrConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setParameter("key", configKey)
 		.uniqueResult();
 
     }

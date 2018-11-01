@@ -35,7 +35,7 @@ public class CommonCartridgeConfigItemDAOHibernate extends LAMSBaseDAO implement
 
     @Override
     public CommonCartridgeConfigItem getConfigItemByKey(final String configKey) {
-	return (CommonCartridgeConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+	return (CommonCartridgeConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setParameter("key", configKey)
 		.uniqueResult();
     }
 

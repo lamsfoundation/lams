@@ -28,11 +28,9 @@ package org.lamsfoundation.lams.tool.forum.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.LockOptions;
-import org.hibernate.SQLQuery;
-import org.hibernate.type.StringType;
+import org.hibernate.query.NativeQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.forum.dao.IMessageDAO;
-import org.lamsfoundation.lams.tool.forum.model.ForumUser;
 import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.springframework.stereotype.Repository;
 
@@ -127,8 +125,8 @@ public class MessageDao extends LAMSBaseDAO implements IMessageDAO {
     
     @Override
     public Object[] getDateRangeOfMessages(Long userUid) {
-	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
-		.setLong("userUid", userUid);
+	NativeQuery<?> query =  getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setParameter("userUid", userUid);
 	Object[] values = (Object[]) query.list().get(0);
 	return values;
     }

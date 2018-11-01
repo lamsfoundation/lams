@@ -31,8 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
@@ -106,11 +106,11 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		.append(LOAD_USERS_JOINS)
 		.append(sortOrder);
 	
-	SQLQuery query = getSession().createSQLQuery(bldr.toString());
-	query.setLong("sessionId", sessionId);
+	NativeQuery query = getSession().createNativeQuery(bldr.toString());
+	query.setParameter("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
+	query.setParameter("searchString", searchString);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
@@ -160,13 +160,13 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		+ " WHEN :sortBy='completed' THEN visitLog.complete "
 		+ " WHEN :sortBy='accessDate' THEN visitLog.access_date " + " END " + sortOrder;
 
-	SQLQuery query = getSession().createSQLQuery(LOAD_USERS);
-	query.setLong("sessionId", sessionId);
-	query.setLong("taskListItemUid", taskListItemUid);
+	NativeQuery query = getSession().createNativeQuery(LOAD_USERS);
+	query.setParameter("sessionId", sessionId);
+	query.setParameter("taskListItemUid", taskListItemUid);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
-	query.setString("sortBy", sortBy);
+	query.setParameter("searchString", searchString);
+	query.setParameter("sortBy", sortBy);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();

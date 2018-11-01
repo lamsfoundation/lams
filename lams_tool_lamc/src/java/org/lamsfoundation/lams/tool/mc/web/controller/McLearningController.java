@@ -594,7 +594,7 @@ public class McLearningController {
 	//create attemptMap for displaying on jsp
 	Map<String, McUsrAttempt> attemptMap = new TreeMap<String, McUsrAttempt>(new McComparator());
 	for (int i = 1; i <= mcContent.getMcQueContents().size(); i++) {
-	    McQueContent question = mcService.getQuestionByDisplayOrder(new Long(i), toolContentUID);
+	    McQueContent question = mcService.getQuestionByDisplayOrder(i, toolContentUID);
 
 	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(user.getUid(), question.getUid());
 

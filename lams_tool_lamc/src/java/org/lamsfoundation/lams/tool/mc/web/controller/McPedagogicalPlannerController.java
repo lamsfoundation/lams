@@ -105,7 +105,7 @@ public class McPedagogicalPlannerController {
 		    plannerForm.removeQuestion(questionIndex - 1);
 		} else {
 		    if (questionIndex <= mcContent.getMcQueContents().size()) {
-			McQueContent mcQueContent = mcService.getQuestionByDisplayOrder((long) questionIndex,
+			McQueContent mcQueContent = mcService.getQuestionByDisplayOrder(questionIndex,
 				mcContent.getUid());
 			mcQueContent.setQuestion(question);
 			int candidateAnswerDTOIndex = 0;
@@ -148,7 +148,7 @@ public class McPedagogicalPlannerController {
 		}
 	    } while (questionIndex <= plannerForm.getQuestionCount());
 	    for (; questionIndex <= mcContent.getMcQueContents().size(); questionIndex++) {
-		McQueContent mcQueContent = mcService.getQuestionByDisplayOrder((long) questionIndex,
+		McQueContent mcQueContent = mcService.getQuestionByDisplayOrder(questionIndex,
 			mcContent.getUid());
 		mcContent.getMcQueContents().remove(mcQueContent);
 		mcService.removeMcQueContent(mcQueContent);

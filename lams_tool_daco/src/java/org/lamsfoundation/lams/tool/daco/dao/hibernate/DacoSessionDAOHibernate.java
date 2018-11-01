@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.daco.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
@@ -54,7 +54,7 @@ public class DacoSessionDAOHibernate extends LAMSBaseDAO implements DacoSessionD
 
     @Override
     public DacoSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
+	List<?> list = doFind(DacoSessionDAOHibernate.FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -73,11 +73,12 @@ public class DacoSessionDAOHibernate extends LAMSBaseDAO implements DacoSessionD
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<MonitoringSummarySessionDTO> statistics(Long toolContentUid) {
-	SQLQuery query = getSession().createSQLQuery(DacoSessionDAOHibernate.CALC_SESSION_STATS);
+	NativeQuery<MonitoringSummarySessionDTO> query = getSession().createNativeQuery(DacoSessionDAOHibernate.CALC_SESSION_STATS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("numberLearners", IntegerType.INSTANCE).addScalar("totalRecordCount", IntegerType.INSTANCE)
-		.setLong("contentUid", toolContentUid)
+		.setParameter("contentUid", toolContentUid)
 		.setResultTransformer(Transformers.aliasToBean(MonitoringSessionStatsDTO.class));
 	return query.list();
 

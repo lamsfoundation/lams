@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -181,10 +181,10 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", ForumUser.class).addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 
     }
@@ -210,7 +210,7 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 		" JOIN tl_lafrum11_tool_session session ON user.session_id = session.uid and session.session_id = :sessionId");
 	buildNameSearch(queryText, searchString);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
+	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue())
 		.list();
 	if (list == null || list.size() == 0) {
 	    return 0;

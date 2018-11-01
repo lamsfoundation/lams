@@ -40,7 +40,7 @@ import org.springframework.stereotype.Repository;
 public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDetailsDAO {
 
     private static final String FIND_BY_SESSION = "from " + SubmissionDetails.class.getName()
-	    + " as d where d.submitFileSession.sessionID=?";
+	    + " as d where d.submitFileSession.sessionID=:sessionID";
     private static final String FIND_BY_SESSION_LEARNER = "from " + SubmissionDetails.class.getName()
 	    + " as d where d.submitFileSession.sessionID=? and d.learner.userID=?";
 
@@ -64,7 +64,7 @@ public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDeta
     public List<SubmissionDetails> getSubmissionDetailsBySession(Long sessionID) {
 	if (sessionID != null) {
 	    return getSessionFactory().getCurrentSession().createQuery(FIND_BY_SESSION)
-		    .setLong(0, sessionID.longValue()).list();
+		    .setParameter("sessionID", sessionID.longValue()).list();
 	}
 	return null;
     }

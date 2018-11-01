@@ -67,7 +67,7 @@ public class SubmitFilesSessionDAO extends LAMSBaseDAO implements ISubmitFilesSe
     public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID) {
 	if (contentID != null) {
 	    return getSessionFactory().getCurrentSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
-		    .setLong("contentID", contentID.longValue()).list();
+		    .setParameter("contentID", contentID.longValue()).list();
 	}
 	return null;
     }

@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -88,20 +87,20 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS);
-	query.setLong("toolContentId", toolContentId);
+	NativeQuery query = getSession().createNativeQuery(LOAD_MARKS);
+	query.setParameter("toolContentId", toolContentId);
 	List<Number> list = query.list();
 	return list;
     }
     
     @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
-	Query query = getSession().createSQLQuery(FIND_MARK_STATS)
+	NativeQuery query = getSession().createNativeQuery(FIND_MARK_STATS)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE)
 		.addScalar("num_complete", IntegerType.INSTANCE);
-	query.setLong("toolContentId", toolContentId);
+	query.setParameter("toolContentId", toolContentId);
 	@SuppressWarnings("rawtypes")
 	List list = query.list();
 	if ((list == null) || (list.size() == 0)) {

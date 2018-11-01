@@ -42,8 +42,8 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
      */
     @Override
     public QaSession getQaSessionById(long qaSessionId) {
-	String query = "from QaSession as qus where qus.qaSessionId = ?";
-	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaSessionId).list();
+	String query = "from QaSession as qus where qus.qaSessionId = :qaSessionId";
+	List<?> list = getSessionFactory().getCurrentSession().createQuery(query).setParameter("qaSessionId", qaSessionId).list();
 
 	if (list != null && list.size() > 0) {
 	    QaSession qus = (QaSession) list.get(0);

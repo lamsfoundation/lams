@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.SQLQuery;
 import org.hibernate.query.NativeQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemVisitDAO;
@@ -100,7 +99,7 @@ public class CommonCartridgeItemVisitDAOHibernate extends LAMSBaseDAO implements
     @Override
     public Object[] getDateRangeOfAccesses(Long userUid) {
 	@SuppressWarnings("unchecked")
-	NativeQuery<Object[]> query = getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+	NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
 		.setParameter("userUid", userUid);
 	Object[] values = query.list().get(0);
 	return values;

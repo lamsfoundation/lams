@@ -71,7 +71,7 @@ public class NoticeboardContentDAO extends LAMSBaseDAO implements INoticeboardCo
     @Override
     public NoticeboardContent getNbContentBySession(final Long nbSessionId) {
 	return (NoticeboardContent) getSession().createQuery(LOAD_NB_BY_SESSION)
-		.setLong("sessionId", nbSessionId.longValue()).uniqueResult();
+		.setParameter("sessionId", nbSessionId.longValue()).uniqueResult();
     }
 
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO#saveNbContent(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent) */
@@ -91,7 +91,7 @@ public class NoticeboardContentDAO extends LAMSBaseDAO implements INoticeboardCo
     public void removeNoticeboard(Long nbContentId) {
 	if (nbContentId != null) {
 	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_NB_CONTENT)
-		    .setLong("nbContentId", nbContentId.longValue()).list();
+		    .setParameter("nbContentId", nbContentId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
 		NoticeboardContent nb = (NoticeboardContent) list.get(0);

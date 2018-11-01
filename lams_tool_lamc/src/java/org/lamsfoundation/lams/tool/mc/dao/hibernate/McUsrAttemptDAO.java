@@ -79,7 +79,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     @Override
     public List<McUsrAttempt> getFinalizedUserAttempts(final Long userUid) {
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
-		.setLong("queUsrUid", userUid.longValue()).list();
+		.setParameter("queUsrUid", userUid.longValue()).list();
     }
     
     @Override
@@ -89,7 +89,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
 
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID)
-		.setLong("sessionId", sessionId).list();
+		.setParameter("sessionId", sessionId).list();
     }
     
     @Override
@@ -100,7 +100,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
 
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID)
-		.setLong("contentId", contentId).list();
+		.setParameter("contentId", contentId).list();
     }
 
     @Override
@@ -119,8 +119,8 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     @SuppressWarnings("unchecked")
     public McUsrAttempt getUserAttemptByQuestion(final Long queUsrUid, final Long mcQueContentId) {
 	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setLong("queUsrUid", queUsrUid.longValue())
-		.setLong("mcQueContentId", mcQueContentId.longValue()).list();
+		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setParameter("queUsrUid", queUsrUid.longValue())
+		.setParameter("mcQueContentId", mcQueContentId.longValue()).list();
 	if (userAttemptList.size() > 1) {
 	    throw new RuntimeException("There are more than 1 latest question attempt");
 	}
@@ -133,8 +133,8 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     @SuppressWarnings("unchecked")
     public List<McUsrAttempt> getUserAttemptsByQuestionSession(final Long sessionUid, final Long mcQueContentId) {
 	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION).setLong("sessionUid", sessionUid.longValue())
-		.setLong("mcQueContentId", mcQueContentId.longValue()).list();
+		.createQuery(LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION).setParameter("sessionUid", sessionUid.longValue())
+		.setParameter("mcQueContentId", mcQueContentId.longValue()).list();
 	return userAttemptList;
     }
 
@@ -146,7 +146,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     @Override
     public void removeAllUserAttempts(Long queUserUid) {
 	List<McUsrAttempt> userAttempts = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_ALL_QUESTION_ATTEMPTS).setLong("queUsrUid", queUserUid.longValue()).list();
+		.createQuery(LOAD_ALL_QUESTION_ATTEMPTS).setParameter("queUsrUid", queUserUid.longValue()).list();
 
 	for (McUsrAttempt userAttempt : userAttempts) {
 	    this.getSession().delete(userAttempt);

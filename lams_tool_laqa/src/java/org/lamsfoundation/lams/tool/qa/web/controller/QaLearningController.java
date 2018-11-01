@@ -517,7 +517,7 @@ public class QaLearningController implements QaAppConstants {
 
 		// store
 		if (errorMap.isEmpty()) {
-		    qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(questionIndex), false);
+		    qaService.updateResponseWithNewAnswer(answer, toolSessionID, questionIndex, false);
 		}
 	    }
 
@@ -618,18 +618,18 @@ public class QaLearningController implements QaAppConstants {
 	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT
 		    .intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		String newAnswer = request.getParameter("answer" + questionIndex);
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(questionIndex), true);
+		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, questionIndex, true);
 	    }
 
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex),
+	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Integer(currentQuestionIndex),
 		    qaContent.getUid());
 
 	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(currentQuestionIndex), true);
+		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Integer(currentQuestionIndex), true);
 	    }
 	}
     }
@@ -925,7 +925,7 @@ public class QaLearningController implements QaAppConstants {
 	// store
 	if (errorMap.isEmpty()) {
 	    qaService.updateResponseWithNewAnswer(newAnswer, qaLearningForm.getToolSessionID(),
-		    new Long(currentQuestionIndex), false);
+		    new Integer(currentQuestionIndex), false);
 	} else {
 	    request.setAttribute("errorMap", errorMap);
 	    nextQuestionOffset = 0;

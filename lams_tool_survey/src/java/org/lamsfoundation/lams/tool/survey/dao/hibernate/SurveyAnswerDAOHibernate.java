@@ -90,8 +90,9 @@ public class SurveyAnswerDAOHibernate extends LAMSBaseDAO implements SurveyAnswe
 	}
 	String sqlQuery = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT + sortingOrder;
 
-	return getSession().createQuery(sqlQuery).setLong("sessionId", sessionId.longValue())
-		.setLong("questionUid", questionUid.longValue()).setFirstResult(page * size).setMaxResults(size).list();
+	return getSession().createQuery(sqlQuery).setParameter("sessionId", sessionId.longValue())
+		.setParameter("questionUid", questionUid.longValue()).setFirstResult(page * size).setMaxResults(size)
+		.list();
     }
 
     @Override

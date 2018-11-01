@@ -27,8 +27,8 @@ package org.lamsfoundation.lams.contentrepository.dao.hibernate;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
@@ -68,10 +68,10 @@ public class CredentialDAO extends LAMSBaseDAO implements ICredentialDAO {
 	}
 
 	Session hibernateSession = getSessionFactory().getCurrentSession();
-	Query query = hibernateSession.createQuery(CredentialDAO.CHECK_CREDENTIAL_WITH_WORKSPACE);
-	query.setString("name", credential.getName());
-	query.setString("password", String.valueOf(credential.getPassword()));
-	query.setLong("workspaceId", workspace.getWorkspaceId());
+	Query<?> query = hibernateSession.createQuery(CredentialDAO.CHECK_CREDENTIAL_WITH_WORKSPACE);
+	query.setParameter("name", credential.getName());
+	query.setParameter("password", String.valueOf(credential.getPassword()));
+	query.setParameter("workspaceId", workspace.getWorkspaceId());
 
 	Long count = (Long) query.uniqueResult();
 	if (count > 2) {
@@ -96,9 +96,9 @@ public class CredentialDAO extends LAMSBaseDAO implements ICredentialDAO {
 	}
 
 	Session hibernateSession = getSessionFactory().getCurrentSession();
-	Query query = hibernateSession.createQuery(CredentialDAO.CHECK_CREDENTIAL);
-	query.setString("name", credential.getName());
-	query.setString("password", String.valueOf(credential.getPassword()));
+	Query<?> query = hibernateSession.createQuery(CredentialDAO.CHECK_CREDENTIAL);
+	query.setParameter("name", credential.getName());
+	query.setParameter("password", String.valueOf(credential.getPassword()));
 
 	Long count = (Long) query.uniqueResult();
 	if (count > 2) {

@@ -28,8 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -44,7 +43,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
-    private static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
 
     private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSession.qaSessionId= :qaSession";
     private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSession.qaSessionId= :qaSessionId";
@@ -58,8 +56,8 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
     public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) {
 
 	String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSession.qaSessionId=:qaSessionId";
-	List list = getSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue())
-		.setLong("qaSessionId", qaSessionId.longValue()).list();
+	List<?> list = getSession().createQuery(strGetUser).setParameter("queUsrId", queUsrId.longValue())
+		.setParameter("qaSessionId", qaSessionId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    QaQueUsr usr = (QaQueUsr) list.get(0);
@@ -69,9 +67,9 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
     }
 
     @Override
-    public List getUserBySessionOnly(final QaSession qaSession) {
-	List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-		.setLong("qaSessionId", qaSession.getQaSessionId().longValue()).list();
+    public List<?> getUserBySessionOnly(final QaSession qaSession) {
+	List<?> list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setParameter("qaSessionId", qaSession.getQaSessionId().longValue()).list();
 	return list;
     }
 
@@ -91,7 +89,6 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
     }
 
     private void buildNameSearch(StringBuilder queryText, String searchString) {
-	String filteredSearchString = null;
 	if (!StringUtils.isBlank(searchString)) {
 	    String[] tokens = searchString.trim().split("\\s+");
 	    for (String token : tokens) {
@@ -143,9 +140,9 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addScalar("username", StringType.INSTANCE).addScalar("fullname", StringType.INSTANCE)
-		.addScalar("notebookEntry", StringType.INSTANCE).setLong("toolSessionId", toolSessionId.longValue())
+		.addScalar("notebookEntry", StringType.INSTANCE).setParameter("toolSessionId", toolSessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 
 	return query.list();
@@ -154,14 +151,15 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
     private static final String GET_COUNT_USERS_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) FROM tl_laqa11_que_usr user "
 	    + " JOIN tl_laqa11_session session ON user.qa_session_id = session.uid AND session.qa_session_id = :toolSessionId ";
 
+    @SuppressWarnings("unchecked")
     @Override
     public int getCountUsersBySessionWithSearch(final Long toolSessionId, String searchString) {
 
 	StringBuilder queryText = new StringBuilder(GET_COUNT_USERS_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH);
 	buildNameSearch(queryText, searchString);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.setLong("toolSessionId", toolSessionId);
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
+	query.setParameter("toolSessionId", toolSessionId);
 	List list = query.list();
 
 	if (list == null || list.size() == 0) {

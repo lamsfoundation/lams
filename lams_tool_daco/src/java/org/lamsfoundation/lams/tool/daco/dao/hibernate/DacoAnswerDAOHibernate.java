@@ -48,6 +48,7 @@ public class DacoAnswerDAOHibernate extends LAMSBaseDAO implements DacoAnswerDAO
 	    + DacoAnswer.class.getName() + " AS a WHERE a.user.session.sessionId=:sessionId";
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<QuestionSummaryDTO> getQuestionSummaries(Long userUid, List<QuestionSummaryDTO> summaries) {
 
 	List<Object[]> result = (List<Object[]>) doFindByNamedParam(DacoAnswerDAOHibernate.FIND_USER_NUMBER_SUMMARY,

@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -54,7 +54,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
     @Override
     public SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List<?> list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -63,7 +63,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
     @Override
     public SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List<?> list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -78,7 +78,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
     @Override
     public int getCountFinishedUsers(Long sessionId) {
-	List list = doFind(GET_COUNT_FINISHED_USERS_FOR_SESSION, new Object[] { sessionId });
+	List<?> list = doFind(GET_COUNT_FINISHED_USERS_FOR_SESSION, new Object[] { sessionId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -125,11 +125,11 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SurveyUser.class).addScalar("answerChoices", StringType.INSTANCE)
 		.addScalar("answerText", StringType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("sessionId", sessionId.longValue())
-		.setLong("questionId", questionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.setParameter("sessionId", sessionId.longValue())
+		.setParameter("questionId", questionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 
@@ -154,7 +154,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 		" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
+	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue())
 		.list();
 	if (list == null || list.size() == 0) {
 	    return 0;
@@ -207,10 +207,10 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SurveyUser.class).addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 
@@ -224,8 +224,8 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
     /** Returns < [surveySession, numUsers] ... [surveySession, numUsers]> */
     public List<Object[]> getStatisticsBySession(final Long contentId) {
 
-	SQLQuery query = getSession().createSQLQuery(GET_STATISTICS);
-	query.addEntity(SurveySession.class).addScalar("numUsers", IntegerType.INSTANCE).setLong("contentId",
+	NativeQuery<Object[]> query = getSession().createNativeQuery(GET_STATISTICS);
+	query.addEntity(SurveySession.class).addScalar("numUsers", IntegerType.INSTANCE).setParameter("contentId",
 		contentId);
 	return query.list();
     }

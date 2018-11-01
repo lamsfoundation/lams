@@ -69,8 +69,8 @@ public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserD
     @Override
     public NoticeboardUser getNbUserBySession(Long userId, Long sessionId) {
 	List usersReturned = getSessionFactory().getCurrentSession().createQuery(FIND_NB_USER_BY_SESSION)
-		.setLong("userId", userId.longValue())
-		.setLong("sessionId", sessionId.longValue()).list();
+		.setParameter("userId", userId.longValue())
+		.setParameter("sessionId", sessionId.longValue()).list();
 
 	if (usersReturned != null && usersReturned.size() > 0) {
 	    NoticeboardUser nb = (NoticeboardUser) usersReturned.get(0);

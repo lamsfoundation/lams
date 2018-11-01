@@ -40,9 +40,6 @@ public class MindmapSessionDAO extends LAMSBaseDAO implements IMindmapSessionDAO
     public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + MindmapSession.class.getName()
 	    + " where session_id = ?";
 
-    public static final String SQL_QUERY_FIND_BY_MINDMAP_ID = "from " + MindmapSession.class.getName()
-	    + " ms where ms.mindmap.uid = ?";
-
     @Override
     public void saveOrUpdate(MindmapSession session) {
 	getSession().saveOrUpdate(session);

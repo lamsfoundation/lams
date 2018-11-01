@@ -25,8 +25,8 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -40,16 +40,16 @@ import org.springframework.stereotype.Repository;
 public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements AssessmentResultDAO {
 
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
+	    + " AS r WHERE r.user.userId = :userId AND r.assessment.uid=:uid AND r.latest=1";
     
     private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT (r.finishDate IS NOT NULL) FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND r.latest=1";
+	    + " AS r WHERE r.user.userId = :userId AND r.assessment.uid=:uid AND r.latest=1";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
     private static final String FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
+	    + " AS r WHERE r.user.userId = :userId AND r.assessment.uid=:uid AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=?";
@@ -58,7 +58,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
     private static final String FIND_LAST_FINISHED_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) AND r.latest=1";
+	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1";
@@ -68,7 +68,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
 
     private static final String LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
+	    + " AS r WHERE r.user.userId=:userId AND r.assessment.uid=:uid AND (r.finishDate != null) AND r.latest=1";
 
     private static final String LAST_ASSESSMENT_RESULT_GRADES_BY_CONTENT_ID = "select r.user.userId, r.grade FROM "
 	    + AssessmentResult.class.getName()
@@ -76,7 +76,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     private static final String BEST_SCORE_BY_SESSION_AND_USER = "SELECT MAX(r.grade) FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null)";
+	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null)";
 
     private static final String BEST_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, MAX(r.grade) FROM "
 	    + AssessmentResult.class.getName()
@@ -84,11 +84,11 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     private static final String FIRST_SCORE_BY_SESSION_AND_USER = "SELECT r.grade FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
+	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
     private static final String AVERAGE_SCORE_BY_SESSION_AND_USER = "SELECT AVG(r.grade) FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null)";
+	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null)";
 
     private static final String AVERAGE_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, AVG(r.grade) FROM "
 	    + AssessmentResult.class.getName()
@@ -121,8 +121,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	Query q = getSession().createQuery(FIND_LAST_BY_ASSESSMENT_AND_USER);
-	q.setParameter(0, userId);
-	q.setParameter(1, assessmentUid);
+	q.setParameter("userId", userId);
+	q.setParameter("uid", assessmentUid);
 	return (AssessmentResult) q.uniqueResult();
     }
     
@@ -131,8 +131,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	Assessment assessment = user.getAssessment() == null ? user.getSession().getAssessment() : user.getAssessment();
 	
 	Query q = getSession().createQuery(FIND_WHETHER_LAST_RESULT_FINISHED);
-	q.setParameter(0, user.getUserId());
-	q.setParameter(1, assessment.getUid());
+	q.setParameter("userId", user.getUserId());
+	q.setParameter("uid", assessment.getUid());
 	return (Boolean) q.uniqueResult();
     }
 
@@ -140,8 +140,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 
 	Query q = getSession().createQuery(FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER);
-	q.setParameter(0, userId);
-	q.setParameter(1, assessmentUid);
+	q.setParameter("userId", userId);
+	q.setParameter("uid", assessmentUid);
 	return (AssessmentResult) q.uniqueResult();
     }
 
@@ -149,8 +149,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
 
 	Query q = getSession().createQuery(LAST_ASSESSMENT_RESULT_GRADE);
-	q.setParameter(0, userId);
-	q.setParameter(1, assessmentUid);
+	q.setParameter("userId", userId);
+	q.setParameter("uid", assessmentUid);
 	Object lastTotalScore = q.uniqueResult();
 	
 	return (lastTotalScore == null) ? 0 : (Float)lastTotalScore;
@@ -166,8 +166,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
 	Query q = getSession().createQuery(BEST_SCORE_BY_SESSION_AND_USER);
-	q.setParameter(0, userId);
-	q.setParameter(1, sessionId);
+	q.setParameter("userId", userId);
+	q.setParameter("sessionId", sessionId);
 	return ((Float) q.uniqueResult());
     }
 
@@ -180,8 +180,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
 	Query q = getSession().createQuery(FIRST_SCORE_BY_SESSION_AND_USER);
-	q.setParameter(0, userId);
-	q.setParameter(1, sessionId);
+	q.setParameter("userId", userId);
+	q.setParameter("sessionId", sessionId);
 	q.setMaxResults(1);
 	return ((Float) q.uniqueResult());
     }
@@ -195,8 +195,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		+ "INNER JOIN (SELECT user_uid, MIN(start_date) AS startDate FROM tl_laasse10_assessment_result WHERE finish_date IS NOT NULL GROUP BY user_uid) firstRes "
 		+ "ON (res.user_uid = firstRes.user_uid AND res.start_date = firstRes.startDate) GROUP BY res.user_uid";
 
-	SQLQuery query = getSession().createSQLQuery(FIRST_SCORES_BY_CONTENT_ID);
-	query.setLong("contentId", toolContentId);
+	NativeQuery query = getSession().createNativeQuery(FIRST_SCORES_BY_CONTENT_ID);
+	query.setParameter("contentId", toolContentId);
 	List<Object[]> list = query.list();
 	return convertResultsToAssessmentUserDTOList(list);
     }
@@ -204,8 +204,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
 	Query q = getSession().createQuery(AVERAGE_SCORE_BY_SESSION_AND_USER);
-	q.setParameter(0, userId);
-	q.setParameter(1, sessionId);
+	q.setParameter("userId", userId);
+	q.setParameter("sessionId", sessionId);
 	Object result = q.uniqueResult();
 	return result == null ? null : ((Double) result).floatValue();
     }
@@ -230,8 +230,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public AssessmentResult getLastFinishedAssessmentResultByUser(Long sessionId, Long userId) {
 	Query q = getSession().createQuery(FIND_LAST_FINISHED_BY_SESSION_AND_USER);
-	q.setParameter(0, userId);
-	q.setParameter(1, sessionId);
+	q.setParameter("userId", userId);
+	q.setParameter("sessionId", sessionId);
 	return (AssessmentResult) q.uniqueResult();
     }
 
@@ -283,8 +283,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid AND optionAnswer.answer_boolean=1 AND optionAnswer.question_option_uid = :optionUid "
 		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1";
 
-	SQLQuery query = getSession().createSQLQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
-	query.setLong("optionUid", optionUid);
+	NativeQuery query = getSession().createNativeQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	query.setParameter("optionUid", optionUid);
 	List list = query.list();
 	if (list == null || list.size() == 0) {
 	    return 0;
