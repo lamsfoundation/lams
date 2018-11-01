@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -50,7 +50,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 
     @Override
     public SpreadsheetUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List<?> list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -59,7 +59,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 
     @Override
     public SpreadsheetUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List<?> list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -136,10 +136,10 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SpreadsheetUser.class).addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.setParameter("sessionId", sessionId).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 
@@ -164,8 +164,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 		" JOIN tl_lasprd10_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
-		.list();
+	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId).list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

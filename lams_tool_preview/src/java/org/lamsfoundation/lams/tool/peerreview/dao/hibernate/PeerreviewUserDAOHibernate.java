@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
@@ -124,8 +124,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     @Override
     public int createUsersForSession(final PeerreviewSession session) {
 
-	SQLQuery query = getSession().createSQLQuery(CREATE_USERS);
-	query.setLong("session_uid", session.getUid()).setLong("tool_session_id", session.getSessionId());
+	NativeQuery<?> query = getSession().createNativeQuery(CREATE_USERS);
+	query.setParameter("session_uid", session.getUid()).setParameter("tool_session_id", session.getSessionId());
 	return query.executeUpdate();
     }
     
@@ -202,12 +202,12 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     	bldr.append(sortingOrder);
     	
 	String queryString = bldr.toString();
-	Query query = getSession().createSQLQuery(queryString)
-		.setLong("toolContentId", toolContentId)
-		.setLong("toolSessionId", toolSessionId)
-		.setLong("ratingCriteriaId", criteria.getRatingCriteriaId());
+	NativeQuery<?> query = getSession().createNativeQuery(queryString)
+		.setParameter("toolContentId", toolContentId)
+		.setParameter("toolSessionId", toolSessionId)
+		.setParameter("ratingCriteriaId", criteria.getRatingCriteriaId());
 	if ( queryString.contains(":userId") ) {
-		query.setLong("userId", userId);
+		query.setParameter("userId", userId);
 	}
 	if ( page != null && size != null ) {
 	    query.setFirstResult(page * size).setMaxResults(size);
@@ -231,11 +231,11 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId ) {
-	Query query = getSession().createSQLQuery(SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM)
-		.setLong("toolContentId", toolContentId)
-		.setLong("toolSessionId", toolSessionId)
-		.setLong("ratingCriteriaId", criteriaId)
-		.setLong("itemId", itemId);
+	NativeQuery<?> query = getSession().createNativeQuery(SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM)
+		.setParameter("toolContentId", toolContentId)
+		.setParameter("toolSessionId", toolSessionId)
+		.setParameter("ratingCriteriaId", criteriaId)
+		.setParameter("itemId", itemId);
 	return (List<Object[]>) query.list();
     }
 
@@ -282,10 +282,10 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     	bldr.append(sortingOrder);
     	
 	String queryString = bldr.toString();
-	Query query = getSession().createSQLQuery(queryString)
-		.setLong("toolContentId", toolContentId)
-		.setLong("toolSessionId", toolSessionId)
-		.setLong("ratingCriteriaId", criteria.getRatingCriteriaId());
+	NativeQuery<?> query = getSession().createNativeQuery(queryString)
+		.setParameter("toolContentId", toolContentId)
+		.setParameter("toolSessionId", toolSessionId)
+		.setParameter("ratingCriteriaId", criteria.getRatingCriteriaId());
 	if ( page != null && size != null ) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
@@ -341,14 +341,14 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	// Now specify the sort based on the switch statement above.
 	queryText.append(sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery query = getSession().createNativeQuery(queryText.toString());
 	query.addScalar("user_id", LongType.INSTANCE)
 		.addScalar("first_name", StringType.INSTANCE)
 		.addScalar("last_name", StringType.INSTANCE)
 		.addScalar("portraitId", LongType.INSTANCE)
 		.addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("notebookModifiedDate", TimestampType.INSTANCE)
-		.setLong("toolSessionId", toolSessionId.longValue())
+		.setParameter("toolSessionId", toolSessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 
@@ -389,7 +389,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     	
 	String queryString = bldr.toString();
 	Query query = getSession().createQuery(queryString)
-		.setLong("toolSessionId", toolSessionId);
+		.setParameter("toolSessionId", toolSessionId);
 	if ( page != null && size != null ) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}

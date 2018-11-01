@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
@@ -92,8 +92,8 @@ public class TaskListItemVisitDAOHibernate extends LAMSBaseDAO implements TaskLi
 
     @Override
     public Object[] getDateRangeOfTasks(Long userUid, Long sessionId) {
-	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
-		.setLong("userUid", userUid).setLong("sessionId", sessionId);
+	NativeQuery query = (NativeQuery) getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setParameter("userUid", userUid).setParameter("sessionId", sessionId);
 	Object[] values = (Object[]) query.list().get(0);
 	return values;
     }

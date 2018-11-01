@@ -169,7 +169,7 @@ public class MonitoringController {
 
 	    responseRow.put(NotebookConstants.ATTR_USER_ID, user.getUserId());
 	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
-		responseRow.put(NotebookConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[3]);
+		responseRow.put(NotebookConstants.ATTR_PORTRAIT_ID, (Integer) userAndReflection[3]);
 	    }
 	    rows.add(responseRow);
 	}

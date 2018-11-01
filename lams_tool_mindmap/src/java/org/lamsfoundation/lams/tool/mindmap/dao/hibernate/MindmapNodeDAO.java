@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapNodeDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;

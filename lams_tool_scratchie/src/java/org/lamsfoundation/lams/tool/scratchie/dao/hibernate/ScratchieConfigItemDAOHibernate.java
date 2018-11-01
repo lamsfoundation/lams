@@ -35,7 +35,7 @@ public class ScratchieConfigItemDAOHibernate extends LAMSBaseDAO implements Scra
 
     @Override
     public ScratchieConfigItem getConfigItemByKey(final String configKey) {
-	return (ScratchieConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+	return (ScratchieConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setParameter("key", configKey)
 		.uniqueResult();
 
     }

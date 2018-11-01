@@ -69,7 +69,7 @@ public class ScratchieUserDAOHibernate extends LAMSBaseDAO implements ScratchieU
 	final String COUNT_USERS_BY_CONTENT_ID = "SELECT COUNT(*) FROM " + ScratchieUser.class.getName()
 		+ " as user WHERE user.session.scratchie.contentId = :contentId ";
 	    
-	List list = getSession().createQuery(COUNT_USERS_BY_CONTENT_ID).setLong("contentId", contentId).list();
+	List list = getSession().createQuery(COUNT_USERS_BY_CONTENT_ID).setParameter("contentId", contentId).list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	} else {

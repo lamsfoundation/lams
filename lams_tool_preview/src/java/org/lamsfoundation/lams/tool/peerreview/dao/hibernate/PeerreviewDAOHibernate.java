@@ -70,7 +70,7 @@ public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO
     @Override
     public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
 	return getSession().createSQLQuery(GET_STATS)
-		.setLong("toolContentId", toolContentId)
+		.setParameter("toolContentId", toolContentId)
 		.setResultTransformer( Transformers.aliasToBean( PeerreviewStatisticsDTO.class ) )
 		.list();
 	

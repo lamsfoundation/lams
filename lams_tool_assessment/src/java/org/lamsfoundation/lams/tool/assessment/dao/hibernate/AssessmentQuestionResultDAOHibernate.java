@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
