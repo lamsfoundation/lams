@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.forum.dao.IMessageSeqDAO;
 import org.lamsfoundation.lams.tool.forum.model.MessageSeq;

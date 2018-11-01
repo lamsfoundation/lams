@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -77,10 +77,11 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	getSession().delete(resp);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long questionId) {
 	List<QaUsrResp> list = getSessionFactory().getCurrentSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("questionId", questionId.longValue()).list();
+		.setParameter("queUsrId", queUsrId.longValue()).setParameter("questionId", questionId.longValue()).list();
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
@@ -88,10 +89,11 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId) {
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION)
-		.setLong("qaSessionId", qaSessionId.longValue()).setLong("questionId", questionId.longValue()).list();
+		.setParameter("qaSessionId", qaSessionId.longValue()).setParameter("questionId", questionId.longValue()).list();
     }
 
     private String buildNameSearch(String searchString, String userRef) {
@@ -224,17 +226,17 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 
 	}
 
-	Query query = getSessionFactory().getCurrentSession()
+	Query<Object[]> query = getSessionFactory().getCurrentSession()
 		.createSQLQuery(queryText.toString())
 		.addEntity(QaUsrResp.class)
 		.addScalar("portraitId", IntegerType.INSTANCE);
 
 	if ( needsToolContentId ) { 
-	    query.setLong("toolContentId", toolContentId.longValue());
+	    query.setParameter("toolContentId", toolContentId.longValue());
 	}
-	query.setLong("questionId", questionId.longValue())
-		.setLong("qaSessionId", qaSessionId.longValue())
-    		.setLong("excludeUserId", excludeUserId.longValue());
+	query.setParameter("questionId", questionId.longValue())
+		.setParameter("qaSessionId", qaSessionId.longValue())
+    		.setParameter("excludeUserId", excludeUserId.longValue());
 
 	if ( size > 0 ) {
 	    query.setFirstResult(page * size);
@@ -252,17 +254,18 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	return respList;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<QaUsrResp> getResponsesByUserUid(final Long userUid) {
 	List<QaUsrResp> list = getSessionFactory().getCurrentSession().createQuery(LOAD_ATTEMPT_FOR_USER)
-		.setLong("userUid", userUid.longValue()).list();
+		.setParameter("userUid", userUid.longValue()).list();
 	return list;
     }
 
     @Override
     public int getCountResponsesByQaContent(final Long qaContentId) {
 
-	List list = doFind(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
+	List<?> list = doFind(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -284,7 +287,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	    queryText += filteredSearchString;
 	}
 
-	List list = doFind(queryText, new Object[] { qaSessionId, questionId, excludeUserId });
+	List<?> list = doFind(queryText, new Object[] { qaSessionId, questionId, excludeUserId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

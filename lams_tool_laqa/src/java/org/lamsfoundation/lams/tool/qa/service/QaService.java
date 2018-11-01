@@ -221,7 +221,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid) {
+    public QaQueContent getQuestionByContentAndDisplayOrder(Integer displayOrder, Long contentUid) {
 	return qaQuestionDAO.getQuestionByDisplayOrder(displayOrder, contentUid);
     }
 
@@ -303,7 +303,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Integer questionDisplayOrder,
 	    boolean isAutosave) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -313,7 +313,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	QaSession session = getSessionById(new Long(toolSessionID));
 	QaContent qaContent = session.getQaContent();
 
-	QaQueContent question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder), qaContent.getUid());
+	QaQueContent question = getQuestionByContentAndDisplayOrder(questionDisplayOrder, qaContent.getUid());
 
 	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 	// if response doesn't exist

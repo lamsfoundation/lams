@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.mc.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -47,7 +46,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.lamsfoundation.lams.util.NumberUtil;
 
 /**
  * Interface that defines the contract that all MCQ service provider must follow.
@@ -78,7 +76,7 @@ public interface IMcService {
 
     void setDefineLater(String strToolContentID, boolean value);
 
-    McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid);
+    McQueContent getQuestionByDisplayOrder(final Integer displayOrder, final Long mcContentUid);
 
     McQueUsr createMcUser(Long toolSessionId) throws McApplicationException;
 

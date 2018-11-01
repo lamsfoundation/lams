@@ -233,7 +233,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid) {
+    public McQueContent getQuestionByDisplayOrder(final Integer displayOrder, final Long mcContentUid) {
 	return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
     }
 

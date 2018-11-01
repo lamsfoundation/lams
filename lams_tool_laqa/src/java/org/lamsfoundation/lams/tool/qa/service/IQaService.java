@@ -118,7 +118,7 @@ public interface IQaService extends ToolRatingManager {
      * @param isAutosave
      *            whether it's requested by autosave feature
      */
-    void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+    void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Integer questionDisplayOrder,
 	    boolean isAutosave);
 
     void createQuestion(QaQueContent qaQuestion);
@@ -131,7 +131,7 @@ public interface IQaService extends ToolRatingManager {
 
     QaUsrResp getResponseById(Long responseId);
 
-    QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid);
+    QaQueContent getQuestionByContentAndDisplayOrder(Integer displayOrder, Long contentUid);
 
     QaQueContent getQuestionByUid(Long questionUid);
 

@@ -42,7 +42,7 @@ public interface IQaQuestionDAO {
 
     List<QaQueContent> getAllQuestionEntries(final long qaContentId);
 
-    QaQueContent getQuestionByDisplayOrder(Long displayOrder, Long qaContentId);
+    QaQueContent getQuestionByDisplayOrder(Integer displayOrder, Long qaContentId);
 
     QaQueContent getQuestionByUid(Long questionUid);
 

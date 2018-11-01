@@ -43,23 +43,25 @@ public class McOptionsContentDAO extends LAMSBaseDAO implements IMcOptionsConten
 
     private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<McOptsContent> findMcOptionsContentByQueId(Long questionUid) {
 	if (questionUid != null) {
 	    List<McOptsContent> list = getSessionFactory().getCurrentSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
-		    .setLong("mcQueContentUid", questionUid.longValue()).list();
+		    .setParameter("mcQueContentUid", questionUid.longValue()).list();
 	    return list;
 	}
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<McOptionDTO> getOptionDtos(Long questionUid) {
-	List<McOptionDTO> optionDtos = new LinkedList();
+	List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
 
 	if (questionUid != null) {
 	    List<McOptsContent> options = getSessionFactory().getCurrentSession()
-		    .createQuery(FIND_OPTIONS_BY_QUESTION_UID).setLong("mcQueContentUid", questionUid.longValue())
+		    .createQuery(FIND_OPTIONS_BY_QUESTION_UID).setParameter("mcQueContentUid", questionUid.longValue())
 		    .list();
 
 	    if (options != null && options.size() > 0) {

@@ -35,7 +35,7 @@ public class ImageGalleryConfigItemDAOHibernate extends LAMSBaseDAO implements I
 
     @Override
     public ImageGalleryConfigItem getConfigItemByKey(final String configKey) {
-	return (ImageGalleryConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+	return (ImageGalleryConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setParameter("key", configKey)
 		.uniqueResult();
     }
 

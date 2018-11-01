@@ -41,8 +41,8 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 
     @Override
     public QaContent getQaByContentId(long qaId) {
-	String query = "from QaContent as qa where qa.qaContentId = ?";
-	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaId).list();
+	String query = "from QaContent as qa where qa.qaContentId = :qaContentId";
+	List<?> list = getSessionFactory().getCurrentSession().createQuery(query).setParameter("qaContentId", qaId).list();
 
 	if (list != null && list.size() > 0) {
 	    QaContent qa = (QaContent) list.get(0);
@@ -78,8 +78,8 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
     @Override
     public void removeQa(Long qaContentId) {
 	if (qaContentId != null) {
-	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = ?";
-	    Object obj = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaContentId.longValue())
+	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = :qaContentId";
+	    Object obj = getSessionFactory().getCurrentSession().createQuery(query).setParameter("qaContentId", qaContentId.longValue())
 		    .uniqueResult();
 	    getSession().delete(obj);
 	}

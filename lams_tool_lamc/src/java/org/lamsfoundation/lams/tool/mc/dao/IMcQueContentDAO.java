@@ -43,7 +43,7 @@ public interface IMcQueContentDAO {
      * @param mcContentUid
      * @return McQueContent
      */
-    McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid);
+    McQueContent getQuestionContentByDisplayOrder(final Integer displayOrder, final Long mcContentUid);
 
     /**
      * <p>

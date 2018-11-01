@@ -80,7 +80,7 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
 
 	if (nbSessionId != null) {
 	    List<NoticeboardSession> list = getSessionFactory().getCurrentSession().createQuery(FIND_NB_SESSION)
-		    .setLong("nbSessionId", nbSessionId.longValue()).list();
+		    .setParameter("nbSessionId", nbSessionId.longValue()).list();
 
 	    if ((list != null) && (list.size() > 0)) {
 		NoticeboardSession nb = list.get(0);
@@ -101,7 +101,7 @@ public class NoticeboardSessionDAO extends LAMSBaseDAO implements INoticeboardSe
     @Override
     public NoticeboardSession getNbSessionByUser(final Long userId) {
 	return (NoticeboardSession) getSession().createQuery(NoticeboardSessionDAO.LOAD_NBSESSION_BY_USER)
-		.setLong("userId", userId.longValue()).uniqueResult();
+		.setParameter("userId", userId.longValue()).uniqueResult();
     }
 
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession) */
