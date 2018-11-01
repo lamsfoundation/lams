@@ -79,7 +79,7 @@ public class McContentDAO extends LAMSBaseDAO implements IMcContentDAO {
     public void removeMcById(Long mcContentId) {
 	if (mcContentId != null) {
 	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_MC_CONTENT)
-		    .setParameter(0, mcContentId.longValue()).list();
+		    .setParameter("mcContentId", mcContentId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
 		McContent mc = (McContent) list.get(0);

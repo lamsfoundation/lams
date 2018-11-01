@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 
     public static final String GET_BY_WIKI_AND_TITLE = "from tl_lawiki10_wiki_page in class " + WikiPage.class.getName()
-	    + " where wiki_uid=? AND title=? AND wiki_session_uid=null";
+	    + " where wiki_uid=:wikiId AND title=:title AND wiki_session_uid=null";
 
     public static final String GET_BY_SESSION_AND_TITLE = "from tl_lawiki10_wiki_page in class "
 	    + WikiPage.class.getName() + " where wiki_session_uid=:wikiId AND title=:title";
@@ -35,8 +35,8 @@ public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 	if (wiki != null && title != null && title.length() > 0) {
 	    Long wikiId = wiki.getUid();
 	    Query query = getSessionFactory().getCurrentSession().createQuery(GET_BY_WIKI_AND_TITLE);
-	    query.setParameter(0, wikiId);
-	    query.setParameter(1, title);
+	    query.setParameter("wikiId", wikiId);
+	    query.setParameter("title", title);
 	    return (WikiPage) query.uniqueResult();
 	}
 	return null;
