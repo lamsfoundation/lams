@@ -28,64 +28,90 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 
 /**
  * CommonCartridge
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laimsc11_commoncartridge")
 public class CommonCartridge implements Cloneable {
-
     private static final Logger log = Logger.getLogger(CommonCartridge.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
     // advance
 
+    @Column(name = "allow_auto_run")
     private boolean runAuto;
 
+    @Column(name = "mini_view_commonCartridge_number")
     private int miniViewCommonCartridgeNumber;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
     // general infomation
+    
+    @Column(name = "create_date")
     private Date created;
 
+    @Column(name = "update_date")
     private Date updated;
 
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
     private CommonCartridgeUser createdBy;
 
-    // commonCartridge Items
-    private Set commonCartridgeItems;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "commonCartridge_uid")
+    @OrderBy("create_date DESC")
+    private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();;
 
+    @Column(name = "reflect_instructions")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_on_activity")
     private String reflectInstructions;
 
     // *************** NON Persist Fields ********************
 
+    @Transient
     private String miniViewNumberStr;
-
-    /**
-     * Default contruction method.
-     *
-     */
-    public CommonCartridge() {
-	commonCartridgeItems = new HashSet();
-    }
 
     // **********************************************************
     // Function method for CommonCartridge
@@ -108,16 +134,16 @@ public class CommonCartridge implements Cloneable {
 
     @Override
     public Object clone() {
-
 	CommonCartridge commonCartridge = null;
+	
 	try {
 	    commonCartridge = (CommonCartridge) super.clone();
 	    commonCartridge.setUid(null);
 	    if (commonCartridgeItems != null) {
-		Iterator iter = commonCartridgeItems.iterator();
-		Set set = new HashSet();
+		Iterator<CommonCartridgeItem> iter = commonCartridgeItems.iterator();
+		Set<CommonCartridgeItem> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    CommonCartridgeItem item = (CommonCartridgeItem) iter.next();
+		    CommonCartridgeItem item = iter.next();
 		    CommonCartridgeItem newItem = (CommonCartridgeItem) item.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newItem);
@@ -129,7 +155,7 @@ public class CommonCartridge implements Cloneable {
 		commonCartridge.setCreatedBy((CommonCartridgeUser) createdBy.clone());
 	    }
 	} catch (CloneNotSupportedException e) {
-	    CommonCartridge.log.error("When clone " + CommonCartridge.class + " failed");
+	    log.error("When clone " + CommonCartridge.class + " failed");
 	}
 
 	return commonCartridge;
@@ -161,7 +187,6 @@ public class CommonCartridge implements Cloneable {
      * Updates the modification data for this entity.
      */
     public void updateModificationData() {
-
 	long now = System.currentTimeMillis();
 	if (created == null) {
 	    this.setCreated(new Date(now));
@@ -212,9 +237,6 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share commonCartridge.
-     *
-     *
-     *
      */
     public CommonCartridgeUser getCreatedBy() {
 	return createdBy;
@@ -228,9 +250,6 @@ public class CommonCartridge implements Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -239,28 +258,16 @@ public class CommonCartridge implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     * @return Returns the title.
-     *
-     *
-     *
-     */
     public String getTitle() {
 	return title;
     }
-
-    /**
-     * @param title
-     *            The title to set.
-     */
+    
     public void setTitle(String title) {
 	this.title = title;
     }
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -270,27 +277,14 @@ public class CommonCartridge implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getCommonCartridgeItems() {
+    public Set<CommonCartridgeItem> getCommonCartridgeItems() {
 	return commonCartridgeItems;
     }
 
-    public void setCommonCartridgeItems(Set commonCartridgeItems) {
+    public void setCommonCartridgeItems(Set<CommonCartridgeItem> commonCartridgeItems) {
 	this.commonCartridgeItems = commonCartridgeItems;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -299,10 +293,6 @@ public class CommonCartridge implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -311,10 +301,6 @@ public class CommonCartridge implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -323,10 +309,6 @@ public class CommonCartridge implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getMiniViewCommonCartridgeNumber() {
 	return miniViewCommonCartridgeNumber;
     }
@@ -335,10 +317,6 @@ public class CommonCartridge implements Cloneable {
 	miniViewCommonCartridgeNumber = minViewCommonCartridgeNumber;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isRunAuto() {
 	return runAuto;
     }
@@ -360,10 +338,6 @@ public class CommonCartridge implements Cloneable {
 	miniViewNumberStr = minViewNumber;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -372,10 +346,6 @@ public class CommonCartridge implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }

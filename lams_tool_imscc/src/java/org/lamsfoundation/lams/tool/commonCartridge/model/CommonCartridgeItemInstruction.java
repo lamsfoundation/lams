@@ -23,17 +23,32 @@
 
 package org.lamsfoundation.lams.tool.commonCartridge.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
- *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laimsc11_item_instruction")
 public class CommonCartridgeItemInstruction implements Cloneable {
     private static final Logger log = Logger.getLogger(CommonCartridgeItemInstruction.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "sequence_id")
     private int sequenceId;
+    
+    @Column
     private String description;
 
     @Override
@@ -49,11 +64,11 @@ public class CommonCartridgeItemInstruction implements Cloneable {
 	return obj;
     }
 
-// **********************************************************
+    // **********************************************************
     //		Get/Set methods
-//	  **********************************************************
+    // **********************************************************
+    
     /**
-     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -68,10 +83,6 @@ public class CommonCartridgeItemInstruction implements Cloneable {
 	this.uid = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -80,10 +91,6 @@ public class CommonCartridgeItemInstruction implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getSequenceId() {
 	return sequenceId;
     }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemVisitDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
@@ -86,22 +87,22 @@ public class CommonCartridgeItemVisitDAOHibernate extends LAMSBaseDAO implements
 		summaryList.put((Long) list[0], new Integer(((Number) list[1]).intValue()));
 	    }
 	}
+	
 	return summaryList;
-
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<CommonCartridgeItemVisitLog> getCommonCartridgeItemLogBySession(Long sessionId, Long itemUid) {
-
 	return (List<CommonCartridgeItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
     @Override
     public Object[] getDateRangeOfAccesses(Long userUid) {
-	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
-		.setLong("userUid", userUid);
-	Object[] values = (Object[]) query.list().get(0);
+	@SuppressWarnings("unchecked")
+	NativeQuery<Object[]> query = getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setParameter("userUid", userUid);
+	Object[] values = query.list().get(0);
 	return values;
     }
 }

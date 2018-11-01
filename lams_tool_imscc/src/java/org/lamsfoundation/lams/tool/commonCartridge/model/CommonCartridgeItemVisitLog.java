@@ -26,24 +26,44 @@ package org.lamsfoundation.lams.tool.commonCartridge.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
- * CommonCartridge
- * 
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laimsc11_item_log")
 public class CommonCartridgeItemVisitLog {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_uid")
     private CommonCartridgeUser user;
+    
+    @ManyToOne
+    @JoinColumn(name = "commonCartridge_item_uid")
     private CommonCartridgeItem commonCartridgeItem;
+    
+    @Column
     private boolean complete;
+    
+    @Column(name = "access_date")
     private Date accessDate;
+    
+    @Column(name = "session_id")
     private Long sessionId;
 
-    /**
-     *
-     * @return
-     */
     public Date getAccessDate() {
 	return accessDate;
     }
@@ -52,11 +72,6 @@ public class CommonCartridgeItemVisitLog {
 	this.accessDate = accessDate;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public CommonCartridgeItem getCommonCartridgeItem() {
 	return commonCartridgeItem;
     }
@@ -77,11 +92,6 @@ public class CommonCartridgeItemVisitLog {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public CommonCartridgeUser getUser() {
 	return user;
     }
@@ -90,10 +100,6 @@ public class CommonCartridgeItemVisitLog {
 	this.user = user;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isComplete() {
 	return complete;
     }
@@ -102,10 +108,6 @@ public class CommonCartridgeItemVisitLog {
 	this.complete = complete;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
