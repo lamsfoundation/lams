@@ -19,18 +19,6 @@
             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    
-    <bean id="userModifiedSpreadsheetDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.UserModifiedSpreadsheetDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
-    
-    <bean id="spreadsheetMarkDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetMarkDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
 
    <bean id="spreadsheetUserDao" class="org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate.SpreadsheetUserDAOHibernate">
         <property name="sessionFactory">
@@ -56,12 +44,6 @@
     <bean id="spreadsheetManagerTarget" class="org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetServiceImpl">
         <property name="spreadsheetDao">
             <ref bean="spreadsheetDao"/>
-        </property>
-        <property name="userModifiedSpreadsheetDao">
-            <ref bean="userModifiedSpreadsheetDao"/>
-        </property>
-        <property name="spreadsheetMarkDao">
-            <ref bean="spreadsheetMarkDao"/>
         </property>
         <property name="spreadsheetUserDao">
             <ref bean="spreadsheetUserDao"/>

@@ -25,45 +25,82 @@ package org.lamsfoundation.lams.tool.spreadsheet.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 
 /**
  * Spreadsheet
  *
  * @author Andrey Balan
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_lasprd10_spreadsheet")
 public class Spreadsheet implements Cloneable {
-
     private static final Logger log = Logger.getLogger(Spreadsheet.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    // tool contentID
+    
+    @Column(name = "content_id")
     private Long contentId;
+    
+    @Column
     private String title;
+    
+    @Column
     private String instructions;
+    
+    @Column
     private String code;
 
     // advance
+    
+    @Column(name = "is_learner_allowed_to_save")
     private boolean isLearnerAllowedToSave;
+    
+    @Column(name = "is_marking_enabled")
     private boolean isMarkingEnabled;
 
+    @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
+    
+    @Column(name = "define_later")
     private boolean defineLater;
+    
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
-    // general infomation
-    private Date created;
-    private Date updated;
-    private SpreadsheetUser createdBy;
-
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
+    
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
+
+    // general infomation
+    
+    @Column(name = "create_date")
+    private Date created;
+    
+    @Column(name = "update_date")
+    private Date updated;
+    
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
+    private SpreadsheetUser createdBy;
 
     // **********************************************************
     // Function method for Spreadsheet
@@ -176,8 +213,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share spreadsheet.
-     *
-     *
      */
     public SpreadsheetUser getCreatedBy() {
 	return createdBy;
@@ -191,9 +226,6 @@ public class Spreadsheet implements Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -204,8 +236,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the title.
-     *
-     *
      */
     public String getTitle() {
 	return title;
@@ -221,8 +251,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns whether learner is allowed to save spreadsheet.
-     *
-     *
      */
     public boolean isLearnerAllowedToSave() {
 	return isLearnerAllowedToSave;
@@ -238,8 +266,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns whether the marking is enabled.
-     *
-     *
      */
     public boolean isMarkingEnabled() {
 	return isMarkingEnabled;
@@ -255,8 +281,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     *
-     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -272,8 +296,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -285,8 +307,6 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns spreadsheet code.
-     *
-     *
      */
     public String getCode() {
 	return code;
@@ -297,10 +317,6 @@ public class Spreadsheet implements Cloneable {
 	// this.code = javaScriptEscape(code);;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -309,10 +325,6 @@ public class Spreadsheet implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -321,10 +333,6 @@ public class Spreadsheet implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -333,10 +341,6 @@ public class Spreadsheet implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -345,10 +349,6 @@ public class Spreadsheet implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }

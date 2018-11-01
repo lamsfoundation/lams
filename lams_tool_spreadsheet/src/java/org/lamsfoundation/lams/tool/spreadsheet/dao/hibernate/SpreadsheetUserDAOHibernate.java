@@ -73,7 +73,6 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     /**
      * Will return List<[SpreadsheetUser, String], [SpreadsheetUser, String], ... , [SpreadsheetUser, String]>
      * where the String is the notebook entry. No notebook entries needed? Will return in their place.
@@ -136,6 +135,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
+	@SuppressWarnings("unchecked")
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SpreadsheetUser.class).addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("portraitId", IntegerType.INSTANCE)
@@ -156,14 +156,13 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public int getCountUsersBySession(final Long sessionId, String searchString) {
-
 	StringBuilder queryText = new StringBuilder("SELECT count(*) FROM tl_lasprd10_user user ");
 	queryText.append(
 		" JOIN tl_lasprd10_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
+	@SuppressWarnings("rawtypes")
 	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId).list();
 	if (list == null || list.size() == 0) {
 	    return 0;

@@ -25,6 +25,13 @@ package org.lamsfoundation.lams.tool.spreadsheet.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,20 +41,24 @@ import org.apache.log4j.Logger;
  * SpreadsheetMark
  * 
  * @author Andrey Balan
- *
- *
  */
+@Entity
+@Table(name = "tl_lasprd10_spreadsheet_mark")
 public class SpreadsheetMark {
-
-    private static final long serialVersionUID = -3415065437595925246L;
-
     private static Logger log = Logger.getLogger(SpreadsheetMark.class);
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private Float marks;
+    
+    @Column
     private String comments;
+    
+    @Column(name = "date_marks_released")
     private Date dateMarksReleased;
 
     /** default constructor */
@@ -61,9 +72,6 @@ public class SpreadsheetMark {
 	this.dateMarksReleased = dateMarksReleased;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return this.uid;
     }
@@ -72,9 +80,6 @@ public class SpreadsheetMark {
 	this.uid = uid;
     }
 
-    /**
-     *
-     */
     public Float getMarks() {
 	return this.marks;
     }
@@ -83,9 +88,6 @@ public class SpreadsheetMark {
 	this.marks = marks;
     }
 
-    /**
-     *
-     */
     public String getComments() {
 	return this.comments;
     }
@@ -94,9 +96,6 @@ public class SpreadsheetMark {
 	this.comments = comments;
     }
 
-    /**
-     *
-     */
     public Date getDateMarksReleased() {
 	return this.dateMarksReleased;
     }
@@ -111,11 +110,6 @@ public class SpreadsheetMark {
 		.append("marks", getMarks()).append("dateMarksReleased", getDateMarksReleased()).toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone() {
 
