@@ -40,7 +40,7 @@ public class DokumaranSessionDAOHibernate extends LAMSBaseDAO implements Dokumar
 
     @Override
     public DokumaranSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List<?> list = doFind(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

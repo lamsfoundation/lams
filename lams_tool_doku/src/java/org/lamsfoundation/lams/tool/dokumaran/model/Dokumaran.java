@@ -25,63 +25,96 @@ package org.lamsfoundation.lams.tool.dokumaran.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 
 /**
  * Dokumaran
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_ladoku11_dokumaran")
 public class Dokumaran implements Cloneable {
-
     private static final Logger log = Logger.getLogger(Dokumaran.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
     // advance
 
+    @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
     
+    @Column(name = "allow_multiple_leaders")
     private boolean allowMultipleLeaders;
     
+    @Column(name = "time_limit")
     private int timeLimit;
     
     //date when teacher has started time counter (pressed start button)
+    @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
 
+    @Column(name = "show_chat")
     private boolean showChat;
 
+    @Column(name = "show_line_numbers")
     private boolean showLineNumbers;
     
+    @Column(name = "shared_pad_id")
     private String sharedPadId;
 
+    @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
-    // general infomation
-    private Date created;
-
-    private Date updated;
-
-    private DokumaranUser createdBy;
-
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
+
+    // general information
+    
+    @Column(name = "create_date")
+    private Date created;
+
+    @Column(name = "update_date")
+    private Date updated;
+
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
+    private DokumaranUser createdBy;
 
     // **********************************************************
     // Function method for Dokumaran
@@ -100,7 +133,6 @@ public class Dokumaran implements Cloneable {
 
     @Override
     public Object clone() {
-
 	Dokumaran dokumaran = null;
 	try {
 	    dokumaran = (Dokumaran) super.clone();
@@ -176,7 +208,6 @@ public class Dokumaran implements Cloneable {
      * Returns the object's date of last update
      *
      * @return date updated
-     *
      */
     public Date getUpdated() {
 	return updated;
@@ -193,9 +224,6 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share dokumaran.
-     *
-     *
-     *
      */
     public DokumaranUser getCreatedBy() {
 	return createdBy;
@@ -209,9 +237,6 @@ public class Dokumaran implements Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -222,9 +247,6 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @return Returns the title.
-     *
-     *
-     *
      */
     public String getTitle() {
 	return title;
@@ -240,9 +262,6 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     *
-     *
-     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -258,8 +277,6 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -269,10 +286,6 @@ public class Dokumaran implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -281,10 +294,6 @@ public class Dokumaran implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -293,10 +302,6 @@ public class Dokumaran implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -321,7 +326,6 @@ public class Dokumaran implements Cloneable {
     }
     
     /**
-    *
     * @return date when teacher has started time counter (pressed start button)
     */
    public Date getTimeLimitLaunchedDate() {
@@ -332,10 +336,6 @@ public class Dokumaran implements Cloneable {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
    }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShowChat() {
 	return showChat;
     }
@@ -344,10 +344,6 @@ public class Dokumaran implements Cloneable {
 	this.showChat = showChat;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShowLineNumbers() {
 	return showLineNumbers;
     }
@@ -355,11 +351,7 @@ public class Dokumaran implements Cloneable {
     public void setShowLineNumbers(boolean showLineNumbers) {
 	this.showLineNumbers = showLineNumbers;
     }
-    
-    /**
-    *
-    * @return
-    */
+
    public String getSharedPadId() {
 	return sharedPadId;
    }
@@ -372,10 +364,6 @@ public class Dokumaran implements Cloneable {
        return StringUtils.isNotEmpty(sharedPadId);
    }
 
-    /**
-     *
-     * @return
-     */
     public boolean isUseSelectLeaderToolOuput() {
 	return useSelectLeaderToolOuput;
     }
@@ -383,11 +371,7 @@ public class Dokumaran implements Cloneable {
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
-    
-    /**
-    *
-    * @return
-    */
+
    public boolean isAllowMultipleLeaders() {
 	return allowMultipleLeaders;
    }
@@ -396,10 +380,6 @@ public class Dokumaran implements Cloneable {
 	this.allowMultipleLeaders = allowMultipleLeaders;
    }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -408,10 +388,6 @@ public class Dokumaran implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
