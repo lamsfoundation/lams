@@ -23,6 +23,15 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -31,16 +40,26 @@ import org.apache.log4j.Logger;
  * ImageVote
  *
  * @author Andrey Balan
- *
- *
  */
+@Entity
+@Table(name = "tl_laimag10_image_vote")
 public class ImageVote implements Cloneable {
-
     private static final Logger log = Logger.getLogger(ImageVote.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    private boolean isVoted;
+    
+    @Column(name = "is_voted")
+    private boolean voted;
+    
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private ImageGalleryUser createBy;
+    
+    @ManyToOne
+    @JoinColumn(name = "imageGallery_item_uid")
     private ImageGalleryItem imageGalleryItem;
 
     // **********************************************************
@@ -76,23 +95,19 @@ public class ImageVote implements Cloneable {
 
 	final ImageVote genericEntity = (ImageVote) o;
 
-	return new EqualsBuilder().append(this.uid, genericEntity.uid).append(this.isVoted, genericEntity.isVoted)
+	return new EqualsBuilder().append(this.uid, genericEntity.uid).append(this.voted, genericEntity.voted)
 		.append(this.createBy, genericEntity.createBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(isVoted).append(createBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(voted).append(createBy).toHashCode();
     }
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
 
-    /**
-     *
-     * @return Returns the log Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -101,10 +116,6 @@ public class ImageVote implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public ImageGalleryUser getCreateBy() {
 	return createBy;
     }
@@ -113,22 +124,14 @@ public class ImageVote implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isVoted() {
-	return isVoted;
+	return voted;
     }
 
-    public void setVoted(boolean isVoted) {
-	this.isVoted = isVoted;
+    public void setVoted(boolean voted) {
+	this.voted = voted;
     }
 
-    /**
-     *
-     * @return
-     */
     public ImageGalleryItem getImageGalleryItem() {
 	return imageGalleryItem;
     }

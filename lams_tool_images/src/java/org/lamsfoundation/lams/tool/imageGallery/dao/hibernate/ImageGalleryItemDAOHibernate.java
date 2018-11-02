@@ -37,8 +37,8 @@ public class ImageGalleryItemDAOHibernate extends LAMSBaseDAO implements ImageGa
 	    + " where imageGallery_uid = ? order by create_date asc";
 
     @Override
-    public List getAuthoringItems(Long imageGalleryUid) {
-	return this.doFind(FIND_AUTHORING_ITEMS, imageGalleryUid);
+    public List<ImageGalleryItem> getAuthoringItems(Long imageGalleryUid) {
+	return (List<ImageGalleryItem>) this.doFind(FIND_AUTHORING_ITEMS, imageGalleryUid);
     }
 
     @Override

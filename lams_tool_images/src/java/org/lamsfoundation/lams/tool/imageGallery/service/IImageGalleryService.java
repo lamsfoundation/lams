@@ -64,7 +64,7 @@ public interface IImageGalleryService extends ToolRatingManager {
      * @param imageGalleryUid
      * @return
      */
-    List getAuthoredItems(Long imageGalleryUid);
+    List<ImageGalleryItem> getAuthoredItems(Long imageGalleryUid);
 
     /**
      * Upload imageGallery item file to repository. i.e., single file, websize zip file, or learning object zip file.

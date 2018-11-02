@@ -27,74 +27,112 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * ImageGallery
- *
  */
+@Entity
+@Table(name = "tl_laimag10_imagegallery")
 public class ImageGallery implements Cloneable {
-
     private static final Logger log = Logger.getLogger(ImageGallery.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "next_image_title")
     private Long nextImageTitle;
 
     // advance
 
+    @Column(name = "allow_vote")
     private boolean allowVote;
 
+    @Column(name = "allow_share_images")
     private boolean allowShareImages;
 
+    @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
 
+    @Column(name = "define_later")
     private boolean defineLater;
-
+    
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "allow_rank")
     private boolean allowRank;
 
+    @Column(name = "maximum_rates")
     private int maximumRates;
 
+    @Column(name = "minimum_rates")
     private int minimumRates;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("order_id ASC")
+    @JoinColumn(name = "tool_content_id")
+    private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
-    private Set<LearnerItemRatingCriteria> ratingCriterias;
-
-    // general infomation
-    private Date created;
-
-    private Date updated;
-
-    private ImageGalleryUser createdBy;
-
-    // imageGallery Items
-    private Set imageGalleryItems;
-
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "image_submit_notify")
     private boolean notifyTeachersOnImageSumbit;
 
+    // general information
+    
+    @Column(name = "create_date")
+    private Date created;
+
+    @Column(name = "update_date")
+    private Date updated;
+
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
+    private ImageGalleryUser createdBy;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("create_date DESC")
+    @JoinColumn(name = "imageGallery_uid")
+    private Set<ImageGalleryItem> imageGalleryItems = new HashSet<>();
+
     /**
-     * Default contruction method.
-     *
+     * Default contructor
      */
     public ImageGallery() {
-	nextImageTitle = new Long(1);
-	imageGalleryItems = new HashSet();
+	nextImageTitle = 1L;
     }
 
     // **********************************************************
@@ -135,8 +173,8 @@ public class ImageGallery implements Cloneable {
 
 	    // clone imageGalleryItems as well
 	    if (imageGalleryItems != null) {
-		Set<ImageGalleryItem> newItems = new HashSet<ImageGalleryItem>();
-		for (ImageGalleryItem item : (Set<ImageGalleryItem>) imageGalleryItems) {
+		Set<ImageGalleryItem> newItems = new HashSet<>();
+		for (ImageGalleryItem item : imageGalleryItems) {
 		    ImageGalleryItem newItem = (ImageGalleryItem) item.clone();
 		    // just clone old file without duplicate it in repository
 		    newItems.add(newItem);
@@ -151,7 +189,7 @@ public class ImageGallery implements Cloneable {
 
 	    // clone ratingCriterias as well
 	    if (ratingCriterias != null) {
-		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
+		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<>();
 		for (LearnerItemRatingCriteria criteria : ratingCriterias) {
 		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
 		    // just clone old file without duplicate it in repository
@@ -256,8 +294,6 @@ public class ImageGallery implements Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     */
     public Long getUid() {
 	return uid;
     }
@@ -320,21 +356,14 @@ public class ImageGallery implements Cloneable {
 	this.nextImageTitle = nextImageTitle;
     }
 
-    /**
-     *
-     * @return
-     */
-    public Set getImageGalleryItems() {
+    public Set<ImageGalleryItem> getImageGalleryItems() {
 	return imageGalleryItems;
     }
 
-    public void setImageGalleryItems(Set imageGalleryItems) {
+    public void setImageGalleryItems(Set<ImageGalleryItem> imageGalleryItems) {
 	this.imageGalleryItems = imageGalleryItems;
     }
 
-    /**
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -343,9 +372,6 @@ public class ImageGallery implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -354,9 +380,6 @@ public class ImageGallery implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -365,9 +388,6 @@ public class ImageGallery implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     * @return
-     */
     public boolean isAllowShareImages() {
 	return allowShareImages;
     }
@@ -376,9 +396,6 @@ public class ImageGallery implements Cloneable {
 	this.allowShareImages = allowShareImages;
     }
 
-    /**
-     * @return
-     */
     public boolean isAllowVote() {
 	return allowVote;
     }
@@ -387,9 +404,6 @@ public class ImageGallery implements Cloneable {
 	this.allowVote = allowVote;
     }
 
-    /**
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -398,9 +412,6 @@ public class ImageGallery implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -409,9 +420,6 @@ public class ImageGallery implements Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     * @return
-     */
     public boolean isAllowRank() {
 	return allowRank;
     }
@@ -420,9 +428,6 @@ public class ImageGallery implements Cloneable {
 	this.allowRank = allowRank;
     }
 
-    /**
-     * @return
-     */
     public int getMaximumRates() {
 	return maximumRates;
     }
@@ -431,9 +436,6 @@ public class ImageGallery implements Cloneable {
 	this.maximumRates = maximumRate;
     }
 
-    /**
-     * @return
-     */
     public int getMinimumRates() {
 	return minimumRates;
     }
@@ -442,10 +444,6 @@ public class ImageGallery implements Cloneable {
 	this.minimumRates = minimumRates;
     }
 
-    /**
-     *
-     * @return
-     */
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {
 	return ratingCriterias;
     }
@@ -454,9 +452,6 @@ public class ImageGallery implements Cloneable {
 	this.ratingCriterias = ratingCriterias;
     }
 
-    /**
-     * @return
-     */
     public boolean isNotifyTeachersOnImageSumbit() {
 	return notifyTeachersOnImageSumbit;
     }

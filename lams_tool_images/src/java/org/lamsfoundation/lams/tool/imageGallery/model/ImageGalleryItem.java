@@ -25,63 +25,93 @@ package org.lamsfoundation.lams.tool.imageGallery.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.imageGallery.dto.ImageGalleryAttachment;
 
 /**
- * ImageGallery
- *
- *
+ * ImageGallery item
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laimag10_imagegallery_item")
 public class ImageGalleryItem implements Cloneable {
-
     private static final Logger log = Logger.getLogger(ImageGalleryItem.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private String title;
 
+    @Column
     private String description;
 
+    @Column(name = "sequence_id")
     private int sequenceId;
 
+    @Column(name = "is_hide")
     private boolean isHide;
 
+    @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private ImageGalleryUser createBy;
 
+    @Column(name = "original_file_uuid")
     private Long originalFileUuid;
 
+    @Column(name = "original_image_width")
     private int originalImageWidth;
 
+    @Column(name = "original_image_height")
     private int originalImageHeight;
 
+    @Column(name = "medium_file_uuid")
     private Long mediumFileUuid;
 
+    @Column(name = "medium_image_width")
     private int mediumImageWidth;
 
+    @Column(name = "medium_image_height")
     private int mediumImageHeight;
 
+    @Column(name = "thumbnail_file_uuid")
     private Long thumbnailFileUuid;
 
+    @Column(name = "file_name")
     private String fileName;
 
     // *************** NON Persist Fields  ********************
+    @Transient
     private String attachmentLocalUrl;
-
+    @Transient
     private ImageGalleryAttachment originalFile;
-
+    @Transient
     private ImageGalleryAttachment mediumFile;
-
+    @Transient
     private ImageGalleryAttachment thumbnailFile;
-
+    @Transient
     private String titleEscaped;
-
+    @Transient
     private String descriptionEscaped;
 
     @Override
@@ -102,30 +132,24 @@ public class ImageGalleryItem implements Cloneable {
 
 	return image;
     }
+    
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("uid", uid).append(" title", title).toString();
+    }
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
+
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getTitle() {
 	return title;
     }
@@ -134,10 +158,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -150,8 +170,6 @@ public class ImageGalleryItem implements Cloneable {
      * Returns image sequence number.
      *
      * @return image sequence number
-     *
-     *
      */
     public int getSequenceId() {
 	return sequenceId;
@@ -167,11 +185,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.sequenceId = sequenceId;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public ImageGalleryUser getCreateBy() {
 	return createBy;
     }
@@ -180,10 +193,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -192,10 +201,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCreateByAuthor() {
 	return isCreateByAuthor;
     }
@@ -204,10 +209,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isHide() {
 	return isHide;
     }
@@ -216,11 +217,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.isHide = isHide;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Long getOriginalFileUuid() {
 	return originalFileUuid;
     }
@@ -229,11 +225,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.originalFileUuid = originalFileUuid;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public int getOriginalImageWidth() {
 	return originalImageWidth;
     }
@@ -242,11 +233,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.originalImageWidth = originalImageWidth;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public int getOriginalImageHeight() {
 	return originalImageHeight;
     }
@@ -255,11 +241,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.originalImageHeight = originalImageHeight;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Long getMediumFileUuid() {
 	return mediumFileUuid;
     }
@@ -268,11 +249,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.mediumFileUuid = mediumFileUuid;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public int getMediumImageWidth() {
 	return mediumImageWidth;
     }
@@ -281,11 +257,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.mediumImageWidth = mediumImageWidth;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public int getMediumImageHeight() {
 	return mediumImageHeight;
     }
@@ -294,11 +265,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.mediumImageHeight = mediumImageHeight;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Long getThumbnailFileUuid() {
 	return thumbnailFileUuid;
     }
@@ -307,9 +273,6 @@ public class ImageGalleryItem implements Cloneable {
 	this.thumbnailFileUuid = thumbnailFileUuid;
     }
 
-    /**
-     *
-     */
     public String getFileName() {
 	return fileName;
     }
@@ -366,10 +329,5 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setDescriptionEscaped(String descriptionEscaped) {
 	this.descriptionEscaped = descriptionEscaped;
-    }
-    
-    @Override
-    public String toString() {
-	return new ToStringBuilder(this).append("uid", uid).append(" title", title).toString();
     }
 }

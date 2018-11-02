@@ -42,7 +42,7 @@ public class ImageGalleryUserDAOHibernate extends LAMSBaseDAO implements ImageGa
 
     @Override
     public ImageGalleryUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List<?> list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -51,7 +51,7 @@ public class ImageGalleryUserDAOHibernate extends LAMSBaseDAO implements ImageGa
 
     @Override
     public ImageGalleryUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List<?> list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

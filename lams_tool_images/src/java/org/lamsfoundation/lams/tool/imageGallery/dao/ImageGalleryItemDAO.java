@@ -35,7 +35,7 @@ public interface ImageGalleryItemDAO extends DAO {
      * @param imageGalleryUid
      * @return
      */
-    List getAuthoringItems(Long imageGalleryUid);
+    List<ImageGalleryItem> getAuthoringItems(Long imageGalleryUid);
 
     ImageGalleryItem getByUid(Long imageGalleryItemUid);
 

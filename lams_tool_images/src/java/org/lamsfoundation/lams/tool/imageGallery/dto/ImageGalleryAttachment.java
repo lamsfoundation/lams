@@ -21,13 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.imageGallery.model;
-
-import java.util.Date;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+package org.lamsfoundation.lams.tool.imageGallery.dto;
 
 /**
  * A Wrapper class for uploaded files. Used for learning design export/import functionality, namely, for export/import
@@ -36,76 +30,16 @@ import org.apache.log4j.Logger;
  * @author Andrey Balan
  */
 public class ImageGalleryAttachment implements Cloneable {
-    private static final Logger log = Logger.getLogger(ImageGalleryAttachment.class);
 
-    private Long uid;
     private Long fileUuid;
     private Long fileVersionId;
     private String fileType;
     private String fileName;
-    private Date created;
-
-    // Default contruction method
-    public ImageGalleryAttachment() {
-
-    }
-
-    // **********************************************************
-    // Function method for Attachment
-    // **********************************************************
-    @Override
-    public Object clone() {
-	Object obj = null;
-	try {
-	    obj = super.clone();
-	    ((ImageGalleryAttachment) obj).setUid(null);
-	} catch (CloneNotSupportedException e) {
-	    ImageGalleryAttachment.log.error("When clone " + ImageGalleryAttachment.class + " failed");
-	}
-
-	return obj;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-	if (this == o) {
-	    return true;
-	}
-	if (!(o instanceof ImageGalleryAttachment)) {
-	    return false;
-	}
-
-	final ImageGalleryAttachment genericEntity = (ImageGalleryAttachment) o;
-
-	return new EqualsBuilder().append(this.uid, genericEntity.uid)
-		.append(this.fileVersionId, genericEntity.fileVersionId).append(this.fileName, genericEntity.fileName)
-		.append(this.fileType, genericEntity.fileType).append(this.created, genericEntity.created).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(fileVersionId).append(fileName).append(fileType).append(created)
-		.toHashCode();
-    }
 
     // **********************************************************
     // get/set methods
     // **********************************************************
-    /**
-     *
-     */
-    public Long getUid() {
-	return uid;
-    }
 
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
-    /**
-     *
-     *
-     */
     public Long getFileVersionId() {
 	return fileVersionId;
     }
@@ -114,9 +48,6 @@ public class ImageGalleryAttachment implements Cloneable {
 	this.fileVersionId = version;
     }
 
-    /**
-     *
-     */
     public String getFileType() {
 	return fileType;
     }
@@ -125,9 +56,6 @@ public class ImageGalleryAttachment implements Cloneable {
 	this.fileType = type;
     }
 
-    /**
-     *
-     */
     public String getFileName() {
 	return fileName;
     }
@@ -136,27 +64,11 @@ public class ImageGalleryAttachment implements Cloneable {
 	this.fileName = name;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getFileUuid() {
 	return fileUuid;
     }
 
     public void setFileUuid(Long uuid) {
 	this.fileUuid = uuid;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Date getCreated() {
-	return created;
-    }
-
-    public void setCreated(Date created) {
-	this.created = created;
     }
 }

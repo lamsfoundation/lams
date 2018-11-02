@@ -78,11 +78,11 @@ import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemVisitDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGallerySessionDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryUserDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageVoteDAO;
+import org.lamsfoundation.lams.tool.imageGallery.dto.ImageGalleryAttachment;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
@@ -169,12 +169,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	// save default content by given ID.
 	ImageGallery content = new ImageGallery();
 	content = ImageGallery.newInstance(defaultContent, contentId);
-	// content.setNextImageTitle(new Long(1));
+	// content.setNextImageTitle(1L);
 	return content;
     }
 
     @Override
-    public List getAuthoredItems(Long imageGalleryUid) {
+    public List<ImageGalleryItem> getAuthoredItems(Long imageGalleryUid) {
 	return imageGalleryItemDao.getAuthoringItems(imageGalleryUid);
     }
 
@@ -408,8 +408,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		}
 		final Long USER_ID = -1L;
 		final boolean IS_COMMENTS_BY_OTHER_USERS_REQUIRED = true;
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO calculate average ratings based on one
-		// session data
+		// ! TODO calculate average ratings based on one session data
 		itemRatingDtos = getRatingCriteriaDtos(contentId, session.getSessionId(), itemIds,
 			IS_COMMENTS_BY_OTHER_USERS_REQUIRED, USER_ID);
 	    }
@@ -802,7 +801,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    }
 		}
 	    }
-	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
+	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(newUserUid.longValue(),
 		    toolContentId);
 	    if (user == null) {
 		user = new ImageGalleryUser();
@@ -810,7 +809,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		user.setFirstName(sysUser.getFirstName());
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
-		user.setUserId(new Long(newUserUid.longValue()));
+		user.setUserId(newUserUid.longValue());
 		user.setImageGallery(toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
@@ -864,11 +863,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	ImageGallery toContent = ImageGallery.newInstance(imageGallery, toContentId);
 	// save imageGallery items first
-	Set items = toContent.getImageGalleryItems();
+	Set<ImageGalleryItem> items = toContent.getImageGalleryItems();
 	if (items != null) {
-	    Iterator iter = items.iterator();
+	    Iterator<ImageGalleryItem> iter = items.iterator();
 	    while (iter.hasNext()) {
-		ImageGalleryItem item = (ImageGalleryItem) iter.next();
+		ImageGalleryItem item = iter.next();
 		if (item.isCreateByAuthor()) {
 		    imageGalleryUserDao.saveObject(item.getCreateBy());
 		    imageGalleryItemDao.saveObject(item);
@@ -1190,8 +1189,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     private Long getToolDefaultContentIdBySignature(String toolSignature) throws ImageGalleryException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
 	    ImageGalleryServiceImpl.log.error(error);

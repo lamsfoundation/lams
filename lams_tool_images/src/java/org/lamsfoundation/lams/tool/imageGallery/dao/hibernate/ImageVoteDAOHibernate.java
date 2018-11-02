@@ -38,7 +38,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class ImageVoteDAOHibernate extends LAMSBaseDAO implements ImageVoteDAO {
-
     private static final String FIND_BY_IMAGE_AND_USER = "from " + ImageVote.class.getName()
 	    + " as r where r.createBy.userId = ? and r.imageGalleryItem.uid=?";
 
@@ -50,7 +49,7 @@ public class ImageVoteDAOHibernate extends LAMSBaseDAO implements ImageVoteDAO {
 
     @Override
     public ImageVote getImageVoteByImageAndUser(Long imageUid, Long userId) {
-	List list = doFind(ImageVoteDAOHibernate.FIND_BY_IMAGE_AND_USER, new Object[] { userId, imageUid });
+	List<ImageVote> list = (List<ImageVote>) doFind(ImageVoteDAOHibernate.FIND_BY_IMAGE_AND_USER, new Object[] { userId, imageUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	}
@@ -59,7 +58,7 @@ public class ImageVoteDAOHibernate extends LAMSBaseDAO implements ImageVoteDAO {
 
     @Override
     public int getNumImageVotesByImageUid(Long imageUid, Long sessionId) {
-	List list = doFind(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_IMAGE, new Object[] { imageUid, sessionId });
+	List<?> list = doFind(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_IMAGE, new Object[] { imageUid, sessionId });
 	if ((list == null) || (list.size() == 0)) {
 	    return 0;
 	}
@@ -68,7 +67,7 @@ public class ImageVoteDAOHibernate extends LAMSBaseDAO implements ImageVoteDAO {
 
     @Override
     public int getNumImageVotesByUserId(Long userId) {
-	List list = doFind(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_USER, userId);
+	List<?> list = doFind(ImageVoteDAOHibernate.FIND_IMAGE_VOTES_COUNT_BY_USER, userId);
 	if ((list == null) || (list.size() == 0)) {
 	    return 0;
 	}
