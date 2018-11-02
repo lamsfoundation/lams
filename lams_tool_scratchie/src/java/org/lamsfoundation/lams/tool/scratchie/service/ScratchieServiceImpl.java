@@ -164,7 +164,7 @@ public class ScratchieServiceImpl
     public Scratchie getDefaultContent(Long contentId) throws ScratchieApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ScratchieServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new ScratchieApplicationException(error);
 	}
 
@@ -319,7 +319,7 @@ public class ScratchieServiceImpl
 
 		// create new user in a DB
 		if (leader == null) {
-		    ScratchieServiceImpl.log.debug("creating new user with userId: " + leaderUserId);
+		    log.debug("creating new user with userId: " + leaderUserId);
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
 		    this.createUser(leader);
@@ -1780,7 +1780,7 @@ public class ScratchieServiceImpl
 	Scratchie defaultScratchie = getScratchieByContentId(defaultScratchieId);
 	if (defaultScratchie == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ScratchieServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new ScratchieApplicationException(error);
 	}
 
@@ -1788,11 +1788,10 @@ public class ScratchieServiceImpl
     }
 
     private Long getToolDefaultContentIdBySignature(String toolSignature) throws ScratchieApplicationException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ScratchieServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new ScratchieApplicationException(error);
 	}
 	return contentId;
@@ -1921,7 +1920,7 @@ public class ScratchieServiceImpl
 		user.setFirstName(sysUser.getFirstName());
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
-		user.setUserId(new Long(newUserUid.longValue()));
+		user.setUserId(newUserUid.longValue());
 	    }
 
 	    scratchieDao.saveObject(toolContentObj);
@@ -1975,11 +1974,11 @@ public class ScratchieServiceImpl
 	scratchieDao.saveObject(toContent);
 
 	// save scratchie items as well
-	Set items = toContent.getScratchieItems();
+	Set<ScratchieItem> items = toContent.getScratchieItems();
 	if (items != null) {
-	    Iterator iter = items.iterator();
+	    Iterator<ScratchieItem> iter = items.iterator();
 	    while (iter.hasNext()) {
-		ScratchieItem item = (ScratchieItem) iter.next();
+		ScratchieItem item = iter.next();
 		// createRootTopic(toContent.getUid(),null,msg);
 	    }
 	}
@@ -2020,7 +2019,7 @@ public class ScratchieServiceImpl
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
 	if (scratchie == null) {
-	    ScratchieServiceImpl.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -2037,9 +2036,8 @@ public class ScratchieServiceImpl
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log
-		    .debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
@@ -2077,11 +2075,11 @@ public class ScratchieServiceImpl
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
-	    ScratchieServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
 	}
 	if (learnerId == null) {
-	    ScratchieServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(toolSessionId);
@@ -2089,8 +2087,8 @@ public class ScratchieServiceImpl
 	    session.setStatus(ScratchieConstants.COMPLETED);
 	    scratchieSessionDao.saveObject(session);
 	} else {
-	    ScratchieServiceImpl.log.error("Fail to leave tool Session.Could not find shared scratchie "
-		    + "session by given session id: " + toolSessionId);
+	    log.error("Fail to leave tool Session.Could not find shared scratchie " + "session by given session id: "
+		    + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared scratchie session by given session id: " + toolSessionId);
 	}

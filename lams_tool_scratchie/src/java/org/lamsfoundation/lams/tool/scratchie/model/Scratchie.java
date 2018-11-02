@@ -28,6 +28,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -37,60 +48,73 @@ import org.apache.log4j.Logger;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_lascrt11_scratchie")
 public class Scratchie implements Cloneable {
-
     private static final Logger log = Logger.getLogger(Scratchie.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
     // advance
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
     // general infomation
+    
+    @Column(name = "create_date")
     private Date created;
 
+    @Column(name = "update_date")
     private Date updated;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    // scratchie Items
-    private Set scratchieItems;
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("order_id ASC")
+    @JoinColumn(name = "scratchie_uid")
+    private Set<ScratchieItem> scratchieItems = new HashSet<>();;
 
+    @Column(name = "extra_point")
     private boolean extraPoint;
 
+    @Column(name = "burning_questions_enabled")
     private boolean burningQuestionsEnabled;
 
+    @Column(name = "shuffle_items")
     private boolean shuffleItems;
 
+    @Column(name = "time_limit")
     private int timeLimit;
 
+    @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
 
     //overwrites default preset marks stored as admin config setting
+    @Column(name = "preset_marks")
     private String presetMarks;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "show_scratchies_in_results")
     private boolean showScrachiesInResults;
-
-    /**
-     * Default contruction method.
-     *
-     */
-    public Scratchie() {
-	scratchieItems = new HashSet();
-    }
 
     // **********************************************************
     // Function method for Scratchie
@@ -105,16 +129,15 @@ public class Scratchie implements Cloneable {
 
     @Override
     public Object clone() {
-
 	Scratchie scratchie = null;
 	try {
 	    scratchie = (Scratchie) super.clone();
 	    scratchie.setUid(null);
 	    if (scratchieItems != null) {
-		Iterator iter = scratchieItems.iterator();
-		Set set = new HashSet();
+		Iterator<ScratchieItem> iter = scratchieItems.iterator();
+		Set<ScratchieItem> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    ScratchieItem item = (ScratchieItem) iter.next();
+		    ScratchieItem item = iter.next();
 		    ScratchieItem newItem = (ScratchieItem) item.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newItem);
@@ -122,7 +145,7 @@ public class Scratchie implements Cloneable {
 		scratchie.scratchieItems = set;
 	    }
 	} catch (CloneNotSupportedException e) {
-	    Scratchie.log.error("When clone " + Scratchie.class + " failed");
+	    log.error("When clone " + Scratchie.class + " failed");
 	}
 
 	return scratchie;
@@ -207,7 +230,6 @@ public class Scratchie implements Cloneable {
      * Returns deadline for learner's submission
      *
      * @return submissionDeadline
-     *
      */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
@@ -221,10 +243,7 @@ public class Scratchie implements Cloneable {
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
     }
-
-    /**
-     *
-     */
+    
     public Long getUid() {
 	return uid;
     }
@@ -235,9 +254,6 @@ public class Scratchie implements Cloneable {
 
     /**
      * @return Returns the title.
-     *
-     *
-     *
      */
     public String getTitle() {
 	return title;
@@ -253,8 +269,6 @@ public class Scratchie implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -264,15 +278,6 @@ public class Scratchie implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
     public Set<ScratchieItem> getScratchieItems() {
 	return scratchieItems;
     }
@@ -281,10 +286,6 @@ public class Scratchie implements Cloneable {
 	this.scratchieItems = scratchieItems;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -293,10 +294,6 @@ public class Scratchie implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -305,10 +302,6 @@ public class Scratchie implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -317,10 +310,6 @@ public class Scratchie implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -329,10 +318,6 @@ public class Scratchie implements Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isExtraPoint() {
 	return extraPoint;
     }
@@ -341,10 +326,6 @@ public class Scratchie implements Cloneable {
 	this.extraPoint = extraPoint;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isBurningQuestionsEnabled() {
 	return burningQuestionsEnabled;
     }
@@ -353,10 +334,6 @@ public class Scratchie implements Cloneable {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShuffleItems() {
 	return shuffleItems;
     }

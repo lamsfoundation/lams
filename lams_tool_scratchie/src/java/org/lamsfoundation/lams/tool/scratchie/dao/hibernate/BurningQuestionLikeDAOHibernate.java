@@ -12,16 +12,15 @@ public class BurningQuestionLikeDAOHibernate extends LAMSBaseDAO implements Burn
 
     @Override
     public boolean addLike(Long burningQuestionUid, Long sessionId) {
-	int status = getSession().createSQLQuery(INSERT_LIKE).setParameter("burningQuestionUid", burningQuestionUid)
+	int status = getSession().createNativeQuery(INSERT_LIKE).setParameter("burningQuestionUid", burningQuestionUid)
 		.setParameter("sessionId", sessionId).executeUpdate();
 	return status == 1;
     }
 
     @Override
     public void removeLike(Long burningQuestionUid, Long sessionId) {
-
-	final String FIND_BY_SESSION_AND_BURNING_QUESTION = "from " + BurningQuestionLike.class.getName()
-		+ " as l where l.sessionId=? and l.burningQuestion.uid = ?";
+	final String FIND_BY_SESSION_AND_BURNING_QUESTION = "FROM " + BurningQuestionLike.class.getName()
+		+ " AS l WHERE l.sessionId=? AND l.burningQuestion.uid = ?";
 
 	List<BurningQuestionLike> list = find(FIND_BY_SESSION_AND_BURNING_QUESTION,
 		new Object[] { sessionId, burningQuestionUid });

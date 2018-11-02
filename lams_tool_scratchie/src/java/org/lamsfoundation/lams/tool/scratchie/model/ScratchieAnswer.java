@@ -23,9 +23,17 @@
 
 package org.lamsfoundation.lams.tool.scratchie.model;
 
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -35,24 +43,37 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_lascrt11_scratchie_answer")
 public class ScratchieAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(ScratchieAnswer.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private String description;
 
+    @Column
     private boolean correct;
 
+    @Column(name = "order_id")
     private Integer orderId;
 
+    @ManyToOne
+    @JoinColumn(name = "scratchie_item_uid")
     private ScratchieItem scratchieItem;
 
-    // ***********************************************
-    // DTO fields:
+    // ******************** DTO fields ***************************
+    @Transient
     private boolean scratched;
+    @Transient
     private int attemptOrder;
+    @Transient
     private int[] attempts;
+    @Transient
     private List<ConfidenceLevelDTO> confidenceLevelDtos;
 
     // **********************************************************

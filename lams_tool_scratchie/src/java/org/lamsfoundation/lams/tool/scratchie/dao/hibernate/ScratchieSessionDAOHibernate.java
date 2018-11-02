@@ -83,33 +83,30 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     public void deleteBySessionId(Long toolSessionId) {
 	this.removeObject(ScratchieSession.class, toolSessionId);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-	NativeQuery query = getSession().createNativeQuery(LOAD_MARKS);
+	NativeQuery<?> query = getSession().createNativeQuery(LOAD_MARKS);
 	query.setParameter("toolContentId", toolContentId);
-	List<Number> list = query.list();
-	return list;
+	return (List<Number>) query.list();
     }
     
     @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
-	NativeQuery query = getSession().createNativeQuery(FIND_MARK_STATS)
+	NativeQuery<?> query = getSession().createNativeQuery(FIND_MARK_STATS)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE)
 		.addScalar("num_complete", IntegerType.INSTANCE);
 	query.setParameter("toolContentId", toolContentId);
-	@SuppressWarnings("rawtypes")
-	List list = query.list();
+	@SuppressWarnings("unchecked")
+	List<Object[]> list = (List<Object[]>) query.list();
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
 	    return (Object[]) list.get(0);
 	}
     }
-
-
 
 }
