@@ -26,6 +26,9 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.PermissionGateActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -34,15 +37,18 @@ import org.lamsfoundation.lams.tool.SystemTool;
  * @author Manpreet Minhas
  *
  */
+@Entity
+@DiscriminatorValue("5")
 public class PermissionGateActivity extends GateActivity implements Serializable {
+    private static final long serialVersionUID = 7871269712887929284L;
 
     /** full constructor */
     public PermissionGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
 	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
-	    SystemTool sysTool, Set branchActivityEntries) {
+	    String languageFile, Boolean stopAfterActivity, Set<Activity> inputActivities, Integer gateActivityLevelId,
+	    SystemTool sysTool, Set<BranchActivityEntry> branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
@@ -76,7 +82,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     public Activity createCopy(int uiidOffset) {
 	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
 	copyToNewActivity(newPermissionGateActivity, uiidOffset);
-	newPermissionGateActivity.setGateOpen(new Boolean(false));
+	newPermissionGateActivity.setGateOpen(false);
 	newPermissionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
 	return newPermissionGateActivity;
 
@@ -94,5 +100,4 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     public boolean isNull() {
 	return false;
     }
-
 }

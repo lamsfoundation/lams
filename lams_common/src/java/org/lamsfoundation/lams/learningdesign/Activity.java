@@ -33,6 +33,25 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -49,8 +68,13 @@ import org.lamsfoundation.lams.util.Nullable;
  * Base class for all activities. If you add another subclass, you must update ActivityDAO.getActivityByActivityId() and
  * add a ACTIVITY_TYPE constant.
  */
+@Entity
+@Table(name = "lams_learning_activity")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "learning_activity_type_id", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class Activity implements Serializable, Nullable, Comparable<Activity> {
 
+    private static final long serialVersionUID = -7181715764819934724L;
     // ---------------------------------------------------------------------
     // Class Level Constants
     // ---------------------------------------------------------------------
@@ -105,105 +129,129 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     public static final String I18N_DESCRIPTION = "activity.description";
     public static final String I18N_HELP_TEXT = "activity.helptext";
 
-    /** identifier field */
+    @Id
+    @Column(name = "activity_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long activityId;
 
     /**
      * Authoring generated value. Unique per LearningDesign.
      */
+    @Column(name = "activity_ui_id")
     private Integer activityUIID;
 
-    /** Description of the activity */
+    @Column
     private String description;
 
-    /** Title of the activity */
+    @Column
     private String title;
-
-    /** Help text for the activity */
-    private String helpText;
 
     /**
      * UI specific attribute indicating the position of the activity
      */
+    @Column
     private Integer xcoord;
 
     /**
      * UI specific attribute indicating the position of the activity
      */
+    @Column
     private Integer ycoord;
 
     /**
      * Indicates the order in which the activities appear inside complex activities. Starts from 0, 1 and so on.
      */
+    @Column(name = "order_id")
     private Integer orderId;
 
     /** Date this activity was created */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
     /**
      * The image that represents the icon of this activity in the UI
      */
+    @Column(name = "library_activity_ui_image")
     private String libraryActivityUiImage;
 
     /** The LearningLibrary of which this activity is a part */
+    @ManyToOne
+    @JoinColumn(name = "learning_library_id")
     private LearningLibrary learningLibrary;
 
     /**
      * The activity that acts as a container/parent for this activity. Normally would be one of the complex activities
      * which have child activities defined inside them.
      */
+    @ManyToOne
+    @JoinColumn(name = "parent_activity_id")
     private Activity parentActivity;
 
     /**
      * Single Library can have one or more activities defined inside it. This field indicates which activity is this.
      */
+    @ManyToOne
+    @JoinColumn(name = "library_activity_id")
     private Activity libraryActivity;
 
     /** The LearningDesign to which this activity belongs */
+    @ManyToOne
+    @JoinColumn(name = "learning_design_id")
     private LearningDesign learningDesign;
 
     /** The Grouping that applies to this activity */
+    @ManyToOne
+    @JoinColumn(name = "grouping_id")
     private Grouping grouping;
 
     /**
      * The grouping_ui_id of the Grouping that applies that to this activity
      */
+    @Column(name = "grouping_ui_id")
     private Integer groupingUIID;
 
-    /** The type of activity */
+    @Column(name = "learning_activity_type_id", insertable = false, updatable = false)
     private Integer activityTypeId;
 
-    /** The category of activity */
+    @Column(name = "activity_category_id")
     private Integer activityCategoryID;
 
-    /** persistent field */
+    @OneToOne
+    @JoinColumn(name = "transition_to_id")
     private Transition transitionTo;
 
-    /** persistent field */
+    @OneToOne
+    @JoinColumn(name = "transition_from_id")
     private Transition transitionFrom;
 
     /** the activity_ui_id of the parent activity */
+    @Column(name = "parent_ui_id")
     private Integer parentUIID;
 
+    @Column(name = "apply_grouping_flag")
     private Boolean applyGrouping;
 
+    @Column(name = "grouping_support_type_id")
     private Integer groupingSupportType;
 
     /**
      * Name of the file (including the package) that contains the text strings for this activity. e.g.
      * org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
      */
+    @Column(name = "language_file")
     private String languageFile;
 
     /**
      * An activity is readOnly when a learner starts doing the activity. Used in editOnFly.
      */
+    @Column(name = "read_only")
     private Boolean readOnly;
 
     /**
      * An activity is initialised if it is ready to be used in lesson ie the tool content is set up, schedule gates are
      * scheduled, etc. Used to detect which activities need to be initialised for live edit.
      */
+    @Column
     private Boolean initialised;
 
     /**
@@ -211,18 +259,23 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * stop somewhere in a design, such as at the end of the branch. The normal final activity of a design does not
      * necessarily have this set - the progress engine will just stop when it runs out of transitions to follow.
      */
+    @Column(name = "stop_after_activity")
     private Boolean stopAfterActivity;
 
     /**
      * The activities that supplied inputs to this activity.
      */
-    private Set inputActivities;
+    @ManyToMany
+    @JoinTable(name = "lams_input_activity", joinColumns = @JoinColumn(name = "activity_id"), inverseJoinColumns = @JoinColumn(name = "input_activity_id"))
+    @OrderBy("activity_id")
+    private Set<Activity> inputActivities = new HashSet<Activity>();
 
     /**
      * The BranchActivityEntries that map conditions to this Activity; bi-directional association required (e.g.
      * LDEV-1910)
      */
-    private Set branchActivityEntries;
+    @OneToMany(mappedBy = "branchingActivity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BranchActivityEntry> branchActivityEntries = new HashSet<BranchActivityEntry>();
 
     // ---------------------------------------------------------------------
     // Object constructors
@@ -237,7 +290,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	    Integer orderId, Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
 	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
 	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-	    Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
+	    Boolean stopAfterActivity, Set<Activity> inputActivities, Set<BranchActivityEntry> branchActivityEntries) {
 	this.activityId = activityId;
 	activityUIID = id;
 	this.description = description;
@@ -357,7 +410,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	}
-	activity.setActivityTypeId(new Integer(activityType));
+	activity.setActivityTypeId(activityType);
 	return activity;
     }
 
@@ -547,10 +600,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * @return Returns the inputActivities.
      */
-    public Set getInputActivities() {
-	if (inputActivities == null) {
-	    this.setInputActivities(new HashSet());
-	}
+    public Set<Activity> getInputActivities() {
 	return inputActivities;
     }
 
@@ -558,7 +608,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * @param InputActivities
      *            The InputActivities to set.
      */
-    public void setInputActivities(Set inputActivities) {
+    public void setInputActivities(Set<Activity> inputActivities) {
 	this.inputActivities = inputActivities;
     }
 
@@ -573,7 +623,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * @param branchActivityEntries
      *            The branchActivityEntries to set.
      */
-    public void setBranchActivityEntries(Set branchActivityEntries) {
+    public void setBranchActivityEntries(Set<BranchActivityEntry> branchActivityEntries) {
 	this.branchActivityEntries = branchActivityEntries;
     }
 
@@ -674,14 +724,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.libraryActivity = libraryActivity;
     }
 
-    public String getHelpText() {
-	return helpText;
-    }
-
-    public void setHelpText(String helpText) {
-	this.helpText = helpText;
-    }
-
     public Integer getGroupingUIID() {
 	return groupingUIID;
     }
@@ -720,16 +762,14 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      *
      * @return the set of all tool activities.
      */
-    public Set getAllToolActivities() {
-	SortedSet toolActivities = new TreeSet(new ActivityOrderComparator());
+    public Set<ToolActivity> getAllToolActivities() {
+	SortedSet<ToolActivity> toolActivities = new TreeSet<ToolActivity>(new ActivityOrderComparator());
 	getToolActivitiesInActivity(toolActivities);
 	return toolActivities;
     }
 
-    protected void getToolActivitiesInActivity(SortedSet toolActivities) {
-
+    protected void getToolActivitiesInActivity(SortedSet<ToolActivity> toolActivities) {
 	// a simple activity doesn't have any tool activities
-
     }
 
     /**
@@ -757,8 +797,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      */
     protected Group getGroupFor(User learner, Grouping inGrouping) {
 	if (inGrouping != null) {
-	    for (Iterator i = inGrouping.getGroups().iterator(); i.hasNext();) {
-		Group group = (Group) i.next();
+	    for (Iterator<Group> i = inGrouping.getGroups().iterator(); i.hasNext();) {
+		Group group = i.next();
 		if (inGrouping.isLearnerGroup(group) && group.hasLearner(learner)) {
 		    return group;
 		}
@@ -967,7 +1007,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	newActivity.setActivityUIID(LearningDesign.addOffset(this.getActivityUIID(), uiidOffset));
 	newActivity.setDescription(this.getDescription());
 	newActivity.setTitle(this.getTitle());
-	newActivity.setHelpText(this.getHelpText());
 	newActivity.setXcoord(this.getXcoord());
 	newActivity.setYcoord(this.getYcoord());
 	newActivity.setActivityTypeId(this.getActivityTypeId());
@@ -993,7 +1032,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	newActivity.setParentUIID(LearningDesign.addOffset(this.getParentUIID(), uiidOffset));
 
 	if ((this.getInputActivities() != null) && (this.getInputActivities().size() > 0)) {
-	    newActivity.setInputActivities(new HashSet());
+	    newActivity.setInputActivities(new HashSet<Activity>());
 	    newActivity.getInputActivities().addAll(this.getInputActivities());
 	}
     }
@@ -1016,9 +1055,9 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     public ArrayList<Integer> getInputActivityUIIDs() {
 	ArrayList<Integer> list = new ArrayList<Integer>();
 	if ((getInputActivities() != null) && (getInputActivities().size() > 0)) {
-	    Iterator iter = getInputActivities().iterator();
+	    Iterator<Activity> iter = getInputActivities().iterator();
 	    while (iter.hasNext()) {
-		Activity inputAct = (Activity) iter.next();
+		Activity inputAct = iter.next();
 		list.add(inputAct.getActivityUIID());
 	    }
 	}
@@ -1031,9 +1070,9 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      */
     public Integer getToolInputActivityUIID() {
 	if (getInputActivities() != null) {
-	    Iterator iter = getInputActivities().iterator();
+	    Iterator<Activity> iter = getInputActivities().iterator();
 	    if (iter.hasNext()) {
-		return ((Activity) iter.next()).getActivityUIID();
+		return iter.next().getActivityUIID();
 	    }
 	}
 	return null;

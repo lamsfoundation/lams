@@ -74,9 +74,6 @@ public class AuthoringActivityDTO extends BaseDTO {
     /** Title of the activity */
     private String activityTitle;
 
-    /** Help text for the activity */
-    private String helpText;
-
     /** Help URL for the activity */
     private String helpURL;
 
@@ -273,14 +270,13 @@ public class AuthoringActivityDTO extends BaseDTO {
      ******************************************************************************************************************/
     public AuthoringActivityDTO() {
     }
-    
+
     public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings,
 	    String languageCode) {
 	activityID = activity.getActivityId();
 	activityUIID = activity.getActivityUIID();
 	description = activity.getDescription();
 	activityTitle = activity.getTitle();
-	helpText = activity.getHelpText();
 	xCoord = activity.getXcoord();
 	yCoord = activity.getYcoord();
 	parentActivityID = activity.getParentActivity() != null ? activity.getParentActivity().getActivityId() : null;
@@ -609,13 +605,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      */
     public Integer getGroupingUIID() {
 	return groupingUIID;
-    }
-
-    /**
-     * @return Returns the helpText.
-     */
-    public String getHelpText() {
-	return helpText;
     }
 
     /**
@@ -972,14 +961,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      */
     public void setGroupingUIID(Integer groupingUIID) {
 	this.groupingUIID = groupingUIID;
-    }
-
-    /**
-     * @param helpText
-     *            The helpText to set.
-     */
-    public void setHelpText(String helpText) {
-	this.helpText = helpText;
     }
 
     /**

@@ -119,7 +119,7 @@ public class MonitoringController {
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
-    
+
     @Autowired
     private ILogEventService logEventService;
     @Autowired
@@ -804,7 +804,7 @@ public class MonitoringController {
 	    learnerCount = monitoringService.getCountLearnersCompletedLesson(lessonId);
 	} else {
 	    Activity activity = monitoringService.getActivityById(activityId);
-	    Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+	    Lesson lesson = activity.getLearningDesign().getLessons().iterator().next();
 	    if (!securityService.isLessonMonitor(lesson.getLessonId(), getUserId(), "get activity learners", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
@@ -1233,7 +1233,7 @@ public class MonitoringController {
 
 	Set<Activity> activities = new HashSet<>();
 	// filter activities that are interesting for further processing
-	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	for (Activity activity : learningDesign.getActivities()) {
 	    if (activity.isSequenceActivity()) {
 		// skip sequence activities as they are just for grouping
 		continue;
@@ -1384,7 +1384,7 @@ public class MonitoringController {
 	// on first fetch get transitions metadata so Monitoring can set their SVG elems IDs
 	if (WebUtil.readBooleanParam(request, "getTransitions", false)) {
 	    ArrayNode transitions = JsonNodeFactory.instance.arrayNode();
-	    for (Transition transition : (Set<Transition>) learningDesign.getTransitions()) {
+	    for (Transition transition : learningDesign.getTransitions()) {
 		ObjectNode transitionJSON = JsonNodeFactory.instance.objectNode();
 		transitionJSON.put("uiid", transition.getTransitionUIID());
 		transitionJSON.put("fromID", transition.getFromActivity().getActivityId());
@@ -1396,11 +1396,11 @@ public class MonitoringController {
 	}
 
 	// check for live edit status
-	if ( lesson.getLiveEditEnabled() ) {
-	    if ( lesson.getLockedForEdit()) {
+	if (lesson.getLiveEditEnabled()) {
+	    if (lesson.getLockedForEdit()) {
 		responseJSON.put("lockedForEdit", true);
 		User currentEditor = lesson.getLearningDesign().getEditOverrideUser();
-		if ( currentEditor != null ) {
+		if (currentEditor != null) {
 		    responseJSON.put("lockedForEditUserId", currentEditor.getUserId());
 		    responseJSON.put("lockedForEditUsername", currentEditor.getFullName());
 		}
@@ -1408,7 +1408,7 @@ public class MonitoringController {
 		responseJSON.put("lockedForEdit", false);
 	    }
 	}
-	
+
 	response.setContentType("application/json;charset=utf-8");
 
 	return responseJSON.toString();
@@ -1505,7 +1505,7 @@ public class MonitoringController {
     @SuppressWarnings("unchecked")
     private boolean containsActivity(ComplexActivity complexActivity, long targetActivityId,
 	    IMonitoringService monitoringService) {
-	for (Activity childActivity : (Set<Activity>) complexActivity.getActivities()) {
+	for (Activity childActivity : complexActivity.getActivities()) {
 	    if (childActivity.getActivityId().equals(targetActivityId)) {
 		return true;
 	    }
@@ -1546,8 +1546,7 @@ public class MonitoringController {
 	    throw new InvalidParameterException(
 		    "There are no lessons associated with learning design: " + learningDesignId);
 	}
-	Integer organisationID = ((Lesson) learningDesign.getLessons().iterator().next()).getOrganisation()
-		.getOrganisationId();
+	Integer organisationID = learningDesign.getLessons().iterator().next().getOrganisation().getOrganisationId();
 	Integer userID = getUserId();
 	if (!securityService.hasOrgRole(organisationID, userID, new String[] { Role.AUTHOR }, "start live edit",
 		false)) {
@@ -1695,7 +1694,7 @@ public class MonitoringController {
 			    Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
 			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService
 				    .getActivityById(contributeActivity.getActivityID());
-			    for (SequenceActivity branch : (Set<SequenceActivity>) branching.getActivities()) {
+			    for (SequenceActivity branch : (Set<SequenceActivity>) (Set<?>) branching.getActivities()) {
 				Group group = branch.getSoleGroupForBranch();
 				if (group != null) {
 				    learners.removeAll(group.getUsers());

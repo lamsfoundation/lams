@@ -24,46 +24,24 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SynchGateActivityStrategy;
-import org.lamsfoundation.lams.tool.SystemTool;
 
 /**
  * @author Manpreet Minhas
  *
  */
+@Entity
+@DiscriminatorValue("3")
 public class SynchGateActivity extends GateActivity implements Serializable {
-
-    /** full constructor */
-    public SynchGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, String languageFile, Boolean stopAfterActivity, Set inputActivities,
-	    Integer gateActivityLevelId, Set waitingLearners, SystemTool sysTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
-		branchActivityEntries);
-	super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
-    }
+    private static final long serialVersionUID = 1306760691780177765L;
 
     /** default constructor */
     public SynchGateActivity() {
-	super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public SynchGateActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId, Set waitingLearners) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId);
 	super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 
@@ -77,7 +55,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
 	copyToNewActivity(newSynchGateActivity, uiidOffset);
 	newSynchGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
-	newSynchGateActivity.setGateOpen(new Boolean(false));
+	newSynchGateActivity.setGateOpen(false);
 	return newSynchGateActivity;
     }
 
@@ -93,5 +71,4 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     public boolean isNull() {
 	return false;
     }
-
 }

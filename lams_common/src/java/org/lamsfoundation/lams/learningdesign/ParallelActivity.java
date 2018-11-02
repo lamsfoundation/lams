@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.ParallelActivityStrategy;
@@ -33,36 +35,13 @@ import org.lamsfoundation.lams.learningdesign.strategy.ParallelActivityStrategy;
  * @author Manpreet Minhas
  *
  */
+@Entity
+@DiscriminatorValue("6")
 public class ParallelActivity extends ComplexActivity implements Serializable {
-
-    /** full constructor */
-    public ParallelActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set activities,
-	    Activity defaultActivity, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
-		branchActivityEntries);
-	super.activityStrategy = new ParallelActivityStrategy(this);
-    }
+    private static final long serialVersionUID = 5910140223400659619L;
 
     /** default constructor */
     public ParallelActivity() {
-	super.activityStrategy = new ParallelActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public ParallelActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Set activities) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, activities);
 	super.activityStrategy = new ParallelActivityStrategy(this);
     }
 
@@ -84,12 +63,8 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
     @Override
     public boolean isNull() {
 	return false;
     }
-
 }

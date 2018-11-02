@@ -26,6 +26,11 @@ package org.lamsfoundation.lams.tool;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -38,10 +43,13 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @author daveg, Jacky Fang
  *
  */
+@Entity
+@DiscriminatorValue("1")
 public class GroupedToolSession extends ToolSession {
     private static final long serialVersionUID = 8638128083435243375L;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "group_id")
     private Group sessionGroup;
 
     /** default constructor */

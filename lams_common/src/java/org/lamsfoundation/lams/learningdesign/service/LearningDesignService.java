@@ -444,8 +444,6 @@ public class LearningDesignService implements ILearningDesignService {
 			    activity.getActivityTitle(), locale));
 		    activity.setDescription(toolMessageSource.getMessage(Activity.I18N_DESCRIPTION, null,
 			    activity.getDescription(), locale));
-		    activity.setHelpText(toolMessageSource.getMessage(Activity.I18N_HELP_TEXT, null,
-			    activity.getHelpText(), locale));
 		} else {
 		    log.warn("Unable to internationalise the library activity " + activity.getActivityID() + " "
 			    + activity.getActivityTitle() + " message file " + activity.getLanguageFile()
@@ -493,12 +491,12 @@ public class LearningDesignService implements ILearningDesignService {
 	}
 	return FileUtil.getFullPath(thumbnailDir.getAbsolutePath(), thumbnailFileName);
     }
-    
+
     /**
      * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
      * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
      * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
-     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the 
+     * quite intensive as it gets all the learning designs in a folder. Moved from AuthoringService to here so that the
      * Import code can use it.
      *
      * @param originalLearningDesign
@@ -514,10 +512,10 @@ public class LearningDesignService implements ILearningDesignService {
 	    List<String> ldTitleList = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderId,
 		    originalTitle);
 
-	    if ( ldTitleList.size() == 0 ) {
+	    if (ldTitleList.size() == 0) {
 		return originalTitle;
 	    }
-	    
+
 	    Calendar calendar = Calendar.getInstance();
 	    int mth = calendar.get(Calendar.MONTH) + 1;
 	    String mthStr = new Integer(mth).toString();

@@ -57,7 +57,6 @@ public class LibraryActivityDTO extends BaseDTO {
     private Integer groupingUIID;
     private String description;
     private String activityTitle;
-    private String helpText;
     private String helpURL;
     private Integer xCoord;
     private Integer yCoord;
@@ -125,7 +124,6 @@ public class LibraryActivityDTO extends BaseDTO {
 	groupingUIID = activity.getGroupingUIID();
 	description = activity.getDescription();
 	activityTitle = activity.getTitle();
-	helpText = activity.getHelpText();
 	xCoord = activity.getXcoord();
 	yCoord = activity.getYcoord();
 	libraryActivityUIImage = activity.getLibraryActivityUiImage();
@@ -195,7 +193,7 @@ public class LibraryActivityDTO extends BaseDTO {
 	Tool tool = toolActivity.getTool();
 	if (tool != null) {
 	    toolID = tool.getToolId();
-	    toolContentID = new Long(tool.getDefaultToolContentId());
+	    toolContentID = tool.getDefaultToolContentId();
 	    toolDisplayName = tool.getToolDisplayName();
 	    toolLanguageFile = tool.getLanguageFile();
 	    toolSignature = tool.getToolSignature();
@@ -321,14 +319,7 @@ public class LibraryActivityDTO extends BaseDTO {
     }
 
     /**
-     * @return Returns the helpText.
-     */
-    public String getHelpText() {
-	return helpText;
-    }
-
-    /**
-     * 
+     *
      * @return Return the helpURL
      */
     public String getHelpURL() {
@@ -455,7 +446,7 @@ public class LibraryActivityDTO extends BaseDTO {
     }
 
     /**
-     * 
+     *
      * @return Returns the toolSignature
      */
     public String getToolSignature() {
@@ -548,14 +539,9 @@ public class LibraryActivityDTO extends BaseDTO {
 	this.description = description;
     }
 
-    /** Set the activity's help text */
-    public void setHelpText(String helpText) {
-	this.helpText = helpText;
-    }
-
     /**
      * Set the activity's help url
-     * 
+     *
      * @param helpURL
      */
     public void setHelpURL(String helpURL) {
@@ -574,7 +560,7 @@ public class LibraryActivityDTO extends BaseDTO {
 
     /**
      * Set the tool's signature
-     * 
+     *
      * @param toolSignature
      */
 

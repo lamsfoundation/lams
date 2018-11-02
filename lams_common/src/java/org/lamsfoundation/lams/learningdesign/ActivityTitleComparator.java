@@ -22,9 +22,6 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
 /**
  * The activity name comparator used for sorted set, sorting on the activity's name then order id
  * then activity id. This comparator will impose orderings that are inconsistent with equals.
@@ -35,18 +32,15 @@ import java.util.Comparator;
  * activities then it calls ActivityOrderComparator to do the other comparisons. Do not assume that
  * it will always extend the ActivityOrderComparator.
  */
-public class ActivityTitleComparator extends ActivityOrderComparator implements Comparator, Serializable {
+public class ActivityTitleComparator extends ActivityOrderComparator {
 
     /**
      * Compare the order.
-     * 
+     *
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     @Override
-    public int compare(Object o1, Object o2) {
-	Activity activity1 = (Activity) o1;
-	Activity activity2 = (Activity) o2;
-
+    public int compare(Activity activity1, Activity activity2) {
 	int orderDiff = 0;
 
 	if (activity1.getTitle() != null) {
@@ -57,7 +51,6 @@ public class ActivityTitleComparator extends ActivityOrderComparator implements 
 	    }
 	}
 
-	return orderDiff != 0 ? orderDiff : super.compare(o1, o2);
+	return orderDiff != 0 ? orderDiff : super.compare(activity1, activity2);
     }
-
 }

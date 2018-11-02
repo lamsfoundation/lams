@@ -24,7 +24,10 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.OptionsActivityStrategy;
@@ -33,31 +36,22 @@ import org.lamsfoundation.lams.learningdesign.strategy.OptionsActivityStrategy;
  * @author Manpreet Minhas
  *
  */
+@Entity
+@DiscriminatorValue("7")
 public class OptionsActivity extends ComplexActivity implements Serializable {
+    private static final long serialVersionUID = 1528382662985852503L;
 
-    /** nullable persistent field */
+    @Column(name = "max_number_of_options")
     private Integer maxNumberOfOptions;
 
-    /** nullable persistent field */
+    @Column(name = "min_number_of_options")
     private Integer minNumberOfOptions;
 
-    /** nullable persistent field */
+    @Column(name = "options_instructions")
     private String optionsInstructions;
 
     /** default constructor */
     public OptionsActivity() {
-	super.activityStrategy = new OptionsActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public OptionsActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Set activities) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, activities);
 	super.activityStrategy = new OptionsActivityStrategy(this);
     }
 
@@ -98,7 +92,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
      * Get the manimum number of options, guaranteed not to return null. If the value is null in the database, returns 0
      */
     public Integer getMinNumberOfOptionsNotNull() {
-	return minNumberOfOptions != null ? minNumberOfOptions : new Integer(0);
+	return minNumberOfOptions != null ? minNumberOfOptions : 0;
     }
 
     public void setMinNumberOfOptions(Integer minNumberOfOptions) {

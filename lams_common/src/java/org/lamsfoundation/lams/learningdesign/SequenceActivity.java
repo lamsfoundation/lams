@@ -31,6 +31,14 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -42,44 +50,23 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Manpreet Minhas
  *
  */
+@Entity
+@DiscriminatorValue("8")
 public class SequenceActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
+
+    private static final long serialVersionUID = -8469144939023452269L;
 
     private static Logger log = Logger.getLogger(SequenceActivity.class);
 
-    private Set<BranchActivityEntry> branchEntries;
-    private SystemTool systemTool;
+    @OneToMany(mappedBy = "branchSequenceActivity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BranchActivityEntry> branchEntries = new HashSet<BranchActivityEntry>();
 
-    /** full constructor */
-    public SequenceActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set activities,
-	    Activity defaultActivity, Set<BranchActivityEntry> branchEntries, SystemTool systemTool,
-	    Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
-		branchActivityEntries);
-	super.activityStrategy = new SequenceActivityStrategy(this);
-	this.branchEntries = branchEntries;
-	this.systemTool = systemTool;
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "system_tool_id")
+    private SystemTool systemTool;
 
     /** default constructor */
     public SequenceActivity() {
-	super.activityStrategy = new SequenceActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public SequenceActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, SortedSet activities) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, activities);
 	super.activityStrategy = new SequenceActivityStrategy(this);
     }
 
@@ -96,10 +83,9 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	newSequenceActivity.systemTool = this.systemTool;
 
 	if (this.getBranchEntries() != null && this.getBranchEntries().size() > 0) {
-	    newSequenceActivity.setBranchEntries(new HashSet());
-	    Iterator iter = this.getBranchEntries().iterator();
+	    Iterator<BranchActivityEntry> iter = this.getBranchEntries().iterator();
 	    while (iter.hasNext()) {
-		BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
+		BranchActivityEntry oldEntry = iter.next();
 		BranchActivityEntry newEntry = new BranchActivityEntry(null,
 			LearningDesign.addOffset(oldEntry.getEntryUIID(), uiidOffset), newSequenceActivity,
 			oldEntry.getBranchingActivity(), oldEntry.getGroup());
@@ -120,18 +106,11 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
     @Override
     public boolean isNull() {
 	return false;
     }
 
-    /**
-     *
-     *
-     */
     @Override
     public SystemTool getSystemTool() {
 	return systemTool;
@@ -145,16 +124,12 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     /**
      * Get the set of the branch to group mappings used for this branching activity. The set contains
      * BranchActivityEntry entries
-     *
-     *
-     *
-     *
      */
     public Set<BranchActivityEntry> getBranchEntries() {
 	return branchEntries;
     }
 
-    public void setBranchEntries(Set branchEntries) {
+    public void setBranchEntries(Set<BranchActivityEntry> branchEntries) {
 	this.branchEntries = branchEntries;
     }
 
@@ -165,11 +140,11 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	TreeSet<Group> sortedGroups = new TreeSet<Group>();
 
 	if (mappingEntries != null) {
-	    Iterator mappingIter = mappingEntries.iterator();
+	    Iterator<BranchActivityEntry> mappingIter = mappingEntries.iterator();
 	    while (mappingIter.hasNext()) {
 		// Not all the BranchEntries have groups - when in preview, if the user selects a different
 		// branch to their expected branch then a group may not exist yet.
-		Group group = ((BranchActivityEntry) mappingIter.next()).getGroup();
+		Group group = mappingIter.next().getGroup();
 		if (group != null) {
 		    sortedGroups.add(group);
 		}
@@ -190,9 +165,9 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	if (groups.size() > 1) {
 	    log.warn("Branch " + this + " has more than one group. This is unexpected. Using only the first group.");
 	}
-	Iterator iter = groups.iterator();
+	Iterator<Group> iter = groups.iterator();
 	if (iter.hasNext()) {
-	    return (Group) iter.next();
+	    return iter.next();
 	}
 
 	return null;
@@ -206,8 +181,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      * @return error message key
      */
     @Override
-    public Vector validateActivity(MessageService messageService) {
-	Vector listOfValidationErrors = new Vector();
+    public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
 	if (getActivities() != null && getActivities().size() > 0 && getDefaultActivity() == null) {
 	    listOfValidationErrors.add(
 		    new ValidationErrorDTO(ValidationErrorDTO.SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY_ERROR_CODE,
@@ -223,14 +198,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      */
     public void removeGroupFromBranch(Group group) {
 	if (getBranchEntries() != null) {
-	    Iterator iter = getBranchEntries().iterator();
+	    Iterator<BranchActivityEntry> iter = getBranchEntries().iterator();
 	    while (iter.hasNext()) {
-		BranchActivityEntry object = (BranchActivityEntry) iter.next();
+		BranchActivityEntry object = iter.next();
 		if (object.getGroup().equals(group)) {
 		    iter.remove();
 		}
 	    }
 	}
     }
-
 }

@@ -31,145 +31,173 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dto.ThemeDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
-public class User implements Serializable, Comparable {
-    /** identifier field */
+@Entity
+@Table(name = "lams_user")
+public class User implements Serializable, Comparable<User> {
+    private static final long serialVersionUID = 8711215689846731994L;
+
+    @Id
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
-    /** persistent field */
+    @Column
     private String login;
 
-    /**
-     * persistent field
-     */
+    @Column
     private String password;
 
+    @Column(name = "failed_attempts")
     private Integer failedAttempts;
 
+    @Column(name = "lock_out_time")
     private Date lockOutTime;
 
+    @Column(name = "two_factor_auth_enabled")
     private Boolean twoFactorAuthenticationEnabled;
 
+    @Column(name = "two_factor_auth_secret")
     private String twoFactorAuthenticationSecret;
 
-    /**
-     * persistent field
-     */
+    @Column
     private String salt;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** nullable persistent field */
+    @Column(name = "first_name")
     private String firstName;
 
-    /** nullable persistent field */
+    @Column(name = "last_name")
     private String lastName;
 
-    /** nullable persistent field */
+    @Column(name = "address_line_1")
     private String addressLine1;
 
-    /** nullable persistent field */
+    @Column(name = "address_line_2")
     private String addressLine2;
 
-    /** nullable persistent field */
+    @Column(name = "address_line_3")
     private String addressLine3;
 
-    /** nullable persistent field */
+    @Column
     private String city;
 
-    /** nullable persistent field */
+    @Column
     private String state;
 
-    /** nullable persistent field */
+    @Column
     private String postcode;
 
-    /** nullable persistent field */
+    @Column
     private String country;
 
-    /** nullable persistent field */
+    @Column(name = "day_phone")
     private String dayPhone;
 
-    /** nullable persistent field */
+    @Column(name = "evening_phone")
     private String eveningPhone;
 
-    /** nullable persistent field */
+    @Column(name = "mobile_phone")
     private String mobilePhone;
 
-    /** nullable persistent field */
+    @Column
     private String fax;
 
-    /** nullable persistent field */
+    @Column
     private String email;
 
-    /** persistent field */
+    @Column(name = "email_verified")
     private Boolean emailVerified = true;
 
-    /** persistent field */
+    @Column(name = "disabled_flag")
     private Boolean disabledFlag;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "locale_id")
     private SupportedLocale locale;
 
-    /** persistent field */
+    @Column(name = "timezone")
     private String timeZone;
 
-    /** persistent field */
+    @Column(name = "create_date")
     private Date createDate;
 
-    /** persistent field */
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "workspace_folder_id")
     private WorkspaceFolder workspaceFolder;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "authentication_method_id")
     private AuthenticationMethod authenticationMethod;
 
-    /** persistent field */
-    private Set<UserOrganisation> userOrganisations;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserOrganisation> userOrganisations = new HashSet<UserOrganisation>();
 
-    /** persistent field */
+    @Column(name = "last_visited_organisation_id")
     private Integer lastVisitedOrganisationId;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "theme_id")
     private Theme theme;
 
-    /** persistent field */
-    private Set learnerProgresses;
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<LearnerProgress> learnerProgresses = new HashSet<LearnerProgress>();
 
-    /** persistent field */
-    private Set userToolSessions;
+    @OneToMany(mappedBy = "user")
+    private Set<LearningDesign> learningDesigns = new HashSet<LearningDesign>();
 
-    /** persistent field */
-    private Set userGroups;
+    @OneToMany(mappedBy = "user")
+    private Set<Lesson> lessons = new HashSet<Lesson>();
 
-    /** persistent field */
-    private Set learningDesigns;
-
-    /** persistent field */
-    private Set lessons;
-
-    /** persistent field */
+    @Column(name = "portrait_uuid")
     private Long portraitUuid;
 
-    /** persistent field */
+    @Column(name = "change_password")
     private Boolean changePassword;
 
-    /** persistent field - latch */
+    @Column(name = "first_login")
     private Boolean firstLogin;
 
-    /** persistent field - for Pedagogical Planner */
+    @ManyToMany
+    @JoinTable(name = "lams_planner_recent_learning_designs", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "learning_design_id"))
+    @OrderBy("learning_design_id")
     private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
 
+    @Column(name = "modified_date")
     private Date modifiedDate;
 
-    /** default constructor */
     public User() {
 	changePassword = false;
 	twoFactorAuthenticationEnabled = false;
@@ -399,11 +427,11 @@ public class User implements Serializable, Comparable {
 	this.theme = theme;
     }
 
-    public Set getUserOrganisations() {
+    public Set<UserOrganisation> getUserOrganisations() {
 	return userOrganisations;
     }
 
-    public void setUserOrganisations(Set userOrganisations) {
+    public void setUserOrganisations(Set<UserOrganisation> userOrganisations) {
 	this.userOrganisations = userOrganisations;
     }
 
@@ -417,41 +445,30 @@ public class User implements Serializable, Comparable {
 
     /** This methods adds a new membership for the given user */
     public void addUserOrganisation(UserOrganisation userOrganisation) {
-	if (userOrganisations == null) {
-	    userOrganisations = new HashSet();
-	}
 	userOrganisations.add(userOrganisation);
     }
 
-    public Set getLearnerProgresses() {
+    public Set<LearnerProgress> getLearnerProgresses() {
 	return learnerProgresses;
     }
 
-    public void setLearnerProgresses(Set learnerProgresses) {
+    public void setLearnerProgresses(Set<LearnerProgress> learnerProgresses) {
 	this.learnerProgresses = learnerProgresses;
     }
 
-    public Set getUserToolSessions() {
-	return userToolSessions;
-    }
-
-    public void setUserToolSessions(Set userToolSessions) {
-	this.userToolSessions = userToolSessions;
-    }
-
-    public Set getLearningDesigns() {
+    public Set<LearningDesign> getLearningDesigns() {
 	return learningDesigns;
     }
 
-    public void setLearningDesigns(Set learningDesigns) {
+    public void setLearningDesigns(Set<LearningDesign> learningDesigns) {
 	this.learningDesigns = learningDesigns;
     }
 
-    public Set getLessons() {
+    public Set<Lesson> getLessons() {
 	return lessons;
     }
 
-    public void setLessons(Set lessons) {
+    public void setLessons(Set<Lesson> lessons) {
 	this.lessons = lessons;
     }
 
@@ -470,9 +487,8 @@ public class User implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object user) {
-	User u = (User) user;
-	return login.compareTo(u.getLogin());
+    public int compareTo(User user) {
+	return login.compareTo(user.getLogin());
     }
 
     @Override
@@ -516,9 +532,9 @@ public class User implements Serializable, Comparable {
      * This method checks whether user is a member of the given organisation
      */
     public boolean isMember(Organisation organisation) {
-	Iterator iterator = userOrganisations.iterator();
+	Iterator<UserOrganisation> iterator = userOrganisations.iterator();
 	while (iterator.hasNext()) {
-	    UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
+	    UserOrganisation userOrganisation = iterator.next();
 	    Integer organisationID = userOrganisation.getOrganisation().getOrganisationId();
 	    if (organisationID == organisation.getOrganisationId()) {
 		return true;
@@ -547,16 +563,16 @@ public class User implements Serializable, Comparable {
 	return false;
     }
 
-    private boolean checkFolders(Set folders, Integer desiredWorkspaceFolderId) {
+    private boolean checkFolders(Set<WorkspaceFolder> folders, Integer desiredWorkspaceFolderId) {
 	boolean foundMemberFolder = false;
-	Iterator folderIter = folders.iterator();
+	Iterator<WorkspaceFolder> folderIter = folders.iterator();
 	while (folderIter.hasNext() && !foundMemberFolder) {
-	    WorkspaceFolder folder = (WorkspaceFolder) folderIter.next();
+	    WorkspaceFolder folder = folderIter.next();
 	    Integer folderID = folder.getWorkspaceFolderId();
 	    if (folderID.equals(desiredWorkspaceFolderId)) {
 		foundMemberFolder = true;
 	    } else {
-		Set childFolders = folder.getChildWorkspaceFolders();
+		Set<WorkspaceFolder> childFolders = folder.getChildWorkspaceFolders();
 		if (childFolders != null) {
 		    foundMemberFolder = checkFolders(childFolders, desiredWorkspaceFolderId);
 		}

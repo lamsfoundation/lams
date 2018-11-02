@@ -20,13 +20,27 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("13")
 public class OptionsWithSequencesActivity extends OptionsActivity {
+    private static final long serialVersionUID = -7741699410475149768L;
+
+    @Column(name = "start_xcoord")
     private Integer startXcoord;
+
+    @Column(name = "start_ycoord")
     private Integer startYcoord;
+
+    @Column(name = "end_xcoord")
     private Integer endXcoord;
+
+    @Column(name = "end_ycoord")
     private Integer endYcoord;
 
     @Override

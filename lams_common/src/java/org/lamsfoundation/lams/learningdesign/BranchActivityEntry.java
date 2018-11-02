@@ -20,13 +20,26 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO;
@@ -42,21 +55,37 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO
  * @author Fiona Malikoff
  * @version 2.1
  */
+@Entity
+@Table(name = "lams_branch_activity_entry")
 public class BranchActivityEntry {
 
-    /** identifier field */
+    @Id
+    @Column(name = "entry_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long entryId;
-    /** persistent field */
+
+    @Column(name = "entry_ui_id")
     protected Integer entryUIID;
-    /** persistent field */
+
+    @ManyToOne
+    @JoinColumn(name = "sequence_activity_id")
     protected SequenceActivity branchSequenceActivity;
-    /** persistent field */
+
+    @ManyToOne
+    @JoinColumn(name = "branch_activity_id")
     protected Activity branchingActivity;
-    /** persistent field */
+    
+    @ManyToOne
+    @JoinColumn(name = "group_id")
     private Group group;
-    /** persistent field */
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "condition_id")
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @Fetch(FetchMode.JOIN)
     private BranchCondition condition;
-    /** persistent field */
+
+    @Column(name = "open_gate")
     private Boolean gateOpenWhenConditionMet;
 
     /**
@@ -203,8 +232,9 @@ public class BranchActivityEntry {
     public String toString() {
 	return new ToStringBuilder(this).append("entryId", getEntryId()).append("entryUIID", getEntryUIID())
 		.append("group", getGroup() != null ? getGroup().getGroupId().toString() : "")
-		.append("sequence activity", getBranchSequenceActivity() != null
-			? getBranchSequenceActivity().getActivityId().toString() : "")
+		.append("sequence activity",
+			getBranchSequenceActivity() != null ? getBranchSequenceActivity().getActivityId().toString()
+				: "")
 		.toString();
     }
 

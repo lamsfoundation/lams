@@ -575,12 +575,6 @@ public class UserManagementService implements IUserManagementService {
 		return true;
 	    }
 	}
-	if (user.getUserToolSessions() != null) {
-	    if (!user.getUserToolSessions().isEmpty()) {
-		log.debug("user has data, userToolSessions: " + user.getUserToolSessions().size());
-		return true;
-	    }
-	}
 	if (user.getLearningDesigns() != null) {
 	    if (!user.getLearningDesigns().isEmpty()) {
 		log.debug("user has data, learningDesigns: " + user.getLearningDesigns().size());
@@ -900,7 +894,8 @@ public class UserManagementService implements IUserManagementService {
 	String[] args = new String[1];
 	args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 	String message = messageService.getMessage("audit.user.password.change", args);
-	getLogEventService().logEvent(LogEvent.TYPE_PASSWORD_CHANGE, modifiedBy != null ? modifiedBy.getUserId() : null , user.getUserId(), null, null, message);
+	getLogEventService().logEvent(LogEvent.TYPE_PASSWORD_CHANGE, modifiedBy != null ? modifiedBy.getUserId() : null,
+		user.getUserId(), null, null, message);
     }
 
     @Override
@@ -909,7 +904,8 @@ public class UserManagementService implements IUserManagementService {
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 	args[1] = user.getFullName();
 	String message = messageService.getMessage("audit.user.create", args);
-	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserId() : null, user.getUserId(), null, null, message);
+	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserId() : null,
+		user.getUserId(), null, null, message);
     }
 
     @Override
@@ -918,7 +914,8 @@ public class UserManagementService implements IUserManagementService {
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
 	args[1] = user.getFullName();
 	String message = messageService.getMessage("audit.user.create", args);
-	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserID() : null, user.getUserId(), null, null, message);
+	getLogEventService().logEvent(LogEvent.TYPE_USER_ORG_ADMIN, createdBy != null ? createdBy.getUserID() : null,
+		user.getUserId(), null, null, message);
     }
 
     @Override
@@ -1131,7 +1128,8 @@ public class UserManagementService implements IUserManagementService {
 
 		//resize to the medium size
 		is = new FileInputStream(portraitFile);
-		modifiedPortraitInputStream = ResizePictureUtil.resize(is, CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
+		modifiedPortraitInputStream = ResizePictureUtil.resize(is,
+			CommonConstants.PORTRAIT_LARGEST_DIMENSION_MEDIUM);
 		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
 			fileNameWithoutExt + "_medium.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();
@@ -1143,7 +1141,8 @@ public class UserManagementService implements IUserManagementService {
 
 		//resize to the small size
 		is = new FileInputStream(portraitFile);
-		modifiedPortraitInputStream = ResizePictureUtil.resize(is, CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
+		modifiedPortraitInputStream = ResizePictureUtil.resize(is,
+			CommonConstants.PORTRAIT_LARGEST_DIMENSION_SMALL);
 		node = centralToolContentHandler.updateFile(node.getUuid(), modifiedPortraitInputStream,
 			fileNameWithoutExt + "_small.jpg", "image/jpeg");
 		modifiedPortraitInputStream.close();

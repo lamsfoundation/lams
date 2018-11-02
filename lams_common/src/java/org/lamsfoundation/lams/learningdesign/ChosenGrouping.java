@@ -25,12 +25,18 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.util.Set;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 /**
  * Grouping formed by staff members choice
- * 
+ *
  * @author chris
  */
+@Entity
+@DiscriminatorValue("2")
 public class ChosenGrouping extends Grouping {
+    private static final long serialVersionUID = 3237424022482923008L;
 
     /** Creates a new instance of ChosenGrouping */
     public ChosenGrouping() {
@@ -38,13 +44,13 @@ public class ChosenGrouping extends Grouping {
     }
 
     /** full constructor */
-    public ChosenGrouping(Long groupingId, Set groups, Set activities) {
+    public ChosenGrouping(Long groupingId, Set<Group> groups, Set<Activity> activities) {
 	super(groupingId, groups, activities, new ChosenGrouper());
     }
 
     /**
      * This method creates a deep copy of the Grouping
-     * 
+     *
      * @return ChosenGrouping The deep copied Grouping object
      */
     @Override
@@ -57,12 +63,11 @@ public class ChosenGrouping extends Grouping {
     /**
      * This type of grouping doesn't have groups other than learner groups.
      * So it always return <code>true</code>.
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
      */
     @Override
     public boolean isLearnerGroup(Group group) {
 	return true;
     }
-
 }

@@ -25,48 +25,63 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.usermanagement.User;
 
-/**
- *
- */
+@Entity
 public abstract class GateActivity extends SimpleActivity implements Serializable, ISystemToolActivity {
+    private static final long serialVersionUID = -5436654342587065425L;
+
     public static final int LEARNER_GATE_LEVEL = 1;
 
     public static final int GROUP_GATE_LEVEL = 2;
 
     public static final int CLASS_GATE_LEVEL = 3;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "system_tool_id")
     private SystemTool systemTool;
 
-    /** persistent field */
+    @Column(name = "gate_activity_level_id")
     private Integer gateActivityLevelId;
 
-    /** persistent field */
+    @Column(name = "gate_open_flag")
     private Boolean gateOpen;
 
+    @ManyToOne
+    @JoinColumn(name = "gate_open_user")
     private User gateOpenUser;
 
+    @Column(name = "gate_open_time")
     private Date gateOpenTime;
 
     /**
      * The learners who passed the gate.
      */
-    private Set<User> allowedToPassLearners;
+    @ManyToMany
+    @JoinTable(name = "lams_gate_allowed_learners", joinColumns = @JoinColumn(name = "activity_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> allowedToPassLearners = new HashSet<User>();
 
     /** full constructor */
     public GateActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
 	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
 	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
 	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-	    Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId, SystemTool sysTool,
-	    Set branchActivityEntries) {
+	    Boolean stopAfterActivity, Set<Activity> inputActivities, Integer gateActivityLevelId, SystemTool sysTool,
+	    Set<BranchActivityEntry> branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
@@ -90,11 +105,6 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	this.gateActivityLevelId = gateActivityLevelId;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Integer getGateActivityLevelId() {
 	return gateActivityLevelId;
     }
