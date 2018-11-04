@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -1593,8 +1593,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public IToolVO getToolBySignature(String toolSignature) throws McApplicationException {
-	IToolVO tool = toolService.getToolBySignature(toolSignature);
+    public Tool getToolBySignature(String toolSignature) throws McApplicationException {
+	Tool tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
@@ -1925,7 +1925,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setShowMarks(JsonUtil.optBoolean(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.optBoolean(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.optInt(toolContentJSON, "passMark", 0));
-	mcq.setEnableConfidenceLevels(JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
+	mcq.setEnableConfidenceLevels(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);

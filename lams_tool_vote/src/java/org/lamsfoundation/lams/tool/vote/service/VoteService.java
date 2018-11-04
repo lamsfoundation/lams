@@ -56,8 +56,8 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.SimpleURL;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -1537,8 +1537,8 @@ public class VoteService
     }
 
     @Override
-    public IToolVO getToolBySignature(String toolSignature) {
-	IToolVO tool = toolService.getToolBySignature(toolSignature);
+    public Tool getToolBySignature(String toolSignature) {
+	Tool tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 

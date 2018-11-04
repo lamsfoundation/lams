@@ -33,7 +33,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -81,7 +81,7 @@ public abstract class LamsAuthoringFinishController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, ACTION_MODE, false);
 	String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
 	String notifyCloseURL = (String) request.getSession().getAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
-	Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	// clear session according to the ToolAccessMode.
 	clearSession(cSessionID, request.getSession(), mode);
@@ -95,7 +95,7 @@ public abstract class LamsAuthoringFinishController {
 	    contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID, true);
 
 	    // check whether it use on define it later page
-	    IToolVO tool = lamsToolService.getToolBySignature(signature);
+	    Tool tool = lamsToolService.getToolBySignature(signature);
 
 	    //add reeditUrl parameter
 	    String reeditUrl = WebUtil.appendParameterToURL(getLamsUrl() + tool.getAuthorUrl(),
@@ -167,7 +167,7 @@ public abstract class LamsAuthoringFinishController {
      */
     private Object findToolService(ApplicationContext applicationContext, String signature)
 	    throws NoSuchBeanDefinitionException {
-	IToolVO tool = lamsToolService.getToolBySignature(signature);
+	Tool tool = lamsToolService.getToolBySignature(signature);
 	return applicationContext.getBean(tool.getServiceName());
     }
 }

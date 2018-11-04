@@ -61,7 +61,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
@@ -336,7 +336,7 @@ public class AuthoringController {
 	}
 
 	// get title from tool content
-	IToolVO tool = toolService.getToolByID(toolID);
+	Tool tool = toolService.getToolByID(toolID);
 	if (learningLibraryID == null) {
 	    // if learning library ID is not set explicitly, derive it from tool
 	    learningLibraryID = tool.getLearningLibraryId();

@@ -351,14 +351,6 @@ public class Tool implements Serializable {
 	return new HashCodeBuilder().append(getToolId()).toHashCode();
     }
 
-    public IToolVO createBasicToolVO() {
-	IToolVO vo = new BasicToolVO(toolId, learnerUrl, learnerPreviewUrl, learnerProgressUrl, authorUrl, monitorUrl,
-		helpUrl, defaultToolContentId, learningLibraryId, toolSignature, toolDisplayName, description,
-		serviceName, createDateTime, groupingSupportTypeId, toolIdentifier, toolVersion, languageFile,
-		extLmsId);
-	return vo;
-    }
-
     public String getPedagogicalPlannerUrl() {
 	return pedagogicalPlannerUrl;
     }

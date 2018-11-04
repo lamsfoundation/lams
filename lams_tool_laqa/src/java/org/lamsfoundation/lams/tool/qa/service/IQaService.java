@@ -30,7 +30,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -210,7 +210,7 @@ public interface IQaService extends ToolRatingManager {
      */
     String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
 
-    IToolVO getToolBySignature(String toolSignature);
+    Tool getToolBySignature(String toolSignature);
 
     long getToolDefaultContentIdBySignature(String toolSignature);
 
@@ -251,10 +251,10 @@ public interface IQaService extends ToolRatingManager {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);

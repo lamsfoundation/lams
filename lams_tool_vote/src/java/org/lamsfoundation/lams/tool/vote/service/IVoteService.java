@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -222,7 +222,7 @@ public interface IVoteService {
 
     ToolSessionExportOutputData exportToolSession(List<Long> toolSessionIds) throws DataMissingException, ToolException;
 
-    IToolVO getToolBySignature(String toolSignature);
+    Tool getToolBySignature(String toolSignature);
 
     long getToolDefaultContentIdBySignature(String toolSignature);
 
@@ -243,7 +243,7 @@ public interface IVoteService {
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     void updateEntry(NotebookEntry notebookEntry);
-    
+
     void removeQuestionsFromCache(VoteContent voteContent);
 
     void removeVoteContentFromCache(VoteContent voteContent);
@@ -263,10 +263,10 @@ public interface IVoteService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);

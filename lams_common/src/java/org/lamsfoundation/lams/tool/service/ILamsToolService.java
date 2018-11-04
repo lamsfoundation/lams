@@ -29,7 +29,6 @@ import java.util.Set;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -46,9 +45,9 @@ import org.lamsfoundation.lams.util.FileUtilException;
 public interface ILamsToolService {
     public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
 
-    IToolVO getToolByID(Long toolId);
+    Tool getToolByID(Long toolId);
 
-    IToolVO getToolBySignature(final String toolSignature);
+    Tool getToolBySignature(final String toolSignature);
 
     long getToolDefaultContentIdBySignature(final String toolSignature);
 
@@ -91,7 +90,7 @@ public interface ILamsToolService {
      *             in case of problems.
      */
     String completeToolSession(Long toolSessionId, Long learnerId);
-    
+
     /**
      * Method for updating an activity mark that tools can call
      *
@@ -116,10 +115,10 @@ public interface ILamsToolService {
      * @return
      */
     Boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
@@ -158,10 +157,10 @@ public interface ILamsToolService {
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
-    
+
     /**
      * Returns all leaders available in the nearest leader selection tool (that is all leaders in all sessions).
-     * 
+     *
      * @param toolSessionId
      * @param learnerId
      * @return
@@ -172,21 +171,25 @@ public interface ILamsToolService {
      * Returns leaders' userIds for all tool sessions from the given Leader Selection Tool.
      */
     Set<Long> getLeaderUserId(Long leaderSelectionActivityId);
-    
+
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
-     * 
-     * @param toolContentId toolContentId of the specified activity 
+     *
+     * @param toolContentId
+     *            toolContentId of the specified activity
      * @return
      */
     Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
-    
+
     /**
-     * Returns confidence levels from the specified activity. 
-     * 
-     * @param activityUiid activityUiid of the activity with confidence levels
-     * @param requestorUserId userId of the requesting user. we need it in order to get confidence level providing tool's sessionId
-     * @param requestorToolSessionId toolSessionId of the activity that calls this method
+     * Returns confidence levels from the specified activity.
+     *
+     * @param activityUiid
+     *            activityUiid of the activity with confidence levels
+     * @param requestorUserId
+     *            userId of the requesting user. we need it in order to get confidence level providing tool's sessionId
+     * @param requestorToolSessionId
+     *            toolSessionId of the activity that calls this method
      * @return
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
