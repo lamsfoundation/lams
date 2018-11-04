@@ -20,15 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.lesson;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.lamsfoundation.lams.learningdesign.Activity;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 /**
  * A class representing a finished activity for a user
@@ -36,40 +34,23 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  * @author lfoxton
  *
  */
+@Embeddable
 public class CompletedActivityProgress implements Serializable {
 
     private static final long serialVersionUID = -6210497575761751861L;
 
-    LearnerProgress learnerProgress;
-    Activity activity;
-    Date startDate;
-    Date finishDate;
+    @Column(name = "start_date_time")
+    private Date startDate;
+
+    @Column(name = "completed_date_time")
+    private Date finishDate;
 
     public CompletedActivityProgress() {
     }
 
-    public CompletedActivityProgress(LearnerProgress learnerProgress, Activity activity, Date startDate,
-	    Date finishDate) {
-	this.learnerProgress = learnerProgress;
-	this.activity = activity;
+    public CompletedActivityProgress(Date startDate, Date finishDate) {
 	this.startDate = startDate;
 	this.finishDate = finishDate;
-    }
-
-    public LearnerProgress getLearnerProgress() {
-	return learnerProgress;
-    }
-
-    public void setLearnerProgress(LearnerProgress learnerProgress) {
-	this.learnerProgress = learnerProgress;
-    }
-
-    public Activity getActivity() {
-	return activity;
-    }
-
-    public void setActivity(Activity activity) {
-	this.activity = activity;
     }
 
     public Date getStartDate() {
@@ -86,28 +67,5 @@ public class CompletedActivityProgress implements Serializable {
 
     public void setFinishDate(Date finishDate) {
 	this.finishDate = finishDate;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-	if ((this == other)) {
-	    return true;
-	}
-	if (!(other instanceof CompletedActivityProgress)) {
-	    return false;
-	}
-	CompletedActivityProgress castOther = (CompletedActivityProgress) other;
-
-	EqualsBuilder eq = new EqualsBuilder();
-	eq.append(this.getActivity().getActivityId(), castOther.getActivity().getActivityId());
-	eq.append(this.getLearnerProgress().getLearnerProgressId(),
-		castOther.getLearnerProgress().getLearnerProgressId());
-	return eq.isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-	return new HashCodeBuilder().append(this.getActivity().getActivityId().toString()
-		+ this.getLearnerProgress().getLearnerProgressId().toString()).toHashCode();
     }
 }

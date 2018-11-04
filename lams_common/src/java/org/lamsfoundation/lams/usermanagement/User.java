@@ -33,6 +33,7 @@ import java.util.TimeZone;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -40,7 +41,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -190,8 +190,9 @@ public class User implements Serializable, Comparable<User> {
     @Column(name = "first_login")
     private Boolean firstLogin;
 
-    @ManyToMany
-    @JoinTable(name = "lams_planner_recent_learning_designs", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "learning_design_id"))
+    @ElementCollection
+    @JoinTable(name = "lams_planner_recent_learning_designs", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "learning_design_id")
     @OrderBy("learning_design_id")
     private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
 

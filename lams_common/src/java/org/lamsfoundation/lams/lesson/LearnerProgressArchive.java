@@ -24,7 +24,21 @@ package org.lamsfoundation.lams.lesson;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyJoinColumn;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -32,26 +46,44 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_learner_progress_archive")
 public class LearnerProgressArchive implements Serializable {
-    /** Identifier field */
+    private static final long serialVersionUID = -6114747067804692585L;
+
+    @Id
+    @Column(name = "learner_progress_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long learnerProgressId;
 
     /** The User to whom this progress data belongs. */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     /** The Lesson this progress data is for */
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
+    @Column(name = "attempt_id")
     private Integer attemptId;
 
     /** Map of attempted activities with their start date */
-    private Map<Activity, Date> attemptedActivities;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "lams_progress_attempted_archive", joinColumns = @JoinColumn(name = "learner_progress_id"))
+    @MapKeyJoinColumn(name = "activity_id")
+    @Column(name = "start_date_time")
+    private Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>();
 
     /**
      * Set of completed activities that includes all completed activities before
      * current activity
      */
-    private Map<Activity, CompletedActivityProgressArchive> completedActivities;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "lams_progress_completed_archive", joinColumns = @JoinColumn(name = "learner_progress_id"))
+    @MapKeyJoinColumn(name = "activity_id")
+    private Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
 
     /**
      * The current activity always present the activity with transition, which
@@ -61,22 +93,25 @@ public class LearnerProgressArchive implements Serializable {
      * not the leaf node. The main purpose of current activity is to restore the
      * progress states if the user exist without finishing the activity.
      */
+    @ManyToOne
+    @JoinColumn(name = "current_activity_id")
     private Activity currentActivity;
 
     /**
      * Indicates is the User has completed this lesson.
      */
+    @Column(name = "lesson_completed_flag")
     private Byte lessonComplete;
 
+    @Column(name = "start_date_time")
     private Date startDate;
+
+    @Column(name = "finish_date_time")
     private Date finishDate;
 
+    @Column(name = "archive_date")
     private Date archiveDate;
 
-    //---------------------------------------------------------------------
-    // Constructors
-    //---------------------------------------------------------------------
-    /** default constructor */
     public LearnerProgressArchive() {
     }
 
@@ -95,9 +130,6 @@ public class LearnerProgressArchive implements Serializable {
 	this.archiveDate = archiveDate;
     }
 
-    //---------------------------------------------------------------------
-    // Getters and Setters
-    //---------------------------------------------------------------------
     public Long getLearnerProgressId() {
 	return this.learnerProgressId;
     }
@@ -195,22 +227,10 @@ public class LearnerProgressArchive implements Serializable {
 		|| lessonComplete == LearnerProgress.LESSON_IN_DESIGN_COMPLETE;
     }
 
-    /**
-     * The "real" value for lessonComplete.
-     *
-     * @return LESSON_NOT_COMPLETE, LESSON_END_OF_DESIGN_COMPLETE,
-     *         LESSON_IN_DESIGN_COMPLETE
-     */
     public Byte getLessonComplete() {
 	return lessonComplete;
     }
 
-    /**
-     * Setter for property lessonComplete.
-     *
-     * @param lessonComplete
-     *            New value of property lessonComplete.
-     */
     public void setLessonComplete(Byte lessonComplete) {
 	this.lessonComplete = lessonComplete;
     }

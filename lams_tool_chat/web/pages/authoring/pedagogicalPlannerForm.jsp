@@ -29,6 +29,6 @@
             toolbarSet="CustomPedplanner" height="190px"
             width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
-	</html:form>
+	</form:form>
 </body>
 </lams:html>

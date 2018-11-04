@@ -23,33 +23,41 @@
 
 package org.lamsfoundation.lams.themes;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
  * @author lfoxton
  */
+@Entity
+@Table(name = "lams_theme")
 public class Theme {
 
-    /** identifier field */
+    @Id
+    @Column(name = "theme_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long themeId;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
+    @Column(name = "image_directory")
     private String imageDirectory;
 
-    /** persistent field */
-    private Integer type;
-
-    /** non-persistent field */
+    @Transient
     private Boolean currentDefaultTheme;
 
-    /** non-persistent field */
+    @Transient
     private Boolean notEditable;
 
-    /** default constructor */
     public Theme() {
     }
 
@@ -83,14 +91,6 @@ public class Theme {
 
     public void setImageDirectory(String imageDirectory) {
 	this.imageDirectory = imageDirectory;
-    }
-
-    public Integer getType() {
-	return type;
-    }
-
-    public void setType(Integer type) {
-	this.type = type;
     }
 
     public Boolean getCurrentDefaultTheme() {

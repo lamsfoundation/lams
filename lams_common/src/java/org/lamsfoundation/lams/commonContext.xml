@@ -24,11 +24,15 @@
 		</property>
 		<property name="packagesToScan">
 			<list>
+				<value>org.lamsfoundation.lams.config</value>
 				<value>org.lamsfoundation.lams.contentrepository</value>
+				<value>org.lamsfoundation.lams.gradebook</value>
 				<value>org.lamsfoundation.lams.learningdesign</value>
 				<value>org.lamsfoundation.lams.lesson</value>
 				<value>org.lamsfoundation.lams.logevent</value>
+				<value>org.lamsfoundation.lams.planner</value>
 				<value>org.lamsfoundation.lams.policies</value>
+				<value>org.lamsfoundation.lams.themes</value>
 				<value>org.lamsfoundation.lams.timezone</value>
 				<value>org.lamsfoundation.lams.tool</value>
 				<value>org.lamsfoundation.lams.usermanagement</value>

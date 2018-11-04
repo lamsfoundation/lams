@@ -25,52 +25,43 @@ package org.lamsfoundation.lams.config;
 
 import java.io.Serializable;
 
-/**
- *
- *
- */
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "lams_configuration")
 public class ConfigurationItem implements Serializable {
+    private static final long serialVersionUID = -2458856157870283305L;
 
     public static String STRING_FORMAT = "STRING";
     public static String LONG_FORMAT = "LONG";
     public static String BOOLEAN_FORMAT = "BOOLEAN";
 
-    /** identifier field */
+    @Id
+    @Column(name = "config_key")
     private String key;
 
-    /** persistent field */
+    @Column(name = "config_value")
     private String value;
 
-    /** persistent field */
+    @Column(name = "description_key")
     private String descriptionKey;
 
-    /** persistent field */
+    @Column(name = "header_name")
     private String headerName;
 
-    /** persistent field */
+    @Column
     private String format;
 
-    /** persistent field - defaults in db to false */
+    /** defaults in db to false */
+    @Column
     private Boolean required;
 
-    /** default constructor */
     public ConfigurationItem() {
     }
 
-    /** full constructor */
-    public ConfigurationItem(String key, String value, String descriptionKey, String headerName, String format,
-	    Boolean required) {
-	this.key = key;
-	this.value = value;
-	this.descriptionKey = descriptionKey;
-	this.headerName = headerName;
-	this.format = format;
-	this.required = required;
-    }
-
-    /**
-     *
-     */
     public String getKey() {
 	return this.key;
     }
@@ -79,10 +70,6 @@ public class ConfigurationItem implements Serializable {
 	this.key = key;
     }
 
-    /**
-     *
-     *
-     */
     public String getValue() {
 	return this.value;
     }
@@ -91,9 +78,6 @@ public class ConfigurationItem implements Serializable {
 	this.value = value;
     }
 
-    /**
-     *
-     */
     public String getDescriptionKey() {
 	return descriptionKey;
     }
@@ -102,9 +86,6 @@ public class ConfigurationItem implements Serializable {
 	this.descriptionKey = descriptionKey;
     }
 
-    /**
-     *
-     */
     public String getHeaderName() {
 	return headerName;
     }
@@ -113,9 +94,6 @@ public class ConfigurationItem implements Serializable {
 	this.headerName = headerName;
     }
 
-    /**
-     *
-     */
     public String getFormat() {
 	return format;
     }
@@ -124,9 +102,6 @@ public class ConfigurationItem implements Serializable {
 	this.format = format;
     }
 
-    /** 
-    *
-    */
     public Boolean getRequired() {
 	return required;
     }
@@ -134,5 +109,4 @@ public class ConfigurationItem implements Serializable {
     public void setRequired(Boolean required) {
 	this.required = required;
     }
-
 }

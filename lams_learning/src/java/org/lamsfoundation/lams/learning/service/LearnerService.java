@@ -220,7 +220,7 @@ public class LearnerService implements ILearnerFullService {
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
     }
-    
+
     public void setKumaliveService(IKumaliveService kumaliveService) {
 	this.kumaliveService = kumaliveService;
     }
@@ -368,7 +368,7 @@ public class LearnerService implements ILearnerFullService {
 	    if ((activity != null) && activity.isToolActivity()) {
 		// make sure that the lesson corresponds to the activity
 		LearningDesign learningDesign = activity.getLearningDesign();
-		Lesson lesson = (Lesson) learningDesign.getLessons().iterator().next();
+		Lesson lesson = learningDesign.getLessons().iterator().next();
 		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity, lesson);
 	    }
 	} catch (RequiredGroupMissingException e) {
@@ -437,7 +437,7 @@ public class LearnerService implements ILearnerFullService {
     @Override
     public List<ActivityURL> getStructuredActivityURLs(Long lessonId) {
 	Lesson lesson = getLesson(lessonId);
-	User learner = (User) lesson.getAllLearners().iterator().next();
+	User learner = lesson.getAllLearners().iterator().next();
 	LearnerProgress learnerProgress = new LearnerProgress(learner, lesson);
 
 	ProgressBuilder builder = new ProgressBuilder(learnerProgress, activityDAO, activityMapping);
@@ -971,7 +971,7 @@ public class LearnerService implements ILearnerFullService {
 	// Work out the tool session appropriate for this user and branching activity. We expect there to be only one at
 	// this point.
 	ToolSession toolSession = null;
-	for (Activity inputActivity : (Set<Activity>) branchingActivity.getInputActivities()) {
+	for (Activity inputActivity : branchingActivity.getInputActivities()) {
 	    toolSession = lamsCoreToolService.getToolSessionByLearner(learner, inputActivity);
 	}
 
@@ -1102,7 +1102,7 @@ public class LearnerService implements ILearnerFullService {
 	    // Work out the tool session appropriate for this user and gate activity. We expect there to be only one at
 	    // this point.
 	    ToolSession toolSession = null;
-	    for (Activity inputActivity : (Set<Activity>) conditionGate.getInputActivities()) {
+	    for (Activity inputActivity : conditionGate.getInputActivities()) {
 		toolSession = lamsCoreToolService.getToolSessionByLearner(learner, inputActivity);
 	    }
 
@@ -1345,7 +1345,7 @@ public class LearnerService implements ILearnerFullService {
 
 			if (learnerProgress != null) {
 			    int completedSubactivities = 0;
-			    for (Activity subactivity : (Set<Activity>) parentOptionsActivity.getActivities()) {
+			    for (Activity subactivity : parentOptionsActivity.getActivities()) {
 				if (LearnerProgress.ACTIVITY_COMPLETED == learnerProgress
 					.getProgressState(subactivity)) {
 				    completedSubactivities++;
@@ -1381,7 +1381,7 @@ public class LearnerService implements ILearnerFullService {
 	// find lesson for given tool content ID
 	ToolActivity activity = activityDAO.getToolActivityByToolContentId(toolContentId);
 	LearningDesign learningDesign = activity.getLearningDesign();
-	Lesson lesson = (Lesson) learningDesign.getLessons().iterator().next();
+	Lesson lesson = learningDesign.getLessons().iterator().next();
 	Long lessonId = lesson.getLessonId();
 
 	// go through each user, find his user name and add a command for him
@@ -1496,7 +1496,7 @@ public class LearnerService implements ILearnerFullService {
 			cap.setFinishDate(results.getFinishDate());
 		    }
 		} else {
-		    cap = new CompletedActivityProgress(learnerProgress, activity,
+		    cap = new CompletedActivityProgress(
 			    startedDateFromAttempted != null ? startedDateFromAttempted : results.getStartDate(),
 			    results.getFinishDate());
 		}
@@ -1599,7 +1599,7 @@ public class LearnerService implements ILearnerFullService {
 	return status;
 
     }
-    
+
     @Override
     public boolean isKumaliveDisabledForOrganisation(Integer organisationId) {
 	Kumalive kumalive = kumaliveService.getKumaliveByOrganisation(organisationId);
