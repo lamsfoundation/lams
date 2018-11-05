@@ -20,11 +20,18 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -32,25 +39,49 @@ import org.lamsfoundation.lams.usermanagement.User;
  * A persistence bean for group/user mappings
  *
  * @author lfoxton
- *
- *
  */
-public class GroupUser implements Serializable {
 
+@Entity
+@Table(name = "lams_user_group")
+public class GroupUser implements Serializable {
     private static final long serialVersionUID = 4680781848791310422L;
 
+    @Embeddable
+    public static class GroupUserPrimaryKey implements Serializable {
+	private static final long serialVersionUID = 8580193558720639292L;
+
+	@Column(name = "group_id")
+	private Long groupId;
+
+	@Column(name = "user_id")
+	private Integer userId;
+
+	public GroupUserPrimaryKey() {
+	}
+
+	public GroupUserPrimaryKey(Long groupId, Integer userId) {
+	    this.groupId = groupId;
+	    this.userId = userId;
+	}
+    }
+
+    @EmbeddedId
+    private GroupUserPrimaryKey id;
+
+    @ManyToOne
+    @MapsId("groupId")
     private Group group;
+
+    @ManyToOne
+    @MapsId("userId")
     private User user;
+
+    @Column(name = "scheduled_lesson_end_date")
     private Date scheduledLessonEndDate;
 
     public GroupUser() {
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Group getGroup() {
 	return group;
     }
@@ -59,11 +90,6 @@ public class GroupUser implements Serializable {
 	this.group = group;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public User getUser() {
 	return user;
     }
@@ -72,19 +98,10 @@ public class GroupUser implements Serializable {
 	this.user = user;
     }
 
-    /**
-     *
-     *
-     * @return Returns the scheduledLessonEndDate.
-     */
     public Date getScheduledLessonEndDate() {
 	return scheduledLessonEndDate;
     }
 
-    /**
-     * @param scheduledLessonEndDate
-     *            The scheduledLessonEndDate to set.
-     */
     public void setScheduledLessonEndDate(Date scheduledLessonEndDate) {
 	this.scheduledLessonEndDate = scheduledLessonEndDate;
     }
@@ -134,5 +151,4 @@ public class GroupUser implements Serializable {
 	}
 	return true;
     }
-
 }

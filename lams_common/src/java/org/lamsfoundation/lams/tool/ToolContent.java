@@ -24,51 +24,46 @@
 package org.lamsfoundation.lams.tool;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/**
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_tool_content")
 public class ToolContent implements Serializable {
+    private static final long serialVersionUID = 6950566115143688408L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "tool_content_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long toolContentId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "tool_id")
     private Tool tool;
 
-    /** persistent field */
-    private Set activities;
-
     public ToolContent(Tool tool) {
-	this(null, tool, new HashSet());
+	this(null, tool);
     }
 
-    /** full constructor */
-    public ToolContent(Long toolContentId, Tool tool, Set activities) {
+    public ToolContent(Long toolContentId, Tool tool) {
 	this.toolContentId = toolContentId;
 	this.tool = tool;
-	this.activities = activities;
     }
 
-    /** default constructor */
     public ToolContent() {
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public Long getToolContentId() {
 	return this.toolContentId;
     }
@@ -77,35 +72,12 @@ public class ToolContent implements Serializable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     */
     public Tool getTool() {
 	return this.tool;
     }
 
     public void setTool(Tool tool) {
 	this.tool = tool;
-    }
-
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     */
-    public Set getActivities() {
-	return this.activities;
-    }
-
-    public void setActivities(Set activities) {
-	this.activities = activities;
     }
 
     @Override
@@ -129,5 +101,4 @@ public class ToolContent implements Serializable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getToolContentId()).toHashCode();
     }
-
 }

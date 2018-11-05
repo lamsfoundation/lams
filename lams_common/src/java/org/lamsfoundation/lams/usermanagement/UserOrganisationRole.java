@@ -25,28 +25,42 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_user_organisation_role")
 public class UserOrganisationRole implements Serializable {
+    private static final long serialVersionUID = 4324592319764806434L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "user_organisation_role_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userOrganisationRoleId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_organisation_id")
     private UserOrganisation userOrganisation;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private Role role;
 
-    /** full constructor */
     public UserOrganisationRole(UserOrganisation userOrganisation, Role role) {
 	this.userOrganisation = userOrganisation;
 	this.role = role;
     }
 
-    /** default constructor */
     public UserOrganisationRole() {
     }
 
@@ -102,5 +116,4 @@ public class UserOrganisationRole implements Serializable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getUserOrganisationRoleId()).toHashCode();
     }
-
 }

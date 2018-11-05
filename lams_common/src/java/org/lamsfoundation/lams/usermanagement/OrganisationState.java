@@ -1,39 +1,35 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_organisation_state")
 public class OrganisationState implements Serializable {
+    private static final long serialVersionUID = -294038064014685720L;
 
     public static final Integer ACTIVE = 1;
     public static final Integer HIDDEN = 2;
     public static final Integer ARCHIVED = 3;
     public static final Integer REMOVED = 4;
 
-    /** identifier field */
+    @Id
+    @Column(name = "organisation_state_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer organisationStateId;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
-    private Set Organisations;
-
-    /** full constructor */
-    public OrganisationState(String description, Set Organisations) {
-	this.description = description;
-	this.Organisations = Organisations;
-    }
-
-    /** default constructor */
     public OrganisationState() {
-    }
-
-    /** minimal constructor */
-    public OrganisationState(Set Organisations) {
-	this.Organisations = Organisations;
     }
 
     public Integer getOrganisationStateId() {
@@ -52,18 +48,9 @@ public class OrganisationState implements Serializable {
 	this.description = description;
     }
 
-    public Set getOrganisations() {
-	return this.Organisations;
-    }
-
-    public void setOrganisations(Set Organisations) {
-	this.Organisations = Organisations;
-    }
-
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("organisationStateId", getOrganisationStateId())
 		.append("description", getDescription()).toString();
     }
-
 }

@@ -22,6 +22,14 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 /**
  * This is a POJO bean object for an evaluation criteria for a given activity.
  * This object exists at the learning design level. Ie it can be designed,
@@ -29,10 +37,22 @@ package org.lamsfoundation.lams.learningdesign;
  *
  * @author lfoxton
  */
+@Entity
+@Table(name = "lams_activity_evaluation")
 public class ActivityEvaluation {
+    @Id
+    @Column(name = "activity_id")
     private Long activityId;
+
+    @OneToOne
+    @JoinColumn(name = "activity_id")
+    @MapsId
     private ToolActivity activity;
+
+    @Column(name = "tool_output_definition")
     private String toolOutputDefinition;
+
+    @Column
     private Integer weight;
 
     public Long getActivityId() {

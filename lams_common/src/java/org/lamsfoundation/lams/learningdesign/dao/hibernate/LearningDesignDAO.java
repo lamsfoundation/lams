@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
@@ -53,7 +53,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 	    + " where workspace_folder_id=? AND title like ? AND removed=0";
 
     private static final String ACCESS_BY_USER = "from " + LearningDesignAccess.class.getName()
-	    + " as a where a.userId = ? order by a.accessDate desc";
+	    + " as a where a.id.userId = ? order by a.accessDate desc";
 
     /*
      * @see
@@ -67,7 +67,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getAllValidLearningDesignsInFolder(java.lang.Integer)
      */
     @Override
@@ -77,7 +77,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getAllLearningDesignsInFolder(java.lang.Integer)
      */
     @Override
@@ -87,7 +87,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see getLearningDesignsByOriginalDesign#getLearningDesignsByParent(java.lang.Long)
      */
     @Override
@@ -98,7 +98,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getLearningDesignTitlesByWorkspaceFolder(java.lang.Integer)
      */
     @Override

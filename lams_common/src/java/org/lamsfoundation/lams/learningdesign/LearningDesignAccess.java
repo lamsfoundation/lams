@@ -20,13 +20,17 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Marks when an user used (opened, saved etc.) a learning design the last time.
@@ -34,30 +38,56 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "lams_learning_design_access")
 public class LearningDesignAccess implements Serializable {
+    private static final long serialVersionUID = -5315312828344350729L;
 
-    Long learningDesignId;
-    Integer userId;
-    Date accessDate;
+    @Embeddable
+    public static class LearningDesignAccessPrimaryKey implements Serializable {
+	private static final long serialVersionUID = 7198235946869480320L;
 
-    // non-persistent fields
-    String title;
-    Integer workspaceFolderId;
+	@Column(name = "learning_design_id")
+	private Long learningDesignId;
 
-    public Long getLearningDesignId() {
-	return learningDesignId;
+	@Column(name = "user_id")
+	private Integer userId;
+
+	public LearningDesignAccessPrimaryKey() {
+	}
+
+	public LearningDesignAccessPrimaryKey(Long learningDesignId, Integer userId) {
+	    this.learningDesignId = learningDesignId;
+	    this.userId = userId;
+	}
     }
 
-    public void setLearningDesignId(Long learningDesignId) {
-	this.learningDesignId = learningDesignId;
+    @EmbeddedId
+    private LearningDesignAccessPrimaryKey id;
+
+    @Column(name = "access_date")
+    private Date accessDate;
+
+    @Transient
+    String title;
+
+    @Transient
+    Integer workspaceFolderId;
+
+    public LearningDesignAccessPrimaryKey getId() {
+	return id;
+    }
+
+    public void setId(LearningDesignAccessPrimaryKey id) {
+	this.id = id;
+    }
+
+    public Long getLearningDesignId() {
+	return id.learningDesignId;
     }
 
     public Integer getUserId() {
-	return userId;
-    }
-
-    public void setUserId(Integer userId) {
-	this.userId = userId;
+	return id.userId;
     }
 
     public Date getAccessDate() {
@@ -82,39 +112,5 @@ public class LearningDesignAccess implements Serializable {
 
     public void setWorkspaceFolderId(Integer workspaceFolderId) {
 	this.workspaceFolderId = workspaceFolderId;
-    }
-
-    @Override
-    public int hashCode() {
-	return new HashCodeBuilder().append(learningDesignId).append(userId).toHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (obj == null) {
-	    return false;
-	}
-	if (getClass() != obj.getClass()) {
-	    return false;
-	}
-	LearningDesignAccess other = (LearningDesignAccess) obj;
-	if (learningDesignId == null) {
-	    if (other.learningDesignId != null) {
-		return false;
-	    }
-	} else if (!learningDesignId.equals(other.learningDesignId)) {
-	    return false;
-	}
-	if (userId == null) {
-	    if (other.userId != null) {
-		return false;
-	    }
-	} else if (!userId.equals(other.userId)) {
-	    return false;
-	}
-	return true;
     }
 }

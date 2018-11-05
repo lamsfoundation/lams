@@ -24,39 +24,46 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@SuppressWarnings("serial")
+@Entity
+@Table(name = "lams_authentication_method")
 public class AuthenticationMethod implements Serializable {
+    private static final long serialVersionUID = -43956990418742273L;
 
     public static final Integer DB = 1;
     public static final Integer LDAP = 3;
 
-    /** identifier field */
+    @Id
+    @Column(name = "authentication_method_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer authenticationMethodId;
 
-    /** persistent field */
+    @Column(name = "authentication_method_name")
     private String authenticationMethodName;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "authentication_method_type_id")
     private AuthenticationMethodType authenticationMethodType;
 
-    /** persistent field */
-    private Set users;
-
-    private boolean enabled = true;
-
-    /** full constructor */
-    public AuthenticationMethod(String authenticationMethodName, AuthenticationMethodType authenticationMethodType,
-	    Set users) {
-	this.authenticationMethodName = authenticationMethodName;
-	this.authenticationMethodType = authenticationMethodType;
-	this.users = users;
-    }
+    @OneToMany(mappedBy = "authenticationMethod")
+    private Set<User> users = new HashSet<User>();
 
     /** default constructor */
     public AuthenticationMethod() {
@@ -86,27 +93,12 @@ public class AuthenticationMethod implements Serializable {
 	this.authenticationMethodType = AuthenticationMethodType;
     }
 
-    public Set getUsers() {
+    public Set<User> getUsers() {
 	return this.users;
     }
 
-    public void setUsers(Set users) {
+    public void setUsers(Set<User> users) {
 	this.users = users;
-    }
-
-    /**
-     * @return Returns the enabled.
-     */
-    public boolean isEnabled() {
-	return enabled;
-    }
-
-    /**
-     * @param enabled
-     *            The enabled to set.
-     */
-    public void setEnabled(boolean enabled) {
-	this.enabled = enabled;
     }
 
     @Override
@@ -128,5 +120,4 @@ public class AuthenticationMethod implements Serializable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getAuthenticationMethodId()).toHashCode();
     }
-
 }

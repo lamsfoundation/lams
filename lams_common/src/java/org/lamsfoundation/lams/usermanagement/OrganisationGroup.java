@@ -24,7 +24,19 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -32,31 +44,29 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * This is a course-level group of learners.
  */
+@Entity
+@Table(name = "lams_organisation_group")
 public class OrganisationGroup implements Serializable, Comparable<OrganisationGroup> {
+    private static final long serialVersionUID = 397854186770141054L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "group_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
 
-    /** persistent field */
+    @Column(name = "grouping_id")
     private Long groupingId;
 
-    /** nullable persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
-    private Set<User> users;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "lams_user_organisation_group", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> users = new HashSet<User>();
 
     public OrganisationGroup() {
     }
 
-    public OrganisationGroup(Long groupingId, String name) {
-	this.groupingId = groupingId;
-	this.name = name;
-    }
-
-    /**
-     *
-     */
     public Long getGroupId() {
 	return groupId;
     }
@@ -65,9 +75,6 @@ public class OrganisationGroup implements Serializable, Comparable<OrganisationG
 	this.groupId = groupId;
     }
 
-    /**
-     *
-     */
     public Long getGroupingId() {
 	return this.groupingId;
     }
@@ -76,9 +83,6 @@ public class OrganisationGroup implements Serializable, Comparable<OrganisationG
 	this.groupingId = organisationId;
     }
 
-    /**
-     *
-     */
     public String getName() {
 	return this.name;
     }
@@ -87,11 +91,6 @@ public class OrganisationGroup implements Serializable, Comparable<OrganisationG
 	this.name = name;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Set<User> getUsers() {
 	return users;
     }

@@ -24,13 +24,22 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class Role implements Serializable, Comparable {
+@Entity
+@Table(name = "lams_role")
+public class Role implements Serializable, Comparable<Role> {
+    private static final long serialVersionUID = 6113480344101675560L;
 
     public static final String LEARNER = "LEARNER";
 
@@ -45,43 +54,31 @@ public class Role implements Serializable, Comparable {
     public static final String SYSADMIN = "SYSADMIN";// for future use
 
     /**
-     * Added by Manpreet Minhas *********************** final static variables indicating the various roles available
+     * Added by Manpreet Minhas
+     * final static variables indicating the various roles available
      * for a given user ar per the database. New roles may be added/deleted in the near future
      *
      ************************************************************/
-    public static final Integer ROLE_SYSADMIN = new Integer(1);
-    public static final Integer ROLE_GROUP_MANAGER = new Integer(2);
-    public static final Integer ROLE_AUTHOR = new Integer(3);
-    public static final Integer ROLE_MONITOR = new Integer(4);
-    public static final Integer ROLE_LEARNER = new Integer(5);
-    public static final Integer ROLE_GROUP_ADMIN = new Integer(6);
+    public static final Integer ROLE_SYSADMIN = 1;
+    public static final Integer ROLE_GROUP_MANAGER = 2;
+    public static final Integer ROLE_AUTHOR = 3;
+    public static final Integer ROLE_MONITOR = 4;
+    public static final Integer ROLE_LEARNER = 5;
+    public static final Integer ROLE_GROUP_ADMIN = 6;
     /***********************************************************/
 
-    /** identifier field */
+    @Id
+    @Column(name = "role_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
-    private Set rolePrivileges;
-
-    /** full constructor */
-    public Role(String name, String description) {
-	this.name = name;
-	this.description = description;
-    }
-
-    /** default constructor */
     public Role() {
-    }
-
-    /** minimal constructor */
-    public Role(String name, Set userOrganisationRoles) {
-	this.name = name;
     }
 
     public Integer getRoleId() {
@@ -108,14 +105,6 @@ public class Role implements Serializable, Comparable {
 	this.description = description;
     }
 
-    public Set getRolePrivileges() {
-	return rolePrivileges;
-    }
-
-    public void setRolePrivileges(Set rolePrivileges) {
-	this.rolePrivileges = rolePrivileges;
-    }
-
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("roleId", getRoleId()).toString();
@@ -131,9 +120,8 @@ public class Role implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object role) {
-	Role r = (Role) role;
-	return name.compareTo(r.getName());
+    public int compareTo(Role role) {
+	return name.compareTo(role.getName());
     }
 
     @Override

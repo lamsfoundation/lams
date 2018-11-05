@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAccess.LearningDesignAccessPrimaryKey;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -397,7 +398,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		throw new LearningDesignException("There are no lessons attached to the design.");
 	    }
 
-	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
+	    for (Lesson lesson : design.getLessons()) {
 		lesson.setLockedForEdit(true);
 
 		if (design.getEditOverrideUser() == null || design.getEditOverrideLock() == null
@@ -411,7 +412,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		}
 	    }
 
-	    
 	    // lock Learning Design
 	    design.setEditOverrideLock(true);
 	    design.setEditOverrideUser(user);
@@ -490,7 +490,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		design = removeTempSystemGate(lastReadOnlyActivity.getActivityId(), design.getLearningDesignId());
 	    }
 
-	    for (Lesson lesson : (Set<Lesson>) design.getLessons()) {
+	    for (Lesson lesson : design.getLessons()) {
 		lesson.setLockedForEdit(false);
 
 		String message = messageService.getMessage("audit.live.edit.end", new Object[] { design.getTitle(),
@@ -729,7 +729,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    throws MonitoringServiceException {
 	Date now = new Date();
 
-	for (Activity activity : (Set<Activity>) design.getActivities()) {
+	for (Activity activity : design.getActivities()) {
 	    if (!activity.isInitialised()) {
 		// this is a new activity - need to set up the content, do any
 		// scheduling, etc
@@ -1336,14 +1336,14 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	if (existingLearningDesign == null) {
 	    // check the user has given it a unique name in this folder, and make it unique if needed
 	    String title = JsonUtil.optString(ldJSON, AuthoringJsonTags.TITLE);
-	    if ( title != null ) {
+	    if (title != null) {
 		title = learningDesignService.getUniqueNameForLearningDesign(title, workspaceFolderID);
 	    } else {
 		title = messageService.getMessage("authoring.fla.page.ld.title");
 	    }
 	    ldJSON.put(AuthoringJsonTags.TITLE, title);
 	}
-		
+
 	IObjectExtractor extractor = (IObjectExtractor) beanFactory
 		.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
 	LearningDesign design = extractor.extractSaveLearningDesign(ldJSON, existingLearningDesign, workspaceFolder,
@@ -1556,8 +1556,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @Override
     public void storeLearningDesignAccess(Long learningDesignId, Integer userId) {
 	LearningDesignAccess access = new LearningDesignAccess();
-	access.setLearningDesignId(learningDesignId);
-	access.setUserId(userId);
+	access.setId(new LearningDesignAccessPrimaryKey(learningDesignId, userId));
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
     }

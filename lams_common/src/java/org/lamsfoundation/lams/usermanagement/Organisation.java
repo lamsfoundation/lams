@@ -25,87 +25,112 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
-public class Organisation implements Serializable, Comparable {
+@Entity
+@Table(name = "lams_organisation")
+public class Organisation implements Serializable, Comparable<Organisation> {
     private static final long serialVersionUID = -6742443056151585129L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "organisation_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer organisationId;
 
-    /** nullable persistent field */
+    @Column
     private String name;
 
-    /** nullable persistent field */
+    @Column
     private String code;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "parent_organisation_id")
     private Organisation parentOrganisation;
 
-    /** persistent field */
+    @Column(name = "create_date")
     private Date createDate;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "created_by")
     private User createdBy;
 
-    /** persistent field */
-    private Set<WorkspaceFolder> workspaceFolders;
+    @OneToMany(mappedBy = "organisationID", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<WorkspaceFolder> workspaceFolders = new HashSet<WorkspaceFolder>();
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "organisation_type_id")
     private OrganisationType organisationType;
 
-    /** persistent field */
-    private Set userOrganisations;
+    @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserOrganisation> userOrganisations = new HashSet<UserOrganisation>();
 
-    /** persistent field */
-    private Set childOrganisations;
+    @OneToMany(mappedBy = "parentOrganisation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Organisation> childOrganisations = new HashSet<Organisation>();
 
-    /** persistent field */
-    private Set lessons;
+    @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<Lesson> lessons = new HashSet<Lesson>();
 
+    @ManyToOne
+    @JoinColumn(name = "organisation_state_id")
     private OrganisationState organisationState;
 
-    /** persistent field */
+    @Column(name = "admin_add_new_users")
     private Boolean courseAdminCanAddNewUsers;
 
-    /** persistent field */
+    @Column(name = "admin_browse_all_users")
     private Boolean courseAdminCanBrowseAllUsers;
 
-    /** persistent field */
+    @Column(name = "admin_change_status")
     private Boolean courseAdminCanChangeStatusOfCourse;
 
-    /** persistent field */
+    @Column(name = "admin_create_guest")
     private Boolean courseAdminCanCreateGuestAccounts;
 
-    /** persistent field */
+    @Column(name = "enable_course_notifications")
     private Boolean enableCourseNotifications;
 
-    /** persistent field */
+    @Column(name = "enable_learner_gradebook")
     private Boolean enableGradebookForLearners;
 
-    /** persistent field */
+    @Column(name = "enable_single_activity_lessons")
     private Boolean enableSingleActivityLessons;
 
-    /** persistent field */
+    @Column(name = "enable_live_edit")
     private Boolean enableLiveEdit;
 
-    /** persistent field */
+    @Column(name = "enable_kumalive")
     private Boolean enableKumalive;
 
-    /** persistent field */
+    @Column(name = "archived_date")
     private Date archivedDate;
 
+    @Column(name = "ordered_lesson_ids")
     private String orderedLessonIds;
 
-    /** default constructor */
     public Organisation() {
 	this.courseAdminCanAddNewUsers = Boolean.FALSE;
 	this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
@@ -212,27 +237,27 @@ public class Organisation implements Serializable, Comparable {
 	this.organisationType = organisationType;
     }
 
-    public Set getUserOrganisations() {
+    public Set<UserOrganisation> getUserOrganisations() {
 	return this.userOrganisations;
     }
 
-    public void setUserOrganisations(Set userOrganisations) {
+    public void setUserOrganisations(Set<UserOrganisation> userOrganisations) {
 	this.userOrganisations = userOrganisations;
     }
 
-    public Set getChildOrganisations() {
+    public Set<Organisation> getChildOrganisations() {
 	return childOrganisations;
     }
 
-    public void setChildOrganisations(Set childOrganisations) {
+    public void setChildOrganisations(Set<Organisation> childOrganisations) {
 	this.childOrganisations = childOrganisations;
     }
 
-    public Set getLessons() {
+    public Set<Lesson> getLessons() {
 	return this.lessons;
     }
 
-    public void setLessons(Set lessons) {
+    public void setLessons(Set<Lesson> lessons) {
 	this.lessons = lessons;
     }
 
@@ -308,8 +333,8 @@ public class Organisation implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-	return name.compareToIgnoreCase(((Organisation) o).getName());
+    public int compareTo(Organisation o) {
+	return name.compareToIgnoreCase(o.getName());
     }
 
     public Date getArchivedDate() {

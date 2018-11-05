@@ -25,6 +25,13 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
@@ -32,17 +39,41 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  *
  * @author Marcin Cieslak
  */
+@Entity
+@Table(name = "lams_learning_design_annotation")
 public class LearningDesignAnnotation implements Serializable {
+    private static final long serialVersionUID = -4668970425938347783L;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "ui_id")
     private Integer annotationUIID;
+
+    @Column(name = "learning_design_id")
     private Long learningDesignId;
+
+    @Column
     private String title;
+
+    @Column
     private Integer xcoord;
+
+    @Column
     private Integer ycoord;
+
+    @Column(name = "end_xcoord")
     private Integer endXcoord;
+
+    @Column(name = "end_ycoord")
     private Integer endYcoord;
+
+    @Column
     private String color;
+
+    @Column
     private Short size;
 
     public Long getUid() {

@@ -25,28 +25,42 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_favorite_organisation")
 public class FavoriteOrganisation implements Serializable {
+    private static final long serialVersionUID = 6320034459017328098L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "favorite_organisation_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer favoriteOrganisationId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
-    /** full constructor */
     public FavoriteOrganisation(User user, Organisation organisation) {
 	this.user = user;
 	this.organisation = organisation;
     }
 
-    /** default constructor */
     public FavoriteOrganisation() {
     }
 
@@ -85,12 +99,12 @@ public class FavoriteOrganisation implements Serializable {
 	    return false;
 	}
 	FavoriteOrganisation castOther = (FavoriteOrganisation) other;
-	return new EqualsBuilder().append(this.getFavoriteOrganisationId(), castOther.getFavoriteOrganisationId()).isEquals();
+	return new EqualsBuilder().append(this.getFavoriteOrganisationId(), castOther.getFavoriteOrganisationId())
+		.isEquals();
     }
 
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getFavoriteOrganisationId()).toHashCode();
     }
-
 }

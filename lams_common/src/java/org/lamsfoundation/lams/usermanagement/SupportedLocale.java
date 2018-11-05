@@ -2,47 +2,44 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class SupportedLocale implements Serializable, Comparable {
+@Entity
+@Table(name = "lams_supported_locale")
+public class SupportedLocale implements Serializable, Comparable<SupportedLocale> {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 4096710015819299886L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "locale_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer localeId;
 
-    /** persistent field */
+    @Column(name = "language_iso_code")
     private String languageIsoCode;
 
-    /** persistent field */
+    @Column(name = "country_iso_code")
     private String countryIsoCode;
 
-    /** persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
+    @Column
     private String direction;
 
-    /** persistent field */
+    @Column(name = "fckeditor_code")
     private String fckLanguageMapping;
 
-    /** full constructor */
-    public SupportedLocale(String languageIsoCode, String countryIsoCode, String description, String direction,
-	    String fckLanguageMapping) {
-	this.languageIsoCode = languageIsoCode;
-	this.countryIsoCode = countryIsoCode;
-	this.description = description;
-	this.direction = direction;
-	this.fckLanguageMapping = fckLanguageMapping;
-    }
-
-    /** default constructor */
     public SupportedLocale() {
     }
-    
+
     /**
      * Return locale name in the format xx_XX, where xx - language ISO code and XX - country ISO code
      */
@@ -99,8 +96,7 @@ public class SupportedLocale implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-	SupportedLocale locale = (SupportedLocale) o;
+    public int compareTo(SupportedLocale locale) {
 	return description.compareTo(locale.getDescription());
     }
 
@@ -111,5 +107,4 @@ public class SupportedLocale implements Serializable, Comparable {
     public void setFckLanguageMapping(String fckLanguageMapping) {
 	this.fckLanguageMapping = fckLanguageMapping;
     }
-
 }

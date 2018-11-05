@@ -25,40 +25,46 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 
 /**
  * @author Manpreet Minhas
  */
+@Entity
+@Table(name = "lams_license")
 public class License implements Serializable {
+    private static final long serialVersionUID = 1410976014177869871L;
 
-    /** persistent field */
+    @Id
+    @Column(name = "license_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long licenseID;
-    /** persistent field */
+
+    @Column
     private String name;
-    /** persistent field */
+
+    @Column
     private String code;
-    /** persistent field */
+
+    @Column
     private String url;
-    /** persistent field */
+
+    @Column(name = "default_flag")
     private Boolean defaultLicense;
-    /** persistent field */
+
+    @Column(name = "picture_url")
     private String pictureURL;
 
-    /** default constructor */
     public License() {
 
-    }
-
-    /** full constructor */
-    public License(Long licenseID, String name, String code, String url, Boolean defaultLicense, String pictureURL) {
-	this.licenseID = licenseID;
-	this.name = name;
-	this.code = code;
-	this.url = url;
-	this.defaultLicense = defaultLicense;
-	this.pictureURL = pictureURL;
     }
 
     /**
@@ -128,13 +134,13 @@ public class License implements Serializable {
      * are checked, with the name fields having any leading or trailing spaces stripped
      * before comparison. If both licenseID fields are null, then they are assumed to be
      * different licenses.
-     * 
+     *
      * This is to be used when importing designs, to see if licenses match. If the id and
      * name fields match, then the imported design is linked to the license record. If
      * they don't match, the design should be attached to the "Other" license.
-     * 
+     *
      * The user selects the license based on the name, hence we have chosen to check the name.
-     * 
+     *
      * @param otherLicense
      * @return true if they are the same type of license
      */
