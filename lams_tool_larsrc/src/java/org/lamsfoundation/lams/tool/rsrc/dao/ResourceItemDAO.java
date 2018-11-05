@@ -35,7 +35,7 @@ public interface ResourceItemDAO extends DAO {
      * @param resourceUid
      * @return
      */
-    List getAuthoringItems(Long resourceUid);
+    List<ResourceItem> getAuthoringItems(Long resourceUid);
 
     ResourceItem getByUid(Long resourceItemUid);
 

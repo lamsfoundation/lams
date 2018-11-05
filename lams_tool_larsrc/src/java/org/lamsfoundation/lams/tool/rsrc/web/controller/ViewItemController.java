@@ -61,14 +61,7 @@ public class ViewItemController {
 
     /**
      * Display main frame to display instrcution and item content.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping("/reviewItem")
     private String reviewItem(HttpServletRequest request) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
@@ -112,19 +105,11 @@ public class ViewItemController {
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	return "pages/itemreview/mainframe";
-
     }
 
     /**
      * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping("/nextInstruction")
     private String nextInstruction(HttpServletRequest request) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
@@ -141,7 +126,7 @@ public class ViewItemController {
 	int currIns = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX),
 		0);
 
-	Set instructions = item.getItemInstructions();
+	Set<ResourceItemInstruction> instructions = item.getItemInstructions();
 	InstructionNavDTO navDto = new InstructionNavDTO();
 	// For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
 	if (!item.isCreateByAuthor()) {
@@ -154,13 +139,13 @@ public class ViewItemController {
 	    navDto.setAllInstructions(navItems);
 	    instructions.add(ins);
 	} else {
-	    navDto.setAllInstructions(new ArrayList(instructions));
+	    navDto.setAllInstructions(new ArrayList<>(instructions));
 	}
 	navDto.setTitle(item.getTitle());
 	navDto.setType(item.getType());
 	navDto.setTotal(instructions.size());
 	if (instructions.size() > 0) {
-	    navDto.setInstruction((ResourceItemInstruction) new ArrayList(instructions).get(currIns));
+	    navDto.setInstruction(new ArrayList<>(instructions).get(currIns));
 	    navDto.setCurrent(currIns + 1);
 	} else {
 	    navDto.setCurrent(0);
@@ -174,14 +159,7 @@ public class ViewItemController {
 
     /**
      * Open url or file in a popup window page.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping("/openUrlPopup")
     private String openUrlPopup(HttpServletRequest request) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
@@ -204,8 +182,9 @@ public class ViewItemController {
     }
 
     // *************************************************************************************
-    // Private method
+    // Private methods
     // *************************************************************************************
+    
     /**
      * Return resource item according to ToolAccessMode.
      *

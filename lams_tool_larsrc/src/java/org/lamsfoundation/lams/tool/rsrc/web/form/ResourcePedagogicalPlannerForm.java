@@ -37,9 +37,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- *
- */
 public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivitySpringForm {
     private List<String> title;
     private List<String> url;

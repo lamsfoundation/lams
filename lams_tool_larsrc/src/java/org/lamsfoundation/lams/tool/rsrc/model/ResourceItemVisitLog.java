@@ -26,28 +26,49 @@ package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
- * Resource
+ * Resource item visit log
  *
  * @author Dapeng Ni
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_larsrc11_item_log")
 public class ResourceItemVisitLog {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_uid")
     private ResourceUser user;
+    
+    @ManyToOne
+    @JoinColumn(name = "resource_item_uid")
     private ResourceItem resourceItem;
+    
+    @Column
     private boolean complete;
+    
+    @Column(name = "complete_date")
     private Date completeDate;
+    
+    @Column(name = "access_date")
     private Date accessDate;
+    
+    @Column(name = "session_id")
     private Long sessionId;
 
-    /**
-     *
-     * @return
-     */
     public Date getAccessDate() {
 	return accessDate;
     }
@@ -56,10 +77,6 @@ public class ResourceItemVisitLog {
 	this.accessDate = accessDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCompleteDate() {
 	return completeDate;
     }
@@ -68,10 +85,6 @@ public class ResourceItemVisitLog {
 	this.completeDate = completeDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public ResourceItem getResourceItem() {
 	return resourceItem;
     }
@@ -80,10 +93,6 @@ public class ResourceItemVisitLog {
 	this.resourceItem = item;
     }
 
-    /**
-     *
-     * @return Returns the log Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -92,10 +101,6 @@ public class ResourceItemVisitLog {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public ResourceUser getUser() {
 	return user;
     }
@@ -104,10 +109,6 @@ public class ResourceItemVisitLog {
 	this.user = user;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isComplete() {
 	return complete;
     }
@@ -116,10 +117,6 @@ public class ResourceItemVisitLog {
 	this.complete = complete;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }

@@ -29,32 +29,20 @@ package org.lamsfoundation.lams.tool.rsrc.ims;
  * @author Fiona Malikoff
  */
 public class ImscpApplicationException extends Exception {
+    private static final long serialVersionUID = -4120899849012910669L;
 
-    /**
-     * 
-     */
     public ImscpApplicationException() {
 	super();
     }
 
-    /**
-     * @param arg0
-     */
     public ImscpApplicationException(String arg0) {
 	super(arg0);
     }
 
-    /**
-     * @param arg0
-     */
     public ImscpApplicationException(Throwable arg0) {
 	super(arg0);
     }
 
-    /**
-     * @param arg0
-     * @param arg1
-     */
     public ImscpApplicationException(String arg0, Throwable arg1) {
 	super(arg0, arg1);
     }

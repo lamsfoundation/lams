@@ -29,8 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
  * Resource Item Form.
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 public class ResourceItemForm {
     private String itemIndex;

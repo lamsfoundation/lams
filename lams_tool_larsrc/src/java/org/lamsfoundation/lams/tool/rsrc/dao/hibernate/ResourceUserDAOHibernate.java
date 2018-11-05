@@ -42,20 +42,22 @@ public class ResourceUserDAOHibernate extends LAMSBaseDAO implements ResourceUse
 
     @Override
     public ResourceUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	List<ResourceUser> list = (List<ResourceUser>) this.doFind(FIND_BY_USER_ID_SESSION_ID,
+		new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
-	return (ResourceUser) list.get(0);
+	return list.get(0);
     }
 
     @Override
     public ResourceUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	List<ResourceUser> list = (List<ResourceUser>) this.doFind(FIND_BY_USER_ID_CONTENT_ID,
+		new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
-	return (ResourceUser) list.get(0);
+	return list.get(0);
     }
 
     @Override

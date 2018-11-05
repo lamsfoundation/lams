@@ -92,17 +92,15 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
 	for (Object[] list : result) {
 	    if (list[1] != null) {
-		summaryList.put((Long) list[0], new Integer(((Number) list[1]).intValue()));
+		summaryList.put((Long) list[0], ((Number) list[1]).intValue());
 	    }
 	}
 	return summaryList;
-
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId, Long itemUid) {
-
 	return (List<ResourceItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
@@ -174,24 +172,19 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		+ " visit WHERE visit.sessionId = :sessionId AND visit.resourceItem.uid = :itemUid"
 		+ " AND (CONCAT(visit.user.lastName, ' ', visit.user.firstName) LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createQuery(COUNT_USERS_BY_SESSION_AND_ITEM);
+	Query<Number> query = getSession().createQuery(COUNT_USERS_BY_SESSION_AND_ITEM, Number.class);
 	query.setParameter("sessionId", sessionId);
 	query.setParameter("itemUid", itemUid);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setParameter("searchString", searchString);
-	List list = query.list();
-
-	if ((list == null) || (list.size() == 0)) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
+	return query.uniqueResult().intValue();
     }
 
     @Override
     public Object[] getDateRangeOfAccesses(Long userUid, Long toolSessionId) {
-	NativeQuery<?> query = getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+	@SuppressWarnings("unchecked")
+	NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
 		.setParameter("userUid", userUid).setParameter("sessionId", toolSessionId);
 	Object[] values = (Object[]) query.list().get(0);
 	return values;

@@ -42,8 +42,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
  * <li>count(resource_item_uid)</li>
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 public class ResourceItemDTO {
 
@@ -85,7 +83,7 @@ public class ResourceItemDTO {
 	    this.setAllowRating(item.isAllowRating());
 	    this.setAllowComments(item.isAllowComments());
 	} else {
-	    this.itemUid = new Long(-1);
+	    this.itemUid = -1L;
 	}
     }
 

@@ -24,40 +24,64 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 /**
- * Resource
+ * Resource session
  *
  * @author Dapeng Ni
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_larsrc11_session")
 public class ResourceSession {
 
-    private static Logger log = Logger.getLogger(ResourceSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+    
+    @ManyToOne
+    @JoinColumn(name = "resource_uid")
     private Resource resource;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
+    
     // finish or not
+    @Column
     private int status;
-    // resource Items
-    private Set resourceItems;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("create_date DESC")
+    @JoinColumn(name = "session_uid")
+    private Set<ResourceItem> resourceItems = new HashSet<>();
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the learnerID.
-     */
+
     public Long getUid() {
 	return uid;
     }
@@ -66,10 +90,6 @@ public class ResourceSession {
 	this.uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -78,11 +98,6 @@ public class ResourceSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -91,10 +106,6 @@ public class ResourceSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -103,10 +114,6 @@ public class ResourceSession {
 	this.status = status;
     }
 
-    /**
-     *
-     * @return
-     */
     public Resource getResource() {
 	return resource;
     }
@@ -115,10 +122,6 @@ public class ResourceSession {
 	this.resource = resource;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -144,20 +147,11 @@ public class ResourceSession {
 	this.sessionName = sessionName;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getResourceItems() {
+    public Set<ResourceItem> getResourceItems() {
 	return resourceItems;
     }
 
-    public void setResourceItems(Set resourceItems) {
+    public void setResourceItems(Set<ResourceItem> resourceItems) {
 	this.resourceItems = resourceItems;
     }
 
