@@ -22,7 +22,7 @@
  */
 
 
-package org.lamsfoundation.lams.tool.mindmap.util;
+package org.lamsfoundation.lams.tool.mindmap;
 
 public interface MindmapConstants {
     public static final String TOOL_SIGNATURE = "lamind10";

@@ -32,12 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.mindmap.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.dto.RootJSON;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
-import org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
 import org.lamsfoundation.lams.tool.mindmap.web.forms.AuthoringForm;

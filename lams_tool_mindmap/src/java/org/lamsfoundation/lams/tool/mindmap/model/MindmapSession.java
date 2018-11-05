@@ -28,6 +28,16 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -35,27 +45,39 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_lamind10_session")
 public class MindmapSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(MindmapSession.class);
     private static final long serialVersionUID = 4407078136514639026L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne 
+    @JoinColumn(name = "mindmap_uid") 
     private Mindmap mindmap;
 
-    private Set mindmapUsers;
+    @OneToMany(mappedBy = "mindmapSession")
+    private Set<MindmapUser> mindmapUsers;
 
     // Constructors
 
@@ -65,7 +87,7 @@ public class MindmapSession implements java.io.Serializable {
 
     /** full constructor */
     public MindmapSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId,
-	    String sessionName, Mindmap mindmap, Set mindmapUsers) {
+	    String sessionName, Mindmap mindmap, Set<MindmapUser> mindmapUsers) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -76,11 +98,6 @@ public class MindmapSession implements java.io.Serializable {
     }
 
     // Property accessors
-    /**
-     *
-     * 
-     */
-
     public Long getUid() {
 	return this.uid;
     }
@@ -88,11 +105,6 @@ public class MindmapSession implements java.io.Serializable {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
@@ -102,11 +114,6 @@ public class MindmapSession implements java.io.Serializable {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
     }
@@ -114,11 +121,6 @@ public class MindmapSession implements java.io.Serializable {
     public void setSessionStartDate(Date sessionStartDate) {
 	this.sessionStartDate = sessionStartDate;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Integer getStatus() {
 	return this.status;
@@ -128,11 +130,6 @@ public class MindmapSession implements java.io.Serializable {
 	this.status = status;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Long getSessionId() {
 	return this.sessionId;
     }
@@ -140,11 +137,6 @@ public class MindmapSession implements java.io.Serializable {
     public void setSessionId(Long sessionId) {
 	this.sessionId = sessionId;
     }
-
-    /**
-     *
-     * 
-     */
 
     public String getSessionName() {
 	return this.sessionName;
@@ -154,12 +146,6 @@ public class MindmapSession implements java.io.Serializable {
 	this.sessionName = sessionName;
     }
 
-    /**
-     *
-     *
-     * 
-     */
-
     public Mindmap getMindmap() {
 	return this.mindmap;
     }
@@ -168,26 +154,14 @@ public class MindmapSession implements java.io.Serializable {
 	this.mindmap = mindmap;
     }
 
-    /**
-     *
-     *
-     *
-     * 
-     */
-
-    public Set getMindmapUsers() {
+    public Set<MindmapUser> getMindmapUsers() {
 	return this.mindmapUsers;
     }
 
-    public void setMindmapUsers(Set mindmapUsers) {
+    public void setMindmapUsers(Set<MindmapUser> mindmapUsers) {
 	this.mindmapUsers = mindmapUsers;
     }
 
-    /**
-     * toString
-     * 
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -233,7 +207,7 @@ public class MindmapSession implements java.io.Serializable {
 	MindmapSession session = null;
 	try {
 	    session = (MindmapSession) super.clone();
-	    session.mindmapUsers = new HashSet();
+	    session.mindmapUsers = new HashSet<MindmapUser>();
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + MindmapSession.class + " failed");
 	}

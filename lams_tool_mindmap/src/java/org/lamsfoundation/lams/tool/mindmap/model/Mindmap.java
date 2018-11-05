@@ -28,6 +28,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mindmap.service.MindmapService;
 //import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
@@ -35,30 +43,64 @@ import org.lamsfoundation.lams.tool.mindmap.service.MindmapService;
 /**
  *
  */
+@Entity
+@Table(name = "tl_lamind10_mindmap")
 public class Mindmap implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 579733009969321015L;
     static Logger log = Logger.getLogger(MindmapService.class.getName());
 
     // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "create_date")
     private Date createDate;
-    private Date updateDate;
-    private Date submissionDeadline;
-    private Long createBy;
-    private String title;
-    private String instructions;
-    private boolean lockOnFinished;
-    private boolean multiUserMode;
-    private boolean contentInUse;
-    private boolean defineLater;
-    private Long toolContentId;
-    private String mindmapExportContent;
-    private Set mindmapSessions;
 
+    @Column(name = "update_date")
+    private Date updateDate;
+
+    @Column(name = "submission_deadline")
+    private Date submissionDeadline;
+
+    @Column(name = "create_by")
+    private Long createBy;
+
+    @Column
+    private String title;
+
+    @Column
+    private String instructions;
+
+    @Column(name = "lock_on_finished")
+    private boolean lockOnFinished;
+
+    @Column(name = "multiuser_mode")
+    private boolean multiUserMode;
+
+    @Column(name = "content_in_use")
+    private boolean contentInUse;
+
+    @Column(name = "define_later")
+    private boolean defineLater;
+
+    @Column(name = "tool_content_id")
+    private Long toolContentId;
+
+    @Column(name = "export_content")
+    private String mindmapExportContent;
+
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
+
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @OneToMany(mappedBy = "mindmap")
+    private Set<MindmapSession> mindmapSessions;
+    
     // Constructors
 
     /** default constructor */
@@ -68,7 +110,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     /** full constructor */
     public Mindmap(Date createDate, Date updateDate, Long createBy, String title, String instructions,
 	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, boolean contentInUse,
-	    boolean defineLater, Long toolContentId, Set mindmapSessions) {
+	    boolean defineLater, Long toolContentId, Set<MindmapSession> mindmapSessions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -271,11 +313,11 @@ public class Mindmap implements java.io.Serializable, Cloneable {
      *
      *
      */
-    public Set getMindmapSessions() {
+    public Set<MindmapSession> getMindmapSessions() {
 	return mindmapSessions;
     }
 
-    public void setMindmapSessions(Set mindmapSessions) {
+    public void setMindmapSessions(Set<MindmapSession> mindmapSessions) {
 	this.mindmapSessions = mindmapSessions;
     }
 
@@ -338,7 +380,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	    mindmap.setUid(null);
 
 	    // create an empty set for the mindmapSession
-	    mindmap.mindmapSessions = new HashSet();
+	    mindmap.mindmapSessions = new HashSet<MindmapSession>();
 
 	} catch (CloneNotSupportedException cnse) {
 	    Mindmap.log.error("Error cloning " + Mindmap.class);

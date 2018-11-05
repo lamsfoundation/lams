@@ -24,24 +24,52 @@
 
 package org.lamsfoundation.lams.tool.mindmap.model;
 
-import org.apache.log4j.Logger;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * @author Ruslan Kazakov
  *
  */
+@Entity
+@Table(name = "tl_lamind10_node")
 public class MindmapNode implements Cloneable {
 
-    private static Logger log = Logger.getLogger(MindmapNode.class);
-
+    @Id
+    @Column(name = "node_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long nodeId;
+    
+    @Column(name = "unique_id")
     private Long uniqueId;
+
+    @ManyToOne 
+    @JoinColumn(name = "parent_id") 
     private MindmapNode parent;
+
+    @Column(name = "node_text")
     private String text;
+
+    @Column(name = "node_color")
     private String color;
-    private MindmapSession session;
-    private MindmapUser user;
-    private Mindmap mindmap;
+
+    @ManyToOne 
+    @JoinColumn(name = "session_id") 
+     private MindmapSession session;
+
+    @ManyToOne 
+    @JoinColumn(name = "user_id") 
+     private MindmapUser user;
+    
+    @ManyToOne 
+    @JoinColumn(name = "mindmap_id") 
+     private Mindmap mindmap;
 
     /** default constructor */
     public MindmapNode() {
