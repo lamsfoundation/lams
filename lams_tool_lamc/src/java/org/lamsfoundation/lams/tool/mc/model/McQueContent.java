@@ -20,13 +20,25 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.pojos;
+package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -38,55 +50,63 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "tl_lamc11_que_content")
 public class McQueContent implements Serializable, Comparable<McQueContent> {
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** Stores mcQueContent.uid, despite of what the name says */
-    private Long mcQueContentId;
-
-    /** nullable persistent field */
+    @Column
     private String question;
     
     /**
      * It stores sha1(question) value that allows us to search for the McQueContentc with the same question
      */
+    @Column(name = "question_hash")
     private String questionHash;
 
-    /** nullable persistent field */
+    @Column(name = "display_order")
     private Integer displayOrder;
 
+    @Column
     private Integer mark;
 
+    @Column
     private String feedback;
 
-    /** non persistent field */
-    private Long mcContentId;
+    @ManyToOne 
+    @JoinColumn(name = "mc_content_id") 
+    private org.lamsfoundation.lams.tool.mc.model.McContent mcContent;
 
-    /** persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent;
-
-    /** persistent field */
-    private Set mcOptionsContents;
+    // TODO Make this orphanRemoval = true, but first fix McService.createQuestions() to stop mucking around with the collections.
+    // Currently options that are deleted in authoring leave junk records in the database with the mc_que_content_id set to null
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("displayOrder")
+    @JoinColumn(name = "mc_que_content_id")
+    private Set<McOptsContent> mcOptionsContents;
 
     //DTO fields
-
+    @Transient
     private String escapedQuestion;
 
-    public McQueContent(String question, String questionHash, Integer displayOrder, Integer mark, String feedback, McContent mcContent,
-	    Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, String questionHash, Integer displayOrder, Integer mark, String feedback,
+	    McContent mcContent, Set<McOptsContent> mcOptionsContents) {
 	this.question = question;
 	this.questionHash = questionHash;
 	this.displayOrder = displayOrder;
 	this.mark = mark;
 	this.feedback = feedback;
 	this.mcContent = mcContent;
-	this.mcOptionsContents = mcOptionsContents;
+	this.mcOptionsContents = mcOptionsContents != null ? mcOptionsContents : new HashSet<McOptsContent>() ;
     }
 
     /** default constructor */
     public McQueContent() {
+	this.mcOptionsContents = new HashSet<McOptsContent>();
     }
 
     /**
@@ -99,17 +119,16 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      * @return the new qa question content object
      */
     public static McQueContent newInstance(McQueContent queContent, McContent newMcContent) {
-	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getQuestionHash(), queContent.getDisplayOrder(),
-		queContent.getMark(), queContent.getFeedback(), newMcContent, new TreeSet(), new TreeSet());
-
+	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getQuestionHash(),
+		queContent.getDisplayOrder(), queContent.getMark(), queContent.getFeedback(), newMcContent,
+		new TreeSet<McOptsContent>());
 	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
 	return newQueContent;
     }
 
-    public Set deepCopyMcOptionsContent(McQueContent newQueContent) {
-	Set newMcOptionsContent = new TreeSet();
-	for (Iterator i = this.getMcOptionsContents().iterator(); i.hasNext();) {
-	    McOptsContent mcOptsContent = (McOptsContent) i.next();
+    public Set<McOptsContent> deepCopyMcOptionsContent(McQueContent newQueContent) {
+	Set<McOptsContent> newMcOptionsContent = new TreeSet<McOptsContent>();
+	for (McOptsContent mcOptsContent : this.getMcOptionsContents()) {
 	    McOptsContent mcNewOptsContent = McOptsContent.newInstance(mcOptsContent, newQueContent);
 	    newMcOptionsContent.add(mcNewOptsContent);
 	}
@@ -122,14 +141,6 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    public Long getMcQueContentId() {
-	return this.mcQueContentId;
-    }
-
-    public void setMcQueContentId(Long mcQueContentId) {
-	this.mcQueContentId = mcQueContentId;
     }
 
     public String getQuestion() {
@@ -158,22 +169,19 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 	this.displayOrder = displayOrder;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McContent getMcContent() {
+    public org.lamsfoundation.lams.tool.mc.model.McContent getMcContent() {
 	return this.mcContent;
     }
 
-    public void setMcContent(org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent) {
+    public void setMcContent(org.lamsfoundation.lams.tool.mc.model.McContent mcContent) {
 	this.mcContent = mcContent;
     }
 
-    public Set getMcOptionsContents() {
-	if (this.mcOptionsContents == null) {
-	    setMcOptionsContents(new HashSet());
-	}
+    public Set<McOptsContent> getMcOptionsContents() {
 	return this.mcOptionsContents;
     }
 
-    public void setMcOptionsContents(Set mcOptionsContents) {
+    public void setMcOptionsContents(Set<McOptsContent> mcOptionsContents) {
 	this.mcOptionsContents = mcOptionsContents;
     }
 
@@ -181,9 +189,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      * Get an options content record by its uid. Iterates over the set from getMcOptionsContents().
      */
     public McOptsContent getOptionsContentByUID(Long uid) {
-	Iterator iter = getMcOptionsContents().iterator();
-	while (iter.hasNext()) {
-	    McOptsContent elem = (McOptsContent) iter.next();
+	for ( McOptsContent elem : getMcOptionsContents() ) {
 	    if (elem.getUid().equals(uid)) {
 		return elem;
 	    }
@@ -194,21 +200,6 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
-    }
-
-    /**
-     * @return Returns the mcContentId.
-     */
-    public Long getMcContentId() {
-	return mcContentId;
-    }
-
-    /**
-     * @param mcContentId
-     *            The mcContentId to set.
-     */
-    public void setMcContentId(Long mcContentId) {
-	this.mcContentId = mcContentId;
     }
 
     /**
@@ -229,10 +220,12 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     @Override
     public int compareTo(McQueContent queContent) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (mcQueContentId == null) {
+	if (uid == null) {
 	    return 1;
+	} else if ( queContent.getUid() == null ) {
+	    return -1;
 	} else {
-	    return (int) (mcQueContentId.longValue() - queContent.mcQueContentId.longValue());
+	    return (int) (uid.longValue() - queContent.getUid().longValue());
 	}
     }
 

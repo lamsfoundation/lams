@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dto;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 
 /**
  * <p>

@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dto;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 
 /**
  * <p>

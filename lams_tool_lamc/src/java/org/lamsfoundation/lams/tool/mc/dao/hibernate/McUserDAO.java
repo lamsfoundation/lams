@@ -32,7 +32,7 @@ import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
-    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
+    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSession.uid=:mcSessionUid";
 
     private static final String LOAD_MARKS_FOR_SESSION = "SELECT last_attempt_total_mark "
 	    + " FROM tl_lamc11_que_usr usr "
@@ -87,7 +87,7 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
 	List<?> list = getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_SESSION)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("mcSessionUid", mcSessionUid.longValue()).list();
+		.setParameter("queUsrId", queUsrId).setParameter("mcSessionUid", mcSessionUid).list();
 
 	if (list != null && list.size() > 0) {
 	    McQueUsr usr = (McQueUsr) list.get(0);

@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 
 /**
  * Interface for the McQueContent DAO, defines methods needed to access/modify mc question content
@@ -91,5 +91,4 @@ public interface IMcQueContentDAO {
     List getAllQuestionEntriesSorted(final long qaContentId);
 
     void releaseQuestionFromCache(McQueContent question);
-
 }

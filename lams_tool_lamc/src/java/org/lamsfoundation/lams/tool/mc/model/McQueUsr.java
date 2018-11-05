@@ -20,10 +20,18 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.pojos;
+package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -35,30 +43,37 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "tl_lamc11_que_usr")
 public class McQueUsr implements Serializable, Comparable<McQueUsr> {
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "que_usr_id")
     private Long queUsrId;
 
-    /** nullable persistent field */
+    @Column
     private String username;
 
-    /** nullable persistent field */
+    @Column
     private String fullname;
 
+    @Column
     private boolean responseFinalised;
 
-    //please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrong name to this field)
-    private Long mcSessionId;
-
-    /** nullable persistent field */
+    //please pay attention this columns is the *sessionUid* and not sessionId (this is due to Ozgur gave wrong name to this field)
+    @ManyToOne 
+    @JoinColumn(name = "mc_session_id") 
     private McSession mcSession;
 
+    @Column(name = "number_attempts")
     private Integer numberOfAttempts;
 
+    @Column(name = "last_attempt_total_mark")
     private Integer lastAttemptTotalMark;
 
     /** default constructor */
@@ -66,7 +81,7 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
     }
 
     /** full constructor */
-    public McQueUsr(Long queUsrId, String username, String fullname, McSession mcSession, Set mcUsrAttempts) {
+    public McQueUsr(Long queUsrId, String username, String fullname, McSession mcSession) {
 	this.queUsrId = queUsrId;
 	this.username = username;
 	this.fullname = fullname;
@@ -133,27 +148,9 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).append("queUsrId", getQueUsrId())
 		.append("username", getUsername()).append("fullname", getFullname())
-		.append("responseFinalised", isResponseFinalised()).append("mcSessionId", getMcSessionId())
+		.append("responseFinalised", isResponseFinalised())
 		.append("numberOfAttempts", getNumberOfAttempts())
 		.append("lastAttemptTotalMark", getLastAttemptTotalMark()).toString();
-    }
-
-    /**
-     * Please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrongly name to this
-     * field)
-     *
-     * @return Returns the mcSessionId.
-     */
-    public Long getMcSessionId() {
-	return mcSessionId;
-    }
-
-    /**
-     * @param mcSessionId
-     *            The mcSessionId to set.
-     */
-    public void setMcSessionId(Long mcSessionId) {
-	this.mcSessionId = mcSessionId;
     }
 
     public Integer getNumberOfAttempts() {

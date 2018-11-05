@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.model.McSession;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -47,7 +47,7 @@ public class McSessionDAO extends LAMSBaseDAO implements IMcSessionDAO {
     public McSession getMcSessionById(Long mcSessionId) {
 
 	List<?> list = getSessionFactory().getCurrentSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID)
-		.setParameter("mcSessionId", mcSessionId.longValue()).list();
+		.setParameter("mcSessionId", mcSessionId).list();
 
 	if (list != null && list.size() > 0) {
 	    McSession mcs = (McSession) list.get(0);
@@ -73,7 +73,7 @@ public class McSessionDAO extends LAMSBaseDAO implements IMcSessionDAO {
 
     @Override
     public McSession getMcSessionByUser(final Long userId) {
-	return (McSession) getSession().createQuery(LOAD_MCSESSION_BY_USER).setParameter("userId", userId.longValue())
+	return (McSession) getSession().createQuery(LOAD_MCSESSION_BY_USER).setParameter("userId", userId)
 		.uniqueResult();
     }
 

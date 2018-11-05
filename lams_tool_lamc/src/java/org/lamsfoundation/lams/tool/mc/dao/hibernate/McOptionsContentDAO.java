@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -41,14 +41,14 @@ import org.springframework.stereotype.Repository;
 public class McOptionsContentDAO extends LAMSBaseDAO implements IMcOptionsContentDAO {
     private static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 
-    private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
+    private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContent.uid=:mcQueContentUid order by mcOptsContent.displayOrder";
 
     @SuppressWarnings("unchecked")
     @Override
     public List<McOptsContent> findMcOptionsContentByQueId(Long questionUid) {
 	if (questionUid != null) {
 	    List<McOptsContent> list = getSessionFactory().getCurrentSession().createQuery(FIND_OPTIONS_BY_QUESTION_UID)
-		    .setParameter("mcQueContentUid", questionUid.longValue()).list();
+		    .setParameter("mcQueContentUid", questionUid).list();
 	    return list;
 	}
 	return null;
@@ -61,7 +61,7 @@ public class McOptionsContentDAO extends LAMSBaseDAO implements IMcOptionsConten
 
 	if (questionUid != null) {
 	    List<McOptsContent> options = getSessionFactory().getCurrentSession()
-		    .createQuery(FIND_OPTIONS_BY_QUESTION_UID).setParameter("mcQueContentUid", questionUid.longValue())
+		    .createQuery(FIND_OPTIONS_BY_QUESTION_UID).setParameter("mcQueContentUid", questionUid)
 		    .list();
 
 	    if (options != null && options.size() > 0) {

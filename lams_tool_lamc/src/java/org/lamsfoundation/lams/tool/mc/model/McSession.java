@@ -20,12 +20,23 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.pojos;
+package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -37,76 +48,87 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "tl_lamc11_session")
 public class McSession implements Serializable, Comparable<McSession> {
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
     public static final String COMPLETED = "COMPLETED";
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "mc_session_id")
     private Long mcSessionId;
 
-    /** nullable persistent field */
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
-    /** nullable persistent field */
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
-    /** nullable persistent field */
+    @Column(name = "session_status")
     private String sessionStatus;
 
+    @Column(name = "session_name")
     private String session_name;
 
-    /** nullable persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent;
+    @ManyToOne 
+    @JoinColumn(name = "mc_content_id") 
+    private org.lamsfoundation.lams.tool.mc.model.McContent mcContent;
 
-    /** persistent field */
-    private Set mcQueUsers;
+    @OneToMany(mappedBy = "mcSession",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true)
+    private Set<McQueUsr> mcQueUsers;
 
-    /** persistent field */
-    private McQueUsr groupLeader;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "mc_group_leader_uid") 
+     private McQueUsr groupLeader;
 
     /** full constructor */
     public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus,
-	    org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStatus = sessionStatus;
 	this.mcContent = mcContent;
-	this.mcQueUsers = mcQueUsers;
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<McQueUsr>();
     }
 
     public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, String session_name,
-	    org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionStatus = sessionStatus;
 	this.session_name = session_name;
 	this.mcContent = mcContent;
-	this.mcQueUsers = mcQueUsers;
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<McQueUsr>();
     }
 
     public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus,
-	    org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionStatus = sessionStatus;
 	this.mcContent = mcContent;
-	this.mcQueUsers = mcQueUsers;
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<McQueUsr>();
     }
 
     /** default constructor */
     public McSession() {
+	this.mcQueUsers = new HashSet<McQueUsr>();
     }
 
     /** minimal constructor */
-    public McSession(Long mcSessionId, Set mcQueUsers) {
+    public McSession(Long mcSessionId, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
-	this.mcQueUsers = mcQueUsers;
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<McQueUsr>();
     }
 
     public Long getUid() {
@@ -125,11 +147,11 @@ public class McSession implements Serializable, Comparable<McSession> {
 	this.mcSessionId = mcSessionId;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McContent getMcContent() {
+    public org.lamsfoundation.lams.tool.mc.model.McContent getMcContent() {
 	return this.mcContent;
     }
 
-    public void setMcContent(org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent) {
+    public void setMcContent(org.lamsfoundation.lams.tool.mc.model.McContent mcContent) {
 	this.mcContent = mcContent;
     }
 
@@ -187,10 +209,7 @@ public class McSession implements Serializable, Comparable<McSession> {
      * @return Returns the mcQueUsers.
      */
 
-    public Set getMcQueUsers() {
-	if (this.mcQueUsers == null) {
-	    setMcQueUsers(new HashSet());
-	}
+    public Set<McQueUsr> getMcQueUsers() {
 	return this.mcQueUsers;
     }
 
@@ -198,7 +217,7 @@ public class McSession implements Serializable, Comparable<McSession> {
      * @param mcQueUsers
      *            The mcQueUsers to set.
      */
-    public void setMcQueUsers(Set mcQueUsers) {
+    public void setMcQueUsers(Set<McQueUsr> mcQueUsers) {
 	this.mcQueUsers = mcQueUsers;
     }
 

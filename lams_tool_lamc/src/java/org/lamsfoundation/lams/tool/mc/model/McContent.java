@@ -20,14 +20,23 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.pojos;
+package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -39,68 +48,88 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "tl_lamc11_content")
 public class McContent implements Serializable {
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "content_id")
     private Long mcContentId;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** nullable persistent field */
+    @Column
     private String instructions;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
-    /** nullable persistent field */
+    @Column
     private boolean reflect;
 
-    /** nullable persistent field */
+    @Column(name = "creation_date")
     private Date creationDate;
 
-    /** nullable persistent field */
+    @Column(name = "update_date")
     private Date updateDate;
 
-    /** nullable persistent field */
+    @Column(name = "questions_sequenced")
     private boolean questionsSequenced;
 
-    /** nullable persistent field */
+    @Column(name = "created_by")
     private long createdBy;
 
-    /** nullable persistent field */
+    @Column
     private boolean retries;
 
+    @Column(name = "show_report")
     private boolean showReport;
 
+    @Column
     private boolean randomize;
 
+    @Column
     private boolean displayAnswers;
+    
+    @Column(name = "display_feedback_only")
     private boolean displayFeedbackOnly;
 
+    @Column
     private boolean showMarks;
 
+    @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
+    @Column(name = "prefix_answers_with_letters")
     private boolean prefixAnswersWithLetters;
 
-    /** nullable persistent field */
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    /** nullable persistent field */
+    @Column(name = "pass_mark")
     private Integer passMark;
     
+    @Column(name = "enable_confidence_levels")
     private boolean enableConfidenceLevels;
 
+    @Column
     private String reflectionSubject;
 
-    /** persistent field */
-    private Set mcQueContents;
+    @OneToMany(mappedBy = "mcContent",
+	    cascade = CascadeType.ALL)
+    @OrderBy("displayOrder")
+    private Set<McQueContent> mcQueContents;
 
-    /** persistent field */
-    private Set mcSessions;
+    @OneToMany(mappedBy = "mcContent",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true)
+    private Set<McSession> mcSessions;
 
     /** full constructor */
     public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate,
@@ -108,7 +137,7 @@ public class McContent implements Serializable {
 	    boolean enableConfidenceLevels, boolean showReport, boolean randomize, boolean displayAnswers,
 	    boolean displayFeedbackOnly, boolean showMarks, boolean useSelectLeaderToolOuput, 
 	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject, 
-	    Set mcQueContents, Set mcSessions) {
+	    Set<McQueContent> mcQueContents, Set<McSession> mcSessions) {
 
 	this.mcContentId = mcContentId;
 	this.title = title;
@@ -130,19 +159,21 @@ public class McContent implements Serializable {
 	this.showMarks = showMarks;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
-	this.mcQueContents = mcQueContents;
-	this.mcSessions = mcSessions;
+	this.mcQueContents = mcQueContents != null ? mcQueContents : new HashSet<McQueContent>();
+	this.mcSessions = mcSessions != null ? mcSessions : new HashSet<McSession>();
     }
 
     /** default constructor */
     public McContent() {
+	this.mcQueContents = new HashSet<McQueContent>();
+	this.mcSessions = new HashSet<McSession>();
     }
 
     /** minimal constructor */
-    public McContent(Long mcContentId, Set mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, Set<McQueContent> mcQueContents, Set<McSession> mcSessions) {
 	this.mcContentId = mcContentId;
-	this.mcQueContents = mcQueContents;
-	this.mcSessions = mcSessions;
+	this.mcQueContents = mcQueContents != null ? mcQueContents : new HashSet<McQueContent>();
+	this.mcSessions = mcSessions != null ? mcSessions : new HashSet<McSession>();
     }
 
     /**
@@ -163,7 +194,7 @@ public class McContent implements Serializable {
 		mc.getPassMark(), mc.isEnableConfidenceLevels(), mc.isShowReport(), mc.isRandomize(),
 		mc.isDisplayAnswers(), mc.displayFeedbackOnly, mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
 		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
-		new TreeSet(), new TreeSet());
+		new TreeSet<McQueContent>(), new TreeSet<McSession>());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
 
 	return newContent;
@@ -175,11 +206,10 @@ public class McContent implements Serializable {
      * @param newQaContent
      * @return Set
      */
-    public Set deepCopyMcQueContent(McContent newMcContent) {
+    public Set<McQueContent> deepCopyMcQueContent(McContent newMcContent) {
 
-	Set newMcQueContent = new TreeSet();
-	for (Iterator i = this.getMcQueContents().iterator(); i.hasNext();) {
-	    McQueContent queContent = (McQueContent) i.next();
+	Set<McQueContent> newMcQueContent = new TreeSet<McQueContent>();
+	for (McQueContent queContent : this.getMcQueContents()) {
 	    if (queContent.getMcContent() != null) {
 		McQueContent mcQueContent = McQueContent.newInstance(queContent, newMcContent);
 		newMcQueContent.add(mcQueContent);
@@ -272,25 +302,19 @@ public class McContent implements Serializable {
 	this.enableConfidenceLevels = enableConfidenceLevels;
    }
 
-    public Set getMcQueContents() {
-	if (this.mcQueContents == null) {
-	    setMcQueContents(new HashSet());
-	}
+    public Set<McQueContent> getMcQueContents() {
 	return this.mcQueContents;
     }
 
-    public void setMcQueContents(Set mcQueContents) {
+    public void setMcQueContents(Set<McQueContent> mcQueContents) {
 	this.mcQueContents = mcQueContents;
     }
 
-    public Set getMcSessions() {
-	if (this.mcSessions == null) {
-	    setMcSessions(new HashSet());
-	}
+    public Set<McSession> getMcSessions() {
 	return this.mcSessions;
     }
 
-    public void setMcSessions(Set mcSessions) {
+    public void setMcSessions(Set<McSession> mcSessions) {
 	this.mcSessions = mcSessions;
     }
 
@@ -469,14 +493,12 @@ public class McContent implements Serializable {
     public Integer getTotalMarksPossible() {
 
 	int totalMarksPossible = 0;
-	Iterator itQuestions = getMcQueContents().iterator();
-	while (itQuestions.hasNext()) {
-	    McQueContent mcQueContent = (McQueContent) itQuestions.next();
+	for (McQueContent mcQueContent : this.getMcQueContents()) {
 	    Integer mark = mcQueContent.getMark();
 	    totalMarksPossible += (mark != null ? mark.intValue() : 0);
 	}
 
-	return new Integer(totalMarksPossible);
+	return Integer.valueOf(totalMarksPossible);
     }
 
     public boolean isPassMarkApplicable() {

@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.mc.dao;
 
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.model.McSession;
 
 /**
  * @author Ozgur Demirtas

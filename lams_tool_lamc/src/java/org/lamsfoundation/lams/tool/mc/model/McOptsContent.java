@@ -20,9 +20,19 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.pojos;
+package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -32,28 +42,33 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "tl_lamc11_options_content")
 public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** nullable persistent field */
+    @Column(name = "correct_option")
     private boolean correctOption;
 
-    /** nullable persistent field */
+    @Column(name = "mc_que_option_text")
     private String mcQueOptionText;
 
+    @Column
     private Integer displayOrder;
 
-    /** non persistent field */
-    private Long mcQueContentId;
-
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "mc_que_content_id") 
     private McQueContent mcQueContent;
 
-    // DTO fields
+    @Transient
     private boolean selected;
 
+    @Transient
     private String escapedOptionText;
 
     public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
@@ -109,21 +124,6 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
-    }
-
-    /**
-     * @return Returns the mcQueContentId.
-     */
-    public Long getMcQueContentId() {
-	return mcQueContentId;
-    }
-
-    /**
-     * @param mcQueContentId
-     *            The mcQueContentId to set.
-     */
-    public void setMcQueContentId(Long mcQueContentId) {
-	this.mcQueContentId = mcQueContentId;
     }
 
     @Override

@@ -20,10 +20,19 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.tool.mc.pojos;
+package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -35,35 +44,42 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
+@Entity
+@Table(name = "tl_lamc11_usr_attempt")
 public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 
     private static final long serialVersionUID = 4514268732673337338L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** nullable persistent field */
+    @Column(name = "attempt_time")
     private Date attemptTime;
 
+    @Column
     private Integer mark;
 
+    @Column(name = "isAttemptCorrect")
     private boolean attemptCorrect;
 
+    @Column
     private boolean passed;
 
-    private Long queUsrId;
-
-    private Long mcQueContentId;
-
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "mc_que_content_id") 
     private McQueContent mcQueContent;
 
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "que_usr_id") 
     private McQueUsr mcQueUsr;
 
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "mc_que_option_id") 
     private McOptsContent mcOptionsContent;
     
+    @Column(name = "confidence_level")
     private int confidenceLevel;
 
     public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, McOptsContent mcOptionsContent,
@@ -128,27 +144,27 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	this.attemptTime = attemptTime;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McQueContent getMcQueContent() {
+    public org.lamsfoundation.lams.tool.mc.model.McQueContent getMcQueContent() {
 	return this.mcQueContent;
     }
 
-    public void setMcQueContent(org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent) {
+    public void setMcQueContent(org.lamsfoundation.lams.tool.mc.model.McQueContent mcQueContent) {
 	this.mcQueContent = mcQueContent;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McQueUsr getMcQueUsr() {
+    public org.lamsfoundation.lams.tool.mc.model.McQueUsr getMcQueUsr() {
 	return this.mcQueUsr;
     }
 
-    public void setMcQueUsr(org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr) {
+    public void setMcQueUsr(org.lamsfoundation.lams.tool.mc.model.McQueUsr mcQueUsr) {
 	this.mcQueUsr = mcQueUsr;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McOptsContent getMcOptionsContent() {
+    public org.lamsfoundation.lams.tool.mc.model.McOptsContent getMcOptionsContent() {
 	return this.mcOptionsContent;
     }
 
-    public void setMcOptionsContent(org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent) {
+    public void setMcOptionsContent(org.lamsfoundation.lams.tool.mc.model.McOptsContent mcOptionsContent) {
 	this.mcOptionsContent = mcOptionsContent;
     }
 
@@ -185,36 +201,6 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
      */
     public void setPassed(boolean isPassed) {
 	this.passed = isPassed;
-    }
-
-    /**
-     * @return Returns the queUsrId.
-     */
-    public Long getQueUsrId() {
-	return queUsrId;
-    }
-
-    /**
-     * @param queUsrId
-     *            The queUsrId to set.
-     */
-    public void setQueUsrId(Long queUsrId) {
-	this.queUsrId = queUsrId;
-    }
-
-    /**
-     * @return Returns the mcQueContentId.
-     */
-    public Long getMcQueContentId() {
-	return mcQueContentId;
-    }
-
-    /**
-     * @param mcQueContentId
-     *            The mcQueContentId to set.
-     */
-    public void setMcQueContentId(Long mcQueContentId) {
-	this.mcQueContentId = mcQueContentId;
     }
 
     /**

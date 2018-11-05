@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.mc.dto;
 
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 
 /**
  * DTO that holds candiate answers data for summary page
