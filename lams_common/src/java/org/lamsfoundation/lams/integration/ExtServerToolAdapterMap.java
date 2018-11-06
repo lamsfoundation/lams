@@ -20,34 +20,42 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.integration;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.tool.Tool;
 
 /**
  * Maps a tool adapter to multiple integrated server instances
- *
- *
  */
+@Entity
+@Table(name = "lams_ext_server_tool_map")
 public class ExtServerToolAdapterMap {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @ManyToOne
+    @JoinColumn(name = "tool_id")
     private Tool tool;
+
+    @ManyToOne
+    @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 
     public ExtServerToolAdapterMap() {
     }
 
-    public ExtServerToolAdapterMap(Tool tool, ExtServer extServer) {
-	this.tool = tool;
-	this.extServer = extServer;
-    }
-
-    /**
-     *
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -56,11 +64,6 @@ public class ExtServerToolAdapterMap {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Tool getTool() {
 	return tool;
     }
@@ -69,11 +72,6 @@ public class ExtServerToolAdapterMap {
 	this.tool = tool;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public ExtServer getExtServer() {
 	return extServer;
     }

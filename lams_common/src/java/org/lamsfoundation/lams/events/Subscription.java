@@ -2,6 +2,16 @@ package org.lamsfoundation.lams.events;
 
 import java.security.InvalidParameterException;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
  * Subscription for an event notification. This class binds an user to an event and stores some information on the
  * notification attempts.
@@ -10,33 +20,43 @@ import java.security.InvalidParameterException;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "lams_notification_subscription")
 public class Subscription {
     /**
      * Unique ID for Hibernate needs.
      */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
     /**
      * ID of the subscribed user
      */
+    @Column(name = "user_id")
     private Integer userId;
 
+    @ManyToOne
+    @JoinColumn(name = "event_uid")
     private Event event;
 
     /**
      * ID of the delivery method used to send a message for this subscription.
      */
+    @Column(name = "deliver_method_id")
     private Short deliveryMethodId;
 
     /**
      * Message returned by a delivery methond during the last notification attempt
      */
+    @Column(name = "last_operation_message")
     private String lastOperationMessage;
 
-    // --------- non-persitent fields ----------
     /**
      * Delivery method used to send a message.
      */
+    @Transient
     private AbstractDeliveryMethod deliveryMethod;
 
     /**
@@ -47,10 +67,6 @@ public class Subscription {
 
     /**
      * Standard consctructor used by Events.
-     *
-     * @param userId
-     * @param deliveryMethod
-     * @param periodicity
      */
     public Subscription(Integer userId, AbstractDeliveryMethod deliveryMethod) {
 	if (deliveryMethod == null) {
@@ -77,42 +93,22 @@ public class Subscription {
 	return deliveryMethod;
     }
 
-    /**
-     *
-     * @return
-     */
     public Short getDeliveryMethodId() {
 	return deliveryMethodId;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Event getEvent() {
 	return event;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getLastOperationMessage() {
 	return lastOperationMessage;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Integer getUserId() {
 	return userId;
     }

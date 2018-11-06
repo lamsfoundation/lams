@@ -20,26 +20,42 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.integration;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Maps a lesson to multiple integrated server instances
  */
+@Entity
+@Table(name = "lams_ext_server_lesson_map")
 public class ExtServerLessonMap {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "lesson_id")
     private Long lessonId;
+
+    @Column(name = "resource_link_id")
     private String resourceLinkId;
+
+    @ManyToOne
+    @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 
     public ExtServerLessonMap() {
     }
 
-    /**
-     *
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -48,10 +64,6 @@ public class ExtServerLessonMap {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Long getLessonId() {
 	return lessonId;
     }
@@ -59,16 +71,13 @@ public class ExtServerLessonMap {
     public void setLessonId(Long lessonId) {
 	this.lessonId = lessonId;
     }
-    
+
     /**
      * Used only for LTI tool consumer servers. Stores value of the resource_link_id parameter. Which is an opaque
      * unique identifier that the TC guarantees will be unique within the TC for every placement of the link. If the
      * tool / activity is placed multiple times in the same context, each of those placements will be distinct. This
      * value will also change if the item is exported from one system or context and imported into another system or
      * context. This parameter is required.
-     * 
-     * @hibernate.property column="resource_link_id"
-     *
      */
     public String getResourceLinkId() {
 	return resourceLinkId;
@@ -78,11 +87,6 @@ public class ExtServerLessonMap {
 	this.resourceLinkId = resourceLinkId;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public ExtServer getExtServer() {
 	return extServer;
     }

@@ -2,39 +2,44 @@ package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.User;
 
-/**
- *
- */
+@Entity
+@Table(name = "lams_ext_user_userid_map")
 public class ExtUserUseridMap implements Serializable {
 
     private static final long serialVersionUID = 1755818193730728064L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sid;
 
-    /** persistent field */
+    @Column(name = "external_username")
     private String extUsername;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
-    
+
     /** id of gradebook item in LTI tool consumer */
+    @Column(name = "tc_gradebook_id")
     private String tcGradebookId;
 
-    /** full constructor */
-    public ExtUserUseridMap(String extUsername, User user, ExtServer extServer) {
-	this.extUsername = extUsername;
-	this.user = user;
-	this.extServer = extServer;
-    }
-
-    /** default constructor */
     public ExtUserUseridMap() {
     }
 
@@ -69,7 +74,7 @@ public class ExtUserUseridMap implements Serializable {
     public void setExtServer(ExtServer extServer) {
 	this.extServer = extServer;
     }
-    
+
     public String getTcGradebookId() {
 	return this.tcGradebookId;
     }
@@ -82,5 +87,4 @@ public class ExtUserUseridMap implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("sid", getSid()).append("extUsername", getExtUsername()).toString();
     }
-
 }

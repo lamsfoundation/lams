@@ -3,6 +3,17 @@ package org.lamsfoundation.lams.events;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Table;
 
 /**
  * An archived lesson or organisation notification sent by email.
@@ -10,16 +21,34 @@ import java.util.Set;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "lams_email_notification_archive")
 public class EmailNotificationArchive implements Serializable {
     private static final long serialVersionUID = 3394158938976463492L;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "organisation_id")
     private Integer organisationId;
+
+    @Column(name = "lesson_id")
     private Long lessonId;
+
+    @Column(name = "search_type")
     private Integer searchType;
+
+    @Column(name = "sent_on")
     private Date sentOn;
+    @Column
     private String body;
-    private Set<Integer> recipients;
+
+    @ElementCollection
+    @JoinTable(name = "lams_email_notification_recipient_archive", joinColumns = @JoinColumn(name = "email_notification_uid"))
+    @Column(name = "user_id")
+    private Set<Integer> recipients = new TreeSet<Integer>();
 
     public EmailNotificationArchive() {
     }

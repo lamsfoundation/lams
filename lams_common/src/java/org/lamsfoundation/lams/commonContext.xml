@@ -26,10 +26,13 @@
 			<list>
 				<value>org.lamsfoundation.lams.config</value>
 				<value>org.lamsfoundation.lams.contentrepository</value>
+				<value>org.lamsfoundation.lams.events</value>
 				<value>org.lamsfoundation.lams.gradebook</value>
+				<value>org.lamsfoundation.lams.integration</value>
 				<value>org.lamsfoundation.lams.learningdesign</value>
 				<value>org.lamsfoundation.lams.lesson</value>
 				<value>org.lamsfoundation.lams.logevent</value>
+				<value>org.lamsfoundation.lams.outcome</value>
 				<value>org.lamsfoundation.lams.planner</value>
 				<value>org.lamsfoundation.lams.policies</value>
 				<value>org.lamsfoundation.lams.themes</value>
