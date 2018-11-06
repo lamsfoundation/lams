@@ -23,16 +23,36 @@
 
 package org.lamsfoundation.lams.comments;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Fiona Malikoff
  *
  */
+@Entity
+@Table(name = "lams_comment_session")
 public class CommentSession implements Cloneable {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "external_id")
     private Long externalId;
+
+    @Column(name = "external_id_type")
     private Integer externalIdType;
+
+    @Column(name = "external_signature")
     private String externalSignature;
+
+    @Column(name = "external_secondary_id")
     private Long externalSecondaryId;
 
     public CommentSession() {

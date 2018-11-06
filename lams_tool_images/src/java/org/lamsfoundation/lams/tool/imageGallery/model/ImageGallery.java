@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +51,7 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
  */
 @Entity
 @Table(name = "tl_laimag10_imagegallery")
-public class ImageGallery implements Cloneable {
+public class ImageGallery implements Serializable, Cloneable {
     private static final Logger log = Logger.getLogger(ImageGallery.class);
 
     @Id
@@ -98,7 +99,7 @@ public class ImageGallery implements Cloneable {
     
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
-    @JoinColumn(name = "tool_content_id")
+    @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     @Column(name = "reflect_on_activity")

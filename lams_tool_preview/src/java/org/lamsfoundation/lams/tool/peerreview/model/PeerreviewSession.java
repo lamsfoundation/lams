@@ -25,6 +25,15 @@ package org.lamsfoundation.lams.tool.peerreview.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * Peerreview Session
  *
@@ -33,17 +42,33 @@ import java.util.Date;
  *
  *
  */
+@Entity
+@Table(name = "tl_laprev11_session")
 public class PeerreviewSession {
 
-//    private static Logger log = Logger.getLogger(PeerreviewSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+    
+    @ManyToOne 
+    @JoinColumn(name = "peerreview_uid")
     private Peerreview peerreview;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
+    
     // finish or not
+    @Column
     private int status;
 
     // **********************************************************

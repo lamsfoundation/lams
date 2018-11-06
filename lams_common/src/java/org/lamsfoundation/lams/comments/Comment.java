@@ -26,6 +26,16 @@ package org.lamsfoundation.lams.comments;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -35,36 +45,76 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @author Fiona Malikoff
  *
  */
+@Entity
+@Table(name = "lams_comment")
 public class Comment implements Cloneable {
 
     // message types - initially just one, the tool type.
     public static final int EXTERNAL_TYPE_TOOL = 1; // externalId will be a toolSessionId
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private String body;
 
+    @Column(name = "create_date")
     private Date created;
+    
+    @ManyToOne 
+    @JoinColumn(name = "create_by") 
     private User createdBy;
+
+    @Column(name = "update_date")
     private Date updated;
+
+    @ManyToOne 
+    @JoinColumn(name = "update_by") 
     private User updatedBy;
 
+    @Column(name = "last_reply_date")
     private Date lastReplyDate;
+
+    @Column(name = "reply_number")
     private int replyNumber;
+
+    @Column(name = "hide_flag")
     private boolean hideFlag;
+
+    @Column
     private boolean sticky;
+
+    @Column
     private boolean monitor;
+
+    @Column
     private boolean anonymous;
 
+    @ManyToOne 
+    @JoinColumn(name = "root_comment_uid") 
     private Comment rootComment;
+    
+    @ManyToOne 
+    @JoinColumn(name = "thread_comment_uid") 
     private Comment threadComment;
+
+    @Column(name = "comment_level")
     private short commentLevel;
 
+    @ManyToOne 
+    @JoinColumn(name = "parent_uid") 
     private Comment parent;
+
+    @ManyToOne 
+    @JoinColumn(name = "session_id") 
     private CommentSession session;
 
     /** Read only fields - calculated when loaded from the database */
+    @Transient
     private Integer likeCount;
+    @Transient
     private Integer vote;
 
     public Comment() {

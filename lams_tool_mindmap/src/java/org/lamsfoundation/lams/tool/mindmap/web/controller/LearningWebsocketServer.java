@@ -24,10 +24,11 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
-import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -282,8 +283,9 @@ public class LearningWebsocketServer {
 
     private static IMindmapService getMindmapService() {
 	if (LearningWebsocketServer.mindmapService == null) {
-	    LearningWebsocketServer.mindmapService = MindmapServiceProxy
-		    .getMindmapService(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    LearningWebsocketServer.mindmapService = (IMindmapService) wac.getBean("mindmapService");
 	}
 	return LearningWebsocketServer.mindmapService;
     }

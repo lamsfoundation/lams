@@ -183,8 +183,8 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getRatingAverageByContentAndItems(Long contentId, Long toolSessionId, Collection<Long> itemIds) {
-	return getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS).setLong("contentId", contentId)
-		.setLong("toolSessionId", toolSessionId)
+	return getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS).setParameter("contentId", contentId)
+		.setParameter("toolSessionId", toolSessionId)
 		.setParameterList("itemIds", itemIds).list();
     }
 
@@ -217,10 +217,10 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 		+ " WHERE comment.ratingCriteria.toolContentId = :toolContentId AND comment.learner.userId =:userId AND comment.ratingCriteria.commentsEnabled IS TRUE";
 
 	List<Long> ratedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_RATED_BY_USER)
-		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
+		.setParameter("toolContentId", toolContentId).setParameter("userId", userId).list();
 
 	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
-		.setLong("toolContentId", toolContentId).setInteger("userId", userId).list();
+		.setParameter("toolContentId", toolContentId).setParameter("userId", userId).list();
 
 	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
 	unionItemIds.addAll(commentedItemIds);
@@ -241,10 +241,10 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 		+ " WHERE comment.ratingCriteria.ratingCriteriaId = :criteriaId AND comment.learner.userId =:userId AND comment.ratingCriteria.commentsEnabled IS TRUE";
 
 	List<Long> ratedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_RATED_BY_USER)
-		.setLong("criteriaId", criteriaId).setInteger("userId", userId).list();
+		.setParameter("criteriaId", criteriaId).setParameter("userId", userId).list();
 
 	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
-		.setLong("criteriaId", criteriaId).setInteger("userId", userId).list();
+		.setParameter("criteriaId", criteriaId).setParameter("userId", userId).list();
 
 	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
 	unionItemIds.addAll(commentedItemIds);
@@ -274,10 +274,11 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 		+ " AND comment.toolSessionId=:toolSessionId";
 
 	List<Object[]> ratedItemObjs  = getSession().createQuery(FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS)
-		.setLong("contentId", contentId).setLong("toolSessionId", toolSessionId).setParameterList("itemIds", itemIds).list();
+		.setParameter("contentId", contentId).setParameter("toolSessionId", toolSessionId).setParameterList("itemIds", itemIds).list();
 
-	List<Object[]> commentedItemObjs =	getSession().createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS).setLong("contentId", contentId)
-		.setParameterList("itemIds", itemIds).setLong("toolSessionId", toolSessionId).list();
+	List<Object[]> commentedItemObjs = getSession()
+		.createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS).setParameter("contentId", contentId)
+		.setParameterList("itemIds", itemIds).setParameter("toolSessionId", toolSessionId).list();
 
 	return createUsersRatedEachItem(itemIds, excludeUserId, itemIdToRatedUsersCountMap, ratedItemObjs,
 		commentedItemObjs);
@@ -307,11 +308,12 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
 
 	List<Object[]> ratedItemObjs = getSession().createQuery(FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS)
-		.setLong("criteriaId", criteriaId).setLong("toolSessionId", toolSessionId).setParameterList("itemIds", itemIds).list();
+		.setParameter("criteriaId", criteriaId).setParameter("toolSessionId", toolSessionId)
+		.setParameterList("itemIds", itemIds).list();
 
 	List<Object[]> commentedItemObjs = getSession()
-		.createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS).setLong("criteriaId", criteriaId)
-		.setParameterList("itemIds", itemIds).setLong("toolSessionId", toolSessionId).list();
+		.createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS).setParameter("criteriaId", criteriaId)
+		.setParameterList("itemIds", itemIds).setParameter("toolSessionId", toolSessionId).list();
 
 	return createUsersRatedEachItem(itemIds, excludeUserId, itemIdToRatedUsersCountMap, ratedItemObjs,
 		commentedItemObjs);
@@ -367,7 +369,6 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
     /** 
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
-    @SuppressWarnings("unchecked")
     public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
 	return getSession().createQuery(FIND_RATINGS_BY_ITEM_CRITERIA)
 		.setParameterList("ratingCriteriaIds", ratingCriteriaIds)

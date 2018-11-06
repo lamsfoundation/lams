@@ -42,10 +42,10 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     private static final String TABLENAME = "lams_learning_design";
     private static final String VALID_IN_FOLDER = "from " + TABLENAME + " in class " + LearningDesign.class.getName()
-	    + " where valid_design_flag=true AND workspace_folder_id=? AND removed=0";
+	    + " where valid_design_flag=true AND workspace_folder_id=:workspace_folder_id AND removed=0";
 
     private static final String ALL_IN_FOLDER = "from " + TABLENAME + " in class " + LearningDesign.class.getName()
-	    + " where workspace_folder_id=? AND removed=0";
+	    + " where workspace_folder_id=:workspace_folder_id AND removed=0";
 
     private static final String FIND_BY_ORIGINAL = "from " + TABLENAME + " in class " + LearningDesign.class.getName()
 	    + " where original_learning_design_id=? AND removed=0";
@@ -72,7 +72,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public List getAllValidLearningDesignsInFolder(Integer workspaceFolderID) {
-	return this.doFind(VALID_IN_FOLDER, workspaceFolderID);
+	return getSession().createQuery(VALID_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID).list();
     }
 
     /**
@@ -82,7 +82,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
      */
     @Override
     public List getAllLearningDesignsInFolder(Integer workspaceFolderID) {
-	return this.doFind(ALL_IN_FOLDER, workspaceFolderID);
+	return getSession().createQuery(ALL_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID).list();
     }
 
     /**
@@ -117,8 +117,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     public List<LearningDesign> getAllPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
 	    String sortName, String sortDate) {
 	String sortingOrder = setupSortString(sortName, sortDate);
-	Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder).setParameter(0,
-		workspaceFolderID.longValue());
+	Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder).setParameter("workspace_folder_id",
+		workspaceFolderID);
 	if (page != null && size != null) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
@@ -131,8 +131,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     public List<LearningDesign> getValidPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
 	    String sortName, String sortDate) {
 	String sortingOrder = setupSortString(sortName, sortDate);
-	Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder).setParameter(0,
-		workspaceFolderID.longValue());
+	Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder).setParameter("workspace_folder_id",
+		workspaceFolderID);
 	if (page != null && size != null) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}

@@ -25,11 +25,22 @@ package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.lesson.Lesson;
 
+@SuppressWarnings("serial")
+@Entity
+@DiscriminatorValue("4")
 public class LessonRatingCriteria extends RatingCriteria implements Cloneable, Serializable {
+
     /** Holds value of property lessonId. */
+    @ManyToOne 
+    @JoinColumn(name = "lesson_id") 
     private Lesson lesson;
 
     @Override

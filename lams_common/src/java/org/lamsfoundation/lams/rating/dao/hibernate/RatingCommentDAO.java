@@ -67,7 +67,8 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
     public List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Long toolSessionId, Collection<Long> itemIds) {
 
 	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS)
-		.setLong("ratingCriteriaId", ratingCriteriaId).setLong("toolSessionId", toolSessionId).setParameterList("itemIds", itemIds).list();
+		.setParameter("ratingCriteriaId", ratingCriteriaId).setParameter("toolSessionId", toolSessionId)
+		.setParameterList("itemIds", itemIds).list();
 
 	return convertIntoCommentDtos(results);
     }
@@ -77,8 +78,8 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
 	    Integer userId) {
 
 	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS_AND_USER)
-		.setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds)
-		.setInteger("userId", userId).list();
+		.setParameter("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds)
+		.setParameter("userId", userId).list();
 
 	return convertIntoCommentDtos(results);
     }
@@ -94,8 +95,8 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
     @Override
     public List<RatingCommentDTO> getRelatedCommentByCriteriaAndUser(Long ratingCriteriaId, Integer userId) {
 	List<Object[]> results = getSession().createQuery(FIND_RELATED_COMMENT_BY_CRITERIA_AND_USER)
-		.setLong("ratingCriteriaId", ratingCriteriaId)
-		.setInteger("userId", userId).list();
+		.setParameter("ratingCriteriaId", ratingCriteriaId)
+		.setParameter("userId", userId).list();
 
 	return convertIntoCommentDtos(results);
     }
