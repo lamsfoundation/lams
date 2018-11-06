@@ -21,8 +21,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 
@@ -32,19 +40,27 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_lascrb11_heading")
 public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHeading>, Cloneable {
 
     private static final long serialVersionUID = -5643334348072895714L;
 
     private static final Logger log = Logger.getLogger(ScribeHeading.class);
 
-    // Properties
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @ManyToOne
+    @JoinColumn(name = "scribe_uid")
     private Scribe scribe;
 
+    @Column(name = "heading")
     private String headingText;
 
+    @Column(name = "display_order")
     private int displayOrder;
 
     public ScribeHeading() {
@@ -54,11 +70,6 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	this.displayOrder = displayOrder;
     }
 
-    // Getters / Setters
-
-    /**
-     *
-     */
     public String getHeadingText() {
 	return headingText;
     }
@@ -67,11 +78,6 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	this.headingText = headingText;
     }
 
-    /**
-     * 
-     *
-     *
-     */
     public Scribe getScribe() {
 	return scribe;
     }
@@ -80,10 +86,6 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	this.scribe = scribe;
     }
 
-    /**
-     *
-     * 
-     */
     public Long getUid() {
 	return uid;
     }
@@ -92,10 +94,6 @@ public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHea
 	this.uid = uid;
     }
 
-    /**
-     * 
-     *
-     */
     public int getDisplayOrder() {
 	return displayOrder;
     }

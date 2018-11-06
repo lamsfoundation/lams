@@ -19,19 +19,17 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
-
-
 import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -109,7 +107,6 @@ public class LearningWebsocketServer {
 	/**
 	 * Feeds websockets with reports and votes.
 	 */
-	@SuppressWarnings("unchecked")
 	private static void send(Long toolSessionId, Session newWebsocket) throws IOException {
 	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	    ScribeSessionCache sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
@@ -334,8 +331,9 @@ public class LearningWebsocketServer {
 
     private static IScribeService getScribeService() {
 	if (LearningWebsocketServer.scribeService == null) {
-	    LearningWebsocketServer.scribeService = ScribeServiceProxy
-		    .getScribeService(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    LearningWebsocketServer.scribeService = (IScribeService) wac.getBean("lascrbScribeService");
 	}
 	return LearningWebsocketServer.scribeService;
     }

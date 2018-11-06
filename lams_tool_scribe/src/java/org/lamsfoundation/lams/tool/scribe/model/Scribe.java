@@ -29,63 +29,77 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scribe.service.ScribeService;
 
-/**
- *
- */
-
+@Entity
+@Table(name = "tl_lascrb11_scribe")
 public class Scribe implements java.io.Serializable, Cloneable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 579733009969321015L;
+     private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(ScribeService.class.getName());
 
-    // Fields
-    /**
-     * 
-     */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "auto_select_scribe")
     private boolean autoSelectScribe;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
-    private Set scribeSessions;
+    @OneToMany(mappedBy = "scribe")
+    private Set<ScribeSession> scribeSessions;
 
-    private Set scribeHeadings;
+    @OneToMany(mappedBy = "scribe", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder")
+    private Set<ScribeHeading> scribeHeadings;
 
+    @Column(name = "aggregated_reports")
     private boolean showAggregatedReports;
-
-    // Property accessors
-    /**
-     *
-     * 
-     */
 
     public Long getUid() {
 	return this.uid;
@@ -95,11 +109,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Date getCreateDate() {
 	return this.createDate;
     }
@@ -107,11 +116,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Date getUpdateDate() {
 	return this.updateDate;
@@ -121,11 +125,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Long getCreateBy() {
 	return this.createBy;
     }
@@ -133,11 +132,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
     public void setCreateBy(Long createBy) {
 	this.createBy = createBy;
     }
-
-    /**
-     *
-     * 
-     */
 
     public String getTitle() {
 	return this.title;
@@ -147,11 +141,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     * 
-     */
-
     public String getInstructions() {
 	return this.instructions;
     }
@@ -159,11 +148,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
     }
-
-    /**
-     *
-     * 
-     */
 
     public boolean isLockOnFinished() {
 	return this.lockOnFinished;
@@ -173,10 +157,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    /**
-     *
-     * 
-     */
     public boolean isAutoSelectScribe() {
 	return autoSelectScribe;
     }
@@ -185,9 +165,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.autoSelectScribe = autoSelectScribe;
     }
 
-    /**
-     *
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -196,9 +173,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -206,11 +180,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
     }
-
-    /**
-     *
-     * 
-     */
 
     public boolean isContentInUse() {
 	return this.contentInUse;
@@ -220,11 +189,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * 
-     */
-
     public boolean isDefineLater() {
 	return this.defineLater;
     }
@@ -232,11 +196,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Long getToolContentId() {
 	return this.toolContentId;
@@ -246,38 +205,21 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     *
-     * 
-     */
-
-    public Set getScribeSessions() {
+    public Set<ScribeSession> getScribeSessions() {
 	return this.scribeSessions;
     }
 
-    public void setScribeSessions(Set scribeSessions) {
+    public void setScribeSessions(Set<ScribeSession> scribeSessions) {
 	this.scribeSessions = scribeSessions;
     }
 
-    /**
-     *
-     *
-     *
-     */
-    public Set getScribeHeadings() {
+    public Set<ScribeHeading> getScribeHeadings() {
 	return scribeHeadings;
     }
 
-    public void setScribeHeadings(Set scribeHeadings) {
+    public void setScribeHeadings(Set<ScribeHeading> scribeHeadings) {
 	this.scribeHeadings = scribeHeadings;
     }
-
-    /**
-     *
-     * 
-     */
 
     public boolean isShowAggregatedReports() {
 	return this.showAggregatedReports;
@@ -287,11 +229,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 	this.showAggregatedReports = showAggregatedReports;
     }
 
-    /**
-     * toString
-     * 
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

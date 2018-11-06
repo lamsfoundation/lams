@@ -21,8 +21,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -35,33 +43,41 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  *
  */
 
+@Entity
+@Table(name = "tl_lascrb11_user")
 public class ScribeUser implements java.io.Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3701664859818409197L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "login_name")
     private String loginName;
 
+    @ManyToOne
+    @JoinColumn(name = "scribe_session_uid")
     private ScribeSession scribeSession;
 
+    @Column
     private boolean finishedActivity;
 
+    @Column(name = "report_approved")
     private boolean reportApproved;
 
+    @Column(name = "started_activity")
     private boolean startedActivity;
-
-    // Constructors
 
     /** default constructor */
     public ScribeUser() {
@@ -85,10 +101,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.scribeSession = scribeSession;
     }
 
-    // Property accessors
-    /**
-     *
-     */
     public Long getUid() {
 	return this.uid;
     }
@@ -97,10 +109,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * 
-     */
     public Long getUserId() {
 	return this.userId;
     }
@@ -109,10 +117,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.userId = userId;
     }
 
-    /**
-     *
-     * 
-     */
     public String getLastName() {
 	return this.lastName;
     }
@@ -121,10 +125,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     * 
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -133,10 +133,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     * 
-     */
     public String getFirstName() {
 	return this.firstName;
     }
@@ -145,9 +141,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     */
     public boolean isFinishedActivity() {
 	return finishedActivity;
     }
@@ -156,11 +149,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.finishedActivity = finishedActivity;
     }
 
-    /**
-     *
-     *
-     * 
-     */
     public ScribeSession getScribeSession() {
 	return this.scribeSession;
     }
@@ -169,9 +157,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.scribeSession = scribeSession;
     }
 
-    /**
-     *
-     */
     public boolean isReportApproved() {
 	return reportApproved;
     }
@@ -180,9 +165,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.reportApproved = reportApproved;
     }
 
-    /**
-     *
-     */
     public boolean isStartedActivity() {
 	return startedActivity;
     }
@@ -191,11 +173,6 @@ public class ScribeUser implements java.io.Serializable {
 	this.startedActivity = startedActivity;
     }
 
-    /**
-     * toString
-     * 
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

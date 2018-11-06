@@ -21,10 +21,18 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * @author Anthony Sukkar
@@ -32,26 +40,28 @@ import java.io.Serializable;
  *
  *
  */
+@Entity
+@Table(name = "tl_lascrb11_report_entry")
 public class ScribeReportEntry implements Serializable {
 
-    /**
-     * TODO problems generating serialVersionUID
-     */
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "entry_text")
     private String entryText;
 
+    @ManyToOne
+    @JoinColumn(name = "scribe_heading_uid")
     private ScribeHeading scribeHeading;
 
+    @ManyToOne
+    @JoinColumn(name = "scribe_session_uid")
     private ScribeSession scribeSession;
 
-    // Getters / Setters
-
-    /**
-     *
-     */
     public String getEntryText() {
 	return entryText;
     }
@@ -60,10 +70,6 @@ public class ScribeReportEntry implements Serializable {
 	this.entryText = entryText;
     }
 
-    /**
-     *
-     *
-     */
     public ScribeHeading getScribeHeading() {
 	return scribeHeading;
     }
@@ -72,9 +78,6 @@ public class ScribeReportEntry implements Serializable {
 	this.scribeHeading = scribeHeading;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -83,10 +86,6 @@ public class ScribeReportEntry implements Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public ScribeSession getScribeSession() {
 	return scribeSession;
     }
