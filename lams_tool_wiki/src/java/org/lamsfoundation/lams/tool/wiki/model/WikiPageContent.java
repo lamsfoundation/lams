@@ -25,6 +25,15 @@ package org.lamsfoundation.lams.tool.wiki.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -35,17 +44,34 @@ import org.apache.log4j.Logger;
  * @author lfoxton
  *
  */
+@Entity
+@Table(name = "tl_lawiki10_wiki_page_content")
 public class WikiPageContent implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 98276541234892314L;
 
     private static Logger log = Logger.getLogger(WikiPageContent.class.getName());
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne 
+    @JoinColumn(name = "wiki_page_uid") 
     private WikiPage wikiPage;
+    
+    @Column
     private String body;
+
+    @ManyToOne 
+    @JoinColumn(name = "editor") 
     private WikiUser editor;
+    
+    @Column(name = "edit_date")
     private Date editDate;
+    
+    @Column
     private Long version;
 
     public WikiPageContent() {

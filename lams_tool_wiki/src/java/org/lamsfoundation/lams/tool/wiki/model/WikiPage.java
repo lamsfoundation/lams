@@ -3,6 +3,18 @@ package org.lamsfoundation.lams.tool.wiki.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -13,28 +25,51 @@ import org.apache.log4j.Logger;
  * @author lfoxton
  *
  */
+@Entity
+@Table(name = "tl_lawiki10_wiki_page")
 public class WikiPage implements java.io.Serializable, Cloneable {
     private static final long serialVersionUID = 2980989002817635889L;
 
     private static Logger log = Logger.getLogger(WikiPage.class.getName());
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @ManyToOne
+    @JoinColumn(name = "wiki_uid")
     private Wiki parentWiki;
+
+    @Column
     private String title;
+
+    @Column
     private Boolean editable;
+
+    @Column
     private Boolean deleted;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "wiki_page_uid")
+    @OrderBy("uid ASC")
     private Set<WikiPageContent> wikiContentVersions;
+
+    @ManyToOne
+    @JoinColumn(name = "wiki_current_content")
     private WikiPageContent currentWikiContent;
+
+    @ManyToOne
+    @JoinColumn(name = "wiki_session_uid")
     private WikiSession wikiSession;
+
+    @ManyToOne
+    @JoinColumn(name = "added_by")
     private WikiUser addedBy;
 
     public WikiPage() {
     }
 
-    /**
-     *
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -43,11 +78,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Wiki getParentWiki() {
 	return parentWiki;
     }
@@ -56,10 +86,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.parentWiki = parentWiki;
     }
 
-    /**
-     *
-     *
-     */
     public String getTitle() {
 	return title;
     }
@@ -68,10 +94,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     *
-     */
     public Boolean getEditable() {
 	return editable;
     }
@@ -80,10 +102,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.editable = editable;
     }
 
-    /**
-     *
-     *
-     */
     public Boolean getDeleted() {
 	return deleted;
     }
@@ -92,13 +110,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.deleted = deleted;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public Set<WikiPageContent> getWikiContentVersions() {
 	return wikiContentVersions;
     }
@@ -107,11 +118,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.wikiContentVersions = wikiContentVersions;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public WikiPageContent getCurrentWikiContent() {
 	return currentWikiContent;
     }
@@ -120,11 +126,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.currentWikiContent = currentWikiContent;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public WikiUser getAddedBy() {
 	return addedBy;
     }
@@ -133,14 +134,6 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.addedBy = addedBy;
     }
 
-    /**
-     * Gets the toolSession
-     *
-     *
-     *
-     *
-     *
-     */
     public WikiSession getWikiSession() {
 	return wikiSession;
     }

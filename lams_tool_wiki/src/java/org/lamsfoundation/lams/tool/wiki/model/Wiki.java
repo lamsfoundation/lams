@@ -21,94 +21,115 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
-/**
- *
- */
-
+@Entity
+@Table(name = "tl_lawiki10_wiki")
 public class Wiki implements java.io.Serializable, Cloneable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 382787654329119829L;
 
     static Logger log = Logger.getLogger(Wiki.class.getName());
 
-    // Fields
-    /**
-     *
-     */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
     // BEGIN ADVANCED OPTIONS------------------
 
     // Lock the wiki after learner is finished
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
     // Allow learners to create their own pages
+    @Column(name = "allow_learner_create_pages")
     private boolean allowLearnerCreatePages;
 
     // Allow learners to insert external links into wiki
+    @Column(name = "allow_learner_insert_links")
     private boolean allowLearnerInsertLinks;
 
     // Allow learners to attach images to the wiki page
+    @Column(name = "allow_learner_attach_images")
     private boolean allowLearnerAttachImages;
 
     // Add notification for wiki updates
+    @Column(name = "notify_updates")
     private boolean notifyUpdates;
 
     // Add notebook at the end of activity
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
     // instructions for notebook
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
     // Minimum number of edits a learner must do before finishing activity
+    @Column(name = "minimum_edits")
     private Integer minimumEdits;
 
     // Maximum number of edits a learner can do for an activity
+    @Column(name = "maximum_edits")
     private Integer maximumEdits;
 
     // END ADVANCED OPTIONS------------------
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
-    
-	private Date submissionDeadline;
 
+    @Column(name = "submission_deadline")
+    private Date submissionDeadline;
+
+    @OneToMany(mappedBy = "wiki")
     private Set<WikiSession> wikiSessions;
 
+    @OneToMany(mappedBy = "parentWiki")
+    @OrderBy("uid ASC")
     private Set<WikiPage> wikiPages;
 
+    @ManyToOne
+    @JoinColumn(name = "wiki_main_page_uid")
     private WikiPage mainPage;
-
-    // Property accessors
-    /**
-     *
-     *
-     */
 
     public Long getUid() {
 	return this.uid;
@@ -118,11 +139,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
-
     public Date getCreateDate() {
 	return this.createDate;
     }
@@ -130,11 +146,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Date getUpdateDate() {
 	return this.updateDate;
@@ -144,11 +155,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getCreateBy() {
 	return this.createBy;
     }
@@ -156,11 +162,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setCreateBy(Long createBy) {
 	this.createBy = createBy;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getTitle() {
 	return this.title;
@@ -170,11 +171,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     *
-     */
-
     public String getInstructions() {
 	return this.instructions;
     }
@@ -182,11 +178,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isLockOnFinished() {
 	return this.lockOnFinished;
@@ -196,10 +187,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isAllowLearnerCreatePages() {
 	return allowLearnerCreatePages;
     }
@@ -208,10 +195,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.allowLearnerCreatePages = allowLearnerCreatePages;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isAllowLearnerInsertLinks() {
 	return allowLearnerInsertLinks;
     }
@@ -220,10 +203,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.allowLearnerInsertLinks = allowLearnerInsertLinks;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isAllowLearnerAttachImages() {
 	return allowLearnerAttachImages;
     }
@@ -232,10 +211,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.allowLearnerAttachImages = allowLearnerAttachImages;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isNotifyUpdates() {
 	return notifyUpdates;
     }
@@ -244,9 +219,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.notifyUpdates = notifyUpdates;
     }
 
-    /**
-     *
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -255,9 +227,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -266,9 +235,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     */
     public Integer getMinimumEdits() {
 	return minimumEdits;
     }
@@ -277,9 +243,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.minimumEdits = minimumEdits;
     }
 
-    /**
-     *
-     */
     public Integer getMaximumEdits() {
 	return maximumEdits;
     }
@@ -287,11 +250,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setMaximumEdits(Integer maximumEdits) {
 	this.maximumEdits = maximumEdits;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isContentInUse() {
 	return this.contentInUse;
@@ -301,11 +259,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     *
-     */
-
     public boolean isDefineLater() {
 	return this.defineLater;
     }
@@ -313,11 +266,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
     }
-
-    /**
-     *
-     *
-     */
 
     public Long getToolContentId() {
 	return this.toolContentId;
@@ -327,13 +275,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
-
     public Set<WikiSession> getWikiSessions() {
 	return this.wikiSessions;
     }
@@ -341,14 +282,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setWikiSessions(Set<WikiSession> wikiSessions) {
 	this.wikiSessions = wikiSessions;
     }
-
-    /**
-     *
-     * asc"
-     *
-     *
-     *
-     */
 
     public Set<WikiPage> getWikiPages() {
 	return wikiPages;
@@ -358,11 +291,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	this.wikiPages = wikiPages;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public WikiPage getMainPage() {
 	return mainPage;
     }
@@ -370,26 +298,15 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setMainPage(WikiPage mainPage) {
 	this.mainPage = mainPage;
     }
-    
-    
-    /**
-    *
-    * @return
-    */
-    public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
-    
 
-	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
-    
-    /**
-     * toString
-     *
-     * @return String
-     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
+
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

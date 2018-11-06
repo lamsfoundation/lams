@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
@@ -333,4 +335,7 @@ public interface IWikiService {
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
+    
+    /** Copied from ToolSessionManager so that LearningController can access it */
+    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
 }
