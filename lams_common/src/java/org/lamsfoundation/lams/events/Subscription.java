@@ -44,7 +44,7 @@ public class Subscription {
     /**
      * ID of the delivery method used to send a message for this subscription.
      */
-    @Column(name = "deliver_method_id")
+    @Column(name = "delivery_method_id")
     private Short deliveryMethodId;
 
     /**

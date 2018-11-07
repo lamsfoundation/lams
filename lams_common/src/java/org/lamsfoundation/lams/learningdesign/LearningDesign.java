@@ -193,7 +193,9 @@ public class LearningDesign implements Serializable {
      * are null, then it will default to the current datetime.
      */
 
-    /** full constructor */
+    /** Full constructor. This is called by AuthoringService.insertSingleActivityLearningDesign with nulls for the 
+     * sets, so if they are null let the default initialisation (above) stand - don't overwrite the empty sets with nulls.
+     */
     public LearningDesign(Long learningDesignId, Integer ui_id, String description, String title,
 	    Activity firstActivity, FloatingActivity floatingActivity, Integer maxID, Boolean validDesign,
 	    Boolean readOnly, Date dateReadOnly, String helpText, Integer copyTypeID, Date createDateTime,
@@ -219,9 +221,12 @@ public class LearningDesign implements Serializable {
 	this.originalUser = originalUser;
 	this.originalLearningDesign = originalLearningDesign;
 	this.childLearningDesigns = childLearningDesigns;
-	this.lessons = lessons;
-	this.transitions = transitions;
-	this.activities = activities;
+	if ( lessons != null ) 
+	    this.lessons = lessons;
+	if ( transitions != null )
+	    this.transitions = transitions;
+	if ( activities  != null )
+	    this.activities = activities;
 	this.duration = duration;
 	this.licenseText = licenseText;
 	this.license = license;
@@ -242,6 +247,7 @@ public class LearningDesign implements Serializable {
 	this.editOverrideLock = false;
 	this.designVersion = 1;
 	this.removed = Boolean.FALSE;
+	this.activities = new TreeSet<Activity>(new ActivityOrderComparator());
     }
 
     /**
