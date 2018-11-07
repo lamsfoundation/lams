@@ -115,7 +115,7 @@ public interface ToolContentManager {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException;
 
-    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType);
+    public Class<?>[] getSupportedToolOutputDefinitionClasses(int definitionType);
 
     /**
      * Finds title entered in the tool content.
