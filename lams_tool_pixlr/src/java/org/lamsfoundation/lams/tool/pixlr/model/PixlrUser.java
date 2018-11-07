@@ -21,8 +21,16 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.pixlr.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -31,50 +39,56 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Caches the user details. This allows the tool to be more efficient at
  * displaying user names but means that when people's names change, they won't
  * change in the "old" tool data.
- *
- *
  */
-
+@Entity
+@Table(name = "tl_lapixl10_user")
 public class PixlrUser implements java.io.Serializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -3701664859818409197L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "login_name")
     private String loginName;
 
+    @ManyToOne
+    @JoinColumn(name = "pixlr_session_uid")
     private PixlrSession pixlrSession;
 
+    @Column
     private boolean finishedActivity;
 
+    @Column(name = "entry_uid")
     private Long entryUID;
 
+    @Column(name = "image_file_name")
     private String imageFileName;
 
+    @Column
     private Long imageHeight;
 
+    @Column
     private Long imageWidth;
 
+    @Column
     private boolean imageHidden;
 
-    // Constructors
-
-    /** default constructor */
     public PixlrUser() {
     }
 
     public PixlrUser(UserDTO user, PixlrSession pixlrSession) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -82,18 +96,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.finishedActivity = false;
     }
 
-    /** full constructor */
-    public PixlrUser(Long userId, String lastName, String firstName, PixlrSession pixlrSession) {
-	this.userId = userId;
-	this.lastName = lastName;
-	this.firstName = firstName;
-	this.pixlrSession = pixlrSession;
-    }
-
-    // Property accessors
-    /**
-     *
-     */
     public Long getUid() {
 	return this.uid;
     }
@@ -102,10 +104,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Long getUserId() {
 	return this.userId;
     }
@@ -114,10 +112,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.userId = userId;
     }
 
-    /**
-     *
-     *
-     */
     public String getLastName() {
 	return this.lastName;
     }
@@ -126,10 +120,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     *
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -138,10 +128,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     *
-     */
     public String getFirstName() {
 	return this.firstName;
     }
@@ -150,9 +136,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     */
     public boolean isFinishedActivity() {
 	return finishedActivity;
     }
@@ -161,11 +144,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.finishedActivity = finishedActivity;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public PixlrSession getPixlrSession() {
 	return this.pixlrSession;
     }
@@ -174,9 +152,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.pixlrSession = pixlrSession;
     }
 
-    /**
-     *
-     */
     public Long getEntryUID() {
 	return entryUID;
     }
@@ -184,11 +159,6 @@ public class PixlrUser implements java.io.Serializable {
     public void setEntryUID(Long entryUID) {
 	this.entryUID = entryUID;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getImageFileName() {
 	return imageFileName;
@@ -198,10 +168,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.imageFileName = imageFileName;
     }
 
-    /**
-     *
-     *
-     */
     public Long getImageHeight() {
 	return imageHeight;
     }
@@ -210,10 +176,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.imageHeight = imageHeight;
     }
 
-    /**
-     *
-     *
-     */
     public Long getImageWidth() {
 	return imageWidth;
     }
@@ -222,10 +184,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.imageWidth = imageWidth;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isImageHidden() {
 	return imageHidden;
     }
@@ -234,11 +192,6 @@ public class PixlrUser implements java.io.Serializable {
 	this.imageHidden = imageHidden;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

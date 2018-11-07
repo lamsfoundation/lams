@@ -21,101 +21,84 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.pixlr.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.pixlr.service.PixlrService;
 
-/**
- *
- */
-
+@Entity
+@Table(name = "tl_lapixl10_pixlr")
 public class Pixlr implements java.io.Serializable, Cloneable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 579733009969321015L;
 
-    static Logger log = Logger.getLogger(PixlrService.class.getName());
+    private static Logger log = Logger.getLogger(Pixlr.class.getName());
 
-    // Fields
-    /**
-     *
-     */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "allow_view_others_images")
     private boolean allowViewOthersImages;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
+    @Column(name = "image_file_name")
     private String imageFileName; // Image uploaded for pixlr
 
+    @Column(name = "image_width")
     private Long imageWidth;
 
+    @Column(name = "image_height")
     private Long imageHeight;
 
-    private Set<PixlrSession> pixlrSessions;
+    @OneToMany(mappedBy = "pixlr")
+    private Set<PixlrSession> pixlrSessions = new HashSet<PixlrSession>();
 
-    // Constructors
-
-    /** default constructor */
     public Pixlr() {
     }
-
-    /** full constructor */
-    public Pixlr(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, String onlineInstructions,
-	    String offlineInstructions, boolean contentInUse, boolean defineLater, Long toolContentId,
-	    String reflectInstructions, Set<PixlrSession> pixlrSessions, String imageFileName, Long imageWidth,
-	    Long imageHeight, boolean allowViewOthersImages) {
-	this.createDate = createDate;
-	this.updateDate = updateDate;
-	this.createBy = createBy;
-	this.title = title;
-	this.instructions = instructions;
-	this.lockOnFinished = lockOnFinished;
-	this.contentInUse = contentInUse;
-	this.defineLater = defineLater;
-	this.toolContentId = toolContentId;
-	this.pixlrSessions = pixlrSessions;
-	this.imageFileName = imageFileName;
-	this.reflectInstructions = reflectInstructions;
-	this.imageHeight = imageHeight;
-	this.imageWidth = imageWidth;
-	this.allowViewOthersImages = allowViewOthersImages;
-    }
-
-    // Property accessors
-    /**
-     *
-     *
-     */
 
     public Long getUid() {
 	return uid;
@@ -125,11 +108,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
-
     public Date getCreateDate() {
 	return createDate;
     }
@@ -137,11 +115,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Date getUpdateDate() {
 	return updateDate;
@@ -151,11 +124,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getCreateBy() {
 	return createBy;
     }
@@ -163,11 +131,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setCreateBy(Long createBy) {
 	this.createBy = createBy;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getTitle() {
 	return title;
@@ -177,11 +140,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     *
-     */
-
     public String getInstructions() {
 	return instructions;
     }
@@ -189,11 +147,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isLockOnFinished() {
 	return lockOnFinished;
@@ -203,9 +156,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    /**
-     *
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -214,9 +164,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     */
     public boolean isAllowViewOthersImages() {
 	return allowViewOthersImages;
     }
@@ -224,11 +171,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
 	this.allowViewOthersImages = allowViewOthersImages;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isContentInUse() {
 	return contentInUse;
@@ -238,11 +180,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     *
-     */
-
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -250,11 +187,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
     }
-
-    /**
-     *
-     *
-     */
 
     public Long getToolContentId() {
 	return toolContentId;
@@ -264,13 +196,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
-
     public Set<PixlrSession> getPixlrSessions() {
 	return pixlrSessions;
     }
@@ -279,11 +204,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.pixlrSessions = pixlrSessions;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -346,11 +266,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	return pixlr;
     }
 
-    /**
-     *
-     *
-     */
-
     public String getImageFileName() {
 	return imageFileName;
     }
@@ -358,11 +273,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setImageFileName(String imageFileName) {
 	this.imageFileName = imageFileName;
     }
-
-    /**
-     *
-     *
-     */
 
     public Long getImageWidth() {
 	return imageWidth;
@@ -372,11 +282,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.imageWidth = imageWidth;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getImageHeight() {
 	return imageHeight;
     }
@@ -385,9 +290,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.imageHeight = imageHeight;
     }
 
-    /**
-     *
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -395,5 +297,4 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
     }
-
 }
