@@ -26,10 +26,10 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
+import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.springframework.stereotype.Repository;
 
 /**

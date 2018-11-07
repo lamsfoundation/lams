@@ -29,12 +29,12 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -64,7 +64,6 @@ public class LearningUtil implements QaAppConstants {
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
 	generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 	generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
-	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 
 	if (qaContent.isQuestionsSequenced()) {
 	    generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);

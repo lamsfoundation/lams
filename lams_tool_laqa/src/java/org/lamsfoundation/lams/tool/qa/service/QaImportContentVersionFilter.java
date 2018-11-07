@@ -23,8 +23,8 @@
 package org.lamsfoundation.lams.tool.qa.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 
 /**
  * Import filter class for different versions of Q&A content.

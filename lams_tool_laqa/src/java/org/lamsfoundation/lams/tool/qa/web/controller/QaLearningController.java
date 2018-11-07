@@ -50,13 +50,13 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.model.QaSession;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.LearningUtil;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
@@ -211,7 +211,6 @@ public class QaLearningController implements QaAppConstants {
 	generalLearnerFlowDTO.setHttpSessionID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
-	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());

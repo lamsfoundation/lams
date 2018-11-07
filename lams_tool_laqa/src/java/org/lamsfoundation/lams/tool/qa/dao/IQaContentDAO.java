@@ -23,8 +23,8 @@
 
 package org.lamsfoundation.lams.tool.qa.dao;
 
-import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
 
 /**
  * @author Ozgur Demirtas

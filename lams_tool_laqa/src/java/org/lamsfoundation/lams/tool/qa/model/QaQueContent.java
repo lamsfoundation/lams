@@ -21,13 +21,23 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
  *
@@ -38,26 +48,34 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  *         Holds question content within a particular content
  */
+@Entity
+@Table(name = "tl_laqa11_que_content")
 public class QaQueContent implements Serializable, Comparable, Nullable {
 
     private static final long serialVersionUID = -4028785701106936621L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** nullable persistent field */
+    @Column
     private String question;
 
-    /** nullable persistent field */
+    @Column(name = "display_order")
     private int displayOrder;
 
+    @Column
     private String feedback;
 
+    @Column(name = "answer_required")
     private boolean required;
 
+    @Column(name = "min_words_limit")
     private int minWordsLimit;
 
-    /** nullable persistent field */
+    @ManyToOne
+    @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
 
     /** default constructor */
@@ -148,7 +166,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     /**
      * @return Returns the qaContent.
      */
-    public org.lamsfoundation.lams.tool.qa.QaContent getQaContent() {
+    public org.lamsfoundation.lams.tool.qa.model.QaContent getQaContent() {
 	return qaContent;
     }
 
@@ -156,7 +174,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
      * @param qaContent
      *            The qaContent to set.
      */
-    public void setQaContent(org.lamsfoundation.lams.tool.qa.QaContent qaContent) {
+    public void setQaContent(org.lamsfoundation.lams.tool.qa.model.QaContent qaContent) {
 	this.qaContent = qaContent;
     }
 

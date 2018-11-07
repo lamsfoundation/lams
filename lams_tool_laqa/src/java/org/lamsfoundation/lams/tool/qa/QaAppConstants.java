@@ -180,8 +180,6 @@ public interface QaAppConstants {
     public static final String TOTAL_QUESTION_COUNT = "totalQuestionCount";
     public static final String MAP_ANSWERS = "mapAnswers";
     public static final String USER_FEEDBACK = "userFeedback";
-    public static final String REPORT_TITLE = "reportTitle";
-    public static final String MONITORING_REPORT_TITLE = "monitoringReportTitle";
     public static final String REPORT_TITLE_LEARNER = "reportTitleLearner";
     public static final String END_LEARNING_MESSAGE = "endLearningMessage";
     public static final String CHECK_ALL_SESSIONS_COMPLETED = "checkAllSessionsCompleted";

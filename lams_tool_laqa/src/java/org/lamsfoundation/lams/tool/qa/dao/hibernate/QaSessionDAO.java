@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
+import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.springframework.stereotype.Repository;
 
 /**

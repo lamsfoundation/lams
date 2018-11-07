@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 
 /**
  * <p>
@@ -73,8 +73,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
     protected String reflectionSubject;
 
     protected String notebookEntry;
-
-    protected String reportTitleLearner;
 
     protected String endLearningMessage;
 
@@ -257,7 +255,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle)
 		.append("countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
 		.append("currentQuestionIndex: ", currentQuestionIndex)
-		.append("questionListingMode: ", questionListingMode).append("reportTitleLearner: ", reportTitleLearner)
+		.append("questionListingMode: ", questionListingMode)
 		.append("userNameVisible: ", userNameVisible).append("requestLearningReport: ", requestLearningReport)
 		.append("requestLearningReportProgress: ", requestLearningReportProgress)
 		.append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)
@@ -338,21 +336,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public void setEndLearningMessage(String endLearningMessage) {
 	this.endLearningMessage = endLearningMessage;
-    }
-
-    /**
-     * @return Returns the reportTitleLearner.
-     */
-    public String getReportTitleLearner() {
-	return reportTitleLearner;
-    }
-
-    /**
-     * @param reportTitleLearner
-     *            The reportTitleLearner to set.
-     */
-    public void setReportTitleLearner(String reportTitleLearner) {
-	this.reportTitleLearner = reportTitleLearner;
     }
 
     /**

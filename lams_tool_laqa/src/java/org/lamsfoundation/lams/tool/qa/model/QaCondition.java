@@ -21,12 +21,22 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.model;
 
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -47,22 +57,29 @@ import org.lamsfoundation.lams.util.WebUtil;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "tl_laqa11_conditions")
 public class QaCondition extends TextSearchCondition {
     /**
      * Questions linked to this condition. Answers to them will be scanned for
      * the words that make the condition's parameters.
      */
-    private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
+    @ManyToMany
+    @Cascade({ CascadeType.SAVE_UPDATE })
+    @JoinTable(name = "tl_laqa11_condition_questions", joinColumns = @JoinColumn(name = "condition_id"), inverseJoinColumns = @JoinColumn(name = "question_uid"))
+    @OrderBy("uid ASC")
+   private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
 
-    public SortedSet<QaQuestionDTO> temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(
-	    new QaQuestionContentDTOComparator());
+    @Transient
+    public SortedSet<QaQuestionDTO> temporaryQuestionDTOSet;
 
     public QaCondition() {
-
+	this.temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(new QaQuestionContentDTOComparator());
     }
 
     public QaCondition(QaConditionDTO conditionDTO) {
 	super(conditionDTO);
+	this.temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(new QaQuestionContentDTOComparator());
 	for (QaQueContent question : conditionDTO.getQuestions()) {
 	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
 		    question.isRequired(), question.getMinWordsLimit(), null);
@@ -74,6 +91,7 @@ public class QaCondition extends TextSearchCondition {
 	    String allWords, String phrase, String anyWords, String excludedWords, Set<QaQueContent> questions) {
 	super(conditionId, conditionUIID, orderId, name, displayName, BranchCondition.OUTPUT_TYPE_COMPLEX, null, null,
 		null, allWords, phrase, anyWords, excludedWords);
+	this.temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(new QaQuestionContentDTOComparator());
 	setQuestions(questions);
     }
 

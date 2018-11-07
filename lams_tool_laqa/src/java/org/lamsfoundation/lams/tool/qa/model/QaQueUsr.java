@@ -21,15 +21,27 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
  *
@@ -40,48 +52,54 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  *         Represents tool users.
  */
+@Entity
+@Table(name = "tl_laqa11_que_usr")
 public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     private static final long serialVersionUID = -6768077344827699440L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** persistent field */
+    @Column(name = "que_usr_id")
     private Long queUsrId;
 
-    /** nullable persistent field */
+    @Column
     private String username;
 
-    /** nullable persistent field */
+    @Column
     private String fullname;
 
+    @Column
     private boolean responseFinalized;
 
+    @Column
     private boolean learnerFinished;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "qa_session_id")
     private QaSession qaSession;
 
-    /** persistent field */
-    private Set qaUsrResps;
+    @OneToMany(mappedBy = "qaQueUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<QaUsrResp>qaUsrResps;
 
     public QaQueUsr() {
+	this.qaUsrResps = new TreeSet<QaUsrResp>();
     };
 
     /** full constructor */
-    public QaQueUsr(Long queUsrId, String username, String fullname, QaSession qaSession, Set qaUsrResps)
-
-    {
+    public QaQueUsr(Long queUsrId, String username, String fullname, QaSession qaSession, Set<QaUsrResp> qaUsrResps) {
 	this.queUsrId = queUsrId;
 	this.username = username;
 	this.fullname = fullname;
 	this.qaSession = qaSession;
-	this.qaUsrResps = qaUsrResps;
+	this.qaUsrResps = qaUsrResps != null ? qaUsrResps : new TreeSet<QaUsrResp>();
     }
 
     /**
-     * Copy construtor; We copy all data except the hibernate id field.
+     * Copy constructor; We copy all data except the hibernate id field.
      *
      * @param queUsr
      *            the original survey question user object.
@@ -125,10 +143,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
     /**
      * @return Returns the qaUsrResps.
      */
-    public Set getQaUsrResps() {
-	if (this.qaUsrResps == null) {
-	    setQaUsrResps(new TreeSet());
-	}
+    public Set<QaUsrResp> getQaUsrResps() {
 	return this.qaUsrResps;
     }
 
@@ -136,7 +151,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
      * @param qaUsrResps
      *            The qaUsrResps to set.
      */
-    public void setQaUsrResps(Set qaUsrResps) {
+    public void setQaUsrResps(Set<QaUsrResp> qaUsrResps) {
 	this.qaUsrResps = qaUsrResps;
     }
 

@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.tool.qa.web.form;
 
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.model.QaCondition;
 import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**

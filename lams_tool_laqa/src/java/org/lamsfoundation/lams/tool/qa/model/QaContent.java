@@ -22,13 +22,24 @@
  */
 
 
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -44,99 +55,113 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
  *
  * @author Ozgur Demirtas
  */
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "tl_laqa11_content")
 public class QaContent implements Serializable {
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** identifier field */
+    @Column(name = "qa_content_id")
     private Long qaContentId;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** nullable persistent field */
+    @Column
     private String instructions;
 
-    /** nullable persistent field */
-    private String reportTitle;
-
-    /** nullable persistent field */
-    private String monitoringReportTitle;
-
-    /** nullable persistent field */
+    @Column(name = "created_by")
     private long createdBy;
 
-    /** nullable persistent field */
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column
     private boolean reflect;
 
+    @Column
     private String reflectionSubject;
 
-    /** nullable persistent field */
-
+    @Column(name = "questions_sequenced")
     private boolean questionsSequenced;
 
+    @Column
     private boolean lockWhenFinished;
 
+    @Column(name = "no_reedit_allowed")
     private boolean noReeditAllowed;
 
+    @Column
     private boolean showOtherAnswers;
 
+    @Column(name = "allow_rich_editor")
     private boolean allowRichEditor;
 
+    @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
-    /** nullable persistent field */
+    @Column(name = "username_visible")
     private boolean usernameVisible;
 
-    /** nullable persistent field */
+    @Column(name = "allow_rate_answers")
     private boolean allowRateAnswers;
 
+    @Column(name = "notify_response_submit")
     private boolean notifyTeachersOnResponseSubmit;
 
-    /** nullable persistent field */
+    @Column(name = "creation_date")
     private Date creationDate;
 
-    /** nullable persistent field */
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
+    @Column(name = "show_other_answers_after_deadline")
     private boolean showOtherAnswersAfterDeadline;
 
+    @Column(name = "maximum_rates")
     private int maximumRates;
 
+    @Column(name = "minimum_rates")
     private int minimumRates;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tool_content_id", referencedColumnName = "qa_content_id")
+    @OrderBy("orderId asc")
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
-    /** persistent field */
+    @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL)
+    @OrderBy("displayOrder")
     private Set<QaQueContent> qaQueContents;
 
-    /** persistent field */
-    private Set qaSessions;
+    @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<QaSession> qaSessions;
 
-    /** persistent field */
-    private Set<QaCondition> conditions = new TreeSet<QaCondition>(new TextSearchConditionComparator());
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_uid")
+    private Set<QaCondition> conditions;
 
     public QaContent() {
+	conditions =  new TreeSet<QaCondition>(new TextSearchConditionComparator());
     };
 
     /** full constructor */
-    public QaContent(Long qaContentId, String title, String instructions, String reportTitle,
-	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished,
-	    boolean noReeditAllowed, boolean showOtherAnswers, boolean reflect, String reflectionSubject,
-	    Date creationDate, Date updateDate, Set<QaQueContent> qaQueContents, Set qaSessions,
-	    Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput, int maximumRates,
-	    int minimumRates, Set<LearnerItemRatingCriteria> ratingCriterias) {
+    public QaContent(Long qaContentId, String title, String instructions, long createdBy, boolean questionsSequenced,
+	    boolean usernameVisible, boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit,
+	    boolean lockWhenFinished, boolean noReeditAllowed, boolean showOtherAnswers, boolean reflect,
+	    String reflectionSubject, Date creationDate, Date updateDate, Set<QaQueContent> qaQueContents,
+	    Set<QaSession> qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
+	    boolean useSelectLeaderToolOuput, int maximumRates, int minimumRates,
+	    Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.qaContentId = qaContentId;
 	this.title = title;
 	this.instructions = instructions;
-	this.reportTitle = reportTitle;
-	this.monitoringReportTitle = monitoringReportTitle;
 	this.createdBy = createdBy;
 	this.questionsSequenced = questionsSequenced;
 	this.usernameVisible = usernameVisible;
@@ -151,7 +176,8 @@ public class QaContent implements Serializable {
 	this.updateDate = updateDate;
 	this.qaQueContents = qaQueContents;
 	this.qaSessions = qaSessions;
-	this.conditions = conditions;
+	this.conditions = conditions != null ? conditions
+		: new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	this.allowRichEditor = allowRichEditor;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
 	this.maximumRates = maximumRates;
@@ -160,7 +186,7 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * Copy Construtor to create a new qa content instance. Note that we don't copy the qa session data here because the
+     * Copy Constructor to create a new qa content instance. Note that we don't copy the qa session data here because the
      * qa session will be created after we copied tool content.
      *
      * @param qa
@@ -170,13 +196,14 @@ public class QaContent implements Serializable {
      * @return the new qa content object.
      */
     public static QaContent newInstance(QaContent qa, Long newContentId) {
-	QaContent newContent = new QaContent(newContentId, qa.getTitle(), qa.getInstructions(), qa.getReportTitle(),
-		qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(), qa.isUsernameVisible(),
-		qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(), qa.isLockWhenFinished(),
-		qa.isNoReeditAllowed(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
-		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
+	QaContent newContent = new QaContent(newContentId, qa.getTitle(), qa.getInstructions(), qa.getCreatedBy(),
+		qa.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isAllowRateAnswers(),
+		qa.isNotifyTeachersOnResponseSubmit(), qa.isLockWhenFinished(), qa.isNoReeditAllowed(),
+		qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(), qa.getCreationDate(),
+		qa.getUpdateDate(), new TreeSet<QaQueContent>(), new TreeSet<QaSession>(),
 		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(),
-		qa.isUseSelectLeaderToolOuput(), qa.maximumRates, qa.minimumRates, new TreeSet());
+		qa.isUseSelectLeaderToolOuput(), qa.maximumRates, qa.minimumRates,
+		new TreeSet<LearnerItemRatingCriteria>());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
@@ -219,8 +246,8 @@ public class QaContent implements Serializable {
 	return newConditions;
     }
 
-    public Set deepCopyQaSession(QaContent newQaSession) {
-	return new TreeSet();
+    public Set<QaSession> deepCopyQaSession(QaContent newQaSession) {
+	return new TreeSet<QaSession>();
     }
 
     public Set<QaQueContent> getQaQueContents() {
@@ -234,14 +261,11 @@ public class QaContent implements Serializable {
 	this.qaQueContents = qaQueContents;
     }
 
-    public Set getQaSessions() {
-	if (qaSessions == null) {
-	    setQaSessions(new TreeSet());
-	}
+    public Set<QaSession> getQaSessions() {
 	return qaSessions;
     }
 
-    public void setQaSessions(Set qaSessions) {
+    public void setQaSessions(Set<QaSession> qaSessions) {
 	this.qaSessions = qaSessions;
     }
 
@@ -280,8 +304,8 @@ public class QaContent implements Serializable {
 	return new ToStringBuilder(this).append("qaContentId:", getQaContentId()).append("qa title:", getTitle())
 		.append("qa instructions:", getInstructions()).append("creator user id", getCreatedBy())
 		.append("username_visible:", isUsernameVisible()).append("allow to rate answers:", isAllowRateAnswers())
-		.append("defineLater", isDefineLater()).append("report_title: ", getReportTitle())
-		.append("reflection subject: ", getReflectionSubject()).toString();
+		.append("defineLater", isDefineLater()).append("reflection subject: ", getReflectionSubject())
+		.toString();
     }
 
     @Override
@@ -341,21 +365,6 @@ public class QaContent implements Serializable {
      */
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the reportTitle.
-     */
-    public String getReportTitle() {
-	return reportTitle;
-    }
-
-    /**
-     * @param reportTitle
-     *            The reportTitle to set.
-     */
-    public void setReportTitle(String reportTitle) {
-	this.reportTitle = reportTitle;
     }
 
     /**
@@ -457,21 +466,6 @@ public class QaContent implements Serializable {
      */
     public void setQuestionsSequenced(boolean questionsSequenced) {
 	this.questionsSequenced = questionsSequenced;
-    }
-
-    /**
-     * @return Returns the monitoringReportTitle.
-     */
-    public String getMonitoringReportTitle() {
-	return monitoringReportTitle;
-    }
-
-    /**
-     * @param monitoringReportTitle
-     *            The monitoringReportTitle to set.
-     */
-    public void setMonitoringReportTitle(String monitoringReportTitle) {
-	this.monitoringReportTitle = monitoringReportTitle;
     }
 
     /**

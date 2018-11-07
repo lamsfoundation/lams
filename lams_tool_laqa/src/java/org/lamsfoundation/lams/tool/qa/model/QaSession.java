@@ -21,17 +21,28 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
  *
@@ -43,59 +54,67 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  *         Holds tool sessions
  */
+@Entity
+@Table(name = "tl_laqa11_session")
 public class QaSession implements Serializable, Comparable, Nullable {
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
     public static final String COMPLETED = "COMPLETED";
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    /** identifier field */
+    @Column(name = "qa_session_id")
     private Long qaSessionId;
 
-    /** nullable persistent field */
+    @Column(name = "session_start_date")
     private Date session_start_date;
 
-    /** nullable persistent field */
+    @Column(name = "session_end_date")
     private Date session_end_date;
 
-    /** nullable persistent field */
+    @Column(name = "session_status")
     private String session_status;
 
-    /** nullable persistent field */
+    @Column(name = "session_name")
     private String session_name;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
 
-    /** persistent field */
-    private Set qaQueUsers;
+    @OneToMany(mappedBy = "qaSession", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<QaQueUsr> qaQueUsers;
 
+    @ManyToOne
+    @JoinColumn(name = "qa_group_leader_uid")
     private QaQueUsr groupLeader;
 
     public QaSession() {
-    };
+	this.qaQueUsers = new TreeSet<QaQueUsr>();
+   };
 
     public QaSession(Long qaSessionId, Date session_start_date, Date session_end_date, String session_status,
-	    QaContent qaContent, Set qaQueUsers) {
+	    QaContent qaContent, Set<QaQueUsr> qaQueUsers) {
 	this.qaSessionId = qaSessionId;
 	this.session_start_date = session_start_date;
 	this.session_end_date = session_end_date;
 	this.session_status = session_status;
 	this.qaContent = qaContent;
-	this.qaQueUsers = qaQueUsers;
+	this.qaQueUsers = qaQueUsers != null ? qaQueUsers : new TreeSet<QaQueUsr>();
     }
 
     public QaSession(Long qaSessionId, Date session_start_date, String session_status, String session_name,
-	    QaContent qaContent, Set qaQueUsers) {
+	    QaContent qaContent, Set<QaQueUsr> qaQueUsers) {
 	this.qaSessionId = qaSessionId;
 	this.session_start_date = session_start_date;
 	this.session_status = session_status;
 	this.session_name = session_name;
 	this.qaContent = qaContent;
-	this.qaQueUsers = qaQueUsers;
+	this.qaQueUsers = qaQueUsers != null ? qaQueUsers : new TreeSet<QaQueUsr>();
     }
 
     public Long getQaSessionId() {
@@ -138,19 +157,12 @@ public class QaSession implements Serializable, Comparable, Nullable {
 	this.qaContent = qaContent;
     }
 
-    public Set getQaQueUsers() {
-	if (this.qaQueUsers == null) {
-	    setQaQueUsers(new TreeSet());
-	}
+    public Set<QaQueUsr> getQaQueUsers() {
 	return this.qaQueUsers;
     }
 
-    public void setQaQueUsers(Set qaQueUsers) {
+    public void setQaQueUsers(Set<QaQueUsr> qaQueUsers) {
 	this.qaQueUsers = qaQueUsers;
-    }
-
-    public void removeQueUsersBy(List responses) {
-	Set queUserSet = new TreeSet(this.getQaQueUsers());
     }
 
     @Override

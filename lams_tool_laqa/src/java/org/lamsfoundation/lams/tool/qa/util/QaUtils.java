@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
@@ -136,8 +135,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(QaAppConstants.TOTAL_QUESTION_COUNT);
 	request.getSession().removeAttribute(QaAppConstants.MAP_ANSWERS);
 	request.getSession().removeAttribute(QaAppConstants.USER_FEEDBACK);
-	request.getSession().removeAttribute(QaAppConstants.REPORT_TITLE);
-	request.getSession().removeAttribute(QaAppConstants.MONITORING_REPORT_TITLE);
 	request.getSession().removeAttribute(QaAppConstants.REPORT_TITLE_LEARNER);
 	request.getSession().removeAttribute(QaAppConstants.END_LEARNING_MESSAGE);
 	request.getSession().removeAttribute(QaAppConstants.CHECK_ALL_SESSIONS_COMPLETED);

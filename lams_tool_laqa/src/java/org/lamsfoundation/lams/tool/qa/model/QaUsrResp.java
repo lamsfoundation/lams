@@ -21,10 +21,20 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -41,33 +51,42 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
  * @author Ozgur Demirtas
  */
 
+@Entity
+@Table(name = "tl_laqa11_usr_resp")
 public class QaUsrResp implements Serializable, Comparable {
 
-    /** identifier field */
-    private Long responseId;
+    @Id
+    @Column(name = "response_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long responseId;
 
-    /** nullable persistent field */
+    @Column
     private String answer;
 
-    /** nullable persistent field */
-    private String answerAutosaved;
+    @Column(name = "answer_autosaved")
+     private String answerAutosaved;
 
-    /** nullable persistent field */
+    @Column(name = "attempt_time")
     private Date attemptTime;
 
-    /** nullable persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "qa_que_content_id") 
     private QaQueContent qaQuestion;
 
+    @Column
     private boolean visible;
 
-    /** nullable persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "que_usr_id") 
     private QaQueUsr qaQueUser;
 
-    /** nullable persistent field */
+    @Column(name = "time_zone")
     private String timezone;
 
-    //DTO fields
+    @Transient
     private ItemRatingDTO itemRatingDto;
+
+    @Transient
     private Long portraitId;
 
     /** full constructor */
