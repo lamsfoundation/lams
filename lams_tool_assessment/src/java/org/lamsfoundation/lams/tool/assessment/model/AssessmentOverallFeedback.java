@@ -23,6 +23,13 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -30,16 +37,37 @@ import org.apache.log4j.Logger;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_assessment_overall_feedback")
 public class AssessmentOverallFeedback implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentOverallFeedback.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "sequence_id")
     private Integer sequenceId;
 
+    @Column(name = "grade_boundary")
     private Integer gradeBoundary;
 
+    @Column
     private String feedback;
+
+    @Override
+    public Object clone() {
+	AssessmentOverallFeedback obj = null;
+	try {
+	    obj = (AssessmentOverallFeedback) super.clone();
+	    obj.setUid(null);
+	} catch (CloneNotSupportedException e) {
+	    AssessmentOverallFeedback.log.error("When clone " + AssessmentOverallFeedback.class + " failed");
+	}
+
+	return obj;
+    }
 
     // **********************************************************
     // Get/Set methods
@@ -104,18 +132,5 @@ public class AssessmentOverallFeedback implements Cloneable, Sequencable {
 
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
-    }
-
-    @Override
-    public Object clone() {
-	AssessmentOverallFeedback obj = null;
-	try {
-	    obj = (AssessmentOverallFeedback) super.clone();
-	    obj.setUid(null);
-	} catch (CloneNotSupportedException e) {
-	    AssessmentOverallFeedback.log.error("When clone " + AssessmentOverallFeedback.class + " failed");
-	}
-
-	return obj;
     }
 }

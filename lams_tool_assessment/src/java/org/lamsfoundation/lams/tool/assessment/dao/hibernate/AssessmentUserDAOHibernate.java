@@ -115,7 +115,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString, IUserManagementService userManagementService) {
-
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 	
 	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_SESSION_SELECT)
@@ -167,8 +166,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @SuppressWarnings("rawtypes")
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
-
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
+	final String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
 		+ " WHERE user.session.sessionId = :sessionId "
 		+ " AND (CONCAT(user.lastName, ' ', user.firstName) LIKE CONCAT('%', :searchString, '%')) ";
 
@@ -188,25 +186,17 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     
     @Override
     public int getCountUsersByContentId(Long contentId) {
-
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
+	final String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
 		+ " WHERE user.session.assessment.contentId = :contentId ";
 
-	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
+	Query<Number> query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME, Number.class);
 	query.setParameter("contentId", contentId);
-	List list = query.list();
-
-	if ((list == null) || (list.size() == 0)) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
+	return query.uniqueResult().intValue();
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public Object[] getStatsMarksBySession(Long sessionId) {
-
 	Query query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_SESSION)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
@@ -220,11 +210,10 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	}
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings("unchecked")
     @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
-
-	Query query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_LEADERS)
+	NativeQuery<Object[]> query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_LEADERS)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE)
@@ -237,7 +226,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    return (Object[]) list.get(0);
 	}
     }
-
 
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_SELECT = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark";
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_FROM = " FROM tl_laasse10_user user";
@@ -309,21 +297,19 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return userDtos;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawUserMarksBySession(Long sessionId) {
-
-	NativeQuery query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
+	@SuppressWarnings("unchecked")
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
 	query.setParameter("sessionId", sessionId);
 	List<Number> list = query.list();
 	return list;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-
-	NativeQuery query = getSession().createNativeQuery(LOAD_MARKS_FOR_LEADERS);
+	@SuppressWarnings("unchecked")
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_LEADERS);
 	query.setParameter("toolContentId", toolContentId);
 	List<Number> list = query.list();
 	return list;

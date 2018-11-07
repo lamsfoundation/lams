@@ -28,6 +28,19 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -36,29 +49,60 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_question_result")
 public class AssessmentQuestionResult {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    private AssessmentQuestion assessmentQuestion;
-    private AssessmentResult assessmentResult;
+    
+    @Column(name = "answer_string")
     private String answerString;
+    
+    @Column(name = "answer_float")
     private float answerFloat;
+    
+    @Column(name = "answer_boolean")
     private boolean answerBoolean;
+    
+    @Column(name = "submitted_option_uid")
     private Long submittedOptionUid;
+    
+    @Column
     private float mark;
+    
+    @Column(name = "max_mark")
     private Float maxMark;
+    
+    @Column
     private float penalty;
-    private Set<AssessmentOptionAnswer> optionAnswers;
+    
+    @Column(name = "finish_date")
     private Date finishDate;
+    
+    @Column(name = "confidence_level")
     private int confidenceLevel;
+    
+    @ManyToOne
+    @JoinColumn(name = "assessment_question_uid")
+    private AssessmentQuestion assessmentQuestion;
+    
+    @ManyToOne
+    @JoinColumn(name = "result_uid")
+    private AssessmentResult assessmentResult;
+    
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "question_result_uid")
+    private Set<AssessmentOptionAnswer> optionAnswers = new LinkedHashSet<>();
 
-    // DTO fields:
+    // *************** NON Persist Fields ********************
+    
+    @Transient
     private AssessmentUser user;
+    @Transient
     private String answerStringEscaped;
-
-    public AssessmentQuestionResult() {
-	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
-    }
 
     @Override
     public int hashCode() {
@@ -78,10 +122,6 @@ public class AssessmentQuestionResult {
 	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).isEquals();
     }
 
-    /**
-     *
-     * @return Returns the result Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -90,10 +130,6 @@ public class AssessmentQuestionResult {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public AssessmentQuestion getAssessmentQuestion() {
 	return assessmentQuestion;
     }
@@ -102,10 +138,6 @@ public class AssessmentQuestionResult {
 	this.assessmentQuestion = question;
     }
 
-    /**
-     *
-     * @return
-     */
     public AssessmentResult getAssessmentResult() {
 	return assessmentResult;
     }
@@ -115,8 +147,6 @@ public class AssessmentQuestionResult {
     }
 
     /**
-     *
-     *
      * @return Returns the possible answer.
      */
     public String getAnswerString() {
@@ -128,8 +158,6 @@ public class AssessmentQuestionResult {
     }
 
     /**
-     *
-     *
      * @return Returns the possible answer.
      */
     public float getAnswerFloat() {
@@ -141,8 +169,6 @@ public class AssessmentQuestionResult {
     }
 
     /**
-     *
-     *
      * @return Returns the possible answer.
      */
     public boolean getAnswerBoolean() {
@@ -153,11 +179,6 @@ public class AssessmentQuestionResult {
 	this.answerBoolean = answerBoolean;
     }
 
-    /**
-     *
-     *
-     * @return Returns submittedOptionUid.
-     */
     public Long getSubmittedOptionUid() {
 	return submittedOptionUid;
     }
@@ -166,11 +187,6 @@ public class AssessmentQuestionResult {
 	this.submittedOptionUid = submittedOptionUid;
     }
 
-    /**
-     *
-     *
-     * @return Returns the mark.
-     */
     public Float getMark() {
 	return mark;
     }
@@ -183,8 +199,6 @@ public class AssessmentQuestionResult {
      * Maximum mark user could have scored for this question. (It is stored in AssessmentQuestionResult class due to
      * existence of random questions which makes it's impossible to obtain this info from question)
      *
-     *
-     *
      * @return Returns the mark.
      */
     public Float getMaxMark() {
@@ -196,8 +210,6 @@ public class AssessmentQuestionResult {
     }
 
     /**
-     *
-     *
      * @return Returns the possible numeric answer.
      */
     public Float getPenalty() {
@@ -209,30 +221,16 @@ public class AssessmentQuestionResult {
     }
 
     /**
-     *
-     *
-     *
-     *
-     *
      * @return a set of answerOptions to this AssessmentQuestion.
      */
     public Set<AssessmentOptionAnswer> getOptionAnswers() {
 	return optionAnswers;
     }
 
-    /**
-     * @param answerOptions
-     *            answerOptions to set.
-     */
     public void setOptionAnswers(Set<AssessmentOptionAnswer> answers) {
 	this.optionAnswers = answers;
     }
 
-    /**
-     *
-     *
-     * @return Returns submittedOptionUid.
-     */
     public Date getFinishDate() {
 	return finishDate;
     }

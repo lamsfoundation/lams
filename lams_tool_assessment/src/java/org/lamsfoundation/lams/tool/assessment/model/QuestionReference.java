@@ -23,6 +23,15 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -30,25 +39,34 @@ import org.apache.log4j.Logger;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_question_reference")
 public class QuestionReference implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(QuestionReference.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    private AssessmentQuestion question;
-
+    @Column(name = "question_type")
     private short type;
 
+    @Column
     private String title;
 
+    @Column(name = "sequence_id")
     private int sequenceId;
 
+    @Column(name = "default_grade")
     private int defaultGrade;
 
+    @Column(name = "random_question")
     private boolean randomQuestion;
 
-    // ***********************************************
-    // Non persistant fields:
+    @ManyToOne
+    @JoinColumn(name = "question_uid")
+    private AssessmentQuestion question;
 
     @Override
     public Object clone() {
@@ -72,27 +90,15 @@ public class QuestionReference implements Cloneable, Sequencable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
+
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public AssessmentQuestion getQuestion() {
 	return question;
     }
@@ -101,10 +107,6 @@ public class QuestionReference implements Cloneable, Sequencable {
 	this.question = question;
     }
 
-    /**
-     *
-     * @return
-     */
     public short getType() {
 	return type;
     }
@@ -113,10 +115,6 @@ public class QuestionReference implements Cloneable, Sequencable {
 	this.type = type;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getTitle() {
 	return title;
     }
@@ -148,11 +146,6 @@ public class QuestionReference implements Cloneable, Sequencable {
 	this.sequenceId = sequenceId;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public int getDefaultGrade() {
 	return defaultGrade;
     }
@@ -161,10 +154,6 @@ public class QuestionReference implements Cloneable, Sequencable {
 	this.defaultGrade = defaultGrade;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isRandomQuestion() {
 	return randomQuestion;
     }

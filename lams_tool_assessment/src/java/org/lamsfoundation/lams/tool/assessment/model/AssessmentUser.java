@@ -25,6 +25,16 @@ package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -35,29 +45,50 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_user")
 public class AssessmentUser implements Cloneable {
-    private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(AssessmentUser.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_id")
     private Long userId;
+    
+    @Column(name = "first_name")
     private String firstName;
+    
+    @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "login_name")
     private String loginName;
+    
+    @Column(name = "session_finished")
     private boolean sessionFinished;
 
+    @ManyToOne
+    @JoinColumn(name = "session_uid")
     private AssessmentSession session;
+    
+    @ManyToOne
+    @JoinColumn(name = "assessment_uid")
     private Assessment assessment;
 
-    // =============== NON Persisit value: for display use ===========
+    // *************** NON Persist Fields ********************
+    
     // the user access some reousrce question date time. Use in monitoring summary page
+    @Transient
     private Date accessDate;
 
     public AssessmentUser() {
     }
 
     public AssessmentUser(UserDTO user, AssessmentSession session) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -67,7 +98,7 @@ public class AssessmentUser implements Cloneable {
     }
 
     public AssessmentUser(UserDTO user, Assessment content) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();

@@ -33,8 +33,6 @@ import org.springframework.stereotype.Repository;
 /**
  *
  * @author Andrey Balan
- *
- * @version $Revision$
  */
 @Repository
 public class AssessmentDAOHibernate extends LAMSBaseDAO implements AssessmentDAO {

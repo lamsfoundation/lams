@@ -27,6 +27,19 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -39,82 +52,114 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  *
  * @author Andrey Balan
  */
-public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
-    
+@Entity
+@Table(name = "tl_laasse10_assessment_question")
+public class AssessmentQuestion implements Cloneable, Sequencable, Comparable<AssessmentQuestion> {
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "question_type")
     private short type;
 
+    @Column
     private String title;
 
+    @Column
     private String question;
 
     /**
      * It stores sha1(question) value that allows us to search for the AssessmentQuestions with the same question
      */
+    @Column(name = "question_hash")
     private String questionHash;
 
+    @Column(name = "sequence_id")
     private int sequenceId;
 
     /**
      * Default grade set in author.
      */
+    @Column(name = "default_grade")
     private int defaultGrade;
 
+    @Column(name = "penalty_factor")
     private float penaltyFactor;
 
+    @Column(name = "answer_required")
     private boolean answerRequired;
 
+    @Column(name = "general_feedback")
     private String generalFeedback;
 
+    @Column
     private String feedback;
 
+    @Column(name = "multiple_answers_allowed")
     private boolean multipleAnswersAllowed;
 
+    @Column(name = "incorrect_answer_nullifies_mark")
     private boolean incorrectAnswerNullifiesMark;
 
+    @Column(name = "feedback_on_correct")
     private String feedbackOnCorrect;
 
+    @Column(name = "feedback_on_partially_correct")
     private String feedbackOnPartiallyCorrect;
 
+    @Column(name = "feedback_on_incorrect")
     private String feedbackOnIncorrect;
 
     // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
+    @Column
     private boolean shuffle;
+    
+    @Column(name = "prefix_answers_with_letters")
     private boolean prefixAnswersWithLetters;
 
+    @Column(name = "case_sensitive")
     private boolean caseSensitive;
 
+    @Column(name = "correct_answer")
     private boolean correctAnswer;
 
+    @Column(name = "allow_rich_editor")
     private boolean allowRichEditor;
 
-    private Set<AssessmentQuestionOption> options;
-
-    private Set<AssessmentUnit> units;
-
     // only for essay type of question
+    @Column(name = "max_words_limit")
     private int maxWordsLimit;
+    
     // only for essay type of question
+    @Column(name = "min_words_limit")
     private int minWordsLimit;
 
     // only for hedging mark type of question
+    @Column(name = "hedging_justification_enabled")
     private boolean hedgingJustificationEnabled;
 
+    @Column(name = "correct_answers_disclosed")
     private boolean correctAnswersDisclosed;
 
+    @Column(name = "groups_answers_disclosed")
     private boolean groupsAnswersDisclosed;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "question_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<AssessmentQuestionOption> options = new TreeSet<>(new SequencableComparator());
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "question_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<AssessmentUnit> units = new TreeSet<>(new SequencableComparator());
+
     // *************** NON Persist Fields used in monitoring ********************
-
+    @Transient
     private String titleEscaped;
-
-    public AssessmentQuestion() {
-	options = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
-	units = new TreeSet<AssessmentUnit>(new SequencableComparator());
-    }
 
     @Override
     public Object clone() {
@@ -126,7 +171,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	    // clone options
 	    if (options != null) {
 		Iterator<AssessmentQuestionOption> iter = options.iterator();
-		Set<AssessmentQuestionOption> set = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+		Set<AssessmentQuestionOption> set = new TreeSet<>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentQuestionOption answerOption = iter.next();
 		    AssessmentQuestionOption newAnswerOption = (AssessmentQuestionOption) answerOption.clone();
@@ -138,7 +183,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	    // clone units
 	    if (units != null) {
 		Iterator<AssessmentUnit> iter = units.iterator();
-		Set<AssessmentUnit> set = new TreeSet<AssessmentUnit>(new SequencableComparator());
+		Set<AssessmentUnit> set = new TreeSet<>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentUnit unit = iter.next();
 		    AssessmentUnit newUnit = (AssessmentUnit) unit.clone();
@@ -170,13 +215,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-	if ((o != null) && o instanceof AssessmentQuestion) {
-	    AssessmentQuestion anotherQuestion = (AssessmentQuestion) o;
-	    return sequenceId - anotherQuestion.getSequenceId();
-	} else {
-	    return 1;
-	}
+    public int compareTo(AssessmentQuestion anotherQuestion) {
+	return sequenceId - anotherQuestion.getSequenceId();
     }
 
     @Override
@@ -198,18 +238,10 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
@@ -473,6 +505,14 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	this.groupsAnswersDisclosed = groupsAnswersDisclosed;
     }
 
+    public boolean isPrefixAnswersWithLetters() {
+        return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+    }
+
     // *************** NON Persist Fields used in monitoring ********************
 
     public String getTitleEscaped() {
@@ -481,13 +521,5 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     public void setTitleEscaped(String titleEscaped) {
 	this.titleEscaped = titleEscaped;
-    }
-
-    public boolean isPrefixAnswersWithLetters() {
-        return prefixAnswersWithLetters;
-    }
-
-    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
-        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 }

@@ -122,7 +122,7 @@ public class AuthoringController {
     public String definelater(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
 	    HttpServletRequest request) throws ServletException {
 	// update define later flag to true
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 
 	assessment.setDefineLater(true);
@@ -140,7 +140,7 @@ public class AuthoringController {
      */
     private String showStartPage(AssessmentForm assessmentForm, HttpServletRequest request) throws ServletException {
 	// save toolContentID into HTTPSession
-	Long contentId = new Long(WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
 	List<AssessmentQuestion> questions = null;
 	Assessment assessment = null;
@@ -164,7 +164,7 @@ public class AuthoringController {
 
 	    assessmentForm.setAssessment(assessment);
 	} catch (Exception e) {
-	    AuthoringController.log.error(e);
+	    log.error(e);
 	    throw new ServletException(e);
 	}
 
@@ -199,9 +199,7 @@ public class AuthoringController {
     @RequestMapping("/init")
     public String init(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm, HttpServletRequest request)
 	    throws ServletException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	AssessmentForm existForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 
 	try {
@@ -220,6 +218,7 @@ public class AuthoringController {
      * This method will persist all inforamtion in this authoring page, include all assessment question, information
      * etc.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/updateContent")
     public String updateContent(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
 	    HttpServletRequest request) throws Exception {
@@ -228,27 +227,26 @@ public class AuthoringController {
 		.getAttribute(assessmentForm.getSessionMapID());
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	Assessment assessment = assessmentForm.getAssessment();
-
-	// **********************************Get Assessment PO*********************
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
-
-	//allow using old and modified questions and references altogether
-	if (mode.isTeacher()) {
-	    for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
-		service.releaseFromCache(question);
-	    }
-	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
-		service.releaseFromCache(reference);
-	    }
-	}
 
 	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
 	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
+	
+	//allow using old and modified questions and references altogether
+	if (mode.isTeacher()) {
+	    for (AssessmentQuestion question : oldQuestions) {
+		service.releaseFromCache(question);
+	    }
+	    for (QuestionReference reference : oldReferences) {
+		service.releaseFromCache(reference);
+	    }
+	}
+	
 	AssessmentUser assessmentUser = null;
 
 	if (assessmentPO == null) {
-	    // new Assessment, create it.
+	    // new Assessment, create it
 	    assessmentPO = assessment;
 	    assessmentPO.setCreated(new Timestamp(new Date().getTime()));
 
@@ -269,7 +267,6 @@ public class AuthoringController {
 		assessmentPO.setDefineLater(false);
 		assessmentPO.setUpdated(new Timestamp(new Date().getTime()));
 	    }
-
 	}
 
 	// *******************************Handle user*******************
@@ -278,7 +275,7 @@ public class AuthoringController {
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    assessmentUser = service.getUserCreatedAssessment(new Long(user.getUserID().intValue()),
+	    assessmentUser = service.getUserCreatedAssessment(user.getUserID().longValue(),
 		    assessmentPO.getContentId());
 	    if (assessmentUser == null) {
 		assessmentUser = new AssessmentUser(user, assessmentPO);
@@ -287,22 +284,20 @@ public class AuthoringController {
 	assessmentPO.setCreatedBy(assessmentUser);
 
 	// ************************* Handle assessment questions *******************
-	// Handle assessment questions
-	Set<AssessmentQuestion> questions = new LinkedHashSet<>();
 	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
 	for (AssessmentQuestion question : newQuestions) {
 	    removeNewLineCharacters(question);
-	    questions.add(question);
 	}
-	assessmentPO.setQuestions(questions);
+	assessmentPO.setQuestions(newQuestions);
 
 	List<AssessmentQuestion> deletedQuestions = getDeletedQuestionList(sessionMap);
 	Set<QuestionReference> newReferences = updateQuestionReferencesGrades(request, sessionMap, true);
 	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
+	
 	//recalculate results in case content is edited from monitoring
 	if (mode.isTeacher()) {
-	    service.recalculateUserAnswers(assessmentPO, oldQuestions, newQuestions, deletedQuestions, oldReferences,
-		    newReferences, deletedReferences);
+	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
+		    newQuestions, deletedQuestions, oldReferences, newReferences, deletedReferences);
 	}
 
 	// delete References from database.
@@ -350,8 +345,7 @@ public class AuthoringController {
     public String newQuestionInit(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
 	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	questionForm.setSessionMapID(sessionMapID);
@@ -394,11 +388,7 @@ public class AuthoringController {
     @RequestMapping("/editQuestion")
     public String editQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
 	    HttpServletRequest request) {
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
@@ -424,6 +414,7 @@ public class AuthoringController {
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/saveOrUpdateQuestion")
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
 	    HttpServletRequest request) {
@@ -441,12 +432,9 @@ public class AuthoringController {
     /**
      * Parses questions extracted from IMS QTI file and adds them as new items.
      */
-    @SuppressWarnings("rawtypes")
     @RequestMapping("/saveQTI")
     public String saveQTI(HttpServletRequest request) throws UnsupportedEncodingException {
-	String sessionMapId = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapId);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 
@@ -498,8 +486,7 @@ public class AuthoringController {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 				question.getResourcesFolderPath());
 			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    AuthoringController.log
-				    .warn("Skipping an answer with same text as the correct answer: " + answerText);
+			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			    continue;
 			}
 			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
@@ -511,14 +498,13 @@ public class AuthoringController {
 			    // for fill in blanks question all answers are correct and get full grade
 			    if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
 				// whatever the correct answer holds, it becomes the question score
-				questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
+				questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
 				// 100% goes to the correct answer
 				assessmentAnswer.setGrade(1);
 				correctAnswer = answerText;
 			    } else {
-				AuthoringController.log
-					.warn("Choosing only first correct answer, despite another one was found: "
-						+ answerText);
+				log.warn("Choosing only first correct answer, despite another one was found: "
+					+ answerText);
 				assessmentAnswer.setGrade(0);
 			    }
 			} else {
@@ -532,7 +518,7 @@ public class AuthoringController {
 		}
 
 		if (correctAnswer == null) {
-		    AuthoringController.log.warn("No correct answer found for question: " + question.getText());
+		    log.warn("No correct answer found for question: " + question.getText());
 		    continue;
 		}
 
@@ -550,7 +536,7 @@ public class AuthoringController {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    questionGrade = new Double(Math.round(totalScore)).intValue();
+		    questionGrade = Double.valueOf(Math.round(totalScore)).intValue();
 
 		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 		    int orderId = 1;
@@ -578,13 +564,13 @@ public class AuthoringController {
 		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_TRUE_FALSE);
 
 		if (question.getAnswers() == null) {
-		    AuthoringController.log.warn("Answers missing from true-false question: " + question.getText());
+		    log.warn("Answers missing from true-false question: " + question.getText());
 		    continue;
 		} else {
 		    for (Answer answer : question.getAnswers()) {
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    assessmentQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
-			    questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
+			    questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
 			}
 			if (!StringUtils.isBlank(answer.getFeedback())) {
 			    // set feedback for true/false answers
@@ -608,7 +594,7 @@ public class AuthoringController {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    questionGrade = new Double(Math.round(totalScore)).intValue();
+		    questionGrade = Double.valueOf(Math.round(totalScore)).intValue();
 
 		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 		    int orderId = 1;
@@ -650,8 +636,7 @@ public class AuthoringController {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 				question.getResourcesFolderPath());
 			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    AuthoringController.log
-				    .warn("Skipping an answer with same text as the correct answer: " + answerText);
+			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			    continue;
 			}
 			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
@@ -663,14 +648,13 @@ public class AuthoringController {
 			    // for fill in blanks question all answers are correct and get full grade
 			    if (correctAnswer == null) {
 				// whatever the correct answer holds, it becomes the question score
-				questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
+				questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
 				// 100% goes to the correct answer
 				assessmentAnswer.setGrade(1);
 				correctAnswer = answerText;
 			    } else {
-				AuthoringController.log
-					.warn("Choosing only first correct answer, despite another one was found: "
-						+ answerText);
+				log.warn("Choosing only first correct answer, despite another one was found: "
+					+ answerText);
 				assessmentAnswer.setGrade(0);
 			    }
 			} else {
@@ -684,40 +668,35 @@ public class AuthoringController {
 		}
 
 		if (correctAnswer == null) {
-		    AuthoringController.log.warn("No correct answer found for question: " + question.getText());
+		    log.warn("No correct answer found for question: " + question.getText());
 		    continue;
 		}
 
 	    } else {
-		AuthoringController.log.warn("Unknow QTI question type: " + question.getType());
+		log.warn("Unknow QTI question type: " + question.getType());
 		continue;
 	    }
 
 	    assessmentQuestion.setDefaultGrade(questionGrade);
 
 	    questionList.add(assessmentQuestion);
-	    if (AuthoringController.log.isDebugEnabled()) {
-		AuthoringController.log.debug("Added question: " + assessmentQuestion.getTitle());
+	    if (log.isDebugEnabled()) {
+		log.debug("Added question: " + assessmentQuestion.getTitle());
 	    }
 	}
 
 	reinitializeAvailableQuestions(sessionMap);
 
-	// set session map ID so that questionlist.jsp can get sessionMAP
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	return "pages/authoring/parts/questionlist";
     }
 
     /**
      * Prepares Assessment content for QTI packing
      */
-    @SuppressWarnings("rawtypes")
     @RequestMapping("/exportQTI")
     public String exportQTI(HttpServletRequest request, HttpServletResponse response)
 	    throws UnsupportedEncodingException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	List<Question> questions = new LinkedList<>();
@@ -740,11 +719,11 @@ public class AuthoringController {
 			}
 
 			Float correctAnswerScore = correctAnswerCount > 0
-				? new Integer(100 / correctAnswerCount).floatValue()
+				? Integer.valueOf(100 / correctAnswerCount).floatValue()
 				: null;
 			int incorrectAnswerCount = assessmentQuestion.getOptions().size() - correctAnswerCount;
 			Float incorrectAnswerScore = incorrectAnswerCount > 0
-				? new Integer(-100 / incorrectAnswerCount).floatValue()
+				? Integer.valueOf(-100 / incorrectAnswerCount).floatValue()
 				: null;
 
 			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
@@ -768,7 +747,7 @@ public class AuthoringController {
 
 			    answer.setText(assessmentAnswer.getOptionString());
 			    answer.setScore(
-				    isCorrectAnswer ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue()
+				    isCorrectAnswer ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue()
 					    : 0);
 			    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
 				    : assessmentQuestion.getFeedbackOnIncorrect());
@@ -786,7 +765,7 @@ public class AuthoringController {
 			if (assessmentAnswer.getGrade() > 0) {
 			    Answer answer = new Answer();
 			    answer.setText(assessmentAnswer.getOptionString());
-			    answer.setScore(new Integer(assessmentQuestion.getDefaultGrade()).floatValue());
+			    answer.setScore(Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue());
 
 			    answers.add(answer);
 			}
@@ -801,7 +780,7 @@ public class AuthoringController {
 		    Answer trueAnswer = new Answer();
 		    trueAnswer.setText("True");
 		    trueAnswer.setScore(
-			    isTrueCorrect ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
+			    isTrueCorrect ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
 		    trueAnswer.setFeedback(isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect()
 			    : assessmentQuestion.getFeedbackOnIncorrect());
 		    answers.add(trueAnswer);
@@ -809,7 +788,7 @@ public class AuthoringController {
 		    Answer falseAnswer = new Answer();
 		    falseAnswer.setText("False");
 		    falseAnswer.setScore(
-			    !isTrueCorrect ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
+			    !isTrueCorrect ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
 		    falseAnswer.setFeedback(!isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect()
 			    : assessmentQuestion.getFeedbackOnIncorrect());
 		    answers.add(falseAnswer);
@@ -855,7 +834,7 @@ public class AuthoringController {
 
 			answer.setText(assessmentAnswer.getOptionString());
 			answer.setScore(
-				isCorrectAnswer ? new Integer(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
+				isCorrectAnswer ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
 			answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
 				: assessmentQuestion.getFeedbackOnIncorrect());
 
@@ -888,11 +867,7 @@ public class AuthoringController {
      */
     @RequestMapping("/removeQuestion")
     public String removeQuestion(HttpServletRequest request) {
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
 	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
@@ -936,7 +911,6 @@ public class AuthoringController {
 
 	reinitializeAvailableQuestions(sessionMap);
 
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
     }
 
@@ -946,10 +920,7 @@ public class AuthoringController {
      */
     @RequestMapping("/addQuestionReference")
     public String addQuestionReference(HttpServletRequest request) {
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
@@ -987,7 +958,6 @@ public class AuthoringController {
 
 	reinitializeAvailableQuestions(sessionMap);
 
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
     }
 
@@ -997,11 +967,7 @@ public class AuthoringController {
      */
     @RequestMapping("/removeQuestionReference")
     public String removeQuestionReference(HttpServletRequest request) {
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
 	int questionReferenceIdx = NumberUtils
@@ -1019,7 +985,6 @@ public class AuthoringController {
 
 	reinitializeAvailableQuestions(sessionMap);
 
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
     }
 
@@ -1040,10 +1005,7 @@ public class AuthoringController {
     }
 
     private String switchQuestionReferences(HttpServletRequest request, boolean up) {
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
 	int questionReferenceIdx = NumberUtils
@@ -1068,7 +1030,6 @@ public class AuthoringController {
 	    references.addAll(rList);
 	}
 
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
     }
 
@@ -1086,12 +1047,10 @@ public class AuthoringController {
     /**
      * Imports questions into question bank from uploaded xml file.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/importQuestions")
     public String importQuestions(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request) throws ServletException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	SortedSet<AssessmentQuestion> oldQuestions = getQuestionList(sessionMap);
 
 	List<String> toolsErrorMsgs = new ArrayList<>();
@@ -1127,7 +1086,7 @@ public class AuthoringController {
 	    }
 
 	} catch (Exception e) {
-	    AuthoringController.log.error("Error occured during import", e);
+	    log.error("Error occured during import", e);
 	    toolsErrorMsgs.add(e.getClass().getName() + " " + e.getMessage());
 	}
 
@@ -1144,9 +1103,7 @@ public class AuthoringController {
      */
     @RequestMapping("/exportQuestions")
     public String exportQuestions(HttpServletRequest request, HttpServletResponse response) {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	Assessment assessment = assessmentForm.getAssessment();
@@ -1168,18 +1125,18 @@ public class AuthoringController {
 		response.setContentType("application/x-download");
 		response.setHeader("Content-Disposition",
 			"attachment;filename=" + AssessmentConstants.EXPORT_QUESTIONS_FILENAME);
-		AuthoringController.log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
+		log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
 
 		OutputStream out = null;
 		try {
 		    out = response.getOutputStream();
 		    out.write(resultedXml.getBytes());
 		    int count = resultedXml.getBytes().length;
-		    AuthoringController.log.debug("Wrote out " + count + " bytes");
+		    log.debug("Wrote out " + count + " bytes");
 		    response.setContentLength(count);
 		    out.flush();
 		} catch (Exception e) {
-		    AuthoringController.log.error("Exception occured writing out file:" + e.getMessage());
+		    log.error("Exception occured writing out file:" + e.getMessage());
 		    throw new ExportToolContentException(e);
 		} finally {
 		    try {
@@ -1187,14 +1144,13 @@ public class AuthoringController {
 			    out.close();
 			}
 		    } catch (Exception e) {
-			AuthoringController.log
-				.error("Error Closing file. File already written out - no exception being thrown.", e);
+			log.error("Error Closing file. File already written out - no exception being thrown.", e);
 		    }
 		}
 
 	    } catch (Exception e) {
 		errors = "Unable to export tool content: " + e.toString();
-		AuthoringController.log.error(errors);
+		log.error(errors);
 	    }
 
 	}
@@ -1242,7 +1198,7 @@ public class AuthoringController {
 	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
 	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
-	    AssessmentQuestionOption question = rList.remove(optionIndex);
+	    rList.remove(optionIndex);
 	    optionList.clear();
 	    optionList.addAll(rList);
 	}
@@ -1328,9 +1284,7 @@ public class AuthoringController {
      */
     @RequestMapping("/initOverallFeedback")
     public String initOverallFeedback(HttpServletRequest request) {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	Assessment assessment = assessmentForm.getAssessment();
 
@@ -1381,6 +1335,7 @@ public class AuthoringController {
      *
      * @param sessionMap
      */
+    @SuppressWarnings("unchecked")
     private void reinitializeAvailableQuestions(SessionMap<String, Object> sessionMap) {
 	SortedSet<AssessmentQuestion> bankQuestions = getQuestionList(sessionMap);
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
@@ -1401,6 +1356,7 @@ public class AuthoringController {
      * @param request
      * @return
      */
+    @SuppressWarnings("unchecked")
     private SortedSet<AssessmentQuestion> getQuestionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_LIST);
@@ -1413,10 +1369,8 @@ public class AuthoringController {
 
     /**
      * List save current question references.
-     *
-     * @param request
-     * @return
      */
+    @SuppressWarnings("unchecked")
     private SortedSet<QuestionReference> getQuestionReferences(SessionMap<String, Object> sessionMap) {
 	SortedSet<QuestionReference> list = (SortedSet<QuestionReference>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_REFERENCES);
@@ -1429,35 +1383,28 @@ public class AuthoringController {
 
     /**
      * List save deleted assessment questions, which could be persisted or non-persisted questions.
-     *
-     * @param request
-     * @return
+
      */
+    @SuppressWarnings("unchecked")
     private List<AssessmentQuestion> getDeletedQuestionList(SessionMap<String, Object> sessionMap) {
-	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_LIST);
+	return (List<AssessmentQuestion>) getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_LIST);
     }
 
     /**
      * List save deleted assessment questions, which could be persisted or non-persisted questions.
-     *
-     * @param request
-     * @return
      */
+    @SuppressWarnings("unchecked")
     private List<QuestionReference> getDeletedQuestionReferences(SessionMap<String, Object> sessionMap) {
-	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
+	return (List<QuestionReference>) getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
     }
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
      */
-    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
+    private List<?> getListFromSession(SessionMap<String, Object> sessionMap, String name) {
+	List<?> list = (List<?>) sessionMap.get(name);
 	if (list == null) {
-	    list = new ArrayList();
+	    list = new ArrayList<>();
 	    sessionMap.put(name, list);
 	}
 	return list;
@@ -1465,10 +1412,6 @@ public class AuthoringController {
 
     /**
      * Get back jsp name.
-     *
-     * @param type
-     * @param mapping
-     * @return
      */
     private String findForward(short type) {
 	String forward;
@@ -1506,11 +1449,6 @@ public class AuthoringController {
 
     /**
      * This method will populate assessment question information to its form for edit use.
-     *
-     * @param questionIdx
-     * @param question
-     * @param form
-     * @param request
      */
     private void populateQuestionToForm(int questionIdx, AssessmentQuestion question, AssessmentQuestionForm form,
 	    HttpServletRequest request) {
@@ -1535,7 +1473,7 @@ public class AuthoringController {
 	form.setMinWordsLimit(question.getMinWordsLimit());
 	form.setHedgingJustificationEnabled(question.isHedgingJustificationEnabled());
 	if (questionIdx >= 0) {
-	    form.setQuestionIndex(new Integer(questionIdx).toString());
+	    form.setQuestionIndex(String.valueOf(questionIdx));
 	}
 
 	short questionType = question.getType();
@@ -1557,6 +1495,7 @@ public class AuthoringController {
     /**
      * Extract web form content to assessment question.
      */
+    @SuppressWarnings("unchecked")
     private void extractFormToAssessmentQuestion(HttpServletRequest request, AssessmentQuestionForm questionForm) {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to an old or new AssessmentQuestion
@@ -1680,12 +1619,12 @@ public class AuthoringController {
 			    AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
 		} else {
 		    String gradeStr = paramMap.get(AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
-		    grade = new Integer(gradeStr);
+		    grade = Integer.valueOf(gradeStr);
 		}
 
 		questionReference.setDefaultGrade(grade);
 	    } catch (Exception e) {
-		AuthoringController.log.debug(e.getMessage());
+		log.debug(e.getMessage());
 	    }
 	}
 
@@ -1786,7 +1725,7 @@ public class AuthoringController {
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
-		if ((correctOptionIndex != null) && correctOptionIndex.equals(new Integer(sequenceId))) {
+		if ((correctOptionIndex != null) && correctOptionIndex.equals(Integer.valueOf(sequenceId))) {
 		    option.setCorrect(true);
 		}
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
@@ -1911,7 +1850,7 @@ public class AuthoringController {
 	    try {
 		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
-		AuthoringController.log.error("Error occurs when decode instruction string:" + e.toString());
+		log.error("Error occurs when decode instruction string:" + e.toString());
 	    }
 	}
 	return paramMap;
@@ -1940,4 +1879,11 @@ public class AuthoringController {
 
 	}
     }
+    
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    } 
 }

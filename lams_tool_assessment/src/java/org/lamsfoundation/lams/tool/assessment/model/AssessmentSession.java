@@ -24,39 +24,68 @@
 package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 /**
  * Assessment session
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_session")
 public class AssessmentSession {
 
-    private static Logger log = Logger.getLogger(AssessmentSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+
+    @ManyToOne
+    @JoinColumn(name = "assessment_uid")
     private Assessment assessment;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
+    
     // finish or not
+    @Column
     private int status;
-    // assessment Questions
-    private Set assessmentQuestions;
-    private Set<AssessmentUser> assessmentUsers;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "session_uid")
+    @OrderBy("last_name ASC")
+    private Set<AssessmentUser> assessmentUsers = new HashSet<>();
+    
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_leader_uid")
     private AssessmentUser groupLeader;
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the learnerID.
-     */
+    
     public Long getUid() {
 	return uid;
     }
@@ -65,10 +94,6 @@ public class AssessmentSession {
 	this.uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -77,11 +102,6 @@ public class AssessmentSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -90,10 +110,6 @@ public class AssessmentSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -102,10 +118,6 @@ public class AssessmentSession {
 	this.status = status;
     }
 
-    /**
-     *
-     * @return
-     */
     public Assessment getAssessment() {
 	return assessment;
     }
@@ -114,10 +126,6 @@ public class AssessmentSession {
 	this.assessment = assessment;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -142,20 +150,6 @@ public class AssessmentSession {
 	this.sessionName = sessionName;
     }
 
-    /**
-     * @return
-     */
-    public Set getAssessmentQuestions() {
-	return assessmentQuestions;
-    }
-
-    public void setAssessmentQuestions(Set assessmentQuestions) {
-	this.assessmentQuestions = assessmentQuestions;
-    }
-
-    /**
-     * @return
-     */
     public Set<AssessmentUser> getAssessmentUsers() {
 	return assessmentUsers;
     }
@@ -164,10 +158,6 @@ public class AssessmentSession {
 	this.assessmentUsers = assessmentUsers;
     }
 
-    /**
-     *
-     * @return
-     */
     public AssessmentUser getGroupLeader() {
 	return this.groupLeader;
     }

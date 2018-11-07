@@ -77,14 +77,13 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
     }
 
     @Override
-    public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId) {
-	Query q = getSession().createQuery(GET_ANSWER_MARK);
+    public Float getQuestionResultMark(final Long assessmentUid, final Long userId, final int questionSequenceId) {
+	Query<Number> q = getSession().createQuery(GET_ANSWER_MARK, Number.class);
 	q.setParameter("assessmentUid", assessmentUid);
 	q.setParameter("userId", userId);
 	q.setParameter("questionSequenceId", questionSequenceId);
 	q.setMaxResults(1);
-	Object result = q.uniqueResult();
-	return result != null ? ((Number) result).floatValue() : null;
-
+	Number result = q.uniqueResult();
+	return result != null ? result.floatValue() : null;
     }
 }

@@ -52,10 +52,10 @@ public class AssessmentOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
 	ToolOutputDefinition definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS,
-		new Long(0), null);
+		0L, null);
 	definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS, definition);
 
-	definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, new Long(0), null);
+	definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, 0L, null);
 	definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, definition);
 
 	if (toolContentObject != null) {
@@ -63,28 +63,27 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
 
-	    Long totalMarksPossible = new Long(0);
+	    Long totalMarksPossible = 0L;
 	    for (QuestionReference questionReference : questionReferences) {
 		totalMarksPossible += questionReference.getDefaultGrade();
 	    }
-	    ;
-	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0),
+	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, 0L,
 		    totalMarksPossible, true);
 	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
 
-	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_BEST_SCORE, new Long(0),
-		    totalMarksPossible, false);
+	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_BEST_SCORE, 0L, totalMarksPossible,
+		    false);
 	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_BEST_SCORE, definition);
 
-	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE, new Long(0),
-		    totalMarksPossible, false);
+	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE, 0L, totalMarksPossible,
+		    false);
 	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE, definition);
 
-	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE, new Long(0),
-		    totalMarksPossible, false);
+	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE, 0L, totalMarksPossible,
+		    false);
 	    definition.setWeightable(true);
 	    definitionMap.put(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE, definition);
 
@@ -92,7 +91,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    for (QuestionReference questionReference : questionReferences) {
 		Long markAvailable = null;
 		if (questionReference.getDefaultGrade() != 0) {
-		    markAvailable = new Long(questionReference.getDefaultGrade());
+		    markAvailable = Long.valueOf(questionReference.getDefaultGrade());
 		}
 
 		String description = getI18NText("output.user.score.for.question", false);
@@ -103,8 +102,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 		    description += questionReference.getQuestion().getTitle();
 		}
 
-		definition = buildRangeDefinition(String.valueOf(questionReference.getSequenceId()), new Long(0),
-			markAvailable);
+		definition = buildRangeDefinition(String.valueOf(questionReference.getSequenceId()), 0L, markAvailable);
 		definition.setDescription(description);
 		definitionMap.put(String.valueOf(questionReference.getSequenceId()), definition);
 	    }

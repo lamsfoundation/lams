@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +51,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
-import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -117,7 +115,6 @@ public class LearningController {
      *
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page".
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping("/start")
     public String start(HttpServletRequest request) throws ServletException, IllegalAccessException,
 	    InstantiationException, InvocationTargetException, NoSuchMethodException {
@@ -128,8 +125,7 @@ public class LearningController {
 
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-
-	Long toolSessionId = new Long(request.getParameter(AssessmentConstants.PARAM_TOOL_SESSION_ID));
+	Long toolSessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_SESSION_ID);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
@@ -150,13 +146,13 @@ public class LearningController {
 
 	// support for leader select feature
 	AssessmentUser groupLeader = assessment.isUseSelectLeaderToolOuput()
-		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue())
+		? service.checkLeaderSelectToolForSessionLeader(user, toolSessionId)
 		: null;
 	if (assessment.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null) {
-		List<AssessmentUser> groupUsers = service.getUsersBySession(new Long(toolSessionId).longValue());
+		List<AssessmentUser> groupUsers = service.getUsersBySession(toolSessionId);
 		request.setAttribute(AssessmentConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 
@@ -198,7 +194,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(user, new Long(toolSessionId));
+	boolean isUserLeader = service.isUserGroupLeader(user, toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
@@ -418,12 +414,12 @@ public class LearningController {
      *            page number with questions required to be answered
      * @return
      */
+    @SuppressWarnings("unchecked")
     private String nextPage(HttpServletRequest request, boolean isAnswersValidationFailed,
 	    int pageNumberWithUnasweredQuestions)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	int oldPageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
@@ -483,10 +479,7 @@ public class LearningController {
     @ResponseBody
     public String getSecondsLeft(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	    IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
-
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	long secondsLeft = service.getSecondsLeft(assessment, user);
@@ -497,18 +490,13 @@ public class LearningController {
     }
 
     /**
-     * Handling submittion of MarkHedging type of Questions (in case of leader aware tool).
-     *
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * Handling submittion of MarkHedging type of Questions (in case of leader aware tool)
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/submitSingleMarkHedgingQuestion")
     public String submitSingleMarkHedgingQuestion(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
@@ -563,9 +551,7 @@ public class LearningController {
     @RequestMapping("/submitAll")
     public String submitAll(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//get user answers from request and store them into sessionMap
@@ -605,10 +591,7 @@ public class LearningController {
      */
     @RequestMapping("/resubmit")
     public String resubmit(HttpServletRequest request) throws ServletException {
-
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
@@ -631,11 +614,9 @@ public class LearningController {
 
 	    //otherwise use data from SessionMap
 	} else {
-
 	    sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, false);
 	    sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);
-	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	    // clear isUserFailed indicator
 	    sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, false);
 
@@ -653,21 +634,18 @@ public class LearningController {
      */
     @RequestMapping("/finish")
     public String finish(HttpServletRequest request) {
-	// get back SessionMap
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	String nextActivityUrl = null;
 	try {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	    Long userID = user.getUserID().longValue();
 	    Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	    nextActivityUrl = service.finishToolSession(sessionId, userID);
 	    request.setAttribute(AssessmentConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (AssessmentApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
+	    log.error("Failed get next activity url:" + e.getMessage());
 	}
 
 	return "pages/learning/finish";
@@ -689,15 +667,14 @@ public class LearningController {
 	return switchOption(request, false);
     }
 
+    @SuppressWarnings("unchecked")
     private String switchOption(HttpServletRequest request, boolean up) {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
-	Long questionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
+	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
 
 	QuestionDTO questionDto = null;
 	for (QuestionDTO questionDtoIter : questionsForOnePage) {
@@ -727,7 +704,6 @@ public class LearningController {
 	}
 
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, questionDto);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/learning/parts/ordering";
     }
 
@@ -738,9 +714,7 @@ public class LearningController {
     @ResponseStatus(HttpStatus.OK)
     public void autoSaveAnswers(HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//get user answers from request and store them into sessionMap
@@ -755,9 +729,7 @@ public class LearningController {
     @RequestMapping("/launchTimeLimit")
     @ResponseStatus(HttpStatus.OK)
     public void launchTimeLimit(HttpServletRequest request) {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
@@ -781,8 +753,8 @@ public class LearningController {
 	refForm.setSessionMapID(sessionMapID);
 
 	// get the existing reflection entry
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = service.getEntry(toolSessionID, user.getUserID());
 
 	if (entry != null) {
@@ -800,9 +772,7 @@ public class LearningController {
 	    HttpServletRequest request) {
 	Integer userId = refForm.getUserID();
 
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
@@ -832,10 +802,9 @@ public class LearningController {
      * @param pageNumber
      *            number of the page to process
      */
+    @SuppressWarnings("unchecked")
     private void storeUserAnswersIntoSessionMap(HttpServletRequest request, int pageNumber) {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
@@ -939,6 +908,7 @@ public class LearningController {
      * @param sessionMap
      * @return 0 if all questions were answered OK, or a number of the first page that contains questions with issues
      */
+    @SuppressWarnings("unchecked")
     private int validateAnswers(SessionMap<String, Object> sessionMap) {
 
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
@@ -1038,6 +1008,7 @@ public class LearningController {
     /**
      * Prepare data for displaying results page
      */
+    @SuppressWarnings("unchecked")
     private void showResults(HttpServletRequest request, SessionMap<String, Object> sessionMap) {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
@@ -1136,6 +1107,7 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
     }
 
+    @SuppressWarnings("unchecked")
     private void loadupLastAttempt(SessionMap<String, Object> sessionMap) {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
@@ -1223,11 +1195,8 @@ public class LearningController {
 
     /**
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
-     *
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
+    @SuppressWarnings("unchecked")
     private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
@@ -1256,7 +1225,7 @@ public class LearningController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	AssessmentUser assessmentUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
+	AssessmentUser assessmentUser = service.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
 
 	if (assessmentUser == null) {
 	    AssessmentSession session = service.getSessionBySessionId(sessionId);
@@ -1267,13 +1236,18 @@ public class LearningController {
     }
 
     private AssessmentUser getSpecifiedUser(IAssessmentService service, Long sessionId, Integer userId) {
-	AssessmentUser assessmentUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
+	AssessmentUser assessmentUser = service.getUserByIDAndSession(userId.longValue(), sessionId);
 	if (assessmentUser == null) {
-	    LearningController.log.error(
-		    "Unable to find specified user for assessment activity. Screens are likely to fail. SessionId="
-			    + sessionId + " UserId=" + userId);
+	    log.error("Unable to find specified user for assessment activity. Screens are likely to fail. SessionId="
+		    + sessionId + " UserId=" + userId);
 	}
 	return assessmentUser;
     }
 
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    }
 }

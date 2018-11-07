@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -36,11 +34,6 @@ public class AssessmentQuestionDAOHibernate extends LAMSBaseDAO implements Asses
     @Override
     public AssessmentQuestion getByUid(Long assessmentQuestionUid) {
 	return (AssessmentQuestion) this.getObject(AssessmentQuestion.class, assessmentQuestionUid);
-    }
-
-    @Override
-    public void evict(Object o) {
-	getSession().evict(o);
     }
 
 }
