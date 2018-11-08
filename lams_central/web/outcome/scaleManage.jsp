@@ -104,7 +104,7 @@
 			<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
 				<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
 			</div>
-			<form id="importForm" action="outcome/scaleImport.do" method="post" enctype="multipart/form-data">
+			<form id="importForm" action="scaleImport.do" method="post" enctype="multipart/form-data">
 				<input type="file" id="importInput" name="file"/>
 			</form>
 		</c:if>

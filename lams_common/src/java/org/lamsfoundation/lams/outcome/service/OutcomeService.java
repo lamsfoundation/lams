@@ -182,7 +182,7 @@ public class OutcomeService implements IOutcomeService {
 	    cell = row.getCell(0);
 	    String name = cell.getStringCellValue();
 	    cell = row.getCell(2);
-	    String description = cell.getStringCellValue();
+	    String description = cell == null ? null : cell.getStringCellValue();
 	    cell = row.getCell(3);
 	    String itemsString = cell.getStringCellValue();
 
@@ -248,7 +248,7 @@ public class OutcomeService implements IOutcomeService {
 	    cell = row.getCell(0);
 	    String name = cell.getStringCellValue();
 	    cell = row.getCell(2);
-	    String description = cell.getStringCellValue();
+	    String description = cell == null ? null : cell.getStringCellValue();
 
 	    Outcome outcome = new Outcome();
 	    outcome.setName(name);

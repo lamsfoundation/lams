@@ -65,6 +65,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -493,8 +494,8 @@ public class OutcomeController {
     }
 
     @RequestMapping("/outcomeImport")
-    public String outcomeImport(MultipartFile file, HttpServletRequest request, HttpServletResponse response)
-	    throws Exception {
+    public String outcomeImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
 
@@ -742,8 +743,8 @@ public class OutcomeController {
     }
 
     @RequestMapping("/scaleImport")
-    public String scaleImport(MultipartFile file, HttpServletRequest request, HttpServletResponse response)
-	    throws Exception {
+    public String scaleImport(@RequestParam("file") MultipartFile file, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcome scales", true);
 

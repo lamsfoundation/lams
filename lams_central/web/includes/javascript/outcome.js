@@ -8,13 +8,13 @@
 
 function removeOutcome(outcomeId) {
 	if (confirm(LABELS.REMOVE_OUTCOME_CONFIRM_LABEL)) {
-		document.location.href = 'outcome/outcomeRemove.do?organisationID=' + organisationId + '&outcomeId=' + outcomeId;
+		document.location.href = 'outcomeRemove.do?organisationID=' + organisationId + '&outcomeId=' + outcomeId;
 	}
 }
 
 function removeScale(scaleId) {
 	if (confirm(LABELS.REMOVE_SCALE_CONFIRM_LABEL)) {
-		document.location.href = 'outcomeScale/scaleRemove.do?organisationID=' + organisationId + '&scaleId=' + scaleId;
+		document.location.href = 'scaleRemove.do?organisationID=' + organisationId + '&scaleId=' + scaleId;
 	}
 }
 
