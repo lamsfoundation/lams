@@ -160,55 +160,62 @@ public class OutcomeService implements IOutcomeService {
     @Override
     @SuppressWarnings("unchecked")
     public int importScales(MultipartFile fileItem) throws IOException {
-	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
-	HSSFWorkbook wb = new HSSFWorkbook(fs);
-	HSSFSheet sheet = wb.getSheetAt(0);
-	int startRow = sheet.getFirstRowNum();
-	int endRow = sheet.getLastRowNum();
-	User user = null;
 	int counter = 0;
+	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
+	try (HSSFWorkbook wb = new HSSFWorkbook(fs)) {
+	    HSSFSheet sheet = wb.getSheetAt(0);
+	    int startRow = sheet.getFirstRowNum();
+	    int endRow = sheet.getLastRowNum();
+	    User user = null;
 
-	for (int i = startRow + 5; i < (endRow + 1); i++) {
-	    HSSFRow row = sheet.getRow(i);
-	    HSSFCell cell = row.getCell(1);
-	    String code = cell.getStringCellValue();
-	    List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", code);
-	    if (!foundScales.isEmpty()) {
-		if (log.isDebugEnabled()) {
-		    log.debug("Skipping an outcome scale with existing code: " + code);
+	    // make import work with files with header ("exported on") or without (pure data)
+	    HSSFRow row = sheet.getRow(startRow);
+	    HSSFCell cell = row.getCell(0);
+	    String header = cell.getStringCellValue();
+	    startRow += "name".equalsIgnoreCase(header) ? 1 : 5;
+
+	    for (int i = startRow; i < (endRow + 1); i++) {
+		row = sheet.getRow(i);
+		cell = row.getCell(1);
+		String code = cell.getStringCellValue();
+		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", code);
+		if (!foundScales.isEmpty()) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Skipping an outcome scale with existing code: " + code);
+		    }
+		    continue;
 		}
-		continue;
-	    }
-	    cell = row.getCell(0);
-	    String name = cell.getStringCellValue();
-	    cell = row.getCell(2);
-	    String description = cell == null ? null : cell.getStringCellValue();
-	    cell = row.getCell(3);
-	    String itemsString = cell.getStringCellValue();
+		cell = row.getCell(0);
+		String name = cell.getStringCellValue();
+		cell = row.getCell(2);
+		String description = cell == null ? null : cell.getStringCellValue();
+		cell = row.getCell(3);
+		String itemsString = cell.getStringCellValue();
 
-	    OutcomeScale scale = new OutcomeScale();
-	    scale.setName(name);
-	    scale.setCode(code);
-	    scale.setDescription(description);
-	    if (user == null) {
-		UserDTO userDTO = OutcomeService.getUserDTO();
-		user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
-	    }
-	    scale.setCreateBy(user);
-	    scale.setCreateDateTime(new Date());
-	    outcomeDAO.insert(scale);
+		OutcomeScale scale = new OutcomeScale();
+		scale.setName(name);
+		scale.setCode(code);
+		scale.setDescription(description);
+		if (user == null) {
+		    UserDTO userDTO = OutcomeService.getUserDTO();
+		    user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
+		}
+		scale.setCreateBy(user);
+		scale.setCreateDateTime(new Date());
+		outcomeDAO.insert(scale);
 
-	    List<String> items = OutcomeScale.parseItems(itemsString);
-	    int value = 0;
-	    for (String itemString : items) {
-		OutcomeScaleItem item = new OutcomeScaleItem();
-		item.setName(itemString);
-		item.setValue(value++);
-		item.setScale(scale);
-		outcomeDAO.insert(item);
-	    }
+		List<String> items = OutcomeScale.parseItems(itemsString);
+		int value = 0;
+		for (String itemString : items) {
+		    OutcomeScaleItem item = new OutcomeScaleItem();
+		    item.setName(itemString);
+		    item.setValue(value++);
+		    item.setScale(scale);
+		    outcomeDAO.insert(item);
+		}
 
-	    counter++;
+		counter++;
+	    }
 	}
 	return counter;
     }
@@ -216,54 +223,61 @@ public class OutcomeService implements IOutcomeService {
     @Override
     @SuppressWarnings("unchecked")
     public int importOutcomes(MultipartFile fileItem) throws IOException {
-	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
-	HSSFWorkbook wb = new HSSFWorkbook(fs);
-	HSSFSheet sheet = wb.getSheetAt(0);
-	int startRow = sheet.getFirstRowNum();
-	int endRow = sheet.getLastRowNum();
-	User user = null;
 	int counter = 0;
+	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
+	try (HSSFWorkbook wb = new HSSFWorkbook(fs)) {
+	    HSSFSheet sheet = wb.getSheetAt(0);
+	    int startRow = sheet.getFirstRowNum();
+	    int endRow = sheet.getLastRowNum();
+	    User user = null;
 
-	for (int i = startRow + 5; i < (endRow + 1); i++) {
-	    HSSFRow row = sheet.getRow(i);
-	    HSSFCell cell = row.getCell(1);
-	    String code = cell.getStringCellValue();
-	    List<Outcome> foundOutcomes = outcomeDAO.findByProperty(Outcome.class, "code", code);
-	    if (!foundOutcomes.isEmpty()) {
-		if (log.isDebugEnabled()) {
-		    log.debug("Skipping an outcome with existing code: " + code);
+	    // make import work with files with header ("exported on") or without (pure data)
+	    HSSFRow row = sheet.getRow(startRow);
+	    HSSFCell cell = row.getCell(0);
+	    String header = cell.getStringCellValue();
+	    startRow += "name".equalsIgnoreCase(header) ? 1 : 5;
+
+	    for (int i = startRow; i < (endRow + 1); i++) {
+		row = sheet.getRow(i);
+		cell = row.getCell(1);
+		String code = cell.getStringCellValue();
+		List<Outcome> foundOutcomes = outcomeDAO.findByProperty(Outcome.class, "code", code);
+		if (!foundOutcomes.isEmpty()) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Skipping an outcome with existing code: " + code);
+		    }
+		    continue;
 		}
-		continue;
-	    }
-	    cell = row.getCell(3);
-	    String scaleCode = cell.getStringCellValue();
-	    List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", scaleCode);
-	    OutcomeScale scale = foundScales.isEmpty() ? null : foundScales.get(0);
-	    if (scale == null) {
-		if (log.isDebugEnabled()) {
-		    log.debug("Skipping an outcome with missing scale with code: " + scaleCode);
+		cell = row.getCell(3);
+		String scaleCode = cell.getStringCellValue();
+		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", scaleCode);
+		OutcomeScale scale = foundScales.isEmpty() ? null : foundScales.get(0);
+		if (scale == null) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Skipping an outcome with missing scale with code: " + scaleCode);
+		    }
+		    continue;
 		}
-		continue;
-	    }
-	    cell = row.getCell(0);
-	    String name = cell.getStringCellValue();
-	    cell = row.getCell(2);
-	    String description = cell == null ? null : cell.getStringCellValue();
+		cell = row.getCell(0);
+		String name = cell.getStringCellValue();
+		cell = row.getCell(2);
+		String description = cell == null ? null : cell.getStringCellValue();
 
-	    Outcome outcome = new Outcome();
-	    outcome.setName(name);
-	    outcome.setCode(code);
-	    outcome.setDescription(description);
-	    outcome.setScale(scale);
-	    if (user == null) {
-		UserDTO userDTO = OutcomeService.getUserDTO();
-		user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
-	    }
-	    outcome.setCreateBy(user);
-	    outcome.setCreateDateTime(new Date());
-	    outcomeDAO.insert(outcome);
+		Outcome outcome = new Outcome();
+		outcome.setName(name);
+		outcome.setCode(code);
+		outcome.setDescription(description);
+		outcome.setScale(scale);
+		if (user == null) {
+		    UserDTO userDTO = OutcomeService.getUserDTO();
+		    user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
+		}
+		outcome.setCreateBy(user);
+		outcome.setCreateDateTime(new Date());
+		outcomeDAO.insert(outcome);
 
-	    counter++;
+		counter++;
+	    }
 	}
 	return counter;
     }
