@@ -22,82 +22,61 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt;
+package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @serial 3399851325547422573L
- */
+@Entity
+@Table(name = "tl_lasbmt11_session")
 public class SubmitFilesSession implements Serializable, Cloneable {
-
     private static final long serialVersionUID = 3399851325547422573L;
-
     private static Logger log = Logger.getLogger(SubmitFilesSession.class);
 
     public final static int INCOMPLETE = 0;
     public final static int COMPLETED = 1;
 
-    /** identifier field */
+    @Id
+    @Column(name = "session_id")
     private Long sessionID;
 
-    /** persistent field */
+    @Column(name = "session_name")
     private String sessionName;
 
-    /** persistent field */
+    @Column
     private Integer status;
+    
+    @Column(name = "marks_released")
+    private boolean marksReleased;
 
-    /** persistent field */
-    private Set submissionDetails;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "submitFileSession")
+    private Set<SubmissionDetails> submissionDetails = new HashSet<>();
 
     /** persistent field, but not cloned to avoid to clone block */
+    @ManyToOne
+    @JoinColumn(name = "content_id")
     private SubmitFilesContent content;
-
+    
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_leader_uid")
     private SubmitUser groupLeader;
     
-    private boolean marksReleased;
-    
-    /** full constructor */
-    public SubmitFilesSession(Long sessionID, int status) {
-	this.sessionID = sessionID;
-	this.status = new Integer(status);
-    }
-
-    /** default constructor */
-    public SubmitFilesSession() {
-    }
-
-    /**
-     *
-     */
-    public Long getSessionID() {
-	return this.sessionID;
-    }
-
-    public void setSessionID(Long sessionID) {
-	this.sessionID = sessionID;
-    }
-
-    /**
-     *
-     */
-    public Integer getStatus() {
-	return this.status;
-    }
-
-    public void setStatus(Integer status) {
-	this.status = status;
-    }
-
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("sessionID", getSessionID()).append("status", getStatus()).toString();
@@ -121,11 +100,6 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 	return new HashCodeBuilder().append(getSessionID()).append(getStatus()).toHashCode();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone() {
 	Object obj = null;
@@ -135,10 +109,10 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 	    ((SubmitFilesSession) obj).setSessionID(null);
 	    //clone SubmissionDetails object
 	    if (submissionDetails != null) {
-		Iterator iter = submissionDetails.iterator();
-		Set set = new HashSet();
+		Iterator<SubmissionDetails> iter = submissionDetails.iterator();
+		Set<SubmissionDetails> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    set.add(((SubmissionDetails) iter.next()).clone());
+		    set.add((SubmissionDetails) (iter.next()).clone());
 		}
 		((SubmitFilesSession) obj).submissionDetails = set;
 	    }
@@ -149,14 +123,31 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 	return obj;
     }
 
+    // ***********************************************************
+    // Get / Set methods
+    // ***********************************************************
+
+    public Long getSessionID() {
+	return this.sessionID;
+    }
+
+    public void setSessionID(Long sessionID) {
+	this.sessionID = sessionID;
+    }
+
+    public Integer getStatus() {
+	return this.status;
+    }
+
+    public void setStatus(Integer status) {
+	this.status = status;
+    }
+
+
     /**
-     *
-     *
-     *
-     *
      * @return Returns the submissionDetails.
      */
-    public Set getSubmissionDetails() {
+    public Set<SubmissionDetails> getSubmissionDetails() {
 	return submissionDetails;
     }
 
@@ -164,13 +155,11 @@ public class SubmitFilesSession implements Serializable, Cloneable {
      * @param submissionDetails
      *            The submissionDetails to set.
      */
-    public void setSubmissionDetails(Set submissionDetails) {
+    public void setSubmissionDetails(Set<SubmissionDetails> submissionDetails) {
 	this.submissionDetails = submissionDetails;
     }
 
     /**
-     *
-     * 
      * @return Returns the content.
      */
     public SubmitFilesContent getContent() {
@@ -186,8 +175,6 @@ public class SubmitFilesSession implements Serializable, Cloneable {
     }
 
     /**
-     *
-     * 
      * @return Returns the session name.
      */
     public String getSessionName() {
@@ -195,7 +182,6 @@ public class SubmitFilesSession implements Serializable, Cloneable {
     }
 
     /**
-     * 
      * @param sessionName
      *            The session name to set.
      */

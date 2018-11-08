@@ -81,7 +81,7 @@ public interface SbmtConstants {
 
     public static final String ATTR_LIMIT_UPLOAD_NUMBER = "limitUploadNumber";
 
-    public static final Object ATTR_ARRIVE_LIMIT = "arriveLimit";
+    public static final String ATTR_ARRIVE_LIMIT = "arriveLimit";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 

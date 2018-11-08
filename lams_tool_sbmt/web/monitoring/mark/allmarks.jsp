@@ -22,7 +22,7 @@
 		//constants for marks.js
 		var LABEL_DELETE = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
 		var LABEL_RESTORE = '<fmt:message key="message.monitor.confirm.original.learner.file.restore"/>';
-		var MONITOR_URL = "<c:url value="/monitoring.do"/>";
+		var MONITOR_URL = "<c:url value="/monitoring"/>";
 
 		function updateMark(detailId,reportId,sessionId,userId){
 			location.href="<lams:WebAppURL/>mark/newMark.do?updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;

@@ -45,11 +45,11 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.web.form.LearnerForm;
@@ -82,7 +82,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/learning")
 public class LearnerController implements SbmtConstants {
-
     public static Logger logger = Logger.getLogger(LearnerController.class);
 
     @Autowired
@@ -101,7 +100,7 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/learner")
     public String learner(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -116,10 +115,9 @@ public class LearnerController implements SbmtConstants {
 	if (mode == null) {
 	    mode = ToolAccessMode.LEARNER;
 	}
-
 	request.setAttribute("mode", mode);
 
-	Long toolSessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
@@ -139,8 +137,8 @@ public class LearnerController implements SbmtConstants {
 	// this must before getFileUploadByUser() method becuase getCurrentLearner()
 	// will create session user if it does not exist.
 	SubmitUser learner = getCurrentLearner(toolSessionID, submitFilesService);
-	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, toolSessionID, request.getLocale(),
-		false);
+	List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, toolSessionID,
+		request.getLocale(), false);
 
 	// check whehter finish lock is on/off
 	boolean lock = content.isLockOnFinished() && learner.isFinished();
@@ -205,17 +203,18 @@ public class LearnerController implements SbmtConstants {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
-	SortedMap submittedFilesMap = submitFilesService.getFilesUploadedBySession(toolSessionID, request.getLocale());
+	SortedMap<SubmitUserDTO, List<FileDetailsDTO>> submittedFilesMap = submitFilesService
+		.getFilesUploadedBySession(toolSessionID, request.getLocale());
 	// support for leader select feature
 	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
-		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, new Long(toolSessionID).longValue())
+		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, toolSessionID)
 		: null;
 
 	if (content.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null) {
-		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(new Long(toolSessionID).longValue());
+		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(toolSessionID);
 		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
 		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
@@ -226,8 +225,8 @@ public class LearnerController implements SbmtConstants {
 	    boolean isNonLeader = !userID.equals(groupLeader.getUserID());
 
 	    if (isNonLeader && !learner.isFinished()) {
-		List filesUploadedByLeader = submitFilesService.getFilesUploadedByUser(groupLeader.getUserID(),
-			toolSessionID, request.getLocale(), false);
+		List<FileDetailsDTO> filesUploadedByLeader = submitFilesService
+			.getFilesUploadedByUser(groupLeader.getUserID(), toolSessionID, request.getLocale(), false);
 
 		if (filesUploadedByLeader == null) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
@@ -282,7 +281,7 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/refresh")
     public String refresh(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	learnerForm.setSessionMapID(sessionMap.getSessionID());
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
@@ -293,7 +292,8 @@ public class LearnerController implements SbmtConstants {
 	Integer userID = user.getUserID();
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	List filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), false);
+	List<FileDetailsDTO> filesUploaded = submitFilesService.getFilesUploadedByUser(userID, sessionID,
+		request.getLocale(), false);
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
@@ -309,9 +309,8 @@ public class LearnerController implements SbmtConstants {
      */
     @RequestMapping("/uploadFile")
     public String uploadFile(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
-
 	String sessionMapID = learnerForm.getSessionMapID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute("sessionMapID", sessionMapID);
 
 	// set the mode into http session
@@ -368,9 +367,8 @@ public class LearnerController implements SbmtConstants {
      */
     @RequestMapping("/finish")
     public String finish(HttpServletRequest request, HttpServletResponse response) {
-
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -422,11 +420,11 @@ public class LearnerController implements SbmtConstants {
 	}
 
 	if (learnerForm.getFile() != null) {
-	    LearnerController.logger.debug("Learner submit file : " + learnerForm.getFile().getName());
+	    logger.debug("Learner submit file : " + learnerForm.getFile().getName());
 	}
 
 	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getName())) {
-	    LearnerController.logger.debug("File is executatable : " + learnerForm.getFile().getName());
+	    logger.debug("File is executatable : " + learnerForm.getFile().getName());
 	    errorMap.add("GLOBAL", messageService.getMessage("error.attachment.executable"));
 	}
 
@@ -442,16 +440,16 @@ public class LearnerController implements SbmtConstants {
      * Set information into learner DTO object for page display. Fill file list uploaded by the special user into web
      * form. Remove the unauthorized mark and comments.
      */
-    private void setLearnerDTO(HttpServletRequest request, SessionMap sessionMap, SubmitUser currUser,
-	    List filesUploaded, ToolAccessMode mode) {
+    private void setLearnerDTO(HttpServletRequest request, SessionMap<String, Object> sessionMap, SubmitUser currUser,
+	    List<FileDetailsDTO> filesUploaded, ToolAccessMode mode) {
 
 	SubmitUserDTO dto = new SubmitUserDTO(currUser);
 	if (currUser != null) {
 	    // if Monitoring does not release marks, then skip this mark and comment content.
 	    if (filesUploaded != null) {
-		Iterator iter = filesUploaded.iterator();
+		Iterator<FileDetailsDTO> iter = filesUploaded.iterator();
 		while (iter.hasNext()) {
-		    FileDetailsDTO filedto = (FileDetailsDTO) iter.next();
+		    FileDetailsDTO filedto = iter.next();
 		    if (mode.isTeacher() || currUser.getUid().equals(filedto.getOwner().getUserUid())) {
 			filedto.setCurrentLearner(true);
 		    } else {
@@ -470,7 +468,7 @@ public class LearnerController implements SbmtConstants {
 	    int limit = (Integer) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER);
 	    int limitUploadLeft = 0;
 	    if (limit <= filesUploaded.size()) {
-		sessionMap.put(SbmtConstants.ATTR_ARRIVE_LIMIT, true);
+		sessionMap.put(SbmtConstants.ATTR_ARRIVE_LIMIT, Boolean.TRUE);
 	    } else {
 		limitUploadLeft = limit - filesUploaded.size();
 	    }
@@ -478,7 +476,6 @@ public class LearnerController implements SbmtConstants {
 	}
 
 	// retrieve notebook reflection entry.
-
 	NotebookEntry notebookEntry = submitFilesService.getEntry(
 		(Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		SbmtConstants.TOOL_SIGNATURE, currUser.getUserID());
@@ -508,8 +505,6 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/deleteLearnerFile")
     public void deleteLearnerFile(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
-	HttpSession ss = SessionManager.getSession();
-
 	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Long detailID = WebUtil.readLongParam(request, "detailId");
 
@@ -551,7 +546,7 @@ public class LearnerController implements SbmtConstants {
 
 	// get the existing reflection entry
 
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		SbmtConstants.TOOL_SIGNATURE, user.getUserID());
@@ -574,7 +569,7 @@ public class LearnerController implements SbmtConstants {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
@@ -597,14 +592,15 @@ public class LearnerController implements SbmtConstants {
 
     public static void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userID = user.getUserID();
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	List list = submitFilesService.getFilesUploadedByUser(userID, sessionId, request.getLocale(), false);
+	List<FileDetailsDTO> list = submitFilesService.getFilesUploadedByUser(userID, sessionId, request.getLocale(),
+		false);
 	int minUpload = (Integer) sessionMap.get(SbmtConstants.PARAM_MIN_UPLOAD);
 	if (minUpload > 0) {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.learning.minimum.upload.number.less"));

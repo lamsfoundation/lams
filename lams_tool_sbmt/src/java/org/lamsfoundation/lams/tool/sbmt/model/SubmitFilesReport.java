@@ -22,120 +22,72 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt;
+package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Parameter;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.GenericGenerator;
 
-/**
- *
- * @serial -3415065437595925246L
- */
+@Entity
+@Table(name = "tl_lasbmt11_report")
 public class SubmitFilesReport implements Serializable, Cloneable {
-
     private static final long serialVersionUID = -3415065437595925246L;
-
     private static Logger log = Logger.getLogger(SubmitFilesReport.class);
-
-    /** identifier field */
+    
+    @Id
+    @Column(name = "report_id")
     private Long reportID;
 
-    /** persistent field */
+    @MapsId
+    @OneToOne(mappedBy = "report")
+    @JoinColumn(name = "report_id")
+    private SubmissionDetails details;
+
+    
+    
+//    @Id
+//    @GeneratedValue(generator="foreign")
+//    @GenericGenerator(name="foreign", strategy = "foreign", parameters={
+//        @Parameter(name="property", value="person")
+//    })
+//    @Column(name="report_id")
+    
+//    @Id
+//    @Column(name = "report_id")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    
+
+    @Column
     private String comments;
 
-    /** nullable persistent field */
+    @Column
     private Float marks;
 
-    /** persistent field */
+    @Column(name = "mark_file_uuid")
     private Long markFileUUID;
 
-    /** persistent field */
+    @Column(name = "mark_file_name")
     private String markFileName;
 
-    /** persistent field */
+    @Column(name = "mark_file_version_id")
     private Long markFileVersionID;
-
-    /** full constructor */
-    public SubmitFilesReport(String comments, Float marks) {
-	this.comments = comments;
-	this.marks = marks;
-    }
-
-    /** default constructor */
-    public SubmitFilesReport() {
-    }
-
-    /**
-     *
-     *
-     */
-    public Long getReportID() {
-	return this.reportID;
-    }
-
-    public void setReportID(Long reportID) {
-	this.reportID = reportID;
-    }
-
-    /**
-     *
-     */
-    public String getComments() {
-	return this.comments;
-    }
-
-    public void setComments(String comments) {
-	this.comments = comments;
-    }
-
-    /**
-     *
-     */
-    public Float getMarks() {
-	return this.marks;
-    }
-
-    public void setMarks(Float marks) {
-	this.marks = marks;
-    }
-
-    /**
-     *
-     */
-    public Long getMarkFileUUID() {
-	return markFileUUID;
-    }
-
-    public void setMarkFileUUID(Long markFileUUID) {
-	this.markFileUUID = markFileUUID;
-    }
-
-    /**
-     *
-     */
-    public String getMarkFileName() {
-	return markFileName;
-    }
-
-    public void setMarkFileName(String markFileName) {
-	this.markFileName = markFileName;
-    }
-
-    /**
-     *
-     */
-    public Long getMarkFileVersionID() {
-	return markFileVersionID;
-    }
-
-    public void setMarkFileVersionID(Long markFileVersionID) {
-	this.markFileVersionID = markFileVersionID;
-    }
 
     @Override
     public String toString() {
@@ -143,11 +95,6 @@ public class SubmitFilesReport implements Serializable, Cloneable {
 		.append("marks", getMarks()).toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public Object clone() {
 
@@ -179,5 +126,65 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getReportID()).append(getComments()).append(getMarks()).toHashCode();
+    }
+
+    // ***********************************************************
+    // Get / Set methods
+    // ***********************************************************
+
+    public Long getReportID() {
+	return this.reportID;
+    }
+
+    public void setReportID(Long reportID) {
+	this.reportID = reportID;
+    }
+
+    public SubmissionDetails getDetails() {
+	return details;
+    }
+
+    public void setDetails(SubmissionDetails details) {
+	this.details = details;
+    }
+
+    public String getComments() {
+	return this.comments;
+    }
+
+    public void setComments(String comments) {
+	this.comments = comments;
+    }
+
+    public Float getMarks() {
+	return this.marks;
+    }
+
+    public void setMarks(Float marks) {
+	this.marks = marks;
+    }
+
+    public Long getMarkFileUUID() {
+	return markFileUUID;
+    }
+
+    public void setMarkFileUUID(Long markFileUUID) {
+	this.markFileUUID = markFileUUID;
+    }
+
+    public String getMarkFileName() {
+	return markFileName;
+    }
+
+    public void setMarkFileName(String markFileName) {
+	this.markFileName = markFileName;
+    }
+
+    public Long getMarkFileVersionID() {
+	return markFileVersionID;
+    }
+
+    public void setMarkFileVersionID(Long markFileVersionID) {
+	this.markFileVersionID = markFileVersionID;
     }
 }

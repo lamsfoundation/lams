@@ -22,40 +22,56 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt;
+package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 
 /**
- *
- *
  * @author Steve.Ni
- *
- * @version $Revision$
- * @serial 4951104689120529660L;
  */
+@Entity
+@Table(name = "tl_lasbmt11_user")
 public class SubmitUser implements Serializable, Cloneable {
-
     private static final long serialVersionUID = 4951104689120529660L;
     private static Logger log = Logger.getLogger(SubmitUser.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    // lams User ID
+
+    @Column(name = "user_id")
     private Integer userID;
+    
+    @Column(name = "first_name")
     private String firstName;
+    
+    @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "login_name")
     private String login;
+    
+    @Column(name = "session_id")
     private Long sessionID;
+    
+    @Column(name = "content_id")
     private Long contentID;
 
+    @Column
     private boolean finished;
 
     @Override
     public Object clone() {
-
 	SubmitUser user = null;
 	try {
 	    user = (SubmitUser) super.clone();
@@ -71,8 +87,8 @@ public class SubmitUser implements Serializable, Cloneable {
     // ***********************************************************
     // Get / Set methods
     // ***********************************************************
+    
     /**
-     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -88,7 +104,6 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     *
      * @return Returns the userID.
      */
     public Integer getUserID() {
@@ -104,7 +119,6 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     *
      * @return Returns the finished.
      */
     public boolean isFinished() {
@@ -120,7 +134,6 @@ public class SubmitUser implements Serializable, Cloneable {
     }
 
     /**
-     *
      * @return Returns the sessionID.
      */
     public Long getSessionID() {
@@ -135,9 +148,6 @@ public class SubmitUser implements Serializable, Cloneable {
 	this.sessionID = sessionID;
     }
 
-    /**
-     *
-     */
     public String getFirstName() {
 	return firstName;
     }
@@ -146,9 +156,6 @@ public class SubmitUser implements Serializable, Cloneable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     */
     public String getLogin() {
 	return login;
     }
@@ -157,9 +164,6 @@ public class SubmitUser implements Serializable, Cloneable {
 	this.login = loginName;
     }
 
-    /**
-     *
-     */
     public String getLastName() {
 	return lastName;
     }
@@ -168,10 +172,6 @@ public class SubmitUser implements Serializable, Cloneable {
 	this.lastName = secondName;
     }
 
-    /**
-     *
-     * @return Returns the sessionID.
-     */
     public Long getContentID() {
 	return contentID;
     }

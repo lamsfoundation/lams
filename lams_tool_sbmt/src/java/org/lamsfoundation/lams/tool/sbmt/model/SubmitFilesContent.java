@@ -22,68 +22,89 @@
  */
 
 
-package org.lamsfoundation.lams.tool.sbmt;
+package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 
-/**
- *
- * @serial 9072799761861936838L
- */
+@Entity
+@Table(name = "tl_lasbmt11_content")
 public class SubmitFilesContent implements Serializable, Cloneable {
-
     private static final long serialVersionUID = 9072799761861936838L;
-
     private static Logger log = Logger.getLogger(SubmitFilesContent.class);
 
-    /** identifier field */
+    @Id
+    @Column(name = "content_id")
     private Long contentID;
 
-    /** persistent field */
     // basic tab fields
+    
+    @Column(nullable = false)
     private String title;
-
+    
+    @Column(nullable = false)
     private String instruction;
 
     // advance tab fields
+    
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
+    @Column(name = "mark_release_notify")
     private boolean notifyLearnersOnMarkRelease;
 
+    @Column(name = "file_submit_notify")
     private boolean notifyTeachersOnFileSubmit;
 
     // system level fields
+    
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
     
+    @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
+    @Column(name = "limit_upload")
     private boolean limitUpload;
 
+    @Column(name = "limit_upload_number")
     private int limitUploadNumber;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column
     private Date created;
 
+    @Column
     private Date updated;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "created_by")
     private SubmitUser createdBy;
-
-    /** default constructor */
-    public SubmitFilesContent() {
-    }
 
     /**
      * Copy constructor to create a new SubmitFiles tool's content.
@@ -99,39 +120,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	SubmitFilesContent newContent = (SubmitFilesContent) content.clone();
 	newContent.setContentID(newContentID);
 	return newContent;
-    }
-
-    /**
-     *
-     */
-    public Long getContentID() {
-	return contentID;
-    }
-
-    public void setContentID(Long contentID) {
-	this.contentID = contentID;
-    }
-
-    /**
-     *
-     */
-    public String getTitle() {
-	return title;
-    }
-
-    public void setTitle(String title) {
-	this.title = title;
-    }
-
-    /**
-     *
-     */
-    public String getInstruction() {
-	return instruction;
-    }
-
-    public void setInstruction(String instructions) {
-	instruction = instructions;
     }
 
     @Override
@@ -159,50 +147,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	return new HashCodeBuilder().append(getContentID()).append(getTitle()).append(getInstruction()).toHashCode();
     }
 
-    /**
-     *
-     */
-    public boolean isDefineLater() {
-	return defineLater;
-    }
-
-    public void setDefineLater(boolean defineLater) {
-	this.defineLater = defineLater;
-    }
-
-    /**
-     *
-     * @return Returns the contentInUse.
-     */
-    public boolean isContentInUse() {
-	return contentInUse;
-    }
-
-    /**
-     * @param contentInUse
-     *            The contentInUse to set.
-     */
-    public void setContentInUse(boolean contentInUse) {
-	this.contentInUse = contentInUse;
-    }
-
-    /**
-     *
-     *
-     * @return Returns the lockOnFinished.
-     */
-    public boolean isLockOnFinished() {
-	return lockOnFinished;
-    }
-
-    /**
-     * @param lockOnFinished
-     *            The lockOnFinished to set.
-     */
-    public void setLockOnFinished(boolean lockOnFinished) {
-	this.lockOnFinished = lockOnFinished;
-    }
-
     @Override
     public Object clone() {
 	SubmitFilesContent content = null;
@@ -222,10 +166,72 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	return content;
     }
 
+    // ***********************************************************
+    // Get / Set methods
+    // ***********************************************************
+
+    public Long getContentID() {
+	return contentID;
+    }
+
+    public void setContentID(Long contentID) {
+	this.contentID = contentID;
+    }
+
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    public String getInstruction() {
+	return instruction;
+    }
+
+    public void setInstruction(String instructions) {
+	instruction = instructions;
+    }
+
+    public boolean isDefineLater() {
+	return defineLater;
+    }
+
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
+
     /**
-     *
-     * @return
+     * @return Returns the contentInUse.
      */
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
+
+    /**
+     * @param contentInUse
+     *            The contentInUse to set.
+     */
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
+
+    /**
+     * @return Returns the lockOnFinished.
+     */
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
+
+    /**
+     * @param lockOnFinished
+     *            The lockOnFinished to set.
+     */
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
+
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -234,10 +240,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -246,10 +248,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isLimitUpload() {
 	return limitUpload;
     }
@@ -258,10 +256,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.limitUpload = limitUpload;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getLimitUploadNumber() {
 	return limitUploadNumber;
     }
@@ -270,10 +264,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.limitUploadNumber = limitUploadNumber;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreated() {
 	return created;
     }
@@ -282,11 +272,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.created = created;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public SubmitUser getCreatedBy() {
 	return createdBy;
     }
@@ -295,10 +280,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getUpdated() {
 	return updated;
     }
@@ -307,10 +288,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.updated = updated;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
     }
@@ -319,10 +296,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.submissionDeadline = submissionDeadline;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isNotifyLearnersOnMarkRelease() {
 	return notifyLearnersOnMarkRelease;
     }
@@ -331,10 +304,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isNotifyTeachersOnFileSubmit() {
 	return notifyTeachersOnFileSubmit;
     }

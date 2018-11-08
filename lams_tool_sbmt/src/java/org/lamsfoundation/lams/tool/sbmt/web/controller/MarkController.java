@@ -81,7 +81,7 @@ public class MarkController {
 
 	String comments = WebUtil.readStrParam(request, "comments", true);
 	if (!errorMap.isEmpty()) {
-	    List report = new ArrayList<FileDetailsDTO>();
+	    List<FileDetailsDTO> report = new ArrayList<>();
 	    FileDetailsDTO fileDetail = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	    // echo back the input, even they are wrong.
 	    fileDetail.setComments(comments);
@@ -161,7 +161,7 @@ public class MarkController {
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);
 
-	List report = new ArrayList<FileDetailsDTO>();
+	List<FileDetailsDTO> report = new ArrayList<>();
 	report.add(submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale()));
 
 	request.setAttribute("updateMode", markForm.getUpdateMode());

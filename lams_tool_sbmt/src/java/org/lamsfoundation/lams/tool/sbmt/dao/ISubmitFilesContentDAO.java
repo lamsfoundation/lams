@@ -26,7 +26,7 @@
 package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
 
 /**
  * @author Manpreet Minhas

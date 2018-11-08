@@ -31,14 +31,14 @@ import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterExcep
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesReport;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -214,7 +214,7 @@ public interface ISubmitFilesService {
      * @return a list of SubmitFileSession
      */
     // public List getSubmitFilesSessionsByContentID(Long contentID);
-    public List getSubmitFilesSessionByContentID(Long contentID);
+    public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID);
 
     /**
      * Save or update tool content into database.
