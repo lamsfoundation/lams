@@ -29,65 +29,97 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
- * Survey
- *
  * @author Dapeng Ni
- *
- *
- *
  */
+
+@Entity
+@Table(name = "tl_lasurv11_survey")
 public class Survey implements Cloneable {
 
     private static final Logger log = Logger.getLogger(Survey.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    // tool contentID
+
+    @Column(name = "content_id")
     private Long contentId;
+
+    @Column
     private String title;
+
+    @Column
     private String instructions;
-    // advance
+
+    @Column(name = "show_questions_on_one_page")
     private boolean showOnePage;
+
+    @Column(name = "show_other_users_answers")
     private boolean showOtherUsersAnswers;
+
+    @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
+
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "define_later")
     private boolean defineLater;
+
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "answer_submit_notify")
     private boolean notifyTeachersOnAnswerSumbit;
 
-    // general infomation
+    @Column(name = "create_date")
     private Date created;
+
+    @Column(name = "update_date")
     private Date updated;
+
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private SurveyUser createdBy;
 
-    // survey Items
-    private Set<SurveyQuestion> questions;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "survey_uid")
+    @OrderBy("sequence_id")
+    private Set<SurveyQuestion> questions = new HashSet<SurveyQuestion>();
 
-    // conditions
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_uid")
+    @SortComparator(TextSearchConditionComparator.class)
     private Set<SurveyCondition> conditions = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
 
-    /**
-     * Default contruction method.
-     *
-     */
-    public Survey() {
-	questions = new HashSet<SurveyQuestion>();
-    }
-
-    // **********************************************************
-    // Function method for Survey
-    // **********************************************************
     public static Survey newInstance(Survey defaultContent, Long contentId) {
 	Survey toContent = new Survey();
 	toContent = (Survey) defaultContent.clone();
@@ -112,10 +144,10 @@ public class Survey implements Cloneable {
 	    survey = (Survey) super.clone();
 	    survey.setUid(null);
 	    if (questions != null) {
-		Iterator iter = questions.iterator();
+		Iterator<SurveyQuestion> iter = questions.iterator();
 		Set<SurveyQuestion> set = new HashSet<SurveyQuestion>();
 		while (iter.hasNext()) {
-		    SurveyQuestion item = (SurveyQuestion) iter.next();
+		    SurveyQuestion item = iter.next();
 		    SurveyQuestion newItem = (SurveyQuestion) item.clone();
 		    set.add(newItem);
 		}
@@ -174,14 +206,8 @@ public class Survey implements Cloneable {
 	this.setUpdated(new Date(now));
     }
 
-    // **********************************************************
-    // get/set methods
-    // **********************************************************
     /**
      * Returns the object's creation date
-     *
-     * @return date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -189,8 +215,6 @@ public class Survey implements Cloneable {
 
     /**
      * Sets the object's creation date
-     *
-     * @param created
      */
     public void setCreated(Date created) {
 	this.created = created;
@@ -198,9 +222,6 @@ public class Survey implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     *
-     * @return date updated
-     *
      */
     public Date getUpdated() {
 	return updated;
@@ -208,8 +229,6 @@ public class Survey implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     *
-     * @param updated
      */
     public void setUpdated(Date updated) {
 	this.updated = updated;
@@ -217,25 +236,18 @@ public class Survey implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share surveys.
-     *
-     *
-     *
      */
     public SurveyUser getCreatedBy() {
 	return createdBy;
     }
 
     /**
-     * @param createdBy
-     *            The userid of the user who created this Share surveys.
+     * The userid of the user who created this Share surveys.
      */
     public void setCreatedBy(SurveyUser createdBy) {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -244,37 +256,20 @@ public class Survey implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     * @return Returns the title.
-     *
-     *
-     *
-     */
     public String getTitle() {
 	return title;
     }
 
-    /**
-     * @param title
-     *            The title to set.
-     */
     public void setTitle(String title) {
 	this.title = title;
     }
 
-    /**
-     * @return Returns the lockWhenFinish.
-     *
-     *
-     *
-     */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
     }
 
     /**
-     * @param lockWhenFinished
-     *            Set to true to lock the survey for finished users.
+     * Set to true to lock the survey for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -282,8 +277,6 @@ public class Survey implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -293,27 +286,14 @@ public class Survey implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
     public Set<SurveyQuestion> getQuestions() {
 	return questions;
     }
 
-    public void setQuestions(Set questions) {
+    public void setQuestions(Set<SurveyQuestion> questions) {
 	this.questions = questions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -322,10 +302,6 @@ public class Survey implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -334,10 +310,6 @@ public class Survey implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -346,10 +318,6 @@ public class Survey implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -358,10 +326,6 @@ public class Survey implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -370,10 +334,6 @@ public class Survey implements Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShowOnePage() {
 	return showOnePage;
     }
@@ -382,10 +342,6 @@ public class Survey implements Cloneable {
 	this.showOnePage = showOnePage;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShowOtherUsersAnswers() {
 	return showOtherUsersAnswers;
     }
@@ -394,10 +350,6 @@ public class Survey implements Cloneable {
 	this.showOtherUsersAnswers = showOtherUsersAnswers;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isNotifyTeachersOnAnswerSumbit() {
 	return notifyTeachersOnAnswerSumbit;
     }
@@ -406,13 +358,6 @@ public class Survey implements Cloneable {
 	this.notifyTeachersOnAnswerSumbit = notifyTeachersOnAnswerSumbit;
     }
 
-    /**
-     *
-     * sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     *
-     *
-     *
-     */
     public Set<SurveyCondition> getConditions() {
 	return conditions;
     }
@@ -421,10 +366,6 @@ public class Survey implements Cloneable {
 	this.conditions = conditions;
     }
 
-    /**
-     *
-     * @return date submissionDeadline
-     */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
     }

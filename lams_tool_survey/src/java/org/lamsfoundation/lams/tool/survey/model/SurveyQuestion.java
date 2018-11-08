@@ -28,42 +28,69 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 
 /**
- * Survey
- *
  * @author Dapeng Ni
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_lasurv11_question")
 public class SurveyQuestion implements Cloneable {
     private static final Logger log = Logger.getLogger(SurveyQuestion.class);
     private static final int SHORT_TITLE_LENGTH = 60;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
     // Survey Type:1=Single Choice,2=Multiple Choice,3=Text Entry
+    @Column(name = "question_type")
     private short type;
 
+    @Column
     private String description;
+
+    @Column(name = "sequence_id")
     private int sequenceId;
 
-    // option of Question
+    @Column(name = "append_text")
     private boolean appendText;
+
+    @Column
     private boolean optional;
+
+    @Column(name = "allow_multiple_answer")
     private boolean allowMultipleAnswer;
 
-    private Set<SurveyOption> options;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "question_uid")
+    @OrderBy("sequence_id")
+    private Set<SurveyOption> options = new HashSet<SurveyOption>();
 
+    @Column(name = "create_date")
     private Date createDate;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private SurveyUser createBy;
 
-    // ***********************************************
-    // DTO fields:
+    @Transient
     private String shortTitle;
 
     @Override
@@ -73,10 +100,10 @@ public class SurveyQuestion implements Cloneable {
 	    obj = (SurveyQuestion) super.clone();
 	    // clone options
 	    if (options != null) {
-		Iterator iter = options.iterator();
-		Set set = new HashSet();
+		Iterator<SurveyOption> iter = options.iterator();
+		Set<SurveyOption> set = new HashSet<SurveyOption>();
 		while (iter.hasNext()) {
-		    SurveyOption instruct = (SurveyOption) iter.next();
+		    SurveyOption instruct = iter.next();
 		    SurveyOption newInsruct = (SurveyOption) instruct.clone();
 		    set.add(newInsruct);
 		}
@@ -95,29 +122,14 @@ public class SurveyQuestion implements Cloneable {
 	return obj;
     }
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -126,12 +138,6 @@ public class SurveyQuestion implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     *
-     *
-     * @return
-     */
     public Set<SurveyOption> getOptions() {
 	return options;
     }
@@ -140,11 +146,6 @@ public class SurveyQuestion implements Cloneable {
 	this.options = itemInstructions;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public SurveyUser getCreateBy() {
 	return createBy;
     }
@@ -153,10 +154,6 @@ public class SurveyQuestion implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -165,10 +162,6 @@ public class SurveyQuestion implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public short getType() {
 	return type;
     }
@@ -177,10 +170,6 @@ public class SurveyQuestion implements Cloneable {
 	this.type = type;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAppendText() {
 	return appendText;
     }
@@ -189,10 +178,6 @@ public class SurveyQuestion implements Cloneable {
 	this.appendText = appendText;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isOptional() {
 	return optional;
     }
@@ -201,10 +186,6 @@ public class SurveyQuestion implements Cloneable {
 	this.optional = compulsory;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowMultipleAnswer() {
 	return allowMultipleAnswer;
     }
@@ -213,10 +194,6 @@ public class SurveyQuestion implements Cloneable {
 	this.allowMultipleAnswer = allowMultipleAnswer;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getSequenceId() {
 	return sequenceId;
     }

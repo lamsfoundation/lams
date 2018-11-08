@@ -52,7 +52,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with SurveyCondition. The rest of operations are located in
@@ -134,7 +133,7 @@ public class AuthoringConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/saveOrUpdateCondition", method = RequestMethod.POST)
+    @RequestMapping(value = "/saveOrUpdateCondition")
     public String saveOrUpdateCondition(@ModelAttribute("surveyConditionForm") SurveyConditionForm surveyConditionForm,
 	    HttpServletRequest request) {
 

@@ -20,13 +20,19 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.model;
 
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -40,17 +46,19 @@ import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 /**
  * A text search condition with a set of questions on answers to which the search should be performed.
  *
- *
  * @author Marcin Cieslak
- *
  */
+@Entity
+@Table(name = "tl_lasurv11_conditions")
 public class SurveyCondition extends TextSearchCondition {
     /**
      * Questions linked to this condition. Answers to them will be scanned for the words that make the condition's
      * parameters.
      */
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "tl_lasurv11_condition_questions", joinColumns = @JoinColumn(name = "condition_id"), inverseJoinColumns = @JoinColumn(name = "question_uid"))
+    @OrderBy("question_uid")
     private Set<SurveyQuestion> questions = new TreeSet<SurveyQuestion>(new QuestionsComparator());
-    private static Logger log = Logger.getLogger(SurveyCondition.class);
 
     public SurveyCondition() {
 
