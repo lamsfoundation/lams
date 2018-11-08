@@ -26,6 +26,18 @@ package org.lamsfoundation.lams.tool.daco.model;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -36,29 +48,43 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_ladaco10_sessions")
 public class DacoSession {
 
     private static Logger log = Logger.getLogger(DacoSession.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+
+    @Column(name = "session_name")
     private String sessionName;
+
+    @ManyToOne 
+    @JoinColumn(name = "content_uid") 
     private Daco daco;
+
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
+    
     // finish or not
+    @Column
     private int status;
-    // daco Questions
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "session_uid")
+    @OrderBy("createDate")
     private Set<DacoQuestion> dacoQuestions;
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-    /**
-     *
-     * @return Returns the learnerID.
-     */
-    public Long getUid() {
+     public Long getUid() {
 	return uid;
     }
 
@@ -66,10 +92,6 @@ public class DacoSession {
 	uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -78,11 +100,6 @@ public class DacoSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     * 
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -91,10 +108,6 @@ public class DacoSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -103,10 +116,6 @@ public class DacoSession {
 	this.status = status;
     }
 
-    /**
-     *
-     * @return
-     */
     public Daco getDaco() {
 	return daco;
     }
@@ -115,10 +124,6 @@ public class DacoSession {
 	this.daco = daco;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -127,32 +132,14 @@ public class DacoSession {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * @return Returns the session name
-     */
     public String getSessionName() {
 	return sessionName;
     }
 
-    /**
-     * 
-     * @param sessionName
-     *            The session name to set.
-     */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
 
-    /**
-     * 
-     * 
-     *
-     *
-     *
-     * 
-     * @return
-     */
     public Set<DacoQuestion> getDacoQuestions() {
 	return dacoQuestions;
     }

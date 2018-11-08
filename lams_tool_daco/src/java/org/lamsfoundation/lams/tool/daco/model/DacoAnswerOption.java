@@ -22,6 +22,13 @@
  */
 package org.lamsfoundation.lams.tool.daco.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -32,23 +39,22 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_ladaco10_answer_options")
 public class DacoAnswerOption implements Cloneable {
     private static final Logger log = Logger.getLogger(DacoQuestion.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "sequence_num")
     private Integer sequenceNumber;
 
+    @Column(name = "answer_option")
     private String answerOption;
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-
-    /**
-     *
-     * @return Returns the answer ID.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -57,10 +63,6 @@ public class DacoAnswerOption implements Cloneable {
 	uid = uuid;
     }
 
-    /**
-     *
-     * @return Returns the sequence number.
-     */
     public Integer getSequenceNumber() {
 	return sequenceNumber;
     }
@@ -69,10 +71,6 @@ public class DacoAnswerOption implements Cloneable {
 	this.sequenceNumber = sequenceNumber;
     }
 
-    /**
-     *
-     * @return Returns the possible answer.
-     */
     public String getAnswerOption() {
 	return answerOption;
     }

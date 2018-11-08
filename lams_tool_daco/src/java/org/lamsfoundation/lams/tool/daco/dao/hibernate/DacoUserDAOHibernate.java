@@ -188,7 +188,7 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 		" JOIN tl_ladaco10_sessions sess on user.session_uid = sess.uid and sess.session_id = :sessionId");
 	buildNameSearch(queryText, searchString);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
+	List list = getSession().createNativeQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
 		.list();
 	if (list == null || list.size() == 0) {
 	    return 0;
