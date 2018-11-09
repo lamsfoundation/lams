@@ -6,8 +6,7 @@
  */
 package org.hibernate.engine.query.spi;
 
-import java.io.Serializable;
-
+import org.hibernate.Incubating;
 import org.hibernate.type.Type;
 
 /**
@@ -15,33 +14,30 @@ import org.hibernate.type.Type;
  *
  * @author Steve Ebersole
  */
-public class OrdinalParameterDescriptor implements Serializable {
-	private final int ordinalPosition;
-	private final Type expectedType;
-	private final int sourceLocation;
+@Incubating
+public class OrdinalParameterDescriptor extends AbstractParameterDescriptor {
+	private final int label;
+	private final int valuePosition;
 
 	/**
 	 * Constructs an ordinal parameter descriptor.
-	 *
-	 * @param ordinalPosition The ordinal position
-	 * @param expectedType The expected type of the parameter
-	 * @param sourceLocation The location of the parameter
 	 */
-	public OrdinalParameterDescriptor(int ordinalPosition, Type expectedType, int sourceLocation) {
-		this.ordinalPosition = ordinalPosition;
-		this.expectedType = expectedType;
-		this.sourceLocation = sourceLocation;
+	public OrdinalParameterDescriptor(
+			int label,
+			int valuePosition,
+			Type expectedType,
+			int[] sourceLocations) {
+		super( sourceLocations, expectedType );
+		this.label = label;
+		this.valuePosition = valuePosition;
 	}
 
-	public int getOrdinalPosition() {
-		return ordinalPosition;
+	@Override
+	public Integer getPosition() {
+		return label;
 	}
 
-	public Type getExpectedType() {
-		return expectedType;
-	}
-
-	public int getSourceLocation() {
-		return sourceLocation;
+	public int getValuePosition() {
+		return valuePosition;
 	}
 }

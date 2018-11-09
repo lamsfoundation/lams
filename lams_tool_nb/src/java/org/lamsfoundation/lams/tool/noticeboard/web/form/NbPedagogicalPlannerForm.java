@@ -23,7 +23,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import org.lamsfoundation.lams.planner.PedagogicalPlannerActivitySpringForm;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

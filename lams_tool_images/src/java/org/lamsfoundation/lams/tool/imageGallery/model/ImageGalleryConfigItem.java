@@ -23,24 +23,32 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
-/**
- *
- */
-public class ImageGalleryConfigItem implements java.io.Serializable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "tl_laimag10_configuration")
+public class ImageGalleryConfigItem implements java.io.Serializable {
     private static final long serialVersionUID = 6360672537352753361L;
 
     public static final String KEY_MEDIUM_IMAGE_DIMENSIONS = "mediumImageDimensions";
     public static final String KEY_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
 
-    Long id;
-    String configKey;
-    String configValue;
+    @Id
+    @Column(name = "uid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "config_key")
+    private String configKey;
+    
+    @Column(name = "config_value")
+    private String configValue;
 
-    /**
-     *
-     *
-     */
     public Long getId() {
 	return id;
     }
@@ -49,9 +57,6 @@ public class ImageGalleryConfigItem implements java.io.Serializable {
 	this.id = id;
     }
 
-    /**
-     *
-     */
     public String getConfigKey() {
 	return configKey;
     }
@@ -60,9 +65,6 @@ public class ImageGalleryConfigItem implements java.io.Serializable {
 	this.configKey = configKey;
     }
 
-    /**
-     *
-     */
     public String getConfigValue() {
 	return configValue;
     }

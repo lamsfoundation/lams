@@ -25,10 +25,18 @@ package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@SuppressWarnings("serial")
+@Entity
+@DiscriminatorValue("2")
 public class AuthoredItemRatingCriteria extends ToolActivityRatingCriteria implements Cloneable, Serializable {
     /** Holds value of property itemId. */
+    @Column(name = "item_id")
     private Long itemId;
 
     @Override

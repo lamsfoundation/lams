@@ -40,9 +40,6 @@ public class LeaderselectionUserDAO extends LAMSBaseDAO implements ILeaderselect
     private static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + LeaderselectionUser.class.getName()
 	    + " as f" + " where user_id=? and f.leaderselectionSession.sessionId=?";
 
-    private static final String SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID = "from " + LeaderselectionUser.class.getName()
-	    + " as f where login_name=? and f.leaderselectionSession.sessionId=?";
-
     private static final String SQL_QUERY_FIND_BY_UID = "from " + LeaderselectionUser.class.getName() + " where uid=?";
 
     private static final String FIND_BY_SESSION_ID = "from " + LeaderselectionUser.class.getName()

@@ -27,51 +27,80 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
+import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 
+@Entity
+@Table(name = "lams_group")
 public class Group implements Serializable, Nullable, Comparable<Group> {
+    private static final long serialVersionUID = 5654513153596816881L;
 
     public final static int STAFF_GROUP_ORDER_ID = 2;
     public final static String NAME_OF_STAFF_GROUP = "Staff Group";
 
-    /** identifier field */
+    @Id
+    @Column(name = "group_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
 
+    @Column(name = "group_name")
     private String groupName;
 
-    /** persistent field */
+    @Column(name = "order_id")
     private int orderId;
 
     /**
      * Authoring generated value. Unique per LearningDesign.
      */
+    @Column(name = "group_ui_id")
     private Integer groupUIID;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "grouping_id", updatable = false)
     private Grouping grouping;
 
-    /** persistent field */
-    private Set<User> users;
+    @ManyToMany
+    @JoinTable(name = "lams_user_group", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @BatchSize(size = 20)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<User> users = new HashSet<User>();
 
-    /** persistent field */
-    private Set toolSessions;
+    @OneToMany(mappedBy = "sessionGroup")
+    @BatchSize(size = 20)
+    private Set<GroupedToolSession> toolSessions = new HashSet<GroupedToolSession>();
 
-    /** persistent field */
-    private Set branchActivities;
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private Set<BranchActivityEntry> branchActivities = new HashSet<BranchActivityEntry>();
 
     // ---------------------------------------------------------------------
     // Object creation Methods
     // ---------------------------------------------------------------------
 
     /** full constructor */
-    public Group(Long groupId, String groupName, int orderId, Integer groupUIID, Grouping grouping, Set users,
-	    Set toolSessions, Set branchActivities) {
+    public Group(Long groupId, String groupName, int orderId, Integer groupUIID, Grouping grouping, Set<User> users,
+	    Set<GroupedToolSession> toolSessions, Set<BranchActivityEntry> branchActivities) {
 	this.groupId = groupId;
 	this.groupName = groupName;
 	this.orderId = orderId;
@@ -92,10 +121,11 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      *            the users in this group.
      * @return the new learner group
      */
-    public static Group createLearnerGroup(Grouping grouping, String groupName, Set users) {
+    public static Group createLearnerGroup(Grouping grouping, String groupName, Set<User> users) {
 	int nextOrderId = grouping.getNextGroupOrderIdCheckName(groupName);
 	if (nextOrderId > -1) {
-	    return new Group(null, groupName, nextOrderId, null, grouping, users, new HashSet(), null);
+	    return new Group(null, groupName, nextOrderId, null, grouping, users, new HashSet<GroupedToolSession>(),
+		    null);
 	}
 	return null;
     }
@@ -114,8 +144,8 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      *            all tool sessions included in this group
      * @return the new learner group
      */
-    public static Group createLearnerGroupWithToolSession(Grouping grouping, String groupName, Set users,
-	    Set toolSessions) {
+    public static Group createLearnerGroupWithToolSession(Grouping grouping, String groupName, Set<User> users,
+	    Set<GroupedToolSession> toolSessions) {
 	int nextOrderId = grouping.getNextGroupOrderIdCheckName(groupName);
 	if (nextOrderId > -1) {
 	    return new Group(null, groupName, nextOrderId, null, grouping, users, toolSessions, null);
@@ -135,8 +165,9 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      *
      * @return the new staff group.
      */
-    public static Group createStaffGroup(Grouping grouping, String groupName, Set staffs) {
-	return new Group(null, groupName, Group.STAFF_GROUP_ORDER_ID, null, grouping, staffs, new HashSet(), null);
+    public static Group createStaffGroup(Grouping grouping, String groupName, Set<User> staffs) {
+	return new Group(null, groupName, Group.STAFF_GROUP_ORDER_ID, null, grouping, staffs,
+		new HashSet<GroupedToolSession>(), null);
     }
 
     /** default constructor */
@@ -186,30 +217,19 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
 	this.grouping = grouping;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Set<User> getUsers() {
 	return this.users;
     }
 
-    public void setUsers(Set userGroups) {
+    public void setUsers(Set<User> userGroups) {
 	this.users = userGroups;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
-    public Set getToolSessions() {
+    public Set<GroupedToolSession> getToolSessions() {
 	return this.toolSessions;
     }
 
-    public void setToolSessions(Set toolSessions) {
+    public void setToolSessions(Set<GroupedToolSession> toolSessions) {
 	this.toolSessions = toolSessions;
     }
 
@@ -217,17 +237,12 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      * Maps the branch activities appropriate for this Group. Normally there is only one branch per branching activity
      * that is applicable to a group, but this may be changed in the future. If the group is applied to multiple
      * branching activities, then there will be multiple branches - one for each branching activity.
-     *
-     *
-     *
-     *
-     *
      */
-    public Set getBranchActivities() {
+    public Set<BranchActivityEntry> getBranchActivities() {
 	return this.branchActivities;
     }
 
-    public void setBranchActivities(Set branchActivities) {
+    public void setBranchActivities(Set<BranchActivityEntry> branchActivities) {
 	this.branchActivities = branchActivities;
     }
 
@@ -315,12 +330,9 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      * Create a copy of this group, without copying the users or tool sessions. Copies any group to branch mappings,
      * updating the group but not the activity.
      */
-    @SuppressWarnings("unchecked")
     public Group createCopy(Grouping newGrouping) {
-
 	Group newGroup = new Group(null, this.getGroupName(), this.getOrderId(), this.getGroupUIID(), newGrouping, null,
 		null, null);
-
 	return newGroup;
     }
 
@@ -331,9 +343,6 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
     public BranchActivityEntry allocateBranchToGroup(Integer entryUIID, SequenceActivity branch,
 	    BranchingActivity branchingActivity) {
 	BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, branchingActivity, this);
-	if (getBranchActivities() == null) {
-	    setBranchActivities(new HashSet());
-	}
 	getBranchActivities().add(entry);
 	return entry;
     }

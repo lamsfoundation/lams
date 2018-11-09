@@ -24,9 +24,21 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 
 /**
@@ -34,33 +46,58 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_lascrt11_session")
 public class ScratchieSession {
 
-    private static Logger log = Logger.getLogger(ScratchieSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+    
+    @ManyToOne
+    @JoinColumn(name = "scratchie_uid")
     private Scratchie scratchie;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
+    
     //date when user has started activity (pressed start button) that has time limitation
+    @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
+    
     // finish or not
+    @Column
     private int status;
-    // scratchie Items
-    private Set scratchieItems;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("create_date DESC")
+    @JoinColumn(name = "session_uid")
+    private Set<ScratchieItem> scratchieItems = new HashSet<>();
+    
+    @ManyToOne
+    @JoinColumn(name = "group_leader_uid")
     private ScratchieUser groupLeader;
+    
+    @Column
     private int mark;
+    
+    @Column(name = "scratching_finished")
     private boolean scratchingFinished;
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the learnerID.
-     */
+
     public Long getUid() {
 	return uid;
     }
@@ -69,10 +106,6 @@ public class ScratchieSession {
 	this.uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -81,10 +114,6 @@ public class ScratchieSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getTimeLimitLaunchedDate() {
 	return timeLimitLaunchedDate;
     }
@@ -93,11 +122,6 @@ public class ScratchieSession {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -106,10 +130,6 @@ public class ScratchieSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -118,10 +138,6 @@ public class ScratchieSession {
 	this.status = status;
     }
 
-    /**
-     *
-     * @return
-     */
     public Scratchie getScratchie() {
 	return scratchie;
     }
@@ -130,10 +146,6 @@ public class ScratchieSession {
 	this.scratchie = scratchie;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -151,7 +163,6 @@ public class ScratchieSession {
     }
 
     /**
-     *
      * @param sessionName
      *            The session name to set.
      */
@@ -159,27 +170,14 @@ public class ScratchieSession {
 	this.sessionName = sessionName;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getScratchieItems() {
+    public Set<ScratchieItem> getScratchieItems() {
 	return scratchieItems;
     }
 
-    public void setScratchieItems(Set scratchieItems) {
+    public void setScratchieItems(Set<ScratchieItem> scratchieItems) {
 	this.scratchieItems = scratchieItems;
     }
 
-    /**
-     *
-     *
-     */
     public ScratchieUser getGroupLeader() {
 	return this.groupLeader;
     }
@@ -189,14 +187,12 @@ public class ScratchieSession {
     }
 
     public boolean isUserGroupLeader(Long userUid) {
-
 	boolean isUserLeader = (this.groupLeader != null) && userUid.equals(this.groupLeader.getUid());
 	return isUserLeader;
     }
 
     /**
      * Mark scored by a leader and shared by all users in a group.
-     *
      *
      * @return
      */
@@ -211,7 +207,6 @@ public class ScratchieSession {
     /**
      * Indicates whether leader has pressed Continue button in learning thus finishing scratching. And is shared by all
      * users in a group.
-     *
      *
      * @return
      */

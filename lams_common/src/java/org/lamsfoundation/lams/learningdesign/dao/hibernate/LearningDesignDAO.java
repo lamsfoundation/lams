@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
@@ -42,10 +42,10 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     private static final String TABLENAME = "lams_learning_design";
     private static final String VALID_IN_FOLDER = "from " + TABLENAME + " in class " + LearningDesign.class.getName()
-	    + " where valid_design_flag=true AND workspace_folder_id=? AND removed=0";
+	    + " where valid_design_flag=true AND workspace_folder_id=:workspace_folder_id AND removed=0";
 
     private static final String ALL_IN_FOLDER = "from " + TABLENAME + " in class " + LearningDesign.class.getName()
-	    + " where workspace_folder_id=? AND removed=0";
+	    + " where workspace_folder_id=:workspace_folder_id AND removed=0";
 
     private static final String FIND_BY_ORIGINAL = "from " + TABLENAME + " in class " + LearningDesign.class.getName()
 	    + " where original_learning_design_id=? AND removed=0";
@@ -53,7 +53,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 	    + " where workspace_folder_id=? AND title like ? AND removed=0";
 
     private static final String ACCESS_BY_USER = "from " + LearningDesignAccess.class.getName()
-	    + " as a where a.userId = ? order by a.accessDate desc";
+	    + " as a where a.id.userId = ? order by a.accessDate desc";
 
     /*
      * @see
@@ -67,27 +67,27 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getAllValidLearningDesignsInFolder(java.lang.Integer)
      */
     @Override
     public List getAllValidLearningDesignsInFolder(Integer workspaceFolderID) {
-	return this.doFind(VALID_IN_FOLDER, workspaceFolderID);
+	return getSession().createQuery(VALID_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID).list();
     }
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getAllLearningDesignsInFolder(java.lang.Integer)
      */
     @Override
     public List getAllLearningDesignsInFolder(Integer workspaceFolderID) {
-	return this.doFind(ALL_IN_FOLDER, workspaceFolderID);
+	return getSession().createQuery(ALL_IN_FOLDER).setParameter("workspace_folder_id", workspaceFolderID).list();
     }
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see getLearningDesignsByOriginalDesign#getLearningDesignsByParent(java.lang.Long)
      */
     @Override
@@ -98,7 +98,7 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getLearningDesignTitlesByWorkspaceFolder(java.lang.Integer)
      */
     @Override
@@ -117,8 +117,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     public List<LearningDesign> getAllPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
 	    String sortName, String sortDate) {
 	String sortingOrder = setupSortString(sortName, sortDate);
-	Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder).setParameter(0,
-		workspaceFolderID.longValue());
+	Query query = getSession().createQuery(ALL_IN_FOLDER + sortingOrder).setParameter("workspace_folder_id",
+		workspaceFolderID);
 	if (page != null && size != null) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
@@ -131,8 +131,8 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     public List<LearningDesign> getValidPagedLearningDesigns(Integer workspaceFolderID, Integer page, Integer size,
 	    String sortName, String sortDate) {
 	String sortingOrder = setupSortString(sortName, sortDate);
-	Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder).setParameter(0,
-		workspaceFolderID.longValue());
+	Query query = getSession().createQuery(VALID_IN_FOLDER + sortingOrder).setParameter("workspace_folder_id",
+		workspaceFolderID);
 	if (page != null && size != null) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}

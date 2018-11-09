@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 
 /**
  * Import filter class for different version of Noticeboard content.

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public class CompetenceMappingDAO extends LAMSBaseDAO implements ICompetenceMappingDAO {
 
     private static final String LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE = "from lams_competence_mapping in class "
-	    + CompetenceMapping.class.getName() + " where competence_id=? AND activity_id=?";
+	    + CompetenceMapping.class.getName() + " where competence_id=:competence_id AND activity_id=:activity_id";
 
     @Override
     public void saveOrUpdate(CompetenceMapping competenceMapping) {
@@ -27,8 +27,8 @@ public class CompetenceMappingDAO extends LAMSBaseDAO implements ICompetenceMapp
 	    Long activityId = toolActivity.getActivityId();
 	    Long competenceId = competence.getCompetenceId();
 	    Query query = getSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
-	    query.setLong(0, competenceId);
-	    query.setLong(1, activityId.longValue());
+	    query.setLong("competence_id", competenceId);
+	    query.setLong("activity_id", activityId.longValue());
 	    return (CompetenceMapping) query.uniqueResult();
 	}
 	return null;

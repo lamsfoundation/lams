@@ -26,17 +26,31 @@ package org.lamsfoundation.lams.workspace;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 /**
  * @author Manpreet Minhas
  */
+@Entity
+@Table(name = "lams_workspace_folder_content")
 public class WorkspaceFolderContent implements Serializable {
 
-    public static final Integer CONTENT_TYPE_FILE = new Integer(1);
-    public static final Integer CONTENT_TYPE_PACKAGE = new Integer(2);
+    private static final long serialVersionUID = 3861351481415168595L;
+    public static final Integer CONTENT_TYPE_FILE = 1;
+    public static final Integer CONTENT_TYPE_PACKAGE = 2;
 
-    /** identifier field */
+    @Id
+    @Column(name = "folder_content_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long folderContentID;
 
     /**
@@ -45,18 +59,21 @@ public class WorkspaceFolderContent implements Serializable {
      * It can be either CONTENT_TYPE_FILE or
      * CONTENT_TYPE_PACKAGE
      */
+    @Column(name = "content_type_id")
     private Integer contentTypeID;
 
     /**
      * non-nullable persistent field
      * representing the name of the File
      **/
+    @Column
     private String name;
 
     /**
      * non-nullable persistent field
      * representing the description of the File
      **/
+    @Column
     private String description;
 
     /**
@@ -64,6 +81,7 @@ public class WorkspaceFolderContent implements Serializable {
      * representing the date the content
      * was created.
      **/
+    @Column(name = "create_date_time")
     private Date createDate;
 
     /**
@@ -71,6 +89,7 @@ public class WorkspaceFolderContent implements Serializable {
      * representing the date the content
      * was last modified.
      **/
+    @Column(name = "last_modified_date")
     private Date lastModified;
 
     /**
@@ -78,6 +97,7 @@ public class WorkspaceFolderContent implements Serializable {
      * part key - UUID and version, returned by the
      * ContentRepository once the content has been successfully updated.
      **/
+    @Column
     private Long uuid;
 
     /**
@@ -85,12 +105,14 @@ public class WorkspaceFolderContent implements Serializable {
      * part key - UUID and version, returned by the
      * ContentRepository once the content has been successfully updated.
      **/
+    @Column(name = "version_id")
     private Long versionID;
 
     /**
      * non-nullable persistent field
      * indicating the type of the file
      **/
+    @Column(name = "mime_type")
     private String mimeType;
 
     /**
@@ -98,6 +120,8 @@ public class WorkspaceFolderContent implements Serializable {
      * <code>WorkspaceFolder</code> that contains
      * this content
      **/
+    @ManyToOne
+    @JoinColumn(name = "workspace_folder_id")
     private WorkspaceFolder workspaceFolder;
 
     /** Default Constructor */

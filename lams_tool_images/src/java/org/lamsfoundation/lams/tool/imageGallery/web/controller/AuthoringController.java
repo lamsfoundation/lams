@@ -107,7 +107,7 @@ public class AuthoringController {
     public String defineLater(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request)
 	    throws ServletException {
 
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ImageGallery imageGallery = igService.getImageGalleryByContentId(contentId);
 
 	imageGallery.setDefineLater(true);
@@ -125,7 +125,7 @@ public class AuthoringController {
      */
     private String readDatabaseData(ImageGalleryForm imageGalleryForm, HttpServletRequest request) throws ServletException {
 	// save toolContentID into HTTPSession
-	Long contentId = new Long(WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_TOOL_CONTENT_ID);
 
 	List<ImageGalleryItem> items = null;
 	ImageGallery imageGallery = null;
@@ -267,7 +267,7 @@ public class AuthoringController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndContent(user.getUserID().longValue(),
 		contentId);
 	if (imageGalleryUser == null) {
 	    imageGalleryUser = new ImageGalleryUser(user, imageGalleryPO);

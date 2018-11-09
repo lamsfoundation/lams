@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.loader.plan.exec.query.spi.NamedParameterContext;
 import org.hibernate.loader.spi.AfterLoadAction;
 import org.hibernate.transform.ResultTransformer;
@@ -53,7 +53,7 @@ public interface ResultSetProcessor {
 	 */
 	public List extractResults(
 			ResultSet resultSet,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			QueryParameters queryParameters,
 			NamedParameterContext namedParameterContext,
 			boolean returnProxies,

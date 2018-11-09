@@ -12,6 +12,7 @@ import javax.persistence.SharedCacheMode;
 
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.boot.AttributeConverterInfo;
 import org.hibernate.boot.CacheRegionDefinition;
 import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
 import org.hibernate.boot.archive.scan.spi.ScanOptions;
@@ -22,7 +23,6 @@ import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cache.spi.access.AccessType;
-import org.hibernate.cfg.AttributeConverterDefinition;
 import org.hibernate.cfg.MetadataSourceType;
 import org.hibernate.dialect.function.SQLFunction;
 
@@ -65,18 +65,38 @@ public interface MetadataBuildingOptions {
 	List<BasicTypeRegistration> getBasicTypeRegistrations();
 
 	/**
+	 * Retrieve the Hibernate Commons Annotations ReflectionManager to use.
+	 *
+	 * @return The Hibernate Commons Annotations ReflectionManager to use.
+	 *
+	 * @deprecated Use {@link BootstrapContext#getReflectionManager()} instead,
+	 * The plan is to remove first {@link MetadataBuildingOptions#getReflectionManager()}
+	 * keeping {@link BootstrapContext#getReflectionManager()} till the migration from
+	 * Hibernate Commons Annotations to Jandex.
+	 *
+	 */
+	@Deprecated
+	ReflectionManager getReflectionManager();
+
+	/**
 	 * Access to the Jandex index passed by call to
 	 * {@link org.hibernate.boot.MetadataBuilder#applyIndexView(org.jboss.jandex.IndexView)}, if any.
 	 *
 	 * @return The Jandex index
+	 *
+	 * @deprecated  Use {@link BootstrapContext#getJandexView()} instead.
 	 */
+	@Deprecated
 	IndexView getJandexView();
 
 	/**
 	 * Access to the options to be used for scanning
 	 *
 	 * @return The scan options
+	 *
+	 * @deprecated  Use {@link BootstrapContext#getScanOptions()} instead.
 	 */
+	@Deprecated
 	ScanOptions getScanOptions();
 
 	/**
@@ -84,7 +104,10 @@ public interface MetadataBuildingOptions {
 	 * {@link ScanEnvironment}
 	 *
 	 * @return The scan environment
+	 *
+	 * @deprecated  Use {@link BootstrapContext#getScanEnvironment()} instead.
 	 */
+	@Deprecated
 	ScanEnvironment getScanEnvironment();
 
 	/**
@@ -95,14 +118,20 @@ public interface MetadataBuildingOptions {
 	 * </ul>
 	 *
 	 * @return The scanner
+	 *
+	 *  @deprecated  Use {@link BootstrapContext#getScanner()} instead.
 	 */
+	@Deprecated
 	Object getScanner();
 
 	/**
 	 * Access to the ArchiveDescriptorFactory to be used for scanning
 	 *
 	 * @return The ArchiveDescriptorFactory
+	 *
+	 * @deprecated Use {@link BootstrapContext#getArchiveDescriptorFactory()} instead.
 	 */
+	@Deprecated
 	ArchiveDescriptorFactory getArchiveDescriptorFactory();
 
 	/**
@@ -110,13 +139,15 @@ public interface MetadataBuildingOptions {
 	 * {@link javax.persistence.spi.PersistenceUnitInfo#getNewTempClassLoader()}, if any.
 	 *
 	 * @return The tempo ClassLoader
+	 *
+	 *  @deprecated  Use {@link BootstrapContext#getJpaTempClassLoader()} instead.
 	 */
+	@Deprecated
 	ClassLoader getTempClassLoader();
 
 	ImplicitNamingStrategy getImplicitNamingStrategy();
-	PhysicalNamingStrategy getPhysicalNamingStrategy();
 
-	ReflectionManager getReflectionManager();
+	PhysicalNamingStrategy getPhysicalNamingStrategy();
 
 	/**
 	 * Access to the SharedCacheMode for determining whether we should perform second level
@@ -146,7 +177,10 @@ public interface MetadataBuildingOptions {
 	 * Access to all explicit cache region mappings.
 	 *
 	 * @return Explicit cache region mappings.
+	 *
+	 *  @deprecated  Use {@link BootstrapContext#getClassmateContext()} instead.
 	 */
+	@Deprecated
 	List<CacheRegionDefinition> getCacheRegionDefinitions();
 
 	/**
@@ -203,12 +237,19 @@ public interface MetadataBuildingOptions {
 	 */
 	List<MetadataSourceType> getSourceProcessOrdering();
 
+	default String getSchemaCharset() {
+		return null;
+	}
+
 	/**
 	 * Access to any SQL functions explicitly registered with the MetadataBuilder.  This
 	 * does not include Dialect defined functions, etc.
 	 *
 	 * @return The SQLFunctions registered through MetadataBuilder
+	 *
+	 *  @deprecated  Use {@link BootstrapContext#getSqlFunctions()} instead.
 	 */
+	@Deprecated
 	Map<String,SQLFunction> getSqlFunctions();
 
 	/**
@@ -216,15 +257,19 @@ public interface MetadataBuildingOptions {
 	 * does not include AuxiliaryDatabaseObject defined in mappings.
 	 *
 	 * @return The AuxiliaryDatabaseObject registered through MetadataBuilder
+	 *
+	 * @deprecated Use {@link BootstrapContext#getAuxiliaryDatabaseObjectList()} instead.
 	 */
+	@Deprecated
 	List<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList();
 
-	List<AttributeConverterDefinition> getAttributeConverters();
-
-//	/**
-//	 * Obtain the selected strategy for resolving members identifying persistent attributes
-//	 *
-//	 * @return The select resolver strategy
-//	 */
-//	PersistentAttributeMemberResolver getPersistentAttributeMemberResolver();
+	/**
+	 * Access to collected AttributeConverter definitions.
+	 *
+	 * @return The AttributeConverterInfo registered through MetadataBuilder
+	 *
+	 * @deprecated Use {@link BootstrapContext#getAttributeConverters()} instead
+	 */
+	@Deprecated
+	List<AttributeConverterInfo> getAttributeConverters();
 }

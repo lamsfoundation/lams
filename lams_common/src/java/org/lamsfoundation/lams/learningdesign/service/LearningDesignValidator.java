@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign.service;
 
 import java.util.ArrayList;
@@ -262,6 +261,7 @@ public class LearningDesignValidator {
 
     }
 
+    @SuppressWarnings("unchecked")
     private void checkTransitionsInComplexActivity(ComplexActivity complexActivity) {
 	// All the branching activities and optional activities we find are stored in this list, so we can process them
 	// at the end.
@@ -271,15 +271,15 @@ public class LearningDesignValidator {
 	ArrayList<ComplexActivity> complexActivitiesToProcess = null;
 
 	if (complexActivity.isBranchingActivity()) {
-	    for (ComplexActivity sequence : (Set<ComplexActivity>) complexActivity.getActivities()) {
-		for (Activity activity : (Set<Activity>) sequence.getActivities()) {
+	    for (ComplexActivity sequence : (Set<ComplexActivity>) (Set<?>) complexActivity.getActivities()) {
+		for (Activity activity : sequence.getActivities()) {
 		    checkActivityForTransition(activity, sequence.getActivities().size());
 		    complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess,
 			    activity);
 		}
 	    }
 	} else {
-	    for (Activity activity : (Set<Activity>) complexActivity.getActivities()) {
+	    for (Activity activity : complexActivity.getActivities()) {
 		complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
 	    }
 	}

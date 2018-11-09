@@ -30,16 +30,16 @@ import java.util.Set;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.model.QaSession;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 
 /**
@@ -118,7 +118,7 @@ public interface IQaService extends ToolRatingManager {
      * @param isAutosave
      *            whether it's requested by autosave feature
      */
-    void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+    void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Integer questionDisplayOrder,
 	    boolean isAutosave);
 
     void createQuestion(QaQueContent qaQuestion);
@@ -131,7 +131,7 @@ public interface IQaService extends ToolRatingManager {
 
     QaUsrResp getResponseById(Long responseId);
 
-    QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid);
+    QaQueContent getQuestionByContentAndDisplayOrder(Integer displayOrder, Long contentUid);
 
     QaQueContent getQuestionByUid(Long questionUid);
 
@@ -210,7 +210,7 @@ public interface IQaService extends ToolRatingManager {
      */
     String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
 
-    IToolVO getToolBySignature(String toolSignature);
+    Tool getToolBySignature(String toolSignature);
 
     long getToolDefaultContentIdBySignature(String toolSignature);
 
@@ -251,10 +251,10 @@ public interface IQaService extends ToolRatingManager {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);

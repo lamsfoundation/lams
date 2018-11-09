@@ -58,10 +58,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO;
-import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemAttachmentDAO;
-import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemCommentDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
@@ -93,12 +90,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     private static Logger log = Logger.getLogger(TaskListServiceImpl.class.getName());
     private TaskListDAO taskListDao;
     private TaskListItemDAO taskListItemDao;
-    private TaskListConditionDAO taskListConditionDAO;
     private TaskListUserDAO taskListUserDao;
     private TaskListSessionDAO taskListSessionDao;
     private TaskListItemVisitDAO taskListItemVisitDao;
-    private TaskListItemAttachmentDAO taskListItemAttachmentDao;
-    private TaskListItemCommentDAO taskListItemCommentDAO;
     // tool service
     private IToolContentHandler taskListToolContentHandler;
     private MessageService messageService;
@@ -188,7 +182,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     @Override
     public void deleteTaskListCondition(Long conditionUid) {
-	taskListConditionDAO.removeObject(TaskListCondition.class, conditionUid);
+	taskListItemDao.removeObject(TaskListCondition.class, conditionUid);
     }
 
     @Override
@@ -493,14 +487,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     public void setTaskListOutputFactory(TaskListOutputFactory taskListOutputFactory) {
 	this.taskListOutputFactory = taskListOutputFactory;
-    }
-
-    public void setTaskListAttachmentDao(TaskListItemAttachmentDAO taskListItemAttachmentDao) {
-	this.taskListItemAttachmentDao = taskListItemAttachmentDao;
-    }
-
-    public void setTaskListConditionDao(TaskListConditionDAO taskListConditionDAO) {
-	this.taskListConditionDAO = taskListConditionDAO;
     }
 
     public void setTaskListDao(TaskListDAO taskListDao) {

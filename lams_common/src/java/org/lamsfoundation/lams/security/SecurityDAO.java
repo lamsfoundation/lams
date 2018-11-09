@@ -49,8 +49,8 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
      * Checks if the user is a learner in the given lesson.
      */
     private static final String CHECK_LESSON_LEARNER = "SELECT 1 FROM lams_lesson AS l JOIN lams_grouping AS ging "
-	    + "ON l.lesson_id = ? AND l.class_grouping_id = ging.grouping_id JOIN lams_group AS g USING (grouping_id) "
-	    + "JOIN lams_user_group AS ug USING (group_id) WHERE ug.user_id = ?";
+	    + "ON l.lesson_id = :lessonId AND l.class_grouping_id = ging.grouping_id JOIN lams_group AS g USING (grouping_id) "
+	    + "JOIN lams_user_group AS ug USING (group_id) WHERE ug.user_id = :user_id";
 
     /**
      * Checks if the user has any of the given roles in the given organisation.
@@ -98,8 +98,8 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
     @Override
     public boolean isLessonLearner(Long lessonId, Integer userId) {
 	SQLQuery query = getSession().createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
-	query.setLong(0, lessonId);
-	query.setInteger(1, userId);
+	query.setLong("lessonId", lessonId);
+	query.setInteger("user_id", userId);
 	return !query.list().isEmpty();
     }
 

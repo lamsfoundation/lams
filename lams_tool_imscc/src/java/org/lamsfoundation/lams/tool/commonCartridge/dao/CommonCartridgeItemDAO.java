@@ -35,7 +35,7 @@ public interface CommonCartridgeItemDAO extends DAO {
      * @param commonCartridgeUid
      * @return
      */
-    List getAuthoringItems(Long commonCartridgeUid);
+    List<CommonCartridgeItem> getAuthoringItems(Long commonCartridgeUid);
 
     CommonCartridgeItem getByUid(Long commonCartridgeItemUid);
 

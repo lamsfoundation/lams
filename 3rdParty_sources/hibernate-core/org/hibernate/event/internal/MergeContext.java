@@ -12,11 +12,11 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.logging.Logger;
-
 import org.hibernate.event.spi.EntityCopyObserver;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.pretty.MessageHelper;
+
+import org.jboss.logging.Logger;
 
 /**
  * MergeContext is a Map implementation that is intended to be used by a merge
@@ -215,7 +215,7 @@ class MergeContext implements Map {
 	 * method is called, then <code>managedEntity</code> must be the same as what is already associated
 	 * with <code>mergeEntity</code>.
 	 *
-	 * @param mergeEntity the mergge entity; must be non-null
+	 * @param mergeEntity the merge entity; must be non-null
 	 * @param managedEntity the managed entity; must be non-null
 	 * @param isOperatedOn indicates if the merge operation is performed on the mergeEntity.
 	 *
@@ -251,7 +251,7 @@ class MergeContext implements Map {
 			}
 			if ( oldOperatedOn != null ) {
 				throw new IllegalStateException(
-						"MergeContext#mergeEntityToOperatedOnFlagMap contains an merge entity " + printEntity( mergeEntity )
+						"MergeContext#mergeEntityToOperatedOnFlagMap contains a merge entity " + printEntity( mergeEntity )
 								+ ", but MergeContext#mergeToManagedEntityXref does not."
 				);
 			}
@@ -267,7 +267,7 @@ class MergeContext implements Map {
 			}
 			if ( oldOperatedOn == null ) {
 				throw new IllegalStateException(
-						"MergeContext#mergeToManagedEntityXref contained an mergeEntity " + printEntity( mergeEntity )
+						"MergeContext#mergeToManagedEntityXref contained a merge entity " + printEntity( mergeEntity )
 								+ ", but MergeContext#mergeEntityToOperatedOnFlagMap did not."
 				);
 			}

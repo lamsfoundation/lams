@@ -24,34 +24,35 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_auth_method_type")
 public class AuthenticationMethodType implements Serializable {
+    private static final long serialVersionUID = 1220342429769830966L;
 
     public static final String LAMS = "LAMS";
     public static final String WEB_AUTH = "WEB_AUTH";
     public static final String LDAP = "LDAP";
 
-    /** identifier field */
+    @Id
+    @Column(name = "authentication_method_type_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer authenticationMethodTypeId;
 
-    /** persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
-    private Set authenticationMethods;
-
-    /** full constructor */
-    public AuthenticationMethodType(String description, Set authenticationMethods) {
-	this.description = description;
-	this.authenticationMethods = authenticationMethods;
-    }
-
-    /** default constructor */
     public AuthenticationMethodType() {
     }
 
@@ -69,14 +70,6 @@ public class AuthenticationMethodType implements Serializable {
 
     public void setDescription(String description) {
 	this.description = description;
-    }
-
-    public Set getAuthenticationMethods() {
-	return this.authenticationMethods;
-    }
-
-    public void setAuthenticationMethods(Set authenticationMethods) {
-	this.authenticationMethods = authenticationMethods;
     }
 
     @Override
@@ -99,5 +92,4 @@ public class AuthenticationMethodType implements Serializable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getAuthenticationMethodTypeId()).toHashCode();
     }
-
 }

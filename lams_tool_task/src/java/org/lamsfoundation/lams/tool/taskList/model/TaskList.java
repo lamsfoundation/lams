@@ -29,68 +29,103 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 
 /**
  * The main entity class of TaskList tool. Contains all the data related to the whole tool.
  *
- * @author Dapeng Ni
  * @author Andrey Balan
- *
- *
  */
+@Entity
+@Table(name = "tl_latask10_tasklist")
 public class TaskList implements Cloneable {
 
     private static final Logger log = Logger.getLogger(TaskList.class);
 
-    //key 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    //tool contentID
+    
+    @Column(name = "content_id")
     private Long contentId;
+    
+    @Column
     private String title;
+    
+    @Column
     private String instructions;
 
-    //advance
+    @Column(name = "lock_when_finished")
     private boolean lockWhenFinished;
+    
+    @Column(name = "is_sequential_order")
     private boolean sequentialOrder;
+    
+    @Column(name = "minimum_number_tasks")
     private int minimumNumberTasks;
+    
+    @Column(name = "allow_contribute_tasks")
     private boolean allowContributeTasks;
+    
+    @Column(name = "is_monitor_verification_required")
     private boolean monitorVerificationRequired;
 
+    @Column(name = "define_later")
     private boolean defineLater;
+    
+    @Column(name = "content_in_use")
     private boolean contentInUse;
+    
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    //conditions
-    private Set conditions;
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("sequence_id ASC")
+    @JoinColumn(name = "taskList_uid")
+    private Set<TaskListCondition> conditions = new HashSet<TaskListCondition>();
 
-    //general infomation
+    @Column(name = "create_date")
     private Date created;
+    
+    @Column(name = "update_date")
     private Date updated;
+    
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
     private TaskListUser createdBy;
 
-    //taskList Items
-    private Set taskListItems;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "taskList_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<TaskListItem> taskListItems = new HashSet<TaskListItem>();
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
+    
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
     //*************** NON Persist Fields ********************
+    @Transient
     private String minimumNumberTasksErrorStr;
-
-    /**
-     * Default contructor.
-     */
-    public TaskList() {
-	conditions = new HashSet();
-	taskListItems = new HashSet();
-    }
-
-    //  **********************************************************
-    //		Function method for TaskList
-    //  **********************************************************
 
     public static TaskList newInstance(TaskList defaultContent, Long contentId) {
 	TaskList toContent = new TaskList();
@@ -118,10 +153,10 @@ public class TaskList implements Cloneable {
 
 	    //clone taskListItems
 	    if (taskListItems != null) {
-		Iterator iter = taskListItems.iterator();
-		Set set = new HashSet();
+		Iterator<TaskListItem> iter = taskListItems.iterator();
+		Set<TaskListItem> set = new HashSet<TaskListItem>();
 		while (iter.hasNext()) {
-		    TaskListItem item = (TaskListItem) iter.next();
+		    TaskListItem item = iter.next();
 		    TaskListItem newItem = (TaskListItem) item.clone();
 		    //just clone old file without duplicate it in repository
 		    set.add(newItem);
@@ -141,20 +176,19 @@ public class TaskList implements Cloneable {
 		    taskListItemsSeq.put(item.getSequenceId(), item);
 		}
 
-		Set newConditions = new HashSet();
-		Iterator conds = conditions.iterator();
+		Set<TaskListCondition> newConditions = new HashSet<TaskListCondition>();
+		Iterator<TaskListCondition> conds = conditions.iterator();
 		while (conds.hasNext()) {
-		    TaskListCondition condition = (TaskListCondition) conds.next();
+		    TaskListCondition condition = conds.next();
 		    TaskListCondition newCondition = (TaskListCondition) condition.clone();
 
 		    //picking up all the taskListItems that condition had
 		    if (condition.getTaskListItems() != null) {
-			Set condTaskListItems = new HashSet();
+			Set<TaskListItem> condTaskListItems = new HashSet<TaskListItem>();
 
-			Iterator iterCondItems = condition.getTaskListItems().iterator();
+			Iterator<TaskListItem> iterCondItems = condition.getTaskListItems().iterator();
 			while (iterCondItems.hasNext()) {
-			    TaskListItem item = (TaskListItem) iterCondItems.next();
-
+			    TaskListItem item = iterCondItems.next();
 			    condTaskListItems.add(taskListItemsSeq.get(item.getSequenceId()));
 			}
 			newCondition.setTaskListItems(condTaskListItems);
@@ -255,11 +289,6 @@ public class TaskList implements Cloneable {
      * Returns id of a user created the taskList.
      *
      * @return id of a user
-     *
-     *
-     *
-     *
-     *
      */
     public TaskListUser getCreatedBy() {
 	return createdBy;
@@ -279,8 +308,6 @@ public class TaskList implements Cloneable {
      * Returns <code>TaskList</code> id.
      * 
      * @return tasklist id
-     * 
-     *
      */
     public Long getUid() {
 	return uid;
@@ -300,10 +327,6 @@ public class TaskList implements Cloneable {
      * Returns the tasklist title.
      * 
      * @return tasklist title.
-     *
-     *
-     *
-     *
      */
     public String getTitle() {
 	return title;
@@ -323,10 +346,6 @@ public class TaskList implements Cloneable {
      * Returns tasklist instructions set by teacher.
      *
      * @return tasklist instructions set by teacher
-     *
-     *
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -346,15 +365,8 @@ public class TaskList implements Cloneable {
      * Returns a set of conditions belong to this tasklist.
      *
      * @return a set of conditions belong to this tasklist.
-     *
-     *
-     *
-     *
-     *
-     *
-     *
      */
-    public Set getConditions() {
+    public Set<TaskListCondition> getConditions() {
 	return conditions;
     }
 
@@ -364,7 +376,7 @@ public class TaskList implements Cloneable {
      * @param conditions
      *            set of conditions to set
      */
-    public void setConditions(Set conditions) {
+    public void setConditions(Set<TaskListCondition> conditions) {
 	this.conditions = conditions;
     }
 
@@ -372,15 +384,8 @@ public class TaskList implements Cloneable {
      * Return set of TaskListItems
      * 
      * @return set of TaskListItems
-     * 
-     *
-     *
-     *
-     *
-     *
-     *
      */
-    public Set getTaskListItems() {
+    public Set<TaskListItem> getTaskListItems() {
 	return taskListItems;
     }
 
@@ -390,7 +395,7 @@ public class TaskList implements Cloneable {
      * @param taskListItems
      *            set of TaskListItems
      */
-    public void setTaskListItems(Set taskListItems) {
+    public void setTaskListItems(Set<TaskListItem> taskListItems) {
 	this.taskListItems = taskListItems;
     }
 
@@ -461,9 +466,6 @@ public class TaskList implements Cloneable {
      * Returns if the tasklist should be locked after being finished or not.
      *
      * @return if the tasklist should be locked after being finished or not
-     *
-     *
-     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;

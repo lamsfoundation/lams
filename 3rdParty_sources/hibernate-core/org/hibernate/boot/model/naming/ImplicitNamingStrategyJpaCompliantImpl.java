@@ -198,8 +198,10 @@ public class ImplicitNamingStrategyJpaCompliantImpl implements ImplicitNamingStr
 
 	@Override
 	public Identifier determineForeignKeyName(ImplicitForeignKeyNameSource source) {
-		return toIdentifier(
-				NamingHelper.INSTANCE.generateHashedFkName(
+		Identifier userProvidedIdentifier = source.getUserProvidedIdentifier();
+		source.getBuildingContext().getBuildingOptions().getSchemaCharset();
+		return userProvidedIdentifier != null ? userProvidedIdentifier : toIdentifier(
+				NamingHelper.withCharset( source.getBuildingContext().getBuildingOptions().getSchemaCharset() ).generateHashedFkName(
 						"FK",
 						source.getTableName(),
 						source.getReferencedTableName(),
@@ -211,8 +213,9 @@ public class ImplicitNamingStrategyJpaCompliantImpl implements ImplicitNamingStr
 
 	@Override
 	public Identifier determineUniqueKeyName(ImplicitUniqueKeyNameSource source) {
-		return toIdentifier(
-				NamingHelper.INSTANCE.generateHashedConstraintName(
+		Identifier userProvidedIdentifier = source.getUserProvidedIdentifier();
+		return userProvidedIdentifier != null ? userProvidedIdentifier : toIdentifier(
+				NamingHelper.withCharset( source.getBuildingContext().getBuildingOptions().getSchemaCharset() ).generateHashedConstraintName(
 						"UK",
 						source.getTableName(),
 						source.getColumnNames()
@@ -223,8 +226,9 @@ public class ImplicitNamingStrategyJpaCompliantImpl implements ImplicitNamingStr
 
 	@Override
 	public Identifier determineIndexName(ImplicitIndexNameSource source) {
-		return toIdentifier(
-				NamingHelper.INSTANCE.generateHashedConstraintName(
+		Identifier userProvidedIdentifier = source.getUserProvidedIdentifier();
+		return userProvidedIdentifier != null ? userProvidedIdentifier : toIdentifier(
+				NamingHelper.withCharset( source.getBuildingContext().getBuildingOptions().getSchemaCharset() ).generateHashedConstraintName(
 						"IDX",
 						source.getTableName(),
 						source.getColumnNames()

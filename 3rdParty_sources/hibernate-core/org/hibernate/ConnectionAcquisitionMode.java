@@ -6,12 +6,11 @@
  */
 package org.hibernate;
 
+import org.hibernate.internal.util.StringHelper;
+
 /**
  * Indicates the manner in which JDBC Connections should be acquired.  Inverse to
  * {@link org.hibernate.ConnectionReleaseMode}.
- * <p/>
- * NOTE : Not yet used.  The only current behavior is the legacy behavior, which is
- * {@link #AS_NEEDED}.
  *
  * @author Steve Ebersole
  */
@@ -23,11 +22,33 @@ public enum ConnectionAcquisitionMode {
 	 */
 	IMMEDIATELY,
 	/**
-	 * The legacy behavior.  A Connection is only acquired when (if_) it is actually needed.
+	 * The legacy behavior.  A Connection is only acquired when (if) it is actually needed.
 	 */
-	AS_NEEDED,
-	/**
-	 * Not sure yet tbh :)
-	 */
-	DEFAULT
+	AS_NEEDED;
+
+	public static ConnectionAcquisitionMode interpret(String value) {
+		if ( value != null
+				&& ( "immediate".equalsIgnoreCase( value ) || "immediately".equalsIgnoreCase( value ) ) ) {
+			return IMMEDIATELY;
+		}
+
+		return AS_NEEDED;
+	}
+
+	public static ConnectionAcquisitionMode interpret(Object setting) {
+		if ( setting == null ) {
+			return null;
+		}
+
+		if ( setting instanceof ConnectionAcquisitionMode ) {
+			return (ConnectionAcquisitionMode) setting;
+		}
+
+		final String value = setting.toString();
+		if ( StringHelper.isEmpty( value ) ) {
+			return null;
+		}
+
+		return interpret( value );
+	}
 }

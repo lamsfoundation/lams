@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -21,6 +24,8 @@ import org.lamsfoundation.lams.tool.chat.dto.ChatConditionDTO;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "tl_lachat11_conditions")
 public class ChatCondition extends TextSearchCondition {
 
     public ChatCondition() {

@@ -31,10 +31,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.web.form.AuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -57,7 +56,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
-    private Logger log = Logger.getLogger(AuthoringController.class);
 
     @Autowired
     private ISubmitFilesService submitFilesService;
@@ -78,7 +76,7 @@ public class AuthoringController {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 
-	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	// get back the upload file list and display them on page
 
@@ -109,6 +107,7 @@ public class AuthoringController {
     /**
      * Update all content for submit tool except online/offline instruction files list.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/updateContent")
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {

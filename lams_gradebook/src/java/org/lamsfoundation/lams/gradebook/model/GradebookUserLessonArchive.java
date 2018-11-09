@@ -22,17 +22,42 @@
 
 package org.lamsfoundation.lams.gradebook.model;
 
-import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_gradebook_user_lesson_archive")
 public class GradebookUserLessonArchive {
+    
+    @Id
+    @Column
     private long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User learner;
+    
+    @Column
     private Double mark;
+    
+    @Column
     private String feedback;
+    
+    @Column(name = "archive_date")
     private Date archiveDate;
 
     public GradebookUserLessonArchive() {

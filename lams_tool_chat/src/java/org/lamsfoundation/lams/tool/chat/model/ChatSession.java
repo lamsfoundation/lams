@@ -21,58 +21,67 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
-/**
- *
- * Represents the tool session.
- *
- *
- */
-
+@Entity
+@Table(name = "tl_lachat11_session")
 public class ChatSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(ChatSession.class);
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 4407078136514639026L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne
+    @JoinColumn(name = "chat_uid")
     private Chat chat;
 
-    private Set chatUsers;
+    @OneToMany(mappedBy = "chatSession")
+    private Set<ChatUser> chatUsers = new HashSet<ChatUser>();
 
-    private Set chatMessages;
+    @OneToMany(mappedBy = "chatSession")
+    private Set<ChatMessage> chatMessages = new HashSet<ChatMessage>();
 
-    // Constructors
-
-    /** default constructor */
     public ChatSession() {
     }
 
-    /** full constructor */
     public ChatSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId, String sessionName,
-	    Chat chat, Set chatUsers) {
+	    Chat chat, Set<ChatUser> chatUsers) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -81,12 +90,6 @@ public class ChatSession implements java.io.Serializable {
 	this.chat = chat;
 	this.chatUsers = chatUsers;
     }
-
-    // Property accessors
-    /**
-     *
-     * 
-     */
 
     public Long getUid() {
 	return this.uid;
@@ -96,11 +99,6 @@ public class ChatSession implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
     }
@@ -108,11 +106,6 @@ public class ChatSession implements java.io.Serializable {
     public void setSessionEndDate(Date sessionEndDate) {
 	this.sessionEndDate = sessionEndDate;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
@@ -122,11 +115,6 @@ public class ChatSession implements java.io.Serializable {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Integer getStatus() {
 	return this.status;
     }
@@ -134,11 +122,6 @@ public class ChatSession implements java.io.Serializable {
     public void setStatus(Integer status) {
 	this.status = status;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Long getSessionId() {
 	return this.sessionId;
@@ -148,11 +131,6 @@ public class ChatSession implements java.io.Serializable {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * 
-     */
-
     public String getSessionName() {
 	return this.sessionName;
     }
@@ -160,12 +138,6 @@ public class ChatSession implements java.io.Serializable {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-
-    /**
-     *
-     *
-     * 
-     */
 
     public Chat getChat() {
 	return this.chat;
@@ -175,41 +147,22 @@ public class ChatSession implements java.io.Serializable {
 	this.chat = chat;
     }
 
-    /**
-     *
-     *
-     *
-     * 
-     */
-
-    public Set getChatUsers() {
+    public Set<ChatUser> getChatUsers() {
 	return this.chatUsers;
     }
 
-    public void setChatUsers(Set chatUsers) {
+    public void setChatUsers(Set<ChatUser> chatUsers) {
 	this.chatUsers = chatUsers;
     }
 
-    /**
-     *
-     *
-     *
-     * 
-     */
-
-    public Set getChatMessages() {
+    public Set<ChatMessage> getChatMessages() {
 	return this.chatMessages;
     }
 
-    public void setChatMessages(Set chatMessages) {
+    public void setChatMessages(Set<ChatMessage> chatMessages) {
 	this.chatMessages = chatMessages;
     }
 
-    /**
-     * toString
-     * 
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -255,11 +208,10 @@ public class ChatSession implements java.io.Serializable {
 	ChatSession session = null;
 	try {
 	    session = (ChatSession) super.clone();
-	    session.chatUsers = new HashSet();
+	    session.chatUsers = new HashSet<ChatUser>();
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ChatSession.class + " failed");
 	}
 	return session;
     }
-
 }

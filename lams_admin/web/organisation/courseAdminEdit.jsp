@@ -6,12 +6,13 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.organisation.entry"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	
+	<script type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 </lams:head>
     
 <body class="stripes">
@@ -53,7 +54,7 @@
 						<td><fmt:message key="admin.organisation.description"/>:</td>
 						<td><form:textarea path="description" cols="50" rows="3"  cssClass="form-control"></form:textarea></td>
 					</tr>
-					<c:if test=${organisationForm.courseAdminCanChangeStatusOfCourse == true}>
+					<c:if test="${organisationForm.courseAdminCanChangeStatusOfCourse == true}">
 					<tr>
 						<td><fmt:message key="admin.organisation.status"/>:</td>
 						<td>
@@ -90,8 +91,4 @@
 
 </body>
 </lams:html>
-
-
-
-
 		

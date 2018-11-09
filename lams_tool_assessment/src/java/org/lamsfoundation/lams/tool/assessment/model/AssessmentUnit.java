@@ -23,6 +23,13 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -30,15 +37,23 @@ import org.apache.log4j.Logger;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_assessment_unit")
 public class AssessmentUnit implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentUnit.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "sequence_id")
     private Integer sequenceId;
 
+    @Column
     private String unit;
 
+    @Column
     private float multiplier;
 
     // **********************************************************

@@ -26,30 +26,41 @@ package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 
 /**
- * TaskList
- * 
  * @author Andrey Balan
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_latask10_item_comment")
 public class TaskListItemComment implements Cloneable {
-
     private static final Logger log = Logger.getLogger(TaskListItemComment.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column
     private String comment;
+    
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private TaskListUser createBy;
+    
+    @Column(name = "create_date")
     private Date createDate;
-
-    //  **********************************************************
-    //				Function method for TaskListItemComment
-    //  **********************************************************
 
     @Override
     public Object clone() {
@@ -93,10 +104,6 @@ public class TaskListItemComment implements Cloneable {
     //					Get/Set methods
     //  **********************************************************
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -117,11 +124,6 @@ public class TaskListItemComment implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public TaskListUser getCreateBy() {
 	return createBy;
     }
@@ -130,11 +132,6 @@ public class TaskListItemComment implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public String getComment() {
 	return comment;
     }

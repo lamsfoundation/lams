@@ -6,19 +6,32 @@
  */
 package org.hibernate.engine.spi;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.naming.NamingException;
 import javax.naming.Reference;
-import java.sql.Connection;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import javax.persistence.EntityGraph;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceUnitUtil;
+import javax.persistence.Query;
+import javax.persistence.SynchronizationType;
+import javax.persistence.criteria.CriteriaBuilder;
 
-import org.hibernate.*;
+import org.hibernate.CustomEntityDirtinessStrategy;
+import org.hibernate.EntityNameResolver;
+import org.hibernate.HibernateException;
+import org.hibernate.Interceptor;
+import org.hibernate.MappingException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.SessionFactoryObserver;
+import org.hibernate.StatelessSession;
+import org.hibernate.StatelessSessionBuilder;
+import org.hibernate.TypeHelper;
 import org.hibernate.boot.spi.SessionFactoryOptions;
-import org.hibernate.cache.spi.QueryCache;
-import org.hibernate.cache.spi.Region;
-import org.hibernate.cache.spi.UpdateTimestampsCache;
-import org.hibernate.cache.spi.access.RegionAccessStrategy;
+import org.hibernate.cache.spi.CacheImplementor;
 import org.hibernate.cfg.Settings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.dialect.Dialect;
@@ -31,14 +44,14 @@ import org.hibernate.engine.query.spi.QueryPlanCache;
 import org.hibernate.exception.spi.SQLExceptionConverter;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.factory.IdentifierGeneratorFactory;
-import org.hibernate.internal.NamedQueryRepository;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.metadata.CollectionMetadata;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.proxy.EntityNotFoundDelegate;
+import org.hibernate.query.spi.NamedQueryRepository;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
-import org.hibernate.stat.Statistics;
 import org.hibernate.stat.spi.StatisticsImplementor;
 import org.hibernate.type.Type;
 import org.hibernate.type.TypeResolver;
@@ -55,6 +68,10 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 
 	public SessionFactoryDelegatingImpl(SessionFactoryImplementor delegate) {
 		this.delegate = delegate;
+	}
+
+	protected SessionFactoryImplementor delegate() {
+		return delegate;
 	}
 
 	@Override
@@ -118,7 +135,7 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 	}
 
 	@Override
-	public Statistics getStatistics() {
+	public StatisticsImplementor getStatistics() {
 		return delegate.getStatistics();
 	}
 
@@ -133,8 +150,28 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 	}
 
 	@Override
-	public Cache getCache() {
+	public CacheImplementor getCache() {
 		return delegate.getCache();
+	}
+
+	@Override
+	public PersistenceUnitUtil getPersistenceUnitUtil() {
+		return delegate.getPersistenceUnitUtil();
+	}
+
+	@Override
+	public void addNamedQuery(String name, Query query) {
+		delegate.addNamedQuery( name, query );
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> cls) {
+		return delegate.unwrap( cls );
+	}
+
+	@Override
+	public <T> void addNamedEntityGraph(String graphName, EntityGraph<T> entityGraph) {
+		delegate.addNamedEntityGraph( graphName, entityGraph );
 	}
 
 	@Override
@@ -157,13 +194,20 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 		return delegate.getTypeHelper();
 	}
 
-	@Override
+	/**
+	 * Retrieve the {@link Type} resolver associated with this factory.
+	 *
+	 * @return The type resolver
+	 *
+	 * @deprecated (since 5.3) No replacement, access to and handling of Types will be much different in 6.0
+	 */
+	@Deprecated
 	public TypeResolver getTypeResolver() {
 		return delegate.getTypeResolver();
 	}
 
 	@Override
-	public Properties getProperties() {
+	public Map<String, Object> getProperties() {
 		return delegate.getProperties();
 	}
 
@@ -228,23 +272,13 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 	}
 
 	@Override
-	public QueryCache getQueryCache() {
-		return delegate.getQueryCache();
-	}
-
-	@Override
-	public QueryCache getQueryCache(String regionName) throws HibernateException {
-		return delegate.getQueryCache( regionName );
-	}
-
-	@Override
-	public UpdateTimestampsCache getUpdateTimestampsCache() {
-		return delegate.getUpdateTimestampsCache();
+	public EntityGraph findEntityGraphByName(String name) {
+		return delegate.findEntityGraphByName( name );
 	}
 
 	@Override
 	public StatisticsImplementor getStatisticsImplementor() {
-		return delegate.getStatisticsImplementor();
+		return delegate.getStatistics();
 	}
 
 	@Override
@@ -264,7 +298,7 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 
 	@Override
 	public void registerNamedSQLQueryDefinition(String name, NamedSQLQueryDefinition definition) {
-		delegate.registerNamedQueryDefinition( name, definition );
+		delegate.registerNamedSQLQueryDefinition( name, definition );
 	}
 
 	@Override
@@ -275,31 +309,6 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 	@Override
 	public IdentifierGenerator getIdentifierGenerator(String rootEntityName) {
 		return delegate.getIdentifierGenerator( rootEntityName );
-	}
-
-	@Override
-	public Region getSecondLevelCacheRegion(String regionName) {
-		return delegate.getSecondLevelCacheRegion( regionName );
-	}
-
-	@Override
-	public RegionAccessStrategy getSecondLevelCacheRegionAccessStrategy(String regionName) {
-		return delegate.getSecondLevelCacheRegionAccessStrategy(regionName);
-	}
-
-	@Override
-	public Region getNaturalIdCacheRegion(String regionName) {
-		return delegate.getNaturalIdCacheRegion( regionName );
-	}
-
-	@Override
-	public RegionAccessStrategy getNaturalIdCacheRegionAccessStrategy(String regionName) {
-		return delegate.getNaturalIdCacheRegionAccessStrategy(regionName);
-	}
-
-	@Override
-	public Map getAllSecondLevelCacheRegions() {
-		return delegate.getAllSecondLevelCacheRegions();
 	}
 
 	@Override
@@ -408,7 +417,67 @@ public class SessionFactoryDelegatingImpl implements SessionFactoryImplementor, 
 	}
 
 	@Override
+	public String getUuid() {
+		return delegate.getUuid();
+	}
+
+	@Override
+	public String getName() {
+		return delegate.getName();
+	}
+
+	@Override
 	public Reference getReference() throws NamingException {
 		return delegate.getReference();
+	}
+
+	@Override
+	public <T> List<EntityGraph<? super T>> findEntityGraphsByType(Class<T> entityClass) {
+		return delegate.findEntityGraphsByType( entityClass );
+	}
+
+	@Override
+	public EntityManager createEntityManager() {
+		return delegate.createEntityManager();
+	}
+
+	@Override
+	public EntityManager createEntityManager(Map map) {
+		return delegate.createEntityManager( map );
+	}
+
+	@Override
+	public EntityManager createEntityManager(SynchronizationType synchronizationType) {
+		return delegate.createEntityManager( synchronizationType );
+	}
+
+	@Override
+	public EntityManager createEntityManager(SynchronizationType synchronizationType, Map map) {
+		return delegate.createEntityManager( synchronizationType, map );
+	}
+
+	@Override
+	public CriteriaBuilder getCriteriaBuilder() {
+		return delegate.getCriteriaBuilder();
+	}
+
+	@Override
+	public MetamodelImplementor getMetamodel() {
+		return delegate.getMetamodel();
+	}
+
+	@Override
+	public boolean isOpen() {
+		return delegate.isOpen();
+	}
+
+	@Override
+	public Type resolveParameterBindType(Object bindValue) {
+		return delegate.resolveParameterBindType( bindValue );
+	}
+
+	@Override
+	public Type resolveParameterBindType(Class clazz) {
+		return delegate.resolveParameterBindType( clazz );
 	}
 }

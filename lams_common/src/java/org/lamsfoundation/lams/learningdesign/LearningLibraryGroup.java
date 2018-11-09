@@ -24,25 +24,42 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * Represents a tool (learning library) group for use in Authoring.
- *
- *
  */
+@Entity
+@Table(name = "lams_learning_library_group")
 public class LearningLibraryGroup implements Serializable {
+    private static final long serialVersionUID = 2740078417925199829L;
+
+    @Id
+    @Column(name = "group_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
 
+    @Column
     private String name;
 
-    private Set<LearningLibrary> learningLibraries;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "lams_learning_library_to_group", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "learning_library_id"))
+    private Set<LearningLibrary> learningLibraries = new HashSet<LearningLibrary>();
 
-    /**
-     *
-     */
     public Long getGroupId() {
 	return groupId;
     }
@@ -51,9 +68,6 @@ public class LearningLibraryGroup implements Serializable {
 	this.groupId = groupId;
     }
 
-    /**
-     *
-     */
     public String getName() {
 	return this.name;
     }
@@ -62,12 +76,6 @@ public class LearningLibraryGroup implements Serializable {
 	this.name = name;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
     public Set<LearningLibrary> getLearningLibraries() {
 	return learningLibraries;
     }

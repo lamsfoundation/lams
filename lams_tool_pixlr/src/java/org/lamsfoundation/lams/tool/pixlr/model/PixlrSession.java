@@ -21,70 +21,60 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.pixlr.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
-/**
- *
- * Represents the tool session.
- *
- *
- */
-
+@Entity
+@Table(name = "tl_lapixl10_session")
 public class PixlrSession implements java.io.Serializable {
-
-    private static Logger log = Logger.getLogger(PixlrSession.class);
-    /**
-     * 
-     */
     private static final long serialVersionUID = 4407078136514639026L;
 
-    // Fields
+    private static Logger log = Logger.getLogger(PixlrSession.class);
+
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne
+    @JoinColumn(name = "pixlr_uid")
     private Pixlr pixlr;
 
-    private Set<PixlrUser> pixlrUsers;
+    @OneToMany(mappedBy = "pixlrSession")
+    private Set<PixlrUser> pixlrUsers = new HashSet<PixlrUser>();
 
-    // Constructors
-
-    /** default constructor */
     public PixlrSession() {
     }
-
-    /** full constructor */
-    public PixlrSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId, String sessionName,
-	    Pixlr pixlr, Set<PixlrUser> pixlrUsers) {
-	this.sessionEndDate = sessionEndDate;
-	this.sessionStartDate = sessionStartDate;
-	this.status = status;
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	this.pixlr = pixlr;
-	this.pixlrUsers = pixlrUsers;
-    }
-
-    // Property accessors
-    /**
-     *
-     * 
-     */
 
     public Long getUid() {
 	return this.uid;
@@ -94,11 +84,6 @@ public class PixlrSession implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
     }
@@ -106,11 +91,6 @@ public class PixlrSession implements java.io.Serializable {
     public void setSessionEndDate(Date sessionEndDate) {
 	this.sessionEndDate = sessionEndDate;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
@@ -120,11 +100,6 @@ public class PixlrSession implements java.io.Serializable {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Integer getStatus() {
 	return this.status;
     }
@@ -132,11 +107,6 @@ public class PixlrSession implements java.io.Serializable {
     public void setStatus(Integer status) {
 	this.status = status;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Long getSessionId() {
 	return this.sessionId;
@@ -146,11 +116,6 @@ public class PixlrSession implements java.io.Serializable {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * 
-     */
-
     public String getSessionName() {
 	return this.sessionName;
     }
@@ -158,12 +123,6 @@ public class PixlrSession implements java.io.Serializable {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-
-    /**
-     *
-     *
-     * 
-     */
 
     public Pixlr getPixlr() {
 	return this.pixlr;
@@ -173,13 +132,6 @@ public class PixlrSession implements java.io.Serializable {
 	this.pixlr = pixlr;
     }
 
-    /**
-     *
-     *
-     *
-     * 
-     */
-
     public Set<PixlrUser> getPixlrUsers() {
 	return this.pixlrUsers;
     }
@@ -188,11 +140,6 @@ public class PixlrSession implements java.io.Serializable {
 	this.pixlrUsers = pixlrUsers;
     }
 
-    /**
-     * toString
-     * 
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -234,7 +181,6 @@ public class PixlrSession implements java.io.Serializable {
 
     @Override
     public Object clone() {
-
 	PixlrSession session = null;
 	try {
 	    session = (PixlrSession) super.clone();
@@ -244,5 +190,4 @@ public class PixlrSession implements java.io.Serializable {
 	}
 	return session;
     }
-
 }

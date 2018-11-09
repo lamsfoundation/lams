@@ -24,6 +24,15 @@ package org.lamsfoundation.lams.tool.daco.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -33,27 +42,43 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_ladaco10_answers")
 public class DacoAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(DacoQuestion.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @ManyToOne 
+    @JoinColumn(name = "user_uid") 
     private DacoUser user;
 
+    @Column(name = "record_id")
     private Integer recordId;
 
+    @Column
     private String answer;
 
-    private DacoQuestion question;
+    @ManyToOne 
+    @JoinColumn(name = "question_uid") 
+   private DacoQuestion question;
 
+    @Column(name = "file_uuid")
     private Long fileUuid;
 
+    @Column(name = "file_version_id")
     private Long fileVersionId;
 
+    @Column(name = "file_name")
     private String fileName;
 
+    @Column(name = "file_type")
     private String fileType;
 
+    @Column(name = "create_date")
     private Date createDate;
 
     @Override
@@ -69,14 +94,6 @@ public class DacoAnswer implements Cloneable {
 	return cloned;
     }
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-
-    /**
-     *
-     * @return Returns the answer ID.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -85,10 +102,6 @@ public class DacoAnswer implements Cloneable {
 	uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public DacoUser getUser() {
 	return user;
     }
@@ -97,10 +110,6 @@ public class DacoAnswer implements Cloneable {
 	this.user = user;
     }
 
-    /**
-     *
-     * @return Returns the record ID.
-     */
     public Integer getRecordId() {
 	return recordId;
     }
@@ -109,10 +118,6 @@ public class DacoAnswer implements Cloneable {
 	this.recordId = recordId;
     }
 
-    /**
-     *
-     * @return Returns the answer.
-     */
     public String getAnswer() {
 	return answer;
     }
@@ -121,10 +126,6 @@ public class DacoAnswer implements Cloneable {
 	this.answer = answer;
     }
 
-    /**
-     *
-     * @return
-     */
     public DacoQuestion getQuestion() {
 	return question;
     }
@@ -133,11 +134,6 @@ public class DacoAnswer implements Cloneable {
 	this.question = question;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Long getFileUuid() {
 	return fileUuid;
     }
@@ -146,10 +142,6 @@ public class DacoAnswer implements Cloneable {
 	fileUuid = crUuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getFileVersionId() {
 	return fileVersionId;
     }
@@ -158,9 +150,6 @@ public class DacoAnswer implements Cloneable {
 	fileVersionId = crVersionId;
     }
 
-    /**
-     *
-     */
     public String getFileType() {
 	return fileType;
     }
@@ -169,9 +158,6 @@ public class DacoAnswer implements Cloneable {
 	fileType = type;
     }
 
-    /**
-     *
-     */
     public String getFileName() {
 	return fileName;
     }
@@ -180,9 +166,6 @@ public class DacoAnswer implements Cloneable {
 	fileName = name;
     }
 
-    /**
-     *
-     */
     public Date getCreateDate() {
 	return createDate;
     }

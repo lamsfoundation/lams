@@ -25,30 +25,44 @@ package org.lamsfoundation.lams.tool.survey.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
- * Survey
- * 
  * @author Dapeng Ni
- *
- *
- *
  */
+
+@Entity
+@Table(name = "tl_lasurv11_session")
 public class SurveySession {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "session_id")
     private Long sessionId;
+
+    @Column(name = "session_name")
     private String sessionName;
+
+    @ManyToOne
+    @JoinColumn(name = "survey_uid")
     private Survey survey;
+
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
-//  **********************************************************
-    //		Get/Set methods
-//  **********************************************************
-    /**
-     *
-     * @return Returns the learnerID.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -57,10 +71,6 @@ public class SurveySession {
 	this.uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -69,11 +79,6 @@ public class SurveySession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     * 
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -82,11 +87,6 @@ public class SurveySession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Survey getSurvey() {
 	return survey;
     }
@@ -95,10 +95,6 @@ public class SurveySession {
 	this.survey = survey;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -107,21 +103,11 @@ public class SurveySession {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * @return Returns the session name
-     */
     public String getSessionName() {
 	return sessionName;
     }
 
-    /**
-     * 
-     * @param sessionName
-     *            The session name to set.
-     */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-
 }

@@ -25,45 +25,76 @@ package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- * Resource
+ * Resource user
  *
  * @author Dapeng Ni
- *
- *
  */
+@Entity
+@Table(name = "tl_larsrc11_user")
 public class ResourceUser implements Cloneable {
-    private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(ResourceUser.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_id")
     private Long userId;
+    
+    @Column(name = "first_name")
     private String firstName;
+    
+    @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "login_name")
     private String loginName;
+    
+    @Column(name = "session_finished")
     private boolean sessionFinished;
 
+    @ManyToOne
+    @JoinColumn(name = "session_uid")
     private ResourceSession session;
+    
+    @ManyToOne
+    @JoinColumn(name = "resource_uid")
     private Resource resource;
 
     // =============== NON Persisit value: for display use ===========
-    // the user access some reousrce item date time. Use in monitoring summary page
+    
+    // the user access some resource item date time. Use in monitoring summary page
+    @Transient
     private Date accessDate;
     // resource item complete date. Use in monitoring summary page
+    @Transient
     private Date completeDate;
     // difference between completeDate and accessDate
+    @Transient
     private Date timeTaken;
 
     public ResourceUser() {
     }
 
     public ResourceUser(UserDTO user, ResourceSession session) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -73,7 +104,7 @@ public class ResourceUser implements Cloneable {
     }
 
     public ResourceUser(UserDTO user, Resource content) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -82,12 +113,8 @@ public class ResourceUser implements Cloneable {
 	this.sessionFinished = false;
     }
 
-    /**
-     * Clone method from <code>java.lang.Object</code>
-     */
     @Override
     public Object clone() {
-
 	ResourceUser user = null;
 	try {
 	    user = (ResourceUser) super.clone();
@@ -99,6 +126,27 @@ public class ResourceUser implements Cloneable {
 	}
 
 	return user;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (!(obj instanceof ResourceUser)) {
+	    return false;
+	}
+
+	final ResourceUser user = (ResourceUser) obj;
+
+	return new EqualsBuilder().append(this.uid, user.uid).append(this.firstName, user.firstName)
+		.append(this.lastName, user.lastName).append(this.loginName, user.loginName).isEquals();
+
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }
 
     // **********************************************************
@@ -136,10 +184,6 @@ public class ResourceUser implements Cloneable {
 	this.userId = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getLastName() {
 	return lastName;
     }
@@ -148,10 +192,6 @@ public class ResourceUser implements Cloneable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getFirstName() {
 	return firstName;
     }
@@ -160,10 +200,6 @@ public class ResourceUser implements Cloneable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -172,10 +208,6 @@ public class ResourceUser implements Cloneable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     * @return
-     */
     public ResourceSession getSession() {
 	return session;
     }
@@ -184,10 +216,6 @@ public class ResourceUser implements Cloneable {
 	this.session = session;
     }
 
-    /**
-     *
-     * @return
-     */
     public Resource getResource() {
 	return resource;
     }
@@ -196,37 +224,12 @@ public class ResourceUser implements Cloneable {
 	this.resource = content;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isSessionFinished() {
 	return sessionFinished;
     }
 
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (!(obj instanceof ResourceUser)) {
-	    return false;
-	}
-
-	final ResourceUser user = (ResourceUser) obj;
-
-	return new EqualsBuilder().append(this.uid, user.uid).append(this.firstName, user.firstName)
-		.append(this.lastName, user.lastName).append(this.loginName, user.loginName).isEquals();
-
-    }
-
-    @Override
-    public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }
 
     public Date getAccessDate() {

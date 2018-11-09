@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -50,7 +49,6 @@ import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -70,8 +68,6 @@ import org.lamsfoundation.lams.util.FileUtilException;
  * @author Ozgur Demirtas 24/06/2005
  */
 public class LamsToolService implements ILamsToolService {
-    private static Logger log = Logger.getLogger(LamsToolService.class);
-
     // Leader selection tool Constants
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
@@ -91,15 +87,13 @@ public class LamsToolService implements ILamsToolService {
     private IDataFlowDAO dataFlowDAO;
 
     @Override
-    public IToolVO getToolByID(Long toolId) {
-	Tool tool = toolDAO.getToolByID(toolId);
-	return tool.createBasicToolVO();
+    public Tool getToolByID(Long toolId) {
+	return toolDAO.getToolByID(toolId);
     }
 
     @Override
-    public IToolVO getToolBySignature(final String toolSignature) {
-	Tool tool = toolDAO.getToolBySignature(toolSignature);
-	return tool.createBasicToolVO();
+    public Tool getToolBySignature(final String toolSignature) {
+	return toolDAO.getToolBySignature(toolSignature);
     }
 
     @Override
@@ -137,12 +131,12 @@ public class LamsToolService implements ILamsToolService {
     public ToolSession getToolSession(Long toolSessionId) {
 	return toolSessionDAO.getToolSession(toolSessionId);
     }
-    
+
     @Override
     public String completeToolSession(Long toolSessionId, Long learnerId) {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
-    
+
     @Override
     public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook) {
@@ -154,7 +148,6 @@ public class LamsToolService implements ILamsToolService {
 	gradebookService.removeActivityMark(userID, toolSessionID);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Boolean isGroupedActivity(long toolContentID) {
 	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentID);
@@ -206,11 +199,10 @@ public class LamsToolService implements ILamsToolService {
 	}
 
     }
-    
+
     @Override
     public ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId) {
-	DataFlowObject dataFlowObject = dataFlowDAO.getAssignedDataFlowObject(requestingToolContentId,
-		assigmentId);
+	DataFlowObject dataFlowObject = dataFlowDAO.getAssignedDataFlowObject(requestingToolContentId, assigmentId);
 	User learner = (User) userManagementService.findById(User.class, learnerId);
 	Activity activity = dataFlowObject.getDataTransition().getFromActivity();
 	String outputName = dataFlowObject.getName();
@@ -463,7 +455,7 @@ public class LamsToolService implements ILamsToolService {
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
 	return session.getLearners().size();
     }
-    
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -509,11 +501,11 @@ public class LamsToolService implements ILamsToolService {
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
-    
+
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
-    
+
     /**
      * @param userService
      *            User Management Service
@@ -521,7 +513,7 @@ public class LamsToolService implements ILamsToolService {
     public void setUserManagementService(IUserManagementService userService) {
 	this.userManagementService = userService;
     }
-    
+
     public void setDataFlowDAO(IDataFlowDAO dataFlowDAO) {
 	this.dataFlowDAO = dataFlowDAO;
     }

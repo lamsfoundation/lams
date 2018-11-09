@@ -12,14 +12,30 @@
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
  	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
- 		 rather than several local Session Factiories.
+ 		 rather than several local Session Factories.
  	-->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="dataSource"/></property>
-		<property name="mappingLocations">
+		<property name="packagesToScan">
 			<list>
-				<value>classpath*:org/lamsfoundation/lams/**/*.hbm.xml</value>
-				<value>classpath*:org/eucm/lams/**/*.hbm.xml</value>
+				<value>org.lamsfoundation.lams.comments</value>
+				<value>org.lamsfoundation.lams.config</value>
+				<value>org.lamsfoundation.lams.contentrepository</value>
+				<value>org.lamsfoundation.lams.events</value>
+				<value>org.lamsfoundation.lams.gradebook</value>
+				<value>org.lamsfoundation.lams.integration</value>
+				<value>org.lamsfoundation.lams.learningdesign</value>
+				<value>org.lamsfoundation.lams.lesson</value>
+				<value>org.lamsfoundation.lams.logevent</value>
+				<value>org.lamsfoundation.lams.outcome</value>
+				<value>org.lamsfoundation.lams.planner</value>
+				<value>org.lamsfoundation.lams.policies</value>
+				<value>org.lamsfoundation.lams.themes</value>
+				<value>org.lamsfoundation.lams.timezone</value>
+				<value>org.lamsfoundation.lams.tool</value>
+				<value>org.lamsfoundation.lams.usermanagement</value>
+				<value>org.lamsfoundation.lams.workspace</value>
+				<value>org.lamsfoundation.lams.**.model</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -344,7 +360,7 @@
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
-				<prop key="rateItem">PROPAGATION_REQUIRED</prop>
+				<prop key="rate*">PROPAGATION_REQUIRED</prop>
 				<prop key="commentItem">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>

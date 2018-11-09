@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.web.form;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 
 /**
  * Creation Date: 19-05-05

@@ -21,51 +21,61 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionService;
 
-/**
- *
- */
+@Entity
+@Table(name = "tl_lalead11_leaderselection")
 public class Leaderselection implements java.io.Serializable, Cloneable {
-
     private static final long serialVersionUID = 579733009969321015L;
+    private static Logger log = Logger.getLogger(LeaderselectionService.class.getName());
 
-    static Logger log = Logger.getLogger(LeaderselectionService.class.getName());
-
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
-    private Set leaderselectionSessions;
+    @OneToMany(mappedBy = "leaderselection")
+    private Set<LeaderselectionSession> leaderselectionSessions = new HashSet<>();
 
-    // Property accessors
-    /**
-     *
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -74,10 +84,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -86,10 +92,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     *
-     */
     public Date getUpdateDate() {
 	return updateDate;
     }
@@ -98,10 +100,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     *
-     */
     public Long getCreateBy() {
 	return createBy;
     }
@@ -110,10 +108,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     *
-     */
     public String getTitle() {
 	return title;
     }
@@ -122,10 +116,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     *
-     */
     public String getInstructions() {
 	return instructions;
     }
@@ -134,10 +124,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -146,10 +132,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     *
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -158,10 +140,6 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     *
-     */
     public Long getToolContentId() {
 	return toolContentId;
     }
@@ -170,26 +148,14 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
-    public Set getLeaderselectionSessions() {
+    public Set<LeaderselectionSession> getLeaderselectionSessions() {
 	return leaderselectionSessions;
     }
 
-    public void setLeaderselectionSessions(Set leaderselectionSessions) {
+    public void setLeaderselectionSessions(Set<LeaderselectionSession> leaderselectionSessions) {
 	this.leaderselectionSessions = leaderselectionSessions;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -244,7 +210,7 @@ public class Leaderselection implements java.io.Serializable, Cloneable {
 	    leaderselection.setUid(null);
 
 	    // create an empty set for the leaderselectionSession
-	    leaderselection.leaderselectionSessions = new HashSet();
+	    leaderselection.leaderselectionSessions = new HashSet<LeaderselectionSession>();
 
 	} catch (CloneNotSupportedException cnse) {
 	    Leaderselection.log.error("Error cloning " + Leaderselection.class);

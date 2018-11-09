@@ -9,6 +9,7 @@ package org.hibernate.property.access.internal;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.property.access.spi.PropertyAccessSerializationException;
 
 /**
@@ -31,7 +32,9 @@ public abstract class AbstractFieldSerialForm implements Serializable {
 
 	protected Field resolveField() {
 		try {
-			return declaringClass.getDeclaredField( fieldName );
+			final Field field = declaringClass.getDeclaredField( fieldName );
+			ReflectHelper.ensureAccessibility( field );
+			return field;
 		}
 		catch (NoSuchFieldException e) {
 			throw new PropertyAccessSerializationException(

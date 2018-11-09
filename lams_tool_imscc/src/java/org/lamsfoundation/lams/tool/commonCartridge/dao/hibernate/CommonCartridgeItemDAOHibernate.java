@@ -36,10 +36,10 @@ public class CommonCartridgeItemDAOHibernate extends LAMSBaseDAO implements Comm
     private static final String FIND_AUTHORING_ITEMS = "from " + CommonCartridgeItem.class.getName()
 	    + " where commonCartridge_uid = ? order by create_date asc";
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List getAuthoringItems(Long commonCartridgeUid) {
-
-	return this.doFind(FIND_AUTHORING_ITEMS, commonCartridgeUid);
+    public List<CommonCartridgeItem> getAuthoringItems(Long commonCartridgeUid) {
+	return (List<CommonCartridgeItem>) this.doFind(FIND_AUTHORING_ITEMS, commonCartridgeUid);
     }
 
     @Override

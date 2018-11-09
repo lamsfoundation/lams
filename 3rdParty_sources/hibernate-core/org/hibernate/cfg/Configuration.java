@@ -6,6 +6,19 @@
  */
 package org.hibernate.cfg;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import javax.persistence.AttributeConverter;
+import javax.persistence.SharedCacheMode;
+
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
@@ -29,7 +42,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.annotations.NamedEntityGraphDefinition;
 import org.hibernate.cfg.annotations.NamedProcedureCallDefinition;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.ResultSetMappingDefinition;
 import org.hibernate.engine.spi.NamedQueryDefinition;
@@ -46,19 +58,6 @@ import org.hibernate.type.CustomType;
 import org.hibernate.type.SerializationException;
 import org.hibernate.usertype.CompositeUserType;
 import org.hibernate.usertype.UserType;
-
-import javax.persistence.AttributeConverter;
-import javax.persistence.SharedCacheMode;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Represents one approach for bootstrapping Hibernate.  In fact, historically this was
@@ -83,7 +82,7 @@ import java.util.Properties;
  */
 @SuppressWarnings( {"UnusedDeclaration"})
 public class Configuration {
-    private static final CoreMessageLogger log = CoreLogging.messageLogger( Configuration.class );
+	private static final CoreMessageLogger log = CoreLogging.messageLogger( Configuration.class );
 
 	public static final String ARTEFACT_PROCESSING_ORDER = AvailableSettings.ARTIFACT_PROCESSING_ORDER;
 
@@ -651,7 +650,6 @@ public class Configuration {
 	 */
 	public SessionFactory buildSessionFactory(ServiceRegistry serviceRegistry) throws HibernateException {
 		log.debug( "Building session factory using provided StandardServiceRegistry" );
-
 		final MetadataBuilder metadataBuilder = metadataSources.getMetadataBuilder( (StandardServiceRegistry) serviceRegistry );
 		if ( implicitNamingStrategy != null ) {
 			metadataBuilder.applyImplicitNamingStrategy( implicitNamingStrategy );
@@ -688,7 +686,6 @@ public class Configuration {
 			}
 		}
 
-
 		final Metadata metadata = metadataBuilder.build();
 
 		final SessionFactoryBuilder sessionFactoryBuilder = metadata.getSessionFactoryBuilder();
@@ -698,11 +695,14 @@ public class Configuration {
 		if ( getSessionFactoryObserver() != null ) {
 			sessionFactoryBuilder.addSessionFactoryObservers( getSessionFactoryObserver() );
 		}
-		if ( entityNotFoundDelegate != null ) {
-			sessionFactoryBuilder.applyEntityNotFoundDelegate( entityNotFoundDelegate );
+		if ( getEntityNotFoundDelegate() != null ) {
+			sessionFactoryBuilder.applyEntityNotFoundDelegate( getEntityNotFoundDelegate() );
 		}
-		if ( entityTuplizerFactory != null ) {
-			sessionFactoryBuilder.applyEntityTuplizerFactory( entityTuplizerFactory );
+		if ( getEntityTuplizerFactory() != null ) {
+			sessionFactoryBuilder.applyEntityTuplizerFactory( getEntityTuplizerFactory() );
+		}
+		if ( getCurrentTenantIdentifierResolver() != null ) {
+			sessionFactoryBuilder.applyCurrentTenantIdentifierResolver( getCurrentTenantIdentifierResolver() );
 		}
 
 		return sessionFactoryBuilder.build();
@@ -766,7 +766,7 @@ public class Configuration {
 
 	/**
 	 * Adds the AttributeConverter instance to this Configuration.  This form is mainly intended for developers
-	 * to programatically add their own AttributeConverter instance.  HEM, instead, uses the
+	 * to programmatically add their own AttributeConverter instance.  HEM, instead, uses the
 	 * {@link #addAttributeConverter(Class, boolean)} form
 	 *
 	 * @param attributeConverter The AttributeConverter instance.
@@ -777,7 +777,7 @@ public class Configuration {
 
 	/**
 	 * Adds the AttributeConverter instance to this Configuration.  This form is mainly intended for developers
-	 * to programatically add their own AttributeConverter instance.  HEM, instead, uses the
+	 * to programmatically add their own AttributeConverter instance.  HEM, instead, uses the
 	 * {@link #addAttributeConverter(Class, boolean)} form
 	 *
 	 * @param attributeConverter The AttributeConverter instance.

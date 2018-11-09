@@ -23,24 +23,32 @@
 
 package org.lamsfoundation.lams.tool.scratchie.model;
 
-/**
- *
- */
-public class ScratchieConfigItem implements java.io.Serializable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "tl_lascrt11_configuration")
+public class ScratchieConfigItem implements java.io.Serializable {
     private static final long serialVersionUID = 6360672537352753361L;
 
     public static final String KEY_IS_ENABLED_EXTRA_POINT_OPTION = "isEnabledExtraPointOption";
     public static final String KEY_PRESET_MARKS = "presetMarks";
 
+    @Id
+    @Column(name = "uid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "config_key")
     private String configKey;
+    
+    @Column(name = "config_value")
     private String configValue;
 
-    /**
-     *
-     *
-     */
     public Long getId() {
 	return id;
     }
@@ -49,9 +57,6 @@ public class ScratchieConfigItem implements java.io.Serializable {
 	this.id = id;
     }
 
-    /**
-     *
-     */
     public String getConfigKey() {
 	return configKey;
     }
@@ -60,9 +65,6 @@ public class ScratchieConfigItem implements java.io.Serializable {
 	this.configKey = configKey;
     }
 
-    /**
-     *
-     */
     public String getConfigValue() {
 	return configValue;
     }

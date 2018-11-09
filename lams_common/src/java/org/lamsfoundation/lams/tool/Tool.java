@@ -28,95 +28,112 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
+@Entity
+@Table(name = "lams_tool")
 public class Tool implements Serializable {
+    private static final long serialVersionUID = 626016857794096029L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "tool_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long toolId;
 
-    /** persistent field */
-    private boolean supportsGrouping;
-
-    /** persistent field */
+    @Column(name = "learner_url")
     private String learnerUrl;
 
-    /** persistent field */
+    @Column(name = "learner_preview_url")
     private String learnerPreviewUrl;
 
-    /** persistent field */
+    @Column(name = "learner_progress_url")
     private String learnerProgressUrl;
 
-    /** nullable persistent field */
+    @Column(name = "author_url")
     private String authorUrl;
 
-    /** persistent field */
+    @Column(name = "monitor_url")
     private String monitorUrl;
 
-    /** persistent field */
+    @Column(name = "pedagogical_planner_url")
     private String pedagogicalPlannerUrl;
 
-    /** persistent field */
+    @Column(name = "help_url")
     private String helpUrl;
 
-    /** persistent field */
+    @Column(name = "admin_url")
     private String adminUrl;
 
-    /** persistent field */
+    @Column(name = "valid_flag")
     private boolean valid;
 
-    /** nullable persistent field */
+    @Column(name = "default_tool_content_id")
     private long defaultToolContentId;
 
-    /** persistent field */
+    @Column(name = "tool_signature")
     private String toolSignature;
 
-    /** persistent field */
+    @Column(name = "tool_display_name")
     private String toolDisplayName;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
+    @Column(name = "service_name")
     private String serviceName;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
-    /** persistent field */
-    private Set activities;
+    @OneToMany(mappedBy = "tool")
+    private Set<ToolActivity> activities = new HashSet<ToolActivity>();
 
-    /** persistent field */
-    private Set<ExtServerToolAdapterMap> mappedServers;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tool_id")
+    private Set<ExtServerToolAdapterMap> mappedServers = new HashSet<ExtServerToolAdapterMap>();
 
-    /** persistent field */
+    @Column(name = "grouping_support_type_id")
     private Integer groupingSupportTypeId;
 
-    /** persistent field */
+    @Column(name = "tool_identifier")
     private String toolIdentifier;
 
-    /** persistent field */
+    @Column(name = "tool_version")
     private String toolVersion;
 
-    /** persistent field */
+    @Column(name = "learning_library_id")
     private Long learningLibraryId;
 
     /**
      * Name of the file (including the package) that contains the text strings for this activity. e.g.
      * org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
      */
+    @Column(name = "language_file")
     private String languageFile;
 
     /** Does this tool produce output definitions / conditions */
+    @Column(name = "supports_outputs")
     private Boolean supportsOutputs;
 
     /**
      * Null if not a tool adapter tool, otherwise this string maps to the external server which this tool adapter will
      * be used for
      */
+    @Column(name = "ext_lms_id")
     private String extLmsId;
 
     /**
@@ -125,58 +142,7 @@ public class Tool implements Serializable {
     public static final String I18N_DISPLAY_NAME = "tool.display.name";
     public static final String I18N_DESCRIPTION = "tool.description";
 
-    /** full constructor */
-    public Tool(Long toolId, String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String authorUrl,
-	    String monitorUrl, String contributeUrl, String moderationUrl, boolean supportsGrouping,
-	    long defaultToolContentId, String toolSignature, String toolDisplayName, String description,
-	    String className, Set activities, Integer groupingSupportTypeId, Date createDateTime, String toolIdentifier,
-	    String toolVersion, String languageFile, boolean supportsOutputs, String extLmsId) {
-	this.toolId = toolId;
-	this.learnerUrl = learnerUrl;
-	this.learnerPreviewUrl = learnerPreviewUrl;
-	this.learnerProgressUrl = learnerProgressUrl;
-	this.authorUrl = authorUrl;
-	this.monitorUrl = monitorUrl;
-
-	this.supportsGrouping = supportsGrouping;
-	this.defaultToolContentId = defaultToolContentId;
-	this.toolSignature = toolSignature;
-	this.toolDisplayName = toolDisplayName;
-	this.description = description;
-	serviceName = className;
-	this.activities = activities;
-	this.groupingSupportTypeId = groupingSupportTypeId;
-	this.createDateTime = createDateTime;
-	this.toolIdentifier = toolIdentifier;
-	this.toolVersion = toolVersion;
-	this.languageFile = languageFile;
-	this.supportsOutputs = supportsOutputs;
-	this.extLmsId = extLmsId;
-	this.mappedServers = new HashSet<ExtServerToolAdapterMap>();
-    }
-
-    /** default constructor */
     public Tool() {
-    }
-
-    /** minimal constructor */
-    public Tool(Long toolId, String learnerUrl, String authorUrl, boolean supportsGrouping, long defaultToolContentId,
-	    String toolSignature, String toolDisplayName, String className, Set activities,
-	    Integer groupingSupportTypeId, Date createDateTime, String toolIdentifier, String toolVersion) {
-	this.toolId = toolId;
-	this.learnerUrl = learnerUrl;
-	this.authorUrl = authorUrl;
-	this.supportsGrouping = supportsGrouping;
-	this.defaultToolContentId = defaultToolContentId;
-	this.toolSignature = toolSignature;
-	this.toolDisplayName = toolDisplayName;
-	serviceName = className;
-	this.activities = activities;
-	this.groupingSupportTypeId = groupingSupportTypeId;
-	this.createDateTime = createDateTime;
-	this.toolIdentifier = toolIdentifier;
-	this.toolVersion = toolVersion;
-	this.mappedServers = new HashSet<ExtServerToolAdapterMap>();
     }
 
     public Long getToolId() {
@@ -259,100 +225,58 @@ public class Tool implements Serializable {
 	this.serviceName = serviceName;
     }
 
-    public Set getActivities() {
+    public Set<ToolActivity> getActivities() {
 	return activities;
     }
 
-    public void setActivities(Set activities) {
+    public void setActivities(Set<ToolActivity> activities) {
 	this.activities = activities;
     }
 
-    /**
-     * @return Returns the valid.
-     */
     public boolean isValid() {
 	return valid;
     }
 
-    /**
-     * @param valid
-     *            The valid to set.
-     */
     public void setValid(boolean valid) {
 	this.valid = valid;
     }
 
-    /**
-     * @return Returns the groupingSupportTypeId.
-     */
     public Integer getGroupingSupportTypeId() {
 	return groupingSupportTypeId;
     }
 
-    /**
-     * @param groupingSupportTypeId
-     *            The groupingSupportTypeId to set.
-     */
     public void setGroupingSupportTypeId(Integer groupingSupportTypeId) {
 	this.groupingSupportTypeId = groupingSupportTypeId;
     }
 
-    /**
-     * @return Returns the createDateTime.
-     */
     public Date getCreateDateTime() {
 	return createDateTime;
     }
 
-    /**
-     * @param createDateTime
-     *            The createDateTime to set.
-     */
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
     }
 
-    /**
-     * @return Returns the monitorUrl.
-     */
     public String getMonitorUrl() {
 	return monitorUrl;
     }
 
-    /**
-     * @param monitorUrl
-     *            The monitorUrl to set.
-     */
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
     }
 
-    /**
-     * @return Returns the helpUrl.
-     */
     public String getHelpUrl() {
 	return helpUrl;
     }
 
-    /**
-     * @param helpUrl
-     *            The helpUrl to set.
-     */
     public void setHelpUrl(String helpUrl) {
 	this.helpUrl = helpUrl;
     }
 
-    /**
-     * @return Returns the helpUrl.
-     */
     public String getAdminUrl() {
 	return adminUrl;
     }
 
-    /**
-     * @param helpUrl
-     *            The helpUrl to set.
-     */
     public void setAdminUrl(String adminUrl) {
 	this.adminUrl = adminUrl;
     }
@@ -389,17 +313,10 @@ public class Tool implements Serializable {
 	this.languageFile = languageFile;
     }
 
-    /**
-     * @return Returns the supportsOutputs.
-     */
     public boolean getSupportsOutputs() {
 	return supportsOutputs;
     }
 
-    /**
-     * @param supportsOutputs
-     *            The supportsOutputs to set.
-     */
     public void setSupportsOutputs(boolean supportsOutputs) {
 	this.supportsOutputs = supportsOutputs;
     }
@@ -432,14 +349,6 @@ public class Tool implements Serializable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getToolId()).toHashCode();
-    }
-
-    public IToolVO createBasicToolVO() {
-	IToolVO vo = new BasicToolVO(toolId, supportsGrouping, learnerUrl, learnerPreviewUrl, learnerProgressUrl,
-		authorUrl, monitorUrl, helpUrl, defaultToolContentId, learningLibraryId, toolSignature, toolDisplayName, description,
-		serviceName, createDateTime, groupingSupportTypeId, toolIdentifier, toolVersion, languageFile,
-		extLmsId);
-	return vo;
     }
 
     public String getPedagogicalPlannerUrl() {

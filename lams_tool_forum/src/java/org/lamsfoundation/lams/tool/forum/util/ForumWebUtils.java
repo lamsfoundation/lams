@@ -28,8 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**

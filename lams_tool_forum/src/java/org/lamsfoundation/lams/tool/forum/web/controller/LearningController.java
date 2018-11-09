@@ -43,22 +43,20 @@ import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.forum.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
-import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
-import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
+import org.lamsfoundation.lams.tool.forum.model.Attachment;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
+import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.Message;
+import org.lamsfoundation.lams.tool.forum.model.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.ForumException;
+import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -319,9 +317,7 @@ public class LearningController {
 
 		// finish current session for user
 		forumService.finishUserSession(getCurrentUser(request, sessionId));
-		ToolSessionManager sessionMgrService = ForumServiceProxy
-			.getToolSessionManager(applicationContext.getServletContext());
-		nextActivityUrl = sessionMgrService.leaveToolSession(sessionId, userID);
+		nextActivityUrl = forumService.leaveToolSession(sessionId, userID);
 		response.sendRedirect(nextActivityUrl);
 	    } catch (DataMissingException e) {
 		throw new ForumException(e);
@@ -1075,18 +1071,19 @@ public class LearningController {
 		&& !StringUtils.isBlank(messageForm.getAttachmentFile().getOriginalFilename())) {
 
 	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
-	    Set attSet = message.getAttachments();
+	    Set<Attachment> attSet = message.getAttachments();
 	    if (attSet == null) {
-		attSet = new HashSet();
+		attSet = new HashSet<Attachment>();
 	    }
 	    // only allow one attachment, so replace whatever
 	    attSet.clear();
 	    attSet.add(att);
+	    att.setMessage(message);
 	    message.setAttachments(attSet);
 	} else if (!messageForm.isHasAttachment()) {
 	    // user already called deleteAttachment in AJAX call
 	    if (message.getAttachments() != null) {
-		Set atts = message.getAttachments();
+		Set<Attachment> atts = message.getAttachments();
 		atts.clear();
 		message.setAttachments(atts);
 	    } else {

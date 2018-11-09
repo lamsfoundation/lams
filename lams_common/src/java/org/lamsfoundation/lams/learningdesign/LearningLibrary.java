@@ -25,7 +25,16 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -34,47 +43,34 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * @author Manpreet Minhas
  */
+@Entity
+@Table(name = "lams_learning_library")
 public class LearningLibrary implements Serializable {
+    private static final long serialVersionUID = -6055089410863321036L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "learning_library_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long learningLibraryId;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
-    /** persistent field */
-    private Set activities;
+    @OneToMany(mappedBy = "learningLibrary")
+    private Set<Activity> activities = new HashSet<Activity>();
 
-    /** persistent field */
+    @Column(name = "valid_flag")
     private Boolean validLibrary;
-
-    /* If the values for createDateTime is null, it will default to the current datetime */
-    /** full constructor */
-    public LearningLibrary(Long learningLibraryId, String description, String title, Date createDateTime,
-	    Set activities) {
-	this.learningLibraryId = learningLibraryId;
-	this.description = description;
-	this.title = title;
-	this.createDateTime = createDateTime != null ? createDateTime : new Date();
-	this.activities = activities;
-    }
 
     /** default constructor */
     public LearningLibrary() {
 	this.createDateTime = new Date();
-    }
-
-    /** minimal constructor */
-    public LearningLibrary(Long learningLibraryId, Date createDateTime, Set activities) {
-	this.learningLibraryId = learningLibraryId;
-	this.createDateTime = createDateTime != null ? createDateTime : new Date();
-	this.activities = activities;
     }
 
     public Long getLearningLibraryId() {
@@ -109,11 +105,11 @@ public class LearningLibrary implements Serializable {
 	this.createDateTime = createDateTime != null ? createDateTime : new Date();
     }
 
-    public Set getActivities() {
+    public Set<Activity> getActivities() {
 	return this.activities;
     }
 
-    public void setActivities(Set activities) {
+    public void setActivities(Set<Activity> activities) {
 	this.activities = activities;
     }
 

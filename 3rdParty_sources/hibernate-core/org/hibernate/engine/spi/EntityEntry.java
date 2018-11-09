@@ -89,7 +89,7 @@ public interface EntityEntry {
 	 */
 	void postInsert(Object[] insertedState);
 
-	boolean isNullifiable(boolean earlyInsert, SessionImplementor session);
+	boolean isNullifiable(boolean earlyInsert, SharedSessionContractImplementor session);
 
 	/**
 	 * Not sure this is the best method name, but the general idea here is to return {@code true} if the entity can
@@ -126,8 +126,6 @@ public interface EntityEntry {
 
 	@Override
 	String toString();
-
-	boolean isLoadedWithLazyPropertiesUnfetched();
 
 	/**
 	 * Custom serialization routine used during serialization of a

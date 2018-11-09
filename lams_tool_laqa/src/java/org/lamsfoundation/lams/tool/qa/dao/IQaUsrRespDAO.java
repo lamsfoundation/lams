@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**

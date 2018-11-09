@@ -26,43 +26,76 @@ package org.lamsfoundation.lams.tool.spreadsheet.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- * Spreadsheet
+ * Spreadsheet user
  * 
  * @author Andrey Balan
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_lasprd10_user")
 public class SpreadsheetUser implements Cloneable, Serializable {
     private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(SpreadsheetUser.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_id")
     private Long userId;
+    
+    @Column(name = "first_name")
     private String firstName;
+    
+    @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "login_name")
     private String loginName;
+    
+    @Column(name = "session_finished")
     private boolean sessionFinished;
 
+    @ManyToOne
+    @JoinColumn(name = "session_uid")
     private SpreadsheetSession session;
+    
+    @ManyToOne
+    @JoinColumn(name = "spreadsheet_uid")
     private Spreadsheet spreadsheet;
+    
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_modified_spreadsheet_uid")
     private UserModifiedSpreadsheet userModifiedSpreadsheet;
 
     //=============== NON Persisit value: for display use ===========
+    
     //the user access some reousrce item date time. Use in monitoring summary page
+    @Transient
     private Date accessDate;
 
     public SpreadsheetUser() {
     }
 
     public SpreadsheetUser(UserDTO user, SpreadsheetSession session) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -72,7 +105,7 @@ public class SpreadsheetUser implements Cloneable, Serializable {
     }
 
     public SpreadsheetUser(UserDTO user, Spreadsheet content) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -81,12 +114,8 @@ public class SpreadsheetUser implements Cloneable, Serializable {
 	this.sessionFinished = false;
     }
 
-    /**
-     * Clone method from <code>java.lang.Object</code>
-     */
     @Override
     public Object clone() {
-
 	SpreadsheetUser user = null;
 	try {
 	    user = (SpreadsheetUser) super.clone();
@@ -98,129 +127,6 @@ public class SpreadsheetUser implements Cloneable, Serializable {
 	}
 
 	return user;
-    }
-
-//  **********************************************************
-    //		Get/Set methods
-//  **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
-    public Long getUid() {
-	return uid;
-    }
-
-    /**
-     * @param uid
-     *            The uid to set.
-     */
-    public void setUid(Long userID) {
-	this.uid = userID;
-    }
-
-    /**
-     *
-     * @return Returns the userId.
-     */
-    public Long getUserId() {
-	return userId;
-    }
-
-    /**
-     * @param userId
-     *            The userId to set.
-     */
-    public void setUserId(Long userID) {
-	this.userId = userID;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getLastName() {
-	return lastName;
-    }
-
-    public void setLastName(String lastName) {
-	this.lastName = lastName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getFirstName() {
-	return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-	this.firstName = firstName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getLoginName() {
-	return loginName;
-    }
-
-    public void setLoginName(String loginName) {
-	this.loginName = loginName;
-    }
-
-    /**
-     *
-     *
-     * @return
-     */
-    public SpreadsheetSession getSession() {
-	return session;
-    }
-
-    public void setSession(SpreadsheetSession session) {
-	this.session = session;
-    }
-
-    /**
-     *
-     *
-     * @return
-     */
-    public Spreadsheet getSpreadsheet() {
-	return spreadsheet;
-    }
-
-    public void setSpreadsheet(Spreadsheet spreadsheet) {
-	this.spreadsheet = spreadsheet;
-    }
-
-    /**
-     *
-     *
-     * 
-     * @return
-     */
-    public UserModifiedSpreadsheet getUserModifiedSpreadsheet() {
-	return userModifiedSpreadsheet;
-    }
-
-    public void setUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet) {
-	this.userModifiedSpreadsheet = userModifiedSpreadsheet;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isSessionFinished() {
-	return sessionFinished;
-    }
-
-    public void setSessionFinished(boolean sessionFinished) {
-	this.sessionFinished = sessionFinished;
     }
 
     @Override
@@ -236,12 +142,87 @@ public class SpreadsheetUser implements Cloneable, Serializable {
 
 	return new EqualsBuilder().append(this.uid, user.uid).append(this.firstName, user.firstName)
 		.append(this.lastName, user.lastName).append(this.loginName, user.loginName).isEquals();
-
     }
 
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
+    }
+
+    //  **********************************************************
+    //		Get/Set methods
+    //  **********************************************************
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long userID) {
+	this.uid = userID;
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userID) {
+	this.userId = userID;
+    }
+
+    public String getLastName() {
+	return lastName;
+    }
+
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+	return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
+
+    public String getLoginName() {
+	return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
+
+    public SpreadsheetSession getSession() {
+	return session;
+    }
+
+    public void setSession(SpreadsheetSession session) {
+	this.session = session;
+    }
+
+    public Spreadsheet getSpreadsheet() {
+	return spreadsheet;
+    }
+
+    public void setSpreadsheet(Spreadsheet spreadsheet) {
+	this.spreadsheet = spreadsheet;
+    }
+
+    public UserModifiedSpreadsheet getUserModifiedSpreadsheet() {
+	return userModifiedSpreadsheet;
+    }
+
+    public void setUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet) {
+	this.userModifiedSpreadsheet = userModifiedSpreadsheet;
+    }
+
+    public boolean isSessionFinished() {
+	return sessionFinished;
+    }
+
+    public void setSessionFinished(boolean sessionFinished) {
+	this.sessionFinished = sessionFinished;
     }
 
     public Date getAccessDate() {

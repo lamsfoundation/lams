@@ -8,17 +8,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Example;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -48,11 +52,13 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     private static Logger log = Logger.getLogger(LAMSBaseDAO.class);
 
+    @Autowired
+    @Qualifier("coreSessionFactory")
     private SessionFactory sessionFactory;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#insert(java.lang.Object)
      */
     @Override
@@ -62,7 +68,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#update(java.lang.Object)
      */
     @Override
@@ -72,7 +78,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdate(java.lang.Object)
      */
@@ -83,7 +89,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdateAll(java.util.Collection
      * )
@@ -145,7 +151,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#delete(java.lang.Object)
      */
     @Override
@@ -155,7 +161,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteAll(java.lang.Class)
      */
     @Override
@@ -166,7 +172,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteAll(java.util.Collection)
      */
     @Override
@@ -176,7 +182,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteById(java.lang.Class,
      * java.io.Serializable)
      */
@@ -187,7 +193,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#deleteByProperty(java.lang.Class,
      * java.lang.String, java.lang.Object)
@@ -200,7 +206,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#deleteByProperties(java.lang.Class,
      * java.util.Map)
@@ -213,7 +219,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#deleteAnythingLike(java.lang.Object)
      */
@@ -229,7 +235,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#find(java.lang.Class,
      * java.io.Serializable)
      */
@@ -240,7 +246,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findAll(java.lang.Class)
      */
     @Override
@@ -250,7 +256,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findByProperty(java.lang.Class,
      * java.lang.String, java.lang.Object)
      */
@@ -262,7 +268,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#findByProperties(java.lang.Class,
      * java.util.Map)
@@ -271,17 +277,6 @@ public class LAMSBaseDAO implements IBaseDAO {
     public List findByProperties(Class clazz, Map<String, Object> properties) {
 	Qv qv = buildQueryString(clazz, properties, SELECT, EQUAL_TO_WHAT);
 	return doFind(qv.queryString, qv.values);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.lamsfoundation.lams.dao.IBaseDAO#findAnythingLike(java.lang.Object)
-     */
-    @Override
-    public List findAnythingLike(Object object) {
-	return doFindByExample(null, object, -1, -1);
     }
 
     private String buildQueryString(Class clazz, String operation) {
@@ -415,7 +410,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.dao.IBaseDAO#countAll(java.lang.Class)
      */
     @Override
@@ -433,7 +428,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.dao.IBaseDAO#countByProperties(java.lang.Class,
      * java.util.Map)
@@ -465,22 +460,37 @@ public class LAMSBaseDAO implements IBaseDAO {
     }
 
     public List<?> doFind(final String queryString, final Object... values) {
-	Query queryObject = getSession().createQuery(queryString);
-	if (values != null) {
-	    for (int i = 0; i < values.length; i++) {
-		queryObject.setParameter(i, values[i]);
-	    }
-	}
+	Query queryObject = convertLegacyStyleParameters(queryString, values);
 	return queryObject.list();
     }
 
-    public int doBulkUpdate(final String queryString, final Object... values) {
-	Query queryObject = getSession().createQuery(queryString);
-	if (values != null) {
-	    for (int i = 0; i < values.length; i++) {
-		queryObject.setParameter(i, values[i]);
+    private Query convertLegacyStyleParameters(final String queryString, final Object... values) {
+	Query queryObject = null;
+	if (values == null) {
+	    queryObject = getSession().createQuery(queryString);
+	} else {
+	    // replace all the current ? with :P1, :P2, etc
+	    String[] parts = Pattern.compile("\\?").split(queryString, 0);
+	    StringBuilder bldr = new StringBuilder(parts[0]);
+	    int i = 1;
+	    if (parts.length > 1) {
+		for (; i < parts.length; i++) {
+		    bldr.append(":P").append(i).append(" ").append(parts[i]);
+		}
+	    }
+	    if (queryString.endsWith("?")) {
+		bldr.append(" :P").append(i).append(" ");
+	    }
+	    queryObject = getSession().createQuery(bldr.toString());
+	    for (i = 0; i < values.length; i++) {
+		queryObject.setParameter("P" + Integer.toString(i + 1), values[i]);
 	    }
 	}
+	return queryObject;
+    }
+
+    public int doBulkUpdate(final String queryString, final Object... values) {
+	Query queryObject = convertLegacyStyleParameters(queryString, values);
 	return queryObject.executeUpdate();
     }
 
@@ -494,47 +504,13 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return queryObject.list();
     }
 
-    public <T> List<T> doFindByExample(final String entityName, final T exampleEntity, final int firstResult,
-	    final int maxResults) {
-	if (exampleEntity == null) {
-	    throw new IllegalArgumentException("Example entity must not be null");
-	}
-
-	Criteria executableCriteria = (entityName != null ? getSession().createCriteria(entityName)
-		: getSession().createCriteria(exampleEntity.getClass()));
-	executableCriteria.add(Example.create(exampleEntity));
-	if (firstResult >= 0) {
-	    executableCriteria.setFirstResult(firstResult);
-	}
-	if (maxResults > 0) {
-	    executableCriteria.setMaxResults(maxResults);
-	}
-	return executableCriteria.list();
-    }
-
-    public <T> List<T> findByExample(final String entityName, final T exampleEntity, final int firstResult,
-	    final int maxResults) {
-
-	if (exampleEntity == null) {
-	    throw new IllegalArgumentException("Example entity must not be null");
-	}
-
-	Criteria executableCriteria = (entityName != null ? getSession().createCriteria(entityName)
-		: getSession().createCriteria(exampleEntity.getClass()));
-	executableCriteria.add(Example.create(exampleEntity));
-	if (firstResult >= 0) {
-	    executableCriteria.setFirstResult(firstResult);
-	}
-	if (maxResults > 0) {
-	    executableCriteria.setMaxResults(maxResults);
-	}
-	return executableCriteria.list();
-    }
-
     public <T> List<T> loadAll(final Class<T> entityClass) {
-	Criteria criteria = getSession().createCriteria(entityClass);
-	criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-	return criteria.list();
+	CriteriaBuilder builder = getSession().getCriteriaBuilder();
+	CriteriaQuery<T> query = builder.createQuery(entityClass);
+	Root<T> variableRoot = query.from(entityClass);
+	query.select(variableRoot);
+	return getSession().createQuery(query).getResultList();
+
     }
 
     public void doDeleteAll(final Collection<?> entities) {
@@ -619,6 +595,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	getSession().delete(getObject(clazz, id));
     }
 
+    @Override
     public void releaseFromCache(Object o) {
 	getSessionFactory().getCurrentSession().evict(o);
     }

@@ -9,7 +9,6 @@ package org.hibernate.hql.internal.ast.tree;
 import java.util.Locale;
 
 import org.hibernate.QueryException;
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.hql.spi.QueryTranslator;
@@ -39,7 +38,7 @@ public class JavaConstantNode extends Node implements ExpectedTypeAwareNode, Ses
 		// this method to get called twice.  The first time with an empty string
 		if ( StringHelper.isNotEmpty( s ) ) {
 			constantExpression = s;
-			constantValue = ReflectHelper.getConstantValue( s, factory.getServiceRegistry().getService( ClassLoaderService.class ) );
+			constantValue = ReflectHelper.getConstantValue( s, factory );
 			heuristicType = factory.getTypeResolver().heuristicType( constantValue.getClass().getName() );
 			super.setText( s );
 		}
@@ -87,7 +86,7 @@ public class JavaConstantNode extends Node implements ExpectedTypeAwareNode, Ses
 							)
 					);
 				}
-				final Object value = converterType.getAttributeConverter().convertToDatabaseColumn( constantValue );
+				final Object value = converterType.getAttributeConverter().toRelationalValue( constantValue );
 				if ( String.class.equals( converterType.getJdbcType() ) ) {
 					return "'" + value + "'";
 				}

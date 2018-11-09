@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -37,17 +37,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO {
 
-    //   private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
+    private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from voteQueContent in class VoteQueContent where voteQueContent.voteContent.uid=:voteContentId";
 
-    private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
+    private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.displayOrder=:displayOrder and voteQueContent.voteContent.uid=:voteContentUid";
 
-    private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.displayOrder=:displayOrder and voteQueContent.voteContentId=:voteContentUid";
-
-    private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId order by voteQueContent.displayOrder";
+    private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.voteContent.uid=:voteContentId order by voteQueContent.displayOrder";
 
     @Override
     public VoteQueContent getQuestionByUid(Long uid) {
-	return (VoteQueContent) this.getSession().get(VoteQueContent.class, uid);
+	return this.getSession().get(VoteQueContent.class, uid);
     }
 
     @SuppressWarnings("unchecked")
@@ -55,7 +53,7 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
     public VoteQueContent getDefaultVoteContentFirstQuestion() {
 	final long voteContentId = 1;
 	List<VoteQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId", voteContentId).list();
+		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("voteContentId", voteContentId).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueContent voteq = list.get(0);
@@ -68,8 +66,8 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
     @Override
     public VoteQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
 	List<VoteQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("displayOrder", displayOrder.longValue())
-		.setLong("voteContentUid", voteContentUid.longValue()).list();
+		.createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setParameter("displayOrder", displayOrder.intValue())
+		.setParameter("voteContentUid", voteContentUid).list();
 
 	if (list != null && list.size() > 0) {
 	    VoteQueContent voteq = list.get(0);
@@ -82,7 +80,8 @@ public class VoteQueContentDAO extends LAMSBaseDAO implements IVoteQueContentDAO
     @Override
     public List<VoteQueContent> getAllQuestionsSorted(final long voteContentId) {
 	List<VoteQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("voteContentId", voteContentId).list();
+		.createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setParameter("voteContentId", voteContentId)
+		.list();
 
 	return list;
     }

@@ -24,21 +24,51 @@
 
 package org.lamsfoundation.lams.tool.mindmap.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * @author Ruslan Kazakov
  *
  *
  *
  */
+@Entity
+@Table(name = "tl_lamind10_request")
 public class MindmapRequest implements Cloneable {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "unique_id")
     private Long uniqueId;
+
+    @Column(name = "global_id")
     private Long globalId;
+
+    @Column(name = "request_type")
     private int type;
+
+    @Column(name = "node_id")
     private Long nodeId;
+
+    @Column(name = "node_child_id")
     private Long nodeChildId;
+    
+    @ManyToOne()
+    @JoinColumn(name = "user_id") 
     private MindmapUser user;
+    
+    @ManyToOne()
+    @JoinColumn(name = "mindmap_id") 
     private Mindmap mindmap;
 
     /** default constructor */
@@ -55,13 +85,6 @@ public class MindmapRequest implements Cloneable {
 	this.mindmap = mindmap;
     }
 
-    //  **********************************************************
-    //		get/set methods
-    //  **********************************************************
-
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -70,74 +93,38 @@ public class MindmapRequest implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     * @return Returns the subject of the Message.
-     *
-     */
     public Long getUniqueId() {
 	return uniqueId;
     }
 
-    /**
-     * @param subject
-     *            The subject of the Message to be set.
-     */
     public void setUniqueId(Long uniqueId) {
 	this.uniqueId = uniqueId;
     }
 
-    /**
-     * @return Returns the subject of the Message.
-     *
-     */
     public Long getGlobalId() {
 	return globalId;
     }
 
-    /**
-     * @param globalId
-     *            the globalId to set
-     */
     public void setGlobalId(Long globalId) {
 	this.globalId = globalId;
     }
 
-    /**
-     * @return Returns the subject of the Message.
-     *
-     */
     public int getType() {
 	return type;
     }
 
-    /**
-     * @param subject
-     *            The subject of the Message to be set.
-     */
     public void setType(int type) {
 	this.type = type;
     }
 
-    /**
-     * @return Returns the userid of the user who created the Mindmap.
-     *
-     */
     public Long getNodeId() {
 	return nodeId;
     }
 
-    /**
-     * @param createdBy
-     *            The userid of the user who created this Mindmap.
-     */
     public void setNodeId(Long nodeId) {
 	this.nodeId = nodeId;
     }
 
-    /**
-     * @return Returns the userid of the user who created the Mindmap.
-     *
-     */
     public Long getNodeChildId() {
 	return nodeChildId;
     }
@@ -146,26 +133,14 @@ public class MindmapRequest implements Cloneable {
 	this.nodeChildId = nodeChildId;
     }
 
-    /**
-     * @return Returns the userid of the user who created the Mindmap.
-     *
-     */
     public MindmapUser getUser() {
 	return user;
     }
 
-    /**
-     * @param createdBy
-     *            The userid of the user who created this Mindmap.
-     */
     public void setUser(MindmapUser user) {
 	this.user = user;
     }
 
-    /**
-     * @return Returns the userid of the user who created the Mindmap.
-     *
-     */
     public Mindmap getMindmap() {
 	return mindmap;
     }

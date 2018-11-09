@@ -20,6 +20,7 @@ import org.hibernate.hql.internal.antlr.HqlBaseParser;
 import org.hibernate.hql.internal.antlr.HqlTokenTypes;
 import org.hibernate.hql.internal.ast.util.ASTPrinter;
 import org.hibernate.hql.internal.ast.util.ASTUtil;
+import org.hibernate.hql.internal.ast.util.TokenPrinters;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
@@ -41,11 +42,6 @@ public final class HqlParser extends HqlBaseParser {
 	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( HqlParser.class );
 
 	private final ParseErrorHandler parseErrorHandler;
-	private final ASTPrinter printer = getASTPrinter();
-
-	private static ASTPrinter getASTPrinter() {
-		return new ASTPrinter( org.hibernate.hql.internal.antlr.HqlTokenTypes.class );
-	}
 
 	/**
 	 * Get a HqlParser instance for the given HQL string.
@@ -61,7 +57,7 @@ public final class HqlParser extends HqlBaseParser {
 	private HqlParser(String hql) {
 		// The fix for HHH-558...
 		super( new HqlLexer( new StringReader( hql ) ) );
-		parseErrorHandler = new ErrorCounter( hql );
+		parseErrorHandler = new ErrorTracker( hql );
 		// Create nodes that track line and column number.
 		setASTFactory( new HqlASTFactory() );
 	}
@@ -131,7 +127,7 @@ public final class HqlParser extends HqlBaseParser {
 		// If the token can tell us if it could be an identifier...
 		if ( token instanceof HqlToken ) {
 			HqlToken hqlToken = (HqlToken) token;
-			// ... and the token could be an identifer and the error is
+			// ... and the token could be an identifier and the error is
 			// a mismatched token error ...
 			if ( hqlToken.isPossibleID() && ( ex instanceof MismatchedTokenException ) ) {
 				MismatchedTokenException mte = (MismatchedTokenException) ex;
@@ -362,7 +358,46 @@ public final class HqlParser extends HqlBaseParser {
 	}
 
 	private void showAst(AST ast, PrintWriter pw) {
-		printer.showAst( ast, pw );
+		TokenPrinters.HQL_TOKEN_PRINTER.showAst( ast, pw );
+	}
+
+	@Override
+	public void matchOptionalFrom() throws RecognitionException, TokenStreamException {
+		returnAST = null;
+		ASTPair currentAST = new ASTPair();
+		AST optionalFrom_AST = null;
+
+		if ( LA( 1 ) == FROM ) {
+			if ( LA( 2 ) != DOT ) {
+				match( FROM );
+				optionalFrom_AST = (AST) currentAST.root;
+				returnAST = optionalFrom_AST;
+			}
+		}
+	}
+
+	@Override
+	public void firstPathTokenWeakKeywords() throws TokenStreamException {
+		int t = LA( 1 );
+		switch ( t ){
+			case DOT:
+				LT(0).setType( IDENT );
+		}
+	}
+
+	@Override
+	public void handlePrimaryExpressionDotIdent() throws TokenStreamException {
+		if ( LA( 2 ) == DOT && LA( 3 ) != IDENT ) {
+			// See if the second lookahead token can be an identifier.
+			HqlToken t = (HqlToken) LT( 3 );
+			if ( t.isPossibleID() ) {
+				// Set it!
+				t.setType( IDENT );
+				if ( LOG.isDebugEnabled() ) {
+					LOG.debugf( "handleDotIdent() : new LT(3) token - %s", LT( 1 ) );
+				}
+			}
+		}
 	}
 
 	@Override

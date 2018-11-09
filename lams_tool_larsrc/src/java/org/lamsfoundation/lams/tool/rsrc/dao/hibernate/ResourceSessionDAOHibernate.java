@@ -40,7 +40,7 @@ public class ResourceSessionDAOHibernate extends LAMSBaseDAO implements Resource
 
     @Override
     public ResourceSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List<ResourceSession> list = (List<ResourceSession>) doFind(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

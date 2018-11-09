@@ -27,9 +27,9 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserDAO {
     private static final String FIND_NB_USER_BY_SESSION = "from " + NoticeboardUser.class.getName()
-	    + " as nb where nb.userId=? and nb.nbSession.nbSessionId=?";
+	    + " as nb where nb.userId=:userId and nb.nbSession.nbSessionId=:sessionId";
 
     private static final String COUNT_USERS_IN_SESSION = "select nu.userId from NoticeboardUser nu where nu.nbSession= :nbSession";
 
@@ -69,7 +69,8 @@ public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserD
     @Override
     public NoticeboardUser getNbUserBySession(Long userId, Long sessionId) {
 	List usersReturned = getSessionFactory().getCurrentSession().createQuery(FIND_NB_USER_BY_SESSION)
-		.setLong(0, userId.longValue()).setLong(1, sessionId.longValue()).list();
+		.setParameter("userId", userId.longValue())
+		.setParameter("sessionId", sessionId.longValue()).list();
 
 	if (usersReturned != null && usersReturned.size() > 0) {
 	    NoticeboardUser nb = (NoticeboardUser) usersReturned.get(0);
@@ -81,7 +82,7 @@ public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserD
     }
 
     /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser)
      */
     @Override
     public void saveNbUser(NoticeboardUser nbUser) {
@@ -89,7 +90,7 @@ public class NoticeboardUserDAO extends LAMSBaseDAO implements INoticeboardUserD
     }
 
     /**
-     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#updateNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+     * @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#updateNbUser(org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser)
      */
     @Override
     public void updateNbUser(NoticeboardUser nbUser) {

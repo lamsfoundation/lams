@@ -28,49 +28,25 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
-import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Mitchell Seaton
- * @version 2.1
- *
- *
  */
+@Entity
+@DiscriminatorValue("11")
 public class GroupBranchingActivity extends BranchingActivity implements Serializable {
 
     private static final long serialVersionUID = 7426228060060498158L;
 
-    /** full constructor */
-    public GroupBranchingActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Integer startXcoord, Integer startYcoord, Integer endXcoord, Integer endYcoord,
-	    Boolean stopAfterActivity, Set inputActivities, Set activities, Activity defaultActivity,
-	    SystemTool systemTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, startXcoord, startYcoord, endXcoord, endYcoord, stopAfterActivity,
-		inputActivities, activities, defaultActivity, systemTool, branchActivityEntries);
-    }
-
     /** default constructor */
     public GroupBranchingActivity() {
 	super();
-    }
-
-    /** minimal constructor */
-    public GroupBranchingActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Set activities) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, activities);
     }
 
     /**
@@ -98,8 +74,8 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
      * @return error message key
      */
     @Override
-    public Vector validateActivity(MessageService messageService) {
-	Vector listOfValidationErrors = new Vector();
+    public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
 	if (getActivities() == null || getActivities().size() == 0) {
 	    listOfValidationErrors
 		    .add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE,
@@ -121,9 +97,9 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 		for (Group group : groups) {
 		    boolean foundEntry = false;
 		    if (group.getBranchActivities() != null) {
-			Iterator iter = group.getBranchActivities().iterator();
+			Iterator<BranchActivityEntry> iter = group.getBranchActivities().iterator();
 			while (iter.hasNext() && !foundEntry) {
-			    BranchActivityEntry entry = (BranchActivityEntry) iter.next();
+			    BranchActivityEntry entry = iter.next();
 			    foundEntry = entry.getBranchingActivity().equals(this);
 			}
 		    }
@@ -140,5 +116,4 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 	}
 	return listOfValidationErrors;
     }
-
 }

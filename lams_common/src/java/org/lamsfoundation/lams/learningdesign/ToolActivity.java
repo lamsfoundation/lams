@@ -29,8 +29,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -48,64 +60,39 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Manpreet Minhas
  *
  */
+@Entity
+@DiscriminatorValue("1")
 public class ToolActivity extends SimpleActivity implements Serializable {
 
     private static final long serialVersionUID = -7500867438126908849L;
 
     private static Logger log = Logger.getLogger(ToolActivity.class);
 
-    /** Holds value of property toolContentId. */
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
-    /** Holds value of property tool. */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tool_id")
     private Tool tool;
 
-    /** List of sessions associated with this ToolActivity */
-    private Set<ToolSession> toolSessions;
+    @OneToMany(mappedBy = "toolActivity")
+    private Set<ToolSession> toolSessions = new HashSet<ToolSession>();
 
-    private Set<CompetenceMapping> competenceMappings;
+    @OneToMany(mappedBy = "toolActivity")
+    private Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
 
+    @OneToOne(mappedBy = "activity")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private ActivityEvaluation evaluation;
 
-    private Set<GradebookUserActivity> gradebookUserActivities;
+    @OneToMany(mappedBy = "activity")
+    private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<GradebookUserActivity>();
 
+    @OneToOne(mappedBy = "activity", cascade = CascadeType.ALL)
     private PedagogicalPlannerActivityMetadata plannerMetadata;
-
-    /** full constructor */
-    public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
-	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
-	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
-	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-	    Boolean stopAfterActivity, Set<Activity> inputActivities, Tool tool, Long toolContentId,
-	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings, ActivityEvaluation evaluation,
-	    Set<GradebookUserActivity> gradebookUserActivities) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
-	this.tool = tool;
-	this.toolContentId = toolContentId;
-	this.competenceMappings = competenceMappings;
-	this.evaluation = evaluation;
-	super.simpleActivityStrategy = new ToolActivityStrategy(this);
-	this.gradebookUserActivities = gradebookUserActivities;
-    }
 
     /** default constructor */
     public ToolActivity() {
-	super.simpleActivityStrategy = new ToolActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public ToolActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Tool tool, Long toolContentId) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom);
-	this.tool = tool;
-	this.toolContentId = toolContentId;
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);
     }
 
@@ -185,7 +172,6 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      *            the user who should be using this tool session.
      * @return the new tool session.
      */
-    @SuppressWarnings("unchecked")
     public ToolSession createToolSessionForActivity(MessageService messageService, User learner, Lesson lesson)
 	    throws RequiredGroupMissingException {
 	Date now = new Date(System.currentTimeMillis());
@@ -207,7 +193,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 		    throw new RequiredGroupMissingException(errorMessage);
 		}
 
-		for (ToolSession toolSession : (Set<ToolSession>) group.getToolSessions()) {
+		for (ToolSession toolSession : group.getToolSessions()) {
 		    if (this.equals(toolSession.getToolActivity())) {
 			session = toolSession;
 			break;
@@ -244,82 +230,42 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
-    /**
-     * Getter for property toolContentId.
-     *
-     * @return Value of property toolContentId.
-     */
     public Long getToolContentId() {
 
 	return this.toolContentId;
     }
 
-    /**
-     * Setter for property toolContentId.
-     *
-     * @param toolContentId
-     *            New value of property toolContentId.
-     */
     public void setToolContentId(Long toolContentId) {
 
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     * Getter for property tool.
-     *
-     * @return Value of property tool.
-     */
     public Tool getTool() {
 
 	return this.tool;
     }
 
-    /**
-     * Setter for property tool.
-     *
-     * @param tool
-     *            New value of property tool.
-     */
     public void setTool(Tool tool) {
 
 	this.tool = tool;
     }
 
-    /**
-     * @return Returns the toolSessions.
-     */
     public Set<ToolSession> getToolSessions() {
 	return toolSessions;
     }
 
-    /**
-     * @param toolSessions
-     *            The toolSessions to set.
-     */
     public void setToolSessions(Set<ToolSession> toolSessions) {
 	this.toolSessions = toolSessions;
     }
 
-    /**
-     *
-     * @return
-     */
     public Set<CompetenceMapping> getCompetenceMappings() {
 	return competenceMappings;
     }
 
-    /**
-     *
-     * @param competenceMappings
-     */
     public void setCompetenceMappings(Set<CompetenceMapping> competenceMappings) {
 	this.competenceMappings = competenceMappings;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
     @Override
     public boolean isNull() {
 	return false;
@@ -331,7 +277,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      * ourself.
      */
     @Override
-    protected void getToolActivitiesInActivity(SortedSet toolActivities) {
+    protected void getToolActivitiesInActivity(SortedSet<ToolActivity> toolActivities) {
 	toolActivities.add(this);
     }
 

@@ -24,13 +24,22 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_organisation_type")
 public class OrganisationType implements Serializable {
+    private static final long serialVersionUID = -2973910780832221475L;
 
     public static final Integer ROOT_TYPE = 1;
     public static final Integer COURSE_TYPE = 2;
@@ -40,26 +49,17 @@ public class OrganisationType implements Serializable {
     public static final String COURSE_DESCRIPTION = "COURSE ORGANISATION";
     public static final String CLASS_DESCRIPTION = "CLASS ORGANISATION";
 
-    /** identifier field */
+    @Id
+    @Column(name = "organisation_type_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer organisationTypeId;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
-    private Set organisations;
-
-    /** full constructor */
-    public OrganisationType(String name, String description, Set organisations) {
-	this.name = name;
-	this.description = description;
-	this.organisations = organisations;
-    }
-
-    /** default constructor */
     public OrganisationType() {
     }
 
@@ -87,14 +87,6 @@ public class OrganisationType implements Serializable {
 	this.description = description;
     }
 
-    public Set getOrganisations() {
-	return this.organisations;
-    }
-
-    public void setOrganisations(Set organisations) {
-	this.organisations = organisations;
-    }
-
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("organisationTypeId", getOrganisationTypeId()).toString();
@@ -113,5 +105,4 @@ public class OrganisationType implements Serializable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getOrganisationTypeId()).toHashCode();
     }
-
 }

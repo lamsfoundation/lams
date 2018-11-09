@@ -24,46 +24,24 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SystemGateActivityStrategy;
-import org.lamsfoundation.lams.tool.SystemTool;
 
 /**
  * @author Mitch Seaton
  *
  */
+@Entity
+@DiscriminatorValue("9")
 public class SystemGateActivity extends PermissionGateActivity implements Serializable {
-
-    /** full constructor */
-    public SystemGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
-	    SystemTool sysTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
-		branchActivityEntries);
-	super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
-    }
+    private static final long serialVersionUID = -755725984937117677L;
 
     /** default constructor */
     public SystemGateActivity() {
-	super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public SystemGateActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId);
 	super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
     }
 
@@ -77,7 +55,7 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
 	SystemGateActivity newSysGateActivity = new SystemGateActivity();
 	copyToNewActivity(newSysGateActivity, uiidOffset);
 	newSysGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
-	newSysGateActivity.setGateOpen(new Boolean(false));
+	newSysGateActivity.setGateOpen(false);
 	return newSysGateActivity;
     }
 
@@ -93,5 +71,4 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
     public boolean isNull() {
 	return false;
     }
-
 }

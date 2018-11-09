@@ -25,24 +25,45 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * ScratchieBurningQuestion
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_lascrt11_burning_question")
 public class ScratchieBurningQuestion {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "scratchie_item_uid")
     private ScratchieItem scratchieItem;
+    
+    @Column(name = "access_date")
     private Date accessDate;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column
     private String question;
+    
+    @Column(name = "general_question")
     private boolean generalQuestion;
 
-    /**
-     *
-     * @return Returns the log Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -51,10 +72,6 @@ public class ScratchieBurningQuestion {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getAccessDate() {
 	return accessDate;
     }
@@ -63,10 +80,6 @@ public class ScratchieBurningQuestion {
 	this.accessDate = accessDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public ScratchieItem getScratchieItem() {
 	return scratchieItem;
     }
@@ -75,10 +88,6 @@ public class ScratchieBurningQuestion {
 	this.scratchieItem = scratchieItem;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -87,10 +96,6 @@ public class ScratchieBurningQuestion {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getQuestion() {
 	return question;
     }
@@ -99,10 +104,6 @@ public class ScratchieBurningQuestion {
 	this.question = question;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isGeneralQuestion() {
 	return generalQuestion;
     }

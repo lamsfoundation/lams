@@ -28,8 +28,8 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesReport;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -41,21 +41,11 @@ public class SubmitFilesReportDAO extends LAMSBaseDAO implements ISubmitFilesRep
     private static final String FIND_BY_SUBMISSION = "from " + SubmitFilesReport.class.getName()
 	    + " where submission_id=?";
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO#getReportByID(java.lang.Long)
-     */
     @Override
     public SubmitFilesReport getReportByID(Long reportID) {
 	return (SubmitFilesReport) super.find(SubmitFilesReport.class, reportID);
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO#getReportBySubmissionID(java.lang.Long)
-     */
     @Override
     public SubmitFilesReport getReportBySubmissionID(Long submissionID) {
 
@@ -67,12 +57,6 @@ public class SubmitFilesReportDAO extends LAMSBaseDAO implements ISubmitFilesRep
 	}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO#updateReport(org.lamsfoundation.lams.tool.sbmt.
-     * SubmitFilesReport)
-     */
     @Override
     public void updateReport(SubmitFilesReport report) {
 	getSession().update(report);

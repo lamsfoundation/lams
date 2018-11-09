@@ -1,28 +1,46 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * License: GNU Lesser General Public License (LGPL), version 2.1 or later.
- * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or http://www.gnu.org/licenses/lgpl-2.1.html
  */
 package org.hibernate.cache.spi;
 
-import java.util.Map;
-
+import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.CacheException;
 
 /**
- * Defines a contract for accessing a particular named region within the 
- * underlying cache implementation.
+ * Contract for a named "region".  The concept of a Region might not
+ * necessarily correlate to a specific concept in the underlying caching
+ * provider - it is just a thing that can be referenced by name later.
+ * <p/>
+ * A region's name is "unqualified"; i.e. it is not prefixed by
+ * {@link SessionFactoryOptions#getCacheRegionPrefix()}.
+ * <p/>
+ * Region is the base contract defining some common characteristics
+ * regardless of the type of data intended to be stored within this
+ * Region.  The more specific sub-types are {@link DomainDataRegion}
+ * (storing entity, collection and natural-id data) and
+ * {@link DirectAccessRegion} (storing query result and timestamp
+ * data).
  *
  * @author Steve Ebersole
  */
 public interface Region {
 	/**
-	 * Retrieve the name of this region.
-	 *
-	 * @return The region name
+	 * Retrieve the unqualified name of this region.
 	 */
-	public String getName();
+	String getName();
+
+	/**
+	 * The RegionFactory that generated this Region
+	 */
+	RegionFactory getRegionFactory();
+
+	/**
+	 * Clear all data cached in the region
+	 */
+	void clear();
 
 	/**
 	 * The "end state" contract of the region's lifecycle.  Called
@@ -31,69 +49,5 @@ public interface Region {
 	 *
 	 * @throws org.hibernate.cache.CacheException Indicates problem shutting down
 	 */
-	public void destroy() throws CacheException;
-
-	/**
-	 * Determine whether this region contains data for the given key.
-	 * <p/>
-	 * The semantic here is whether the cache contains data visible for the
-	 * current call context.  This should be viewed as a "best effort", meaning
-	 * blocking should be avoid if possible.
-	 *
-	 * @param key The cache key
-	 *
-	 * @return True if the underlying cache contains corresponding data; false
-	 * otherwise.
-	 */
-	public boolean contains(Object key);
-
-	/**
-	 * The number of bytes is this cache region currently consuming in memory.
-	 *
-	 * @return The number of bytes consumed by this region; -1 if unknown or
-	 * unsupported.
-	 */
-	public long getSizeInMemory();
-
-	/**
-	 * The count of entries currently contained in the regions in-memory store.
-	 *
-	 * @return The count of entries in memory; -1 if unknown or unsupported.
-	 */
-	public long getElementCountInMemory();
-
-	/**
-	 * The count of entries currently contained in the regions disk store.
-	 *
-	 * @return The count of entries on disk; -1 if unknown or unsupported.
-	 */
-	public long getElementCountOnDisk();
-
-	/**
-	 * Get the contents of this region as a map.
-	 * <p/>
-	 * Implementors which do not support this notion
-	 * should simply return an empty map.
-	 *
-	 * @return The content map.
-	 */
-	public Map toMap();
-
-	/**
-	 * Get the next timestamp according to the underlying cache implementor.
-	 *
-	 * @todo Document the usages of this method so providers know exactly what is expected.
-	 *
-	 * @return The next timestamp
-	 */
-	public long nextTimestamp();
-
-	/**
-	 * Get a timeout value.
-	 *
-	 * @todo Again, document the usages of this method so providers know exactly what is expected.
-	 *
-	 * @return The time out value
-	 */
-	public int getTimeout();
+	void destroy() throws CacheException;
 }

@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.forum.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.tool.forum.persistence.ForumConfigItem;
+import org.lamsfoundation.lams.tool.forum.model.ForumConfigItem;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.web.forms.AdminForm;
 import org.springframework.beans.factory.annotation.Autowired;

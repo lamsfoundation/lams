@@ -22,7 +22,6 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -40,18 +39,13 @@ import java.util.Comparator;
  *
  * @author dgarth, Jacky Fang
  */
-public class ActivityOrderComparator implements Comparator, Serializable {
+public class ActivityOrderComparator implements Comparator<Activity> {
 
     /**
      * Compare the order.
-     * 
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     @Override
-    public int compare(Object o1, Object o2) {
-	Activity activity1 = (Activity) o1;
-	Activity activity2 = (Activity) o2;
-
+    public int compare(Activity activity1, Activity activity2) {
 	if (activity1.getOrderId() == null || activity2.getOrderId() == null) {
 	    return compareActivityId(activity1, activity2);
 	}

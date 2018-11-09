@@ -26,8 +26,8 @@
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -36,22 +36,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SubmitFilesContentDAO extends LAMSBaseDAO implements ISubmitFilesContentDAO {
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#getContentByID(java.lang.Long)
-     */
     @Override
     public SubmitFilesContent getContentByID(Long contentID) {
 	return (SubmitFilesContent) super.find(SubmitFilesContent.class, contentID);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#save(org.lamsfoundation.lams.tool.sbmt.
-     * SubmitFilesContent)
-     */
     @Override
     public void saveOrUpdate(SubmitFilesContent content) {
 	getSession().saveOrUpdate(content);

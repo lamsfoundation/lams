@@ -67,9 +67,4 @@ public class MindmapDAO extends LAMSBaseDAO implements IMindmapDAO {
 	getSession().flush();
     }
 
-    @Override
-    public void releaseFromCache(Object o) {
-	getSessionFactory().getCurrentSession().evict(o);
-
-    }
 }

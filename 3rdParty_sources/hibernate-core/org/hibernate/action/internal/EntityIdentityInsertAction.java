@@ -11,7 +11,7 @@ import java.io.Serializable;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.event.service.spi.EventListenerGroup;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.PostCommitInsertEventListener;
@@ -50,7 +50,7 @@ public final class EntityIdentityInsertAction extends AbstractEntityInsertAction
 			Object instance,
 			EntityPersister persister,
 			boolean isVersionIncrementDisabled,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			boolean isDelayed) {
 		super(
 				( isDelayed ? generateDelayedPostInsertIdentifier() : null ),
@@ -69,15 +69,15 @@ public final class EntityIdentityInsertAction extends AbstractEntityInsertAction
 		nullifyTransientReferencesIfNotAlready();
 
 		final EntityPersister persister = getPersister();
-		final SessionImplementor session = getSession();
+		final SharedSessionContractImplementor session = getSession();
 		final Object instance = getInstance();
 
-		final boolean veto = preInsert();
+		setVeto( preInsert() );
 
 		// Don't need to lock the cache here, since if someone
 		// else inserted the same pk first, the insert would fail
 
-		if ( !veto ) {
+		if ( !isVeto() ) {
 			generatedId = persister.insert( getState(), instance, session );
 			if ( persister.hasInsertGeneratedProperties() ) {
 				persister.processInsertGeneratedProperties( generatedId, instance, getState(), session );
@@ -101,8 +101,8 @@ public final class EntityIdentityInsertAction extends AbstractEntityInsertAction
 
 		postInsert();
 
-		if ( session.getFactory().getStatistics().isStatisticsEnabled() && !veto ) {
-			session.getFactory().getStatisticsImplementor().insertEntity( getPersister().getEntityName() );
+		if ( session.getFactory().getStatistics().isStatisticsEnabled() && !isVeto() ) {
+			session.getFactory().getStatistics().insertEntity( getPersister().getEntityName() );
 		}
 
 		markExecuted();
@@ -118,7 +118,7 @@ public final class EntityIdentityInsertAction extends AbstractEntityInsertAction
 	protected boolean hasPostCommitEventListeners() {
 		final EventListenerGroup<PostInsertEventListener> group = listenerGroup( EventType.POST_COMMIT_INSERT );
 		for ( PostInsertEventListener listener : group.listeners() ) {
-			if ( listener.requiresPostCommitHanding( getPersister() ) ) {
+			if ( listener.requiresPostCommitHandling( getPersister() ) ) {
 				return true;
 			}
 		}
@@ -127,7 +127,7 @@ public final class EntityIdentityInsertAction extends AbstractEntityInsertAction
 	}
 
 	@Override
-	public void doAfterTransactionCompletion(boolean success, SessionImplementor session) {
+	public void doAfterTransactionCompletion(boolean success, SharedSessionContractImplementor session) {
 		//TODO: reenable if we also fix the above todo
 		/*EntityPersister persister = getEntityPersister();
 		if ( success && persister.hasCache() && !persister.isCacheInvalidationRequired() ) {

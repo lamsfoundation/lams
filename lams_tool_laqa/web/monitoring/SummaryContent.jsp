@@ -51,7 +51,7 @@
 	<c:forEach var="question" items="${questionDTOs}">
 		<div class="panel panel-default"">
 			<div class="panel-heading">
-				<a href="javascript:launchPopup('<lams:WebAppURL/>monitoring.getPrintAnswers.do?questionUid=${question.uid}&toolSessionID=${groupDto.sessionId}');"	
+				<a href="javascript:launchPopup('<lams:WebAppURL/>monitoring/getPrintAnswers.do?questionUid=${question.uid}&toolSessionID=${groupDto.sessionId}');"	
 					id="printAnswers" class="btn btn-default btn-xs pull-right"><i class="fa fa-print"></i></a>
 				<c:out value="${question.question}" escapeXml="false"/>
 			</div>

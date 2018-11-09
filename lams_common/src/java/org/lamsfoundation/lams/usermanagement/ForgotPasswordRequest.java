@@ -3,37 +3,36 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
- *
- *
- *
- *
  * @author lfoxton
- *
  */
+
+@Entity
+@Table(name = "lams_password_request")
 public class ForgotPasswordRequest implements Serializable {
-    /** identifier field */
+    private static final long serialVersionUID = -7140792259303426167L;
+
+    @Id
+    @Column(name = "request_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer requestId;
 
-    /** identifier field */
+    @Column(name = "user_id")
     private Integer userId;
 
-    /** persistent field */
+    @Column(name = "request_key")
     private String requestKey;
 
-    /** persistent field */
+    @Column(name = "request_date")
     private Date requestDate;
 
-    /** Full Constructor */
-    public ForgotPasswordRequest(Integer requestId, Integer userId, String requestKey, Date requestDate) {
-	super();
-	this.requestId = requestId;
-	this.userId = userId;
-	this.requestKey = requestKey;
-	this.requestDate = requestDate;
-    }
-
-    /** default constructor */
     public ForgotPasswordRequest() {
     }
 

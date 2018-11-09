@@ -28,6 +28,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -36,55 +50,85 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
  * Resource
  *
  * @author Dapeng Ni
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_larsrc11_resource_item")
 public class ResourceItem implements Cloneable {
     private static final Logger log = Logger.getLogger(ResourceItem.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
     // Resource Type:1=URL,2=File,3=Website,4=Learning Object
+    @Column(name = "item_type")
     private short type;
 
+    @Column
     private String title;
 
+    @Column
     private String description;
 
+    @Column
     private String url;
 
+    @Column(name = "open_url_new_window")
     private boolean openUrlNewWindow;
 
+    @Column(name = "ims_schema")
     private String imsSchema;
 
+    @Column(name = "init_item")
     private String initialItem;
 
+    @Column(name = "organization_xml")
     private String organizationXml;
 
+    @Column(name = "file_uuid")
     private Long fileUuid;
 
+    @Column(name = "file_version_id")
     private Long fileVersionId;
 
+    @Column(name = "file_name")
     private String fileName;
 
+    @Column(name = "file_type")
     private String fileType;
 
-    private Set itemInstructions;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OrderBy("sequence_id ASC")
+    @JoinColumn(name = "item_uid")
+    private Set<ResourceItemInstruction> itemInstructions = new HashSet<>();
 
+    @Column(name = "order_id")
     private Integer orderId;
 
+    @Column(name = "is_hide")
     private boolean isHide;
+    
+    @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
+    @Column(name = "create_date")
     private Date createDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private ResourceUser createBy;
     
+    @Column(name = "is_allow_rating")
     private boolean allowRating;
+    
+    @Column(name = "is_allow_comments")
     private boolean allowComments;
 
-    // ***********************************************
-    // DTO fields:
+    // ******************************* DTO fields ***********
+    @Transient
     private boolean complete;
+    @Transient
     private ItemRatingDTO ratingDTO;
 
     @Override
@@ -94,10 +138,10 @@ public class ResourceItem implements Cloneable {
 	    obj = (ResourceItem) super.clone();
 	    // clone attachment
 	    if (itemInstructions != null) {
-		Iterator iter = itemInstructions.iterator();
-		Set set = new HashSet();
+		Iterator<ResourceItemInstruction> iter = itemInstructions.iterator();
+		Set<ResourceItemInstruction> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    ResourceItemInstruction instruct = (ResourceItemInstruction) iter.next();
+		    ResourceItemInstruction instruct = iter.next();
 		    ResourceItemInstruction newInsruct = (ResourceItemInstruction) instruct.clone();
 		    set.add(newInsruct);
 		}
@@ -119,27 +163,15 @@ public class ResourceItem implements Cloneable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
+
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Long getFileUuid() {
 	return fileUuid;
     }
@@ -148,10 +180,6 @@ public class ResourceItem implements Cloneable {
 	this.fileUuid = crUuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getFileVersionId() {
 	return fileVersionId;
     }
@@ -160,10 +188,6 @@ public class ResourceItem implements Cloneable {
 	this.fileVersionId = crVersionId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -172,10 +196,6 @@ public class ResourceItem implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getImsSchema() {
 	return imsSchema;
     }
@@ -184,10 +204,6 @@ public class ResourceItem implements Cloneable {
 	this.imsSchema = imsSchema;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getInitialItem() {
 	return initialItem;
     }
@@ -196,26 +212,14 @@ public class ResourceItem implements Cloneable {
 	this.initialItem = initialItem;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getItemInstructions() {
+    public Set<ResourceItemInstruction> getItemInstructions() {
 	return itemInstructions;
     }
 
-    public void setItemInstructions(Set itemInstructions) {
+    public void setItemInstructions(Set<ResourceItemInstruction> itemInstructions) {
 	this.itemInstructions = itemInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getOrganizationXml() {
 	return organizationXml;
     }
@@ -224,10 +228,6 @@ public class ResourceItem implements Cloneable {
 	this.organizationXml = organizationXml;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getTitle() {
 	return title;
     }
@@ -236,10 +236,6 @@ public class ResourceItem implements Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getUrl() {
 	return url;
     }
@@ -248,11 +244,6 @@ public class ResourceItem implements Cloneable {
 	this.url = url;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public ResourceUser getCreateBy() {
 	return createBy;
     }
@@ -261,10 +252,6 @@ public class ResourceItem implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -273,10 +260,6 @@ public class ResourceItem implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCreateByAuthor() {
 	return isCreateByAuthor;
     }
@@ -285,10 +268,6 @@ public class ResourceItem implements Cloneable {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isHide() {
 	return isHide;
     }
@@ -297,10 +276,6 @@ public class ResourceItem implements Cloneable {
 	this.isHide = isHide;
     }
 
-    /**
-     *
-     * @return
-     */
     public short getType() {
 	return type;
     }
@@ -309,9 +284,6 @@ public class ResourceItem implements Cloneable {
 	this.type = type;
     }
 
-    /**
-     *
-     */
     public String getFileType() {
 	return fileType;
     }
@@ -320,9 +292,6 @@ public class ResourceItem implements Cloneable {
 	this.fileType = type;
     }
 
-    /**
-     *
-     */
     public String getFileName() {
 	return fileName;
     }
@@ -331,10 +300,6 @@ public class ResourceItem implements Cloneable {
 	this.fileName = name;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isOpenUrlNewWindow() {
 	return openUrlNewWindow;
     }
@@ -343,10 +308,6 @@ public class ResourceItem implements Cloneable {
 	this.openUrlNewWindow = openUrlNewWindow;
     }
 
-    /**
-     *
-     * @return
-     */
     public Integer getOrderId() {
 	return orderId;
     }

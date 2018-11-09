@@ -6,7 +6,7 @@
  */
 package org.hibernate;
 
-import java.util.Locale;
+import org.hibernate.jpa.internal.util.FlushModeTypeHelper;
 
 /**
  * Represents a flushing strategy. The flush process synchronizes
@@ -20,16 +20,6 @@ import java.util.Locale;
  * @author Gavin King
  */
 public enum FlushMode {
-	/**
-	 * The {@link Session} is never flushed unless {@link Session#flush}
-	 * is explicitly called by the application. This mode is very
-	 * efficient for read only transactions.
-	 *
-	 * @deprecated use {@link #MANUAL} instead.
-	 */
-	@Deprecated
-	NEVER ( 0 ),
-
 	/**
 	 * The {@link Session} is only ever flushed when {@link Session#flush}
 	 * is explicitly called by the application. This mode is very
@@ -99,15 +89,6 @@ public enum FlushMode {
 	 * @throws MappingException Indicates an unrecognized external representation
 	 */
 	public static FlushMode interpretExternalSetting(String externalName) {
-		if ( externalName == null ) {
-			return null;
-		}
-
-		try {
-			return FlushMode.valueOf( externalName.toUpperCase(Locale.ROOT) );
-		}
-		catch ( IllegalArgumentException e ) {
-			throw new MappingException( "unknown FlushMode : " + externalName );
-		}
+		return FlushModeTypeHelper.interpretExternalSetting( externalName );
 	}
 }

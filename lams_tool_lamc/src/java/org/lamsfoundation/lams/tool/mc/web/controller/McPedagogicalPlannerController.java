@@ -36,9 +36,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.web.form.McPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.MessageService;
@@ -105,7 +105,7 @@ public class McPedagogicalPlannerController {
 		    plannerForm.removeQuestion(questionIndex - 1);
 		} else {
 		    if (questionIndex <= mcContent.getMcQueContents().size()) {
-			McQueContent mcQueContent = mcService.getQuestionByDisplayOrder((long) questionIndex,
+			McQueContent mcQueContent = mcService.getQuestionByDisplayOrder(questionIndex,
 				mcContent.getUid());
 			mcQueContent.setQuestion(question);
 			int candidateAnswerDTOIndex = 0;
@@ -128,7 +128,6 @@ public class McPedagogicalPlannerController {
 			McQueContent mcQueContent = new McQueContent();
 			mcQueContent.setDisplayOrder(questionIndex);
 			mcQueContent.setMcContent(mcContent);
-			mcQueContent.setMcContentId(mcContent.getMcContentId());
 			mcQueContent.setQuestion(question);
 			mcQueContent.setMark(McAppConstants.QUESTION_DEFAULT_MARK);
 			Set<McOptsContent> candidateAnswers = mcQueContent.getMcOptionsContents();
@@ -138,7 +137,7 @@ public class McPedagogicalPlannerController {
 			    McOptsContent candidateAnswer = new McOptsContent(candidateAnswerDTOIndex + 1,
 				    McAppConstants.CORRECT.equals(answerDTO.getCorrect()),
 				    answerDTO.getCandidateAnswer(), mcQueContent);
-			    candidateAnswer.setMcQueContentId(mcQueContent.getMcContentId());
+			    candidateAnswer.setMcQueContent(mcQueContent);
 			    candidateAnswers.add(candidateAnswer);
 			}
 			mcService.saveOrUpdateMcQueContent(mcQueContent);
@@ -148,7 +147,7 @@ public class McPedagogicalPlannerController {
 		}
 	    } while (questionIndex <= plannerForm.getQuestionCount());
 	    for (; questionIndex <= mcContent.getMcQueContents().size(); questionIndex++) {
-		McQueContent mcQueContent = mcService.getQuestionByDisplayOrder((long) questionIndex,
+		McQueContent mcQueContent = mcService.getQuestionByDisplayOrder(questionIndex,
 			mcContent.getUid());
 		mcContent.getMcQueContents().remove(mcQueContent);
 		mcService.removeMcQueContent(mcQueContent);

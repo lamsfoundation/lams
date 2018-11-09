@@ -20,37 +20,52 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Similar to DataOutputDefinition. It's bound with DataTransitions. It defines what outputs the source tool can
  * provide. Teacher can rename the data flow object so it's more meaningful to him.
  *
- *
  */
+@Entity
+@Table(name = "lams_data_flow")
 public class DataFlowObject implements Serializable {
-    /** identifier field */
+    private static final long serialVersionUID = 4460757845007369769L;
+
+    @Id
+    @Column(name = "data_flow_object_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dataFlowObjectId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "transition_id")
     private DataTransition dataTransition;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
+    @Column(name = "display_name")
     private String displayName;
 
-    /** persistent field */
+    @Column(name = "order_id")
     private Integer orderId;
 
     /**
      * persistent field It's a tool's internal parameter. It can be anything - the tool itself should know what to do
      * with it. It can be for example an ID of question in Q&A which this data flow object provides input for.
      */
+    @Column(name = "tool_assigment_id")
     private Integer toolAssigmentId;
 
     public DataFlowObject() {
@@ -67,10 +82,6 @@ public class DataFlowObject implements Serializable {
 	this.toolAssigmentId = toolAssigmentId;
     }
 
-    /**
-     *
-     *
-     */
     public Long getDataFlowObjectId() {
 	return dataFlowObjectId;
     }
@@ -79,11 +90,6 @@ public class DataFlowObject implements Serializable {
 	dataFlowObjectId = dataOutputId;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public DataTransition getDataTransition() {
 	return dataTransition;
     }
@@ -92,9 +98,6 @@ public class DataFlowObject implements Serializable {
 	this.dataTransition = dataTransition;
     }
 
-    /**
-     *
-     */
     public String getName() {
 	return name;
     }
@@ -103,9 +106,6 @@ public class DataFlowObject implements Serializable {
 	this.name = name;
     }
 
-    /**
-     *
-     */
     public String getDisplayName() {
 	return displayName;
     }
@@ -114,9 +114,6 @@ public class DataFlowObject implements Serializable {
 	this.displayName = displayName;
     }
 
-    /**
-     *
-     */
     public Integer getOrderId() {
 	return orderId;
     }
@@ -125,9 +122,6 @@ public class DataFlowObject implements Serializable {
 	this.orderId = orderId;
     }
 
-    /**
-     *
-     */
     public Integer getToolAssigmentId() {
 	return toolAssigmentId;
     }

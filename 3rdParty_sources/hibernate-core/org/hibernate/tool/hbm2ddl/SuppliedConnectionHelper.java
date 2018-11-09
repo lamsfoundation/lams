@@ -16,13 +16,19 @@ import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
  * connection.
  *
  * @author Steve Ebersole
+ *
+ * @deprecated Everything in this package has been replaced with
+ * {@link org.hibernate.tool.schema.spi.SchemaManagementTool} and friends.
  */
+@Deprecated
 class SuppliedConnectionHelper implements ConnectionHelper {
 	private Connection connection;
 	private boolean toggleAutoCommit;
+	private final SqlExceptionHelper sqlExceptionHelper;
 
-	public SuppliedConnectionHelper(Connection connection) {
+	public SuppliedConnectionHelper(Connection connection, SqlExceptionHelper sqlExceptionHelper) {
 		this.connection = connection;
+		this.sqlExceptionHelper = sqlExceptionHelper;
 	}
 
 	public void prepare(boolean needsAutoCommit) throws SQLException {
@@ -43,7 +49,7 @@ class SuppliedConnectionHelper implements ConnectionHelper {
 	}
 
 	public void release() throws SQLException {
-		new SqlExceptionHelper().logAndClearWarnings( connection );
+		sqlExceptionHelper.logAndClearWarnings( connection );
 		if ( toggleAutoCommit ) {
 			connection.setAutoCommit( false );
 		}

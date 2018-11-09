@@ -20,27 +20,53 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook;
 
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * This class maps to one activity mark for a learner
- * 
+ *
  * @author lfoxton
  */
+@Entity
+@Table(name = "lams_gradebook_user_activity")
 public class GradebookUserActivity {
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long uid;
+
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
     private ToolActivity activity;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User learner;
+
+    @Column
     private Double mark;
+
+    @Column
     private String feedback;
+
+    @Column(name = "marked_in_gradebook")
     private Boolean markedInGradebook;
+
+    @Column(name = "update_date")
     private Date updateDate;
 
     public GradebookUserActivity() {
@@ -55,9 +81,6 @@ public class GradebookUserActivity {
 	updateDate = new Date();
     }
 
-    /**
-     *
-     */
     public long getUid() {
 	return uid;
     }
@@ -66,10 +89,6 @@ public class GradebookUserActivity {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public ToolActivity getActivity() {
 	return activity;
     }
@@ -78,10 +97,6 @@ public class GradebookUserActivity {
 	this.activity = activity;
     }
 
-    /**
-     *
-     *
-     */
     public User getLearner() {
 	return learner;
     }
@@ -90,9 +105,6 @@ public class GradebookUserActivity {
 	this.learner = learner;
     }
 
-    /**
-     *
-     */
     public Double getMark() {
 	return mark;
     }
@@ -101,9 +113,6 @@ public class GradebookUserActivity {
 	this.mark = mark;
     }
 
-    /**
-     *
-     */
     public String getFeedback() {
 	return feedback;
     }
@@ -112,9 +121,6 @@ public class GradebookUserActivity {
 	this.feedback = feedback;
     }
 
-    /**
-     *
-     */
     public Boolean getMarkedInGradebook() {
 	return markedInGradebook;
     }
@@ -123,10 +129,6 @@ public class GradebookUserActivity {
 	this.markedInGradebook = markedInGradebook;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getUpdateDate() {
 	return updateDate;
     }

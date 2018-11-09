@@ -15,10 +15,9 @@ import org.hibernate.type.descriptor.WrapperOptions;
  */
 public class EnumJavaTypeDescriptor<T extends Enum> extends AbstractTypeDescriptor<T> {
 	@SuppressWarnings("unchecked")
-	protected EnumJavaTypeDescriptor(Class<T> type) {
+	public EnumJavaTypeDescriptor(Class<T> type) {
 		super( type, ImmutableMutabilityPlan.INSTANCE );
-
-		JavaTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
+		//JavaTypeDescriptorRegistry.INSTANCE.addDescriptor( this );
 	}
 
 	@Override
@@ -27,19 +26,68 @@ public class EnumJavaTypeDescriptor<T extends Enum> extends AbstractTypeDescript
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public T fromString(String string) {
-		return string == null ? null : (T) Enum.valueOf( getJavaTypeClass(), string );
+		return string == null ? null : (T) Enum.valueOf( getJavaType(), string );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <X> X unwrap(T value, Class<X> type, WrapperOptions options) {
+		if ( String.class.equals( type ) ) {
+			return (X) toName( value );
+		}
+		else if ( Integer.class.isInstance( type ) ) {
+			return (X) toOrdinal( value );
+		}
+
 		return (X) value;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <X> T wrap(X value, WrapperOptions options) {
+		if ( value == null ) {
+			return null;
+		}
+		else if ( String.class.isInstance( value ) ) {
+			return fromName( (String) value );
+		}
+		else if ( Integer.class.isInstance( value ) ) {
+			return fromOrdinal( (Integer) value );
+		}
+
 		return (T) value;
+	}
+
+
+	public <E extends Enum> Integer toOrdinal(E domainForm) {
+		if ( domainForm == null ) {
+			return null;
+		}
+		return domainForm.ordinal();
+	}
+
+	@SuppressWarnings("unchecked")
+	public <E extends Enum> E fromOrdinal(Integer relationalForm) {
+		if ( relationalForm == null ) {
+			return null;
+		}
+		return (E) getJavaType().getEnumConstants()[ relationalForm ];
+	}
+
+	@SuppressWarnings("unchecked")
+	public T fromName(String relationalForm) {
+		if ( relationalForm == null ) {
+			return null;
+		}
+		return (T) Enum.valueOf( getJavaType(), relationalForm.trim() );
+	}
+
+	public String toName(T domainForm) {
+		if ( domainForm == null ) {
+			return null;
+		}
+		return domainForm.name();
 	}
 }

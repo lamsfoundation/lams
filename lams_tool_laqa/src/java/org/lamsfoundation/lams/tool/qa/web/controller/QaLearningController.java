@@ -50,13 +50,13 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.model.QaSession;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.LearningUtil;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
@@ -211,7 +211,6 @@ public class QaLearningController implements QaAppConstants {
 	generalLearnerFlowDTO.setHttpSessionID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
-	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
@@ -517,7 +516,7 @@ public class QaLearningController implements QaAppConstants {
 
 		// store
 		if (errorMap.isEmpty()) {
-		    qaService.updateResponseWithNewAnswer(answer, toolSessionID, new Long(questionIndex), false);
+		    qaService.updateResponseWithNewAnswer(answer, toolSessionID, questionIndex, false);
 		}
 	    }
 
@@ -618,18 +617,18 @@ public class QaLearningController implements QaAppConstants {
 	    for (int questionIndex = QaAppConstants.INITIAL_QUESTION_COUNT
 		    .intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		String newAnswer = request.getParameter("answer" + questionIndex);
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(questionIndex), true);
+		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, questionIndex, true);
 	    }
 
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex),
+	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Integer(currentQuestionIndex),
 		    qaContent.getUid());
 
 	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Long(currentQuestionIndex), true);
+		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Integer(currentQuestionIndex), true);
 	    }
 	}
     }
@@ -925,7 +924,7 @@ public class QaLearningController implements QaAppConstants {
 	// store
 	if (errorMap.isEmpty()) {
 	    qaService.updateResponseWithNewAnswer(newAnswer, qaLearningForm.getToolSessionID(),
-		    new Long(currentQuestionIndex), false);
+		    new Integer(currentQuestionIndex), false);
 	} else {
 	    request.setAttribute("errorMap", errorMap);
 	    nextQuestionOffset = 0;

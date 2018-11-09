@@ -10,7 +10,9 @@ import java.io.Serializable;
 
 import org.hibernate.type.descriptor.ValueBinder;
 import org.hibernate.type.descriptor.ValueExtractor;
+import org.hibernate.type.descriptor.java.BasicJavaDescriptor;
 import org.hibernate.type.descriptor.java.JavaTypeDescriptor;
+import org.hibernate.type.spi.TypeConfiguration;
 
 /**
  * Descriptor for the <tt>SQL</tt>/<tt>JDBC</tt> side of a value mapping.
@@ -26,7 +28,7 @@ public interface SqlTypeDescriptor extends Serializable {
 	 *
 	 * @return typeCode The JDBC type-code
 	 */
-	public int getSqlType();
+	int getSqlType();
 
 	/**
 	 * Is this descriptor available for remapping?
@@ -36,7 +38,16 @@ public interface SqlTypeDescriptor extends Serializable {
 	 * @see org.hibernate.type.descriptor.WrapperOptions#remapSqlTypeDescriptor
 	 * @see org.hibernate.dialect.Dialect#remapSqlTypeDescriptor
 	 */
-	public boolean canBeRemapped();
+	boolean canBeRemapped();
+
+	@SuppressWarnings("unchecked")
+	default <T> BasicJavaDescriptor<T> getJdbcRecommendedJavaTypeMapping(TypeConfiguration typeConfiguration) {
+		// match legacy behavior
+		return (BasicJavaDescriptor<T>) typeConfiguration.getJavaTypeDescriptorRegistry().getDescriptor(
+				JdbcTypeJavaClassMappings.INSTANCE.determineJavaClassForJdbcTypeCode( getSqlType() )
+		);
+
+	}
 
 	/**
 	 * Get the binder (setting JDBC in-going parameter values) capable of handling values of the type described by the
@@ -46,7 +57,7 @@ public interface SqlTypeDescriptor extends Serializable {
 	 *
 	 * @return The appropriate binder.
 	 */
-	public <X> ValueBinder<X> getBinder(JavaTypeDescriptor<X> javaTypeDescriptor);
+	<X> ValueBinder<X> getBinder(JavaTypeDescriptor<X> javaTypeDescriptor);
 
 	/**
 	 * Get the extractor (pulling out-going values from JDBC objects) capable of handling values of the type described
@@ -56,5 +67,5 @@ public interface SqlTypeDescriptor extends Serializable {
 	 *
 	 * @return The appropriate extractor
 	 */
-	public <X> ValueExtractor<X> getExtractor(JavaTypeDescriptor<X> javaTypeDescriptor);
+	<X> ValueExtractor<X> getExtractor(JavaTypeDescriptor<X> javaTypeDescriptor);
 }

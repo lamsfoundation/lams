@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
+import org.lamsfoundation.lams.tool.forum.model.Attachment;
 
 /**
  * Attachment comparator by unique id, hence should be the order saved in the database.

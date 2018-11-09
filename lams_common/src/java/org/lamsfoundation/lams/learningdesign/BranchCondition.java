@@ -22,6 +22,15 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -39,7 +48,10 @@ import org.lamsfoundation.lams.tool.ToolOutputValue;
  *
  * There should be one branch condition for each ToolOutputBranchActivityEntry.
  */
-public class BranchCondition implements Comparable {
+@Entity
+@Table(name = "lams_branch_condition")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class BranchCondition implements Comparable<BranchCondition> {
 
     public static final String OUTPUT_TYPE_STRING = "OUTPUT_STRING";
 
@@ -53,14 +65,33 @@ public class BranchCondition implements Comparable {
 
     private static Logger log = Logger.getLogger(BranchCondition.class);
 
+    @Id
+    @Column(name = "condition_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long conditionId;
+
+    @Column(name = "condition_ui_id")
     protected Integer conditionUIID;
+
+    @Column(name = "order_id")
     protected Integer orderId;
+
+    @Column
     protected String name;
+
+    @Column(name = "display_name")
     protected String displayName;
+
+    @Column
     protected String type;
+
+    @Column(name = "start_value")
     protected String startValue;
+
+    @Column(name = "end_value")
     protected String endValue;
+
+    @Column(name = "exact_match_value")
     protected String exactMatchValue;
 
     /** default constructor */
@@ -197,8 +228,7 @@ public class BranchCondition implements Comparable {
     }
 
     @Override
-    public int compareTo(Object arg0) {
-	BranchCondition other = (BranchCondition) arg0;
+    public int compareTo(BranchCondition other) {
 	return new CompareToBuilder().append(orderId, other.getOrderId()).append(conditionId, other.getConditionId())
 		.append(name, other.getName()).append(conditionUIID, other.getConditionUIID()).toComparison();
     }
@@ -289,7 +319,7 @@ public class BranchCondition implements Comparable {
 	if (posPeriod > 0) {
 	    textValue = textValue.substring(0, posPeriod);
 	}
-	return new Long(textValue);
+	return Long.valueOf(textValue);
     }
 
     /**
@@ -340,7 +370,7 @@ public class BranchCondition implements Comparable {
 	return false;
     }
 
-    private Comparable getTypedValue(String untypedValue) {
+    private Comparable<?> getTypedValue(String untypedValue) {
 	if (BranchCondition.OUTPUT_TYPE_LONG.equals(type)) {
 	    return convertToLong(untypedValue);
 	} else if (BranchCondition.OUTPUT_TYPE_DOUBLE.equals(type)) {

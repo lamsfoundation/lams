@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.lesson;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyJoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -59,9 +74,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  *
  * @author Chris
  * @author Jacky Fang
- * @version 1.1
  *
  */
+@Entity
+@Table(name = "lams_learner_progress")
 public class LearnerProgress implements Serializable {
     private static final long serialVersionUID = -7866830317967062822L;
 
@@ -103,28 +119,43 @@ public class LearnerProgress implements Serializable {
     //---------------------------------------------------------------------
     // attributes
     //---------------------------------------------------------------------
-    /** Identifier field */
+    @Id
+    @Column(name = "learner_progress_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long learnerProgressId;
 
     /** The User to whom this progress data belongs. */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     /** The Lesson this progress data is for */
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
     /** Map of attempted activities with their start date */
-    private Map<Activity, Date> attemptedActivities;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "lams_progress_attempted", joinColumns = @JoinColumn(name = "learner_progress_id"))
+    @MapKeyJoinColumn(name = "activity_id")
+    @Column(name = "start_date_time")
+    private Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>();
 
     /**
      * Set of completed activities that includes all completed activities before
      * current activity
      */
-    private Map<Activity, CompletedActivityProgress> completedActivities;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "lams_progress_completed", joinColumns = @JoinColumn(name = "learner_progress_id"))
+    @MapKeyJoinColumn(name = "activity_id")
+    private Map<Activity, CompletedActivityProgress> completedActivities = new HashMap<Activity, CompletedActivityProgress>();
 
     /**
      * The activity that user just completed. The purpose of this activity is to
      * allow lams to remove unecessary frame for next activity.
      */
+    @ManyToOne
+    @JoinColumn(name = "previous_activity_id")
     private Activity previousActivity;
 
     /**
@@ -135,6 +166,8 @@ public class LearnerProgress implements Serializable {
      * not the leaf node. The main purpose of current activity is to restore the
      * progress states if the user exist without finishing the activity.
      */
+    @ManyToOne
+    @JoinColumn(name = "current_activity_id")
     private Activity currentActivity;
 
     /**
@@ -142,17 +175,21 @@ public class LearnerProgress implements Serializable {
      * next activity following the transition or leaf activity within a complex
      * activity.
      */
+    @ManyToOne
+    @JoinColumn(name = "next_activity_id")
     private Activity nextActivity;
 
     /**
      * Indicates is the User has completed this lesson.
      */
+    @Column(name = "lesson_completed_flag")
     private Byte lessonComplete;
 
     /**
      * Indicates the learner progress is in a incomplete parallel activity or
      * not.
      */
+    @Column(name = "waiting_flag")
     private byte parallelWaiting;
 
     /**
@@ -160,12 +197,17 @@ public class LearnerProgress implements Serializable {
      * following transition. This is created to help UI calculation what has
      * *just* been done.
      */
-    private List currentCompletedActivitiesList;
+    @Transient
+    private List<Long> currentCompletedActivitiesList;
 
     /** Indicate whether the learning progress is restarting or not */
+    @Column(name = "requires_restart_flag")
     private boolean restarting;
 
+    @Column(name = "start_date_time")
     private Date startDate;
+
+    @Column(name = "finish_date_time")
     private Date finishDate;
 
     //---------------------------------------------------------------------
@@ -173,7 +215,7 @@ public class LearnerProgress implements Serializable {
     //---------------------------------------------------------------------
     /** default constructor */
     public LearnerProgress() {
-	this.lessonComplete = new Byte(LESSON_NOT_COMPLETE);
+	this.lessonComplete = LESSON_NOT_COMPLETE;
     }
 
     /**
@@ -197,16 +239,9 @@ public class LearnerProgress implements Serializable {
 	this.lesson = lesson;
 	this.attemptedActivities = attemptedActivities;
 	this.completedActivities = completedActivities;
-	this.lessonComplete = new Byte(LESSON_NOT_COMPLETE);
+	this.lessonComplete = LESSON_NOT_COMPLETE;
     }
 
-    //---------------------------------------------------------------------
-    // Getters and Setters
-    //---------------------------------------------------------------------
-    /**
-     *
-     *
-     */
     public Long getLearnerProgressId() {
 	return this.learnerProgressId;
     }
@@ -215,9 +250,6 @@ public class LearnerProgress implements Serializable {
 	this.learnerProgressId = learnerProgressId;
     }
 
-    /**
-     *
-     */
     public User getUser() {
 	return this.user;
     }
@@ -226,9 +258,6 @@ public class LearnerProgress implements Serializable {
 	this.user = user;
     }
 
-    /**
-     *
-     */
     public Lesson getLesson() {
 	return this.lesson;
     }
@@ -237,10 +266,6 @@ public class LearnerProgress implements Serializable {
 	this.lesson = lesson;
     }
 
-    /**
-     *
-     *
-     */
     public Map<Activity, Date> getAttemptedActivities() {
 	return this.attemptedActivities;
     }
@@ -249,16 +274,11 @@ public class LearnerProgress implements Serializable {
 	this.attemptedActivities = attemptedActivities;
     }
 
-    /**
-     *
-     *
-     */
     public Map<Activity, CompletedActivityProgress> getCompletedActivities() {
 	return this.completedActivities;
     }
 
     public void setCompletedActivities(Map<Activity, CompletedActivityProgress> completedActivities) {
-
 	this.completedActivities = completedActivities;
     }
 
@@ -284,21 +304,10 @@ public class LearnerProgress implements Serializable {
 	return new HashCodeBuilder().append(getLearnerProgressId()).toHashCode();
     }
 
-    /**
-     * Getter for property currentActivity.
-     *
-     * @return Value of property currentActivity.
-     */
     public Activity getCurrentActivity() {
 	return this.currentActivity;
     }
 
-    /**
-     * Setter for property currentActivity.
-     *
-     * @param currentActivity
-     *            New value of property currentActivity.
-     */
     public void setCurrentActivity(Activity currentActivity) {
 	this.currentActivity = currentActivity;
     }
@@ -370,9 +379,9 @@ public class LearnerProgress implements Serializable {
 	    if (activity.isComplexActivity()) {
 		ComplexActivity complex = (ComplexActivity) activityDAO
 			.getActivityByActivityId(activity.getActivityId(), ComplexActivity.class);
-		Iterator iter = complex.getActivities().iterator();
+		Iterator<Activity> iter = complex.getActivities().iterator();
 		while (iter.hasNext()) {
-		    Activity child = (Activity) iter.next();
+		    Activity child = iter.next();
 		    setProgressState(child, state, activityDAO);
 		}
 	    }
@@ -384,8 +393,7 @@ public class LearnerProgress implements Serializable {
 	} else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    this.getAttemptedActivities().put(activity, new Date());
 	} else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
-	    this.getCompletedActivities().put(activity,
-		    new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
+	    this.getCompletedActivities().put(activity, new CompletedActivityProgress(activityStartDate, new Date()));
 	}
     }
 
@@ -407,94 +415,49 @@ public class LearnerProgress implements Serializable {
 	return lessonComplete;
     }
 
-    /**
-     * Setter for property lessonComplete.
-     *
-     * @param lessonComplete
-     *            New value of property lessonComplete.
-     */
     public void setLessonComplete(Byte lessonComplete) {
 	this.lessonComplete = lessonComplete;
     }
 
-    /**
-     * Getter for property nextActivity.
-     *
-     * @return Value of property nextActivity.
-     */
     public Activity getNextActivity() {
 
 	return this.nextActivity;
     }
 
-    /**
-     * Setter for property nextActivity.
-     *
-     * @param nextActivity
-     *            New value of property nextActivity.
-     */
     public void setNextActivity(Activity nextActivity) {
 
 	this.nextActivity = nextActivity;
     }
 
-    /**
-     * @return Returns the previousActivity.
-     */
     public Activity getPreviousActivity() {
 	return previousActivity;
     }
 
-    /**
-     * @param previousActivity
-     *            The previousActivity to set.
-     */
     public void setPreviousActivity(Activity previousActivity) {
 	this.previousActivity = previousActivity;
     }
 
-    /**
-     * @return Returns the isParallelWaiting.
-     */
     public byte getParallelWaiting() {
 	return parallelWaiting;
     }
 
-    /**
-     * @param isParallelWaiting
-     *            The isParallelWaiting to set.
-     */
     public void setParallelWaiting(byte parallelWaiting) {
 	this.parallelWaiting = parallelWaiting;
     }
 
-    /**
-     * @return Returns the currentCompletedActivitiesList.
-     */
-    public List getCurrentCompletedActivitiesList() {
+    public List<Long> getCurrentCompletedActivitiesList() {
 	return currentCompletedActivitiesList;
     }
 
-    /**
-     * @param completedActivitiesList
-     *            The currentCompletedActivitiesList to set.
-     */
-    public void setCurrentCompletedActivitiesList(List completedActivitiesList) {
-	this.currentCompletedActivitiesList = new LinkedList();
+    public void setCurrentCompletedActivitiesList(List<Long> completedActivitiesList) {
+	this.currentCompletedActivitiesList = new LinkedList<Long>();
 	this.currentCompletedActivitiesList.addAll(completedActivitiesList);
     }
 
-    /**
-     * @return Returns the isRestarting.
-     */
     public boolean isRestarting() {
 	return restarting;
     }
 
-    /**
-     * @param isRestarting
-     *            The isRestarting to set.
-     */
     public void setRestarting(boolean restarting) {
 	this.restarting = restarting;
     }
@@ -531,14 +494,14 @@ public class LearnerProgress implements Serializable {
      * @param activities
      *            the activities that is being used to create the array.
      */
-    private Long[] createIdArrayFrom(Set activities) {
+    private Long[] createIdArrayFrom(Set<Activity> activities) {
 	if (activities == null) {
 	    throw new IllegalArgumentException("Fail to create id array" + " from null activity set");
 	}
 
 	ArrayList<Long> activitiesIds = new ArrayList<Long>();
-	for (Iterator i = activities.iterator(); i.hasNext();) {
-	    Activity activity = (Activity) i.next();
+	for (Iterator<Activity> i = activities.iterator(); i.hasNext();) {
+	    Activity activity = i.next();
 	    activitiesIds.add(activity.getActivityId());
 	}
 

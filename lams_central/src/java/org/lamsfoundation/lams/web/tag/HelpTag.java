@@ -34,7 +34,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HelpUtil;
@@ -51,6 +51,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fiona Malikoff
  */
 public class HelpTag extends TagSupport {
+    private static final long serialVersionUID = -4529242646662173012L;
 
     private static final Logger log = Logger.getLogger(HelpTag.class);
     private String module = null;
@@ -95,7 +96,7 @@ public class HelpTag extends TagSupport {
 		    // retrieve help URL for tool
 		    ILamsToolService toolService = (ILamsToolService) getContext()
 			    .getBean(CentralConstants.TOOL_SERVICE_BEAN_NAME);
-		    IToolVO tool = toolService.getToolBySignature(toolSignature);
+		    Tool tool = toolService.getToolBySignature(toolSignature);
 
 		    String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode);
 

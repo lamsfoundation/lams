@@ -21,11 +21,18 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -36,43 +43,49 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  *
  */
+@Entity
+@Table(name = "tl_lachat11_message")
 public class ChatMessage implements java.io.Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3976906267301586708L;
 
     public static final String MESSAGE_TYPE_PUBLIC = "groupchat";
 
     public static final String MESSAGE_TYPE_PRIVATE = "chat";
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @ManyToOne
+    @JoinColumn(name = "chat_session_uid")
     private ChatSession chatSession;
 
+    @ManyToOne
+    @JoinColumn(name = "from_user_uid")
     private ChatUser fromUser;
 
+    @ManyToOne
+    @JoinColumn(name = "to_user_uid")
     private ChatUser toUser;
 
+    @Column
     private String type;
 
+    @Column
     private String body;
 
+    @Column(name = "send_date")
     private Date sendDate;
 
+    @Column
     private boolean hidden;
 
     /** default constructor */
     public ChatMessage() {
     }
 
-    // Property accessors
-
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -81,9 +94,6 @@ public class ChatMessage implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     */
     public ChatSession getChatSession() {
 	return chatSession;
     }
@@ -92,11 +102,6 @@ public class ChatMessage implements java.io.Serializable {
 	this.chatSession = chatSession;
     }
 
-    /**
-     *
-     *
-     * 
-     */
     public ChatUser getFromUser() {
 	return fromUser;
     }
@@ -106,9 +111,6 @@ public class ChatMessage implements java.io.Serializable {
     }
 
     /**
-     *
-     *
-     * 
      * The toUser field is null when the type is "groupchat", and non null when
      * the type is "chat"
      */
@@ -120,9 +122,6 @@ public class ChatMessage implements java.io.Serializable {
 	this.toUser = to;
     }
 
-    /**
-     *
-     */
     public String getType() {
 	return type;
     }
@@ -131,9 +130,6 @@ public class ChatMessage implements java.io.Serializable {
 	this.type = type;
     }
 
-    /**
-     *
-     */
     public String getBody() {
 	return body;
     }
@@ -142,9 +138,6 @@ public class ChatMessage implements java.io.Serializable {
 	this.body = body;
     }
 
-    /**
-     *
-     */
     public Date getSendDate() {
 	return sendDate;
     }
@@ -153,10 +146,6 @@ public class ChatMessage implements java.io.Serializable {
 	this.sendDate = sendDate;
     }
 
-    /**
-     * 
-     *
-     */
     public boolean isHidden() {
 	return hidden;
     }

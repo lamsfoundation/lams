@@ -23,32 +23,40 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
-import org.apache.log4j.Logger;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * AssessmentOptionAnswer
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_option_answer")
 public class AssessmentOptionAnswer implements Cloneable {
-    private static final Logger log = Logger.getLogger(AssessmentOptionAnswer.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "question_option_uid")
     private Long optionUid;
 
+    @Column(name = "answer_int")
     private int answerInt;
 
+    @Column(name = "answer_boolean")
     private boolean answerBoolean;
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
 
-    /**
-     *
-     * @return Returns the answer ID.
-     */
     public Long getUid() {
 	return uid;
     }

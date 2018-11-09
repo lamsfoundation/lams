@@ -1,5 +1,8 @@
 package org.lamsfoundation.lams.tool.notebook.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -12,6 +15,8 @@ import org.lamsfoundation.lams.tool.notebook.dto.NotebookConditionDTO;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "tl_lantbk11_conditions")
 public class NotebookCondition extends TextSearchCondition {
 
     public NotebookCondition() {

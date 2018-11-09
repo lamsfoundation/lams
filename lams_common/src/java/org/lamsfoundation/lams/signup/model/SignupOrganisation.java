@@ -2,11 +2,22 @@ package org.lamsfoundation.lams.signup.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
 /**
  * Signup organisation.
  */
+@Entity
+@Table(name = "lams_signup_organisation")
 public class SignupOrganisation {
 
     /**
@@ -14,19 +25,46 @@ public class SignupOrganisation {
      */
     public static String SIGNUP_HELP_PAGE = "LAMS+Signup";
 
-    /** identifier field */
+    @Id
+    @Column(name = "signup_organisation_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer signupOrganisationId;
+    
+    @ManyToOne 
+    @JoinColumn(name = "organisation_id") 
     private Organisation organisation;
+
+    @Column(name = "add_to_lessons")
     private Boolean addToLessons;
+
+    @Column(name = "add_as_staff")
     private Boolean addAsStaff;
+
+    @Column(name = "add_with_author")
     private Boolean addWithAuthor;
+
+    @Column(name = "add_with_monitor")
     private Boolean addWithMonitor;
+
+    @Column(name = "email_verify")
     private Boolean emailVerify;
+
+    @Column(name = "course_key")
     private String courseKey;
+
+    @Column
     private String blurb;
+
+    @Column(name = "create_date")
     private Date createDate;
+
+    @Column
     private Boolean disabled;
+
+    @Column(name = "login_tab_active")
     private Boolean loginTabActive;
+
+    @Column
     private String context;
 
     public Integer getSignupOrganisationId() {

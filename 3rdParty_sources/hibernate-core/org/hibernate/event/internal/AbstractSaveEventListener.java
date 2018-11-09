@@ -9,12 +9,12 @@ package org.hibernate.event.internal;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.hibernate.FlushMode;
 import org.hibernate.LockMode;
 import org.hibernate.NonUniqueObjectException;
 import org.hibernate.action.internal.AbstractEntityInsertAction;
 import org.hibernate.action.internal.EntityIdentityInsertAction;
 import org.hibernate.action.internal.EntityInsertAction;
-import org.hibernate.bytecode.instrumentation.spi.FieldInterceptor;
 import org.hibernate.classic.Lifecycle;
 import org.hibernate.engine.internal.Cascade;
 import org.hibernate.engine.internal.CascadePoint;
@@ -24,6 +24,7 @@ import org.hibernate.engine.spi.CascadingAction;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.EntityEntryExtraState;
 import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.SelfDirtinessTracker;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.event.spi.EventSource;
@@ -31,21 +32,34 @@ import org.hibernate.id.IdentifierGenerationException;
 import org.hibernate.id.IdentifierGeneratorHelper;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.jpa.event.spi.CallbackRegistry;
+import org.hibernate.jpa.event.spi.CallbackRegistryConsumer;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
 import org.hibernate.type.Type;
 import org.hibernate.type.TypeHelper;
 
+import static org.hibernate.FlushMode.COMMIT;
+import static org.hibernate.FlushMode.MANUAL;
+
 /**
- * A convenience bas class for listeners responding to save events.
+ * A convenience base class for listeners responding to save events.
  *
  * @author Steve Ebersole.
  */
-public abstract class AbstractSaveEventListener extends AbstractReassociateEventListener {
+public abstract class AbstractSaveEventListener
+		extends AbstractReassociateEventListener
+		implements CallbackRegistryConsumer {
 	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( AbstractSaveEventListener.class );
 
-	public static enum EntityState {
+	public enum EntityState {
 		PERSISTENT, TRANSIENT, DETACHED, DELETED
+	}
+
+	private CallbackRegistry callbackRegistry;
+
+	public void injectCallbackRegistry(CallbackRegistry callbackRegistry) {
+		this.callbackRegistry = callbackRegistry;
 	}
 
 	/**
@@ -65,6 +79,8 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 			String entityName,
 			Object anything,
 			EventSource source) {
+		callbackRegistry.preCreate( entity );
+
 		return performSave(
 				entity,
 				requestedId,
@@ -97,6 +113,12 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 			Object anything,
 			EventSource source,
 			boolean requiresImmediateIdAccess) {
+		callbackRegistry.preCreate( entity );
+
+		if ( entity instanceof SelfDirtinessTracker ) {
+			( (SelfDirtinessTracker) entity ).$$_hibernate_clearDirtyAttributes();
+		}
+
 		EntityPersister persister = source.getEntityPersister( entityName, entity );
 		Serializable generatedId = persister.getIdentifierGenerator().generate( source, entity );
 		if ( generatedId == null ) {
@@ -226,8 +248,7 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 
 		Serializable id = key == null ? null : key.getIdentifier();
 
-		boolean inTxn = source.isTransactionInProgress();
-		boolean shouldDelayIdentityInserts = !inTxn && !requiresImmediateIdAccess;
+		boolean shouldDelayIdentityInserts = shouldDelayIdentityInserts( requiresImmediateIdAccess, source );
 
 		// Put a placeholder in entries, so we don't recurse back and try to save() the
 		// same object again. QUESTION: should this be done before onSave() is called?
@@ -242,7 +263,6 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 				LockMode.WRITE,
 				useIdentityColumn,
 				persister,
-				false,
 				false
 		);
 
@@ -288,8 +308,6 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 			insert.handleNaturalIdPostSaveNotifications( id );
 		}
 
-		markInterceptorDirty( entity, persister, source );
-
 		EntityEntry newEntry = source.getPersistenceContext().getEntry( entity );
 
 		if ( newEntry != original ) {
@@ -300,6 +318,30 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 		}
 
 		return id;
+	}
+
+	private static boolean shouldDelayIdentityInserts(boolean requiresImmediateIdAccess, EventSource source) {
+		return shouldDelayIdentityInserts( requiresImmediateIdAccess, isPartOfTransaction( source ), source.getHibernateFlushMode() );
+	}
+
+	private static boolean shouldDelayIdentityInserts(
+			boolean requiresImmediateIdAccess,
+			boolean partOfTransaction,
+			FlushMode flushMode) {
+		if ( requiresImmediateIdAccess ) {
+			// todo : make this configurable?  as a way to support this behavior with Session#save etc
+			return false;
+		}
+
+		// otherwise we should delay the IDENTITY insertions if either:
+		//		1) we are not part of a transaction
+		//		2) we are in FlushMode MANUAL or COMMIT (not AUTO nor ALWAYS)
+		return !partOfTransaction || flushMode == MANUAL || flushMode == COMMIT;
+
+	}
+
+	private static boolean isPartOfTransaction(EventSource source) {
+		return source.isTransactionInProgress() && source.getTransactionCoordinator().isJoined();
 	}
 
 	private AbstractEntityInsertAction addInsertAction(
@@ -324,18 +366,6 @@ public abstract class AbstractSaveEventListener extends AbstractReassociateEvent
 			);
 			source.getActionQueue().addAction( insert );
 			return insert;
-		}
-	}
-
-	private void markInterceptorDirty(Object entity, EntityPersister persister, EventSource source) {
-		if ( persister.getInstrumentationMetadata().isInstrumented() ) {
-			FieldInterceptor interceptor = persister.getInstrumentationMetadata().injectInterceptor(
-					entity,
-					persister.getEntityName(),
-					null,
-					source
-			);
-			interceptor.dirty();
 		}
 	}
 

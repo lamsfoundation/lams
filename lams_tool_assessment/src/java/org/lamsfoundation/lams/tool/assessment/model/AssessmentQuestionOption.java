@@ -23,6 +23,14 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -30,43 +38,65 @@ import org.apache.log4j.Logger;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_question_option")
 public class AssessmentQuestionOption implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentQuestionOption.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "sequence_id")
     private Integer sequenceId;
 
+    @Column
     private String question;
 
+    @Column(name = "option_string")
     private String optionString;
 
+    @Column(name = "option_float")
     private float optionFloat;
 
+    @Column(name = "accepted_error")
     private float acceptedError;
 
+    @Column
     private float grade;
 
+    @Column
     private boolean correct;
 
+    @Column
     private String feedback;
 
     // *************** DTO fields (used in monitoring) ********************
-
+    @Transient
     private String questionEscaped;
-
+    @Transient
     private String optionStringEscaped;
-    
+    @Transient
     private float percentage;
+
+    @Override
+    public Object clone() {
+	AssessmentQuestionOption obj = null;
+	try {
+	    obj = (AssessmentQuestionOption) super.clone();
+	    obj.setUid(null);
+	} catch (CloneNotSupportedException e) {
+	    AssessmentQuestionOption.log.error("When clone " + AssessmentQuestionOption.class + " failed");
+	}
+
+	return obj;
+    }
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
 
-    /**
-     *
-     * @return Returns the answer ID.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -76,11 +106,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
 
     /**
-     * Returns option's sequence number.
-     *
      * @return option's sequence number
-     *
-     *
      */
     @Override
     public int getSequenceId() {
@@ -218,18 +244,5 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     
     public void setPercentage(float percentage) {
 	this.percentage = percentage;
-    }
-
-    @Override
-    public Object clone() {
-	AssessmentQuestionOption obj = null;
-	try {
-	    obj = (AssessmentQuestionOption) super.clone();
-	    obj.setUid(null);
-	} catch (CloneNotSupportedException e) {
-	    AssessmentQuestionOption.log.error("When clone " + AssessmentQuestionOption.class + " failed");
-	}
-
-	return obj;
     }
 }

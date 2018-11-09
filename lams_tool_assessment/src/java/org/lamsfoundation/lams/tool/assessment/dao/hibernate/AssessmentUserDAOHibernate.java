@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -115,7 +115,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString, IUserManagementService userManagementService) {
-
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 	
 	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_SESSION_SELECT)
@@ -129,11 +128,11 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_NAME);
 	bldr.append(sortOrder);
 	
-	SQLQuery query = getSession().createSQLQuery(bldr.toString());
-	query.setLong("sessionId", sessionId);
+	NativeQuery<Object[]> query = getSession().createNativeQuery(bldr.toString());
+	query.setParameter("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
+	query.setParameter("searchString", searchString);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
@@ -167,16 +166,15 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @SuppressWarnings("rawtypes")
     @Override
     public int getCountUsersBySession(Long sessionId, String searchString) {
-
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
+	final String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
 		+ " WHERE user.session.sessionId = :sessionId "
 		+ " AND (CONCAT(user.lastName, ' ', user.firstName) LIKE CONCAT('%', :searchString, '%')) ";
 
 	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
-	query.setLong("sessionId", sessionId);
+	query.setParameter("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
+	query.setParameter("searchString", searchString);
 	List list = query.list();
 
 	if ((list == null) || (list.size() == 0)) {
@@ -188,30 +186,22 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     
     @Override
     public int getCountUsersByContentId(Long contentId) {
-
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
+	final String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
 		+ " WHERE user.session.assessment.contentId = :contentId ";
 
-	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
-	query.setLong("contentId", contentId);
-	List list = query.list();
-
-	if ((list == null) || (list.size() == 0)) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
+	Query<Number> query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME, Number.class);
+	query.setParameter("contentId", contentId);
+	return query.uniqueResult().intValue();
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public Object[] getStatsMarksBySession(Long sessionId) {
-
-	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_SESSION)
+	Query query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_SESSION)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE);
-	query.setLong("sessionId", sessionId);
+	query.setParameter("sessionId", sessionId);
 	List list = query.list();
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -220,16 +210,15 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	}
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings("unchecked")
     @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
-
-	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_LEADERS)
+	NativeQuery<Object[]> query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_LEADERS)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE)
 		.addScalar("num_complete", IntegerType.INSTANCE);
-	query.setLong("toolContentId", toolContentId);
+	query.setParameter("toolContentId", toolContentId);
 	List list = query.list();
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -237,7 +226,6 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    return (Object[]) list.get(0);
 	}
     }
-
 
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_SELECT = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark";
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_FROM = " FROM tl_laasse10_user user";
@@ -272,12 +260,12 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    bldr.append(LOAD_USERS_ORDERED_ORDER_BY_NAME);
 	bldr.append(sortOrder);
 
-	SQLQuery query = getSession().createSQLQuery(bldr.toString());
-	query.setLong("sessionId", sessionId);
-	query.setLong("questionUid", questionUid);
+	NativeQuery<Object[]> query = getSession().createNativeQuery(bldr.toString());
+	query.setParameter("sessionId", sessionId);
+	query.setParameter("questionUid", questionUid);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
+	query.setParameter("searchString", searchString);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
@@ -309,22 +297,20 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return userDtos;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawUserMarksBySession(Long sessionId) {
-
-	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_SESSION);
-	query.setLong("sessionId", sessionId);
+	@SuppressWarnings("unchecked")
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
+	query.setParameter("sessionId", sessionId);
 	List<Number> list = query.list();
 	return list;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
-
-	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_LEADERS);
-	query.setLong("toolContentId", toolContentId);
+	@SuppressWarnings("unchecked")
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_LEADERS);
+	query.setParameter("toolContentId", toolContentId);
 	List<Number> list = query.list();
 	return list;
     }

@@ -23,7 +23,7 @@
 
 package org.lamsfoundation.lams.tool.qa.dto;
 
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 
 /**
  * DTO that holds users attempt history data for jsp purposes

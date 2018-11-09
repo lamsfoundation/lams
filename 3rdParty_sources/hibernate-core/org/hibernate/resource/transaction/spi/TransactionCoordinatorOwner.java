@@ -26,17 +26,27 @@ public interface TransactionCoordinatorOwner {
 	 *
 	 * @return {@code true} indicates the owner is still active; {@code false} indicates it is not.
 	 */
-	public boolean isActive();
+	boolean isActive();
+
+	/**
+	 * Callback indicating recognition of entering into a transactional
+	 * context whether that is explicitly via the Hibernate
+	 * {@link org.hibernate.Transaction} API or via registration
+	 * of Hibernate's JTA Synchronization impl with a JTA Transaction
+	 */
+	default void startTransactionBoundary() {
+		getJdbcSessionOwner().startTransactionBoundary();
+	}
 
 	/**
 	 * A after-begin callback from the coordinator to its owner.
 	 */
-	public void afterTransactionBegin();
+	void afterTransactionBegin();
 
 	/**
 	 * A before-completion callback from the coordinator to its owner.
 	 */
-	public void beforeTransactionCompletion();
+	void beforeTransactionCompletion();
 
 	/**
 	 * An after-completion callback from the coordinator to its owner.
@@ -44,16 +54,16 @@ public interface TransactionCoordinatorOwner {
 	 * @param successful Was the transaction successful?
 	 * @param delayed Is this a delayed after transaction completion call (aka after a timeout)?
 	 */
-	public void afterTransactionCompletion(boolean successful, boolean delayed);
+	void afterTransactionCompletion(boolean successful, boolean delayed);
 
-	public JdbcSessionOwner getJdbcSessionOwner();
+	JdbcSessionOwner getJdbcSessionOwner();
 
 	/**
 	 * Set the effective transaction timeout period for the current transaction, in seconds.
 	 *
 	 * @param seconds The number of seconds before a time out should occur.
 	 */
-	public void setTransactionTimeOut(int seconds);
+	void setTransactionTimeOut(int seconds);
 
-	public void flushBeforeTransactionCompletion();
+	void flushBeforeTransactionCompletion();
 }

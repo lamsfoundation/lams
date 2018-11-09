@@ -33,8 +33,6 @@ import org.springframework.stereotype.Repository;
 /**
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 @Repository
 public class ResourceDAOHibernate extends LAMSBaseDAO implements ResourceDAO {
@@ -43,7 +41,7 @@ public class ResourceDAOHibernate extends LAMSBaseDAO implements ResourceDAO {
 
     @Override
     public Resource getByContentId(Long contentId) {
-	List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
+	List<Resource> list = (List<Resource>) doFind(GET_RESOURCE_BY_CONTENTID, contentId);
 	if (list.size() > 0) {
 	    return (Resource) list.get(0);
 	} else {

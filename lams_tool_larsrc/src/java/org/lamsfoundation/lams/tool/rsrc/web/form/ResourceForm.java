@@ -27,16 +27,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 
 /**
- *
  * Resource Form.
  *
- *
- *
- * User: Dapeng.Ni
+ * Author: Dapeng.Ni
  */
 public class ResourceForm {
-    private static final long serialVersionUID = 3599879328307492312L;
-
     private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
 
     // Forum fields

@@ -23,7 +23,7 @@
 
 package org.lamsfoundation.lams.tool.qa.dao;
 
-import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.model.QaSession;
 
 /**
  * @author Ozgur Demirtas

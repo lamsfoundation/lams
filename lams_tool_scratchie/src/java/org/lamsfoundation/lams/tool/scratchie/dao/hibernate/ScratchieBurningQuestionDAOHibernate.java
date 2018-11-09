@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -64,11 +64,11 @@ public class ScratchieBurningQuestionDAOHibernate extends LAMSBaseDAO implements
 		+ " LEFT JOIN tl_lascrt11_burning_que_like like1 ON bq.uid = like1.burning_question_uid "
 		+ " WHERE bq.question IS NOT NULL AND bq.question != ''" + " GROUP BY bq.uid";
 
-	SQLQuery query = getSession().createSQLQuery(GET_BURNING_QUESTIONS_WITH_LIKES);
+	NativeQuery<Object[]> query = getSession().createNativeQuery(GET_BURNING_QUESTIONS_WITH_LIKES);
 	query.addEntity("bq", ScratchieBurningQuestion.class).addScalar("sessionName", StringType.INSTANCE)
-		.addScalar("total_likes", IntegerType.INSTANCE).setLong("scratchieUid", scratchieUid);
+		.addScalar("total_likes", IntegerType.INSTANCE).setParameter("scratchieUid", scratchieUid);
 	if (sessionId != null) {
-	    query.addScalar("user_liked", IntegerType.INSTANCE).setLong("sessionId", sessionId);
+	    query.addScalar("user_liked", IntegerType.INSTANCE).setParameter("sessionId", sessionId);
 	}
 	List<Object[]> rawObjects = query.list();
 
@@ -99,7 +99,7 @@ public class ScratchieBurningQuestionDAOHibernate extends LAMSBaseDAO implements
 
     @Override
     public ScratchieBurningQuestion getBurningQuestionBySessionAndItem(Long sessionId, Long itemUid) {
-	List list = this.doFind(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
+	List<?> list = this.doFind(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -108,13 +108,14 @@ public class ScratchieBurningQuestionDAOHibernate extends LAMSBaseDAO implements
 
     @Override
     public ScratchieBurningQuestion getGeneralBurningQuestionBySession(Long sessionId) {
-	List list = this.find(FIND_GENERAL_QUESTION_BY_SESSION, new Object[] { sessionId });
+	List<?> list = this.find(FIND_GENERAL_QUESTION_BY_SESSION, new Object[] { sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
 	return (ScratchieBurningQuestion) list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId) {
 	return (List<ScratchieBurningQuestion>) this.doFind(FIND_BY_SESSION, new Object[] { sessionId });

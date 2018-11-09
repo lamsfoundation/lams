@@ -23,6 +23,7 @@ import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.jmx.spi.JmxService;
 import org.hibernate.service.Service;
 import org.hibernate.service.spi.Manageable;
+import org.hibernate.service.spi.OptionallyManageable;
 import org.hibernate.service.spi.Stoppable;
 
 /**
@@ -106,6 +107,13 @@ public class JmxServiceImpl implements JmxService, Stoppable {
 
 	@Override
 	public void registerService(Manageable service, Class<? extends Service> serviceRole) {
+		if ( OptionallyManageable.class.isInstance( service ) ) {
+			for ( Manageable realManageable : ( (OptionallyManageable) service ).getRealManageables() ) {
+				registerService( realManageable,serviceRole );
+			}
+			return;
+		}
+
 		final String domain = service.getManagementDomain() == null
 				? AvailableSettings.JMX_DEFAULT_OBJ_NAME_DOMAIN
 				: service.getManagementDomain();
@@ -173,7 +181,7 @@ public class JmxServiceImpl implements JmxService, Stoppable {
 		}
 
 		for ( MBeanServer mbeanServer : mbeanServers ) {
-			// they did specify a domain, so attempt to locate an MBEanServer with a matching default domain, returning it
+			// they did specify a domain, so attempt to locate an MBeanServer with a matching default domain, returning it
 			// if we find it.
 			if ( defaultDomain.equals( mbeanServer.getDefaultDomain() ) ) {
 				return mbeanServer;

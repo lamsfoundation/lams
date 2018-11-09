@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.form.QaPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -84,7 +84,7 @@ public class QaPedagogicalPlannerController {
 		} else {
 		    if (questionIndex < qaContent.getQaQueContents().size()) {
 			QaQueContent qaQuestion = qaService
-				.getQuestionByContentAndDisplayOrder((long) questionIndex + 1, qaContent.getUid());
+				.getQuestionByContentAndDisplayOrder(questionIndex + 1, qaContent.getUid());
 			qaQuestion.setQuestion(question);
 			qaService.saveOrUpdateQuestion(qaQuestion);
 
@@ -103,7 +103,7 @@ public class QaPedagogicalPlannerController {
 		qaService.removeQuestionsFromCache(qaContent);
 		qaService.removeQaContentFromCache(qaContent);
 		for (; questionIndex < qaContent.getQaQueContents().size(); questionIndex++) {
-		    QaQueContent qaQuestion = qaService.getQuestionByContentAndDisplayOrder((long) questionIndex + 1,
+		    QaQueContent qaQuestion = qaService.getQuestionByContentAndDisplayOrder(questionIndex + 1,
 			    qaContent.getUid());
 		    qaService.removeQuestion(qaQuestion);
 		}

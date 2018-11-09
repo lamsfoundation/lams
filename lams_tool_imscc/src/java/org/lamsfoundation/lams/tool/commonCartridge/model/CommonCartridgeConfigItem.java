@@ -20,27 +20,34 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.commonCartridge.model;
 
-/**
- *
- */
-public class CommonCartridgeConfigItem implements java.io.Serializable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "tl_laimsc11_configuration")
+public class CommonCartridgeConfigItem implements java.io.Serializable {
     private static final long serialVersionUID = 6360672537352753361L;
 
     public static final String KEY_EXPOSE_USER_NAME = "allowExposeUserName";
     public static final String KEY_EXPOSE_USER_EMAIL = "allowExposeUserEmail";
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    
+    @Column(name = "config_key")
     String configKey;
+    
+    @Column(name = "config_value")
     String configValue;
 
-    /**
-     *
-     *
-     */
     public Long getId() {
 	return id;
     }
@@ -49,9 +56,6 @@ public class CommonCartridgeConfigItem implements java.io.Serializable {
 	this.id = id;
     }
 
-    /**
-     *
-     */
     public String getConfigKey() {
 	return configKey;
     }
@@ -60,9 +64,6 @@ public class CommonCartridgeConfigItem implements java.io.Serializable {
 	this.configKey = configKey;
     }
 
-    /**
-     *
-     */
     public String getConfigValue() {
 	return configValue;
     }

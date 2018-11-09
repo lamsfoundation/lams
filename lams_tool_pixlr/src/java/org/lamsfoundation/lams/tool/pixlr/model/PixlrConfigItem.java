@@ -20,29 +20,39 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.pixlr.model;
 
-/**
- *
- */
-public class PixlrConfigItem {
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "tl_lapixl10_configuration")
+public class PixlrConfigItem implements Serializable {
 
     private static final long serialVersionUID = 930482766653472636L;
 
     public static final String KEY_LANGUAGE_CSV = "LanguageCSV";
 
+    @Id
+    @Column(name = "uid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Column(name = "config_key")
     String configKey;
+
+    @Column(name = "config_value")
     String configValue;
 
     public PixlrConfigItem() {
     }
 
-    /**
-     *
-     *
-     */
     public Long getId() {
 	return id;
     }
@@ -51,10 +61,6 @@ public class PixlrConfigItem {
 	this.id = id;
     }
 
-    /**
-     *
-     *
-     */
     public String getConfigKey() {
 	return configKey;
     }
@@ -63,9 +69,6 @@ public class PixlrConfigItem {
 	this.configKey = configKey;
     }
 
-    /**
-     *
-     */
     public String getConfigValue() {
 	return configValue;
     }
@@ -73,5 +76,4 @@ public class PixlrConfigItem {
     public void setConfigValue(String configValue) {
 	this.configValue = configValue;
     }
-
 }

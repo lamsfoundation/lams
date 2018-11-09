@@ -28,7 +28,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -40,12 +47,19 @@ import org.lamsfoundation.lams.usermanagement.User;
  *
  * @author chris
  */
+@Entity
+@DiscriminatorValue("3")
 public class LessonClass extends Grouping {
+
+    private static final long serialVersionUID = 5363725488837028794L;
 
     private static Logger log = Logger.getLogger(LessonClass.class);
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "staff_group_id")
     private Group staffGroup;
 
+    @OneToOne(mappedBy = "lessonClass")
     private Lesson lesson;
 
     /** Creates a new instance of LessonClass */
@@ -53,7 +67,7 @@ public class LessonClass extends Grouping {
     }
 
     /** full constructor */
-    public LessonClass(Long groupingId, Set groups, Set activities, Group staffGroup, Lesson lesson) {
+    public LessonClass(Long groupingId, Set<Group> groups, Set<Activity> activities, Group staffGroup, Lesson lesson) {
 	//don't think lesson class need perform doGrouping. set grouper to null.
 	super(groupingId, groups, activities, null);
 	this.staffGroup = staffGroup;
@@ -91,7 +105,7 @@ public class LessonClass extends Grouping {
 
     /**
      * This method creates a deep copy of the LessonClass
-     * 
+     *
      * @return LessonClass The deep copied LessonClass object
      */
     @Override
@@ -137,7 +151,7 @@ public class LessonClass extends Grouping {
      * When the users's are added from an external LMS e.g. Moodle, the Learner Group may not exist.
      * If that happens, then this code will ensure that there is a learners group, etc and so adding
      * a user won't throw an exception. This is just fallback code!!!!
-     * 
+     *
      * @return the learner group
      */
     private Group createLearnerGroupIfMissing() {
@@ -151,7 +165,7 @@ public class LessonClass extends Grouping {
 	    }
 	    String learnerGroupName = lessonOrganisation != null ? lessonOrganisation.getName() : "";
 	    learnerGroupName = learnerGroupName + "learners";
-	    getGroups().add(Group.createLearnerGroup(this, learnerGroupName, new HashSet()));
+	    getGroups().add(Group.createLearnerGroup(this, learnerGroupName, new HashSet<User>()));
 	    learnersGroup = getLearnersGroup();
 	}
 	return learnersGroup;
@@ -160,7 +174,7 @@ public class LessonClass extends Grouping {
     /**
      * Add one or more learners to the lesson class. Doesn't bother checking for duplicates as it goes into a set,
      * and User does a check on userID field for equals anyway.
-     * 
+     *
      * @return number of learners added
      */
     public int addLearners(Collection<User> newLearners) {
@@ -177,7 +191,7 @@ public class LessonClass extends Grouping {
 
     /**
      * Sets the staff to the value given by the input collection.
-     * 
+     *
      * @return number of staff set
      */
     public int setLearners(Collection<User> newLearners) {
@@ -194,9 +208,9 @@ public class LessonClass extends Grouping {
 
     public Group getLearnersGroup() {
 	Group learnersGroup = null;
-	Iterator iter = getGroups().iterator();
+	Iterator<Group> iter = getGroups().iterator();
 	while (learnersGroup == null && iter.hasNext()) {
-	    learnersGroup = (Group) iter.next();
+	    learnersGroup = iter.next();
 	    if (!isLearnerGroup(learnersGroup)) {
 		learnersGroup = null;
 	    }
@@ -232,7 +246,7 @@ public class LessonClass extends Grouping {
     /**
      * Add one or more staff members to the lesson class. Doesn't bother checking for duplicates it goes
      * into a set, and User does a check on userID field for equals anyway.
-     * 
+     *
      * @return number of learners added
      */
     public int addStaffMembers(Collection<User> newStaff) {
@@ -249,7 +263,7 @@ public class LessonClass extends Grouping {
 
     /**
      * Sets the staff to the value given by the input collection.
-     * 
+     *
      * @return number of staff set
      */
     public int setStaffMembers(Collection<User> newStaff) {
@@ -268,7 +282,7 @@ public class LessonClass extends Grouping {
      * When the users's are added from an external LMS e.g. Moodle, the Staff Group may not exist.
      * If that happens, then this code will ensure that there is a learners group, etc and so adding
      * a user won't throw an exception. This is just fallback code!!!!
-     * 
+     *
      * @return the staff group
      */
     private Group createStaffGroupIfMissing() {

@@ -25,16 +25,58 @@ package org.lamsfoundation.lams.learning.kumalive.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.TreeMap;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "lams_kumalive_poll_answer")
 public class KumalivePollAnswer implements Serializable {
-
     private static final long serialVersionUID = -760184191959618734L;
 
+    @Id
+    @Column(name = "answer_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long answerId;
+    
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "poll_id")
     private KumalivePoll poll;
+    
+    @Column(name = "order_id")
     private Short orderId;
+    
+    @Column
     private String name;
-    private Map<Integer, Date> votes;
+    
+//	 <map table="lams_kumalive_poll_vote" name="votes" lazy="false" order-by="vote_date ASC">
+//         <key column="answer_id"/>
+//         <index column="user_id" type="java.lang.Integer"/>
+//         <element column="vote_date" type="java.util.Date"/>
+//	</map>
+    
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "kumalive_id")
+//    @OrderBy("sequence_id ASC")
+    
+    @ElementCollection(fetch = FetchType.LAZY)
+    @OrderBy("vote_date ASC")
+    @MapKeyColumn(name="user_id")
+    @Column(name="vote_date")
+    @CollectionTable(name="lams_kumalive_poll_vote", joinColumns=@JoinColumn(name="answer_id"))
+    private Map<Integer, Date> votes = new TreeMap<>();
 
     public KumalivePollAnswer() {
     }

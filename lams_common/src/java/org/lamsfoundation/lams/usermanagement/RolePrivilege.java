@@ -2,26 +2,35 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_role_privilege")
 public class RolePrivilege implements Serializable {
+    private static final long serialVersionUID = -8812038010815801094L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "rp_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rpId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "privilege_id")
     private Privilege privilege;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private Role role;
 
-    /** full constructor */
-    public RolePrivilege(Privilege privilege, Role role) {
-	this.privilege = privilege;
-	this.role = role;
-    }
-
-    /** default constructor */
     public RolePrivilege() {
     }
 
@@ -53,5 +62,4 @@ public class RolePrivilege implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("rpId", getRpId()).toString();
     }
-
 }

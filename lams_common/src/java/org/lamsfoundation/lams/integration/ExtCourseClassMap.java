@@ -2,33 +2,39 @@ package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
+@Entity
+@Table(name = "lams_ext_course_class_map")
 public class ExtCourseClassMap implements Serializable {
-
     private static final long serialVersionUID = -6179393464356966543L;
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sid;
 
-    /** persistent field */
+    @Column
     private String courseid;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "classid")
     private Organisation organisation;
 
-    /** full constructor */
-    public ExtCourseClassMap(String courseid, ExtServer extServer, Organisation organisation) {
-	this.courseid = courseid;
-	this.extServer = extServer;
-	this.organisation = organisation;
-    }
-
-    /** default constructor */
     public ExtCourseClassMap() {
     }
 
@@ -68,5 +74,4 @@ public class ExtCourseClassMap implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("sid", getSid()).append("courseid", getCourseid()).toString();
     }
-
 }

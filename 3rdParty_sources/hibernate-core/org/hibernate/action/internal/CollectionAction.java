@@ -12,10 +12,10 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.action.spi.Executable;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
+import org.hibernate.cache.spi.access.CollectionDataAccess;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.event.service.spi.EventListenerGroup;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventSource;
@@ -31,7 +31,7 @@ import org.hibernate.pretty.MessageHelper;
  */
 public abstract class CollectionAction implements Executable, Serializable, Comparable {
 	private transient CollectionPersister persister;
-	private transient SessionImplementor session;
+	private transient SharedSessionContractImplementor session;
 	private final PersistentCollection collection;
 
 	private final Serializable key;
@@ -41,7 +41,7 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 			final CollectionPersister persister,
 			final PersistentCollection collection, 
 			final Serializable key, 
-			final SessionImplementor session) {
+			final SharedSessionContractImplementor session) {
 		this.persister = persister;
 		this.session = session;
 		this.key = key;
@@ -58,7 +58,7 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 	 *
 	 * @param session The session being deserialized
 	 */
-	public void afterDeserialize(SessionImplementor session) {
+	public void afterDeserialize(SharedSessionContractImplementor session) {
 		if ( this.session != null || this.persister != null ) {
 			throw new IllegalStateException( "already attached to a session." );
 		}
@@ -66,7 +66,7 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		// guard against NullPointerException
 		if ( session != null ) {
 			this.session = session;
-			this.persister = session.getFactory().getCollectionPersister( collectionRole );
+			this.persister = session.getFactory().getMetamodel().collectionPersister( collectionRole );
 		}
 	}
 
@@ -76,7 +76,7 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		// bidirectional association and it is one of the earlier entity actions which actually updates
 		// the database (this action is responsible for second-level cache invalidation only)
 		if ( persister.hasCache() ) {
-			final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final CollectionDataAccess cache = persister.getCacheAccessStrategy();
 			final Object ck = cache.generateCacheKey(
 					key,
 					persister,
@@ -123,13 +123,13 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		return finalKey;
 	}
 
-	protected final SessionImplementor getSession() {
+	protected final SharedSessionContractImplementor getSession() {
 		return session;
 	}
 
 	protected final void evict() throws CacheException {
 		if ( persister.hasCache() ) {
-			final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+			final CollectionDataAccess cache = persister.getCacheAccessStrategy();
 			final Object ck = cache.generateCacheKey(
 					key, 
 					persister,
@@ -172,8 +172,8 @@ public abstract class CollectionAction implements Executable, Serializable, Comp
 		}
 
 		@Override
-		public void doAfterTransactionCompletion(boolean success, SessionImplementor session) {
-			final CollectionRegionAccessStrategy cache = persister.getCacheAccessStrategy();
+		public void doAfterTransactionCompletion(boolean success, SharedSessionContractImplementor session) {
+			final CollectionDataAccess cache = persister.getCacheAccessStrategy();
 			final Object ck = cache.generateCacheKey(
 					key,
 					persister,

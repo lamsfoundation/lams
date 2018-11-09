@@ -32,9 +32,22 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
@@ -42,6 +55,8 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 /**
  * @author Manpreet Minhas
  */
+@Entity
+@Table(name = "lams_learning_design")
 public class LearningDesign implements Serializable {
 
     private static final long serialVersionUID = -5695987114641062118L;
@@ -55,105 +70,122 @@ public class LearningDesign implements Serializable {
     /** Represents a copy of LearningDesign for preview purposes */
     public static final int COPY_TYPE_PREVIEW = 3;
 
-    /** identifier field */
+    @Id
+    @Column(name = "learning_design_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long learningDesignId;
 
-    /** nullable persistent field */
+    @Column(name = "learning_design_ui_id")
     private Integer learningDesignUIID;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** nullable persistent field */
+    @ManyToOne
+    @JoinColumn(name = "first_activity_id")
     private Activity firstActivity;
 
-    /** nullable persistent field */
+    @ManyToOne
+    @JoinColumn(name = "floating_activity_id")
     private FloatingActivity floatingActivity;
 
-    /** nullable persistent field */
+    @Column(name = "max_id")
     private Integer maxID;
 
-    /** persistent field */
+    @Column(name = "valid_design_flag")
     private Boolean validDesign;
 
-    /** persistent field */
+    @Column(name = "read_only_flag")
     private Boolean readOnly;
 
-    /** nullable persistent field */
+    @Column(name = "date_read_only")
     private Date dateReadOnly;
 
     /**
      * Override the read only field. When set to true, the user specified in editOverrideUser can edit the learning
      * design. Used by edit on the fly.
      */
+    @Column(name = "edit_override_lock")
     private Boolean editOverrideLock;
+
+    @ManyToOne
+    @JoinColumn(name = "edit_override_user_id")
     private User editOverrideUser;
+
+    @Column(name = "design_version")
     private Integer designVersion;
 
-    /** nullable persistent field */
+    @Column(name = "help_text")
     private String helpText;
 
-    /** persistent field */
+    @Column(name = "copy_type_id")
     private Integer copyTypeID;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
-    /** persistent field */
+    @Column
     private String version;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "original_user_id")
     private User originalUser;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "original_learning_design_id")
     private LearningDesign originalLearningDesign;
 
-    /** persistent field */
-    private Set childLearningDesigns;
+    @OneToMany
+    @JoinColumn(name = "parent_learning_design_id")
+    private Set<LearningDesign> childLearningDesigns = new HashSet<LearningDesign>();
 
-    /** persistent field */
-    private Set lessons;
+    @OneToMany(mappedBy = "learningDesign")
+    private Set<Lesson> lessons = new HashSet<Lesson>();
 
-    /** persistent field */
-    private Set transitions;
+    @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Transition> transitions = new HashSet<Transition>();
 
-    /** persistent field */
-    private Set activities;
+    @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
+    @SortComparator(ActivityOrderComparator.class)
+    private Set<Activity> activities = new TreeSet<Activity>(new ActivityOrderComparator());
 
-    /** persistent field */
-    private Set<Competence> competences;
+    @OneToMany(mappedBy = "learningDesign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Competence> competences = new HashSet<Competence>();
 
-    /** persistent field */
-    private Set<LearningDesignAnnotation> annotations;
+    @OneToMany(mappedBy = "learningDesignId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LearningDesignAnnotation> annotations = new HashSet<LearningDesignAnnotation>();
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "workspace_folder_id")
     private WorkspaceFolder workspaceFolder;
 
-    /** persistent field */
+    @Column
     private Long duration;
 
-    /** persistent field */
+    @Column(name = "content_folder_id")
     private String contentFolderID;
 
-    /** nullable persistent field */
+    @Column(name = "license_text")
     private String licenseText;
 
-    /** nullable persistent field */
+    @ManyToOne
+    @JoinColumn(name = "license_id")
     private License license;
 
-    /** persistent field */
+    @Column(name = "last_modified_date_time")
     private Date lastModifiedDateTime;
 
-    /** persistent field */
+    @Column
     private Boolean removed;
 
-    /** persistent field */
+    @Column(name = "design_type")
     private String designType;
 
     /*
@@ -161,14 +193,16 @@ public class LearningDesign implements Serializable {
      * are null, then it will default to the current datetime.
      */
 
-    /** full constructor */
+    /** Full constructor. This is called by AuthoringService.insertSingleActivityLearningDesign with nulls for the 
+     * sets, so if they are null let the default initialisation (above) stand - don't overwrite the empty sets with nulls.
+     */
     public LearningDesign(Long learningDesignId, Integer ui_id, String description, String title,
 	    Activity firstActivity, FloatingActivity floatingActivity, Integer maxID, Boolean validDesign,
 	    Boolean readOnly, Date dateReadOnly, String helpText, Integer copyTypeID, Date createDateTime,
 	    String version, User user, User originalUser, LearningDesign originalLearningDesign,
-	    Set childLearningDesigns, Set lessons, Set transitions, SortedSet activities, Long duration,
-	    String licenseText, License license, String contentFolderID, Boolean editOverrideLock,
-	    User editOverrideUser, Integer designVersion, String designType) {
+	    Set<LearningDesign> childLearningDesigns, Set<Lesson> lessons, Set<Transition> transitions,
+	    SortedSet<Activity> activities, Long duration, String licenseText, License license, String contentFolderID,
+	    Boolean editOverrideLock, User editOverrideUser, Integer designVersion, String designType) {
 	this.learningDesignId = learningDesignId;
 	this.learningDesignUIID = ui_id;
 	this.description = description;
@@ -187,9 +221,12 @@ public class LearningDesign implements Serializable {
 	this.originalUser = originalUser;
 	this.originalLearningDesign = originalLearningDesign;
 	this.childLearningDesigns = childLearningDesigns;
-	this.lessons = lessons;
-	this.transitions = transitions;
-	this.activities = activities;
+	if ( lessons != null ) 
+	    this.lessons = lessons;
+	if ( transitions != null )
+	    this.transitions = transitions;
+	if ( activities  != null )
+	    this.activities = activities;
 	this.duration = duration;
 	this.licenseText = licenseText;
 	this.license = license;
@@ -208,32 +245,9 @@ public class LearningDesign implements Serializable {
 	this.createDateTime = new Date();
 	this.lastModifiedDateTime = new Date();
 	this.editOverrideLock = false;
-	this.designVersion = new Integer(1);
+	this.designVersion = 1;
 	this.removed = Boolean.FALSE;
-    }
-
-    /** minimal constructor */
-    public LearningDesign(Long learningDesignId, Boolean validDesign, Boolean readOnly, Integer copyTypeID,
-	    Date createDateTime, String version, User user, User originalUser,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign originalLearningDesign, Set childLearningDesigns,
-	    Set lessons, Set transitions, SortedSet activities) {
-	this.learningDesignId = learningDesignId;
-	this.validDesign = validDesign;
-	this.readOnly = readOnly;
-	this.copyTypeID = copyTypeID;
-	this.createDateTime = createDateTime != null ? createDateTime : new Date();
-	this.version = version;
-	this.user = user;
-	this.originalUser = originalUser;
-	this.originalLearningDesign = originalLearningDesign;
-	this.childLearningDesigns = childLearningDesigns;
-	this.lessons = lessons;
-	this.transitions = transitions;
-	this.activities = activities;
-	this.lastModifiedDateTime = new Date();
-	this.editOverrideLock = false;
-	this.designVersion = new Integer(1);
-	this.removed = Boolean.FALSE;
+	this.activities = new TreeSet<Activity>(new ActivityOrderComparator());
     }
 
     /**
@@ -265,12 +279,7 @@ public class LearningDesign implements Serializable {
 	newDesign.setLicense(design.getLicense());
 	newDesign.setLicenseText(design.getLicenseText());
 	newDesign.setLastModifiedDateTime(new Date());
-
-	if (designCopyType.intValue() != LearningDesign.COPY_TYPE_NONE) {
-	    newDesign.setReadOnly(new Boolean(true));
-	} else {
-	    newDesign.setReadOnly(new Boolean(false));
-	}
+	newDesign.setReadOnly(designCopyType.intValue() != LearningDesign.COPY_TYPE_NONE);
 
 	if (setOriginalDesign) {
 	    newDesign.setOriginalLearningDesign(design);
@@ -439,41 +448,35 @@ public class LearningDesign implements Serializable {
 	this.originalLearningDesign = originalLearningDesign;
     }
 
-    public Set getChildLearningDesigns() {
+    public Set<LearningDesign> getChildLearningDesigns() {
 	return this.childLearningDesigns;
     }
 
-    public void setChildLearningDesigns(Set childLearningDesigns) {
+    public void setChildLearningDesigns(Set<LearningDesign> childLearningDesigns) {
 	this.childLearningDesigns = childLearningDesigns;
     }
 
-    public Set getLessons() {
+    public Set<Lesson> getLessons() {
 	return this.lessons;
     }
 
-    public void setLessons(Set lessons) {
+    public void setLessons(Set<Lesson> lessons) {
 	this.lessons = lessons;
     }
 
-    public Set getTransitions() {
-	if (this.transitions == null) {
-	    setTransitions(new HashSet());
-	}
+    public Set<Transition> getTransitions() {
 	return this.transitions;
     }
 
-    public void setTransitions(Set transitions) {
+    public void setTransitions(Set<Transition> transitions) {
 	this.transitions = transitions;
     }
 
-    public Set getActivities() {
-	if (this.activities == null) {
-	    setActivities(new TreeSet(new ActivityOrderComparator()));
-	}
+    public Set<Activity> getActivities() {
 	return this.activities;
     }
 
-    public void setActivities(Set activities) {
+    public void setActivities(Set<Activity> activities) {
 	this.activities = activities;
     }
 
@@ -499,28 +502,28 @@ public class LearningDesign implements Serializable {
 	return new HashCodeBuilder().append(getReadOnly()).toHashCode();
     }
 
-    public HashMap getActivityTree() {
-	HashMap parentActivities = new HashMap();
-	Iterator iterator = this.getActivities().iterator();
+    public HashMap<Long, Set<Activity>> getActivityTree() {
+	HashMap<Long, Set<Activity>> parentActivities = new HashMap<>();
+	Iterator<Activity> iterator = this.getActivities().iterator();
 	while (iterator.hasNext()) {
-	    Activity act = (Activity) iterator.next();
+	    Activity act = iterator.next();
 	    if (act.isComplexActivity()) {
 		ComplexActivity complexActivity = (ComplexActivity) act;
 		parentActivities.put(complexActivity.getActivityId(), complexActivity.getActivities());
 	    } else {
 		if (act.getParentActivity() == null) {
-		    parentActivities.put(act.getActivityId(), new HashSet());
+		    parentActivities.put(act.getActivityId(), new HashSet<Activity>());
 		}
 	    }
 	}
 	return parentActivities;
     }
 
-    public HashSet getParentActivities() {
-	HashSet parentActivities = new HashSet();
-	Iterator iterator = this.getActivities().iterator();
+    public HashSet<Activity> getParentActivities() {
+	HashSet<Activity> parentActivities = new HashSet<>();
+	Iterator<Activity> iterator = this.getActivities().iterator();
 	while (iterator.hasNext()) {
-	    Activity activity = (Activity) iterator.next();
+	    Activity activity = iterator.next();
 	    if (activity.getParentActivity() == null) {
 		parentActivities.add(activity);
 	    }
@@ -530,10 +533,10 @@ public class LearningDesign implements Serializable {
 
     public Activity calculateFirstActivity() {
 	Activity newFirstActivity = null;
-	HashSet parentActivities = this.getParentActivities();
-	Iterator parentIterator = parentActivities.iterator();
+	HashSet<Activity> parentActivities = this.getParentActivities();
+	Iterator<Activity> parentIterator = parentActivities.iterator();
 	while (parentIterator.hasNext()) {
-	    Activity activity = (Activity) parentIterator.next();
+	    Activity activity = parentIterator.next();
 	    if ((activity.getTransitionTo() == null) && !activity.isFloatingActivity()) {
 		newFirstActivity = activity;
 		break;
@@ -544,10 +547,10 @@ public class LearningDesign implements Serializable {
 
     public FloatingActivity calculateFloatingActivity() {
 	FloatingActivity newFloatingActivity = null;
-	HashSet parentActivities = this.getParentActivities();
-	Iterator parentIterator = parentActivities.iterator();
+	HashSet<Activity> parentActivities = this.getParentActivities();
+	Iterator<Activity> parentIterator = parentActivities.iterator();
 	while (parentIterator.hasNext()) {
-	    Activity activity = (Activity) parentIterator.next();
+	    Activity activity = parentIterator.next();
 	    if (activity.isFloatingActivity()) {
 		newFloatingActivity = (FloatingActivity) activity;
 		break;
@@ -617,7 +620,7 @@ public class LearningDesign implements Serializable {
     }
 
     public static Integer addOffset(Integer uiid, int uiidOffset) {
-	return (uiid != null) && (uiidOffset > 0) ? new Integer(uiid.intValue() + uiidOffset) : uiid;
+	return (uiid != null) && (uiidOffset > 0) ? Integer.valueOf(uiid.intValue() + uiidOffset) : uiid;
     }
 
     public Set<Competence> getCompetences() {
@@ -659,5 +662,4 @@ public class LearningDesign implements Serializable {
     public void setDesignType(String designType) {
 	this.designType = designType;
     }
-
 }

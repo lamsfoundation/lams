@@ -21,10 +21,18 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -35,40 +43,46 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  *
  *
  */
-
+@Entity
+@Table(name = "tl_lachat11_user")
 public class ChatUser implements java.io.Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3701664859818409197L;
-
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "login_name")
     private String loginName;
 
+    @ManyToOne
+    @JoinColumn(name = "chat_session_uid")
     private ChatSession chatSession;
 
+    @Column
     private boolean finishedActivity;
 
+    @Column
     private String nickname;
 
+    @Column(name = "last_presence")
     private Date lastPresence;
 
-    // Constructors
-    /** default constructor */
     public ChatUser() {
     }
 
     public ChatUser(UserDTO user, ChatSession chatSession) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = user.getUserID().longValue();
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -76,7 +90,6 @@ public class ChatUser implements java.io.Serializable {
 	this.finishedActivity = false;
     }
 
-    /** full constructor */
     public ChatUser(Long userId, String lastName, String firstName, ChatSession chatSession) {
 	this.userId = userId;
 	this.lastName = lastName;
@@ -84,10 +97,6 @@ public class ChatUser implements java.io.Serializable {
 	this.chatSession = chatSession;
     }
 
-    // Property accessors
-    /**
-     *
-     */
     public Long getUid() {
 	return this.uid;
     }
@@ -96,10 +105,6 @@ public class ChatUser implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Long getUserId() {
 	return this.userId;
     }
@@ -108,10 +113,6 @@ public class ChatUser implements java.io.Serializable {
 	this.userId = userId;
     }
 
-    /**
-     *
-     *
-     */
     public String getLastName() {
 	return this.lastName;
     }
@@ -120,10 +121,6 @@ public class ChatUser implements java.io.Serializable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     *
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -132,10 +129,6 @@ public class ChatUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     *
-     */
     public String getFirstName() {
 	return this.firstName;
     }
@@ -144,9 +137,6 @@ public class ChatUser implements java.io.Serializable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     */
     public boolean isFinishedActivity() {
 	return finishedActivity;
     }
@@ -155,9 +145,6 @@ public class ChatUser implements java.io.Serializable {
 	this.finishedActivity = finishedActivity;
     }
 
-    /**
-     *
-     */
     public String getNickname() {
 	return nickname;
     }
@@ -166,11 +153,6 @@ public class ChatUser implements java.io.Serializable {
 	this.nickname = nickname;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public ChatSession getChatSession() {
 	return this.chatSession;
     }
@@ -179,9 +161,6 @@ public class ChatUser implements java.io.Serializable {
 	this.chatSession = chatSession;
     }
 
-    /**
-     *
-     */
     public Date getLastPresence() {
 	return lastPresence;
     }
@@ -190,11 +169,6 @@ public class ChatUser implements java.io.Serializable {
 	this.lastPresence = lastPresence;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

@@ -44,8 +44,8 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm;
@@ -78,7 +78,7 @@ public class McController {
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @RequestMapping("/authoring")
     public String execute(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
@@ -368,7 +368,7 @@ public class McController {
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
 	    McQuestionDTO questionDto = iter.next();
-	    McQuestionDTO tempQuestion = new McQuestionDTO();
+	    McQuestionDTO tempQuestion = null;
 
 	    if ((!questionDto.getDisplayOrder().equals(originalQuestionIndex))
 		    && !questionDto.getDisplayOrder().equals(replacedQuestionIndex)) {

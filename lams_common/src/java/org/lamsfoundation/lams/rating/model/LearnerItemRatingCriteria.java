@@ -25,8 +25,14 @@ package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@SuppressWarnings("serial")
+@Entity
+@DiscriminatorValue("3")
 public class LearnerItemRatingCriteria extends ToolActivityRatingCriteria implements Cloneable, Serializable {
 
     @Override

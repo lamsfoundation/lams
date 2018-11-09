@@ -1,18 +1,33 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_lascrt11_burning_que_like")
 public class BurningQuestionLike {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "burning_question_uid")
     private ScratchieBurningQuestion burningQuestion;
+    
+    @Column(name = "session_id")
     private Long sessionId;
 
-    /**
-     *
-     * @return Returns the log Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -21,10 +36,6 @@ public class BurningQuestionLike {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public ScratchieBurningQuestion getBurningQuestion() {
 	return burningQuestion;
     }
@@ -33,10 +44,6 @@ public class BurningQuestionLike {
 	this.burningQuestion = burningQuestion;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }

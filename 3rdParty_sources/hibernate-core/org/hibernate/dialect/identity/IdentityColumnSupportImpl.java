@@ -14,45 +14,40 @@ import org.hibernate.id.PostInsertIdentityPersister;
  * @author Andrea Boriero
  */
 public class IdentityColumnSupportImpl implements IdentityColumnSupport {
-	private final Dialect dialect;
-
-	public IdentityColumnSupportImpl(Dialect dialect) {
-		this.dialect = dialect;
-	}
 
 	@Override
 	public boolean supportsIdentityColumns() {
-		return dialect.supportsIdentityColumns();
+		return false;
 	}
 
 	@Override
 	public boolean supportsInsertSelectIdentity() {
-		return dialect.supportsInsertSelectIdentity();
+		return false;
 	}
 
 	@Override
 	public boolean hasDataTypeInIdentityColumn() {
-		return dialect.hasDataTypeInIdentityColumn();
+		return true;
 	}
 
 	@Override
 	public String appendIdentitySelectToInsert(String insertString) {
-		return dialect.appendIdentitySelectToInsert( insertString );
+		return insertString;
 	}
 
 	@Override
 	public String getIdentitySelectString(String table, String column, int type) throws MappingException {
-		return dialect.getIdentitySelectString( table, column, type );
+		throw new MappingException( getClass().getName() + " does not support identity key generation" );
 	}
 
 	@Override
 	public String getIdentityColumnString(int type) throws MappingException {
-		return dialect.getIdentityColumnString( type );
+		throw new MappingException( getClass().getName() + " does not support identity key generation" );
 	}
 
 	@Override
 	public String getIdentityInsertString() {
-		return dialect.getIdentityInsertString();
+		return null;
 	}
 
 	@Override

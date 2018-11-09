@@ -14,6 +14,9 @@ import org.hibernate.LockOptions;
 import org.hibernate.dialect.function.AnsiTrimEmulationFunction;
 import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.dialect.identity.IdentityColumnSupport;
+import org.hibernate.dialect.identity.SQLServerIdentityColumnSupport;
+import org.hibernate.dialect.pagination.LegacyLimitHandler;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.pagination.TopLimitHandler;
 import org.hibernate.type.StandardBasicTypes;
@@ -53,6 +56,7 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 		registerFunction( "trim", new AnsiTrimEmulationFunction() );
 
 		registerKeyword( "top" );
+		registerKeyword( "key" );
 
 		this.limitHandler = new TopLimitHandler( false, false );
 	}
@@ -79,18 +83,15 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 				.toString();
 	}
 
-	/**
-	 * Use <tt>insert table(...) values(...) select SCOPE_IDENTITY()</tt>
-	 * <p/>
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String appendIdentitySelectToInsert(String insertSQL) {
-		return insertSQL + " select scope_identity()";
-	}
-
 	@Override
 	public LimitHandler getLimitHandler() {
+		if ( isLegacyLimitHandlerBehaviorEnabled() ) {
+			return new LegacyLimitHandler( this );
+		}
+		return getDefaultLimitHandler();
+	}
+
+	protected LimitHandler getDefaultLimitHandler() {
 		return limitHandler;
 	}
 
@@ -117,6 +118,11 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 	@Override
 	public char closeQuote() {
 		return ']';
+	}
+
+	@Override
+	public String getCurrentSchemaCommand() {
+		return "SELECT SCHEMA_NAME()";
 	}
 
 	@Override
@@ -203,5 +209,9 @@ public class SQLServerDialect extends AbstractTransactSQLDialect {
 	public int getInExpressionCountLimit() {
 		return PARAM_LIST_SIZE_LIMIT;
 	}
-	
+
+	@Override
+	public IdentityColumnSupport getIdentityColumnSupport() {
+		return new SQLServerIdentityColumnSupport();
+	}
 }

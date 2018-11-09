@@ -26,12 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author lfoxton
- *
- *
  */
 public class MarkForm {
-
-    private static final long serialVersionUID = -8680214759155659983L;
 
     private Long toolSessionID;
     private Integer userID;

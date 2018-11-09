@@ -11,6 +11,9 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 /**
  * Contract for contributing services.
  *
+ * @implSpec Implementations can be auto-discovered via Java's {@link java.util.ServiceLoader}
+ * mechanism.
+ *
  * @author Steve Ebersole
  */
 public interface ServiceContributor {
@@ -19,5 +22,5 @@ public interface ServiceContributor {
 	 *
 	 * @param serviceRegistryBuilder The builder to which services (or initiators) should be contributed.
 	 */
-	public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder);
+	void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder);
 }

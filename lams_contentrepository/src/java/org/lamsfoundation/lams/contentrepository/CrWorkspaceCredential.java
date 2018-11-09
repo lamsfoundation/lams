@@ -26,24 +26,34 @@ package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/**
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_cr_workspace_credential")
 public class CrWorkspaceCredential implements Serializable {
 
-    /** identifier field */
+    @Id
+    @Column(name = "wc_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wcId;
-
-    /** persistent field */
+    
+    @ManyToOne 
+    @JoinColumn(name = "workspace_id")
     private org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace;
 
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "credential_id") 
     private org.lamsfoundation.lams.contentrepository.CrCredential crCredential;
 
     /** full constructor */
@@ -57,14 +67,6 @@ public class CrWorkspaceCredential implements Serializable {
     public CrWorkspaceCredential() {
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     public Long getWcId() {
 	return this.wcId;
     }
@@ -73,15 +75,7 @@ public class CrWorkspaceCredential implements Serializable {
 	this.wcId = wcId;
     }
 
-    /**
-     * bi-directional many-to-one association to CrWorkspace
-     *
-     *
-     *
-     *
-     * 
-     */
-    public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
+     public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
 	return this.crWorkspace;
     }
 
@@ -89,14 +83,6 @@ public class CrWorkspaceCredential implements Serializable {
 	this.crWorkspace = crWorkspace;
     }
 
-    /**
-     * bi-directional many-to-one association to CrCredential
-     *
-     *
-     *
-     *
-     * 
-     */
     public org.lamsfoundation.lams.contentrepository.CrCredential getCrCredential() {
 	return this.crCredential;
     }

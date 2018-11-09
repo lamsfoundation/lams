@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
@@ -63,7 +63,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 
     @Override
     public ResourceItemVisitLog getResourceItemLog(Long itemUid, Long userId) {
-	List list = doFind(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
+	List<?> list = doFind(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -72,7 +72,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 
     @Override
     public int getUserViewLogCount(Long toolSessionId, Long userUid) {
-	List list = doFind(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userUid });
+	List<?> list = doFind(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userUid });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -85,24 +85,22 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 
 	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
     	List<Object[]> result = getSession().createQuery(FIND_SUMMARY)
-    		.setLong("sessionId", sessionId)
-    		.setLong("contentId", contentId)
+    		.setParameter("sessionId", sessionId)
+    		.setParameter("contentId", contentId)
     		.list();
 	
 	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
 	for (Object[] list : result) {
 	    if (list[1] != null) {
-		summaryList.put((Long) list[0], new Integer(((Number) list[1]).intValue()));
+		summaryList.put((Long) list[0], ((Number) list[1]).intValue());
 	    }
 	}
 	return summaryList;
-
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId, Long itemUid) {
-
 	return (List<ResourceItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
@@ -116,6 +114,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
     	+ "	WHEN :sortBy='completeTime' THEN visit.complete_date "
     	+ "	WHEN :sortBy='timeTaken' THEN TIMEDIFF(visit.complete_date,visit.access_date) END ";
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<VisitLogDTO> getPagedVisitLogsBySessionAndItem(Long sessionId, Long itemUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString, IUserManagementService userManagementService) {
@@ -129,14 +128,14 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		.append(LOAD_USERS_ORDERED_BY_NAME_WHERE)
 		.append(sortOrder);
 	
-	Query query = getSession().createSQLQuery(bldr.toString())
-		.setLong("sessionId", sessionId)
-		.setLong("itemUid", itemUid);
+	Query<Object[]> query = getSession().createSQLQuery(bldr.toString())
+		.setParameter("sessionId", sessionId)
+		.setParameter("itemUid", itemUid);
 
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString)
-		.setString("sortBy", sortBy)
+	query.setParameter("searchString", searchString)
+		.setParameter("sortBy", sortBy)
 		.setFirstResult(page * size)
 		.setMaxResults(size);
 	List<Object[]> list = query.list();
@@ -173,25 +172,20 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		+ " visit WHERE visit.sessionId = :sessionId AND visit.resourceItem.uid = :itemUid"
 		+ " AND (CONCAT(visit.user.lastName, ' ', visit.user.firstName) LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createQuery(COUNT_USERS_BY_SESSION_AND_ITEM);
-	query.setLong("sessionId", sessionId);
-	query.setLong("itemUid", itemUid);
+	Query<Number> query = getSession().createQuery(COUNT_USERS_BY_SESSION_AND_ITEM, Number.class);
+	query.setParameter("sessionId", sessionId);
+	query.setParameter("itemUid", itemUid);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
-	List list = query.list();
-
-	if ((list == null) || (list.size() == 0)) {
-	    return 0;
-	} else {
-	    return ((Number) list.get(0)).intValue();
-	}
+	query.setParameter("searchString", searchString);
+	return query.uniqueResult().intValue();
     }
 
     @Override
     public Object[] getDateRangeOfAccesses(Long userUid, Long toolSessionId) {
-	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
-		.setLong("userUid", userUid).setLong("sessionId", toolSessionId);
+	@SuppressWarnings("unchecked")
+	NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setParameter("userUid", userUid).setParameter("sessionId", toolSessionId);
 	Object[] values = (Object[]) query.list().get(0);
 	return values;
     }

@@ -131,6 +131,7 @@
 		</property>
         <property name="transactionAttributes">
             <props>
+            	<prop key="addLike">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
             	<prop key="recalculate*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

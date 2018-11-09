@@ -20,12 +20,18 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.SortComparator;
 
 /**
  * Different type of transition - does not indicate lesson progress, but rather data flow between tools.
@@ -33,10 +39,16 @@ import java.util.TreeSet;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@DiscriminatorValue("1")
 public class DataTransition extends Transition {
+    private static final long serialVersionUID = -6508807398165476228L;
+
     /**
      * Tool output definitions which can be later used in the target tool.
      */
+    @OneToMany(mappedBy = "dataTransition", cascade = CascadeType.ALL)
+    @SortComparator(DataFlowObjectComparator.class)
     private Set<DataFlowObject> dataFlowObjects = new TreeSet<DataFlowObject>(new DataFlowObjectComparator());
 
     public DataTransition() {
@@ -58,13 +70,6 @@ public class DataTransition extends Transition {
 	transitionType = Transition.DATA_TRANSITION_TYPE;
     }
 
-    /**
-     *
-     * sort="org.lamsfoundation.lams.learningdesign.DataFlowObjectComparator"
-     *
-     *
-     *
-     */
     public Set<DataFlowObject> getDataFlowObjects() {
 	return dataFlowObjects;
     }

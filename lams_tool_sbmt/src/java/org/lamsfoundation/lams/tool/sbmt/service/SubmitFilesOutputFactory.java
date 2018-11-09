@@ -41,14 +41,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SubmitFilesOutputFactory extends OutputFactory {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class arrayOfSimpleUrlArrayClass = SimpleURL[][].class;
+	Class<SimpleURL[][]> arrayOfSimpleUrlArrayClass = SimpleURL[][].class;
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
 		break;
@@ -63,7 +60,6 @@ public class SubmitFilesOutputFactory extends OutputFactory {
 
     /**
      * Follows {@link PixlrService#getToolOutput(List, Long, Long)}.
-     *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, ISubmitFilesService submitFilesService,
 	    Long toolSessionId, Long learnerId) {
@@ -90,7 +86,6 @@ public class SubmitFilesOutputFactory extends OutputFactory {
 	}
 
 	return outputs;
-
     }
 
     public ToolOutput getToolOutput(String name, ISubmitFilesService submitFilesService, Long toolSessionId,

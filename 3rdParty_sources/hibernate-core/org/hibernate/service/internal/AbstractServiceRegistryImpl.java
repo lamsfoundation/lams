@@ -11,7 +11,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.cfg.Environment;
@@ -49,11 +52,11 @@ public abstract class AbstractServiceRegistryImpl
 	private final ServiceRegistryImplementor parent;
 	private final boolean allowCrawling;
 
-	private final ConcurrentServiceBinding<Class,ServiceBinding> serviceBindingMap = new ConcurrentServiceBinding<Class,ServiceBinding>();
-	private final ConcurrentServiceBinding<Class,Class> roleXref = new ConcurrentServiceBinding<Class,Class>();
+	private final ConcurrentMap<Class,ServiceBinding> serviceBindingMap = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class,Class> roleXref = new ConcurrentHashMap<>();
 	// The services stored in initializedServiceByRole are completely initialized
 	// (i.e., configured, dependencies injected, and started)
-	private final ConcurrentServiceBinding<Class,Service> initializedServiceByRole = new ConcurrentServiceBinding<Class, Service>();
+	private final ConcurrentMap<Class,Service> initializedServiceByRole = new ConcurrentHashMap<>();
 
 	// IMPL NOTE : the list used for ordered destruction.  Cannot used map above because we need to
 	// iterate it in reverse order which is only available through ListIterator
@@ -122,6 +125,10 @@ public abstract class AbstractServiceRegistryImpl
 			serviceBindingMap.put( providedService.getServiceRole(), binding );
 		}
 		registerService( binding, providedService.getService() );
+	}
+
+	protected void visitServiceBindings(Consumer<ServiceBinding> action) {
+		serviceBindingList.forEach( action );
 	}
 
 	@Override
@@ -206,8 +213,10 @@ public abstract class AbstractServiceRegistryImpl
 			if ( service == null ) {
 				service = initializeService( serviceBinding );
 			}
-			// add the service only after it is completely initialized
-			initializedServiceByRole.put( serviceRole, service );
+			if ( service != null ) {
+				// add the service only after it is completely initialized
+				initializedServiceByRole.put( serviceRole, service );
+			}
 			return service;
 		}
 	}
@@ -254,7 +263,9 @@ public abstract class AbstractServiceRegistryImpl
 			R service = serviceBinding.getLifecycleOwner().initiateService( serviceInitiator );
 			// IMPL NOTE : the register call here is important to avoid potential stack overflow issues
 			//		from recursive calls through #configureService
-			registerService( serviceBinding, service );
+			if ( service != null ) {
+				registerService( serviceBinding, service );
+			}
 			return service;
 		}
 		catch ( ServiceException e ) {
@@ -294,7 +305,7 @@ public abstract class AbstractServiceRegistryImpl
 
 	@SuppressWarnings({ "unchecked" })
 	private <T extends Service> void processInjection(T service, Method injectionMethod, InjectService injectService) {
-		if ( injectionMethod.getParameterTypes() == null || injectionMethod.getParameterTypes().length != 1 ) {
+		if ( injectionMethod.getParameterTypes() == null || injectionMethod.getParameterCount() != 1 ) {
 			throw new ServiceDependencyException(
 					"Encountered @InjectService on method with unexpected number of parameters"
 			);

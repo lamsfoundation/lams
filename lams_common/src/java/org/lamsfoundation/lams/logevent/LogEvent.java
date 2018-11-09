@@ -26,6 +26,15 @@ package org.lamsfoundation.lams.logevent;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -34,6 +43,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  *
  *
  */
+@Entity
+@Table(name = "lams_log_event")
 public class LogEvent implements Serializable {
 
     private static final long serialVersionUID = 5275008411348257866L;
@@ -67,35 +78,40 @@ public class LogEvent implements Serializable {
 
     /** *************************************************************** */
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**  */
+    @Column(name = "log_event_type_id")
     private Integer logEventTypeId;
 
-    /** persistent field */
     //TODO perhaps make this field possible to be null
+    @ManyToOne 
+    @JoinColumn(name = "user_id")
     private User user;
 
     /** Date this activity was created */
+    @Column(name = "occurred_date_time")
     private Date occurredDateTime;
 
-    /**  */
+    @ManyToOne 
+    @JoinColumn(name = "target_user_id")
     private User targetUser;
 
-    /**  */
+    @Column(name = "lesson_id")
     private Long lessonId;
 
-    /**  */
+    @Column(name = "activity_id")
     private Long activityId;
     
+    @Column
     private String description;
 
     /*
      * For the occurredDateTime fields, if the value is null, then it will default to the current time.
      */
 
-    /** default constructor */
     public LogEvent() {
 	occurredDateTime = new Date(); // default value is set to when the object is created
     }
@@ -103,9 +119,6 @@ public class LogEvent implements Serializable {
     // ---------------------------------------------------------------------
     // Getters and Setters
     // ---------------------------------------------------------------------
-    /**
-     *
-     */
     public Long getId() {
 	return id;
     }
@@ -114,9 +127,6 @@ public class LogEvent implements Serializable {
 	this.id = id;
     }
 
-    /**
-     *
-     */
     public Integer getLogEventTypeId() {
 	return logEventTypeId;
     }
@@ -125,10 +135,6 @@ public class LogEvent implements Serializable {
 	this.logEventTypeId = logEventTypeId;
     }
 
-    /**
-     *
-     *
-     */
     public User getUser() {
 	return this.user;
     }
@@ -137,9 +143,6 @@ public class LogEvent implements Serializable {
 	this.user = user;
     }
 
-    /**
-     *
-     */
     public Date getOccurredDateTime() {
 	return occurredDateTime;
     }
@@ -149,9 +152,6 @@ public class LogEvent implements Serializable {
 	this.occurredDateTime = occurredDateTime != null ? occurredDateTime : new Date();
     }
 
-    /**
-     *
-     */
     public User getTargetUser() {
 	return targetUser;
     }
@@ -160,9 +160,6 @@ public class LogEvent implements Serializable {
 	this.targetUser = targetUser;
     }
 
-    /**
-     *
-     */
     public Long getLessonId() {
 	return lessonId;
     }
@@ -171,9 +168,6 @@ public class LogEvent implements Serializable {
 	this.lessonId = lessonId;
     }
 
-    /**
-     *
-     */
     public Long getActivityId() {
 	return activityId;
     }

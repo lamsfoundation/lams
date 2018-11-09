@@ -28,52 +28,59 @@ public class DefaultSchemaNameResolver implements SchemaNameResolver {
 
 	public static final DefaultSchemaNameResolver INSTANCE = new DefaultSchemaNameResolver();
 
-	private final SchemaNameResolver delegate;
+	// NOTE: The actual delegate should not be cached in DefaultSchemaNameResolver because,
+	//       in the case of multiple data sources, there may be a data source that
+	//       requires a different delegate. See HHH-12392.
 
-	public DefaultSchemaNameResolver() {
-		this.delegate = determineAppropriateResolverDelegate();
+	private DefaultSchemaNameResolver() {
 	}
 
-	private static SchemaNameResolver determineAppropriateResolverDelegate() {
+	private SchemaNameResolver determineAppropriateResolverDelegate(Connection connection) {
 		// unfortunately Connection#getSchema is only available in Java 1.7 and above
 		// and Hibernate still baselines on 1.6.  So for now, use reflection and
 		// leverage the Connection#getSchema method if it is available.
-		final Class<Connection> jdbcConnectionClass = Connection.class;
 		try {
+			final Class<? extends Connection> jdbcConnectionClass = connection.getClass();
 			final Method getSchemaMethod = jdbcConnectionClass.getMethod( "getSchema" );
-			if ( getSchemaMethod != null ) {
-				if ( getSchemaMethod.getReturnType().equals( String.class ) ) {
-					return new SchemaNameResolverJava17Delegate( getSchemaMethod );
+			if ( getSchemaMethod != null && getSchemaMethod.getReturnType().equals( String.class ) ) {
+				try {
+					// If the JDBC driver does not implement the Java 7 spec, but the JRE is Java 7
+					// then the getSchemaMethod is not null but the call to getSchema() throws an java.lang.AbstractMethodError
+					connection.getSchema();
+					return new SchemaNameResolverJava17Delegate();
 				}
+				catch (java.lang.AbstractMethodError e) {
+					log.debugf( "Unable to use Java 1.7 Connection#getSchema" );
+					return SchemaNameResolverFallbackDelegate.INSTANCE;
+				}
+			}
+			else {
+				log.debugf( "Unable to use Java 1.7 Connection#getSchema" );
+				return SchemaNameResolverFallbackDelegate.INSTANCE;
 			}
 		}
 		catch (Exception ignore) {
+			log.debugf(
+					"Unable to use Java 1.7 Connection#getSchema : An error occurred trying to resolve the connection default schema resolver: "
+							+ ignore.getMessage() );
+			return SchemaNameResolverFallbackDelegate.INSTANCE;
 		}
-
-		log.debugf( "Unable to use Java 1.7 Connection#getSchema" );
-		return SchemaNameResolverFallbackDelegate.INSTANCE;
 	}
 
 	@Override
 	public String resolveSchemaName(Connection connection, Dialect dialect) throws SQLException {
+		// NOTE: delegate should not be cached in DefaultSchemaNameResolver because,
+		//       in the case of multiple data sources, there may be a data source that
+		//       requires a different delegate. See HHH-12392.
+		final SchemaNameResolver delegate = determineAppropriateResolverDelegate( connection );
 		return delegate.resolveSchemaName( connection, dialect );
 	}
 
 	public static class SchemaNameResolverJava17Delegate implements SchemaNameResolver {
-		private final Method getSchemaMethod;
-
-		public SchemaNameResolverJava17Delegate(Method getSchemaMethod) {
-			this.getSchemaMethod = getSchemaMethod;
-		}
 
 		@Override
 		public String resolveSchemaName(Connection connection, Dialect dialect) throws SQLException {
-			try {
-				return (String) getSchemaMethod.invoke( connection );
-			}
-			catch (Exception e) {
-				throw new HibernateException( "Unable to invoke Connection#getSchema method via reflection", e );
-			}
+			return connection.getSchema();
 		}
 	}
 
@@ -95,29 +102,11 @@ public class DefaultSchemaNameResolver implements SchemaNameResolver {
 				);
 			}
 
-			final Statement statement = connection.createStatement();
-			try {
-				final ResultSet resultSet = statement.executeQuery( dialect.getCurrentSchemaCommand() );
-				try {
-					if ( !resultSet.next() ) {
-						return null;
-					}
-					return resultSet.getString( 1 );
-				}
-				finally {
-					try {
-						resultSet.close();
-					}
-					catch (SQLException ignore) {
-					}
-				}
-			}
-			finally {
-				try {
-					statement.close();
-				}
-				catch (SQLException ignore) {
-				}
+			try (
+				final Statement statement = connection.createStatement();
+				final ResultSet resultSet = statement.executeQuery( dialect.getCurrentSchemaCommand() )
+			) {
+				return resultSet.next() ? resultSet.getString( 1 ) : null;
 			}
 		}
 	}

@@ -38,6 +38,4 @@ public interface IMindmapDAO extends IBaseDAO {
     public Mindmap getMindmapByUid(Long Uid);
 
     void saveOrUpdate(Mindmap toContent);
-
-    void releaseFromCache(Object o);
 }

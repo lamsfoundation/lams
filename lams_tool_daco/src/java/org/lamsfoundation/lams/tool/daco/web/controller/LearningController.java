@@ -424,7 +424,7 @@ public class LearningController {
 		case DacoConstants.QUESTION_TYPE_FILE:
 		case DacoConstants.QUESTION_TYPE_IMAGE: {
 		    MultipartFile file = recordForm.getFile(fileNumber);
-		    if (file != null) {
+		    if (file != null && !file.isEmpty()) {
 			try {
 			    dacoService.uploadDacoAnswerFile(answer, file);
 			} catch (UploadDacoFileException e) {

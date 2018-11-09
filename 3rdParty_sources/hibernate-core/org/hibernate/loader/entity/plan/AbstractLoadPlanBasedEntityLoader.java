@@ -17,7 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.loader.entity.UniqueEntityLoader;
@@ -28,6 +28,7 @@ import org.hibernate.loader.plan.build.spi.LoadPlanBuildingAssociationVisitation
 import org.hibernate.loader.plan.build.spi.MetamodelDrivenLoadPlanBuilder;
 import org.hibernate.loader.plan.exec.internal.AbstractLoadPlanBasedLoader;
 import org.hibernate.loader.plan.exec.internal.BatchingLoadQueryDetailsFactory;
+import org.hibernate.loader.plan.exec.internal.EntityLoadQueryDetails;
 import org.hibernate.loader.plan.exec.query.spi.QueryBuildingParameters;
 import org.hibernate.loader.plan.exec.spi.LoadQueryDetails;
 import org.hibernate.loader.plan.spi.LoadPlan;
@@ -48,7 +49,7 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 	private final Type uniqueKeyType;
 	private final String entityName;
 
-	private final LoadQueryDetails staticLoadQuery;
+	private final EntityLoadQueryDetails staticLoadQuery;
 
 	public AbstractLoadPlanBasedEntityLoader(
 			OuterJoinLoadable entityPersister,
@@ -64,17 +65,20 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 		final LoadPlanBuildingAssociationVisitationStrategy strategy;
 		if ( buildingParameters.getQueryInfluencers().getFetchGraph() != null ) {
 			strategy = new FetchGraphLoadPlanBuildingStrategy(
-					factory, buildingParameters.getQueryInfluencers(),buildingParameters.getLockMode()
+					factory, buildingParameters.getQueryInfluencers(),
+					buildingParameters.getLockOptions() != null ? buildingParameters.getLockOptions().getLockMode() : buildingParameters.getLockMode()
 			);
 		}
 		else if ( buildingParameters.getQueryInfluencers().getLoadGraph() != null ) {
 			strategy = new LoadGraphLoadPlanBuildingStrategy(
-					factory, buildingParameters.getQueryInfluencers(),buildingParameters.getLockMode()
+					factory, buildingParameters.getQueryInfluencers(),
+					buildingParameters.getLockOptions() != null ? buildingParameters.getLockOptions().getLockMode() : buildingParameters.getLockMode()
 			);
 		}
 		else {
 			strategy = new FetchStyleLoadPlanBuildingAssociationVisitationStrategy(
-					factory, buildingParameters.getQueryInfluencers(),buildingParameters.getLockMode()
+					factory, buildingParameters.getQueryInfluencers(),
+					buildingParameters.getLockOptions() != null ? buildingParameters.getLockOptions().getLockMode() : buildingParameters.getLockMode()
 			);
 		}
 
@@ -84,6 +88,23 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 				uniqueKeyColumnNames,
 				buildingParameters,
 				factory
+		);
+	}
+
+	protected AbstractLoadPlanBasedEntityLoader(
+			OuterJoinLoadable entityPersister,
+			SessionFactoryImplementor factory,
+			EntityLoadQueryDetails entityLoaderQueryDetailsTemplate,
+			Type uniqueKeyType,
+			QueryBuildingParameters buildingParameters) {
+		super( factory );
+		this.entityPersister = entityPersister;
+		this.uniqueKeyType = uniqueKeyType;
+		this.entityName = entityPersister.getEntityName();
+
+		this.staticLoadQuery = BatchingLoadQueryDetailsFactory.INSTANCE.makeEntityLoadQueryDetails(
+				entityLoaderQueryDetailsTemplate,
+				buildingParameters
 		);
 	}
 
@@ -102,7 +123,7 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 	 * @param lockOptions
 	 */
 	public final List loadEntityBatch(
-			final SessionImplementor session,
+			final SharedSessionContractImplementor session,
 			final Serializable[] ids,
 			final Type idType,
 			final Object optionalObject,
@@ -147,12 +168,12 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 	}
 
 	@Override
-	public Object load(Serializable id, Object optionalObject, SessionImplementor session) throws HibernateException {
+	public Object load(Serializable id, Object optionalObject, SharedSessionContractImplementor session) throws HibernateException {
 		return load( id, optionalObject, session, LockOptions.NONE );
 	}
 
 	@Override
-	public Object load(Serializable id, Object optionalObject, SessionImplementor session, LockOptions lockOptions) {
+	public Object load(Serializable id, Object optionalObject, SharedSessionContractImplementor session, LockOptions lockOptions) {
 
 		final Object result;
 		try {
@@ -171,10 +192,10 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 					false,
 					null
 			);
-			result = extractEntityResult( results );
+			result = extractEntityResult( results, id );
 		}
 		catch ( SQLException sqle ) {
-			throw getFactory().getSQLExceptionHelper().convert(
+			throw session.getJdbcServices().getSqlExceptionHelper().convert(
 					sqle,
 					"could not load an entity: " + MessageHelper.infoString(
 							entityPersister,
@@ -190,14 +211,22 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 		return result;
 	}
 
+	/**
+	 * @deprecated {@link #extractEntityResult(List, Serializable)} should be used instead.
+	 */
+	@Deprecated
 	protected Object extractEntityResult(List results) {
+		return extractEntityResult( results, null );
+	}
+
+	protected Object extractEntityResult(List results, Serializable id) {
 		if ( results.size() == 0 ) {
 			return null;
 		}
 		else if ( results.size() == 1 ) {
 			return results.get( 0 );
 		}
-		else {
+		else if ( staticLoadQuery.hasCollectionInitializers() ) {
 			final Object row = results.get( 0 );
 			if ( row.getClass().isArray() ) {
 				// the logical type of the result list is List<Object[]>.  See if the contained
@@ -212,7 +241,20 @@ public abstract class AbstractLoadPlanBasedEntityLoader extends AbstractLoadPlan
 			}
 		}
 
-		throw new HibernateException( "Unable to interpret given query results in terms of a load-entity query" );
+		if ( id == null ) {
+			throw new HibernateException(
+					"Unable to interpret given query results in terms of a load-entity query for " +
+							entityName
+			);
+		}
+		else {
+			throw new HibernateException(
+					"More than one row with the given identifier was found: " +
+							id +
+							", for class: " +
+							entityName
+			);
+		}
 	}
 
 	protected int[] getNamedParameterLocs(String name) {

@@ -28,58 +28,80 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 
 /**
  * @author Fei Yang,Manpreet Minhas
- * 
+ *
  */
+@Entity
+@Table(name = "lams_workspace_folder")
 public class WorkspaceFolder implements Serializable {
+
+    private static final long serialVersionUID = -8625668819930442409L;
 
     /** static final variables indicating the type of workspaceFolder */
     /******************************************************************/
-    public static final Integer NORMAL = new Integer(1);
-    public static final Integer RUN_SEQUENCES = new Integer(2);
-    public static final Integer PUBLIC_SEQUENCES = new Integer(3);
+    public static final Integer NORMAL = 1;
+    public static final Integer RUN_SEQUENCES = 2;
+    public static final Integer PUBLIC_SEQUENCES = 3;
     /******************************************************************/
 
     /** static final variables indicating the permissions on the workspaceFolder */
     /******************************************************************/
-    public static final Integer READ_ACCESS = new Integer(1);
-    public static final Integer MEMBERSHIP_ACCESS = new Integer(2);
-    public static final Integer OWNER_ACCESS = new Integer(3);
-    public static final Integer NO_ACCESS = new Integer(4);
+    public static final Integer READ_ACCESS = 1;
+    public static final Integer MEMBERSHIP_ACCESS = 2;
+    public static final Integer OWNER_ACCESS = 3;
+    public static final Integer NO_ACCESS = 4;
     /******************************************************************/
 
-    /** identifier field */
+    @Id
+    @Column(name = "workspace_folder_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer workspaceFolderId;
 
-    /** persistent field */
+    @Column
     private String name;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "parent_folder_id")
     private WorkspaceFolder parentWorkspaceFolder;
 
-    /** persistent field */
-    private Set childWorkspaceFolders;
+    @OneToMany(mappedBy = "parentWorkspaceFolder")
+    private Set<WorkspaceFolder> childWorkspaceFolders = new HashSet<WorkspaceFolder>();
 
-    private Set learningDesigns;
+    @OneToMany(mappedBy = "workspaceFolder")
+    private Set<LearningDesign> learningDesigns = new HashSet<LearningDesign>();
 
     /**
      * non-nullable persistent field indicating the
      * user who created/owns the workspace folder
      */
+    @Column(name = "user_id")
     private Integer userID;
 
+    @Column(name = "organisation_id")
     private Integer organisationID;
 
-    /** non-nullable persistent field */
+    @Column(name = "create_date_time")
     private Date creationDate;
 
-    /** non-nullable persistent field */
+    @Column(name = "last_modified_date_time")
     private Date lastModifiedDate;
 
     /**
@@ -87,6 +109,7 @@ public class WorkspaceFolder implements Serializable {
      * the type of workspace folder. Can be either
      * NORMAL OR RUN_SEQUENCES
      */
+    @Column(name = "lams_workspace_folder_type_id")
     private Integer workspaceFolderType;
 
     /**
@@ -94,7 +117,8 @@ public class WorkspaceFolder implements Serializable {
      * objects representing the content of this
      * folder. As of now it represents only Files.
      */
-    private Set folderContent;
+    @OneToMany(mappedBy = "workspaceFolder", cascade = CascadeType.REMOVE)
+    private Set<WorkspaceFolderContent> folderContent = new HashSet<WorkspaceFolderContent>();
 
     public WorkspaceFolder(String name, Integer userID, Date creationDate, Date lastModifiedDate,
 	    Integer workspaceFolderType) {
@@ -119,7 +143,7 @@ public class WorkspaceFolder implements Serializable {
     /**
      * @return Returns the learningDesigns.
      */
-    public Set getLearningDesigns() {
+    public Set<LearningDesign> getLearningDesigns() {
 	return learningDesigns;
     }
 
@@ -127,12 +151,13 @@ public class WorkspaceFolder implements Serializable {
      * @param learningDesigns
      *            The learningDesigns to set.
      */
-    public void setLearningDesigns(Set learningDesigns) {
+    public void setLearningDesigns(Set<LearningDesign> learningDesigns) {
 	this.learningDesigns = learningDesigns;
     }
 
     /** full constructor */
-    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set childWorkspaceFolders) {
+    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder,
+	    Set<WorkspaceFolder> childWorkspaceFolders) {
 	this.name = name;
 	this.parentWorkspaceFolder = parentWorkspaceFolder;
 	this.childWorkspaceFolders = childWorkspaceFolders;
@@ -166,11 +191,11 @@ public class WorkspaceFolder implements Serializable {
 	this.parentWorkspaceFolder = parentWorkspaceFolder;
     }
 
-    public Set getChildWorkspaceFolders() {
+    public Set<WorkspaceFolder> getChildWorkspaceFolders() {
 	return this.childWorkspaceFolders;
     }
 
-    public void setChildWorkspaceFolders(Set childWorkspaceFolders) {
+    public void setChildWorkspaceFolders(Set<WorkspaceFolder> childWorkspaceFolders) {
 	this.childWorkspaceFolders = childWorkspaceFolders;
     }
 
@@ -265,7 +290,7 @@ public class WorkspaceFolder implements Serializable {
     /**
      * This is a utility function which checks if the given
      * workspaceFolder has subFolders defined inside it.
-     * 
+     *
      * @return boolean A boolean value indicating whether the
      *         current workspaces contains subFolders
      */
@@ -280,7 +305,7 @@ public class WorkspaceFolder implements Serializable {
     /**
      * This is a utility function which checks whether the given
      * workspace Folder is empty or not.
-     * 
+     *
      * @return boolean A boolean value indicating whether this
      *         folder is empty or it contains Learning Designs
      */
@@ -299,7 +324,7 @@ public class WorkspaceFolder implements Serializable {
     /**
      * This is a utility function which checks if the given
      * workspaceFolder has files inside it.
-     * 
+     *
      * @return boolean A boolean value indicating whether this
      *         folder is empty or it contains Files
      */
@@ -314,7 +339,7 @@ public class WorkspaceFolder implements Serializable {
     /**
      * @return Returns the folderContents.
      */
-    public Set getFolderContent() {
+    public Set<WorkspaceFolderContent> getFolderContent() {
 	return folderContent;
     }
 
@@ -322,7 +347,7 @@ public class WorkspaceFolder implements Serializable {
      * @param folderContents
      *            The folderContents to set.
      */
-    public void setFolderContent(Set folderContent) {
+    public void setFolderContent(Set<WorkspaceFolderContent> folderContent) {
 	this.folderContent = folderContent;
     }
 
@@ -331,17 +356,11 @@ public class WorkspaceFolder implements Serializable {
      *            The content to be added
      */
     public void addFolderContent(WorkspaceFolderContent workspaceFolderContent) {
-	if (this.folderContent == null) {
-	    this.folderContent = new HashSet();
-	}
 	this.folderContent.add(workspaceFolderContent);
 	workspaceFolderContent.setWorkspaceFolder(this);
     }
 
     public void addChild(WorkspaceFolder workspaceFolder) {
-	if (childWorkspaceFolders == null) {
-	    childWorkspaceFolders = new HashSet();
-	}
 	childWorkspaceFolders.add(workspaceFolder);
     }
 }

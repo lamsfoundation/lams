@@ -1,23 +1,36 @@
 package org.lamsfoundation.lams.learningdesign;
 
-/**
- *
- *
- */
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "lams_competence")
 public class Competence {
 
+    @Id
+    @Column(name = "competence_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long competenceId;
+
+    @ManyToOne
+    @JoinColumn(name = "learning_design_id")
     private LearningDesign learningDesign;
+
+    @Column
     private String title;
+
+    @Column
     private String description;
 
     public Competence() {
     }
 
-    /**
-     *
-     *
-     */
     public Long getCompetenceId() {
 	return this.competenceId;
     }
@@ -26,9 +39,6 @@ public class Competence {
 	this.competenceId = competenceId;
     }
 
-    /**
-     *
-     */
     public String getTitle() {
 	return title;
     }
@@ -37,9 +47,6 @@ public class Competence {
 	this.title = title;
     }
 
-    /**
-     *
-     */
     public String getDescription() {
 	return description;
     }
@@ -48,11 +55,6 @@ public class Competence {
 	this.description = description;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
 	return this.learningDesign;
     }

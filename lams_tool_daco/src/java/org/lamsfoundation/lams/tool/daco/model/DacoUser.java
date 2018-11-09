@@ -27,6 +27,19 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -40,23 +53,48 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  *
  *
  */
+@Entity
+@Table(name = "tl_ladaco10_users")
 public class DacoUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(DacoUser.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_id")
     private Long userId;
+    
+    @Column(name = "first_name")
     private String firstName;
+    
+    @Column(name = "last_name")
     private String lastName;
+    
+    @Column(name = "login_name")
     private String loginName;
+    
+    @Column(name = "session_finished")
     private boolean sessionFinished;
 
+    @ManyToOne 
+    @JoinColumn(name = "session_uid") 
     private DacoSession session;
+    
+    @ManyToOne 
+    @JoinColumn(name = "content_uid") 
     private Daco daco;
-    // =============== NON Persisit value: for display use ===========
-    // the user access some reousrce question date time. Use in monitoring summary page
-    private Date accessDate;
+    
+    @OneToMany(fetch = FetchType.EAGER,
+	    mappedBy = "user")
+    @OrderBy("recordId ASC, uid ASC")
     private Set<DacoAnswer> answers = new LinkedHashSet<DacoAnswer>();
+
+    // the user access some resource question date time. Use in monitoring summary page
+    @Transient
+    private Date accessDate;
 
     public DacoUser() {
     }
@@ -104,45 +142,22 @@ public class DacoUser implements Cloneable {
 	return user;
     }
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	uid = userID;
     }
 
-    /**
-     *
-     * @return Returns the userId.
-     */
     public Long getUserId() {
 	return userId;
     }
 
-    /**
-     * @param userId
-     *            The userId to set.
-     */
     public void setUserId(Long userID) {
 	userId = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getLastName() {
 	return lastName;
     }
@@ -151,10 +166,6 @@ public class DacoUser implements Cloneable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getFirstName() {
 	return firstName;
     }
@@ -163,10 +174,6 @@ public class DacoUser implements Cloneable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -175,10 +182,6 @@ public class DacoUser implements Cloneable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     * @return
-     */
     public DacoSession getSession() {
 	return session;
     }
@@ -187,10 +190,6 @@ public class DacoUser implements Cloneable {
 	this.session = session;
     }
 
-    /**
-     *
-     * @return
-     */
     public Daco getDaco() {
 	return daco;
     }
@@ -199,10 +198,6 @@ public class DacoUser implements Cloneable {
 	daco = content;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isSessionFinished() {
 	return sessionFinished;
     }
@@ -239,12 +234,6 @@ public class DacoUser implements Cloneable {
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
     }
-
-    /**
-     *
-     *
-     *
-     */
 
     public Set<DacoAnswer> getAnswers() {
 	return answers;

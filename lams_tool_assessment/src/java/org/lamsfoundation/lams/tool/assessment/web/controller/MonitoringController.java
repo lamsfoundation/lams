@@ -112,7 +112,6 @@ public class MonitoringController {
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
 	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
-
 	}
 
 	// Create reflectList if reflection is enabled.
@@ -171,10 +170,7 @@ public class MonitoringController {
 
     @RequestMapping("/questionSummary")
     public String questionSummary(HttpServletRequest request, HttpServletResponse response) {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
 	if (questionUid.equals(-1l)) {
@@ -189,10 +185,7 @@ public class MonitoringController {
 
     @RequestMapping("/userSummary")
     public String userSummary(HttpServletRequest request, HttpServletResponse response) {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
@@ -246,22 +239,11 @@ public class MonitoringController {
 
     /**
      * Set tool's activityEvaluation
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws JSONException
-     * @throws IOException
      */
     @RequestMapping("/setActivityEvaluation")
     @ResponseBody
     public String setActivityEvaluation(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long contentID = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	String activityEvaluation = WebUtil.readStrParam(request, AssessmentConstants.ATTR_ACTIVITY_EVALUATION, true);
@@ -282,9 +264,7 @@ public class MonitoringController {
      */
     @RequestMapping("/getUsers")
     public String getUsers(HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
@@ -328,9 +308,8 @@ public class MonitoringController {
 	    countSessionUsers = service.getCountUsersBySession(sessionId, searchString);
 	}
 
-	int totalPages = new Double(
-		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
-			.intValue();
+	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countSessionUsers) / Double.valueOf(rowLimit)))
+		.intValue();
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
@@ -370,9 +349,7 @@ public class MonitoringController {
     @RequestMapping("/getUsersByQuestion")
     public String getUsersByQuestion(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
@@ -425,9 +402,8 @@ public class MonitoringController {
 	    countSessionUsers = service.getCountUsersBySession(sessionId, searchString);
 	}
 
-	int totalPages = new Double(
-		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
-			.intValue();
+	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countSessionUsers) / Double.valueOf(rowLimit)))
+		.intValue();
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
@@ -490,11 +466,7 @@ public class MonitoringController {
     @RequestMapping("/getMarkChartData")
     public String getMarkChartData(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
-
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long contentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
@@ -525,6 +497,7 @@ public class MonitoringController {
     /**
      * Excel Summary Export.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/exportSummary")
     public String exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
@@ -579,10 +552,7 @@ public class MonitoringController {
 
     @RequestMapping("/statistic")
     public String statistic(HttpServletRequest request, HttpServletResponse response) {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
@@ -637,5 +607,12 @@ public class MonitoringController {
 		    + " and question ID " + questionUid);
 	}
     }
+    
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    } 
 
 }

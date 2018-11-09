@@ -28,60 +28,116 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
 /**
- * CommonCartridge
+ * CommonCartridge Item
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laimsc11_commoncartridge_item")
 public class CommonCartridgeItem implements Cloneable {
     private static final Logger log = Logger.getLogger(CommonCartridgeItem.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
     // CommonCartridge Type:1=URL,2=File,3=Website,4=Learning Object
+    @Column(name = "item_type")
     private short type;
 
+    @Column
     private String title;
 
+    @Column
     private String description;
 
+    @Column
     private String url;
 
+    @Column(name = "ims_schema")
     private String imsSchema;
 
+    @Column(name = "init_item")
     private String initialItem;
 
+    @Column(name = "organization_xml")
     private String organizationXml;
 
+    @Column(name = "launch_url")
     private String launchUrl;
+    
+    @Column(name = "secure_launch_url")
     private String secureLaunchUrl;
+    
+    @Column(name = "tool_key")
     private String key;
+    
+    @Column(name = "tool_secret")
     private String secret;
+    
+    @Column(name = "custom_str")
     private String customStr;
+    
+    @Column(name = "frame_height")
     private int frameHeight;
+    
+    @Column(name = "open_url_new_window")
     private boolean openUrlNewWindow;
+    
+    @Column(name = "button_text")
     private String buttonText;
 
+    @Column(name = "file_uuid")
     private Long fileUuid;
 
+    @Column(name = "file_version_id")
     private Long fileVersionId;
 
+    @Column(name = "file_name")
     private String fileName;
 
+    @Column(name = "file_type")
     private String fileType;
 
-    private Set itemInstructions;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "item_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<CommonCartridgeItemInstruction> itemInstructions = new HashSet<>();
 
+    @Column(name = "is_hide")
     private boolean isHide;
+    
+    @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
+    @Column(name = "create_date")
     private Date createDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private CommonCartridgeUser createBy;
 
-    // ***********************************************
-    // DTO fields:
+    // *********************************************** DTO fields
+    @Transient
     private boolean complete;
 
     @Override
@@ -91,10 +147,10 @@ public class CommonCartridgeItem implements Cloneable {
 	    obj = (CommonCartridgeItem) super.clone();
 	    // clone attachment
 	    if (itemInstructions != null) {
-		Iterator iter = itemInstructions.iterator();
-		Set set = new HashSet();
+		Iterator<CommonCartridgeItemInstruction> iter = itemInstructions.iterator();
+		Set<CommonCartridgeItemInstruction> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    CommonCartridgeItemInstruction instruct = (CommonCartridgeItemInstruction) iter.next();
+		    CommonCartridgeItemInstruction instruct = iter.next();
 		    CommonCartridgeItemInstruction newInsruct = (CommonCartridgeItemInstruction) instruct.clone();
 		    set.add(newInsruct);
 		}
@@ -112,31 +168,24 @@ public class CommonCartridgeItem implements Cloneable {
 
 	return obj;
     }
+    
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append(" uid", uid).append(" type", type).append(" title", title).toString();
+    }
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
+
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public Long getFileUuid() {
 	return fileUuid;
     }
@@ -145,10 +194,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.fileUuid = crUuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getFileVersionId() {
 	return fileVersionId;
     }
@@ -157,10 +202,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.fileVersionId = crVersionId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -169,10 +210,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getImsSchema() {
 	return imsSchema;
     }
@@ -181,10 +218,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.imsSchema = imsSchema;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getInitialItem() {
 	return initialItem;
     }
@@ -193,25 +226,14 @@ public class CommonCartridgeItem implements Cloneable {
 	this.initialItem = initialItem;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getItemInstructions() {
+    public Set<CommonCartridgeItemInstruction> getItemInstructions() {
 	return itemInstructions;
     }
 
-    public void setItemInstructions(Set itemInstructions) {
+    public void setItemInstructions(Set<CommonCartridgeItemInstruction> itemInstructions) {
 	this.itemInstructions = itemInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getOrganizationXml() {
 	return organizationXml;
     }
@@ -220,10 +242,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.organizationXml = organizationXml;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getTitle() {
 	return title;
     }
@@ -232,10 +250,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getUrl() {
 	return url;
     }
@@ -244,11 +258,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.url = url;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public CommonCartridgeUser getCreateBy() {
 	return createBy;
     }
@@ -257,10 +266,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -269,10 +274,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCreateByAuthor() {
 	return isCreateByAuthor;
     }
@@ -281,10 +282,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isHide() {
 	return isHide;
     }
@@ -293,10 +290,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.isHide = isHide;
     }
 
-    /**
-     *
-     * @return
-     */
     public short getType() {
 	return type;
     }
@@ -305,9 +298,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.type = type;
     }
 
-    /**
-     *
-     */
     public String getFileType() {
 	return fileType;
     }
@@ -316,9 +306,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.fileType = type;
     }
 
-    /**
-     *
-     */
     public String getFileName() {
 	return fileName;
     }
@@ -327,10 +314,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.fileName = name;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isOpenUrlNewWindow() {
 	return openUrlNewWindow;
     }
@@ -339,10 +322,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.openUrlNewWindow = openUrlNewWindow;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getLaunchUrl() {
 	return launchUrl;
     }
@@ -351,10 +330,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.launchUrl = launchUrl;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getSecureLaunchUrl() {
 	return secureLaunchUrl;
     }
@@ -363,10 +338,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.secureLaunchUrl = secureLaunchUrl;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getKey() {
 	return key;
     }
@@ -375,10 +346,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.key = key;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getSecret() {
 	return secret;
     }
@@ -387,10 +354,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.secret = secret;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getCustomStr() {
 	return customStr;
     }
@@ -399,10 +362,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.customStr = customStr;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getButtonText() {
 	return buttonText;
     }
@@ -411,10 +370,6 @@ public class CommonCartridgeItem implements Cloneable {
 	this.buttonText = buttonText;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getFrameHeight() {
 	return frameHeight;
     }
@@ -430,11 +385,5 @@ public class CommonCartridgeItem implements Cloneable {
     public boolean isComplete() {
 	return complete;
     }
-    
-    @Override
-    public String toString() {
-	return new ToStringBuilder(this).append(" uid", uid).append(" type", type).append(" title", title).toString();
-    }
-
 
 }

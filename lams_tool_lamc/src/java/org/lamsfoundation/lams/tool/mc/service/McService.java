@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -87,12 +87,12 @@ import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.model.McSession;
+import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.tool.mc.util.McStringComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -165,7 +165,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    leader = new McQueUsr(leaderUserId, userName, fullName, mcSession, new TreeSet());
+		    leader = new McQueUsr(leaderUserId, userName, fullName, mcSession);
 		    mcUserDAO.saveMcUser(user);
 		}
 
@@ -233,7 +233,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid) {
+    public McQueContent getQuestionByDisplayOrder(final Integer displayOrder, final Long mcContentUid) {
 	return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
     }
 
@@ -276,7 +276,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // in case question doesn't exist
 	    if (question == null) {
 		question = new McQueContent(currentQuestionText, null, new Integer(displayOrder),
-			new Integer(currentMark), currentFeedback, content, null, null);
+			new Integer(currentMark), currentFeedback, content, null);
 
 		// adding a new question to content
 		content.getMcQueContents().add(question);
@@ -295,6 +295,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
 	    Set<McOptsContent> newOptions = new HashSet<McOptsContent>();
+	    Set<Long> wantedUids = new HashSet<Long>();
 	    int displayOrderOption = 1;
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
@@ -314,13 +315,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		option.setCorrectOption(isCorrectOption);
 		option.setMcQueOptionText(optionText);
 		option.setMcQueContent(question);
-
+		
 		newOptions.add(option);
 		displayOrderOption++;
 	    }
-
 	    question.setMcOptionsContents(newOptions);
-
+	    
 	    // updating the existing question content
 	    saveOrUpdateMcQueContent(question);
 
@@ -345,7 +345,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
 	    McSession mcSession = getMcSessionById(toolSessionID.longValue());
 
-	    McQueUsr user = new McQueUsr(userId, userName, fullName, mcSession, new TreeSet());
+	    McQueUsr user = new McQueUsr(userId, userName, fullName, mcSession);
 	    mcUserDAO.saveMcUser(user);
 
 	    return user;
@@ -1537,7 +1537,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
 	    Long portraitUuid = userAttemptAndPortraitIter[1] == null ? null
 		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
-	    Long userId = userAttempt.getQueUsrId();
+	    Long userId = userAttempt.getMcQueUsr().getQueUsrId();
 
 	    //fill in question's and user answer's hashes
 	    McQueContent question = userAttempt.getMcQueContent();
@@ -1575,7 +1575,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		String userName = user.getLogin();
 		String fullName = user.getFirstName() + " " + user.getLastName();
-		mcUser = new McQueUsr(userId, userName, fullName, session, new TreeSet());
+		mcUser = new McQueUsr(userId, userName, fullName, session);
 		mcUserDAO.saveMcUser(mcUser);
 	    }
 
@@ -1593,8 +1593,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public IToolVO getToolBySignature(String toolSignature) throws McApplicationException {
-	IToolVO tool = toolService.getToolBySignature(toolSignature);
+    public Tool getToolBySignature(String toolSignature) throws McApplicationException {
+	Tool tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
@@ -1925,7 +1925,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	mcq.setShowMarks(JsonUtil.optBoolean(toolContentJSON, "showMarks", Boolean.FALSE));
 	mcq.setPrefixAnswersWithLetters(JsonUtil.optBoolean(toolContentJSON, "prefixAnswersWithLetters", Boolean.TRUE));
 	mcq.setPassMark(JsonUtil.optInt(toolContentJSON, "passMark", 0));
-	mcq.setEnableConfidenceLevels(JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
+	mcq.setEnableConfidenceLevels(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	createMc(mcq);
@@ -1934,8 +1935,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (JsonNode questionData : questions) {
 	    McQueContent question = new McQueContent(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT), null,
-		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), 1, "", mcq, null,
-		    new HashSet<McOptsContent>());
+		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), 1, "", mcq, new HashSet<McOptsContent>());
 
 	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 	    for (JsonNode optionData : optionsData) {
@@ -1946,10 +1946,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 	    saveOrUpdateMcQueContent(question);
 	}
-
-	// TODO
-	// mcq.setContent(content) - can't find in database
-	// mcq.setConditions(conditions);
 
     }
 }

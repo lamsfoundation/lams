@@ -56,8 +56,8 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.SimpleURL;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -83,11 +83,11 @@ import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.model.VoteSession;
+import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
@@ -1114,7 +1114,7 @@ public class VoteService
 
 	if (question != null) {
 	    VoteUsrAttempt existingAttempt = voteUsrAttemptDAO.getAttemptForUserAndQuestionContentAndSession(
-		    user.getQueUsrId(), question.getVoteContentId(), session.getUid());
+		    user.getQueUsrId(), question.getVoteContent().getUid(), session.getUid());
 
 	    if (existingAttempt != null) {
 		existingAttempt.setUserEntry(userEntry);
@@ -1165,8 +1165,7 @@ public class VoteService
 	}
 
 	logEventService.logHideLearnerContent(voteUsrAttempt.getVoteQueUsr().getQueUsrId(),
-		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId,
-		voteUsrAttempt.getUserEntry());
+		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId, voteUsrAttempt.getUserEntry());
 
     }
 
@@ -1181,8 +1180,7 @@ public class VoteService
 	}
 
 	logEventService.logShowLearnerContent(voteUsrAttempt.getVoteQueUsr().getQueUsrId(),
-		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId,
-		voteUsrAttempt.getUserEntry());
+		voteUsrAttempt.getVoteQueUsr().getUsername(), toolContentId, voteUsrAttempt.getUserEntry());
     }
 
     @Override
@@ -1539,8 +1537,8 @@ public class VoteService
     }
 
     @Override
-    public IToolVO getToolBySignature(String toolSignature) {
-	IToolVO tool = toolService.getToolBySignature(toolSignature);
+    public Tool getToolBySignature(String toolSignature) {
+	Tool tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 

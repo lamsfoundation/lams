@@ -521,20 +521,12 @@ public interface IAssessmentService {
     String getLearnerContentFolder(Long toolSessionId, Long userId);
 
     /**
-     * Recalculate marks after editing content from monitoring.
-     *
-     * @param assessment
-     * @param oldQuestions
-     * @param newQuestions
-     * @param deletedQuestions
-     * @param oldReferences
-     * @param newReferences
-     * @param deletedReferences
+     * Recalculate marks after editing content from monitoring
      */
-    void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions,
-	    Set<AssessmentQuestion> newQuestions, List<AssessmentQuestion> deletedQuestions,
-	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
-	    List<QuestionReference> deletedReferences);
+    void recalculateUserAnswers(final Long assessmentUid, final Long toolContentId,
+	    Set<AssessmentQuestion> oldQuestions, Set<AssessmentQuestion> newQuestions,
+	    List<AssessmentQuestion> deletedQuestions, Set<QuestionReference> oldReferences,
+	    Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences);
 
     void releaseFromCache(Object object);
 

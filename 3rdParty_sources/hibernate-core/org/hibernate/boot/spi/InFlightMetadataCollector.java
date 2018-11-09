@@ -17,11 +17,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.boot.internal.ClassmateContext;
 import org.hibernate.boot.model.IdentifierGeneratorDefinition;
 import org.hibernate.boot.model.TypeDefinition;
+import org.hibernate.boot.model.convert.internal.InstanceBasedConverterDescriptor;
+import org.hibernate.boot.model.convert.spi.ConverterAutoApplyHandler;
+import org.hibernate.boot.model.convert.spi.ConverterDescriptor;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.model.relational.Database;
+import org.hibernate.boot.model.relational.QualifiedTableName;
 import org.hibernate.boot.model.source.spi.LocalMetadataBuildingContext;
 import org.hibernate.cfg.AnnotatedClassType;
 import org.hibernate.cfg.AttributeConverterDefinition;
@@ -43,7 +48,6 @@ import org.hibernate.mapping.Join;
 import org.hibernate.mapping.MappedSuperclass;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Table;
-import org.hibernate.type.TypeResolver;
 
 /**
  * An in-flight representation of Metadata while Metadata is being built.
@@ -53,6 +57,7 @@ import org.hibernate.type.TypeResolver;
  * @since 5.0
  */
 public interface InFlightMetadataCollector extends Mapping, MetadataImplementor {
+	BootstrapContext getBootstrapContext();
 
 	/**
 	 * Add the PersistentClass for an entity mapping.
@@ -201,19 +206,37 @@ public interface InFlightMetadataCollector extends Mapping, MetadataImplementor 
 
 	void addFetchProfile(FetchProfile profile);
 
-	TypeResolver getTypeResolver();
-
-	Database getDatabase();
-
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// make sure these are account for better in metamodel
 
 	void addIdentifierGenerator(IdentifierGeneratorDefinition generatorDefinition);
 
 
-	void addAttributeConverter(AttributeConverterDefinition converter);
+	/**
+	 * @deprecated AttributeConverterDefinition forces early resolution of the
+	 * AttributeConverter instance, which precludes resolution of the converter
+	 * from {@link org.hibernate.resource.beans.spi.ManagedBeanRegistry} (CDI, etc).
+	 * Instead one of:
+	 * * {@link #addAttributeConverter(ConverterDescriptor)}
+	 * * {@link #addAttributeConverter(Class)}
+	 * * {@link #addAttributeConverter(Class)}
+	 */
+	@Deprecated
+	default void addAttributeConverter(AttributeConverterDefinition converter) {
+		addAttributeConverter(
+				new InstanceBasedConverterDescriptor(
+						converter.getAttributeConverter(),
+						getBootstrapContext().getClassmateContext()
+				)
+		);
+	}
+
+	void addAttributeConverter(ConverterDescriptor descriptor);
+
 	void addAttributeConverter(Class<? extends AttributeConverter> converterClass);
-	java.util.Collection<AttributeConverterDefinition> getAttributeConverters();
+
+	ConverterAutoApplyHandler getAttributeConverterAutoApplyHandler();
+
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// second passes
@@ -275,6 +298,17 @@ public interface InFlightMetadataCollector extends Mapping, MetadataImplementor 
 	NaturalIdUniqueKeyBinder locateNaturalIdUniqueKeyBinder(String entityName);
 	void registerNaturalIdUniqueKeyBinder(String entityName, NaturalIdUniqueKeyBinder ukBinder);
 
+	/**
+	 * Access to the shared Classmate objects used throughout Hibernate's
+	 * bootstrap process.
+	 *
+	 * @return Access to the shared Classmate delegates.
+	 *
+	 * @deprecated Use {@link BootstrapContext#getClassmateContext()} instead.
+	 */
+	@Deprecated
+	ClassmateContext getClassmateContext();
+
 	interface DelayedPropertyReferenceHandler extends Serializable {
 		void process(InFlightMetadataCollector metadataCollector);
 	}
@@ -295,7 +329,7 @@ public interface InFlightMetadataCollector extends Mapping, MetadataImplementor 
 
 	interface EntityTableXref {
 		void addSecondaryTable(LocalMetadataBuildingContext buildingContext, Identifier logicalName, Join secondaryTableJoin);
-		void addSecondaryTable(Identifier logicalName, Join secondaryTableJoin);
+		void addSecondaryTable(QualifiedTableName logicalName, Join secondaryTableJoin);
 		Table resolveTable(Identifier tableName);
 		Table getPrimaryTable();
 		Join locateJoin(Identifier tableName);

@@ -32,44 +32,56 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 
-/**
- *
- *
- *
- *
-*/
+@Entity
+@Table(name = "lams_cr_node")
 public class CrNode implements Serializable {
 
-    protected Logger log = Logger.getLogger(CrNode.class);
-
-    /** identifier field */
+    @Id
+    @Column(name = "node_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long nodeId;
 
-    /** nullable persistent field */
+    @Column
     private String path;
 
-    /** persistent field */
+    @Column
     private String type;
 
-    /** nullable persistent field */
+    @Column(name = "created_date_time")
     private Date createdDateTime;
 
-    /** persistent field */
+    @Column(name = "next_version_id")
     private Long nextVersionId;
 
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "workspace_id") 
     private org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace;
 
-    /** persistent field */
+    @ManyToOne 
+    @JoinColumn(name = "parent_nv_id") 
     private org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion;
 
-    /** versions of this node. persistent field */
-    private Set crNodeVersions;
+    @OneToMany(mappedBy = "node",
+	    cascade = CascadeType.ALL,
+	    orphanRemoval = true,
+	    fetch = FetchType.EAGER)
+    private Set<CrNodeVersion> crNodeVersions;
 
     /** default constructor - used by Hibernate */
     public CrNode() {
@@ -98,14 +110,14 @@ public class CrNode implements Serializable {
 /*
  * public CrNode(String path, String type, Date createdDateTime, Long nextVersionId,
  * org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace,
- * org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
+ * org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set<CrNodeVersion> crNodeVersions) {
  * }
  */
 
     /** minimal constructor */
 /*
  * public CrNode(String type, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace,
- * org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
+ * org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set<CrNodeVersion> crNodeVersions) {
  * this.type = type;
  * this.nextVersionId = nextVersionId;
  * this.crWorkspace = crWorkspace;
@@ -113,14 +125,6 @@ public class CrNode implements Serializable {
  * this.crNodeVersions = crNodeVersions;
  * }
  */
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     */
     public Long getNodeId() {
 	return this.nodeId;
     }
@@ -129,12 +133,6 @@ public class CrNode implements Serializable {
 	this.nodeId = nodeId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
     public String getPath() {
 	return this.path;
     }
@@ -143,13 +141,6 @@ public class CrNode implements Serializable {
 	this.path = path;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     */
     public String getType() {
 	return this.type;
     }
@@ -158,12 +149,6 @@ public class CrNode implements Serializable {
 	this.type = type;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
     public Date getCreatedDateTime() {
 	return this.createdDateTime;
     }
@@ -172,12 +157,6 @@ public class CrNode implements Serializable {
 	this.createdDateTime = createdDateTime;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
     public Long getNextVersionId() {
 	return this.nextVersionId;
     }
@@ -186,14 +165,6 @@ public class CrNode implements Serializable {
 	this.nextVersionId = nextVersionId;
     }
 
-    /**
-     * bi-directional many-to-one association to CrWorkspace
-     * 
-     *
-     *
-     *
-     * 
-     */
     public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
 	return this.crWorkspace;
     }
@@ -202,17 +173,6 @@ public class CrNode implements Serializable {
 	this.crWorkspace = crWorkspace;
     }
 
-    /**
-     * Get the parent node/version to this node.
-     * bi-directional many-to-one association to CrNodeVersion.
-     * 
-     *
-     *
-     *
-     *
-     *
-     * 
-     */
     public org.lamsfoundation.lams.contentrepository.CrNodeVersion getParentNodeVersion() {
 	return this.parentNodeVersion;
     }
@@ -221,33 +181,18 @@ public class CrNode implements Serializable {
 	this.parentNodeVersion = parentNodeVersion;
     }
 
-    /**
-     * bi-directional one-to-many association to CrNodeVersion
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * usage = "transactional"
-     * 
-     */
-    public Set getCrNodeVersions() {
+    public Set<CrNodeVersion> getCrNodeVersions() {
 	return this.crNodeVersions;
     }
 
-    private void setCrNodeVersions(Set crNodeVersions) {
+    private void setCrNodeVersions(Set<CrNodeVersion> crNodeVersions) {
 	this.crNodeVersions = crNodeVersions;
     }
 
     /** Add a version to this node */
     public void addCrNodeVersion(CrNodeVersion version) {
 	if (getCrNodeVersions() == null) {
-	    Set set = new HashSet();
+	    Set<CrNodeVersion> set = new HashSet<CrNodeVersion>();
 	    set.add(version);
 	    setCrNodeVersions(set);
 	} else {
@@ -324,9 +269,9 @@ public class CrNode implements Serializable {
      */
     public SortedSet getVersionHistory() {
 
-	SortedSet history = new TreeSet();
+	SortedSet<SimpleVersionDetail> history = new TreeSet<SimpleVersionDetail>();
 
-	Set versions = getCrNodeVersions();
+	Set<CrNodeVersion> versions = getCrNodeVersions();
 	if (versions != null) {
 	    Iterator iter = versions.iterator();
 	    while (iter.hasNext()) {
@@ -357,7 +302,7 @@ public class CrNode implements Serializable {
     public CrNodeVersion getNodeVersion(Long versionId) {
 
 	CrNodeVersion nodeVersion = null;
-	Set nodeVersionSet = getCrNodeVersions();
+	Set<CrNodeVersion> nodeVersionSet = getCrNodeVersions();
 
 	if (nodeVersionSet != null) {
 	    Iterator iter = nodeVersionSet.iterator();
@@ -408,7 +353,7 @@ public class CrNode implements Serializable {
 
     /** Get a list of all the versions - just the Long value. */
     public Long[] getVersionIds() {
-	Set allCrNodeVersions = getCrNodeVersions();
+	Set<CrNodeVersion> allCrNodeVersions = getCrNodeVersions();
 	Long[] versions = new Long[allCrNodeVersions != null ? allCrNodeVersions.size() : 0];
 	Iterator iter = allCrNodeVersions.iterator();
 	int i = 0;

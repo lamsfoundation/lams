@@ -34,6 +34,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.model.relational.Sequence;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.CastFunction;
 import org.hibernate.dialect.function.SQLFunction;
@@ -53,6 +54,8 @@ import org.hibernate.dialect.pagination.LegacyLimitHandler;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.unique.DefaultUniqueDelegate;
 import org.hibernate.dialect.unique.UniqueDelegate;
+import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.config.spi.StandardConverters;
 import org.hibernate.engine.jdbc.LobCreator;
 import org.hibernate.engine.jdbc.env.internal.DefaultSchemaNameResolver;
 import org.hibernate.engine.jdbc.env.spi.AnsiSqlKeywords;
@@ -61,7 +64,8 @@ import org.hibernate.engine.jdbc.env.spi.IdentifierHelperBuilder;
 import org.hibernate.engine.jdbc.env.spi.NameQualifierSupport;
 import org.hibernate.engine.jdbc.env.spi.SchemaNameResolver;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.exception.spi.ConversionContext;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
 import org.hibernate.exception.spi.SQLExceptionConverter;
@@ -69,13 +73,14 @@ import org.hibernate.exception.spi.ViolatedConstraintNameExtracter;
 import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
 import org.hibernate.hql.spi.id.persistent.PersistentTableBulkIdStrategy;
 import org.hibernate.id.IdentityGenerator;
-import org.hibernate.id.SequenceGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.internal.util.io.StreamCopier;
+import org.hibernate.loader.BatchLoadSizingStrategy;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Constraint;
 import org.hibernate.mapping.ForeignKey;
@@ -104,8 +109,6 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
-import org.jboss.logging.Logger;
-
 /**
  * Represents a dialect of SQL implemented by a particular RDBMS.  Subclasses implement Hibernate compatibility
  * with different systems.  Subclasses should provide a public default constructor that register a set of type
@@ -115,10 +118,7 @@ import org.jboss.logging.Logger;
  */
 @SuppressWarnings("deprecation")
 public abstract class Dialect implements ConversionContext {
-	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
-			CoreMessageLogger.class,
-			Dialect.class.getName()
-	);
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( Dialect.class );
 
 	/**
 	 * Defines a default batch size constant
@@ -144,11 +144,12 @@ public abstract class Dialect implements ConversionContext {
 	private final TypeNames hibernateTypeNames = new TypeNames();
 
 	private final Properties properties = new Properties();
-	private final Map<String, SQLFunction> sqlFunctions = new HashMap<String, SQLFunction>();
-	private final Set<String> sqlKeywords = new HashSet<String>();
+	private final Map<String, SQLFunction> sqlFunctions = new HashMap<>();
+	private final Set<String> sqlKeywords = new HashSet<>();
 
 	private final UniqueDelegate uniqueDelegate;
 
+	private boolean legacyLimitHandlerBehavior;
 
 	// constructors and factory methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -228,6 +229,7 @@ public abstract class Dialect implements ConversionContext {
 		registerHibernateType( Types.TIME, StandardBasicTypes.TIME.getName() );
 		registerHibernateType( Types.TIMESTAMP, StandardBasicTypes.TIMESTAMP.getName() );
 		registerHibernateType( Types.VARCHAR, StandardBasicTypes.STRING.getName() );
+		registerHibernateType( Types.NVARCHAR, StandardBasicTypes.NSTRING.getName() );
 		registerHibernateType( Types.VARBINARY, StandardBasicTypes.BINARY.getName() );
 		registerHibernateType( Types.LONGVARCHAR, StandardBasicTypes.TEXT.getName() );
 		registerHibernateType( Types.LONGVARBINARY, StandardBasicTypes.IMAGE.getName() );
@@ -236,6 +238,10 @@ public abstract class Dialect implements ConversionContext {
 		registerHibernateType( Types.BLOB, StandardBasicTypes.BLOB.getName() );
 		registerHibernateType( Types.CLOB, StandardBasicTypes.CLOB.getName() );
 		registerHibernateType( Types.REAL, StandardBasicTypes.FLOAT.getName() );
+
+		if(supportsPartitionBy()) {
+			registerKeyword( "PARTITION" );
+		}
 
 		uniqueDelegate = new DefaultUniqueDelegate( this );
 	}
@@ -249,7 +255,6 @@ public abstract class Dialect implements ConversionContext {
 	public static Dialect getDialect() throws HibernateException {
 		return instantiateDialect( Environment.getProperties().getProperty( Environment.DIALECT ) );
 	}
-
 
 	/**
 	 * Get an instance of the dialect specified by the given properties or by
@@ -306,7 +311,7 @@ public abstract class Dialect implements ConversionContext {
 	 * @param serviceRegistry The service registry
 	 */
 	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-		// by default, nothing to do
+		resolveLegacyLimitHandlerBehavior( serviceRegistry );
 	}
 
 	/**
@@ -440,7 +445,7 @@ public abstract class Dialect implements ConversionContext {
 	 * {@link #getSqlTypeDescriptorOverride}  to get an optional override based on the SQL code returned by
 	 * {@link SqlTypeDescriptor#getSqlType()}.
 	 * <p/>
-	 * If this dialect does not provide an override or if the {@code sqlTypeDescriptor} doe not allow itself to be
+	 * If this dialect does not provide an override or if the {@code sqlTypeDescriptor} does not allow itself to be
 	 * remapped, then this method simply returns the original passed {@code sqlTypeDescriptor}
 	 *
 	 * @param sqlTypeDescriptor The {@link SqlTypeDescriptor} to override
@@ -490,17 +495,17 @@ public abstract class Dialect implements ConversionContext {
 	@SuppressWarnings( {"UnusedDeclaration"})
 	protected static final LobMergeStrategy LEGACY_LOB_MERGE_STRATEGY = new LobMergeStrategy() {
 		@Override
-		public Blob mergeBlob(Blob original, Blob target, SessionImplementor session) {
+		public Blob mergeBlob(Blob original, Blob target, SharedSessionContractImplementor session) {
 			return target;
 		}
 
 		@Override
-		public Clob mergeClob(Clob original, Clob target, SessionImplementor session) {
+		public Clob mergeClob(Clob original, Clob target, SharedSessionContractImplementor session) {
 			return target;
 		}
 
 		@Override
-		public NClob mergeNClob(NClob original, NClob target, SessionImplementor session) {
+		public NClob mergeNClob(NClob original, NClob target, SharedSessionContractImplementor session) {
 			return target;
 		}
 	};
@@ -511,7 +516,7 @@ public abstract class Dialect implements ConversionContext {
 	@SuppressWarnings( {"UnusedDeclaration"})
 	protected static final LobMergeStrategy STREAM_XFER_LOB_MERGE_STRATEGY = new LobMergeStrategy() {
 		@Override
-		public Blob mergeBlob(Blob original, Blob target, SessionImplementor session) {
+		public Blob mergeBlob(Blob original, Blob target, SharedSessionContractImplementor session) {
 			if ( original != target ) {
 				try {
 					// the BLOB just read during the load phase of merge
@@ -531,7 +536,7 @@ public abstract class Dialect implements ConversionContext {
 		}
 
 		@Override
-		public Clob mergeClob(Clob original, Clob target, SessionImplementor session) {
+		public Clob mergeClob(Clob original, Clob target, SharedSessionContractImplementor session) {
 			if ( original != target ) {
 				try {
 					// the CLOB just read during the load phase of merge
@@ -551,7 +556,7 @@ public abstract class Dialect implements ConversionContext {
 		}
 
 		@Override
-		public NClob mergeNClob(NClob original, NClob target, SessionImplementor session) {
+		public NClob mergeNClob(NClob original, NClob target, SharedSessionContractImplementor session) {
 			if ( original != target ) {
 				try {
 					// the NCLOB just read during the load phase of merge
@@ -576,7 +581,7 @@ public abstract class Dialect implements ConversionContext {
 	 */
 	protected static final LobMergeStrategy NEW_LOCATOR_LOB_MERGE_STRATEGY = new LobMergeStrategy() {
 		@Override
-		public Blob mergeBlob(Blob original, Blob target, SessionImplementor session) {
+		public Blob mergeBlob(Blob original, Blob target, SharedSessionContractImplementor session) {
 			if ( original == null && target == null ) {
 				return null;
 			}
@@ -594,7 +599,7 @@ public abstract class Dialect implements ConversionContext {
 		}
 
 		@Override
-		public Clob mergeClob(Clob original, Clob target, SessionImplementor session) {
+		public Clob mergeClob(Clob original, Clob target, SharedSessionContractImplementor session) {
 			if ( original == null && target == null ) {
 				return null;
 			}
@@ -610,7 +615,7 @@ public abstract class Dialect implements ConversionContext {
 		}
 
 		@Override
-		public NClob mergeNClob(NClob original, NClob target, SessionImplementor session) {
+		public NClob mergeNClob(NClob original, NClob target, SharedSessionContractImplementor session) {
 			if ( original == null && target == null ) {
 				return null;
 			}
@@ -651,6 +656,18 @@ public abstract class Dialect implements ConversionContext {
 	}
 
 	/**
+	 * Whether or not the given type name has been registered for this dialect (including both hibernate type names and
+	 * custom-registered type names).
+	 *
+	 * @param typeName the type name.
+	 *
+	 * @return true if the given string has been registered either as a hibernate type or as a custom-registered one
+	 */
+	public boolean isTypeNameRegistered(final String typeName) {
+		return this.typeNames.containsTypeName( typeName );
+	}
+
+	/**
 	 * Get the name of the Hibernate {@link org.hibernate.type.Type} associated
 	 * with the given {@link java.sql.Types} typecode with the given storage
 	 * specification parameters.
@@ -685,7 +702,7 @@ public abstract class Dialect implements ConversionContext {
 	 * @param name The Hibernate {@link org.hibernate.type.Type} name
 	 */
 	protected void registerHibernateType(int code, long capacity, String name) {
-		hibernateTypeNames.put( code, capacity, name);
+		hibernateTypeNames.put( code, capacity, name );
 	}
 
 	/**
@@ -696,7 +713,7 @@ public abstract class Dialect implements ConversionContext {
 	 * @param name The Hibernate {@link org.hibernate.type.Type} name
 	 */
 	protected void registerHibernateType(int code, String name) {
-		hibernateTypeNames.put( code, name);
+		hibernateTypeNames.put( code, name );
 	}
 
 
@@ -728,7 +745,9 @@ public abstract class Dialect implements ConversionContext {
 	 * Comes into play whenever the user specifies the native generator.
 	 *
 	 * @return The native generator class.
+	 * @deprecated use {@link #getNativeIdentifierGeneratorStrategy()} instead
 	 */
+	@Deprecated
 	public Class getNativeIdentifierGeneratorClass() {
 		if ( getIdentityColumnSupport().supportsIdentityColumns() ) {
 			return IdentityGenerator.class;
@@ -738,6 +757,21 @@ public abstract class Dialect implements ConversionContext {
 		}
 	}
 
+	/**
+	 * Resolves the native generation strategy associated to this dialect.
+	 * <p/>
+	 * Comes into play whenever the user specifies the native generator.
+	 *
+	 * @return The native generator strategy.
+	 */
+	public String getNativeIdentifierGeneratorStrategy() {
+		if ( getIdentityColumnSupport().supportsIdentityColumns() ) {
+			return "identity";
+		}
+		else {
+			return "sequence";
+		}
+	}
 
 	// IDENTITY support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -745,154 +779,11 @@ public abstract class Dialect implements ConversionContext {
 	 * Get the appropriate {@link IdentityColumnSupport}
 	 *
 	 * @return the IdentityColumnSupport
+	 * @since 5.1
 	 */
 	public IdentityColumnSupport getIdentityColumnSupport(){
-		return new IdentityColumnSupportImpl( this );
+		return new IdentityColumnSupportImpl();
 	}
-
-	/**
-	 * Does this dialect support identity column key generation?
-	 *
-	 * @return True if IDENTITY columns are supported; false otherwise.
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().supportsIdentityColumns()} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public boolean supportsIdentityColumns() {
-		return false;
-	}
-
-	/**
-	 * Does the dialect support some form of inserting and selecting
-	 * the generated IDENTITY value all in the same statement.
-	 *
-	 * @return True if the dialect supports selecting the just
-	 * generated IDENTITY in the insert statement.
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().supportsInsertSelectIdentity()} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public boolean supportsInsertSelectIdentity() {
-		return false;
-	}
-
-	/**
-	 * Whether this dialect have an Identity clause added to the data type or a
-	 * completely separate identity data type
-	 *
-	 * @return boolean
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().hasDataTypeInIdentityColumn()} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public boolean hasDataTypeInIdentityColumn() {
-		return true;
-	}
-
-	/**
-	 * Provided we {@link #supportsInsertSelectIdentity}, then attach the
-	 * "select identity" clause to the  insert statement.
-	 *  <p/>
-	 * Note, if {@link #supportsInsertSelectIdentity} == false then
-	 * the insert-string should be returned without modification.
-	 *
-	 * @param insertString The insert command
-	 * @return The insert command with any necessary identity select
-	 * clause attached.
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().appendIdentitySelectToInsert(String)} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public String appendIdentitySelectToInsert(String insertString) {
-		return insertString;
-	}
-
-	/**
-	 * Get the select command to use to retrieve the last generated IDENTITY
-	 * value for a particular table
-	 *
-	 * @param table The table into which the insert was done
-	 * @param column The PK column.
-	 * @param type The {@link java.sql.Types} type code.
-	 * @return The appropriate select command
-	 * @throws MappingException If IDENTITY generation is not supported.
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().getIdentitySelectString(String,String,int)} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public String getIdentitySelectString(String table, String column, int type) throws MappingException {
-		return getIdentitySelectString();
-	}
-
-	/**
-	 * Get the select command to use to retrieve the last generated IDENTITY
-	 * value.
-	 *
-	 * @return The appropriate select command
-	 * @throws MappingException If IDENTITY generation is not supported.
-	 *
-	 * @deprecated use {@link Dialect#getIdentitySelectString(String, String, int)} instead
-	 */
-	@Deprecated
-	protected String getIdentitySelectString() throws MappingException {
-		throw new MappingException( getClass().getName() + " does not support identity key generation" );
-	}
-
-	/**
-	 * The syntax used during DDL to define a column as being an IDENTITY of
-	 * a particular type.
-	 *
-	 * @param type The {@link java.sql.Types} type code.
-	 * @return The appropriate DDL fragment.
-	 * @throws MappingException If IDENTITY generation is not supported.
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().getIdentityColumnString(int)} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public String getIdentityColumnString(int type) throws MappingException {
-		return getIdentityColumnString();
-	}
-
-	/**
-	 * The syntax used during DDL to define a column as being an IDENTITY.
-	 *
-	 * @return The appropriate DDL fragment.
-	 * @throws MappingException If IDENTITY generation is not supported.
-	 *
-	 * @deprecated use {@link Dialect#getIdentityColumnString(int)} instead
-	 */
-	@Deprecated
-	protected String getIdentityColumnString() throws MappingException {
-		throw new MappingException( getClass().getName() + " does not support identity key generation" );
-	}
-
-	/**
-	 * The keyword used to insert a generated value into an identity column (or null).
-	 * Need if the dialect does not support inserts that specify no column values.
-	 *
-	 * @return The appropriate keyword.
-	 *
-	 * @deprecated {@link #getIdentityColumnSupport()} should be overridden instead;
-	 * if {@code getIdentityColumnSupport().getIdentityInsertString()} does not delegate
-	 * to this method, then this method is ignored.
-	 */
-	@Deprecated
-	public String getIdentityInsertString() {
-		return null;
-	}
-
 
 	// SEQUENCE support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1360,6 +1251,22 @@ public abstract class Dialect implements ConversionContext {
 
 	/**
 	 * Get the string to append to SELECT statements to acquire WRITE locks
+	 * for this dialect given the aliases of the columns to be write locked.
+	 * Location of the of the returned string is treated
+	 * the same as getForUpdateString.
+	 *
+	 * @param aliases The columns to be read locked.
+	 * @param timeout in milliseconds, -1 for indefinite wait and 0 for no wait.
+	 * @return The appropriate <tt>LOCK</tt> clause string.
+	 */
+	public String getWriteLockString(String aliases, int timeout) {
+		// by default we simply return the getWriteLockString(timeout) result since
+		// the default is to say no support for "FOR UPDATE OF ..."
+		return getWriteLockString( timeout );
+	}
+
+	/**
+	 * Get the string to append to SELECT statements to acquire READ locks
 	 * for this dialect.  Location of the of the returned string is treated
 	 * the same as getForUpdateString.
 	 *
@@ -1370,6 +1277,21 @@ public abstract class Dialect implements ConversionContext {
 		return getForUpdateString();
 	}
 
+	/**
+	 * Get the string to append to SELECT statements to acquire READ locks
+	 * for this dialect given the aliases of the columns to be read locked.
+	 * Location of the of the returned string is treated
+	 * the same as getForUpdateString.
+	 *
+	 * @param aliases The columns to be read locked.
+	 * @param timeout in milliseconds, -1 for indefinite wait and 0 for no wait.
+	 * @return The appropriate <tt>LOCK</tt> clause string.
+	 */
+	public String getReadLockString(String aliases, int timeout) {
+		// by default we simply return the getReadLockString(timeout) result since
+		// the default is to say no support for "FOR UPDATE OF ..."
+		return getReadLockString( timeout );
+	}
 
 	/**
 	 * Is <tt>FOR UPDATE OF</tt> syntax supported?
@@ -1527,6 +1449,22 @@ public abstract class Dialect implements ConversionContext {
 	 */
 	public String getCreateTableString() {
 		return "create table";
+	}
+
+	/**
+	 * Command used to alter a table.
+	 *
+	 * @param tableName The name of the table to alter
+	 * @return The command used to alter a table.
+	 * @since 5.2.11
+	 */
+	public String getAlterTableString(String tableName) {
+		final StringBuilder sb = new StringBuilder( "alter table " );
+		if ( supportsIfExistsAfterAlterTable() ) {
+			sb.append( "if exists " );
+		}
+		sb.append( tableName );
+		return sb.toString();
 	}
 
 	/**
@@ -1894,7 +1832,9 @@ public abstract class Dialect implements ConversionContext {
 	// keyword support ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	protected void registerKeyword(String word) {
-		sqlKeywords.add( word );
+		// When tokens are checked for keywords, they are always compared against the lower-case version of the token.
+		// For instance, Template#renderWhereStringTemplate transforms all tokens to lower-case too.
+		sqlKeywords.add( word.toLowerCase( Locale.ROOT ) );
 	}
 
 	/**
@@ -2190,17 +2130,28 @@ public abstract class Dialect implements ConversionContext {
 		res.append( " add constraint " )
 				.append( quote( constraintName ) )
 				.append( " foreign key (" )
-				.append( StringHelper.join( ", ", foreignKey ) )
+				.append( String.join( ", ", foreignKey ) )
 				.append( ") references " )
 				.append( referencedTable );
 
 		if ( !referencesPrimaryKey ) {
 			res.append( " (" )
-					.append( StringHelper.join( ", ", primaryKey ) )
+					.append( String.join( ", ", primaryKey ) )
 					.append( ')' );
 		}
 
 		return res.toString();
+	}
+
+	public String getAddForeignKeyConstraintString(
+			String constraintName,
+			String foreignKeyDefinition) {
+		return new StringBuilder( 30 )
+				.append( " add constraint " )
+				.append( quote( constraintName ) )
+				.append( " " )
+				.append( foreignKeyDefinition )
+				.toString();
 	}
 
 	/**
@@ -2303,6 +2254,16 @@ public abstract class Dialect implements ConversionContext {
 	 * @return {@code true} if the "if exists" can be applied after the constraint name
 	 */
 	public boolean supportsIfExistsAfterConstraintName() {
+		return false;
+	}
+
+	/**
+	 * For an "alter table", can the phrase "if exists" be applied?
+	 *
+	 * @return {@code true} if the "if exists" can be applied after ALTER TABLE
+	 * @since 5.2.11
+	 */
+	public boolean supportsIfExistsAfterAlterTable() {
 		return false;
 	}
 
@@ -2494,7 +2455,7 @@ public abstract class Dialect implements ConversionContext {
 			orderByElement.append( " " ).append( order );
 		}
 		if ( nulls != NullPrecedence.NONE ) {
-			orderByElement.append( " nulls " ).append( nulls.name().toLowerCase(Locale.ROOT) );
+			orderByElement.append( " nulls " ).append( nulls.name().toLowerCase( Locale.ROOT ) );
 		}
 		return orderByElement.toString();
 	}
@@ -2710,7 +2671,7 @@ public abstract class Dialect implements ConversionContext {
 	}
 
 	/**
-	 * Return the limit that the underlying database places on the number elements in an {@code IN} predicate.
+	 * Return the limit that the underlying database places on the number of elements in an {@code IN} predicate.
 	 * If the database defines no such limits, simply return zero or less-than-zero.
 	 *
 	 * @return int The limit, or zero-or-less to indicate no limit.
@@ -2723,7 +2684,7 @@ public abstract class Dialect implements ConversionContext {
 	 * HHH-4635
 	 * Oracle expects all Lob values to be last in inserts and updates.
 	 *
-	 * @return boolean True of Lob values should be last, false if it
+	 * @return boolean True if Lob values should be last, false if it
 	 * does not matter.
 	 */
 	public boolean forceLobAsLastValue() {
@@ -2737,8 +2698,24 @@ public abstract class Dialect implements ConversionContext {
 	 *
 	 * @return {@code true} indicates that the dialect requests that locking be applied by subsequent select;
 	 * {@code false} (the default) indicates that locking should be applied to the main SQL statement..
+	 * @deprecated Use {@link #useFollowOnLocking(QueryParameters)} instead.
 	 */
+	@Deprecated
 	public boolean useFollowOnLocking() {
+		return useFollowOnLocking( null );
+	}
+
+	/**
+	 * Some dialects have trouble applying pessimistic locking depending upon what other query options are
+	 * specified (paging, ordering, etc).  This method allows these dialects to request that locking be applied
+	 * by subsequent selects.
+	 *
+	 * @param parameters query parameters
+	 * @return {@code true} indicates that the dialect requests that locking be applied by subsequent select;
+	 * {@code false} (the default) indicates that locking should be applied to the main SQL statement..
+	 * @since 5.2
+	 */
+	public boolean useFollowOnLocking(QueryParameters parameters) {
 		return false;
 	}
 
@@ -2816,10 +2793,28 @@ public abstract class Dialect implements ConversionContext {
 	 * and syntax of the hint.  By default, ignore the hint and simply return the query.
 	 *
 	 * @param query The query to which to apply the hint.
+	 * @param hintList The  hints to apply
+	 * @return The modified SQL
+	 */
+	public String getQueryHintString(String query, List<String> hintList) {
+		final String hints = String.join( ", ", hintList );
+
+		if ( StringHelper.isEmpty( hints ) ) {
+			return query;
+		}
+
+		return getQueryHintString( query, hints );
+	}
+
+	/**
+	 * Apply a hint to the query.  The entire query is provided, allowing the Dialect full control over the placement
+	 * and syntax of the hint.  By default, ignore the hint and simply return the query.
+	 *
+	 * @param query The query to which to apply the hint.
 	 * @param hints The  hints to apply
 	 * @return The modified SQL
 	 */
-	public String getQueryHintString(String query, List<String> hints) {
+	public String getQueryHintString(String query, String hints) {
 		return query;
 	}
 
@@ -2856,6 +2851,43 @@ public abstract class Dialect implements ConversionContext {
 		return null;
 	}
 
+	protected final BatchLoadSizingStrategy STANDARD_DEFAULT_BATCH_LOAD_SIZING_STRATEGY = new BatchLoadSizingStrategy() {
+		@Override
+		public int determineOptimalBatchLoadSize(int numberOfKeyColumns, int numberOfKeys) {
+			return 50;
+		}
+	};
+
+	public BatchLoadSizingStrategy getDefaultBatchLoadSizingStrategy() {
+		return STANDARD_DEFAULT_BATCH_LOAD_SIZING_STRATEGY;
+	}
+
+	/**
+	 * Does the fetching JDBC statement warning for logging is enabled by default
+	 *
+	 * @return boolean
+	 *
+	 * @since 5.1
+	 */
+	public boolean isJdbcLogWarningsEnabledByDefault() {
+		return true;
+	}
+
+	public void augmentRecognizedTableTypes(List<String> tableTypesList) {
+		// noihing to do
+	}
+
+	/**
+	 * Does the underlying database support partition by
+	 *
+	 * @return boolean
+	 *
+	 * @since 5.2
+	 */
+	public boolean supportsPartitionBy() {
+		return false;
+	}
+
 	/**
 	 * Override the DatabaseMetaData#supportsNamedParameters()
 	 *
@@ -2865,5 +2897,111 @@ public abstract class Dialect implements ConversionContext {
 	 */
 	public boolean supportsNamedParameters(DatabaseMetaData databaseMetaData) throws SQLException {
 		return databaseMetaData != null && databaseMetaData.supportsNamedParameters();
+	}
+
+	/**
+	 * Does this dialect supports Nationalized Types
+	 *
+	 * @return boolean
+	 */
+	public boolean supportsNationalizedTypes() {
+		return true;
+	}
+
+	/**
+	 * Does this dialect/database support non-query statements (e.g. INSERT, UPDATE, DELETE) with CTE (Common Table Expressions)?
+	 *
+	 * @return {@code true} if non-query statements are supported with CTE
+	 */
+	public boolean supportsNonQueryWithCTE() {
+		return false;
+	}
+
+	/**
+	 * Does this dialect/database support VALUES list (e.g. VALUES (1), (2), (3) )
+	 *
+	 * @return {@code true} if VALUES list are supported
+	 */
+	public boolean supportsValuesList() {
+		return false;
+	}
+
+	/**
+	 * Does this dialect/database support SKIP_LOCKED timeout.
+	 *
+	 * @return {@code true} if SKIP_LOCKED is supported
+	 */
+	public boolean supportsSkipLocked() {
+		return false;
+	}
+
+	/**
+	 * Does this dialect/database support NO_WAIT timeout.
+	 *
+	 * @return {@code true} if NO_WAIT is supported
+	 */
+	public boolean supportsNoWait() {
+		return false;
+	}
+
+	public boolean isLegacyLimitHandlerBehaviorEnabled() {
+		return legacyLimitHandlerBehavior;
+	}
+
+	/**
+	 * Inline String literal.
+	 *
+	 * @return escaped String
+	 */
+	public String inlineLiteral(String literal) {
+		return String.format( "\'%s\'", escapeLiteral( literal ) );
+	}
+
+	/**
+	 * Escape String literal.
+	 *
+	 * @return escaped String
+	 */
+	protected String escapeLiteral(String literal) {
+		return literal.replace("'", "''");
+	}
+
+	private void resolveLegacyLimitHandlerBehavior(ServiceRegistry serviceRegistry) {
+		// HHH-11194
+		// Temporary solution to set whether legacy limit handler behavior should be used.
+		final ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
+		legacyLimitHandlerBehavior = configurationService.getSetting(
+				AvailableSettings.USE_LEGACY_LIMIT_HANDLERS,
+				StandardConverters.BOOLEAN,
+				false
+		);
+	}
+
+	/**
+	 * Modify the SQL, adding hints or comments, if necessary
+	 *
+	 * @param sql original sql
+	 * @param parameters query parameters
+	 * @param commentsEnabled if comments are enabled
+	 */
+	public String addSqlHintOrComment(
+			String sql,
+			QueryParameters parameters,
+			boolean commentsEnabled) {
+
+		// Keep this here, rather than moving to Select.  Some Dialects may need the hint to be appended to the very
+		// end or beginning of the finalized SQL statement, so wait until everything is processed.
+		if ( parameters.getQueryHints() != null && parameters.getQueryHints().size() > 0 ) {
+			sql = getQueryHintString( sql, parameters.getQueryHints() );
+		}
+		if ( commentsEnabled && parameters.getComment() != null ){
+			sql = prependComment( sql, parameters.getComment() );
+		}
+
+		return sql;
+	}
+
+	protected String prependComment(String sql, String comment) {
+		return  "/* " + comment + " */ " + sql;
 	}
 }

@@ -24,15 +24,15 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ConditionGateActivityStrategy;
-import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -41,36 +41,13 @@ import org.lamsfoundation.lams.util.MessageService;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@DiscriminatorValue("14")
 public class ConditionGateActivity extends GateActivity implements Serializable {
-
-    /** full constructor */
-    public ConditionGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
-	    SystemTool sysTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
-		branchActivityEntries);
-	super.simpleActivityStrategy = new ConditionGateActivityStrategy(this);
-    }
+    private static final long serialVersionUID = 2054132139360279827L;
 
     /** default constructor */
     public ConditionGateActivity() {
-	super.simpleActivityStrategy = new ConditionGateActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public ConditionGateActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId);
 	super.simpleActivityStrategy = new ConditionGateActivityStrategy(this);
     }
 
@@ -83,14 +60,13 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
     public Activity createCopy(int uiidOffset) {
 	ConditionGateActivity newConditionGateActivity = new ConditionGateActivity();
 	copyToNewActivity(newConditionGateActivity, uiidOffset);
-	newConditionGateActivity.setGateOpen(new Boolean(false));
+	newConditionGateActivity.setGateOpen(false);
 	newConditionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
 
 	if ((this.getBranchActivityEntries() != null) && (this.getBranchActivityEntries().size() > 0)) {
-	    newConditionGateActivity.setBranchActivityEntries(new HashSet());
-	    Iterator iter = this.getBranchActivityEntries().iterator();
+	    Iterator<BranchActivityEntry> iter = this.getBranchActivityEntries().iterator();
 	    while (iter.hasNext()) {
-		BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
+		BranchActivityEntry oldEntry = iter.next();
 		BranchActivityEntry newEntry = new BranchActivityEntry(null,
 			LearningDesign.addOffset(oldEntry.getEntryUIID(), uiidOffset), null, newConditionGateActivity,
 			null, oldEntry.getGateOpenWhenConditionMet());
@@ -121,8 +97,8 @@ public class ConditionGateActivity extends GateActivity implements Serializable 
     }
 
     @Override
-    public Vector validateActivity(MessageService messageService) {
-	Vector listOfValidationErrors = new Vector();
+    public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
 
 	if ((getInputActivities() == null) || (getInputActivities().size() == 0)) {
 	    listOfValidationErrors

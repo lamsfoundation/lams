@@ -20,22 +20,45 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * This class maps to one learner's entire mark for a lesson
- * 
+ *
  * @author lfoxton
  */
+@Entity
+@Table(name = "lams_gradebook_user_lesson")
 public class GradebookUserLesson {
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long uid;
+
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User learner;
+
+    @Column
     private Double mark;
+
+    @Column
     private String feedback;
 
     public GradebookUserLesson() {
@@ -46,9 +69,6 @@ public class GradebookUserLesson {
 	this.learner = learner;
     }
 
-    /**
-     *
-     */
     public long getUid() {
 	return uid;
     }
@@ -57,10 +77,6 @@ public class GradebookUserLesson {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Lesson getLesson() {
 	return lesson;
     }
@@ -69,10 +85,6 @@ public class GradebookUserLesson {
 	this.lesson = lesson;
     }
 
-    /**
-     *
-     *
-     */
     public User getLearner() {
 	return learner;
     }
@@ -81,9 +93,6 @@ public class GradebookUserLesson {
 	this.learner = learner;
     }
 
-    /**
-     *
-     */
     public Double getMark() {
 	return mark;
     }
@@ -92,9 +101,6 @@ public class GradebookUserLesson {
 	this.mark = mark;
     }
 
-    /**
-     *
-     */
     public String getFeedback() {
 	return feedback;
     }

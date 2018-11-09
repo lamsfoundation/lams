@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
@@ -39,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/tblmonitoring")
 public class TblMonitoringController {
-    private static Logger logger = Logger.getLogger(TblMonitoringController.class.getName());
 
     @Autowired
     @Qualifier("laasseAssessmentService")
@@ -304,7 +302,7 @@ public class TblMonitoringController {
 		    return sb.toString();
 
 		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		    return new Boolean(question.getCorrectAnswer()).toString();
+		    return String.valueOf(question.getCorrectAnswer());
 
 		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
 		    for (AssessmentQuestionOption option : question.getOptions()) {

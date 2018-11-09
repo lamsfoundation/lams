@@ -7,25 +7,37 @@
 package org.hibernate.type.descriptor.java;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.HibernateException;
-import org.hibernate.type.descriptor.WrapperOptions;
+import javax.persistence.AttributeConverter;
 
-import org.jboss.logging.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.internal.CoreLogging;
+import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.type.descriptor.WrapperOptions;
+import org.hibernate.type.descriptor.java.spi.RegistryHelper;
+import org.hibernate.type.spi.TypeConfiguration;
 
 /**
  * Basically a map from {@link Class} -> {@link JavaTypeDescriptor}
  *
  * @author Steve Ebersole
+ *
+ * @deprecated Use (5.3) Use {@link org.hibernate.type.descriptor.java.spi.JavaTypeDescriptorRegistry} instead
  */
-public class JavaTypeDescriptorRegistry {
-	private static final Logger log = Logger.getLogger( JavaTypeDescriptorRegistry.class );
+@Deprecated
+public class JavaTypeDescriptorRegistry implements Serializable {
+	private static final CoreMessageLogger log = CoreLogging.messageLogger( JavaTypeDescriptorRegistry.class );
 
+	/**
+	 * @deprecated (5.3) Use {@link TypeConfiguration#getJavaTypeDescriptorRegistry()} instead.
+	 */
+	@Deprecated
 	public static final JavaTypeDescriptorRegistry INSTANCE = new JavaTypeDescriptorRegistry();
 
-	private ConcurrentHashMap<Class,JavaTypeDescriptor> descriptorsByClass = new ConcurrentHashMap<Class, JavaTypeDescriptor>();
+	private ConcurrentHashMap<Class, JavaTypeDescriptor> descriptorsByClass = new ConcurrentHashMap<>();
 
 	public JavaTypeDescriptorRegistry() {
 		addDescriptorInternal( ByteTypeDescriptor.INSTANCE );
@@ -50,6 +62,14 @@ public class JavaTypeDescriptorRegistry {
 		addDescriptorInternal( PrimitiveByteArrayTypeDescriptor.INSTANCE );
 		addDescriptorInternal( PrimitiveCharacterArrayTypeDescriptor.INSTANCE );
 
+		addDescriptorInternal( DurationJavaDescriptor.INSTANCE );
+		addDescriptorInternal( InstantJavaDescriptor.INSTANCE );
+		addDescriptorInternal( LocalDateJavaDescriptor.INSTANCE );
+		addDescriptorInternal( LocalDateTimeJavaDescriptor.INSTANCE );
+		addDescriptorInternal( OffsetDateTimeJavaDescriptor.INSTANCE );
+		addDescriptorInternal( OffsetTimeJavaDescriptor.INSTANCE );
+		addDescriptorInternal( ZonedDateTimeJavaDescriptor.INSTANCE );
+
 		addDescriptorInternal( CalendarTypeDescriptor.INSTANCE );
 		addDescriptorInternal( DateTypeDescriptor.INSTANCE );
 		descriptorsByClass.put( java.sql.Date.class, JdbcDateTypeDescriptor.INSTANCE );
@@ -66,75 +86,86 @@ public class JavaTypeDescriptorRegistry {
 	}
 
 	private JavaTypeDescriptor addDescriptorInternal(JavaTypeDescriptor descriptor) {
-		return descriptorsByClass.put( descriptor.getJavaTypeClass(), descriptor );
+		return descriptorsByClass.put( descriptor.getJavaType(), descriptor );
 	}
 
 	/**
 	 * Adds the given descriptor to this registry
 	 *
 	 * @param descriptor The descriptor to add.
+	 *
+	 * @deprecated (5.3) Use {@link org.hibernate.type.descriptor.java.spi.JavaTypeDescriptorRegistry#addDescriptor(JavaTypeDescriptor)} instead.
 	 */
+	@Deprecated
 	public void addDescriptor(JavaTypeDescriptor descriptor) {
 		JavaTypeDescriptor old = addDescriptorInternal( descriptor );
 		if ( old != null ) {
 			log.debugf(
 					"JavaTypeDescriptorRegistry entry replaced : %s -> %s (was %s)",
-					descriptor.getJavaTypeClass(),
+					descriptor.getJavaType(),
 					descriptor,
 					old
 			);
 		}
 	}
 
+	/**
+	 * @deprecated (5.3) Use {@link org.hibernate.type.descriptor.java.spi.JavaTypeDescriptorRegistry#getDescriptor(Class)} instead.
+	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
-	public <T> JavaTypeDescriptor<T> getDescriptor(Class<T> cls) {
-		if ( cls == null ) {
-			throw new IllegalArgumentException( "Class passed to locate Java type descriptor cannot be null" );
-		}
+	public <J> JavaTypeDescriptor<J> getDescriptor(Class<J> cls) {
+		return RegistryHelper.INSTANCE.resolveDescriptor(
+				descriptorsByClass,
+				cls,
+				() -> {
+					if ( Serializable.class.isAssignableFrom( cls ) ) {
+						return new SerializableTypeDescriptor( cls );
+					}
 
-		JavaTypeDescriptor<T> descriptor = descriptorsByClass.get( cls );
-		if ( descriptor != null ) {
-			return descriptor;
-		}
+					if ( !AttributeConverter.class.isAssignableFrom( cls ) ) {
+						log.debugf(
+								"Could not find matching JavaTypeDescriptor for requested Java class [%s]; using fallback.  " +
+										"This means Hibernate does not know how to perform certain basic operations in relation to this Java type." +
+										"",
+								cls.getName()
+						);
+						checkEqualsAndHashCode( cls );
+					}
 
-		if ( cls.isEnum() ) {
-			descriptor = new EnumJavaTypeDescriptor( cls );
-			descriptorsByClass.put( cls, descriptor );
-			return descriptor;
-		}
+					return new FallbackJavaTypeDescriptor<>( cls );
+				}
+		);
+	}
 
-		if ( Serializable.class.isAssignableFrom( cls ) ) {
-			return new SerializableTypeDescriptor( cls );
+	@SuppressWarnings("unchecked")
+	private void checkEqualsAndHashCode(Class javaType) {
+		if ( !ReflectHelper.overridesEquals( javaType ) || !ReflectHelper.overridesHashCode( javaType ) ) {
+			log.unknownJavaTypeNoEqualsHashCode( javaType );
 		}
-
-		// find the first "assignable" match
-		for ( Map.Entry<Class,JavaTypeDescriptor> entry : descriptorsByClass.entrySet() ) {
-			if ( entry.getKey().isAssignableFrom( cls ) ) {
-				log.debugf( "Using  cached JavaTypeDescriptor instance for Java class [%s]", cls.getName() );
-				return entry.getValue();
-			}
-		}
-
-		log.warnf( "Could not find matching type descriptor for requested Java class [%s]; using fallback", cls.getName() );
-		return new FallbackJavaTypeDescriptor<T>( cls );
 	}
 
 
 	public static class FallbackJavaTypeDescriptor<T> extends AbstractTypeDescriptor<T> {
-		@SuppressWarnings("unchecked")
 		protected FallbackJavaTypeDescriptor(final Class<T> type) {
+			super( type, createMutabilityPlan( type ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		private static <T> MutabilityPlan<T> createMutabilityPlan(final Class<T> type) {
+			if ( type.isAnnotationPresent( Immutable.class ) ) {
+				return ImmutableMutabilityPlan.INSTANCE;
+			}
 			// MutableMutabilityPlan is the "safest" option, but we do not necessarily know how to deepCopy etc...
-			super(
-					type,
-					new MutableMutabilityPlan<T>() {
-						@Override
-						protected T deepCopyNotNull(T value) {
-							throw new HibernateException(
-									"Not known how to deep copy value of type: [" + type.getName() + "]"
-							);
-						}
-					}
-			);
+			return new MutableMutabilityPlan<T>() {
+				@Override
+				protected T deepCopyNotNull(T value) {
+					throw new HibernateException(
+							"Not known how to deep copy value of type: [" + type
+									.getName() + "]"
+					);
+				}
+			};
 		}
 
 		@Override
@@ -145,7 +176,7 @@ public class JavaTypeDescriptorRegistry {
 		@Override
 		public T fromString(String string) {
 			throw new HibernateException(
-					"Not known how to convert String to given type [" + getJavaTypeClass().getName() + "]"
+					"Not known how to convert String to given type [" + getJavaType().getName() + "]"
 			);
 		}
 
@@ -161,5 +192,4 @@ public class JavaTypeDescriptorRegistry {
 			return (T) value;
 		}
 	}
-
 }

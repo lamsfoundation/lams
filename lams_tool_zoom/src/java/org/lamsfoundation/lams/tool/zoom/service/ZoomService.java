@@ -193,7 +193,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	Zoom toContent = Zoom.newInstance(fromContent, toContentId, zoomToolContentHandler);
+	Zoom toContent = Zoom.newInstance(fromContent, toContentId);
 	saveOrUpdateZoom(toContent);
     }
 
@@ -270,8 +270,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
-	zoom = Zoom.newInstance(zoom, toolContentId, null);
-	zoom.setToolContentHandler(null);
+	zoom = Zoom.newInstance(zoom, toolContentId);
 	zoom.setZoomSessions(null);
 	zoom.setApi(null);
 	try {
@@ -421,7 +420,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	Zoom defaultContent = getDefaultContent();
 	// create new zoom using the newContentID
 	Zoom newContent = new Zoom();
-	newContent = Zoom.newInstance(defaultContent, newContentID, zoomToolContentHandler);
+	newContent = Zoom.newInstance(defaultContent, newContentID);
 	saveOrUpdateZoom(newContent);
 	return newContent;
     }

@@ -8,9 +8,7 @@ package org.hibernate;
 
 import java.util.Iterator;
 
-import org.hibernate.bytecode.enhance.spi.interceptor.LazyAttributeLoader;
-import org.hibernate.bytecode.instrumentation.internal.FieldInterceptionHelper;
-import org.hibernate.bytecode.instrumentation.spi.FieldInterceptor;
+import org.hibernate.bytecode.enhance.spi.interceptor.LazyAttributeLoadingInterceptor;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.HibernateIterator;
 import org.hibernate.engine.jdbc.LobCreator;
@@ -18,6 +16,7 @@ import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.engine.spi.PersistentAttributeInterceptor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 
@@ -122,6 +121,20 @@ public final class Hibernate {
 	 *
 	 * @return The log creator reference
 	 */
+	public static LobCreator getLobCreator(SharedSessionContractImplementor session) {
+		return session.getFactory()
+				.getServiceRegistry()
+				.getService( JdbcServices.class )
+				.getLobCreator( session );
+	}
+
+	/**
+	 * Obtain a lob creator for the given session.
+	 *
+	 * @param session The session for which to obtain a lob creator
+	 *
+	 * @return The log creator reference
+	 */
 	public static LobCreator getLobCreator(SessionImplementor session) {
 		return session.getFactory()
 				.getServiceRegistry()
@@ -174,17 +187,29 @@ public final class Hibernate {
 
 		if ( entity instanceof PersistentAttributeInterceptable ) {
 			PersistentAttributeInterceptor interceptor = ( (PersistentAttributeInterceptable) entity ).$$_hibernate_getInterceptor();
-			if ( interceptor != null && interceptor instanceof LazyAttributeLoader ) {
-				return ( (LazyAttributeLoader) interceptor ).isAttributeLoaded( propertyName );
+			if ( interceptor != null && interceptor instanceof LazyAttributeLoadingInterceptor ) {
+				return ( (LazyAttributeLoadingInterceptor) interceptor ).isAttributeLoaded( propertyName );
 			}
-		}
-
-		if ( FieldInterceptionHelper.isInstrumented( entity ) ) {
-			final FieldInterceptor interceptor = FieldInterceptionHelper.extractFieldInterceptor( entity );
-			return interceptor == null || interceptor.isInitialized( propertyName );
 		}
 
 		return true;
 	}
 
+    /**
+     * Unproxies a {@link HibernateProxy}. If the proxy is uninitialized, it automatically triggers an initialization.
+     * In case the supplied object is null or not a proxy, the object will be returned as-is.
+     *
+     * @param proxy the {@link HibernateProxy} to be unproxied
+     * @return the proxy's underlying implementation object, or the supplied object otherwise
+     */
+	public static Object unproxy(Object proxy) {
+		if ( proxy instanceof HibernateProxy ) {
+			HibernateProxy hibernateProxy = (HibernateProxy) proxy;
+			LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+			return initializer.getImplementation();
+		}
+		else {
+			return proxy;
+		}
+	}
 }

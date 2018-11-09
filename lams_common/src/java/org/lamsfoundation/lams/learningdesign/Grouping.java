@@ -31,9 +31,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.BatchSize;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -41,43 +57,53 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @author Jacky Fang
  */
+@Entity
+@Table(name = "lams_grouping")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "grouping_type_id", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class Grouping implements Serializable {
 
+    private static final long serialVersionUID = -8644392914291370672L;
+
     /** Grouping type id of random grouping */
-    public static final Integer RANDOM_GROUPING_TYPE = new Integer(1);
+    public static final Integer RANDOM_GROUPING_TYPE = 1;
 
     /** Grouping type id of chosen grouping */
-    public static final Integer CHOSEN_GROUPING_TYPE = new Integer(2);
+    public static final Integer CHOSEN_GROUPING_TYPE = 2;
 
     /** Grouping type id for lesson class grouping */
-    public static final Integer CLASS_GROUPING_TYPE = new Integer(3);
+    public static final Integer CLASS_GROUPING_TYPE = 3;
 
     /** Grouping type id for learner's choice grouping */
-    public static final Integer LEARNER_CHOICE_GROUPING_TYPE = new Integer(4);
+    public static final Integer LEARNER_CHOICE_GROUPING_TYPE = 4;
 
-    /** identifier field */
+    @Id
+    @Column(name = "grouping_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupingId;
 
     /**
-     * nullable persistent field
      * TODO It make sense only if we want to setup some limits for the number
      * of groups the author can setup in the authoring GUI. It might need
      * to be deleted if the end user doesn't like this limits.
      */
+    @Column(name = "max_number_of_groups")
     private Integer maxNumberOfGroups;
 
-    /** nullable persistent field */
+    @Column(name = "grouping_ui_id")
     private Integer groupingUIID;
 
-    /** persistent field */
-    private Set<Group> groups;
+    @OneToMany(mappedBy = "grouping", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @BatchSize(size = 10)
+    private Set<Group> groups = new HashSet<Group>();
 
-    /** persistent field */
-    private Set<Activity> activities;
+    @OneToMany(mappedBy = "grouping")
+    private Set<Activity> activities = new HashSet<Activity>();
 
-    /** non-persistent field */
-    protected Set<User> learners;
+    @Transient
+    protected Set<User> learners = new HashSet<User>();
 
+    @Transient
     protected Grouper grouper;
     /**
      * static final variables indicating the grouping_support of activities
@@ -91,7 +117,7 @@ public abstract class Grouping implements Serializable {
     /******************************************************************/
 
     /** full constructor */
-    public Grouping(Long groupingId, Set groups, Set activities, Grouper grouper) {
+    public Grouping(Long groupingId, Set<Group> groups, Set<Activity> activities, Grouper grouper) {
 	this.groupingId = groupingId;
 	this.groups = groups;
 	this.activities = activities;
@@ -100,11 +126,6 @@ public abstract class Grouping implements Serializable {
 
     /** default constructor */
     public Grouping() {
-    }
-
-    /** minimal constructor */
-    public Grouping(Long groupingId) {
-	this.groupingId = groupingId;
     }
 
     /**
@@ -132,9 +153,9 @@ public abstract class Grouping implements Serializable {
 	newGrouping.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(), uiidOffset));
 
 	if (this.getGroups() != null && this.getGroups().size() > 0) {
-	    Iterator iter = this.getGroups().iterator();
+	    Iterator<Group> iter = this.getGroups().iterator();
 	    while (iter.hasNext()) {
-		Group oldGroup = (Group) iter.next();
+		Group oldGroup = iter.next();
 		Group newGroup = oldGroup.createCopy(newGrouping);
 		newGroup.setGroupUIID(LearningDesign.addOffset(newGroup.getGroupUIID(), uiidOffset));
 		newGrouping.getGroups().add(newGroup);
@@ -142,10 +163,6 @@ public abstract class Grouping implements Serializable {
 	}
     }
 
-    /**
-     *
-     *
-     */
     public Long getGroupingId() {
 	return groupingId;
     }
@@ -154,10 +171,6 @@ public abstract class Grouping implements Serializable {
 	this.groupingId = groupingId;
     }
 
-    /**
-     *
-     *
-     */
     public Integer getGroupingTypeId() {
 	if (this instanceof LessonClass) {
 	    return Grouping.CLASS_GROUPING_TYPE;
@@ -178,7 +191,7 @@ public abstract class Grouping implements Serializable {
 	return groups;
     }
 
-    public void setGroups(Set groups) {
+    public void setGroups(Set<Group> groups) {
 	this.groups = groups;
     }
 
@@ -287,8 +300,8 @@ public abstract class Grouping implements Serializable {
      * @return the group that has the learner
      */
     public Group getGroupBy(User learner) {
-	for (Iterator i = getGroups().iterator(); i.hasNext();) {
-	    Group group = (Group) i.next();
+	for (Iterator<Group> i = getGroups().iterator(); i.hasNext();) {
+	    Group group = i.next();
 	    if (isLearnerGroup(group) && group.hasLearner(learner)) {
 		return group;
 	    }
@@ -303,12 +316,12 @@ public abstract class Grouping implements Serializable {
      * @return the group with the least member.
      */
     public Group getGroupWithLeastMember() {
-	List groups = new ArrayList(this.getGroups());
+	List<Group> groups = new ArrayList<Group>(this.getGroups());
 
-	Group minGroup = (Group) groups.get(0);
+	Group minGroup = groups.get(0);
 
 	for (int i = 1; i < groups.size(); i++) {
-	    Group tempGroup = (Group) groups.get(i);
+	    Group tempGroup = groups.get(i);
 	    if (tempGroup.getUsers().size() < minGroup.getUsers().size()) {
 		minGroup = tempGroup;
 	    }
@@ -377,9 +390,9 @@ public abstract class Grouping implements Serializable {
 
     public Group getGroup(Integer groupUIID) {
 	if (this.getGroups() != null) {
-	    Iterator iter = this.getGroups().iterator();
+	    Iterator<Group> iter = this.getGroups().iterator();
 	    while (iter.hasNext()) {
-		Group elem = (Group) iter.next();
+		Group elem = iter.next();
 		if (elem.getGroupUIID().equals(groupUIID)) {
 		    return elem;
 		}
@@ -393,9 +406,9 @@ public abstract class Grouping implements Serializable {
      * If so, that has implications for the changes allowed at runtime.
      */
     public boolean isUsedForBranching() {
-	Iterator actIter = getActivities().iterator();
+	Iterator<Activity> actIter = getActivities().iterator();
 	while (actIter.hasNext()) {
-	    Activity act = (Activity) actIter.next();
+	    Activity act = actIter.next();
 	    if (act.isBranchingActivity()) {
 		return true;
 	    }

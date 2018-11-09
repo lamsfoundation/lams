@@ -24,11 +24,10 @@ package org.lamsfoundation.lams.tool.mc.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -41,13 +40,12 @@ import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.model.McSession;
+import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 
 /**
  * Interface that defines the contract that all MCQ service provider must follow.
@@ -78,7 +76,7 @@ public interface IMcService {
 
     void setDefineLater(String strToolContentID, boolean value);
 
-    McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid);
+    McQueContent getQuestionByDisplayOrder(final Integer displayOrder, final Long mcContentUid);
 
     McQueUsr createMcUser(Long toolSessionId) throws McApplicationException;
 
@@ -89,7 +87,7 @@ public interface IMcService {
     void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos);
 
     void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
-    
+
     /**
      * Count how many attempts done to this option
      *
@@ -116,7 +114,7 @@ public interface IMcService {
     McQueContent getQuestionByUid(Long uid);
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
-    
+
     McQueUsr getMcUserByContentId(Long userId, Long contentId);
 
     List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
@@ -143,7 +141,7 @@ public interface IMcService {
     void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
-    
+
     List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId);
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
@@ -160,7 +158,7 @@ public interface IMcService {
 
     ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException;
 
-    IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
+    Tool getToolBySignature(String toolSignature) throws McApplicationException;
 
     long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
 
@@ -185,10 +183,10 @@ public interface IMcService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Audit log the teacher has started editing activity in monitor.
-     * 
+     *
      * @param toolContentID
      */
     void auditLogStartEditingActivityInMonitor(long toolContentID);
@@ -198,11 +196,11 @@ public interface IMcService {
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
      * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
      * the toolContentId
-     * 
+     *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     String getActivityEvaluation(Long toolContentId);
-    
+
     void setActivityEvaluation(Long toolContentId, String toolOutputDefinition);
 
     /**
@@ -248,34 +246,37 @@ public interface IMcService {
      * @return
      */
     List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID);
-    
-    /** 
+
+    /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
      * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
+     * 
      * @param contentId
      * @return
      */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
-    
-    /** 
+
+    /**
      * Prepares data for the marks summary graph on the statistics page
+     * 
      * @param assessment
      * @param sessionDtos
      * @return
      */
     List<Number> getMarksArray(Long sessionId);
 
-    /** 
-     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders 
+    /**
+     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders
      * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
+     * 
      * @param assessment
      * @param sessionDtos
      * @return
      */
     List<Number> getMarksArrayForLeaders(Long contentId);
 
-    /** 
-     * Contains the session id and name for a session. If includeStatistics is true also includes the number of 
+    /**
+     * Contains the session id and name for a session. If includeStatistics is true also includes the number of
      * learners, max min and average of marks for the session.
      */
     List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);

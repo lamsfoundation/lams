@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeDTO;
@@ -44,7 +43,6 @@ import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
@@ -218,9 +216,6 @@ public class LearningController {
 		    .error("finishActivity(): couldn't find ScribeUser with uid: " + learningform.getScribeUserUID());
 	}
 
-	ToolSessionManager sessionMgrService = ScribeServiceProxy
-		.getScribeSessionManager(applicationContext.getServletContext());
-
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userID = new Long(user.getUserID().longValue());
@@ -228,7 +223,7 @@ public class LearningController {
 
 	String nextActivityUrl;
 	try {
-	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, userID);
+	    nextActivityUrl = scribeService.leaveToolSession(toolSessionID, userID);
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new ScribeException(e);

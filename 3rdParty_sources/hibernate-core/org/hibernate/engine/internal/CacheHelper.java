@@ -8,9 +8,9 @@ package org.hibernate.engine.internal;
 
 import java.io.Serializable;
 
-import org.hibernate.cache.spi.access.RegionAccessStrategy;
+import org.hibernate.cache.spi.access.CachedDomainDataAccess;
 import org.hibernate.engine.spi.SessionEventListenerManager;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /**
  * @author Steve Ebersole
@@ -22,14 +22,14 @@ public final class CacheHelper {
 	}
 
 	public static Serializable fromSharedCache(
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			Object cacheKey,
-			RegionAccessStrategy cacheAccessStrategy) {
+			CachedDomainDataAccess cacheAccess) {
 		final SessionEventListenerManager eventListenerManager = session.getEventListenerManager();
 		Serializable cachedValue = null;
 		eventListenerManager.cacheGetStart();
 		try {
-			cachedValue = (Serializable) cacheAccessStrategy.get( session, cacheKey, session.getTimestamp() );
+			cachedValue = (Serializable) cacheAccess.get( session, cacheKey );
 		}
 		finally {
 			eventListenerManager.cacheGetEnd( cachedValue != null );

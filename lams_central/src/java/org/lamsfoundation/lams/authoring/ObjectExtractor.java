@@ -1315,7 +1315,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	    // One of the to/from is missing, can't store this transition. Make
 	    // sure we clean up the related activities
 	    cleanupTransition(transition);
-	    transition.setLearningDesign(null);
 	    return null;
 	}
     }
@@ -1332,6 +1331,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	if ((transition.getToActivity() != null) && transition.equals(transition.getToActivity().getTransitionTo())) {
 	    transition.getToActivity().setTransitionTo(null);
 	}
+	transitionDAO.delete(transition);
     }
 
     /**

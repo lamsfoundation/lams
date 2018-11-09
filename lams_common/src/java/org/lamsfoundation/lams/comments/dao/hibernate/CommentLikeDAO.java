@@ -34,7 +34,7 @@ public class CommentLikeDAO extends LAMSBaseDAO implements ICommentLikeDAO {
 
     @Override
     public boolean addLike(Long commentUid, Integer userId, Integer vote) {
-	int status = getSession().createSQLQuery(INSERT_LIKE).setParameter("comment", commentUid)
+	int status = getSession().createNativeQuery(INSERT_LIKE).setParameter("comment", commentUid)
 		.setParameter("user", userId).setParameter("vote", vote).executeUpdate();
 	return status == 1;
     }

@@ -50,9 +50,9 @@ public class KumaliveController {
     private static Logger log = Logger.getLogger(KumaliveController.class);
 
     @Autowired
-    private static IKumaliveService kumaliveService;
+    private IKumaliveService kumaliveService;
     @Autowired
-    private static ISecurityService securityService;
+    private ISecurityService securityService;
 
     @RequestMapping("/getRubrics")
     public String getRubrics(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -283,11 +283,9 @@ public class KumaliveController {
 	response.addCookie(fileDownloadTokenCookie);
 
 	ExcelUtil.createExcel(response.getOutputStream(), dataToExport, "Exported on:", true);
-
     }
 
     @RequestMapping("/saveRubrics")
-    @ResponseBody
     public void saveRubrics(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	UserDTO userDTO = getUserDTO();
 	Integer userId = userDTO.getUserID();
@@ -306,7 +304,6 @@ public class KumaliveController {
 
 	ArrayNode rubricsJSON = JsonUtil.readArray(WebUtil.readStrParam(request, "rubrics"));
 	kumaliveService.saveRubrics(organisationId, rubricsJSON);
-
     }
 
     private UserDTO getUserDTO() {

@@ -80,6 +80,7 @@
  </div>
  <div class="form-group">
     <label for="daco.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <lams:CKEditor id="daco.instructions" value="${authoringForm.daco.instructions}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
  </div>
   
 <!-- Dropdown menu for choosing a question type -->

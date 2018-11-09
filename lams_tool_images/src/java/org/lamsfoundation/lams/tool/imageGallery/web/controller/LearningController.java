@@ -109,7 +109,7 @@ public class LearningController {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	Long sessionId = new Long(request.getParameter(ImageGalleryConstants.PARAM_TOOL_SESSION_ID));
+	Long sessionId = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_TOOL_SESSION_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	ImageGallery imageGallery = igService.getImageGalleryBySessionId(sessionId);
 
@@ -242,7 +242,7 @@ public class LearningController {
 	try {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(userDTO.getUserID().longValue());
+	    Long userID = userDTO.getUserID().longValue();
 
 	    nextActivityUrl = igService.finishToolSession(sessionId, userID);
 	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
@@ -333,7 +333,7 @@ public class LearningController {
     @RequestMapping("/deleteImage")
     public String deleteImage(HttpServletRequest request, HttpServletResponse response) {
 
-	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	Long imageUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -362,7 +362,7 @@ public class LearningController {
 	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
 	Long userId = ((Integer) sessionMap.get(AttributeNames.PARAM_USER_ID)).longValue();
 
-	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	Long imageUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	ImageGalleryItem image = igService.getImageGalleryItemByUid(imageUid);
 	String escapedDescription = image.getDescription().replaceAll("[\"]", "&quot;");
 	image.setDescription(escapedDescription);
@@ -425,9 +425,9 @@ public class LearningController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	Long imageUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndSession(new Long(user.getUserID().intValue()),
+	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndSession(user.getUserID().longValue(),
 		sessionId);
 
 	// persist ImageGalleryItem changes in DB
@@ -515,7 +515,7 @@ public class LearningController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(user.getUserID().longValue(),
 		sessionId);
 
 	if (imageGalleryUser == null) {
@@ -527,7 +527,7 @@ public class LearningController {
     }
 
     private ImageGalleryUser getSpecifiedUser(IImageGalleryService service, Long sessionId, Integer userId) {
-	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(userId.longValue(), sessionId);
 	if (imageGalleryUser == null) {
 	    LearningController.log.error(
 		    "Unable to find specified user for imageGallery activity. Screens are likely to fail. SessionId="

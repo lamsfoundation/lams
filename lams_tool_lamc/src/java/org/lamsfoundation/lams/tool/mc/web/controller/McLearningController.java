@@ -46,12 +46,12 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.model.McSession;
+import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.LearningUtil;
 import org.lamsfoundation.lams.tool.mc.util.McComparator;
@@ -594,7 +594,7 @@ public class McLearningController {
 	//create attemptMap for displaying on jsp
 	Map<String, McUsrAttempt> attemptMap = new TreeMap<String, McUsrAttempt>(new McComparator());
 	for (int i = 1; i <= mcContent.getMcQueContents().size(); i++) {
-	    McQueContent question = mcService.getQuestionByDisplayOrder(new Long(i), toolContentUID);
+	    McQueContent question = mcService.getQuestionByDisplayOrder(i, toolContentUID);
 
 	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(user.getUid(), question.getUid());
 

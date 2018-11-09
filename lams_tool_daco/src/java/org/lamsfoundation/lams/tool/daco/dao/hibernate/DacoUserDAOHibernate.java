@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -47,12 +47,10 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + DacoUser.class.getName()
 	    + " as u where u.session.sessionId=?";
-    private static final String FIND_BY_CONTENT_ID = "from " + DacoUser.class.getName()
-	    + " as u where u.daco.contentId=?";
 
     @Override
     public DacoUser getUserByUserIdAndSessionId(Long userID, Long sessionId) {
-	List list = doFind(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_SESSION_ID, new Object[] { userID, sessionId });
+	List<?> list = doFind(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_SESSION_ID, new Object[] { userID, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -61,7 +59,7 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 
     @Override
     public DacoUser getUserByUserIdAndContentId(Long userId, Long contentId) {
-	List list = doFind(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_CONTENT_ID, new Object[] { userId, contentId });
+	List<?> list = doFind(DacoUserDAOHibernate.FIND_BY_USER_ID_AND_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -158,11 +156,11 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", DacoUser.class).addScalar("record_count", IntegerType.INSTANCE)
 		.addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setLong("sessionId", sessionId.longValue())
+		.setParameter("sessionId", sessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 
@@ -190,7 +188,7 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 		" JOIN tl_ladaco10_sessions sess on user.session_uid = sess.uid and sess.session_id = :sessionId");
 	buildNameSearch(queryText, searchString);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
+	List list = getSession().createNativeQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
 		.list();
 	if (list == null || list.size() == 0) {
 	    return 0;

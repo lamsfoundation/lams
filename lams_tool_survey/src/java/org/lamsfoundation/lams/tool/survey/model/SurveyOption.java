@@ -23,25 +23,46 @@
 
 package org.lamsfoundation.lams.tool.survey.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
+
+@Entity
+@Table(name = "tl_lasurv11_option")
 public class SurveyOption implements Cloneable {
     private static final Logger log = Logger.getLogger(SurveyOption.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "sequence_id")
     private int sequenceId;
+
+    @Column
     private String description;
 
     //****************************************************
     // DTO fields: percentage of response for this option. For monitoring summary usage.
+    @Transient
     private double response;
+
+    @Transient
     private String responseFormatStr;
+
+    @Transient
     private int responseCount;
 
     @Override
@@ -57,29 +78,14 @@ public class SurveyOption implements Cloneable {
 	return obj;
     }
 
-// **********************************************************
-    //		Get/Set methods
-//	  **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -88,10 +94,6 @@ public class SurveyOption implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getSequenceId() {
 	return sequenceId;
     }
@@ -123,5 +125,4 @@ public class SurveyOption implements Cloneable {
     public void setResponseFormatStr(String reponseFormatStr) {
 	this.responseFormatStr = reponseFormatStr;
     }
-
 }

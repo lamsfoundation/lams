@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
@@ -29,70 +28,88 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
-/**
- *
- */
-
+@Entity
+@Table(name = "tl_lachat11_chat")
 public class Chat implements java.io.Serializable, Cloneable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(ChatService.class.getName());
 
-    // Fields
-    /**
-     *
-     */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "update_date")
     private Date updateDate;
 
+    @Column(name = "create_by")
     private Long createBy;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "filtering_enabled")
     private boolean filteringEnabled;
 
+    @Column(name = "filter_keywords")
     private String filterKeywords;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "tool_content_id")
     private Long toolContentId;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    private Set chatSessions;
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    private Set<ChatSession> chatSessions = new HashSet<ChatSession>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_uid")
     private Set<ChatCondition> conditions = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
 
-    // Constructors
-
-    /** default constructor */
     public Chat() {
     }
 
-    /** full constructor */
     public Chat(Date createDate, Date updateDate, Long createBy, String title, String instructions,
 	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, boolean contentInUse,
-	    boolean defineLater, Long toolContentId, Set chatSessions) {
+	    boolean defineLater, Long toolContentId, Set<ChatSession> chatSessions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -106,12 +123,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
 	this.chatSessions = chatSessions;
     }
-
-    // Property accessors
-    /**
-     *
-     *
-     */
 
     public Long getUid() {
 	return uid;
@@ -121,11 +132,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
-
     public Date getCreateDate() {
 	return createDate;
     }
@@ -133,11 +139,6 @@ public class Chat implements java.io.Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Date getUpdateDate() {
 	return updateDate;
@@ -147,11 +148,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getCreateBy() {
 	return createBy;
     }
@@ -159,11 +155,6 @@ public class Chat implements java.io.Serializable, Cloneable {
     public void setCreateBy(Long createBy) {
 	this.createBy = createBy;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getTitle() {
 	return title;
@@ -173,11 +164,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.title = title;
     }
 
-    /**
-     *
-     *
-     */
-
     public String getInstructions() {
 	return instructions;
     }
@@ -185,11 +171,6 @@ public class Chat implements java.io.Serializable, Cloneable {
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isLockOnFinished() {
 	return lockOnFinished;
@@ -199,9 +180,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    /**
-     *
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -210,9 +188,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -220,11 +195,6 @@ public class Chat implements java.io.Serializable, Cloneable {
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
     }
-
-    /**
-     *
-     *
-     */
 
     public boolean isContentInUse() {
 	return contentInUse;
@@ -234,11 +204,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     *
-     */
-
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -246,11 +211,6 @@ public class Chat implements java.io.Serializable, Cloneable {
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
     }
-
-    /**
-     *
-     *
-     */
 
     public Long getToolContentId() {
 	return toolContentId;
@@ -260,24 +220,14 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
-
-    public Set getChatSessions() {
+    public Set<ChatSession> getChatSessions() {
 	return chatSessions;
     }
 
-    public void setChatSessions(Set chatSessions) {
+    public void setChatSessions(Set<ChatSession> chatSessions) {
 	this.chatSessions = chatSessions;
     }
 
-    /**
-     *
-     */
     public boolean isFilteringEnabled() {
 	return filteringEnabled;
     }
@@ -286,9 +236,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.filteringEnabled = filteringEnabled;
     }
 
-    /**
-     *
-     */
     public String getFilterKeywords() {
 	return filterKeywords;
     }
@@ -297,10 +244,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.filterKeywords = filterKeywords;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
     }
@@ -309,11 +252,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.submissionDeadline = submissionDeadline;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -368,7 +306,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 	    chat.setUid(null);
 
 	    // create an empty set for the chatSession
-	    chat.chatSessions = new HashSet();
+	    chat.chatSessions = new HashSet<ChatSession>();
 
 	    if (conditions != null) {
 		Set<ChatCondition> set = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
@@ -384,13 +322,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 	return chat;
     }
 
-    /**
-     *
-     * sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
-     *
-     *
-     *
-     */
     public Set<ChatCondition> getConditions() {
 	return conditions;
     }

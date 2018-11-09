@@ -418,15 +418,15 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	try {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
 
-	    Class[] supportedClasses = contentManager.getSupportedToolOutputDefinitionClasses(definitionType);
+	    Class<?>[] supportedClasses = contentManager.getSupportedToolOutputDefinitionClasses(definitionType);
 	    if (supportedClasses != null) {
 		Set<String> keysToRemove = new TreeSet<String>();
 		for (String key : definitions.keySet()) {
 		    ToolOutputDefinition value = definitions.get(key);
-		    Class valueClass = value.getValueClass();
+		    Class<?> valueClass = value.getValueClass();
 		    boolean matchFound = false;
 		    if (valueClass != null) {
-			for (Class supportedClass : supportedClasses) {
+			for (Class<?> supportedClass : supportedClasses) {
 			    // we take into account also superclasses
 			    if (supportedClass.isAssignableFrom(valueClass)) {
 				matchFound = true;
@@ -486,7 +486,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	try {
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
-	    Long longLearnerId = learnerId != null ? new Long(learnerId.longValue()) : null;
+	    Long longLearnerId = learnerId != null ? learnerId.longValue() : null;
 	    return sessionManager.getToolOutput(conditionName, toolSession.getToolSessionId(), longLearnerId);
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "

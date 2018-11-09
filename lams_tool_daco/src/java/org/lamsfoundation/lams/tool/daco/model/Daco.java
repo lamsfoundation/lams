@@ -27,6 +27,19 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -39,48 +52,65 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_ladaco10_contents")
 public class Daco implements Cloneable {
 
     private static final Logger log = Logger.getLogger(Daco.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
-    // advance
-
+    @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "min_records")
     private Short minRecords;
 
+    @Column(name = "max_records")
     private Short maxRecords;
 
-    // general infomation
+    @Column(name = "create_date")
     private Date created;
 
+    @Column(name = "update_date")
     private Date updated;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "create_by")
     private DacoUser createdBy;
 
-    // daco Questions
-    private Set<DacoQuestion> dacoQuestions = new LinkedHashSet();
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "daco", cascade = CascadeType.ALL)
+    @OrderBy("uid ASC")
+    private Set<DacoQuestion> dacoQuestions = new LinkedHashSet<DacoQuestion>();
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "learner_entry_notify")
     private boolean notifyTeachersOnLearnerEntry;
 
+    @Column(name = "record_submit_notify")
     private boolean notifyTeachersOnRecordSumbit;
 
     // **********************************************************
@@ -160,67 +190,30 @@ public class Daco implements Cloneable {
 	this.setUpdated(new Date(now));
     }
 
-    // **********************************************************
-    // get/set methods
-    // **********************************************************
-    /**
-     * Returns the object's creation date
-     * 
-     * @return date
-     *
-     */
     public Date getCreated() {
 	return created;
     }
 
-    /**
-     * Sets the object's creation date
-     * 
-     * @param created
-     */
     public void setCreated(Date created) {
 	this.created = created;
     }
 
-    /**
-     * Returns the object's date of last update
-     * 
-     * @return date updated
-     *
-     */
     public Date getUpdated() {
 	return updated;
     }
 
-    /**
-     * Sets the object's date of last update
-     * 
-     * @param updated
-     */
     public void setUpdated(Date updated) {
 	this.updated = updated;
     }
 
-    /**
-     *
-     * @return Returns the userid of the user who created the Share daco.
-     * 
-     */
     public DacoUser getCreatedBy() {
 	return createdBy;
     }
 
-    /**
-     * @param createdBy
-     *            The userid of the user who created this Share daco.
-     */
     public void setCreatedBy(DacoUser createdBy) {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -229,47 +222,22 @@ public class Daco implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     * @return Returns the title.
-     * 
-     *
-     * 
-     */
     public String getTitle() {
 	return title;
     }
 
-    /**
-     * @param title
-     *            The title to set.
-     */
     public void setTitle(String title) {
 	this.title = title;
     }
 
-    /**
-     * @return Returns the lockOnFinish.
-     * 
-     *
-     * 
-     */
     public boolean getLockOnFinished() {
 	return lockOnFinished;
     }
 
-    /**
-     * @param lockOnFinished
-     *            Set to true to lock the daco for finished users.
-     */
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
     }
 
-    /**
-     * @return Returns the instructions set by the teacher.
-     * 
-     *
-     */
     public String getInstructions() {
 	return instructions;
     }
@@ -278,15 +246,6 @@ public class Daco implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     * 
-     * 
-     *
-     *
-     *
-     * 
-     * @return
-     */
     public Set<DacoQuestion> getDacoQuestions() {
 	return dacoQuestions;
     }
@@ -295,10 +254,6 @@ public class Daco implements Cloneable {
 	this.dacoQuestions = dacoQuestions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -307,10 +262,6 @@ public class Daco implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -319,10 +270,6 @@ public class Daco implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -331,10 +278,6 @@ public class Daco implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -343,10 +286,6 @@ public class Daco implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -355,11 +294,6 @@ public class Daco implements Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     * @return Returns the instructions set by the teacher.
-     * 
-     *
-     */
     public Short getMinRecords() {
 	return minRecords;
     }
@@ -368,11 +302,6 @@ public class Daco implements Cloneable {
 	this.minRecords = minRecords;
     }
 
-    /**
-     * @return Returns the instructions set by the teacher.
-     * 
-     *
-     */
     public Short getMaxRecords() {
 	return maxRecords;
     }
@@ -381,10 +310,6 @@ public class Daco implements Cloneable {
 	this.maxRecords = maxRecords;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isNotifyTeachersOnLearnerEntry() {
 	return notifyTeachersOnLearnerEntry;
     }
@@ -393,10 +318,6 @@ public class Daco implements Cloneable {
 	this.notifyTeachersOnLearnerEntry = notifyTeachersOnLearnerEntry;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isNotifyTeachersOnRecordSumbit() {
 	return notifyTeachersOnRecordSumbit;
     }

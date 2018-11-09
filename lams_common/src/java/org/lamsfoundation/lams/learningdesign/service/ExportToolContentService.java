@@ -1890,7 +1890,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setActivityTypeId(actDto.getActivityTypeID());
 	act.setApplyGrouping(actDto.getApplyGrouping());
 	act.setDescription(actDto.getDescription());
-	act.setHelpText(actDto.getHelpText());
 	act.setLanguageFile(actDto.getLanguageFile());
 
 	// added in 2.1 - will be missing from earlier import files.

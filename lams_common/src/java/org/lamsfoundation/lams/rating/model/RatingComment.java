@@ -25,26 +25,49 @@ package org.lamsfoundation.lams.rating.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
+ * The actual comment left by a user
  */
+@Entity
+@Table(name = "lams_rating_comment")
 public class RatingComment implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 4831819420875651676L;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @ManyToOne 
+    @JoinColumn(name = "rating_criteria_id") 
     private RatingCriteria ratingCriteria;
 
+    @Column(name = "item_id")
     private Long itemId;
 
-    private User learner;
+    @ManyToOne 
+    @JoinColumn(name = "user_id") 
+   private User learner;
 
+    @Column
     private String comment;
 
+    @Column(name = "posted_date")
     private Date postedDate;
     
+    @Column(name = "tool_session_id")
     private Long toolSessionId;
 
     public RatingComment() {

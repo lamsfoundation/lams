@@ -28,9 +28,23 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
@@ -38,87 +52,119 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_assessment")
 public class Assessment implements Cloneable {
-
     private static final Logger log = Logger.getLogger(Assessment.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
-    // advance
+    // *** advance tab ***
+    
+    @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
+    @Column(name = "time_limit")
     private int timeLimit;
 
+    @Column(name = "questions_per_page")
     private int questionsPerPage;
 
+    @Column(name = "attempts_allowed")
     private int attemptsAllowed;
 
+    @Column(name = "passing_mark")
     private int passingMark;
 
+    @Column
     private boolean shuffled;
 
+    @Column
     private boolean numbered;
 
+    @Column(name = "allow_question_feedback")
     private boolean allowQuestionFeedback;
 
+    @Column(name = "allow_overall_feedback")
     private boolean allowOverallFeedbackAfterQuestion;
 
+    @Column(name = "allow_disclose_answers")
     private boolean allowDiscloseAnswers;
 
+    @Column(name = "allow_right_answers")
     private boolean allowRightAnswersAfterQuestion;
 
+    @Column(name = "allow_wrong_answers")
     private boolean allowWrongAnswersAfterQuestion;
 
+    @Column(name = "allow_grades_after_attempt")
     private boolean allowGradesAfterAttempt;
 
+    @Column(name = "enable_confidence_levels")
     private boolean enableConfidenceLevels;
 
+    @Column(name = "allow_history_responses")
     private boolean allowHistoryResponses;
 
+    @Column(name = "display_summary")
     private boolean displaySummary;
-
+    
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "attempt_completion_notify")
     private boolean notifyTeachersOnAttemptCompletion;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
-    // general infomation
+    // general information
+    
+    @Column(name = "create_date")
     private Date created;
 
+    @Column(name = "update_date")
     private Date updated;
 
+    @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
     private AssessmentUser createdBy;
 
     // Question bank questions
-    private Set questions;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "assessment_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<AssessmentQuestion> questions = new TreeSet<>(new SequencableComparator());
 
     // assessment questions references that form question list
-    private Set questionReferences;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "assessment_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 
-    private Set overallFeedbacks;
-
-    /**
-     * Default contruction method.
-     *
-     */
-    public Assessment() {
-	questions = new TreeSet(new SequencableComparator());
-	questionReferences = new TreeSet(new SequencableComparator());
-	overallFeedbacks = new TreeSet(new SequencableComparator());
-    }
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "assessment_uid")
+    @OrderBy("sequence_id ASC")
+    private Set<AssessmentOverallFeedback> overallFeedbacks = new TreeSet<>(new SequencableComparator());
 
     // **********************************************************
     // Function method for Assessment
@@ -145,10 +191,10 @@ public class Assessment implements Cloneable {
 
 	    // clone questions
 	    if (questions != null) {
-		Iterator iter = questions.iterator();
-		TreeSet<AssessmentQuestion> set = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+		Iterator<AssessmentQuestion> iter = questions.iterator();
+		TreeSet<AssessmentQuestion> set = new TreeSet<>(new SequencableComparator());
 		while (iter.hasNext()) {
-		    AssessmentQuestion question = (AssessmentQuestion) iter.next();
+		    AssessmentQuestion question = iter.next();
 		    AssessmentQuestion newQuestion = (AssessmentQuestion) question.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newQuestion);
@@ -158,15 +204,15 @@ public class Assessment implements Cloneable {
 
 	    // clone questionReferences
 	    if (questionReferences != null) {
-		Iterator iter = questionReferences.iterator();
-		Set<QuestionReference> set = new TreeSet<QuestionReference>(new SequencableComparator());
+		Iterator<QuestionReference> iter = questionReferences.iterator();
+		Set<QuestionReference> set = new TreeSet<>(new SequencableComparator());
 		while (iter.hasNext()) {
-		    QuestionReference questionReference = (QuestionReference) iter.next();
+		    QuestionReference questionReference = iter.next();
 		    QuestionReference newQuestionReference = (QuestionReference) questionReference.clone();
 
 		    // update questionReferences with new cloned question
 		    if (newQuestionReference.getQuestion() != null) {
-			for (AssessmentQuestion newQuestion : (Set<AssessmentQuestion>) assessment.questions) {
+			for (AssessmentQuestion newQuestion : assessment.questions) {
 			    if (newQuestion.getSequenceId() == newQuestionReference.getQuestion().getSequenceId()) {
 				newQuestionReference.setQuestion(newQuestion);
 				break;
@@ -181,11 +227,10 @@ public class Assessment implements Cloneable {
 
 	    // clone OverallFeedbacks
 	    if (overallFeedbacks != null) {
-		Iterator iter = overallFeedbacks.iterator();
-		Set<AssessmentOverallFeedback> set = new TreeSet<AssessmentOverallFeedback>(
-			new SequencableComparator());
+		Iterator<AssessmentOverallFeedback> iter = overallFeedbacks.iterator();
+		Set<AssessmentOverallFeedback> set = new TreeSet<>(new SequencableComparator());
 		while (iter.hasNext()) {
-		    AssessmentOverallFeedback overallFeedback = (AssessmentOverallFeedback) iter.next();
+		    AssessmentOverallFeedback overallFeedback = iter.next();
 		    AssessmentOverallFeedback newOverallFeedback = (AssessmentOverallFeedback) overallFeedback.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newOverallFeedback);
@@ -197,7 +242,7 @@ public class Assessment implements Cloneable {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());
 	    }
 	} catch (CloneNotSupportedException e) {
-	    Assessment.log.error("When clone " + Assessment.class + " failed");
+	    log.error("When clone " + Assessment.class + " failed");
 	}
 
 	return assessment;
@@ -253,7 +298,7 @@ public class Assessment implements Cloneable {
      */
     public boolean hasRandomQuestion() {
 	boolean hasRandomQuestion = false;
-	for (QuestionReference reference : (Set<QuestionReference>) questionReferences) {
+	for (QuestionReference reference : questionReferences) {
 	    hasRandomQuestion |= reference.isRandomQuestion();
 	}
 	return hasRandomQuestion;
@@ -334,9 +379,6 @@ public class Assessment implements Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -399,58 +441,33 @@ public class Assessment implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getQuestions() {
+    public Set<AssessmentQuestion> getQuestions() {
 	return questions;
     }
 
-    public void setQuestions(Set questions) {
+    public void setQuestions(Set<AssessmentQuestion> questions) {
 	this.questions = questions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getQuestionReferences() {
+    public Set<QuestionReference> getQuestionReferences() {
 	return questionReferences;
     }
 
-    public void setQuestionReferences(Set questionReferences) {
+    public void setQuestionReferences(Set<QuestionReference> questionReferences) {
 	this.questionReferences = questionReferences;
     }
 
     /**
-     *
-     *
-     *
-     *
-     *
      * @return a set of OverallFeedbacks for this Assessment.
      */
-    public Set getOverallFeedbacks() {
+    public Set<AssessmentOverallFeedback> getOverallFeedbacks() {
 	return overallFeedbacks;
     }
 
-    public void setOverallFeedbacks(Set assessmentOverallFeedbacks) {
+    public void setOverallFeedbacks(Set<AssessmentOverallFeedback> assessmentOverallFeedbacks) {
 	this.overallFeedbacks = assessmentOverallFeedbacks;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -459,10 +476,6 @@ public class Assessment implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -471,10 +484,6 @@ public class Assessment implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowQuestionFeedback() {
 	return allowQuestionFeedback;
     }
@@ -483,10 +492,6 @@ public class Assessment implements Cloneable {
 	this.allowQuestionFeedback = allowQuestionFeedback;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowOverallFeedbackAfterQuestion() {
 	return allowOverallFeedbackAfterQuestion;
     }
@@ -503,10 +508,6 @@ public class Assessment implements Cloneable {
 	this.allowDiscloseAnswers = tblReleaseAnswers;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowRightAnswersAfterQuestion() {
 	return allowRightAnswersAfterQuestion;
     }
@@ -515,10 +516,6 @@ public class Assessment implements Cloneable {
 	this.allowRightAnswersAfterQuestion = allowRightAnswersAfterQuestion;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowWrongAnswersAfterQuestion() {
 	return allowWrongAnswersAfterQuestion;
     }
@@ -527,10 +524,6 @@ public class Assessment implements Cloneable {
 	this.allowWrongAnswersAfterQuestion = allowWrongAnswersAfterQuestion;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowGradesAfterAttempt() {
 	return allowGradesAfterAttempt;
     }
@@ -539,10 +532,6 @@ public class Assessment implements Cloneable {
 	this.allowGradesAfterAttempt = allowGradesAfterAttempt;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isEnableConfidenceLevels() {
 	return enableConfidenceLevels;
     }
@@ -551,10 +540,6 @@ public class Assessment implements Cloneable {
 	this.enableConfidenceLevels = enableConfidenceLevels;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowHistoryResponses() {
 	return allowHistoryResponses;
     }
@@ -563,10 +548,6 @@ public class Assessment implements Cloneable {
 	this.allowHistoryResponses = allowHistoryResponses;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDisplaySummary() {
 	return displaySummary;
     }
@@ -575,10 +556,6 @@ public class Assessment implements Cloneable {
 	this.displaySummary = displaySummary;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getQuestionsPerPage() {
 	return questionsPerPage;
     }
@@ -589,7 +566,6 @@ public class Assessment implements Cloneable {
 
     /**
      * number of allow students attempts
-     *
      *
      * @return
      */
@@ -604,7 +580,6 @@ public class Assessment implements Cloneable {
     /**
      * passing mark based on which we decide either user has failed or passed
      *
-     *
      * @return
      */
     public int getPassingMark() {
@@ -615,10 +590,6 @@ public class Assessment implements Cloneable {
 	this.passingMark = passingMark;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShuffled() {
 	return shuffled;
     }
@@ -630,7 +601,6 @@ public class Assessment implements Cloneable {
     /**
      * If this is checked, then in learner we display the numbering for learners.
      *
-     *
      * @return
      */
     public boolean isNumbered() {
@@ -641,10 +611,6 @@ public class Assessment implements Cloneable {
 	this.numbered = numbered;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isNotifyTeachersOnAttemptCompletion() {
 	return notifyTeachersOnAttemptCompletion;
     }
@@ -653,10 +619,6 @@ public class Assessment implements Cloneable {
 	this.notifyTeachersOnAttemptCompletion = notifyTeachersOnAttemptCompletion;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -665,10 +627,6 @@ public class Assessment implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }

@@ -13,9 +13,19 @@ import org.hibernate.id.PostInsertIdentityPersister;
  * @author Andrea Boriero
  */
 public class Oracle12cIdentityColumnSupport extends IdentityColumnSupportImpl {
+	@Override
+	public boolean supportsIdentityColumns() {
+		return true;
+	}
 
-	public Oracle12cIdentityColumnSupport(Dialect dialect) {
-		super( dialect );
+	@Override
+	public boolean supportsInsertSelectIdentity() {
+		return true;
+	}
+
+	@Override
+	public String getIdentityColumnString(int type) {
+		return "generated as identity";
 	}
 
 	@Override

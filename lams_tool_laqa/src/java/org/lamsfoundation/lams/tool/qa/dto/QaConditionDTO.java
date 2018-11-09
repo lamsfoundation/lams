@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
-import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 
 public class QaConditionDTO extends TextSearchConditionDTO {

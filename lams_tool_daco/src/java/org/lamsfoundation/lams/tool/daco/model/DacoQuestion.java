@@ -27,6 +27,19 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -37,32 +50,52 @@ import org.apache.log4j.Logger;
  *
  *
  */
+@Entity
+@Table(name = "tl_ladaco10_questions")
 public class DacoQuestion implements Cloneable {
     private static final Logger log = Logger.getLogger(DacoQuestion.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "question_type")
     private short type;
 
+    @Column(name = "min_constraint")
     private Float min;
 
+    @Column(name = "max_constraint")
     private Float max;
 
+    @Column(name = "digits_decimal")
     private Short digitsDecimal;
 
+    @Column
     private Short summary;
 
+    @Column
     private String description;
 
-    private String initialQuestion;
-
+    @OneToMany(fetch = FetchType.EAGER,
+	    cascade = CascadeType.ALL)
+    @JoinColumn(name = "question_uid")
+    @OrderBy("sequenceNumber ASC")
     private Set<DacoAnswerOption> answerOptions = new LinkedHashSet<DacoAnswerOption>();
 
+    @Column(name = "is_required")
     private boolean isRequired;
 
+    @Column(name = "create_date")
     private Date createDate;
+    
+    @ManyToOne 
+    @JoinColumn(name = "create_by") 
     private DacoUser createBy;
 
+    @ManyToOne 
+    @JoinColumn(name = "content_uid") 
     private Daco daco;
 
     @Override
@@ -88,29 +121,14 @@ public class DacoQuestion implements Cloneable {
 	return obj;
     }
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long uid) {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getDescription() {
 	return description;
     }
@@ -119,11 +137,6 @@ public class DacoQuestion implements Cloneable {
 	this.description = description;
     }
 
-    /**
-     *
-     * 
-     * @return
-     */
     public DacoUser getCreateBy() {
 	return createBy;
     }
@@ -132,10 +145,6 @@ public class DacoQuestion implements Cloneable {
 	this.createBy = createBy;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -144,10 +153,6 @@ public class DacoQuestion implements Cloneable {
 	this.createDate = createDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isRequired() {
 	return isRequired;
     }
@@ -156,10 +161,6 @@ public class DacoQuestion implements Cloneable {
 	this.isRequired = isRequired;
     }
 
-    /**
-     *
-     * @return
-     */
     public short getType() {
 	return type;
     }
@@ -168,10 +169,6 @@ public class DacoQuestion implements Cloneable {
 	this.type = type;
     }
 
-    /**
-     *
-     * @return
-     */
     public Float getMin() {
 	return min;
     }
@@ -180,10 +177,6 @@ public class DacoQuestion implements Cloneable {
 	this.min = min;
     }
 
-    /**
-     *
-     * @return
-     */
     public Float getMax() {
 	return max;
     }
@@ -192,10 +185,6 @@ public class DacoQuestion implements Cloneable {
 	this.max = max;
     }
 
-    /**
-     *
-     * @return
-     */
     public Short getDigitsDecimal() {
 	return digitsDecimal;
     }
@@ -204,10 +193,6 @@ public class DacoQuestion implements Cloneable {
 	this.digitsDecimal = digitsDecimal;
     }
 
-    /**
-     *
-     * @return
-     */
     public Short getSummary() {
 	return summary;
     }
@@ -216,12 +201,6 @@ public class DacoQuestion implements Cloneable {
 	this.summary = summary;
     }
 
-    /**
-     *
-     *
-     *
-     * @return
-     */
     public Set<DacoAnswerOption> getAnswerOptions() {
 	return answerOptions;
     }
@@ -230,20 +209,6 @@ public class DacoQuestion implements Cloneable {
 	answerOptions = options;
     }
 
-    /*
-     * public Long getContentUid() {
-     * return contentUid;
-     * }
-     * 
-     * public void setContentUid(Long contentUid) {
-     * this.contentUid = contentUid;
-     * }
-     */
-
-    /**
-     *
-     * @return
-     */
     public Daco getDaco() {
 	return daco;
     }

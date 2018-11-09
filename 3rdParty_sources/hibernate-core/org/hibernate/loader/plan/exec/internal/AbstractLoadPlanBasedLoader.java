@@ -30,7 +30,7 @@ import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.TypedValue;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
@@ -77,7 +77,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 	protected abstract void autoDiscoverTypes(ResultSet rs);
 
 	protected List executeLoad(
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			QueryParameters queryParameters,
 			LoadQueryDetails loadQueryDetails,
 			boolean returnProxies,
@@ -94,7 +94,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 	}
 
 	protected List executeLoad(
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			QueryParameters queryParameters,
 			LoadQueryDetails loadQueryDetails,
 			boolean returnProxies,
@@ -159,7 +159,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			final QueryParameters queryParameters,
 			final boolean scroll,
 			List<AfterLoadAction> afterLoadActions,
-			final SessionImplementor session) throws SQLException {
+			final SharedSessionContractImplementor session) throws SQLException {
 		return executeQueryStatement( getStaticLoadQuery().getSqlStatement(), queryParameters, scroll, afterLoadActions, session );
 	}
 
@@ -168,7 +168,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			QueryParameters queryParameters,
 			boolean scroll,
 			List<AfterLoadAction> afterLoadActions,
-			SessionImplementor session) throws SQLException {
+			SharedSessionContractImplementor session) throws SQLException {
 
 		// Processing query filters.
 		queryParameters.processFilters( sqlStatement, session );
@@ -180,7 +180,12 @@ public abstract class AbstractLoadPlanBasedLoader {
 		String sql = limitHandler.processSql( queryParameters.getFilteredSQL(), queryParameters.getRowSelection() );
 
 		// Adding locks and comments.
-		sql = preprocessSQL( sql, queryParameters, getFactory().getDialect(), afterLoadActions );
+		sql = session.getJdbcServices().getJdbcEnvironment().getDialect()
+				.addSqlHintOrComment(
+					sql,
+					queryParameters,
+					session.getFactory().getSessionFactoryOptions().isCommentsEnabled()
+				);
 
 		final PreparedStatement st = prepareQueryStatement( sql, queryParameters, limitHandler, scroll, session );
 		return new SqlStatementWrapper( st, getResultSet( st, queryParameters.getRowSelection(), limitHandler, queryParameters.hasAutoDiscoverScalarTypes(), session ) );
@@ -198,26 +203,6 @@ public abstract class AbstractLoadPlanBasedLoader {
 		return LimitHelper.useLimit( limitHandler, selection ) ? limitHandler : NoopLimitHandler.INSTANCE;
 	}
 
-	private String preprocessSQL(
-			String sql,
-			QueryParameters queryParameters,
-			Dialect dialect,
-			List<AfterLoadAction> afterLoadActions) {
-		return getFactory().getSettings().isCommentsEnabled()
-				? prependComment( sql, queryParameters )
-				: sql;
-	}
-
-	private String prependComment(String sql, QueryParameters parameters) {
-		final String comment = parameters.getComment();
-		if ( comment == null ) {
-			return sql;
-		}
-		else {
-			return "/* " + comment + " */ " + sql;
-		}
-	}
-
 	/**
 	 * Obtain a <tt>PreparedStatement</tt> with all parameters pre-bound.
 	 * Bind JDBC-style <tt>?</tt> parameters, named parameters, and
@@ -228,8 +213,8 @@ public abstract class AbstractLoadPlanBasedLoader {
 			final QueryParameters queryParameters,
 			final LimitHandler limitHandler,
 			final boolean scroll,
-			final SessionImplementor session) throws SQLException, HibernateException {
-		final Dialect dialect = getFactory().getDialect();
+			final SharedSessionContractImplementor session) throws SQLException, HibernateException {
+		final Dialect dialect = session.getJdbcServices().getJdbcEnvironment().getDialect();
 		final RowSelection selection = queryParameters.getRowSelection();
 		final boolean useLimit = LimitHelper.useLimit( limitHandler, selection );
 		final boolean hasFirstRow = LimitHelper.hasFirstRow( selection );
@@ -329,7 +314,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			PreparedStatement statement,
 			QueryParameters queryParameters,
 			int startIndex,
-			SessionImplementor session) throws SQLException {
+			SharedSessionContractImplementor session) throws SQLException {
 		int span = 0;
 		span += bindPositionalParameters( statement, queryParameters, startIndex, session );
 		span += bindNamedParameters( statement, queryParameters.getNamedParameters(), startIndex + span, session );
@@ -355,7 +340,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			final PreparedStatement statement,
 			final QueryParameters queryParameters,
 			final int startIndex,
-			final SessionImplementor session) throws SQLException, HibernateException {
+			final SharedSessionContractImplementor session) throws SQLException, HibernateException {
 		final Object[] values = queryParameters.getFilteredPositionalParameterValues();
 		final Type[] types = queryParameters.getFilteredPositionalParameterTypes();
 		int span = 0;
@@ -388,7 +373,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			final PreparedStatement statement,
 			final Map namedParams,
 			final int startIndex,
-			final SessionImplementor session) throws SQLException, HibernateException {
+			final SharedSessionContractImplementor session) throws SQLException, HibernateException {
 		if ( namedParams != null ) {
 			// assumes that types are all of span 1
 			final Iterator itr = namedParams.entrySet().iterator();
@@ -427,7 +412,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 			final RowSelection selection,
 			final LimitHandler limitHandler,
 			final boolean autodiscovertypes,
-			final SessionImplementor session)
+			final SharedSessionContractImplementor session)
 			throws SQLException, HibernateException {
 
 		try {
@@ -443,10 +428,10 @@ public abstract class AbstractLoadPlanBasedLoader {
 			}
 			return rs;
 		}
-		catch ( SQLException sqle ) {
+		catch (SQLException | HibernateException ex) {
 			session.getJdbcCoordinator().getResourceRegistry().release( st );
 			session.getJdbcCoordinator().afterStatementExecution();
-			throw sqle;
+			throw ex;
 		}
 	}
 
@@ -469,7 +454,7 @@ public abstract class AbstractLoadPlanBasedLoader {
 		}
 	}
 
-	private ResultSet wrapResultSetIfEnabled(final ResultSet rs, final SessionImplementor session) {
+	private ResultSet wrapResultSetIfEnabled(final ResultSet rs, final SharedSessionContractImplementor session) {
 		if ( session.getFactory().getSessionFactoryOptions().isWrapResultSetsEnabled() ) {
 			try {
 				if ( log.isDebugEnabled() ) {

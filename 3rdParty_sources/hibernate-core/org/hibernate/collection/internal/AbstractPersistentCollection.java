@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.naming.NamingException;
-
 import org.hibernate.AssertionFailure;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -29,18 +27,17 @@ import org.hibernate.engine.spi.CollectionEntry;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.engine.spi.TypedValue;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.SessionFactoryRegistry;
 import org.hibernate.internal.util.MarkerObject;
-import org.hibernate.internal.util.collections.EmptyIterator;
 import org.hibernate.internal.util.collections.IdentitySet;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
-import org.hibernate.type.ComponentType;
 import org.hibernate.type.CompositeType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
@@ -58,7 +55,7 @@ import org.hibernate.type.UUIDCharType;
 public abstract class AbstractPersistentCollection implements Serializable, PersistentCollection {
 	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( AbstractPersistentCollection.class );
 
-	private transient SessionImplementor session;
+	private transient SharedSessionContractImplementor session;
 	private boolean isTempSession = false;
 	private boolean initialized;
 	private transient List<DelayedOperation> operationQueue;
@@ -72,6 +69,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 	// collections detect changes made via their public interface and mark
 	// themselves as dirty as a performance optimization
 	private boolean dirty;
+	protected boolean elementRemoved;
 	private Serializable storedSnapshot;
 
 	private String sessionFactoryUuid;
@@ -84,8 +82,16 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 	public AbstractPersistentCollection() {
 	}
 
-	protected AbstractPersistentCollection(SessionImplementor session) {
+	protected AbstractPersistentCollection(SharedSessionContractImplementor session) {
 		this.session = session;
+	}
+
+	/**
+	 *  * @deprecated {@link #AbstractPersistentCollection(SharedSessionContractImplementor)} should be used instead.
+	 */
+	@Deprecated
+	protected AbstractPersistentCollection(SessionImplementor session) {
+		this( (SharedSessionContractImplementor) session );
 	}
 
 	@Override
@@ -109,8 +115,14 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 	}
 
 	@Override
+	public boolean isElementRemoved() {
+		return elementRemoved;
+	}
+
+	@Override
 	public final void clearDirty() {
 		dirty = false;
+		elementRemoved = false;
 	}
 
 	@Override
@@ -194,7 +206,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 	}
 
 	private <T> T withTemporarySessionIfNeeded(LazyInitializationWork<T> lazyInitializationWork) {
-		SessionImplementor tempSession = null;
+		SharedSessionContractImplementor tempSession = null;
 
 		if ( session == null ) {
 			if ( allowLoadOutsideTransaction ) {
@@ -204,7 +216,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 				throwLazyInitializationException( "could not initialize proxy - no Session" );
 			}
 		}
-		else if ( !session.isOpen() ) {
+		else if ( !session.isOpenOrWaitingForAutoClose() ) {
 			if ( allowLoadOutsideTransaction ) {
 				tempSession = openTemporarySessionForLoading();
 			}
@@ -221,8 +233,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			}
 		}
 
-
-		SessionImplementor originalSession = null;
+		SharedSessionContractImplementor originalSession = null;
 		boolean isJTA = false;
 
 		if ( tempSession != null ) {
@@ -230,9 +241,8 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			originalSession = session;
 			session = tempSession;
 
-
 			isJTA = session.getTransactionCoordinator().getTransactionCoordinatorBuilder().isJta();
-			
+
 			if ( !isJTA ) {
 				// Explicitly handle the transactions only if we're not in
 				// a JTA environment.  A lazy loading temporary session can
@@ -270,14 +280,14 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 		}
 	}
 
-	private SessionImplementor openTemporarySessionForLoading() {
+	private SharedSessionContractImplementor openTemporarySessionForLoading() {
 		if ( sessionFactoryUuid == null ) {
 			throwLazyInitializationException( "SessionFactory UUID not known to create temporary Session for loading" );
 		}
 
 		final SessionFactoryImplementor sf = (SessionFactoryImplementor)
 				SessionFactoryRegistry.INSTANCE.getSessionFactory( sessionFactoryUuid );
-		final SessionImplementor session = (SessionImplementor) sf.openSession();
+		final SharedSessionContractImplementor session = (SharedSessionContractImplementor) sf.openSession();
 		session.getPersistenceContext().setDefaultReadOnly( true );
 		session.setFlushMode( FlushMode.MANUAL );
 		return session;
@@ -606,7 +616,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 	}
 
 	@Override
-	public final boolean unsetSession(SessionImplementor currentSession) {
+	public final boolean unsetSession(SharedSessionContractImplementor currentSession) {
 		prepareForPossibleLoadingOutsideTransaction();
 		if ( currentSession == this.session ) {
 			if ( !isTempSession ) {
@@ -627,18 +637,13 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			allowLoadOutsideTransaction = session.getFactory().getSessionFactoryOptions().isInitializeLazyStateOutsideTransactionsEnabled();
 
 			if ( allowLoadOutsideTransaction && sessionFactoryUuid == null ) {
-				try {
-					sessionFactoryUuid = (String) session.getFactory().getReference().get( "uuid" ).getContent();
-				}
-				catch (NamingException e) {
-					//not much we can do if this fails...
-				}
+				sessionFactoryUuid = session.getFactory().getUuid();
 			}
 		}
 	}
 
 	@Override
-	public final boolean setCurrentSession(SessionImplementor session) throws HibernateException {
+	public final boolean setCurrentSession(SharedSessionContractImplementor session) throws HibernateException {
 		if ( session == this.session ) {
 			return false;
 		}
@@ -663,7 +668,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 		}
 	}
 
-	private String generateUnexpectedSessionStateMessage(SessionImplementor session) {
+	private String generateUnexpectedSessionStateMessage(SharedSessionContractImplementor session) {
 		// NOTE: If this.session != null, this.session may be operating on this collection
 		// (e.g., by changing this.role, this.key, or even this.session) in a different thread.
 
@@ -787,7 +792,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			};
 		}
 		else {
-			return EmptyIterator.INSTANCE;
+			return Collections.emptyIterator();
 		}
 	}
 
@@ -824,7 +829,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 	 *
 	 * @return The session
 	 */
-	public final SessionImplementor getSession() {
+	public final SharedSessionContractImplementor getSession() {
 		return session;
 	}
 
@@ -1193,7 +1198,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			Collection oldElements,
 			Collection currentElements,
 			String entityName,
-			SessionImplementor session) throws HibernateException {
+			SharedSessionContractImplementor session) throws HibernateException {
 
 		// short-circuit(s)
 		if ( currentElements.size() == 0 ) {
@@ -1266,7 +1271,7 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			Collection list,
 			Object entityInstance,
 			String entityName,
-			SessionImplementor session) {
+			SharedSessionContractImplementor session) {
 
 		if ( entityInstance != null && ForeignKeys.isNotTransient( entityName, entityInstance, null, session ) ) {
 			final EntityPersister entityPersister = session.getFactory().getEntityPersister( entityName );
@@ -1283,6 +1288,26 @@ public abstract class AbstractPersistentCollection implements Serializable, Pers
 			}
 
 		}
+	}
+
+	/**
+	 * Removes entity entries that have an equal identifier with the incoming entity instance
+	 *
+	 * @param list The list containing the entity instances
+	 * @param entityInstance The entity instance to match elements.
+	 * @param entityName The entity name
+	 * @param session The session
+	 *
+	 * @deprecated {@link #identityRemove(Collection, Object, String, SharedSessionContractImplementor)}
+	 *             should be used instead.
+	 */
+	@Deprecated
+	public static void identityRemove(
+			Collection list,
+			Object entityInstance,
+			String entityName,
+			SessionImplementor session) {
+		identityRemove( list, entityInstance, entityName, (SharedSessionContractImplementor) session );
 	}
 
 	@Override

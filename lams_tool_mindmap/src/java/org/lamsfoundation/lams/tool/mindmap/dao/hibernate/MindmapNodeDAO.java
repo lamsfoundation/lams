@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.mindmap.dao.hibernate;
 
 import java.util.List;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapNodeDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
@@ -82,6 +82,8 @@ public class MindmapNodeDAO extends LAMSBaseDAO implements IMindmapNodeDAO {
     private static final String SQL_QUERY_FIND_NODES_BY_SESSION_ID_AND_USER_ID = "from " + MindmapNode.class.getName()
 	    + " mn where mn.session.sessionId = ? and mn.user.userId = ?";
 
+    private static final String DELETE_NODE_MULTIUSER_MODE =	 "delete from " + MindmapNode.class.getName() + " where unique_id = :unique_id and mindmap_id = :mindmap_id and user_id = :user_id and session_id = :session_id";
+
     /* Functions Implementations */
 
     // deleting Mindmap nodes in singleuser mode
@@ -97,9 +99,11 @@ public class MindmapNodeDAO extends LAMSBaseDAO implements IMindmapNodeDAO {
     @Override
     public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId) {
 	Session session = getSessionFactory().getCurrentSession();
-	String hql = "delete from " + MindmapNode.class.getName() + " where unique_id = " + uniqueId
-		+ " and mindmap_id = " + mindmapId + " and user_id = " + userId + " and session_id = " + sessionId;
-	Query query = session.createQuery(hql);
+	Query query = session.createQuery(DELETE_NODE_MULTIUSER_MODE)
+		.setParameter("unique_id", uniqueId)
+		.setParameter("mindmap_id", mindmapId)
+		.setParameter("user_id", userId)
+		.setParameter("session_id", sessionId);
 	query.executeUpdate();
     }
 

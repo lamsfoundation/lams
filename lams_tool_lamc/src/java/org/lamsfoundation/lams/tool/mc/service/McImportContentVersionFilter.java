@@ -1,10 +1,10 @@
 package org.lamsfoundation.lams.tool.mc.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
+import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 
 /**
  * Import filter class for different version of MC content.

@@ -24,23 +24,35 @@
 
 package org.lamsfoundation.lams.tool.spreadsheet.model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
- * Spreadsheet
- * 
  * @author Andrey Balan
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_lasprd10_user_modified_spreadsheet")
 public class UserModifiedSpreadsheet {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_modified_spreadsheet")
     private String userModifiedSpreadsheet;
+    
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "mark_id")
     private SpreadsheetMark mark;
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -49,11 +61,6 @@ public class UserModifiedSpreadsheet {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * 
-     * @return
-     */
     public String getUserModifiedSpreadsheet() {
 	return userModifiedSpreadsheet;
     }
@@ -62,10 +69,6 @@ public class UserModifiedSpreadsheet {
 	this.userModifiedSpreadsheet = userModifiedSpreadsheet;
     }
 
-    /**
-     *
-     *
-    */
     public SpreadsheetMark getMark() {
 	return mark;
     }

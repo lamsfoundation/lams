@@ -15,7 +15,9 @@ import javax.persistence.AccessType;
 import javax.persistence.AttributeConverter;
 
 import org.hibernate.AnnotationException;
+import org.hibernate.boot.AttributeConverterInfo;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.ClassLoaderAccess;
 import org.hibernate.cfg.AttributeConverterDefinition;
 import org.hibernate.internal.CoreLogging;
@@ -32,19 +34,27 @@ import org.dom4j.Element;
  * @author Brett Meyer
  */
 public class XMLContext implements Serializable {
-    private static final CoreMessageLogger LOG = CoreLogging.messageLogger( XMLContext.class );
+	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( XMLContext.class );
 
 	private final ClassLoaderAccess classLoaderAccess;
 
 	private Default globalDefaults;
-	private Map<String, Element> classOverriding = new HashMap<String, Element>();
-	private Map<String, Default> defaultsOverriding = new HashMap<String, Default>();
-	private List<Element> defaultElements = new ArrayList<Element>();
-	private List<String> defaultEntityListeners = new ArrayList<String>();
+	private Map<String, Element> classOverriding = new HashMap<>();
+	private Map<String, Default> defaultsOverriding = new HashMap<>();
+	private List<Element> defaultElements = new ArrayList<>();
+	private List<String> defaultEntityListeners = new ArrayList<>();
 	private boolean hasContext = false;
 
+	/**
+	 * @deprecated Use {@link XMLContext#XMLContext(BootstrapContext)} instead.
+	 */
+	@Deprecated
 	public XMLContext(ClassLoaderAccess classLoaderAccess) {
 		this.classLoaderAccess = classLoaderAccess;
+	}
+
+	public XMLContext(BootstrapContext bootstrapContext) {
+		this.classLoaderAccess = bootstrapContext.getClassLoaderAccess();
 	}
 
 	/**
@@ -54,7 +64,7 @@ public class XMLContext implements Serializable {
 	@SuppressWarnings( "unchecked" )
 	public List<String> addDocument(Document doc) {
 		hasContext = true;
-		List<String> addedClasses = new ArrayList<String>();
+		List<String> addedClasses = new ArrayList<>();
 		Element root = doc.getRootElement();
 		//global defaults
 		Element metadata = root.element( "persistence-unit-metadata" );
@@ -157,7 +167,7 @@ public class XMLContext implements Serializable {
 	}
 
 	private List<String> addEntityListenerClasses(Element element, String packageName, List<String> addedClasses) {
-		List<String> localAddedClasses = new ArrayList<String>();
+		List<String> localAddedClasses = new ArrayList<>();
 		Element listeners = element.element( "entity-listeners" );
 		if ( listeners != null ) {
 			@SuppressWarnings( "unchecked" )
@@ -192,7 +202,7 @@ public class XMLContext implements Serializable {
 				final Class<? extends AttributeConverter> attributeConverterClass = classLoaderAccess.classForName(
 						className
 				);
-				attributeConverterDefinitions.add(
+				attributeConverterInfoList.add(
 						new AttributeConverterDefinition( attributeConverterClass.newInstance(), autoApply )
 				);
 			}
@@ -238,13 +248,13 @@ public class XMLContext implements Serializable {
 		return hasContext;
 	}
 
-	private List<AttributeConverterDefinition> attributeConverterDefinitions = new ArrayList<AttributeConverterDefinition>();
+	private List<AttributeConverterInfo> attributeConverterInfoList = new ArrayList<>();
 
 	public void applyDiscoveredAttributeConverters(AttributeConverterDefinitionCollector collector) {
-		for ( AttributeConverterDefinition definition : attributeConverterDefinitions ) {
-			collector.addAttributeConverter( definition );
+		for ( AttributeConverterInfo info : attributeConverterInfoList ) {
+			collector.addAttributeConverter( info );
 		}
-		attributeConverterDefinitions.clear();
+		attributeConverterInfoList.clear();
 	}
 
 	public static class Default implements Serializable {
@@ -310,11 +320,21 @@ public class XMLContext implements Serializable {
 
 		public void override(Default globalDefault) {
 			if ( globalDefault != null ) {
-				if ( globalDefault.getAccess() != null ) access = globalDefault.getAccess();
-				if ( globalDefault.getPackageName() != null ) packageName = globalDefault.getPackageName();
-				if ( globalDefault.getSchema() != null ) schema = globalDefault.getSchema();
-				if ( globalDefault.getCatalog() != null ) catalog = globalDefault.getCatalog();
-				if ( globalDefault.getDelimitedIdentifier() != null ) delimitedIdentifier = globalDefault.getDelimitedIdentifier();
+				if ( globalDefault.getAccess() != null ) {
+					access = globalDefault.getAccess();
+				}
+				if ( globalDefault.getPackageName() != null ) {
+					packageName = globalDefault.getPackageName();
+				}
+				if ( globalDefault.getSchema() != null ) {
+					schema = globalDefault.getSchema();
+				}
+				if ( globalDefault.getCatalog() != null ) {
+					catalog = globalDefault.getCatalog();
+				}
+				if ( globalDefault.getDelimitedIdentifier() != null ) {
+					delimitedIdentifier = globalDefault.getDelimitedIdentifier();
+				}
 				if ( globalDefault.getMetadataComplete() != null ) {
 					metadataComplete = globalDefault.getMetadataComplete();
 				}

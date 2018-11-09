@@ -7,9 +7,11 @@
 package org.hibernate.mapping;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.Mapping;
 import org.hibernate.service.ServiceRegistry;
@@ -27,11 +29,19 @@ public class OneToMany implements Value {
 
 	private String referencedEntityName;
 	private PersistentClass associatedClass;
-	private boolean embedded;
 	private boolean ignoreNotFound;
 
+	/**
+	 * @deprecated Use {@link OneToMany#OneToMany(MetadataBuildingContext, PersistentClass)} instead.
+	 */
+	@Deprecated
 	public OneToMany(MetadataImplementor metadata, PersistentClass owner) throws MappingException {
 		this.metadata = metadata;
+		this.referencingTable = ( owner == null ) ? null : owner.getTable();
+	}
+
+	public OneToMany(MetadataBuildingContext buildingContext, PersistentClass owner) throws MappingException {
+		this.metadata = buildingContext.getMetadataCollector();
 		this.referencingTable = ( owner == null ) ? null : owner.getTable();
 	}
 
@@ -131,6 +141,16 @@ public class OneToMany implements Value {
 		return visitor.accept( this );
 	}
 
+	@Override
+	public boolean isSame(Value other) {
+		return this == other || other instanceof OneToMany && isSame( (OneToMany) other );
+	}
+
+	public boolean isSame(OneToMany other) {
+		return Objects.equals( referencingTable, other.referencingTable )
+				&& Objects.equals( referencedEntityName, other.referencedEntityName )
+				&& Objects.equals( associatedClass, other.associatedClass );
+	}
 
 	public boolean[] getColumnInsertability() {
 		//TODO: we could just return all false...

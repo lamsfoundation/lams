@@ -25,17 +25,36 @@ package org.lamsfoundation.lams.learning.kumalive.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class KumaliveLog implements Serializable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "lams_kumalive_log")
+public class KumaliveLog implements Serializable {
     private static final long serialVersionUID = -2294366826356383997L;
 
     public static final short TYPE_HAND_UP = 1;
     public static final short TYPE_HAND_DOWN = 2;
 
+    @Id
+    @Column(name = "log_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long logId;
+    
+    @Column(name = "kumalive_id")
     private Long kumaliveId;
+    
+    @Column(name = "user_id")
     private Integer userId;
+    
+    @Column(name = "log_date")
     private Date date;
+    
+    @Column(name = "log_type")
     private Short type;
 
     public KumaliveLog() {

@@ -28,80 +28,111 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * Resource
  *
  * @author Dapeng Ni
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_larsrc11_resource")
 public class Resource implements Cloneable {
-
     private static final Logger log = Logger.getLogger(Resource.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
     // advance
 
+    @Column(name = "allow_auto_run")
     private boolean runAuto;
 
+    @Column(name = "mini_view_resource_number")
     private int miniViewResourceNumber;
 
+    @Column(name = "allow_add_files")
     private boolean allowAddFiles;
 
+    @Column(name = "allow_add_urls")
     private boolean allowAddUrls;
 
+    @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
+    @Column(name = "assigment_submit_notify")
     private boolean notifyTeachersOnAssigmentSumbit;
 
+    @Column(name = "file_upload_notify")
     private boolean notifyTeachersOnFileUpload;
 
-    // general infomation
-    private Date created;
-
-    private Date updated;
-
-    private ResourceUser createdBy;
-
-    // resource Items
-    private Set resourceItems;
-
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
-    private Set<LearnerItemRatingCriteria> ratingCriterias;
+    // general infomation
+    
+    @Column(name = "create_date")
+    private Date created;
+
+    @Column(name = "update_date")
+    private Date updated;
+
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
+    private ResourceUser createdBy;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("create_date DESC")
+    @JoinColumn(name = "resource_uid")
+    private Set<ResourceItem> resourceItems = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("order_id ASC")
+    @JoinColumn(name = "tool_content_id")
+    private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     // *************** NON Persist Fields ********************
 
+    @Transient
     private String miniViewNumberStr;
-
-    /**
-     * Default contruction method.
-     *
-     */
-    public Resource() {
-	resourceItems = new HashSet();
-    }
 
     // **********************************************************
     // Function method for Resource
@@ -139,10 +170,10 @@ public class Resource implements Cloneable {
 	    resource = (Resource) super.clone();
 	    resource.setUid(null);
 	    if (resourceItems != null) {
-		Iterator iter = resourceItems.iterator();
-		Set set = new HashSet();
+		Iterator<ResourceItem> iter = resourceItems.iterator();
+		Set<ResourceItem> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    ResourceItem item = (ResourceItem) iter.next();
+		    ResourceItem item = iter.next();
 		    ResourceItem newItem = (ResourceItem) item.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newItem);
@@ -156,7 +187,7 @@ public class Resource implements Cloneable {
 	    
 	    // clone ratingCriterias as well
 	    if (ratingCriterias != null) {
-		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
+		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<>();
 		for (LearnerItemRatingCriteria criteria : ratingCriterias) {
 		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
 		    // just clone old file without duplicate it in repository
@@ -199,7 +230,6 @@ public class Resource implements Cloneable {
      * Updates the modification data for this entity.
      */
     public void updateModificationData() {
-
 	long now = System.currentTimeMillis();
 	if (created == null) {
 	    this.setCreated(new Date(now));
@@ -250,9 +280,6 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share resources.
-     *
-     *
-     *
      */
     public ResourceUser getCreatedBy() {
 	return createdBy;
@@ -266,9 +293,6 @@ public class Resource implements Cloneable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -277,30 +301,14 @@ public class Resource implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     * @return Returns the title.
-     *
-     *
-     *
-     */
     public String getTitle() {
 	return title;
     }
 
-    /**
-     * @param title
-     *            The title to set.
-     */
     public void setTitle(String title) {
 	this.title = title;
     }
 
-    /**
-     * @return Returns the lockWhenFinish.
-     *
-     *
-     *
-     */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
     }
@@ -315,8 +323,6 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;
@@ -326,27 +332,14 @@ public class Resource implements Cloneable {
 	this.instructions = instructions;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     * @return
-     */
-    public Set getResourceItems() {
+    public Set<ResourceItem> getResourceItems() {
 	return resourceItems;
     }
 
-    public void setResourceItems(Set resourceItems) {
+    public void setResourceItems(Set<ResourceItem> resourceItems) {
 	this.resourceItems = resourceItems;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -355,10 +348,6 @@ public class Resource implements Cloneable {
 	this.contentInUse = contentInUse;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isDefineLater() {
 	return defineLater;
     }
@@ -367,10 +356,6 @@ public class Resource implements Cloneable {
 	this.defineLater = defineLater;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getContentId() {
 	return contentId;
     }
@@ -379,10 +364,6 @@ public class Resource implements Cloneable {
 	this.contentId = contentId;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowAddFiles() {
 	return allowAddFiles;
     }
@@ -391,10 +372,6 @@ public class Resource implements Cloneable {
 	this.allowAddFiles = allowAddFiles;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowAddUrls() {
 	return allowAddUrls;
     }
@@ -403,10 +380,6 @@ public class Resource implements Cloneable {
 	this.allowAddUrls = allowAddUrls;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getMiniViewResourceNumber() {
 	return miniViewResourceNumber;
     }
@@ -415,10 +388,6 @@ public class Resource implements Cloneable {
 	miniViewResourceNumber = minViewResourceNumber;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isRunAuto() {
 	return runAuto;
     }
@@ -440,10 +409,6 @@ public class Resource implements Cloneable {
 	miniViewNumberStr = minViewNumber;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getReflectInstructions() {
 	return reflectInstructions;
     }
@@ -452,10 +417,6 @@ public class Resource implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
@@ -464,9 +425,6 @@ public class Resource implements Cloneable {
 	this.reflectOnActivity = reflectOnActivity;
     }
 
-    /**
-     *
-     */
     public boolean isNotifyTeachersOnAssigmentSumbit() {
 	return notifyTeachersOnAssigmentSumbit;
     }
@@ -475,9 +433,6 @@ public class Resource implements Cloneable {
 	this.notifyTeachersOnAssigmentSumbit = notifyTeachersOnAssigmentSumbit;
     }
 
-    /**
-     *
-     */
     public boolean isNotifyTeachersOnFileUpload() {
 	return notifyTeachersOnFileUpload;
     }
@@ -485,11 +440,7 @@ public class Resource implements Cloneable {
     public void setNotifyTeachersOnFileUpload(boolean notifyTeachersOnFileUpload) {
 	this.notifyTeachersOnFileUpload = notifyTeachersOnFileUpload;
     }
-    
-    /**
-    *
-    * @return
-    */
+
    public Set<LearnerItemRatingCriteria> getRatingCriterias() {
 	return ratingCriterias;
    }

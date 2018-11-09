@@ -6,64 +6,38 @@
  */
 package org.hibernate.engine.query.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.hibernate.engine.query.spi.NamedParameterDescriptor;
 import org.hibernate.engine.query.spi.NativeQueryInterpreter;
 import org.hibernate.engine.query.spi.NativeSQLQueryPlan;
-import org.hibernate.engine.query.spi.OrdinalParameterDescriptor;
 import org.hibernate.engine.query.spi.ParamLocationRecognizer;
-import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.loader.custom.sql.SQLCustomQuery;
+import org.hibernate.query.internal.ParameterMetadataImpl;
 
 /**
  * @author Steve Ebersole
  */
 public class NativeQueryInterpreterStandardImpl implements NativeQueryInterpreter {
-	/**
-	 * Singleton access
-	 */
-	public static final NativeQueryInterpreterStandardImpl INSTANCE = new NativeQueryInterpreterStandardImpl();
+	private final SessionFactoryImplementor sessionFactory;
+
+	public NativeQueryInterpreterStandardImpl(SessionFactoryImplementor sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	@Override
-	public ParameterMetadata getParameterMetadata(String nativeQuery) {
-		final ParamLocationRecognizer recognizer = ParamLocationRecognizer.parseLocations( nativeQuery );
-
-		final int size = recognizer.getOrdinalParameterLocationList().size();
-		final OrdinalParameterDescriptor[] ordinalDescriptors = new OrdinalParameterDescriptor[ size ];
-		for ( int i = 0; i < size; i++ ) {
-			final Integer position = recognizer.getOrdinalParameterLocationList().get( i );
-			ordinalDescriptors[i] = new OrdinalParameterDescriptor( i, null, position );
-		}
-
-		final Map<String, NamedParameterDescriptor> namedParamDescriptorMap = new HashMap<String, NamedParameterDescriptor>();
-		final Map<String, ParamLocationRecognizer.NamedParameterDescription> map = recognizer.getNamedParameterDescriptionMap();
-
-		for ( final String name : map.keySet() ) {
-			final ParamLocationRecognizer.NamedParameterDescription description = map.get( name );
-			namedParamDescriptorMap.put(
-					name,
-					new NamedParameterDescriptor(
-							name,
-							null,
-							description.buildPositionsArray(),
-							description.isJpaStyle()
-					)
-			);
-		}
-
-		return new ParameterMetadata( ordinalDescriptors, namedParamDescriptorMap );
+	public ParameterMetadataImpl getParameterMetadata(String nativeQuery) {
+		final ParamLocationRecognizer recognizer = ParamLocationRecognizer.parseLocations( nativeQuery, sessionFactory );
+		return new ParameterMetadataImpl(
+				recognizer.getOrdinalParameterDescriptionMap(),
+				recognizer.getNamedParameterDescriptionMap()
+		);
 	}
 
 	@Override
 	public NativeSQLQueryPlan createQueryPlan(
 			NativeSQLQuerySpecification specification,
 			SessionFactoryImplementor sessionFactory) {
-
 		CustomQuery customQuery = new SQLCustomQuery(
 				specification.getQueryString(),
 				specification.getQueryReturns(),

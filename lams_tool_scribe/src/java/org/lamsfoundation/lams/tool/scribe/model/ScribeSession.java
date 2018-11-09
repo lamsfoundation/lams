@@ -27,6 +27,17 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -36,39 +47,54 @@ import org.apache.log4j.Logger;
  *
  */
 
+@Entity
+@Table(name = "tl_lascrb11_session")
 public class ScribeSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(ScribeSession.class);
-    /**
-     *
-     */
+
     private static final long serialVersionUID = 4407078136514639026L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne
+    @JoinColumn(name = "scribe_uid")
     private Scribe scribe;
 
-    private Set scribeUsers;
+    @OneToMany(mappedBy = "scribeSession")
+    private Set<ScribeUser> scribeUsers;
 
-    private Set scribeReportEntries;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "scribe_session_uid")
+    private Set<ScribeReportEntry> scribeReportEntries;
 
+    @ManyToOne
+    @JoinColumn(name = "appointed_scribe_uid")
     private ScribeUser appointedScribe;
 
+    @Column(name = "force_complete")
     private boolean forceComplete;
 
+    @Column(name = "report_submitted")
     private boolean reportSubmitted;
-    // Constructors
 
     /** default constructor */
     public ScribeSession() {
@@ -76,7 +102,7 @@ public class ScribeSession implements java.io.Serializable {
 
     /** full constructor */
     public ScribeSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId, String sessionName,
-	    Scribe scribe, Set scribeUsers) {
+	    Scribe scribe, Set<ScribeUser> scribeUsers) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -85,11 +111,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.scribe = scribe;
 	this.scribeUsers = scribeUsers;
     }
-
-    // Property accessors
-    /**
-     *
-     */
 
     public Long getUid() {
 	return this.uid;
@@ -99,10 +120,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     */
-
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
     }
@@ -110,10 +127,6 @@ public class ScribeSession implements java.io.Serializable {
     public void setSessionEndDate(Date sessionEndDate) {
 	this.sessionEndDate = sessionEndDate;
     }
-
-    /**
-     *
-     */
 
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
@@ -123,10 +136,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     */
-
     public Integer getStatus() {
 	return this.status;
     }
@@ -134,10 +143,6 @@ public class ScribeSession implements java.io.Serializable {
     public void setStatus(Integer status) {
 	this.status = status;
     }
-
-    /**
-     *
-     */
 
     public Long getSessionId() {
 	return this.sessionId;
@@ -147,10 +152,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     */
-
     public String getSessionName() {
 	return this.sessionName;
     }
@@ -158,11 +159,6 @@ public class ScribeSession implements java.io.Serializable {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-
-    /**
-     *
-     *
-     */
 
     public Scribe getScribe() {
 	return this.scribe;
@@ -172,36 +168,22 @@ public class ScribeSession implements java.io.Serializable {
 	this.scribe = scribe;
     }
 
-    /**
-     *
-     *
-     *
-     */
-    public Set getScribeUsers() {
+    public Set<ScribeUser> getScribeUsers() {
 	return this.scribeUsers;
     }
 
-    public void setScribeUsers(Set scribeUsers) {
+    public void setScribeUsers(Set<ScribeUser> scribeUsers) {
 	this.scribeUsers = scribeUsers;
     }
 
-    /**
-     *
-     *
-     *
-     */
-    public Set getScribeReportEntries() {
+    public Set<ScribeReportEntry> getScribeReportEntries() {
 	return scribeReportEntries;
     }
 
-    public void setScribeReportEntries(Set scribeReportEntries) {
+    public void setScribeReportEntries(Set<ScribeReportEntry> scribeReportEntries) {
 	this.scribeReportEntries = scribeReportEntries;
     }
 
-    /**
-     *
-     *
-     */
     public ScribeUser getAppointedScribe() {
 	return appointedScribe;
     }
@@ -210,9 +192,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.appointedScribe = appointedScribe;
     }
 
-    /**
-     *
-     */
     public boolean isForceComplete() {
 	return forceComplete;
     }
@@ -221,9 +200,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.forceComplete = forceComplete;
     }
 
-    /**
-     *
-     */
     public boolean isReportSubmitted() {
 	return reportSubmitted;
     }
@@ -232,11 +208,6 @@ public class ScribeSession implements java.io.Serializable {
 	this.reportSubmitted = reportSubmitted;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -282,7 +253,7 @@ public class ScribeSession implements java.io.Serializable {
 	ScribeSession session = null;
 	try {
 	    session = (ScribeSession) super.clone();
-	    session.scribeUsers = new HashSet();
+	    session.scribeUsers = new HashSet<ScribeUser>();
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ScribeSession.class + " failed");
 	}

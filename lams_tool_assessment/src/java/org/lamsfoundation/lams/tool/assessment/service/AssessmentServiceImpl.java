@@ -189,10 +189,8 @@ public class AssessmentServiceImpl
 
 		// create new user in a DB
 		if (leader == null) {
-		    AssessmentServiceImpl.log.debug("creating new user with userId: " + leaderUserId);
+		    log.debug("creating new user with userId: " + leaderUserId);
 		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-		    String userName = leaderDto.getLogin();
-		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
 		    leader = new AssessmentUser(leaderDto.getUserDTO(), assessmentSession);
 		    createUser(leader);
 		}
@@ -376,7 +374,7 @@ public class AssessmentServiceImpl
     public Assessment getDefaultContent(Long contentId) throws AssessmentApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    AssessmentServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
 
@@ -440,7 +438,24 @@ public class AssessmentServiceImpl
 
     @Override
     public void releaseFromCache(Object object) {
-	assessmentQuestionDao.evict(object);
+	assessmentDao.releaseFromCache(object);
+
+	if (object instanceof AssessmentQuestion) {
+	    AssessmentQuestion question = (AssessmentQuestion) object;
+	    for (AssessmentQuestionOption option : question.getOptions()) {
+		assessmentDao.releaseFromCache(option);
+	    }
+	    for (AssessmentUnit unit : question.getUnits()) {
+		assessmentDao.releaseFromCache(unit);
+	    }
+	}
+
+	if (object instanceof QuestionReference) {
+	    QuestionReference reference = (QuestionReference) object;
+	    if (reference.getQuestion() != null) {
+		assessmentDao.releaseFromCache(reference.getQuestion());
+	    }
+	}
     }
 
     @Override
@@ -450,6 +465,12 @@ public class AssessmentServiceImpl
 
     @Override
     public void deleteQuestionReference(Long uid) {
+	//releaseFromCache associated AssessmentQuestion, otherwise it's treated as "A different object with the same identifier value was already associated with the session: AssessmentQuestion"
+	QuestionReference reference = (QuestionReference) assessmentQuestionDao.getObject(QuestionReference.class, uid);
+	if (reference.getQuestion() != null) {
+	    assessmentDao.releaseFromCache(reference.getQuestion());
+	}
+
 	assessmentQuestionDao.removeObject(QuestionReference.class, uid);
     }
 
@@ -484,7 +505,7 @@ public class AssessmentServiceImpl
 
 		//check all required questionResults exist, it can be missing in case of random question - create new one then
 		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
-		Set<AssessmentQuestionResult> updatedQuestionResults = new TreeSet(
+		Set<AssessmentQuestionResult> updatedQuestionResults = new TreeSet<>(
 			new AssessmentQuestionResultComparator());
 		for (AssessmentQuestion question : questions) {
 
@@ -948,11 +969,11 @@ public class AssessmentServiceImpl
 	//in case user played tricks with accessing Assessment using two tabs, finishedResult can be null and thus we need to request the last *not finished* result
 	if (finishedResult == null) {
 	    AssessmentResult notFinishedResult = getLastAssessmentResult(assessmentUid, userId);
-	    assessmentQuestionDao.evict(notFinishedResult);
+	    assessmentDao.releaseFromCache(notFinishedResult);
 	    return getLastAssessmentResult(assessmentUid, userId);
 
 	} else {
-	    assessmentQuestionDao.evict(finishedResult);
+	    assessmentDao.releaseFromCache(finishedResult);
 	    return getLastFinishedAssessmentResult(assessmentUid, userId);
 	}
     }
@@ -1551,7 +1572,7 @@ public class AssessmentServiceImpl
 			.getQuestionResultsPerSession();
 
 		int markCount = 0;
-		Float markTotal = new Float(0.0);
+		Float markTotal = 0.0F;
 		int timeTakenCount = 0;
 		int timeTakenTotal = 0;
 		for (List<AssessmentQuestionResult> resultList : allResultsForQuestion) {
@@ -1564,9 +1585,9 @@ public class AssessmentServiceImpl
 			userResultRow[count++] = new ExcelCell(
 				getQuestionTypeLanguageLabel(questionResult.getAssessmentQuestion().getType()), false);
 			userResultRow[count++] = new ExcelCell(
-				new Float(questionResult.getAssessmentQuestion().getPenaltyFactor()), false);
+				Float.valueOf(questionResult.getAssessmentQuestion().getPenaltyFactor()), false);
 			Float maxMark = (questionResult.getMaxMark() == null) ? 0
-				: new Float(questionResult.getMaxMark());
+				: Float.valueOf(questionResult.getMaxMark());
 			userResultRow[count++] = new ExcelCell(maxMark, false);
 			if (showUserNames) {
 			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getLoginName(), false);
@@ -1635,26 +1656,26 @@ public class AssessmentServiceImpl
 		    averageRow[7] = new ExcelCell(getMessage("label.export.average"), true);
 
 		    if (timeTakenTotal > 0) {
-			averageRow[8] = new ExcelCell(new Long(timeTakenTotal / timeTakenCount), false);
+			averageRow[8] = new ExcelCell(Long.valueOf(timeTakenTotal / timeTakenCount), false);
 		    }
 		    if (markTotal > 0) {
-			Float averageMark = new Float(markTotal / markCount);
+			Float averageMark = Float.valueOf(markTotal / markCount);
 			averageRow[9] = new ExcelCell(averageMark, false);
 		    } else {
-			averageRow[9] = new ExcelCell(new Float(0.0), false);
+			averageRow[9] = new ExcelCell(0.0F, false);
 		    }
 		} else {
 		    averageRow = new ExcelCell[9];
 		    averageRow[6] = new ExcelCell(getMessage("label.export.average"), true);
 
 		    if (timeTakenTotal > 0) {
-			averageRow[7] = new ExcelCell(new Long(timeTakenTotal / timeTakenCount), false);
+			averageRow[7] = new ExcelCell(Long.valueOf(timeTakenTotal / timeTakenCount), false);
 		    }
 		    if (markTotal > 0) {
-			Float averageMark = new Float(markTotal / markCount);
+			Float averageMark = Float.valueOf(markTotal / markCount);
 			averageRow[8] = new ExcelCell(averageMark, false);
 		    } else {
-			averageRow[8] = new ExcelCell(new Float(0.0), false);
+			averageRow[8] = new ExcelCell(0.0F, false);
 		    }
 		}
 
@@ -1690,8 +1711,8 @@ public class AssessmentServiceImpl
 	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	userSummaryTab.add(summaryRowTitle);
-	Float totalGradesPossible = new Float(0);
-	Float totalAverage = new Float(0);
+	Float totalGradesPossible = 0F;
+	Float totalAverage = 0F;
 	if (assessment.getQuestionReferences() != null) {
 	    Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
@@ -2029,7 +2050,7 @@ public class AssessmentServiceImpl
 		    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionUid);
 
 	    if ((questionResults == null) || questionResults.isEmpty()) {
-		AssessmentServiceImpl.log.warn("User with uid: " + user.getUid()
+		log.warn("User with uid: " + user.getUid()
 			+ " doesn't have any results despite the fact group leader has some.");
 		continue;
 	    }
@@ -2045,7 +2066,7 @@ public class AssessmentServiceImpl
 	    assessmentResultDao.saveObject(result);
 
 	    // propagade changes to Gradebook
-	    toolService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, false);
+	    toolService.updateActivityMark(Double.valueOf(totalMark), null, userId.intValue(), toolSessionId, false);
 
 	    // records mark change with audit service
 	    logEventService.logMarkChange(userId, user.getLoginName(), assessment.getContentId(), "" + oldMark,
@@ -2055,14 +2076,15 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public void recalculateUserAnswers(Assessment assessment, Set<AssessmentQuestion> oldQuestions,
-	    Set<AssessmentQuestion> newQuestions, List<AssessmentQuestion> deletedQuestions,
-	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
-	    List<QuestionReference> deletedReferences) {
+    public void recalculateUserAnswers(final Long assessmentUid, final Long toolContentId,
+	    Set<AssessmentQuestion> oldQuestions, Set<AssessmentQuestion> newQuestions,
+	    List<AssessmentQuestion> deletedQuestions, Set<QuestionReference> oldReferences,
+	    Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences) {
 
 	// create list of modified questions
 	List<AssessmentQuestion> modifiedQuestions = new ArrayList<>();
 	for (AssessmentQuestion oldQuestion : oldQuestions) {
+
 	    for (AssessmentQuestion newQuestion : newQuestions) {
 		if (oldQuestion.getUid().equals(newQuestion.getUid())) {
 
@@ -2134,7 +2156,7 @@ public class AssessmentServiceImpl
 	    }
 	}
 
-	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(assessment.getContentId());
+	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(toolContentId);
 	for (AssessmentSession session : sessionList) {
 	    Long toolSessionId = session.getSessionId();
 	    Set<AssessmentUser> sessionUsers = session.getAssessmentUsers();
@@ -2142,13 +2164,13 @@ public class AssessmentServiceImpl
 	    for (AssessmentUser user : sessionUsers) {
 
 		// get all finished user results
-		List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResults(assessment.getUid(),
+		List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResults(assessmentUid,
 			user.getUserId());
 		AssessmentResult lastFinishedAssessmentResult = (assessmentResults.isEmpty()) ? null
 			: assessmentResults.get(assessmentResults.size() - 1);
 
 		//add autosave assessmentResult as well
-		AssessmentResult lastAssessmentResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
+		AssessmentResult lastAssessmentResult = getLastAssessmentResult(assessmentUid, user.getUserId());
 		if (lastAssessmentResult != null && lastAssessmentResult.getFinishDate() == null) {
 		    assessmentResults.add(lastAssessmentResult);
 		}
@@ -2314,7 +2336,7 @@ public class AssessmentServiceImpl
 			// if this is the last finished assessment result - propagade total mark to Gradebook
 			if (lastFinishedAssessmentResult != null
 				&& lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
-			    toolService.updateActivityMark(new Double(assessmentMark), null,
+			    toolService.updateActivityMark(Double.valueOf(assessmentMark), null,
 				    user.getUserId().intValue(), toolSessionId, false);
 			}
 		    }
@@ -2445,7 +2467,7 @@ public class AssessmentServiceImpl
 	Assessment defaultAssessment = getAssessmentByContentId(defaultAssessmentId);
 	if (defaultAssessment == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    AssessmentServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
 
@@ -2453,11 +2475,10 @@ public class AssessmentServiceImpl
     }
 
     private Long getToolDefaultContentIdBySignature(String toolSignature) throws AssessmentApplicationException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    AssessmentServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
 	return contentId;
@@ -2552,7 +2573,7 @@ public class AssessmentServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(new Long(newUserUid.longValue()),
+	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(newUserUid.longValue(),
 		    toolContentId);
 	    if (user == null) {
 		user = new AssessmentUser();
@@ -2560,7 +2581,7 @@ public class AssessmentServiceImpl
 		user.setFirstName(sysUser.getFirstName());
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
-		user.setUserId(new Long(newUserUid.longValue()));
+		user.setUserId(newUserUid.longValue());
 		user.setAssessment(toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
@@ -2616,8 +2637,7 @@ public class AssessmentServiceImpl
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Assessment assessment = assessmentDao.getByContentId(toolContentId);
 	if (assessment == null) {
-	    AssessmentServiceImpl.log
-		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -2634,9 +2654,8 @@ public class AssessmentServiceImpl
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (AssessmentServiceImpl.log.isDebugEnabled()) {
-	    AssessmentServiceImpl.log
-		    .debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
@@ -2683,11 +2702,11 @@ public class AssessmentServiceImpl
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
-	    AssessmentServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
 	}
 	if (learnerId == null) {
-	    AssessmentServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
 
@@ -2696,8 +2715,8 @@ public class AssessmentServiceImpl
 	    session.setStatus(AssessmentConstants.COMPLETED);
 	    assessmentSessionDao.saveObject(session);
 	} else {
-	    AssessmentServiceImpl.log.error("Fail to leave tool Session.Could not find shared assessment "
-		    + "session by given session id: " + toolSessionId);
+	    log.error("Fail to leave tool Session.Could not find shared assessment " + "session by given session id: "
+		    + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared assessment session by given session id: " + toolSessionId);
 	}
@@ -2711,7 +2730,7 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+    public ToolSessionExportOutputData exportToolSession(List<Long> toolSessionIds)
 	    throws DataMissingException, ToolException {
 	return null;
     }
@@ -2900,7 +2919,7 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+    public Class<?>[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getAssessmentOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
@@ -2955,7 +2974,6 @@ public class AssessmentServiceImpl
      *
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON)
 	    throws IOException {
@@ -3015,7 +3033,7 @@ public class AssessmentServiceImpl
 
 	// **************************** Set the question bank *********************
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
-	Set newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
+	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
 	for (JsonNode questionJSONData : questions) {
 	    AssessmentQuestion question = new AssessmentQuestion();
 	    short type = JsonUtil.optInt(questionJSONData, "type").shortValue();
@@ -3077,7 +3095,7 @@ public class AssessmentServiceImpl
 
 	// **************************** Now set up the references to the questions in the bank *********************
 	ArrayNode references = JsonUtil.optArray(toolContentJSON, "references");
-	Set newReferenceSet = assessment.getQuestionReferences(); // the Assessment constructor will set up the
+	Set<QuestionReference> newReferenceSet = assessment.getQuestionReferences(); // the Assessment constructor will set up the
 
 	;// collection
 	for (JsonNode referenceJSONData : references) {

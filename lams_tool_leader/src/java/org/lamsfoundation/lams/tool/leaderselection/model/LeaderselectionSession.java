@@ -21,47 +21,63 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
- *
  * Represents the tool session.
- *
- *
  */
-
+@Entity
+@Table(name = "tl_lalead11_session")
 public class LeaderselectionSession implements java.io.Serializable {
-
     private static Logger log = Logger.getLogger(LeaderselectionSession.class);
     private static final long serialVersionUID = 4407078136514639026L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne
+    @JoinColumn(name = "leaderselection_uid")
     private Leaderselection leaderselection;
 
-    private Set users;
+    @OneToMany(mappedBy = "leaderselectionSession")
+    private Set<LeaderselectionUser> users = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "group_leader_uid")
     private LeaderselectionUser groupLeader;
-
-    // Constructors
 
     /** default constructor */
     public LeaderselectionSession() {
@@ -69,7 +85,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /** full constructor */
     public LeaderselectionSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId,
-	    String sessionName, Leaderselection leaderselection, Set users) {
+	    String sessionName, Leaderselection leaderselection, Set<LeaderselectionUser> users) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -79,12 +95,6 @@ public class LeaderselectionSession implements java.io.Serializable {
 	this.users = users;
     }
 
-    // Property accessors
-    /**
-     *
-     *
-     */
-
     public Long getUid() {
 	return this.uid;
     }
@@ -92,11 +102,6 @@ public class LeaderselectionSession implements java.io.Serializable {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-
-    /**
-     *
-     *
-     */
 
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
@@ -106,11 +111,6 @@ public class LeaderselectionSession implements java.io.Serializable {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     *
-     */
-
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
     }
@@ -118,11 +118,6 @@ public class LeaderselectionSession implements java.io.Serializable {
     public void setSessionStartDate(Date sessionStartDate) {
 	this.sessionStartDate = sessionStartDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Integer getStatus() {
 	return this.status;
@@ -132,11 +127,6 @@ public class LeaderselectionSession implements java.io.Serializable {
 	this.status = status;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getSessionId() {
 	return this.sessionId;
     }
@@ -144,11 +134,6 @@ public class LeaderselectionSession implements java.io.Serializable {
     public void setSessionId(Long sessionId) {
 	this.sessionId = sessionId;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getSessionName() {
 	return this.sessionName;
@@ -158,12 +143,6 @@ public class LeaderselectionSession implements java.io.Serializable {
 	this.sessionName = sessionName;
     }
 
-    /**
-     *
-     *
-     *
-     */
-
     public Leaderselection getLeaderselection() {
 	return this.leaderselection;
     }
@@ -172,25 +151,14 @@ public class LeaderselectionSession implements java.io.Serializable {
 	this.leaderselection = leaderselection;
     }
 
-    /**
-     *
-     *
-     *
-     *
-     */
-
-    public Set getUsers() {
+    public Set<LeaderselectionUser> getUsers() {
 	return this.users;
     }
 
-    public void setUsers(Set leaderselectionUsers) {
+    public void setUsers(Set<LeaderselectionUser> leaderselectionUsers) {
 	this.users = leaderselectionUsers;
     }
 
-    /**
-     *
-     *
-     */
     public LeaderselectionUser getGroupLeader() {
 	return this.groupLeader;
     }
@@ -199,11 +167,6 @@ public class LeaderselectionSession implements java.io.Serializable {
 	this.groupLeader = groupLeader;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -249,7 +212,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 	LeaderselectionSession session = null;
 	try {
 	    session = (LeaderselectionSession) super.clone();
-	    session.users = new HashSet();
+	    session.users = new HashSet<LeaderselectionUser>();
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + LeaderselectionSession.class + " failed");
 	}

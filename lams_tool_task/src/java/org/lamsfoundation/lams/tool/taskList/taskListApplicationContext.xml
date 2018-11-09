@@ -33,12 +33,6 @@
             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    
-    <bean id="lataskTaskListConditionDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListConditionDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
 
    <bean id="lataskTaskListUserDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListUserDAOHibernate">
         <property name="sessionFactory">
@@ -70,9 +64,6 @@
         </property>
         <property name="taskListItemVisitDao">
             <ref bean="lataskTaskListItemVisitDao"/>
-        </property>
-        <property name="taskListConditionDao">
-            <ref bean="lataskTaskListConditionDao"/>
         </property>
         <property name="taskListUserDao">
             <ref bean="lataskTaskListUserDao"/>

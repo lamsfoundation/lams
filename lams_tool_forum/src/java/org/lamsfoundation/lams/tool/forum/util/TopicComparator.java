@@ -25,13 +25,13 @@
 
 package org.lamsfoundation.lams.tool.forum.util;
 
-import static org.lamsfoundation.lams.tool.forum.util.ForumConstants.OLD_FORUM_STYLE;
+import static org.lamsfoundation.lams.tool.forum.ForumConstants.OLD_FORUM_STYLE;
 
 import java.util.Comparator;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
+import org.lamsfoundation.lams.tool.forum.model.Message;
+import org.lamsfoundation.lams.tool.forum.model.MessageSeq;
 
 /**
  * This class implementaion <code>java.util.Comparator</code> interface. It can sort meesage according to

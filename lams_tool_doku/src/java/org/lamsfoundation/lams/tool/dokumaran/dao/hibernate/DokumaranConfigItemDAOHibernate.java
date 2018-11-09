@@ -12,7 +12,7 @@ public class DokumaranConfigItemDAOHibernate extends LAMSBaseDAO implements Doku
 
     @Override
     public DokumaranConfigItem getConfigItemByKey(final String configKey) {
-	return (DokumaranConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+	return getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY, DokumaranConfigItem.class).setParameter("key", configKey)
 		.uniqueResult();
     }
 

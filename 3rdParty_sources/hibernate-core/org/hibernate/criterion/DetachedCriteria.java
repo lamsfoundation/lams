@@ -274,7 +274,7 @@ public class DetachedCriteria implements CriteriaSpecification, Serializable {
 	}
 
 	/**
-	 * Creates an nested DetachedCriteria representing the association path.
+	 * Creates a nested DetachedCriteria representing the association path.
 	 *
 	 * @param associationPath The association path
 	 * @param alias The alias to apply to that association path
@@ -286,7 +286,7 @@ public class DetachedCriteria implements CriteriaSpecification, Serializable {
 	}
 
 	/**
-	 * Creates an nested DetachedCriteria representing the association path.
+	 * Creates a nested DetachedCriteria representing the association path.
 	 *
 	 * @param associationPath The association path
 	 *
@@ -297,7 +297,7 @@ public class DetachedCriteria implements CriteriaSpecification, Serializable {
 	}
 
 	/**
-	 * Creates an nested DetachedCriteria representing the association path, specifying the type of join to use.
+	 * Creates a nested DetachedCriteria representing the association path, specifying the type of join to use.
 	 *
 	 * @param associationPath The association path
 	 * @param joinType The type of join to use
@@ -309,7 +309,7 @@ public class DetachedCriteria implements CriteriaSpecification, Serializable {
 	}
 
 	/**
-	 * Creates an nested DetachedCriteria representing the association path, specifying the type of join to use.
+	 * Creates a nested DetachedCriteria representing the association path, specifying the type of join to use.
 	 *
 	 * @param associationPath The association path
 	 * @param alias The alias to associate with this "join".
@@ -322,7 +322,7 @@ public class DetachedCriteria implements CriteriaSpecification, Serializable {
 	}
 
 	/**
-	 * Creates an nested DetachedCriteria representing the association path, specifying the type of join to use and
+	 * Creates a nested DetachedCriteria representing the association path, specifying the type of join to use and
 	 * an additional join restriction.
 	 *
 	 * @param associationPath The association path
@@ -418,6 +418,19 @@ public class DetachedCriteria implements CriteriaSpecification, Serializable {
 	 */
 	public DetachedCriteria setLockMode(String alias, LockMode lockMode) {
 		criteria.setLockMode( alias, lockMode );
+		return this;
+	}
+	
+	/**
+	 * Set a timeout for the underlying JDBC query.
+	 *
+	 * @param timeout The timeout value to apply.
+	 * @return this (for method chaining)
+	 *
+	 * @see java.sql.Statement#setQueryTimeout
+	 */
+	public DetachedCriteria setTimeout(int timeout) {
+		criteria.setTimeout( timeout );
 		return this;
 	}
 

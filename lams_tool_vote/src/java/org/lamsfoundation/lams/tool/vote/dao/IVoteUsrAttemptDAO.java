@@ -28,7 +28,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**

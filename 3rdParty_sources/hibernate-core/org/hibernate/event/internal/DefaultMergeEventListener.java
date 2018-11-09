@@ -15,7 +15,7 @@ import org.hibernate.ObjectDeletedException;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.WrongClassException;
 import org.hibernate.boot.registry.selector.spi.StrategySelector;
-import org.hibernate.bytecode.instrumentation.spi.FieldInterceptor;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.internal.Cascade;
 import org.hibernate.engine.internal.CascadePoint;
@@ -81,7 +81,7 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 			final ConfigurationService configurationService
 					= serviceRegistry.getService( ConfigurationService.class );
 			entityCopyObserverStrategy = configurationService.getSetting(
-					"hibernate.event.merge.entity_copy_observer",
+					AvailableSettings.MERGE_ENTITY_COPY_OBSERVER,
 					new ConfigurationService.Converter<String>() {
 						@Override
 						public String convert(Object value) {
@@ -316,8 +316,7 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 			}
 			else if ( isVersionChanged( entity, source, persister, target ) ) {
 				if ( source.getFactory().getStatistics().isStatisticsEnabled() ) {
-					source.getFactory().getStatisticsImplementor()
-							.optimisticFailure( entityName );
+					source.getFactory().getStatistics().optimisticFailure( entityName );
 				}
 				throw new StaleObjectStateException( entityName, id );
 			}
@@ -336,13 +335,6 @@ public class DefaultMergeEventListener extends AbstractSaveEventListener impleme
 	}
 
 	private void markInterceptorDirty(final Object entity, final Object target, EntityPersister persister) {
-		if ( persister.getInstrumentationMetadata().isInstrumented() ) {
-			FieldInterceptor interceptor = persister.getInstrumentationMetadata().extractInterceptor( target );
-			if ( interceptor != null ) {
-				interceptor.dirty();
-			}
-		}
-
 		// for enhanced entities, copy over the dirty attributes
 		if ( entity instanceof SelfDirtinessTracker && target instanceof SelfDirtinessTracker ) {
 			// clear, because setting the embedded attributes dirties them

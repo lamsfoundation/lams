@@ -25,28 +25,59 @@ package org.lamsfoundation.lams.tool.dokumaran.model;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 
 /**
- * Dokumaran
+ * Dokumaran session
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_ladoku11_session")
 public class DokumaranSession {
 
-    private static Logger log = Logger.getLogger(DokumaranSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+    
+    @ManyToOne
+    @JoinColumn(name = "dokumaran_uid")
     private Dokumaran dokumaran;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
-    // finish or not
+    
+    // finished or not
+    @Column
     private int status;
+    
+    @ManyToOne
+    @JoinColumn(name = "group_leader_uid")
     private DokumaranUser groupLeader;
+    
+    @Column(name = "etherpad_group_id")
     private String etherpadGroupId;
+    
+    @Column(name = "etherpad_read_only_id")
     private String etherpadReadOnlyId;
 
     // **********************************************************
@@ -63,9 +94,6 @@ public class DokumaranSession {
 	this.uid = uuid;
     }
 
-    /**
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -74,9 +102,6 @@ public class DokumaranSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -85,9 +110,6 @@ public class DokumaranSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -96,9 +118,6 @@ public class DokumaranSession {
 	this.status = status;
     }
 
-    /**
-     * @return
-     */
     public Dokumaran getDokumaran() {
 	return dokumaran;
     }
@@ -107,9 +126,6 @@ public class DokumaranSession {
 	this.dokumaran = dokumaran;
     }
 
-    /**
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }

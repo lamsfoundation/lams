@@ -27,6 +27,11 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -34,22 +39,30 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Mitchell Seaton
- * @version 2.1
- *
- *
  */
 abstract public class BranchingActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
 
+    private static final long serialVersionUID = -7920442950752010105L;
     // types are used on the URLS to determine which type of branch is expected
     // the code should always then check against the activity to make sure it is correct
     public static final String CHOSEN_TYPE = "chosen";
     public static final String GROUP_BASED_TYPE = "group";
     public static final String TOOL_BASED_TYPE = "tool";
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "system_tool_id")
     private SystemTool systemTool;
+
+    @Column(name = "start_xcoord")
     private Integer startXcoord;
+
+    @Column(name = "start_ycoord")
     private Integer startYcoord;
+
+    @Column(name = "end_xcoord")
     private Integer endXcoord;
+
+    @Column(name = "end_ycoord")
     private Integer endYcoord;
 
     /** full constructor */
@@ -58,8 +71,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Integer startXcoord, Integer startYcoord, Integer endXcoord, Integer endYcoord,
-	    Boolean stopAfterActivity, Set inputActivities, Set activities, Activity defaultActivity,
-	    SystemTool systemTool, Set branchActivityEntries) {
+	    Boolean stopAfterActivity, Set<Activity> inputActivities, Set<Activity> activities,
+	    Activity defaultActivity, SystemTool systemTool, Set<BranchActivityEntry> branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
@@ -83,23 +96,17 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Set activities) {
+	    Transition transitionFrom, Set<Activity> activities) {
 	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom, activities);
 	super.activityStrategy = new BranchingActivityStrategy(this);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
     @Override
     public boolean isNull() {
 	return false;
     }
 
-    /**
-     *
-     */
     public Integer getEndXcoord() {
 	return endXcoord;
     }
@@ -108,9 +115,6 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	this.endXcoord = endXcoord;
     }
 
-    /**
-     *
-     */
     public Integer getEndYcoord() {
 	return endYcoord;
     }
@@ -119,9 +123,6 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	this.endYcoord = endYcoord;
     }
 
-    /**
-     *
-     */
     public Integer getStartXcoord() {
 	return startXcoord;
     }
@@ -130,9 +131,6 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	this.startXcoord = startXcoord;
     }
 
-    /**
-     *
-     */
     public Integer getStartYcoord() {
 	return startYcoord;
     }
@@ -141,10 +139,6 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	this.startYcoord = startYcoord;
     }
 
-    /**
-     *
-     *
-     */
     @Override
     public SystemTool getSystemTool() {
 	return systemTool;
@@ -171,8 +165,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
      * @return error message key
      */
     @Override
-    public Vector validateActivity(MessageService messageService) {
-	Vector listOfValidationErrors = new Vector();
+    public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
 	if (getActivities() == null || getActivities().size() == 0) {
 	    listOfValidationErrors
 		    .add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE,
@@ -181,5 +175,4 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 	}
 	return listOfValidationErrors;
     }
-
 }

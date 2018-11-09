@@ -26,6 +26,13 @@ package org.lamsfoundation.lams.tool;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,58 +41,63 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Represents the URLs for the internal functionality such as grouping and gates. Eventually these will become
  * "pluggable" tools, so that we can have other types of grouping/gates, without making changes to the core.
  */
+@Entity
+@Table(name = "lams_system_tool")
 public class SystemTool implements Serializable {
+    private static final long serialVersionUID = 8804420928455093751L;
 
     /* System Tool IDs */
-    public static final Long GROUPING = new Long(1);
-    public static final Long SYNC_GATE = new Long(2);
-    public static final Long SCHEDULE_GATE = new Long(3);
-    public static final Long PERMISSION_GATE = new Long(4);
-    public static final Long SYSTEM_GATE = new Long(5);
-    public static final Long TEACHER_CHOSEN_BRANCHING = new Long(6);
-    public static final Long GROUP_BASED_BRANCHING = new Long(7);
-    public static final Long TOOL_BASED_BRANCHING = new Long(8);
-    public static final Long SEQUENCE = new Long(9);
-    public static final Long CONDITION_GATE = new Long(10);
-    public static final Long FLOATING_ACTIVITIES = new Long(11);
+    public static final Long GROUPING = 1L;
+    public static final Long SYNC_GATE = 2L;
+    public static final Long SCHEDULE_GATE = 3L;
+    public static final Long PERMISSION_GATE = 4L;
+    public static final Long SYSTEM_GATE = 5L;
+    public static final Long TEACHER_CHOSEN_BRANCHING = 6L;
+    public static final Long GROUP_BASED_BRANCHING = 7L;
+    public static final Long TOOL_BASED_BRANCHING = 8L;
+    public static final Long SEQUENCE = 9L;
+    public static final Long CONDITION_GATE = 10L;
+    public static final Long FLOATING_ACTIVITIES = 11L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "system_tool_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long systemToolId;
 
-    /** persistent field - the type of activity */
+    @Column(name = "learning_activity_type_id")
     private Integer activityTypeId;
 
-    /** persistent field */
+    @Column(name = "tool_display_name")
     private String toolDisplayName;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
+    @Column(name = "learner_url")
     private String learnerUrl;
 
-    /** persistent field */
+    @Column(name = "learner_preview_url")
     private String learnerPreviewUrl;
 
-    /** persistent field */
+    @Column(name = "learner_progress_url")
     private String learnerProgressUrl;
 
-    /** persistent field */
+    @Column(name = "monitor_url")
     private String monitorUrl;
 
-    /** persistent field */
+    @Column(name = "contribute_url")
     private String contributeUrl;
 
-    /** persistent field */
+    @Column(name = "help_url")
     private String helpUrl;
 
-    /** persistent field */
+    @Column(name = "admin_url")
     private String adminUrl;
 
-    /** persistent field */
+    @Column(name = "pedagogical_planner_url")
     private String pedagogicalPlannerUrl;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
     /**
@@ -94,26 +106,6 @@ public class SystemTool implements Serializable {
     public static final String I18N_DISPLAY_NAME = "tool.display.name";
     public static final String I18N_DESCRIPTION = "tool.description";
 
-    /** full constructor */
-    public SystemTool(Long systemToolId, Integer activityTypeId, String displayName, String description,
-	    String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String monitorUrl,
-	    String contributeUrl, String helpUrl, Date createDateTime) {
-	this.systemToolId = systemToolId;
-	this.activityTypeId = activityTypeId;
-	toolDisplayName = displayName;
-	this.description = description;
-
-	this.learnerUrl = learnerUrl;
-	this.learnerPreviewUrl = learnerPreviewUrl;
-	this.learnerProgressUrl = learnerProgressUrl;
-	this.monitorUrl = monitorUrl;
-	this.contributeUrl = contributeUrl;
-	this.helpUrl = helpUrl;
-
-	this.createDateTime = createDateTime;
-    }
-
-    /** default constructor */
     public SystemTool() {
     }
 
@@ -173,32 +165,18 @@ public class SystemTool implements Serializable {
 	this.learnerProgressUrl = learnerProgressUrl;
     }
 
-    /**
-     * @return Returns the helpUrl.
-     */
     public String getAdminUrl() {
 	return adminUrl;
     }
 
-    /**
-     * @param helpUrl
-     *            The helpUrl to set.
-     */
     public void setAdminUrl(String adminUrl) {
 	this.adminUrl = adminUrl;
     }
 
-    /**
-     * @return Returns the createDateTime.
-     */
     public Date getCreateDateTime() {
 	return createDateTime;
     }
 
-    /**
-     * @param createDateTime
-     *            The createDateTime to set.
-     */
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
     }
@@ -211,47 +189,26 @@ public class SystemTool implements Serializable {
 	return (contributeURL != null) && (contributeURL.trim().length() > 0);
     }
 
-    /**
-     * @return Returns the contributeUrl.
-     */
     public String getContributeUrl() {
 	return contributeUrl;
     }
 
-    /**
-     * @param contributeUrl
-     *            The contributUrl to set.
-     */
     public void setContributeUrl(String contributeUrl) {
 	this.contributeUrl = contributeUrl;
     }
 
-    /**
-     * @return Returns the monitorUrl.
-     */
     public String getMonitorUrl() {
 	return monitorUrl;
     }
 
-    /**
-     * @param monitorUrl
-     *            The monitorUrl to set.
-     */
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
     }
 
-    /**
-     * @return Returns the helpUrl.
-     */
     public String getHelpUrl() {
 	return helpUrl;
     }
 
-    /**
-     * @param helpUrl
-     *            The helpUrl to set.
-     */
     public void setHelpUrl(String helpUrl) {
 	this.helpUrl = helpUrl;
     }
@@ -286,5 +243,4 @@ public class SystemTool implements Serializable {
     public void setPedagogicalPlannerUrl(String pedagogicalPlannerUrl) {
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
     }
-
 }

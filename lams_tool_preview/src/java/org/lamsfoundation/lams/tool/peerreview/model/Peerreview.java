@@ -23,13 +23,27 @@
 
 package org.lamsfoundation.lams.tool.peerreview.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
@@ -37,53 +51,79 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
  *
  * @author Dapeng Ni
  */
-public class Peerreview implements Cloneable {
+@Entity
+@Table(name = "tl_laprev11_peerreview")
+public class Peerreview implements Serializable, Cloneable {
+
+    private static final long serialVersionUID = 39313222633921144L;
 
     private static final Logger log = Logger.getLogger(Peerreview.class);
 
-    // key
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // tool contentID
+    @Column(name = "content_id")
     private Long contentId;
 
+    @Column
     private String title;
 
+    @Column
     private String instructions;
 
+    @Column(name = "maximum_rates")
     private int maximumRates;
 
+    @Column(name = "minimum_rates")
     private int minimumRates;
 
+    @OneToMany
+    @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
+    @OrderBy("orderId asc")
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
-    // advance
-
+    @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
 
+    @Column(name = "define_later")
     private boolean defineLater;
 
+    @Column(name = "content_in_use")
     private boolean contentInUse;
 
-    // general infomation
+    @Column(name = "create_date")
     private Date created;
 
+    @Column(name = "update_date")
     private Date updated;
 
+    @ManyToOne
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "create_by")
     private PeerreviewUser createdBy;
 
+    @Column(name = "maximum_rates_per_user")
     private int maximumRatesPerUser;
 
+    @Column(name = "show_ratings_left_for_user")
     private boolean showRatingsLeftForUser;
     
+    @Column(name = "show_ratings_left_by_user")
     private boolean showRatingsLeftByUser;
 
+    @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
 
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
     
+    @Column(name = "self_review")
     private boolean selfReview;
 
+    @Column(name = "notify_users_of_results")
     private boolean notifyUsersOfResults;
     
     // **********************************************************

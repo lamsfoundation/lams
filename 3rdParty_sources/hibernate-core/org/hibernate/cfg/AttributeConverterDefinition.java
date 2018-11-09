@@ -12,20 +12,27 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
-import org.jboss.logging.Logger;
+import org.hibernate.boot.AttributeConverterInfo;
+import org.hibernate.boot.model.convert.internal.InstanceBasedConverterDescriptor;
+import org.hibernate.boot.model.convert.spi.ConverterDescriptor;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 
 /**
+ * Externalized representation of an AttributeConverter
+ *
  * @author Steve Ebersole
+ *
+ * @deprecated (since 5.3) forces the converter instance to be built too early,
+ * which precludes the ability to resolve them from CDI, etc.  See
+ * {@link org.hibernate.boot.model.convert.spi.ConverterDescriptor} instead
  */
-public class AttributeConverterDefinition {
-	private static final Logger log = Logger.getLogger( AttributeConverterDefinition.class );
-
+@Deprecated
+public class AttributeConverterDefinition implements AttributeConverterInfo {
 	private final AttributeConverter attributeConverter;
 	private final boolean autoApply;
 	private final Class entityAttributeType;
@@ -152,7 +159,7 @@ public class AttributeConverterDefinition {
 	private ParameterizedType extractAttributeConverterParameterizedType(Type base) {
 		if ( base != null ) {
 			Class clazz = extractClass( base );
-			List<Type> types = new ArrayList<Type>();
+			List<Type> types = new ArrayList<>();
 			types.add( clazz.getGenericSuperclass() );
 			types.addAll( Arrays.asList( clazz.getGenericInterfaces() ) );
 			for ( Type type : types ) {
@@ -236,15 +243,6 @@ public class AttributeConverterDefinition {
 		return databaseColumnType;
 	}
 
-	private static Class extractType(TypeVariable typeVariable) {
-		java.lang.reflect.Type[] boundTypes = typeVariable.getBounds();
-		if ( boundTypes == null || boundTypes.length != 1 ) {
-			return null;
-		}
-
-		return (Class) boundTypes[0];
-	}
-
 	private static Class extractClass(Type type) {
 		if ( type instanceof Class ) {
 			return (Class) type;
@@ -256,6 +254,11 @@ public class AttributeConverterDefinition {
 	}
 
 	@Override
+	public Class<? extends AttributeConverter> getConverterClass() {
+		return attributeConverter.getClass();
+	}
+
+	@Override
 	public String toString() {
 		return String.format(
 				"%s[converterClass=%s, domainType=%s, jdbcType=%s]",
@@ -263,6 +266,15 @@ public class AttributeConverterDefinition {
 				attributeConverter.getClass().getName(),
 				entityAttributeType.getName(),
 				databaseColumnType.getName()
+		);
+	}
+
+	@Override
+	public ConverterDescriptor toConverterDescriptor(MetadataBuildingContext context) {
+		return new InstanceBasedConverterDescriptor(
+				getAttributeConverter(),
+				isAutoApply(),
+				context.getBootstrapContext().getClassmateContext()
 		);
 	}
 }

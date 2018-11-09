@@ -27,14 +27,16 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
-import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -50,15 +52,17 @@ import org.lamsfoundation.lams.util.MessageService;
  *
  * @author Chris Perfect
  * @author Jacky Fang
- *
- *
  */
+@Entity
+@DiscriminatorValue("4")
 public class ScheduleGateActivity extends GateActivity implements Serializable {
+    private static final long serialVersionUID = -3992109155489420550L;
 
     /**
      * The relative gate open time from the lesson start time. For example, if the lesson starts at 3:00pm and offset is
      * 1, the gate will be opened at 4:00pm.
      */
+    @Column(name = "gate_start_time_offset")
     private Long gateStartTimeOffset;
 
     /**
@@ -69,54 +73,14 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      *
      * Note it must be larger than <code>gateStartTimeOffset</code>.
      */
+    @Column(name = "gate_end_time_offset")
     private Long gateEndTimeOffset;
 
+    @Column(name = "gate_activity_completion_based")
     private Boolean gateActivityCompletionBased;
-
-    /** full constructor */
-    @SuppressWarnings("rawtypes")
-    public ScheduleGateActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId,
-	    Long gateStartTimeOffset, Long gateEndTimeOffset, SystemTool sysTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, gateActivityLevelId, sysTool,
-		branchActivityEntries);
-	// validate pre-condition.
-	if ((gateStartTimeOffset != null) && (gateEndTimeOffset != null)
-		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue())) {
-	    throw new IllegalStateException("End time offset must be larger" + " than start time offset");
-	}
-
-	this.gateStartTimeOffset = gateStartTimeOffset;
-	this.gateEndTimeOffset = gateEndTimeOffset;
-	this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
-    }
 
     /** default constructor */
     public ScheduleGateActivity() {
-	this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public ScheduleGateActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Integer gateActivityLevelId, Long gateStartTimeOffset, Long gateEndTimeOffset) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, gateActivityLevelId);
-	if ((gateStartTimeOffset != null) && (gateEndTimeOffset != null)
-		&& (gateStartTimeOffset.intValue() > gateEndTimeOffset.intValue())) {
-	    throw new IllegalStateException("End time offset must be larger" + " than start time offset");
-	}
-
-	this.gateStartTimeOffset = gateStartTimeOffset;
-	this.gateEndTimeOffset = gateEndTimeOffset;
 	this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
     }
 
@@ -130,7 +94,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	ScheduleGateActivity newScheduleGateActivity = new ScheduleGateActivity();
 	copyToNewActivity(newScheduleGateActivity, uiidOffset);
 	newScheduleGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
-	newScheduleGateActivity.setGateOpen(new Boolean(false));
+	newScheduleGateActivity.setGateOpen(false);
 
 	newScheduleGateActivity.setGateEndTimeOffset(this.getGateEndTimeOffset());
 	newScheduleGateActivity.setGateStartTimeOffset(this.getGateStartTimeOffset());
@@ -138,9 +102,6 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	return newScheduleGateActivity;
     }
 
-    /**
-     *
-     */
     public Long getGateStartTimeOffset() {
 	return this.gateStartTimeOffset;
     }
@@ -149,9 +110,6 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 	this.gateStartTimeOffset = gateStartTimeOffset;
     }
 
-    /**
-     *
-     */
     public Long getGateEndTimeOffset() {
 	return this.gateEndTimeOffset;
     }

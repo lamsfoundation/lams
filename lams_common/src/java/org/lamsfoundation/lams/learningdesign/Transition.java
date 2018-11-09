@@ -26,53 +26,84 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 
 /**
  * @author Manpreet Minhas
  */
+@Entity
+@Table(name = "lams_learning_transition")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "transition_type", discriminatorType = DiscriminatorType.INTEGER)
+@DiscriminatorValue("0")
 public class Transition implements Serializable {
     // LAMS 2.4 introduced different transition types; "classical" one is progress type; now we also have data flow; see
     // DataTransition
+    private static final long serialVersionUID = -1508015273745811405L;
 
     public static final int PROGRESS_TRANSITION_TYPE = 0;
 
     public static final int DATA_TRANSITION_TYPE = 1;
 
-    /** identifier field */
+    @Id
+    @Column(name = "transition_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitionId;
 
-    /** nullable persistent field */
+    @Column(name = "transition_ui_id")
     private Integer transitionUIID;
 
-    /** nullable persistent field */
+    @Column(name = "to_ui_id")
     private Integer toUIID;
 
-    /** nullable persistent field */
+    @Column(name = "from_ui_id")
     private Integer fromUIID;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** nullable persistent field */
+    @Column
     private String title;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
-    /** persistent field */
+    @OneToOne(optional = false)
+    @JoinColumn(name = "to_activity_id")
+    @Cascade(CascadeType.SAVE_UPDATE)
     Activity toActivity;
 
-    /** persistent field */
+    @OneToOne(optional = false)
+    @JoinColumn(name = "from_activity_id")
+    @Cascade(CascadeType.SAVE_UPDATE)
     Activity fromActivity;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "learning_design_id")
+    @Cascade(CascadeType.SAVE_UPDATE)
     LearningDesign learningDesign;
 
-    /** persistent field */
+    @Column(name = "transition_type", insertable = false, updatable = false)
     protected Integer transitionType = Transition.PROGRESS_TRANSITION_TYPE;
 
     /*

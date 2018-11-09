@@ -27,6 +27,8 @@ package org.lamsfoundation.lams.tool.scribe.service;
 
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
@@ -148,4 +150,8 @@ public interface IScribeService {
     void submitReport(Long toolSessionId, String userName, ObjectNode requestJSON);
 
     public void deleteHeading(Long headingUid);
-}
+
+    /** Copied from ToolServiceManager */
+    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
+
+    }

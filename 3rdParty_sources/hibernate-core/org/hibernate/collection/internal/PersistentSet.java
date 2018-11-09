@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.loader.CollectionAliases;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.type.Type;
@@ -50,8 +51,19 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 	 *
 	 * @param session The session to which this set will belong.
 	 */
-	public PersistentSet(SessionImplementor session) {
+	public PersistentSet(SharedSessionContractImplementor session) {
 		super( session );
+	}
+
+	/**
+	 *  Instantiates a lazy set (the underlying set is un-initialized).
+	 *
+	 * @param session The session to which this set will belong.
+	 * @deprecated {@link #PersistentSet(SharedSessionContractImplementor)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentSet(SessionImplementor session) {
+		this( (SharedSessionContractImplementor) session );
 	}
 
 	/**
@@ -61,7 +73,7 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 	 * @param session The session to which this set will belong.
 	 * @param set The underlying set data.
 	 */
-	public PersistentSet(SessionImplementor session, java.util.Set set) {
+	public PersistentSet(SharedSessionContractImplementor session, java.util.Set set) {
 		super( session );
 		// Sets can be just a view of a part of another collection.
 		// do we need to copy it to be sure it won't be changing
@@ -70,6 +82,19 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 		this.set = set;
 		setInitialized();
 		setDirectlyAccessible( true );
+	}
+
+	/**
+	 * Instantiates a non-lazy set (the underlying set is constructed
+	 * from the incoming set reference).
+	 *
+	 * @param session The session to which this set will belong.
+	 * @param set The underlying set data.
+	 * @deprecated {@link #PersistentSet(SharedSessionContractImplementor, java.util.Set)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentSet(SessionImplementor session, java.util.Set set) {
+		this( (SharedSessionContractImplementor) session, set );
 	}
 
 	@Override
@@ -206,6 +231,7 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 		if ( exists == null ) {
 			initialize( true );
 			if ( set.remove( value ) ) {
+				elementRemoved = true;
 				dirty();
 				return true;
 			}
@@ -214,6 +240,7 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 			}
 		}
 		else if ( exists ) {
+			elementRemoved = true;
 			queueOperation( new SimpleRemove( value ) );
 			return true;
 		}
@@ -266,6 +293,7 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 		if ( coll.size() > 0 ) {
 			initialize( true );
 			if ( set.removeAll( coll ) ) {
+				elementRemoved = true;
 				dirty();
 				return true;
 			}
@@ -326,8 +354,8 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 	public boolean endRead() {
 		set.addAll( tempList );
 		tempList = null;
-		setInitialized();
-		return true;
+		// ensure that operationQueue is considered
+		return super.endRead();
 	}
 
 	@Override
@@ -384,7 +412,7 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 		// note that it might be better to iterate the snapshot but this is safe,
 		// assuming the user implements equals() properly, as required by the Set
 		// contract!
-		return oldValue == null || elemType.isDirty( oldValue, entry, getSession() );
+		return ( oldValue == null && entry != null ) || elemType.isDirty( oldValue, entry, getSession() );
 	}
 
 	@Override
@@ -434,7 +462,7 @@ public class PersistentSet extends AbstractPersistentCollection implements java.
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean entryExists(Object key, int i) {
-		return true;
+		return key != null;
 	}
 
 	@Override

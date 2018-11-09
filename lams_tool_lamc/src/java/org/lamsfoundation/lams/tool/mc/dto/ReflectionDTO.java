@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 
 /**
  * <p>

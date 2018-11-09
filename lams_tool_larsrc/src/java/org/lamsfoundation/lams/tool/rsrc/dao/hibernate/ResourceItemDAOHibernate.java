@@ -37,9 +37,8 @@ public class ResourceItemDAOHibernate extends LAMSBaseDAO implements ResourceIte
 	    + " where resource_uid = ? order by create_date asc";
 
     @Override
-    public List getAuthoringItems(Long resourceUid) {
-
-	return this.doFind(FIND_AUTHORING_ITEMS, resourceUid);
+    public List<ResourceItem> getAuthoringItems(Long resourceUid) {
+	return (List<ResourceItem>) this.doFind(FIND_AUTHORING_ITEMS, resourceUid);
     }
 
     @Override

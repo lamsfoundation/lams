@@ -88,6 +88,16 @@ public final class Template {
 
 	private Template() {}
 
+	public static String renderTransformerReadFragment(
+			String fragment,
+			String... columnNames) {
+		// NOTE : would need access to SessionFactoryImplementor to make this configurable
+		for ( String columnName : columnNames ) {
+			fragment = fragment.replace( columnName, TEMPLATE + '.' + columnName );
+		}
+		return fragment;
+	}
+
 	public static String renderWhereStringTemplate(String sqlWhereString, Dialect dialect, SQLFunctionRegistry functionRegistry) {
 		return renderWhereStringTemplate(sqlWhereString, TEMPLATE, dialect, functionRegistry);
 	}
@@ -718,12 +728,21 @@ public final class Template {
 		return token.startsWith( ":" );
 	}
 
-	private static boolean isFunctionOrKeyword(String lcToken, String nextToken, Dialect dialect, SQLFunctionRegistry functionRegistry) {
-		return "(".equals(nextToken) ||
-			KEYWORDS.contains(lcToken) ||
-			isFunction(lcToken, nextToken, functionRegistry ) ||
-			dialect.getKeywords().contains(lcToken) ||
-			FUNCTION_KEYWORDS.contains(lcToken);
+	private static boolean isFunctionOrKeyword(
+			String lcToken,
+			String nextToken,
+			Dialect dialect,
+			SQLFunctionRegistry functionRegistry) {
+		return "(".equals( nextToken ) ||
+				KEYWORDS.contains( lcToken ) ||
+				isType( lcToken, dialect ) ||
+				isFunction( lcToken, nextToken, functionRegistry ) ||
+				dialect.getKeywords().contains( lcToken ) ||
+				FUNCTION_KEYWORDS.contains( lcToken );
+	}
+
+	private static boolean isType(String lcToken, Dialect dialect) {
+		return dialect.isTypeNameRegistered( lcToken );
 	}
 
 	private static boolean isFunction(String lcToken, String nextToken, SQLFunctionRegistry functionRegistry) {

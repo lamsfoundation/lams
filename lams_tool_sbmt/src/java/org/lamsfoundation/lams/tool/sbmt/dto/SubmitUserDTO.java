@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 
 /**
  * @author Manpreet Minhas

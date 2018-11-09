@@ -28,8 +28,8 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -41,23 +41,11 @@ public class SubmitFilesSessionDAO extends LAMSBaseDAO implements ISubmitFilesSe
     private static final String FIND_LEARNER_BY_CONTENT_ID = " from " + SubmitFilesSession.class.getName()
 	    + " as session where session.content.contentID = :contentID";
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#getSessionByID(java.lang.Long)
-     */
     @Override
     public SubmitFilesSession getSessionByID(Long sessionID) {
 	return (SubmitFilesSession) super.find(SubmitFilesSession.class, sessionID);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#createSession(org.lamsfoundation.lams.tool.sbmt.
-     * SubmitFilesSession)
-     */
     @Override
     public void createSession(SubmitFilesSession submitSession) {
 	getSession().save(submitSession);
@@ -66,8 +54,8 @@ public class SubmitFilesSessionDAO extends LAMSBaseDAO implements ISubmitFilesSe
     @Override
     public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID) {
 	if (contentID != null) {
-	    return getSessionFactory().getCurrentSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
-		    .setLong("contentID", contentID.longValue()).list();
+	    return getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID, SubmitFilesSession.class)
+		    .setParameter("contentID", contentID).list();
 	}
 	return null;
     }

@@ -17,15 +17,16 @@ import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.Exportable;
 import org.hibernate.boot.model.relational.InitCommand;
 import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.boot.model.relational.QualifiedTableName;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.env.spi.QualifiedObjectNameFormatter;
 import org.hibernate.engine.spi.Mapping;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.tool.hbm2ddl.ColumnMetadata;
 import org.hibernate.tool.hbm2ddl.TableMetadata;
 import org.hibernate.tool.schema.extract.spi.ColumnInformation;
@@ -438,13 +439,35 @@ public class Table implements RelationalModel, Serializable, Exportable {
 
 	public Iterator sqlAlterStrings(
 			Dialect dialect,
-			Mapping p,
+			Metadata metadata,
 			TableInformation tableInfo,
 			String defaultCatalog,
 			String defaultSchema) throws HibernateException {
+		
+		final JdbcEnvironment jdbcEnvironment = metadata.getDatabase().getJdbcEnvironment();
 
-		StringBuilder root = new StringBuilder( "alter table " )
-				.append( getQualifiedName( dialect, defaultCatalog, defaultSchema ) )
+		Identifier quotedCatalog = catalog != null && catalog.isQuoted() ?
+				new Identifier( tableInfo.getName().getCatalogName().getText(), true ) :
+				tableInfo.getName().getCatalogName();
+
+		Identifier quotedSchema = schema != null && schema.isQuoted() ?
+				new Identifier( tableInfo.getName().getSchemaName().getText(), true ) :
+				tableInfo.getName().getSchemaName();
+
+		Identifier quotedTable = name != null &&  name.isQuoted() ?
+				new Identifier( tableInfo.getName().getObjectName().getText(), true ) :
+				tableInfo.getName().getObjectName();
+
+		final String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter().format(
+				new QualifiedTableName(
+					quotedCatalog,
+					quotedSchema,
+					quotedTable
+				),
+				dialect
+		);
+
+		StringBuilder root = new StringBuilder( dialect.getAlterTableString( tableName ) )
 				.append( ' ' )
 				.append( dialect.getAddColumnString() );
 
@@ -461,7 +484,7 @@ public class Table implements RelationalModel, Serializable, Exportable {
 						.append( ' ' )
 						.append( column.getQuotedName( dialect ) )
 						.append( ' ' )
-						.append( column.getSqlType( dialect, p ) );
+						.append( column.getSqlType( dialect, metadata ) );
 
 				String defaultValue = column.getDefaultValue();
 				if ( defaultValue != null ) {
@@ -681,14 +704,15 @@ public class Table implements RelationalModel, Serializable, Exportable {
 	public void createForeignKeys() {
 	}
 
-	public ForeignKey createForeignKey(String keyName, List keyColumns, String referencedEntityName) {
-		return createForeignKey( keyName, keyColumns, referencedEntityName, null );
+	public ForeignKey createForeignKey(String keyName, List keyColumns, String referencedEntityName, String keyDefinition) {
+		return createForeignKey( keyName, keyColumns, referencedEntityName, keyDefinition, null );
 	}
 
 	public ForeignKey createForeignKey(
 			String keyName,
 			List keyColumns,
 			String referencedEntityName,
+			String keyDefinition,
 			List referencedColumns) {
 		final ForeignKeyKey key = new ForeignKeyKey( keyColumns, referencedEntityName, referencedColumns );
 
@@ -697,6 +721,7 @@ public class Table implements RelationalModel, Serializable, Exportable {
 			fk = new ForeignKey();
 			fk.setTable( this );
 			fk.setReferencedEntityName( referencedEntityName );
+			fk.setKeyDefinition(keyDefinition);
 			fk.addColumns( keyColumns.iterator() );
 			if ( referencedColumns != null ) {
 				fk.addReferencedColumns( referencedColumns.iterator() );
@@ -869,15 +894,15 @@ public class Table implements RelationalModel, Serializable, Exportable {
 
 		public boolean equals(Object other) {
 			ForeignKeyKey fkk = (ForeignKeyKey) other;
-			return fkk.columns.equals( columns ) && fkk.referencedColumns.equals( referencedColumns );
+			return fkk != null && fkk.columns.equals( columns ) && fkk.referencedColumns.equals( referencedColumns );
 		}
 
 		@Override
 		public String toString() {
 			return "ForeignKeyKey{" +
-					"columns=" + StringHelper.join( ",", columns ) +
+					"columns=" + String.join( ",", columns ) +
 					", referencedClassName='" + referencedClassName + '\'' +
-					", referencedColumns=" + StringHelper.join( ",", referencedColumns ) +
+					", referencedColumns=" + String.join( ",", referencedColumns ) +
 					'}';
 		}
 	}

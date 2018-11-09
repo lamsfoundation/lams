@@ -237,12 +237,13 @@ public class InheritanceState {
 	}
 
 	private AccessType determineDefaultAccessType() {
-        for (XClass xclass = clazz; xclass != null; xclass = xclass.getSuperclass()) {
-            if ((xclass.getSuperclass() == null || Object.class.getName().equals(xclass.getSuperclass().getName()))
-                && (xclass.isAnnotationPresent(Entity.class) || xclass.isAnnotationPresent(MappedSuperclass.class))
-                && xclass.isAnnotationPresent(Access.class))
-                return AccessType.getAccessStrategy(xclass.getAnnotation(Access.class).value());
-        }
+		for (XClass xclass = clazz; xclass != null; xclass = xclass.getSuperclass()) {
+			if ( ( xclass.getSuperclass() == null || Object.class.getName().equals( xclass.getSuperclass().getName() ) )
+					&& ( xclass.isAnnotationPresent( Entity.class ) || xclass.isAnnotationPresent( MappedSuperclass.class ) )
+					&& xclass.isAnnotationPresent( Access.class ) ) {
+				return AccessType.getAccessStrategy( xclass.getAnnotation( Access.class ).value() );
+			}
+		}
         // Guess from identifier.
         // FIX: Shouldn't this be determined by the first attribute (i.e., field or property) with annotations, but without an
         //      explicit Access annotation, according to JPA 2.0 spec 2.3.1: Default Access Type?
@@ -262,7 +263,7 @@ public class InheritanceState {
 				}
 			}
 		}
-        throw new AnnotationException( "No identifier specified for entity: " + clazz );
+		throw new AnnotationException( "No identifier specified for entity: " + clazz );
 	}
 
 	private void getMappedSuperclassesTillNextEntityOrdered() {
@@ -278,7 +279,7 @@ public class InheritanceState {
 				superclassState = inheritanceStatePerClass.get( superClass );
 			}
 			while ( superClass != null
-					&& !buildingContext.getBuildingOptions().getReflectionManager().equals( superClass, Object.class )
+					&& !buildingContext.getBootstrapContext().getReflectionManager().equals( superClass, Object.class )
 					&& superclassState == null );
 
 			currentClassInHierarchy = superClass;
@@ -299,7 +300,7 @@ public class InheritanceState {
 		final int lastMappedSuperclass = classesToProcessForMappedSuperclass.size() - 1;
 		for ( int index = 0; index < lastMappedSuperclass; index++ ) {
 			org.hibernate.mapping.MappedSuperclass parentSuperclass = mappedSuperclass;
-			final Class<?> type = buildingContext.getBuildingOptions().getReflectionManager()
+			final Class<?> type = buildingContext.getBootstrapContext().getReflectionManager()
 					.toClass( classesToProcessForMappedSuperclass.get( index ) );
 			//add MAppedSuperclass if not already there
 			mappedSuperclass = buildingContext.getMetadataCollector().getMappedSuperclass( type );

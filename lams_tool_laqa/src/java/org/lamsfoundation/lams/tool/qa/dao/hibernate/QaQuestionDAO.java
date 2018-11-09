@@ -27,8 +27,8 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -42,11 +42,12 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     private static final String LOAD_QUESTION_BY_QUESTION_UID = "from qaQuestion in class QaQueContent where qaQuestion.uid=:uid";
     private static final String SORT_QUESTION_BY_DISPLAY_ORDER = "from qaQuestion in class QaQueContent where qaQuestion.qaContent.uid=:uid order by qaQuestion.displayOrder";
 
+    @SuppressWarnings("unchecked")
     @Override
-    public QaQueContent getQuestionByDisplayOrder(Long displayOrder, Long contentUid) {
+    public QaQueContent getQuestionByDisplayOrder(Integer displayOrder, Long contentUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
 		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER)
-		.setLong("displayOrder", displayOrder.longValue()).setLong("uid", contentUid.longValue()).list();
+		.setParameter("displayOrder", displayOrder).setParameter("uid", contentUid).list();
 
 	if (list != null && list.size() > 0) {
 	    QaQueContent qa = list.get(0);
@@ -55,10 +56,11 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public QaQueContent getQuestionByUid(Long questionUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_QUESTION_UID).setLong("uid", questionUid.longValue())
+		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_QUESTION_UID).setParameter("uid", questionUid.longValue())
 		.list();
 
 	if (list != null && list.size() > 0) {
@@ -68,18 +70,20 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<QaQueContent> getAllQuestionEntriesSorted(final long contentUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setLong("uid", contentUid).list();
+		.createQuery(QaQuestionDAO.SORT_QUESTION_BY_DISPLAY_ORDER).setParameter("uid", contentUid).list();
 
 	return list;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<QaQueContent> getAllQuestionEntries(final long contentUid) {
-	List list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID)
-		.setLong("uid", contentUid).list();
+	List<QaQueContent> list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID)
+		.setParameter("uid", contentUid).list();
 
 	return list;
     }

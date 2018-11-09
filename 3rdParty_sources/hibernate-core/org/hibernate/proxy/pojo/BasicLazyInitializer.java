@@ -9,8 +9,7 @@ package org.hibernate.proxy.pojo;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.util.MarkerObject;
 import org.hibernate.proxy.AbstractLazyInitializer;
 import org.hibernate.type.CompositeType;
@@ -39,7 +38,7 @@ public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 			Method getIdentifierMethod,
 			Method setIdentifierMethod,
 			CompositeType componentIdType,
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			boolean overridesEquals) {
 		super( entityName, id, session );
 		this.persistentClass = persistentClass;
@@ -91,20 +90,15 @@ public abstract class BasicLazyInitializer extends AbstractLazyInitializer {
 	}
 
 	private Object getReplacement() {
-		final SessionImplementor session = getSession();
-		if ( isUninitialized() && session != null && session.isOpen() ) {
-			final EntityKey key = session.generateEntityKey(
-					getIdentifier(),
-					session.getFactory().getEntityPersister( getEntityName() )
-			);
-			final Object entity = session.getPersistenceContext().getEntity( key );
-			if ( entity != null ) {
-				setImplementation( entity );
-			}
-		}
+		/*
+		 * If the target has already been loaded somewhere, just not set on the proxy,
+		 * then use it to initialize the proxy so that we will serialize that instead of the proxy.
+		 */
+		initializeWithoutLoadIfPossible();
 
 		if ( isUninitialized() ) {
 			if ( replacement == null ) {
+				prepareForPossibleLoadingOutsideTransaction();
 				replacement = serializableProxy();
 			}
 			return replacement;

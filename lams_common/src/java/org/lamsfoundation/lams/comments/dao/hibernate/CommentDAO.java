@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.comments.Comment;
 import org.lamsfoundation.lams.comments.dao.ICommentDAO;
@@ -73,13 +73,13 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 	@SuppressWarnings("rawtypes")
 	List list = null;
 	if (externalSecondaryId == null)
-	    list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS).setLong("externalId", externalId)
-		    .setInteger("externalIdType", externalIdType).setString("externalSignature", externalSignature)
+	    list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS).setParameter("externalId", externalId)
+		    .setParameter("externalIdType", externalIdType).setParameter("externalSignature", externalSignature)
 		    .list();
 	else
-	    list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS_EXTRA_ID).setLong("externalId", externalId)
-		    .setLong("externalSecondaryId", externalSecondaryId).setInteger("externalIdType", externalIdType)
-		    .setString("externalSignature", externalSignature).list();
+	    list = getSession().createQuery(SQL_QUERY_FIND_ROOT_TOPICS_EXTRA_ID).setParameter("externalId", externalId)
+		    .setParameter("externalSecondaryId", externalSecondaryId).setParameter("externalIdType", externalIdType)
+		    .setParameter("externalSignature", externalSignature).list();
 
 	if (list != null && list.size() > 0) {
 	    return (Comment) list.get(0);
@@ -99,10 +99,10 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
     @Override
     @SuppressWarnings("unchecked")
     public SortedSet<Comment> getThreadByThreadId(Long threadCommentId, Integer sortBy, Integer userId) {
-	SQLQuery query = getSession().createSQLQuery(SQL_QUERY_GET_COMPLETE_THREAD);
+	NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_GET_COMPLETE_THREAD);
 	query.addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		.addScalar("user_vote", IntegerType.INSTANCE).setLong("userId", userId != null ? userId : 0)
-		.setLong("threadId", threadCommentId);
+		.addScalar("user_vote", IntegerType.INSTANCE).setParameter("userId", userId != null ? userId : 0)
+		.setParameter("threadId", threadCommentId);
 	List<Object[]> results = query.list();
 	return upgradeComments(results, sortBy);
     }
@@ -155,16 +155,16 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 	List<Number> threadUidList = null;
 	if (previousThreadMessageId == null || previousThreadMessageId == 0L) {
 	    threadUidList = getSession().createSQLQuery(SQL_QUERY_FIND_FIRST_THREAD_TOP_BY_UID)
-		    .setLong("rootUid", rootTopicId).setMaxResults(numberOfThreads).list();
+		    .setParameter("rootUid", rootTopicId).setMaxResults(numberOfThreads).list();
 	} else {
-	    threadUidList = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_TOP).setLong("rootUid", rootTopicId)
-		    .setLong("lastUid", previousThreadMessageId).setMaxResults(numberOfThreads).list();
+	    threadUidList = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_TOP).setParameter("rootUid", rootTopicId)
+		    .setParameter("lastUid", previousThreadMessageId).setMaxResults(numberOfThreads).list();
 	}
 
 	if (threadUidList != null && threadUidList.size() > 0) {
-	    SQLQuery query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES);
+	    NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES);
 	    query.addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		    .addScalar("user_vote", IntegerType.INSTANCE).setLong("userId", userId != null ? userId : 0)
+		    .addScalar("user_vote", IntegerType.INSTANCE).setParameter("userId", userId != null ? userId : 0)
 		    .setParameterList("threadIds", threadUidList);
 	    List<Object[]> results = query.list();
 	    return upgradeComments(results, sortBy);
@@ -201,15 +201,15 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 	if (previousThreadMessageId == null || previousThreadMessageId == 0L) {
 	    topThreadObjects = getSession().createSQLQuery(SQL_QUERY_FIND_FIRST_THREAD_TOP_BY_LIKES)
 		    .addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		    .addScalar("user_vote", IntegerType.INSTANCE).setLong("rootUid", rootTopicId)
-		    .setLong("userId", userId != null ? userId : 0).setMaxResults(numberOfThreads).list();
+		    .addScalar("user_vote", IntegerType.INSTANCE).setParameter("rootUid", rootTopicId)
+		    .setParameter("userId", userId != null ? userId : 0).setMaxResults(numberOfThreads).list();
 	} else {
 	    // get more entries with the same number of likes or less likes
 	    topThreadObjects = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_TOP_BY_LIKE)
 		    .addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		    .addScalar("user_vote", IntegerType.INSTANCE).setLong("rootUid", rootTopicId)
-		    .setLong("lastUid", previousThreadMessageId).setString("like", extraSortParam)
-		    .setLong("userId", userId != null ? userId : 0).setMaxResults(numberOfThreads).list();
+		    .addScalar("user_vote", IntegerType.INSTANCE).setParameter("rootUid", rootTopicId)
+		    .setParameter("lastUid", previousThreadMessageId).setParameter("like", extraSortParam)
+		    .setParameter("userId", userId != null ? userId : 0).setMaxResults(numberOfThreads).list();
 	}
 	if (topThreadObjects != null && topThreadObjects.size() > 0) {
 	    // build the list of uids
@@ -218,9 +218,9 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 		Comment comment = (Comment) rawObject[0];
 		threadUidList.add(comment.getUid());
 	    }
-	    SQLQuery query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES_REPLIES_ONLY);
+	   NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES_REPLIES_ONLY);
 	    query.addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		    .addScalar("user_vote", IntegerType.INSTANCE).setLong("userId", userId != null ? userId : 0)
+		    .addScalar("user_vote", IntegerType.INSTANCE).setParameter("userId", userId != null ? userId : 0)
 		    .setParameterList("threadIds", threadUidList);
 	    List<Object[]> results = query.list();
 	    topThreadObjects.addAll(results);
@@ -249,13 +249,13 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 
 	// the search to get to the top level is quite light, so get just the uids
 	// then build a complete set.
-	List<Number> threadUidList = getSession().createSQLQuery(SQL_QUERY_FIND_STICKY_BY_UID)
-		.setLong("rootUid", rootTopicId).list();
+	List<Number> threadUidList = getSession().createNativeQuery(SQL_QUERY_FIND_STICKY_BY_UID)
+		.setParameter("rootUid", rootTopicId).list();
 
 	if (threadUidList != null && threadUidList.size() > 0) {
-	    SQLQuery query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES);
+	    NativeQuery<Object[]> query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES);
 	    query.addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		    .addScalar("user_vote", IntegerType.INSTANCE).setLong("userId", userId != null ? userId : 0)
+		    .addScalar("user_vote", IntegerType.INSTANCE).setParameter("userId", userId != null ? userId : 0)
 		    .setParameterList("threadIds", threadUidList);
 	    List<Object[]> results = query.list();
 	    return upgradeComments(results, sortBy);
@@ -273,10 +273,10 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
     private SortedSet<Comment> getStickyByThreadIdLikes(final Long rootTopicId, Integer sortBy, String extraSortParam,
 	    Integer userId) {
 
-	List<Object[]> topThreadObjects = getSession().createSQLQuery(SQL_QUERY_FIND_STICKY_BY_LIKES)
+	List<Object[]> topThreadObjects = getSession().createNativeQuery(SQL_QUERY_FIND_STICKY_BY_LIKES)
 		.addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		.addScalar("user_vote", IntegerType.INSTANCE).setLong("rootUid", rootTopicId)
-		.setLong("userId", userId != null ? userId : 0).list();
+		.addScalar("user_vote", IntegerType.INSTANCE).setParameter("rootUid", rootTopicId)
+		.setParameter("userId", userId != null ? userId : 0).list();
 
 	if (topThreadObjects != null && topThreadObjects.size() > 0) {
 	    // build the list of uids
@@ -285,9 +285,9 @@ public class CommentDAO extends LAMSBaseDAO implements ICommentDAO {
 		Comment comment = (Comment) rawObject[0];
 		threadUidList.add(comment.getUid());
 	    }
-	    SQLQuery query = getSession().createSQLQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES_REPLIES_ONLY);
+	    NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES_REPLIES_ONLY);
 	    query.addEntity("comment", Comment.class).addScalar("likes_total", IntegerType.INSTANCE)
-		    .addScalar("user_vote", IntegerType.INSTANCE).setLong("userId", userId != null ? userId : 0)
+		    .addScalar("user_vote", IntegerType.INSTANCE).setParameter("userId", userId != null ? userId : 0)
 		    .setParameterList("threadIds", threadUidList);
 	    List<Object[]> results = query.list();
 	    topThreadObjects.addAll(results);

@@ -55,6 +55,8 @@
 			<include name="com/fasterxml/jackson/core/jackson-core/main/jackson-core-*.jar" />
 			<include name="com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-*.jar" />
 			<include name="javax/activation/api/main/activation-*.jar" />
+			<include name="javax/persistence/api/main/javax.persistence-api-*.jar" />
+			<include name="org/hibernate/main/hibernate-core-*.Final.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">

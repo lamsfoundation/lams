@@ -28,9 +28,9 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Repository;
 public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDetailsDAO {
 
     private static final String FIND_BY_SESSION = "from " + SubmissionDetails.class.getName()
-	    + " as d where d.submitFileSession.sessionID=?";
+	    + " as d where d.submitFileSession.sessionID=:sessionID";
     private static final String FIND_BY_SESSION_LEARNER = "from " + SubmissionDetails.class.getName()
 	    + " as d where d.submitFileSession.sessionID=? and d.learner.userID=?";
 
@@ -63,8 +63,8 @@ public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDeta
     @Override
     public List<SubmissionDetails> getSubmissionDetailsBySession(Long sessionID) {
 	if (sessionID != null) {
-	    return getSessionFactory().getCurrentSession().createQuery(FIND_BY_SESSION)
-		    .setLong(0, sessionID.longValue()).list();
+	    return getSession().createQuery(FIND_BY_SESSION, SubmissionDetails.class)
+		    .setParameter("sessionID", sessionID.longValue()).list();
 	}
 	return null;
     }
@@ -72,8 +72,6 @@ public class SubmissionDetailsDAO extends LAMSBaseDAO implements ISubmissionDeta
     @Override
     @SuppressWarnings("unchecked")
     public List<SubmissionDetails> getBySessionAndLearner(Long sessionID, Integer userID) {
-
 	return (List<SubmissionDetails>) doFind(FIND_BY_SESSION_LEARNER, new Object[] { sessionID, userID });
-
     }
 }

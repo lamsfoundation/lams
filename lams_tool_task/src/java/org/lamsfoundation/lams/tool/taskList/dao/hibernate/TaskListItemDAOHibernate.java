@@ -42,17 +42,11 @@ public class TaskListItemDAOHibernate extends LAMSBaseDAO implements TaskListIte
     private static final String FIND_AUTHORING_ITEMS = "from " + TaskListItem.class.getName()
 	    + " where taskList_uid = ? order by sequence_Id asc";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List getAuthoringItems(Long taskListUid) {
 	return this.doFind(FIND_AUTHORING_ITEMS, taskListUid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TaskListItem getByUid(Long taskListItemUid) {
 	return (TaskListItem) this.getObject(TaskListItem.class, taskListItemUid);

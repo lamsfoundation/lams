@@ -1,96 +1,118 @@
 package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class ExtServer implements Serializable, Comparable {
-
+@Entity
+@Table(name = "lams_ext_server_org_map")
+public class ExtServer implements Serializable, Comparable<ExtServer> {
+    
     private static final long serialVersionUID = 337894825609071182L;
 
     /*
-     * static final variables indicating the type of servers available.
+     * variables indicating the type of servers available.
      */
     /* **************************************************************** */
     public static final int INTEGRATION_SERVER_TYPE = 1;
     public static final int LTI_CONSUMER_SERVER_TYPE = 2;
-    /** *************************************************************** */
+    /* *************************************************************** */
 
-    /** identifier field */
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sid;
 
-    /** persistent field */
+    @Column
     private String serverid;
 
-    /** persistent field */
+    @Column
     private String serverkey;
 
-    /** persistent field */
+    @Column
     private String servername;
 
-    /** persistent field */
+    @Column
     private String serverdesc;
 
-    /** The type of activity */
+    @Column(name = "server_type_id")
     private Integer serverTypeId;
 
-    /** persistent field */
+    @Column
     private String prefix;
 
-    /** persistent field */
+    @Column(name = "userinfo_url")
     private String userinfoUrl;
 
-    /** persistent field */
+    @Column(name = "lesson_finish_url")
     private String lessonFinishUrl;
 
+    @Column(name = "ext_groups_url")
     private String extGroupsUrl;
 
-    /** persistent field */
+    @Column
     private Boolean disabled;
 
+    @Column(name = "time_to_live_login_request_enabled")
     private Boolean timeToLiveLoginRequestEnabled;
 
-    /** persistent field */
+    @Column(name = "time_to_live_login_request")
     private int timeToLiveLoginRequest;
 
+    @Column(name = "learner_presence_avail")
     private Boolean learnerPresenceAvailable;
 
+    @Column(name = "learner_im_avail")
     private Boolean learnerImAvailable;
 
+    @Column(name = "live_edit_enabled")
     private Boolean liveEditEnabled;
 
+    @Column(name = "enable_lesson_notifications")
     private Boolean enableLessonNotifications;
 
     /**
      * Should Learner start the lesson from the beginning each time he enters it.
      * Content is not removed, LessonProgress is deleted, not archived.
      */
+    @Column(name = "force_restart")
     private Boolean forceLearnerRestart;
 
     /**
      * Should Learners be allowed to restart the lesson after finishing it.
      * Content is not removed, LessonProgress is archived and then deleted.
      */
+    @Column(name = "allow_restart")
     private Boolean allowLearnerRestart;
 
     /**
      * Should learners be displayed activity gradebook on lesson complete.
      */
+    @Column(name = "gradebook_on_complete")
     private Boolean gradebookOnComplete;
 
-    /** persistent field */
-    private Set extCourseClassMaps;
+    @OneToMany(mappedBy = "extServer")
+    private Set<ExtCourseClassMap> extCourseClassMaps = new HashSet<ExtCourseClassMap>();
 
-    /** persistent field */
-    private Set extUserUseridMaps;
+    @OneToMany(mappedBy = "extServer")
+    private Set<ExtUserUseridMap> extUserUseridMaps = new HashSet<ExtUserUseridMap>();
 
     /**
      * Comma-separated list of roles that LTI tool consumer uses to indicate user monitor role
      */
+    @Column(name = "lti_consumer_monitor_roles")
     private String ltiToolConsumerMonitorRoles;
 
-    /** default constructor */
     public ExtServer() {
 	timeToLiveLoginRequest = 80;
     }
@@ -193,8 +215,6 @@ public class ExtServer implements Serializable, Comparable {
 
     /**
      * Measured in minutes.
-     *
-     * @return
      */
     public int getTimeToLiveLoginRequest() {
 	return this.timeToLiveLoginRequest;
@@ -204,19 +224,19 @@ public class ExtServer implements Serializable, Comparable {
 	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
     }
 
-    public Set getExtCourseClassMaps() {
+    public Set<ExtCourseClassMap> getExtCourseClassMaps() {
 	return this.extCourseClassMaps;
     }
 
-    public void setExtCourseClassMaps(Set extCourseClassMaps) {
+    public void setExtCourseClassMaps(Set<ExtCourseClassMap> extCourseClassMaps) {
 	this.extCourseClassMaps = extCourseClassMaps;
     }
 
-    public Set getExtUserUseridMaps() {
+    public Set<ExtUserUseridMap> getExtUserUseridMaps() {
 	return this.extUserUseridMaps;
     }
 
-    public void setExtUserUseridMaps(Set extUserUseridMaps) {
+    public void setExtUserUseridMaps(Set<ExtUserUseridMap> extUserUseridMaps) {
 	this.extUserUseridMaps = extUserUseridMaps;
     }
 
@@ -235,8 +255,8 @@ public class ExtServer implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-	return serverid.compareToIgnoreCase(((ExtServer) o).getServerid());
+    public int compareTo(ExtServer o) {
+	return serverid.compareToIgnoreCase(o.getServerid());
     }
 
     public boolean isIntegrationServer() {

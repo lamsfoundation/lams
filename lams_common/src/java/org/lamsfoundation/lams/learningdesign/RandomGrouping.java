@@ -23,7 +23,9 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 /**
  * <p>
@@ -41,17 +43,17 @@ import java.util.Set;
  * @author chris
  * @author Jacky Fang
  */
+@Entity
+@DiscriminatorValue("1")
 public class RandomGrouping extends Grouping {
-    /** nullable persistent field */
+    private static final long serialVersionUID = 364252053930917480L;
+
+    @Column(name = "number_of_groups")
     private Integer numberOfGroups;
 
-    /** nullable persistent field */
+    @Column(name = "learners_per_group")
     private Integer learnersPerGroup;
 
-    /**
-     *
-     *
-     */
     public Integer getNumberOfGroups() {
 	return this.numberOfGroups;
     }
@@ -60,10 +62,6 @@ public class RandomGrouping extends Grouping {
 	this.numberOfGroups = numberOfGroups;
     }
 
-    /**
-     *
-     *
-     */
     public Integer getLearnersPerGroup() {
 	return this.learnersPerGroup;
     }
@@ -77,18 +75,10 @@ public class RandomGrouping extends Grouping {
 	super.grouper = new RandomGrouper();
     }
 
-    /** full constructor */
-    public RandomGrouping(Long groupingId, Set groups, Set activities, Integer numberOfGroups,
-	    Integer learnersPerGroup) {
-	super(groupingId, groups, activities, new RandomGrouper());
-	this.learnersPerGroup = learnersPerGroup;
-	this.numberOfGroups = numberOfGroups;
-    }
-
     /**
      * This type of grouping doesn't have groups other than learner groups.
      * So it always return <code>true</code>.
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
      */
     @Override
@@ -98,7 +88,7 @@ public class RandomGrouping extends Grouping {
 
     /**
      * This method creates a deep copy of the Grouping
-     * 
+     *
      * @return RandomGrouping The deep copied Grouping object
      */
     @Override
@@ -111,5 +101,4 @@ public class RandomGrouping extends Grouping {
 
 	return randomGrouping;
     }
-
 }

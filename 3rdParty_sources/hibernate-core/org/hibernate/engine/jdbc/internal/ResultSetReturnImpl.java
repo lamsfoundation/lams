@@ -31,8 +31,6 @@ public class ResultSetReturnImpl implements ResultSetReturn {
 	private final SqlStatementLogger sqlStatementLogger;
 	private final SqlExceptionHelper sqlExceptionHelper;
 
-	private boolean isJdbc4 = true;
-
 	/**
 	 * Constructs a ResultSetReturnImpl
 	 *
@@ -55,14 +53,6 @@ public class ResultSetReturnImpl implements ResultSetReturn {
 	@Override
 	public ResultSet extract(PreparedStatement statement) {
 		// IMPL NOTE : SQL logged by caller
-		if ( isTypeOf( statement, CallableStatement.class ) ) {
-			// We actually need to extract from Callable statement.  Although
-			// this seems needless, Oracle can return an
-			// OracleCallableStatementWrapper that finds its way to this method,
-			// rather than extract(CallableStatement).  See HHH-8022.
-			final CallableStatement callableStatement = (CallableStatement) statement;
-			return extract( callableStatement );
-		}
 		try {
 			final ResultSet rs;
 			try {
@@ -86,25 +76,6 @@ public class ResultSetReturnImpl implements ResultSetReturn {
 
 	private void jdbcExecuteStatementStart() {
 		jdbcCoordinator.getJdbcSessionOwner().getJdbcSessionContext().getObserver().jdbcExecuteStatementStart();
-	}
-
-	private boolean isTypeOf(final Statement statement, final Class<? extends Statement> type) {
-		if ( isJdbc4 ) {
-			try {
-				// This is "more correct" than #isInstance, but not always supported.
-				return statement.isWrapperFor( type );
-			}
-			catch (SQLException e) {
-				// No operation
-			}
-			catch (Throwable e) {
-				// No operation. Note that this catches more than just SQLException to
-				// cover edge cases where a driver might throw an UnsupportedOperationException, AbstractMethodError,
-				// etc.  If so, skip permanently.
-				isJdbc4 = false;
-			}
-		}
-		return type.isInstance( statement );
 	}
 
 	@Override

@@ -231,7 +231,7 @@ public class ClassPropertyHolder extends AbstractPropertyHolder {
 	}
 
 	private void addPropertyToMappedSuperclass(Property prop, XClass declaringClass) {
-		final Class type = getContext().getBuildingOptions().getReflectionManager().toClass( declaringClass );
+		final Class type = getContext().getBootstrapContext().getReflectionManager().toClass( declaringClass );
 		MappedSuperclass superclass = getContext().getMetadataCollector().getMappedSuperclass( type );
 		superclass.addDeclaredProperty( prop );
 	}
@@ -303,7 +303,12 @@ public class ClassPropertyHolder extends AbstractPropertyHolder {
 		return false;
 	}
 
-//	@Override
+	@Override
+	public boolean isWithinElementCollection() {
+		return false;
+	}
+
+	//	@Override
 //	public AttributeConverterDefinition resolveAttributeConverter(String attributeName) {
 //
 //		// @Convert annotations take precedence if present

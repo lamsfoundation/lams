@@ -21,41 +21,55 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
- * Survey
- *
  * @author Dapeng Ni
- *
- *
- *
  */
+
+@Entity
+@Table(name = "tl_lasurv11_answer")
 public class SurveyAnswer {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @ManyToOne
+    @JoinColumn(name = "user_uid")
     private SurveyUser user;
 
+    @ManyToOne
+    @JoinColumn(name = "question_uid")
     private SurveyQuestion surveyQuestion;
+
     // options choice string: option UIDs are conjunctioned by &. Such as 2&5&3
+    @Column(name = "answer_choices")
     private String answerChoices;
+
+    @Column(name = "answer_text")
     private String answerText;
+
+    @Column(name = "udpate_date")
     private Date updateDate;
 
-    // ************************************************
-    // DTO fields
-    // ************************************************
     // it is list of optional UIDs. Uid is long type, but here just save them by String format
+    @Transient
     private String[] choices;
 
-    /**
-     *
-     * @return
-     */
     public SurveyQuestion getSurveyQuestion() {
 	return surveyQuestion;
     }
@@ -64,10 +78,6 @@ public class SurveyAnswer {
 	this.surveyQuestion = item;
     }
 
-    /**
-     *
-     * @return Returns the log Uid.
-     */
     public Long getUid() {
 	return uid;
     }
@@ -76,10 +86,6 @@ public class SurveyAnswer {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public SurveyUser getUser() {
 	return user;
     }
@@ -88,10 +94,6 @@ public class SurveyAnswer {
 	this.user = user;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getAnswerChoices() {
 	return answerChoices;
     }
@@ -100,10 +102,6 @@ public class SurveyAnswer {
 	this.answerChoices = answers;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getUpdateDate() {
 	return updateDate;
     }
@@ -112,10 +110,6 @@ public class SurveyAnswer {
 	this.updateDate = updateDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getAnswerText() {
 	return answerText;
     }
@@ -131,5 +125,4 @@ public class SurveyAnswer {
     public void setChoices(String[] choices) {
 	this.choices = choices;
     }
-
 }

@@ -26,6 +26,17 @@ package org.lamsfoundation.lams.rating.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -54,6 +65,11 @@ import org.lamsfoundation.lams.util.Nullable;
  *   That is, for Hedging a reviewer makes one justification comment, whereas in Star the reviewer makes one comment for each user/item being reviewed.
  *   
  */
+
+@Entity
+@Table(name = "lams_rating_criteria")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "rating_criteria_type_id", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class RatingCriteria implements Serializable, Nullable, Comparable, Cloneable {
 
     private static final Logger log = Logger.getLogger(RatingCriteria.class);
@@ -104,30 +120,41 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     // Instance variables
     // ---------------------------------------------------------------------
 
-    /** identifier field */
+    @Id
+    @Column(name = "rating_criteria_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ratingCriteriaId;
 
     /** Title of the ratingCriteria */
+    @Column
     private String title;
 
     /**
      * Indicates the order in which the activities appear inside complex activities. Starts from 0, 1 and so on.
      */
+    @Column(name = "order_id")
     private Integer orderId;
 
     /** The type of ratingCriteria */
+    @Column(name = "rating_criteria_type_id", insertable = false, updatable = false)
     private Integer ratingCriteriaTypeId;
 
+    @Column(name = "comments_enabled")
     private boolean commentsEnabled; // comments for RATING_STYLE_COMMENT, RATING_STYLE_STAR justification for RATING_STYLE_HEDGING
 
+    @Column(name = "comments_min_words_limit")
     private int commentsMinWordsLimit;
 
+    @Column(name = "rating_style")
     private Integer ratingStyle; // see comments above for RATING_STYLE
     
+    @Column(name = "max_rating")
     private Integer maxRating; // see comments above for RATING_STYLE
     
+    @Column(name = "minimum_rates")
     private Integer minimumRates; // Minimum number of people for whom one user may rate this criteria. Used for RATING_STYLE_STAR.
 
+    @Column(name = "maximum_rates")
     private Integer maximumRates; // Minimum number of people for whom one user may rate this criteria. Used for RATING_STYLE_STAR.
 
     

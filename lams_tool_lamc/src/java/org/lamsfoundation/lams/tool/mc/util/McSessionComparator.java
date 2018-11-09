@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.tool.mc.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.model.McSession;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 
 /**

@@ -23,7 +23,7 @@
 package org.lamsfoundation.lams.tool.vote.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
 
 /**
  * Import filter class for different versions of Vote content.

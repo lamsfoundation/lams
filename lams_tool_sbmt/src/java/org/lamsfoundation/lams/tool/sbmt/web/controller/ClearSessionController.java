@@ -43,8 +43,6 @@ import org.springframework.web.context.WebApplicationContext;
  * This class give a chance to clear HttpSession when user save/close authoring page.
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 @Controller
 public class ClearSessionController extends LamsAuthoringFinishController implements SbmtConstants {
@@ -62,7 +60,7 @@ public class ClearSessionController extends LamsAuthoringFinishController implem
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
 	session.removeAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 	if (mode.isAuthor()) {
-	    ClearSessionController.logger.debug("In Author mode");
+	    logger.debug("In Author mode");
 	    session.removeAttribute(customiseSessionID);
 	}
     }

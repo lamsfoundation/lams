@@ -24,6 +24,15 @@
 
 package org.lamsfoundation.lams.tool.mindmap.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -32,18 +41,37 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  *
  *
  */
+@Entity
+@Table(name = "tl_lamind10_user")
 public class MindmapUser implements java.io.Serializable {
 
     private static final long serialVersionUID = -3701664859818409197L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "user_id")
     private Long userId;
+
+    @Column(name = "last_name")
     private String lastName;
+
+    @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "login_name")
     private String loginName;
+    
+    @ManyToOne 
+    @JoinColumn(name = "mindmap_session_uid") 
     private MindmapSession mindmapSession;
+
+    @Column(name = "finishedActivity")
     private boolean finishedActivity;
+
+    @Column(name = "entry_uid")
     private Long entryUID;
 
     // Constructors
@@ -53,7 +81,7 @@ public class MindmapUser implements java.io.Serializable {
     }
 
     public MindmapUser(UserDTO user, MindmapSession mindmapSession) {
-	this.userId = new Long(user.getUserID().intValue());
+	this.userId = Long.valueOf(user.getUserID().intValue());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.loginName = user.getLogin();
@@ -70,9 +98,6 @@ public class MindmapUser implements java.io.Serializable {
     }
 
     // Property accessors
-    /**
-     *
-     */
     public Long getUid() {
 	return this.uid;
     }
@@ -81,10 +106,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Long getUserId() {
 	return this.userId;
     }
@@ -93,10 +114,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.userId = userId;
     }
 
-    /**
-     *
-     *
-     */
     public String getLastName() {
 	return this.lastName;
     }
@@ -105,10 +122,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.lastName = lastName;
     }
 
-    /**
-     *
-     *
-     */
     public String getLoginName() {
 	return loginName;
     }
@@ -117,10 +130,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
-    /**
-     *
-     *
-     */
     public String getFirstName() {
 	return this.firstName;
     }
@@ -129,9 +138,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.firstName = firstName;
     }
 
-    /**
-     *
-     */
     public boolean isFinishedActivity() {
 	return finishedActivity;
     }
@@ -140,11 +146,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.finishedActivity = finishedActivity;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public MindmapSession getMindmapSession() {
 	return this.mindmapSession;
     }
@@ -153,9 +154,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.mindmapSession = mindmapSession;
     }
 
-    /**
-     *
-     */
     public Long getEntryUID() {
 	return entryUID;
     }
@@ -164,11 +162,6 @@ public class MindmapUser implements java.io.Serializable {
 	this.entryUID = entryUID;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

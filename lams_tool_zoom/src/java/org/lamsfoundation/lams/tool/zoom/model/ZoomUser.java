@@ -23,32 +23,51 @@
 
 package org.lamsfoundation.lams.tool.zoom.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
+@Entity
+@Table(name = "tl_lazoom10_user")
 public class ZoomUser implements java.io.Serializable {
     private static final long serialVersionUID = 8663555378960558429L;
 
-    // Persistent Fields
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "user_id")
     private Integer userId;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "email")
     private String email;
 
+    @ManyToOne
+    @JoinColumn(name = "zoom_session_uid")
     private ZoomSession zoomSession;
 
+    @Column
     private boolean finishedActivity;
 
+    @Column(name = "notebook_entry_uid")
     private Long notebookEntryUID;
 
+    @Column(name = "meeting_join_url")
     private String meetingJoinUrl;
-
-    // Constructors
 
     public ZoomUser() {
     }
@@ -70,10 +89,6 @@ public class ZoomUser implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Integer getUserId() {
 	return this.userId;
     }
@@ -122,9 +137,6 @@ public class ZoomUser implements java.io.Serializable {
 	this.zoomSession = zoomSession;
     }
 
-    /**
-     *
-     */
     public Long getNotebookEntryUID() {
 	return notebookEntryUID;
     }
@@ -141,11 +153,6 @@ public class ZoomUser implements java.io.Serializable {
 	this.meetingJoinUrl = meetingJoinUrl;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

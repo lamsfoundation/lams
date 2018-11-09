@@ -66,11 +66,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
-import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
@@ -79,6 +74,11 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesReport;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -282,6 +282,7 @@ public class SubmitFilesService
 		SubmitFilesReport userreport = usersubmission.getReport();
 		if (userreport == null) {
 		    userreport = new SubmitFilesReport();
+		    userreport.setDetails(usersubmission);
 		    usersubmission.setReport(userreport);
 		}
 		userreport.setComments(leaderReport.getComments());
@@ -438,7 +439,7 @@ public class SubmitFilesService
 
 	    submitSession.setSessionID(toolSessionId);
 	    submitSession.setSessionName(toolSessionName);
-	    submitSession.setStatus(new Integer(SubmitFilesSession.INCOMPLETE));
+	    submitSession.setStatus(SubmitFilesSession.INCOMPLETE);
 	    submitSession.setContent(submitContent);
 	    submitFilesSessionDAO.createSession(submitSession);
 	    log.debug("Submit File session created");
@@ -462,7 +463,7 @@ public class SubmitFilesService
 
 	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
 	if (session != null) {
-	    session.setStatus(new Integer(SubmitFilesSession.COMPLETED));
+	    session.setStatus(SubmitFilesSession.COMPLETED);
 	    submitFilesSessionDAO.update(session);
 	} else {
 	    log.error("Fail to leave tool Session.Could not find submit file " + "session by given session id: "
@@ -479,7 +480,7 @@ public class SubmitFilesService
     }
 
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) {
+    public ToolSessionExportOutputData exportToolSession(List<Long> toolSessionIds) {
 	return null;
     }
 
@@ -500,11 +501,11 @@ public class SubmitFilesService
     }
 
     private void removeToolSession(SubmitFilesSession session) {
-	Set filesUploaded = session.getSubmissionDetails();
+	Set<SubmissionDetails> filesUploaded = session.getSubmissionDetails();
 	if (filesUploaded != null) {
-	    Iterator fileIterator = filesUploaded.iterator();
+	    Iterator<SubmissionDetails>fileIterator = filesUploaded.iterator();
 	    while (fileIterator.hasNext()) {
-		SubmissionDetails details = (SubmissionDetails) fileIterator.next();
+		SubmissionDetails details = fileIterator.next();
 		try {
 		    sbmtToolContentHandler.deleteFile(details.getUuid());
 		} catch (RepositoryCheckedException e) {
@@ -566,11 +567,12 @@ public class SubmitFilesService
 	details.setUuid(nodeKey.getUuid());
 	details.setVersionID(nodeKey.getVersion());
 	SubmitFilesReport report = new SubmitFilesReport();
+	report.setDetails(details);
 	details.setReport(report);
 	details.setSubmitFileSession(session);
 
 	// update session, then insert the detail too.
-	Set detailSet = session.getSubmissionDetails();
+	Set<SubmissionDetails> detailSet = session.getSubmissionDetails();
 	detailSet.add(details);
 	session.setSubmissionDetails(detailSet);
 	submissionDetailsDAO.saveOrUpdate(session);
@@ -821,7 +823,7 @@ public class SubmitFilesService
 	// push outputs to gradebook
 	for (Integer userId : userIdToTotalMarkMap.keySet()) {
 	    Double userTotalMark = userIdToTotalMarkMap.get(userId) == null ? null
-		    : new Double(userIdToTotalMarkMap.get(userId));
+		    : userIdToTotalMarkMap.get(userId).doubleValue();
 	    toolService.updateActivityMark(userTotalMark, null, userId, sessionID, false);
 	}
     }
@@ -995,8 +997,7 @@ public class SubmitFilesService
 
     @Override
     public Long getToolDefaultContentIdBySignature(String toolSignature) {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
 	    log.error(error);
@@ -1034,12 +1035,12 @@ public class SubmitFilesService
     }
 
     @Override
-    public List getSubmitFilesSessionByContentID(Long contentID) {
-	List learners = submitFilesSessionDAO.getSubmitFilesSessionByContentID(contentID);
-	if (learners == null) {
-	    learners = new ArrayList(); // return sized 0 list rather than null value
+    public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID) {
+	List<SubmitFilesSession> sessions = submitFilesSessionDAO.getSubmitFilesSessionByContentID(contentID);
+	if (sessions == null) {
+	    sessions = new ArrayList<>(); // return sized 0 list rather than null value
 	}
-	return learners;
+	return sessions;
     }
 
     @Override
@@ -1242,7 +1243,7 @@ public class SubmitFilesService
     }
 
     @Override
-    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+    public Class<?>[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getSubmitFilesOutputFactory().getSupportedDefinitionClasses(definitionType);
 
     }
@@ -1346,8 +1347,8 @@ public class SubmitFilesService
 		if (leader == null) {
 		    log.debug("creating new user with userId: " + leaderUserId);
 		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-		    String userName = leaderDto.getLogin();
-		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
+//		    String userName = leaderDto.getLogin();
+//		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
 		    //  leader = new SubmitUser(leaderDto.getUserDTO(), submitFileSession);
 		    leader = new SubmitUser();
 		    leader.setLogin(leaderDto.getLogin());

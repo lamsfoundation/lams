@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.model.McContent;
 import org.lamsfoundation.lams.tool.mc.web.form.McLearningForm;
 
 /**

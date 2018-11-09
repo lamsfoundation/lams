@@ -3,10 +3,7 @@ package org.lamsfoundation.lams.tool.sbmt.web.form;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- *
  * Learner Form.
- *
- *
  */
 public class LearnerForm {
 

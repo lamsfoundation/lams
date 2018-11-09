@@ -27,6 +27,26 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -40,6 +60,72 @@ import org.lamsfoundation.lams.usermanagement.User;
  * A Lesson is a learning sequence that is assocated with a number of users for use in learning. A lesson needs a run
  * time copy of learning design to interact with.
  */
+@NamedNativeQueries({
+	@NamedNativeQuery(resultClass = User.class, name = "monitorsByToolSessionId", query = "SELECT DISTINCT user.*"
+		+ " FROM lams_lesson AS l JOIN lams_grouping AS ging ON l.class_grouping_id = ging.grouping_id"
+		+ " JOIN lams_group AS g ON ging.staff_group_id = g.group_id"
+		+ " JOIN lams_user_group AS ug ON g.group_id = ug.group_id"
+		+ " JOIN lams_user AS user ON user.user_id = ug.user_id"
+		+ " JOIN lams_learning_design AS ld ON ld.copy_type_id = 2"
+		+ " AND l.learning_design_id = ld.learning_design_id"
+		+ " JOIN lams_tool_session AS s ON s.tool_session_id = :sessionId AND s.lesson_id = l.lesson_id"),
+	@NamedNativeQuery(resultClass = Lesson.class, name = "activeLessonsAllOrganisations", query = "SELECT DISTINCT lesson.*"
+		+ " FROM lams_lesson AS lesson JOIN lams_learning_design AS ld ON ld.copy_type_id = 2"
+		+ " AND lesson.learning_design_id = ld.learning_design_id"
+		+ " JOIN lams_grouping AS ging ON lesson.lesson_state_id IN (3,5)"
+		+ " AND lesson.class_grouping_id = ging.grouping_id"
+		+ " JOIN lams_group AS g ON ging.grouping_id = g.grouping_id AND g.group_id != ging.staff_group_id"
+		+ " JOIN lams_user_group AS ug ON ug.user_id = :userId AND g.group_id = ug.group_id"),
+	@NamedNativeQuery(name = "learnerLessonsByOrgAndUserWithCompletedFlag", resultSetMapping = "lessonsByOrgAndUserWithCompletedFlag", query = "SELECT l.lesson_id, l.name, l.description, l.lesson_state_id,"
+		+ " lp.lesson_completed_flag, l.enable_lesson_notifications,"
+		+ " (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,"
+		+ "  l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish"
+		+ "  FROM lams_lesson AS l JOIN lams_learning_design AS ld ON l.organisation_id = :orgId"
+		+ "  AND ld.copy_type_id != 3 AND l.lesson_state_id != 7"
+		+ "  AND l.learning_design_id = ld.learning_design_id"
+		+ "  JOIN lams_group AS g ON l.class_grouping_id = g.grouping_id"
+		+ "  JOIN lams_user_group AS ug ON ug.user_id = :userId AND ug.group_id = g.group_id"
+		+ "  JOIN lams_grouping AS gi ON gi.grouping_id = g.grouping_id"
+		+ "  AND g.group_id != gi.staff_group_id"
+		+ "  LEFT JOIN lams_learner_progress AS lp ON lp.user_id = ug.user_id"
+		+ "  AND lp.lesson_id = l.lesson_id"),
+	@NamedNativeQuery(name = "staffLessonsByOrgAndUserWithCompletedFlag", resultSetMapping = "lessonsByOrgAndUserWithCompletedFlag", query = "SELECT l.lesson_id, l.name, l.description, l.lesson_state_id,"
+		+ " lp.lesson_completed_flag, l.enable_lesson_notifications,"
+		+ " (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,"
+		+ "  l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish"
+		+ " FROM lams_lesson AS l JOIN lams_learning_design AS ld ON l.organisation_id = :orgId"
+		+ " AND ld.copy_type_id != 3 AND l.lesson_state_id != 7"
+		+ " AND l.learning_design_id = ld.learning_design_id"
+		+ " JOIN lams_group AS g ON l.class_grouping_id = g.grouping_id"
+		+ " JOIN lams_user_group AS ug ON ug.user_id = :userId AND ug.group_id = g.group_id"
+		+ " JOIN lams_grouping AS gi ON gi.grouping_id = g.grouping_id AND g.group_id = gi.staff_group_id"
+		+ " LEFT JOIN lams_learner_progress AS lp ON lp.user_id = ug.user_id"
+		+ " AND lp.lesson_id = l.lesson_id"),
+	@NamedNativeQuery(name = "allLessonsByOrgAndUserWithCompletedFlag", resultSetMapping = "lessonsByOrgAndUserWithCompletedFlag", query = "SELECT l.lesson_id, l.name, l.description, l.lesson_state_id,"
+		+ " lp.lesson_completed_flag, l.enable_lesson_notifications,"
+		+ " (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,"
+		+ " l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish"
+		+ " FROM lams_lesson AS l JOIN lams_learning_design AS ld ON ld.copy_type_id != 3"
+		+ " AND l.lesson_state_id != 7 AND l.organisation_id = :orgId"
+		+ " AND l.learning_design_id = ld.learning_design_id"
+		+ " LEFT JOIN lams_learner_progress lp ON lp.user_id = :userId AND lp.lesson_id = l.lesson_id"),
+	@NamedNativeQuery(resultClass = Lesson.class, name = "lessonsByOrgAndUserWithChildOrgs", query = "SELECT DISTINCT lesson.*"
+		+ " FROM lams_lesson AS lesson JOIN lams_learning_design AS ld ON ld.copy_type_id != 3"
+		+ " AND lesson.lesson_state_id != 7 AND lesson.learning_design_id = ld.learning_design_id"
+		+ " JOIN lams_organisation AS lo ON lesson.organisation_id = lo.organisation_id"
+		+ " AND (lo.organisation_id = :orgId OR lo.parent_organisation_id = :orgId)"
+		+ " JOIN lams_group AS g ON lesson.class_grouping_id = g.grouping_id"
+		+ " JOIN lams_user_group AS ug ON ug.user_id = :userId" + " AND ug.group_id = g.group_id") })
+@SqlResultSetMappings(@SqlResultSetMapping(name = "lessonsByOrgAndUserWithCompletedFlag", columns = {
+	@ColumnResult(name = "lesson_id", type = Long.class), @ColumnResult(name = "name", type = String.class),
+	@ColumnResult(name = "description", type = String.class),
+	@ColumnResult(name = "lesson_state_id", type = Integer.class),
+	@ColumnResult(name = "lesson_completed_flag", type = Boolean.class),
+	@ColumnResult(name = "enable_lesson_notifications", type = Boolean.class),
+	@ColumnResult(name = "dependent", type = Boolean.class),
+	@ColumnResult(name = "scheduledFinish", type = Boolean.class) }))
+@Entity
+@Table(name = "lams_lesson")
 public class Lesson implements Serializable {
 
     private static final long serialVersionUID = 5733920851084229175L;
@@ -51,129 +137,140 @@ public class Lesson implements Serializable {
      * The state for newly created lesson. The learning design has been copied. The lesson class may or may not have
      * been configured. It is seen on the staff interface but not on the learning interface.
      */
-    public static final Integer CREATED = new Integer(1);
+    public static final Integer CREATED = 1;
     /** The state for lessons that have been scheduled. */
-    public static final Integer NOT_STARTED_STATE = new Integer(2);
+    public static final Integer NOT_STARTED_STATE = 2;
     /** The state for started lesson */
-    public static final Integer STARTED_STATE = new Integer(3);
+    public static final Integer STARTED_STATE = 3;
     /**
      * The state for lessons that have been suspended by the teacher. The lesson can be seen on the staff interface but
      * not on the learning interface
      */
-    public static final Integer SUSPENDED_STATE = new Integer(4);
+    public static final Integer SUSPENDED_STATE = 4;
     /**
      * The state for lessons that have been finished. A finished lesson is shown as inactive on the staff interface, and
      * is shown on the learner interface but the learner is to only see the overall progress and be able to export data
      * - they should not be able to iteract with the tools
      */
-    public static final Integer FINISHED_STATE = new Integer(5);
+    public static final Integer FINISHED_STATE = 5;
     /**
      * The state for lesssons that are shown as inactive on the staff interface but no longer visible to the learners.
      */
-    public static final Integer ARCHIVED_STATE = new Integer(6);
+    public static final Integer ARCHIVED_STATE = 6;
     /** The state for lesssons that are removed and never can be accessed again */
-    public static final Integer REMOVED_STATE = new Integer(7);
+    public static final Integer REMOVED_STATE = 7;
 
-    // ---------------------------------------------------------------------
-    // attributes
-    // ---------------------------------------------------------------------
-    /** identifier field */
+    @Id
+    @Column(name = "lesson_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lessonId;
 
-    /** persistent field */
+    @Column(name = "name")
     private String lessonName;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
-    /** nullable persistent field */
+    @Column(name = "start_date_time")
     private Date startDateTime;
 
-    /** nullable persistent field */
+    @Column(name = "end_date_time")
     private Date endDateTime;
 
-    /** nullable persistent field */
+    @Column(name = "schedule_start_date_time")
     private Date scheduleStartDate;
 
-    /** nullable persistent field */
+    @Column(name = "schedule_end_date_time")
     private Date scheduleEndDate;
 
-    /** nullable persistent field */
+    @Column(name = "scheduled_number_days_to_lesson_finish")
     private Integer scheduledNumberDaysToLessonFinish;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    /** persistent field */
+    @Column(name = "lesson_state_id")
     private Integer lessonStateId;
 
-    /** persistent field */
+    @Column(name = "previous_state_id")
     private Integer previousLessonStateId;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "learning_design_id")
     private LearningDesign learningDesign;
 
-    /** persistent field */
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "class_grouping_id")
     private LessonClass lessonClass;
 
-    /** persistent field */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
-    /** persistent field */
-    private Set learnerProgresses;
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LearnerProgress> learnerProgresses = new HashSet<LearnerProgress>();
 
-    /** persistent field */
-    private Set<GradebookUserLesson> gradebookUserLessons;
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GradebookUserLesson> gradebookUserLessons = new HashSet<GradebookUserLesson>();
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "enable_lesson_intro")
     private Boolean enableLessonIntro;
 
-    /** persistent field */
+    @Column(name = "description")
     private String lessonDescription;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "display_design_image")
     private Boolean displayDesignImage;
 
-    /** Persistent field. Defaults to FALSE - is not included in the constructor anywhere. */
+    @Column(name = "locked_for_edit")
     private Boolean lockedForEdit;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "learner_presence_avail")
     private Boolean learnerPresenceAvailable;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "learner_im_avail")
     private Boolean learnerImAvailable;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "live_edit_enabled")
     private Boolean liveEditEnabled;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "enable_lesson_notifications")
     private Boolean enableLessonNotifications;
 
-    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    @Column(name = "marks_released")
     private Boolean marksReleased;
 
     /**
      * Should Learner start the lesson from the beginning each time he enters it.
      * Content is not removed, LessonProgress is deleted, not archived.
      */
+    @Column(name = "force_restart")
     private Boolean forceLearnerRestart;
 
     /**
      * Should Learners be allowed to restart the lesson after finishing it.
      * Content is not removed, LessonProgress is archived and then deleted.
      */
+    @Column(name = "allow_restart")
     private Boolean allowLearnerRestart;
 
     /**
      * Should learners be displayed activity gradebook on lesson complete.
      */
+    @Column(name = "gradebook_on_complete")
     private Boolean gradebookOnComplete;
 
     /**
      * For lesson conditional release
      */
-    private Set<Lesson> precedingLessons;
-    private Set<Lesson> succeedingLessons;
+    @ManyToMany
+    @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "lesson_id"), inverseJoinColumns = @JoinColumn(name = "preceding_lesson_id"))
+    private Set<Lesson> precedingLessons = new HashSet<Lesson>();
+
+    @ManyToMany
+    @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "preceding_lesson_id"), inverseJoinColumns = @JoinColumn(name = "lesson_id"))
+    private Set<Lesson> succeedingLessons = new HashSet<Lesson>();
 
     // ---------------------------------------------------------------------
     // constructors
@@ -187,7 +284,7 @@ public class Lesson implements Serializable {
      * constructor pattern implementation.
      */
     public Lesson(String name, String description, Date createDateTime, User user, Integer lessonStateId,
-	    Integer previousLessonStateId, LearningDesign learningDesign, Set learnerProgresses,
+	    Integer previousLessonStateId, LearningDesign learningDesign, Set<LearnerProgress> learnerProgresses,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
 	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
@@ -202,10 +299,10 @@ public class Lesson implements Serializable {
     public Lesson(Long lessonId, String name, String description, Date createDateTime, Date startDateTime,
 	    Date endDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean lockedForEdit, LearningDesign learningDesign,
-	    LessonClass lessonClass, Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
-	    Integer scheduledNumberDaysToLessonFinish) {
+	    LessonClass lessonClass, Organisation organisation, Set<LearnerProgress> learnerProgresses,
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish) {
 	this.lessonId = lessonId;
 	this.lessonName = name;
 	this.lessonDescription = description;
@@ -250,9 +347,9 @@ public class Lesson implements Serializable {
 	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
 	    Integer scheduledNumberDaysToLessonFinish) {
 	return new Lesson(lessonName, lessonDescription, new Date(System.currentTimeMillis()), user, Lesson.CREATED,
-		null, ld, new HashSet(), enableLessonIntro, displayDesignImage, learnerPresenceAvailable,
-		learnerImAvailable, liveEditEnabled, enableLessonNotifications, forceLearnerRestart,
-		allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish);
+		null, ld, new HashSet<LearnerProgress>(), enableLessonIntro, displayDesignImage,
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
+		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish);
     }
 
     // ---------------------------------------------------------------------
@@ -478,11 +575,11 @@ public class Lesson implements Serializable {
 	this.organisation = organisation;
     }
 
-    public Set getLearnerProgresses() {
+    public Set<LearnerProgress> getLearnerProgresses() {
 	return this.learnerProgresses;
     }
 
-    public void setLearnerProgresses(Set learnerProgresses) {
+    public void setLearnerProgresses(Set<LearnerProgress> learnerProgresses) {
 	this.learnerProgresses = learnerProgresses;
     }
 
@@ -508,7 +605,7 @@ public class Lesson implements Serializable {
 	return new HashCodeBuilder().append(getLessonId()).toHashCode();
     }
 
-    public Set getAllLearners() {
+    public Set<User> getAllLearners() {
 	return lessonClass == null ? null : lessonClass.getLearners();
     }
 

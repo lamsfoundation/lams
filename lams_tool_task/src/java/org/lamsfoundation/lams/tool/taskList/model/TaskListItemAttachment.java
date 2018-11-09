@@ -25,34 +25,54 @@ package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 
 /**
+ * A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a
+ * TaskListItem.
+ * 
  * @author Andrey Balan
- *
- *         A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a
- *         TaskListItem.
- *
- *
- *
- *
  */
+@Entity
+@Table(name = "tl_latask10_item_attachment")
 public class TaskListItemAttachment implements Cloneable {
     private static final Logger log = Logger.getLogger(TaskListItemAttachment.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+
+    @Column(name = "file_uuid")
     private Long fileUuid;
+
+    @Column(name = "file_version_id")
     private Long fileVersionId;
+
+    @Column(name = "file_type")
     private String fileType;
+
+    @Column(name = "file_name")
     private String fileName;
+
+    @Column(name = "create_date")
     private Date created;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private TaskListUser createBy;
 
-    //  **********************************************************
-    //		Function method for TaskListItemAttachment
-    //  **********************************************************
     @Override
     public Object clone() {
 	TaskListItemAttachment taskListItemAttachment = null;
@@ -65,7 +85,7 @@ public class TaskListItemAttachment implements Cloneable {
 		taskListItemAttachment.setCreateBy((TaskListUser) this.createBy.clone());
 	    }
 	} catch (CloneNotSupportedException e) {
-	    TaskListItemAttachment.log.error("When clone " + TaskListItemAttachment.class + " failed");
+	    log.error("When clone " + TaskListItemAttachment.class + " failed");
 	}
 
 	return taskListItemAttachment;
@@ -110,10 +130,6 @@ public class TaskListItemAttachment implements Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     *
-     */
     public Long getFileVersionId() {
 	return fileVersionId;
     }
@@ -122,9 +138,6 @@ public class TaskListItemAttachment implements Cloneable {
 	this.fileVersionId = version;
     }
 
-    /**
-     *
-     */
     public String getFileType() {
 	return fileType;
     }
@@ -133,9 +146,6 @@ public class TaskListItemAttachment implements Cloneable {
 	this.fileType = type;
     }
 
-    /**
-     *
-     */
     public String getFileName() {
 	return fileName;
     }
@@ -144,10 +154,6 @@ public class TaskListItemAttachment implements Cloneable {
 	this.fileName = name;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getFileUuid() {
 	return fileUuid;
     }
@@ -156,10 +162,6 @@ public class TaskListItemAttachment implements Cloneable {
 	this.fileUuid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getCreated() {
 	return created;
     }
@@ -168,10 +170,6 @@ public class TaskListItemAttachment implements Cloneable {
 	this.created = created;
     }
 
-    /**
-     *
-     * @return
-     */
     public TaskListUser getCreateBy() {
 	return createBy;
     }

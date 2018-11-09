@@ -30,9 +30,9 @@ import java.text.NumberFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesReport;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.util.NumberUtil;
 
 /**

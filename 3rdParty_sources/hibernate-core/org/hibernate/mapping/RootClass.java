@@ -17,6 +17,7 @@ import org.hibernate.engine.spi.Mapping;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.collections.SingletonIterator;
 
 /**
@@ -34,10 +35,12 @@ public class RootClass extends PersistentClass implements TableOwner {
 	private KeyValue identifier;
 	private Property version;
 	private boolean polymorphic;
+
 	private String cacheConcurrencyStrategy;
 	private String cacheRegionName;
-	private String naturalIdCacheRegionName;
 	private boolean lazyPropertiesCacheable = true;
+	private String naturalIdCacheRegionName;
+
 	private Value discriminator;
 	private boolean mutable = true;
 	private boolean embeddedIdentifier;
@@ -50,7 +53,6 @@ public class RootClass extends PersistentClass implements TableOwner {
 	private int nextSubclassId;
 	private Property declaredIdentifierProperty;
 	private Property declaredVersion;
-	private boolean cachingExplicitlyRequested;
 
 	public RootClass(MetadataBuildingContext metadataBuildingContext) {
 		super( metadataBuildingContext );
@@ -311,7 +313,15 @@ public class RootClass extends PersistentClass implements TableOwner {
 	}
 
 	public void setCacheRegionName(String cacheRegionName) {
-		this.cacheRegionName = cacheRegionName;
+		this.cacheRegionName = StringHelper.nullIfEmpty( cacheRegionName );
+	}
+
+	public boolean isLazyPropertiesCacheable() {
+		return lazyPropertiesCacheable;
+	}
+
+	public void setLazyPropertiesCacheable(boolean lazyPropertiesCacheable) {
+		this.lazyPropertiesCacheable = lazyPropertiesCacheable;
 	}
 
 	@Override
@@ -321,15 +331,6 @@ public class RootClass extends PersistentClass implements TableOwner {
 
 	public void setNaturalIdCacheRegionName(String naturalIdCacheRegionName) {
 		this.naturalIdCacheRegionName = naturalIdCacheRegionName;
-	}
-
-	@Override
-	public boolean isLazyPropertiesCacheable() {
-		return lazyPropertiesCacheable;
-	}
-
-	public void setLazyPropertiesCacheable(boolean lazyPropertiesCacheable) {
-		this.lazyPropertiesCacheable = lazyPropertiesCacheable;
 	}
 
 	@Override
@@ -360,11 +361,4 @@ public class RootClass extends PersistentClass implements TableOwner {
 		return mv.accept( this );
 	}
 
-	public void setCachingExplicitlyRequested(boolean explicitlyRequested) {
-		this.cachingExplicitlyRequested = explicitlyRequested;
-	}
-
-	public boolean isCachingExplicitlyRequested() {
-		return cachingExplicitlyRequested;
-	}
 }

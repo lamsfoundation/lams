@@ -27,8 +27,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 
@@ -39,24 +43,30 @@ import org.lamsfoundation.lams.tool.ToolOutput;
  * @author Marcin Cieslak
  *
  */
+@Entity
+@Table(name = "lams_text_search_condition")
 public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     // ---- persistent fields -------
     /**
      * All the words from this string should be found in the tool output.
      */
+    @Column(name = "text_search_all_words")
     protected String allWords;
     /**
      * The whole phrase from this string should be found in the tool output.
      */
+    @Column(name = "text_search_phrase")
     protected String phrase;
     /**
      * At least one of the words from this string should be found in the tool output.
      */
+    @Column(name = "text_search_any_words")
     protected String anyWords;
     /**
      * None of the words from this string should be found in the tool output.
      */
+    @Column(name = "text_search_excluded_words")
     protected String excludedWords;
 
     // ---- non-persistent fields ----------
@@ -78,27 +88,31 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     protected static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 	    | Pattern.MULTILINE;
 
-    private static Logger log = Logger.getLogger(TextSearchCondition.class);
     /**
      * Were the strings provided by user parsed into practical collections of words.
      */
+    @Transient
     protected boolean conditionsParsed = false;
     /**
      * Property {@link #allWords} divided into words.
      */
+    @Transient
     protected List<String> allWordsCondition = new ArrayList<>();
     /**
      * Property {@link #phrase} divided into words. Although we are looking for the whole phrase, spaces between words
      * should be divided into something more regex'y.
      */
+    @Transient
     protected List<String> phraseCondition;
     /**
      * Property {@link #anyWords} divided into words.
      */
+    @Transient
     protected List<String> anyWordsCondition = new ArrayList<>();
     /**
      * Property {@link #excludedWords} divided into words.
      */
+    @Transient
     protected List<String> excludedWordsCondition = new ArrayList<>();
 
     public TextSearchCondition() {

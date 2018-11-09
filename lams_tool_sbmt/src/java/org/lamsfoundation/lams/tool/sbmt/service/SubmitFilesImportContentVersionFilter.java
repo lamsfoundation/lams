@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
 
 /**
  * Import filter class for different version of SubmitFiles content.

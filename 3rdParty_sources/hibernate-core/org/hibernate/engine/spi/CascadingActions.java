@@ -96,6 +96,7 @@ public class CascadingActions {
 				LockOptions lockOptions = (LockOptions) anything;
 				lr.setTimeOut( lockOptions.getTimeOut() );
 				lr.setScope( lockOptions.getScope() );
+				lr.setFollowOnLocking( lockOptions.getFollowOnLocking() );
 				if ( lockOptions.getScope() ) {
 					lockMode = lockOptions.getLockMode();
 				}
@@ -303,7 +304,7 @@ public class CascadingActions {
 				CollectionType collectionType,
 				Object collection) {
 			// persists don't cascade to uninitialized collections
-			return getAllElementsIterator( session, collectionType, collection );
+			return getLoadedElementsIterator( session, collectionType, collection );
 		}
 
 		@Override
@@ -374,12 +375,12 @@ public class CascadingActions {
 						&& !isInManagedState( child, session )
 						&& !(child instanceof HibernateProxy) //a proxy cannot be transient and it breaks ForeignKeys.isTransient
 						&& ForeignKeys.isTransient( childEntityName, child, null, session ) ) {
-					String parentEntiytName = persister.getEntityName();
+					String parentEntityName = persister.getEntityName();
 					String propertyName = persister.getPropertyNames()[propertyIndex];
 					throw new TransientPropertyValueException(
 							"object references an unsaved transient instance - save the transient instance before flushing",
 							childEntityName,
-							parentEntiytName,
+							parentEntityName,
 							propertyName
 					);
 
@@ -470,7 +471,7 @@ public class CascadingActions {
 	 *
 	 * @return The children iterator.
 	 */
-	private static Iterator getAllElementsIterator(
+	public static Iterator getAllElementsIterator(
 			EventSource session,
 			CollectionType collectionType,
 			Object collection) {
@@ -482,7 +483,7 @@ public class CascadingActions {
 	 * any new elements from the database.
 	 */
 	public static Iterator getLoadedElementsIterator(
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			CollectionType collectionType,
 			Object collection) {
 		if ( collectionIsInitialized( collection ) ) {

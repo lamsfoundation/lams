@@ -46,6 +46,7 @@
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="setGroupLeader">PROPAGATION_REQUIRED</prop>
 				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>

@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
+import org.hibernate.action.internal.DelayedPostInsertIdentifier;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.CollectionEntry;
 import org.hibernate.engine.spi.EntityEntry;
@@ -157,14 +158,13 @@ public final class Collections {
 		}
 
 		final SessionFactoryImplementor factory = session.getFactory();
-		final CollectionPersister persister = factory.getCollectionPersister( type.getRole() );
+		final CollectionPersister persister = factory.getMetamodel().collectionPersister( type.getRole() );
 
 		ce.setCurrentPersister( persister );
 		//TODO: better to pass the id in as an argument?
 		ce.setCurrentKey( type.getKeyOfOwner( entity, session ) );
 
-		final boolean isBytecodeEnhanced =
-				persister.getOwnerEntityPersister().getEntityMetamodel().isLazyLoadingBytecodeEnhanced();
+		final boolean isBytecodeEnhanced = persister.getOwnerEntityPersister().getInstrumentationMetadata().isEnhancedForLazyLoading();
 		if ( isBytecodeEnhanced && !collection.wasInitialized() ) {
 			// skip it
 			LOG.debugf(
@@ -178,7 +178,7 @@ public final class Collections {
 			// The CollectionEntry.isReached() stuff is just to detect any silly users
 			// who set up circular or shared references between/to collections.
 			if ( ce.isReached() ) {
-				// We've been here beforeQuery
+				// We've been here before
 				throw new HibernateException(
 						"Found shared references to a collection: " + type.getRole()
 				);
@@ -246,9 +246,15 @@ public final class Collections {
 		if ( loadedPersister != null || currentPersister != null ) {
 			// it is or was referenced _somewhere_
 
+			// check if the key changed
+			// excludes marking key changed when the loaded key is a DelayedPostInsertIdentifier.
+			final boolean keyChanged = currentPersister != null
+					&& entry != null
+					&& !currentPersister.getKeyType().isEqual( entry.getLoadedKey(), entry.getCurrentKey(), factory )
+					&& !( entry.getLoadedKey() instanceof DelayedPostInsertIdentifier );
+
 			// if either its role changed, or its key changed
-			final boolean ownerChanged = loadedPersister != currentPersister
-					|| !currentPersister.getKeyType().isEqual( entry.getLoadedKey(), entry.getCurrentKey(), factory );
+			final boolean ownerChanged = loadedPersister != currentPersister || keyChanged;
 
 			if ( ownerChanged ) {
 				// do a check

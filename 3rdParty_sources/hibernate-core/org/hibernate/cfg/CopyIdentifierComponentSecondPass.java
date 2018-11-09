@@ -66,7 +66,7 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 
 		//prepare column name structure
 		boolean isExplicitReference = true;
-		Map<String, Ejb3JoinColumn> columnByReferencedName = new HashMap<String, Ejb3JoinColumn>(joinColumns.length);
+		Map<String, Ejb3JoinColumn> columnByReferencedName = new HashMap<>(joinColumns.length);
 		for (Ejb3JoinColumn joinColumn : joinColumns) {
 			final String referencedColumnName = joinColumn.getReferencedColumn();
 			if ( referencedColumnName == null || BinderHelper.isEmptyAnnotationValue( referencedColumnName ) ) {
@@ -111,7 +111,7 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 		//property.setOptional( property.isOptional() );
 		property.setPersistentClass( component.getOwner() );
 		property.setPropertyAccessorName( referencedProperty.getPropertyAccessorName() );
-		Component value = new Component( buildingContext.getMetadataCollector(), component.getOwner() );
+		Component value = new Component( buildingContext, component.getOwner() );
 
 		property.setValue( value );
 		final Component referencedValue = (Component) referencedProperty.getValue();
@@ -121,8 +121,7 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 
 
 		Iterator<Property> propertyIterator = referencedValue.getPropertyIterator();
-		while(propertyIterator.hasNext())
-		{
+		while(propertyIterator.hasNext()) {
 			Property referencedComponentProperty = propertyIterator.next();
 
 			if ( referencedComponentProperty.isComposite() ) {
@@ -151,7 +150,7 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 		//property.setOptional( property.isOptional() );
 		property.setPersistentClass( component.getOwner() );
 		property.setPropertyAccessorName( referencedProperty.getPropertyAccessorName() );
-		SimpleValue value = new SimpleValue( buildingContext.getMetadataCollector(), component.getTable() );
+		SimpleValue value = new SimpleValue( buildingContext, component.getTable() );
 		property.setValue( value );
 		final SimpleValue referencedValue = (SimpleValue) referencedProperty.getValue();
 		value.setTypeName( referencedValue.getTypeName() );
@@ -199,12 +198,20 @@ public class CopyIdentifierComponentSecondPass implements SecondPass {
 						.getName();
 				value.addColumn( new Column( columnName ) );
 				if ( joinColumn != null ) {
+					applyComponentColumnSizeValueToJoinColumn( column, joinColumn );
 					joinColumn.linkWithValue( value );
 				}
 				column.setValue( value );
 			}
 		}
 		return property;
+	}
+
+	private void applyComponentColumnSizeValueToJoinColumn(Column column, Ejb3JoinColumn joinColumn) {
+		Column mappingColumn = joinColumn.getMappingColumn();
+		mappingColumn.setLength( column.getLength() );
+		mappingColumn.setPrecision( column.getPrecision() );
+		mappingColumn.setScale( column.getScale() );
 	}
 
 	public boolean dependentUpon( CopyIdentifierComponentSecondPass other ) {

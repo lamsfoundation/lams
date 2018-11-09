@@ -6,7 +6,7 @@
  */
 package org.hibernate.action.spi;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /**
  * Contract representing some process that needs to occur during after transaction completion.
@@ -20,5 +20,5 @@ public interface AfterTransactionCompletionProcess {
 	 * @param success Did the transaction complete successfully?  True means it did.
 	 * @param session The session on which the transaction is completing.
 	 */
-	public void doAfterTransactionCompletion(boolean success, SessionImplementor session);
+	void doAfterTransactionCompletion(boolean success, SharedSessionContractImplementor session);
 }

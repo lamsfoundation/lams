@@ -28,8 +28,8 @@ package org.lamsfoundation.lams.tool.sbmt.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
 
 /**
  * @author Manpreet Minhas

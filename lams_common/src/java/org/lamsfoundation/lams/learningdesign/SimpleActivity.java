@@ -27,6 +27,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.Entity;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 
@@ -34,7 +37,11 @@ import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
  * @author Manpreet Minhas
  *
  */
+@Entity
 public abstract class SimpleActivity extends Activity implements Serializable {
+    private static final long serialVersionUID = 2784194319972928196L;
+
+    @Transient
     protected SimpleActivityStrategy simpleActivityStrategy;
 
     /** full constructor */
@@ -42,7 +49,7 @@ public abstract class SimpleActivity extends Activity implements Serializable {
 	    Integer orderId, Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
 	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
 	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-	    Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
+	    Boolean stopAfterActivity, Set<Activity> inputActivities, Set<BranchActivityEntry> branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);

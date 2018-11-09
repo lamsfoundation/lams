@@ -2,13 +2,36 @@ package org.lamsfoundation.lams.outcome;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "lams_outcome_mapping")
 public class OutcomeMapping implements Serializable {
     private static final long serialVersionUID = -2195345501533401085L;
 
+    @Id
+    @Column(name = "mapping_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long mappingId;
+
+    @ManyToOne
+    @JoinColumn(name = "outcome_id")
     private Outcome outcome;
+
+    @Column(name = "lesson_id")
     private Long lessonId;
+
+    @Column(name = "tool_content_id")
     private Long toolContentId;
+
+    @Column(name = "item_id")
     private Long itemId;
 
     public Long getMappingId() {
@@ -50,5 +73,4 @@ public class OutcomeMapping implements Serializable {
     public void setItemId(Long itemId) {
 	this.itemId = itemId;
     }
-
 }

@@ -3,20 +3,54 @@ package org.lamsfoundation.lams.outcome;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_outcome")
 public class Outcome implements Serializable {
+
     private static final long serialVersionUID = -7175245687448269571L;
 
+    @Id
+    @Column(name = "outcome_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outcomeId;
+
+    @ManyToOne
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
+
+    @ManyToOne
+    @JoinColumn(name = "scale_id")
     private OutcomeScale scale;
+
+    @Column
     private String name;
+
+    @Column
     private String code;
+
+    @Column
     private String description;
+
+    @Column(name = "content_folder_id")
     private String contentFolderId;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private User createBy;
+
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
     public Long getOutcomeId() {

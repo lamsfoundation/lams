@@ -28,6 +28,17 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -36,37 +47,47 @@ import org.apache.log4j.Logger;
  *
  *
  */
-
+@Entity
+@Table(name = "tl_lawiki10_session")
 public class WikiSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(WikiSession.class);
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7762187772612318324L;
+     private static final long serialVersionUID = 7762187772612318324L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne 
+    @JoinColumn(name = "wiki_uid") 
     private Wiki wiki;
 
+    @OneToMany(mappedBy = "wikiSession")
     private Set<WikiUser> wikiUsers;
 
+    @OneToMany(mappedBy = "wikiSession")
+    @OrderBy("uid ASC")
     private Set<WikiPage> wikiPages; // Need a runtime copy for each wikiPage
 
+    @ManyToOne 
+    @JoinColumn(name = "wiki_main_page_uid") 
     private WikiPage mainPage; //Need a runtime reference to the main page
-
-    // Constructors
 
     /** default constructor */
     public WikiSession() {
@@ -85,12 +106,6 @@ public class WikiSession implements java.io.Serializable {
 	this.wikiPages = wikiPages;
     }
 
-    // Property accessors
-    /**
-     *
-     *
-     */
-
     public Long getUid() {
 	return this.uid;
     }
@@ -98,11 +113,6 @@ public class WikiSession implements java.io.Serializable {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-
-    /**
-     *
-     *
-     */
 
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
@@ -112,11 +122,6 @@ public class WikiSession implements java.io.Serializable {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     *
-     */
-
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
     }
@@ -124,11 +129,6 @@ public class WikiSession implements java.io.Serializable {
     public void setSessionStartDate(Date sessionStartDate) {
 	this.sessionStartDate = sessionStartDate;
     }
-
-    /**
-     *
-     *
-     */
 
     public Integer getStatus() {
 	return this.status;
@@ -138,11 +138,6 @@ public class WikiSession implements java.io.Serializable {
 	this.status = status;
     }
 
-    /**
-     *
-     *
-     */
-
     public Long getSessionId() {
 	return this.sessionId;
     }
@@ -150,11 +145,6 @@ public class WikiSession implements java.io.Serializable {
     public void setSessionId(Long sessionId) {
 	this.sessionId = sessionId;
     }
-
-    /**
-     *
-     *
-     */
 
     public String getSessionName() {
 	return this.sessionName;
@@ -164,12 +154,6 @@ public class WikiSession implements java.io.Serializable {
 	this.sessionName = sessionName;
     }
 
-    /**
-     *
-     *
-     *
-     */
-
     public Wiki getWiki() {
 	return this.wiki;
     }
@@ -177,13 +161,6 @@ public class WikiSession implements java.io.Serializable {
     public void setWiki(Wiki wiki) {
 	this.wiki = wiki;
     }
-
-    /**
-     *
-     *
-     *
-     *
-     */
 
     public Set<WikiUser> getWikiUsers() {
 	return this.wikiUsers;
@@ -193,13 +170,6 @@ public class WikiSession implements java.io.Serializable {
 	this.wikiUsers = wikiUsers;
     }
 
-    /**
-     *
-     * asc"
-     *
-     *
-     *
-     */
     public Set<WikiPage> getWikiPages() {
 	return wikiPages;
     }
@@ -208,11 +178,6 @@ public class WikiSession implements java.io.Serializable {
 	this.wikiPages = wikiPages;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public WikiPage getMainPage() {
 	return mainPage;
     }
@@ -221,11 +186,6 @@ public class WikiSession implements java.io.Serializable {
 	this.mainPage = mainPage;
     }
 
-    /**
-     * toString
-     *
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();

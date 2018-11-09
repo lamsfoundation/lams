@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -92,7 +91,7 @@ public interface ToolSessionManager {
      * @throws ToolException
      *             if any other error occurs
      */
-    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException;
+    ToolSessionExportOutputData exportToolSession(List<Long> toolSessionIds) throws DataMissingException, ToolException;
 
     /**
      * Remove sesson data according specified the tool session id.

@@ -5,17 +5,21 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.loader.entity;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.loader.OuterJoinLoader;
+import org.hibernate.param.ParameterBinder;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
@@ -40,18 +44,18 @@ public abstract class AbstractEntityLoader
 	}
 
 	@Override
-	public Object load(Serializable id, Object optionalObject, SessionImplementor session) {
+	public Object load(Serializable id, Object optionalObject, SharedSessionContractImplementor session) {
 		// this form is deprecated!
 		return load( id, optionalObject, session, LockOptions.NONE );
 	}
 
 	@Override
-	public Object load(Serializable id, Object optionalObject, SessionImplementor session, LockOptions lockOptions) {
+	public Object load(Serializable id, Object optionalObject, SharedSessionContractImplementor session, LockOptions lockOptions) {
 		return load( session, id, optionalObject, id, lockOptions );
 	}
 
 	protected Object load(
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			Object id,
 			Object optionalObject,
 			Serializable optionalId,
@@ -95,7 +99,7 @@ public abstract class AbstractEntityLoader
 			Object[] row,
 			ResultTransformer transformer,
 			ResultSet rs,
-			SessionImplementor session) throws SQLException, HibernateException {
+			SharedSessionContractImplementor session) throws SQLException, HibernateException {
 		return row[row.length-1];
 	}
 

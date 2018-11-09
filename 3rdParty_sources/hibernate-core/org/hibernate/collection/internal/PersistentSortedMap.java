@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.collection.BasicCollectionPersister;
 
 /**
@@ -41,8 +42,19 @@ public class PersistentSortedMap extends PersistentMap implements SortedMap {
 	 *
 	 * @param session The session
 	 */
-	public PersistentSortedMap(SessionImplementor session) {
+	public PersistentSortedMap(SharedSessionContractImplementor session) {
 		super( session );
+	}
+
+	/**
+	 * Constructs a PersistentSortedMap.
+	 *
+	 * @param session The session
+	 * @deprecated {@link #PersistentSortedMap(SharedSessionContractImplementor)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentSortedMap(SessionImplementor session) {
+		this( (SharedSessionContractImplementor) session );
 	}
 
 	/**
@@ -51,9 +63,21 @@ public class PersistentSortedMap extends PersistentMap implements SortedMap {
 	 * @param session The session
 	 * @param map The underlying map data
 	 */
-	public PersistentSortedMap(SessionImplementor session, SortedMap map) {
+	public PersistentSortedMap(SharedSessionContractImplementor session, SortedMap map) {
 		super( session, map );
 		comparator = map.comparator();
+	}
+
+	/**
+	 * Constructs a PersistentSortedMap.
+	 *
+	 * @param session The session
+	 * @param map The underlying map data
+	 * @deprecated {@link #PersistentSortedMap(SharedSessionContractImplementor, SortedMap)} should be used instead.
+	 */
+	@Deprecated
+	public PersistentSortedMap(SessionImplementor session, SortedMap map) {
+		this( (SharedSessionContractImplementor) session, map );
 	}
 
 	@SuppressWarnings({"unchecked", "UnusedParameters"})

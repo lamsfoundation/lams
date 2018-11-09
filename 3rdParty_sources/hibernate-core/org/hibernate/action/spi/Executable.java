@@ -9,7 +9,7 @@ package org.hibernate.action.spi;
 import java.io.Serializable;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /**
  * An operation which may be scheduled for later execution.  Usually, the operation is a database
@@ -24,21 +24,21 @@ public interface Executable {
 	 *
 	 * @return The spaces affected by this action.
 	 */
-	public Serializable[] getPropertySpaces();
+	Serializable[] getPropertySpaces();
 
 	/**
 	 * Called before executing any actions.  Gives actions a chance to perform any preparation.
 	 *
 	 * @throws HibernateException Indicates a problem during preparation.
 	 */
-	public void beforeExecutions() throws HibernateException;
+	void beforeExecutions() throws HibernateException;
 
 	/**
 	 * Execute this action.
 	 *
 	 * @throws HibernateException Indicates a problem during execution.
 	 */
-	public void execute() throws HibernateException;
+	void execute() throws HibernateException;
 
 	/**
 	 * Get the after-transaction-completion process, if any, for this action.
@@ -46,7 +46,7 @@ public interface Executable {
 	 * @return The after-transaction-completion process, or null if we have no
 	 * after-transaction-completion process
 	 */
-	public AfterTransactionCompletionProcess getAfterTransactionCompletionProcess();
+	AfterTransactionCompletionProcess getAfterTransactionCompletionProcess();
 
 	/**
 	 * Get the before-transaction-completion process, if any, for this action.
@@ -54,12 +54,12 @@ public interface Executable {
 	 * @return The before-transaction-completion process, or null if we have no
 	 * before-transaction-completion process
 	 */
-	public BeforeTransactionCompletionProcess getBeforeTransactionCompletionProcess();
+	BeforeTransactionCompletionProcess getBeforeTransactionCompletionProcess();
 	
 	/**
 	 * Reconnect to session after deserialization
 	 *
 	 * @param session The session being deserialized
 	 */
-	public void afterDeserialize(SessionImplementor session);
+	void afterDeserialize(SharedSessionContractImplementor session);
 }

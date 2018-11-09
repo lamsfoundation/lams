@@ -28,6 +28,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -35,36 +47,41 @@ import org.apache.log4j.Logger;
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_lascrt11_scratchie_item")
 public class ScratchieItem implements Cloneable {
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private String title;
 
+    @Column
     private String description;
 
+    @Column(name = "order_id")
     private Integer orderId;
 
+    @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
+    @Column(name = "create_date")
     private Date createDate;
 
-    // scratchie Items
-    private Set answers;
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("order_id ASC")
+    @JoinColumn(name = "scratchie_item_uid")
+    private Set<ScratchieAnswer> answers = new HashSet<>();
 
-    // ***********************************************
-    // DTO fields:
+    // ************************ DTO fields ***********************
+    @Transient
     private boolean isUnraveled;
+    @Transient
     private String burningQuestion;
-
-    /**
-     * Default contruction method.
-     *
-     */
-    public ScratchieItem() {
-	answers = new HashSet();
-    }
 
     @Override
     public Object clone() {
@@ -75,10 +92,10 @@ public class ScratchieItem implements Cloneable {
 	    item.setUid(null);
 
 	    if (answers != null) {
-		Iterator iter = answers.iterator();
-		Set set = new HashSet();
+		Iterator<ScratchieAnswer> iter = answers.iterator();
+		Set<ScratchieAnswer> set = new HashSet<>();
 		while (iter.hasNext()) {
-		    ScratchieAnswer answer = (ScratchieAnswer) iter.next();
+		    ScratchieAnswer answer = iter.next();
 		    ScratchieAnswer newAnswer = (ScratchieAnswer) answer.clone();
 		    // just clone old file without duplicate it in repository
 		    set.add(newAnswer);
@@ -96,18 +113,11 @@ public class ScratchieItem implements Cloneable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
+
     public Long getUid() {
 	return uid;
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
@@ -152,11 +162,11 @@ public class ScratchieItem implements Cloneable {
 	this.orderId = orderId;
     }
 
-    public Set getAnswers() {
+    public Set<ScratchieAnswer> getAnswers() {
 	return answers;
     }
 
-    public void setAnswers(Set answers) {
+    public void setAnswers(Set<ScratchieAnswer> answers) {
 	this.answers = answers;
     }
 

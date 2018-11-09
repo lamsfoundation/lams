@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
@@ -37,9 +37,9 @@ import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
@@ -78,24 +78,19 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	return (List<SubmitUser>) doFind(FIND_BY_SESSION_ID, sessionID);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.dao.ILearnerDAO#updateLearer(org.lamsfoundation.lams.tool.sbmt.Learner)
-     */
     @Override
     public void saveOrUpdateUser(SubmitUser learner) {
 	this.insertOrUpdate(learner);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     /**
      * Will return List<[SubmitUser, Integer1, Integer2, String], [SubmitUser, Integer1, Integer2, String], ... ,
      * [SubmitUser, Integer1, Integer2, String]>
      * where Integer1 is the number of files uploaded, Integer2 is the number of files marked
      * and String is the notebook entry. No notebook entries needed? Will return null in their place.
      */
+    @Override
+    @SuppressWarnings("unchecked")
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
 	    IUserManagementService userManagementService) {
@@ -160,12 +155,12 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SubmitUser.class)
 		.addScalar("portraitId", IntegerType.INSTANCE)
 		.addScalar("numFiles", IntegerType.INSTANCE).addScalar("numFilesRemoved", IntegerType.INSTANCE)
 		.addScalar("numFilesMarked", IntegerType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
-		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list(); 
     }
 
@@ -189,7 +184,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 		"SELECT count(*) FROM tl_lasbmt11_user user WHERE user.session_id = :sessionId ");
 	buildNameSearch(searchString, queryText);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId).list();
+	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId).list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -205,11 +200,10 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<StatisticDTO> getStatisticsBySession(final Long contentId) {
-
-	SQLQuery query = getSession().createSQLQuery(GET_STATISTICS);
+	NativeQuery<StatisticDTO> query = getSession().createNativeQuery(GET_STATISTICS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("totalUploadedFiles", IntegerType.INSTANCE).addScalar("markedCount", IntegerType.INSTANCE)
-		.setLong("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
+		.setParameter("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
 
 	List<StatisticDTO> list = query.list();
 	for (StatisticDTO dto : list) {
@@ -228,11 +222,10 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<StatisticDTO> getLeaderStatisticsBySession(final Long contentId) {
-
-	SQLQuery query = getSession().createSQLQuery(GET_LEADER_STATISTICS);
+	NativeQuery<StatisticDTO> query = getSession().createNativeQuery(GET_LEADER_STATISTICS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("totalUploadedFiles", IntegerType.INSTANCE).addScalar("markedCount", IntegerType.INSTANCE)
-		.setLong("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
+		.setParameter("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
 
 	List<StatisticDTO> list = query.list();
 	for (StatisticDTO dto : list) {
@@ -252,14 +245,12 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Long> getReportsForGroup(final Long sessionId, final Long reportId) {
-
-	SQLQuery query = getSession().createSQLQuery(GET_GROUP_REPORTS);
+	NativeQuery<Long> query = getSession().createNativeQuery(GET_GROUP_REPORTS);
 	query.addScalar("reportId", LongType.INSTANCE)
-		.setLong("sessionId", sessionId)
-		.setLong("reportId", reportId);
+		.setParameter("sessionId", sessionId)
+		.setParameter("reportId", reportId);
 
 	return query.list();
-	
     }
 
 }

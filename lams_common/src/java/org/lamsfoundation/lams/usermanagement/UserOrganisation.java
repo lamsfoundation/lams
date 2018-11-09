@@ -27,38 +27,53 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_user_organisation")
+@NamedNativeQuery(resultClass = UserOrganisation.class, name = "userOrganisationsNotById", query = "SELECT userOrganisation.*"
+	+ " FROM lams_user_organisation AS userOrganisation"
+	+ " JOIN lams_organisation AS o ON userOrganisation.user_id = :userId"
+	+ " AND userOrganisation.organisation_id != :orgId AND o.parent_organisation_id != :orgId"
+	+ " AND o.organisation_id = userOrganisation.organisation_id")
 public class UserOrganisation implements Serializable {
+    private static final long serialVersionUID = 4859079742960814389L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "user_organisation_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userOrganisationId;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
-    /** persistent field */
-    private Set<UserOrganisationRole> userOrganisationRoles;
+    @OneToMany(mappedBy = "userOrganisation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserOrganisationRole> userOrganisationRoles = new HashSet<UserOrganisationRole>();
 
-    /** full constructor */
-    public UserOrganisation(User user, Organisation organisation, Set<UserOrganisationRole> userOrganisationRoles) {
-	this.user = user;
-	this.organisation = organisation;
-	this.userOrganisationRoles = userOrganisationRoles;
-    }
-
-    /** minimal constructor */
     public UserOrganisation(User user, Organisation organisation) {
 	this.user = user;
 	this.organisation = organisation;
     }
 
-    /** default constructor */
     public UserOrganisation() {
     }
 
@@ -119,5 +134,4 @@ public class UserOrganisation implements Serializable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getUserOrganisationId()).toHashCode();
     }
-
 }

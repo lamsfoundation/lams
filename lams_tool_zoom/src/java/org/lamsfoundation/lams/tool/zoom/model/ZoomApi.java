@@ -23,26 +23,37 @@
 
 package org.lamsfoundation.lams.tool.zoom.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.util.JsonUtil;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-/**
- *
- */
+@Entity
+@Table(name = "tl_lazoom10_api")
 public class ZoomApi {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column
     private String email;
 
+    @Column(name = "api_key")
     private String key;
 
+    @Column(name = "api_secret")
     private String secret;
 
     public ZoomApi() {
-	// default constructor
     }
 
     public ZoomApi(String email, String key, String value) {
@@ -77,10 +88,6 @@ public class ZoomApi {
 	this.email = email;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getKey() {
 	return key;
     }

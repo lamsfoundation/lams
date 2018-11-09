@@ -12,7 +12,12 @@ import java.util.Map;
 import java.util.Random;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
+import javax.persistence.ConstraintMode;
+import javax.persistence.InheritanceType;
 import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.MapKeyJoinColumn;
+import javax.persistence.MapKeyJoinColumns;
 
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
@@ -30,6 +35,7 @@ import org.hibernate.cfg.CollectionPropertyHolder;
 import org.hibernate.cfg.CollectionSecondPass;
 import org.hibernate.cfg.Ejb3Column;
 import org.hibernate.cfg.Ejb3JoinColumn;
+import org.hibernate.cfg.InheritanceState;
 import org.hibernate.cfg.PropertyData;
 import org.hibernate.cfg.PropertyHolderBuilder;
 import org.hibernate.cfg.PropertyPreloadedData;
@@ -46,6 +52,7 @@ import org.hibernate.mapping.ManyToOne;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
@@ -66,7 +73,7 @@ public class MapBinder extends CollectionBinder {
 	}
 
 	protected Collection createCollection(PersistentClass persistentClass) {
-		return new org.hibernate.mapping.Map( getBuildingContext().getMetadataCollector(), persistentClass );
+		return new org.hibernate.mapping.Map( getBuildingContext(), persistentClass );
 	}
 
 	@Override
@@ -96,8 +103,53 @@ public class MapBinder extends CollectionBinder {
 						mapKeyColumns, mapKeyManyToManyColumns,
 						inverseColumns != null ? inverseColumns[0].getPropertyName() : null
 				);
+				makeOneToManyMapKeyColumnNullableIfNotInProperty( property );
 			}
 		};
+	}
+
+	private void makeOneToManyMapKeyColumnNullableIfNotInProperty(
+			final XProperty property) {
+		final org.hibernate.mapping.Map map = (org.hibernate.mapping.Map) this.collection;
+		if ( map.isOneToMany() &&
+				property.isAnnotationPresent( MapKeyColumn.class ) ) {
+			final Value indexValue = map.getIndex();
+			if ( indexValue.getColumnSpan() != 1 ) {
+				throw new AssertionFailure( "Map key mapped by @MapKeyColumn does not have 1 column" );
+			}
+			final Selectable selectable = indexValue.getColumnIterator().next();
+			if ( selectable.isFormula() ) {
+				throw new AssertionFailure( "Map key mapped by @MapKeyColumn is a Formula" );
+			}
+			Column column = (Column) map.getIndex().getColumnIterator().next();
+			if ( !column.isNullable() ) {
+				final PersistentClass persistentClass = ( ( OneToMany ) map.getElement() ).getAssociatedClass();
+				// check if the index column has been mapped by the associated entity to a property;
+				// @MapKeyColumn only maps a column to the primary table for the one-to-many, so we only
+				// need to check "un-joined" properties.
+				if ( !propertyIteratorContainsColumn( persistentClass.getUnjoinedPropertyIterator(), column ) ) {
+					// The index column is not mapped to an associated entity property so we can
+					// safely make the index column nullable.
+					column.setNullable( true );
+				}
+			}
+		}
+	}
+
+	private boolean propertyIteratorContainsColumn(Iterator propertyIterator, Column column) {
+		for ( Iterator it = propertyIterator; it.hasNext(); ) {
+			final Property property = (Property) it.next();
+			for ( Iterator<Selectable> selectableIterator = property.getColumnIterator(); selectableIterator.hasNext(); ) {
+				final Selectable selectable = selectableIterator.next();
+				if ( column.equals( selectable ) ) {
+					final Column iteratedColumn = (Column) selectable;
+					if ( column.getValue().getTable().equals( iteratedColumn.getValue().getTable() ) ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private void bindKeyFromAssociationTable(
@@ -121,8 +173,13 @@ public class MapBinder extends CollectionBinder {
 				);
 			}
 			org.hibernate.mapping.Map map = (org.hibernate.mapping.Map) this.collection;
+			// HHH-11005 - if InheritanceType.JOINED then need to find class defining the column
+			InheritanceState inheritanceState = inheritanceStatePerClass.get( collType );
+			PersistentClass targetPropertyPersistentClass = InheritanceType.JOINED.equals( inheritanceState.getType() ) ?
+					mapProperty.getPersistentClass() :
+					associatedClass;
 			Value indexValue = createFormulatedValue(
-					mapProperty.getValue(), map, targetPropertyName, associatedClass, buildingContext
+					mapProperty.getValue(), map, targetPropertyName, associatedClass, targetPropertyPersistentClass, buildingContext
 			);
 			map.setIndex( indexValue );
 		}
@@ -149,7 +206,7 @@ public class MapBinder extends CollectionBinder {
 			ManyToOne element = null;
 			org.hibernate.mapping.Map mapValue = (org.hibernate.mapping.Map) this.collection;
 			if ( isIndexOfEntities ) {
-				element = new ManyToOne( buildingContext.getMetadataCollector(), mapValue.getCollectionTable() );
+				element = new ManyToOne( buildingContext, mapValue.getCollectionTable() );
 				mapValue.setIndex( element );
 				element.setReferencedEntityName( mapKeyType );
 				//element.setFetchMode( fetchMode );
@@ -168,16 +225,14 @@ public class MapBinder extends CollectionBinder {
 				}
 				else {
 					try {
-						keyXClass = buildingContext.getBuildingOptions().getReflectionManager().classForName( mapKeyType );
+						keyXClass = buildingContext.getBootstrapContext().getReflectionManager().classForName( mapKeyType );
 					}
 					catch (ClassLoadingException e) {
 						throw new AnnotationException( "Unable to find class: " + mapKeyType, e );
 					}
 					classType = buildingContext.getMetadataCollector().getClassType( keyXClass );
-					//force in case of attribute override
-					boolean attributeOverride = property.isAnnotationPresent( AttributeOverride.class )
-							|| property.isAnnotationPresent( AttributeOverrides.class );
-					if ( isEmbedded || attributeOverride ) {
+					// force in case of attribute override naming the key
+					if ( isEmbedded || mappingDefinedAttributeOverrideOnMapKey( property ) ) {
 						classType = AnnotatedClassType.EMBEDDABLE;
 					}
 				}
@@ -274,7 +329,7 @@ public class MapBinder extends CollectionBinder {
 							property,
 							keyXClass,
 							this.collection.getOwnerEntityName(),
-							holder.keyElementAttributeConverterDefinition( keyXClass )
+							holder.mapKeyAttributeConverterDescriptor( property, keyXClass )
 					);
 					elementBinder.setPersistentClassName( propertyHolder.getEntityName() );
 					elementBinder.setAccessType( accessType );
@@ -288,6 +343,20 @@ public class MapBinder extends CollectionBinder {
 					col.forceNotNull();
 				}
 			}
+
+			if ( element != null ) {
+				final javax.persistence.ForeignKey foreignKey = getMapKeyForeignKey( property );
+				if ( foreignKey != null ) {
+					if ( foreignKey.value() == ConstraintMode.NO_CONSTRAINT ) {
+						element.setForeignKeyName( "none" );
+					}
+					else {
+						element.setForeignKeyName( StringHelper.nullIfEmpty( foreignKey.name() ) );
+						element.setForeignKeyDefinition( StringHelper.nullIfEmpty( foreignKey.foreignKeyDefinition() ) );
+					}
+				}
+			}
+
 			if ( isIndexOfEntities ) {
 				bindManytoManyInverseFk(
 						collectionEntity,
@@ -300,11 +369,47 @@ public class MapBinder extends CollectionBinder {
 		}
 	}
 
+	private javax.persistence.ForeignKey getMapKeyForeignKey(XProperty property) {
+		final MapKeyJoinColumns mapKeyJoinColumns = property.getAnnotation( MapKeyJoinColumns.class );
+		if ( mapKeyJoinColumns != null ) {
+			return mapKeyJoinColumns.foreignKey();
+		}
+		else {
+			final MapKeyJoinColumn mapKeyJoinColumn = property.getAnnotation( MapKeyJoinColumn.class );
+			if ( mapKeyJoinColumn != null ) {
+				return mapKeyJoinColumn.foreignKey();
+			}
+		}
+		return null;
+	}
+
+	private boolean mappingDefinedAttributeOverrideOnMapKey(XProperty property) {
+		if ( property.isAnnotationPresent( AttributeOverride.class ) ) {
+			return namedMapKey( property.getAnnotation( AttributeOverride.class ) );
+		}
+
+		if ( property.isAnnotationPresent( AttributeOverrides.class ) ) {
+			final AttributeOverrides annotations = property.getAnnotation( AttributeOverrides.class );
+			for ( AttributeOverride attributeOverride : annotations.value() ) {
+				if ( namedMapKey( attributeOverride ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean namedMapKey(AttributeOverride annotation) {
+		return annotation.name().startsWith( "key." );
+	}
+
 	protected Value createFormulatedValue(
 			Value value,
 			Collection collection,
 			String targetPropertyName,
 			PersistentClass associatedClass,
+			PersistentClass targetPropertyPersistentClass,
 			MetadataBuildingContext buildingContext) {
 		Value element = collection.getElement();
 		String fromAndWhere = null;
@@ -322,7 +427,7 @@ public class MapBinder extends CollectionBinder {
 					throw new AnnotationException( "SecondaryTable JoinColumn cannot reference a non primary key" );
 				}
 			}
-			Iterator referencedEntityColumns;
+			Iterator<Selectable> referencedEntityColumns;
 			if ( referencedPropertyName == null ) {
 				referencedEntityColumns = associatedClass.getIdentifier().getColumnIterator();
 			}
@@ -330,26 +435,29 @@ public class MapBinder extends CollectionBinder {
 				Property referencedProperty = associatedClass.getRecursiveProperty( referencedPropertyName );
 				referencedEntityColumns = referencedProperty.getColumnIterator();
 			}
-			String alias = "$alias$";
-			StringBuilder fromAndWhereSb = new StringBuilder( " from " )
-					.append( associatedClass.getTable().getName() )
-							//.append(" as ") //Oracle doesn't support it in subqueries
-					.append( " " )
-					.append( alias ).append( " where " );
-			Iterator collectionTableColumns = element.getColumnIterator();
-			while ( collectionTableColumns.hasNext() ) {
-				Column colColumn = (Column) collectionTableColumns.next();
-				Column refColumn = (Column) referencedEntityColumns.next();
-				fromAndWhereSb.append( alias ).append( '.' ).append( refColumn.getQuotedName() )
-						.append( '=' ).append( colColumn.getQuotedName() ).append( " and " );
+			fromAndWhere = getFromAndWhereFormula(
+					associatedClass.getTable().getName(),
+					element.getColumnIterator(),
+					referencedEntityColumns
+			);
+		}
+		else {
+			// HHH-11005 - only if we are OneToMany and location of map key property is at a different level, need to add a select
+			if ( !associatedClass.equals( targetPropertyPersistentClass ) ) {
+				fromAndWhere = getFromAndWhereFormula(
+						targetPropertyPersistentClass.getTable()
+								.getQualifiedTableName()
+								.toString(),
+						element.getColumnIterator(),
+						associatedClass.getIdentifier().getColumnIterator()
+				);
 			}
-			fromAndWhere = fromAndWhereSb.substring( 0, fromAndWhereSb.length() - 5 );
 		}
 
 		if ( value instanceof Component ) {
 			Component component = (Component) value;
 			Iterator properties = component.getPropertyIterator();
-			Component indexComponent = new Component( getBuildingContext().getMetadataCollector(), collection );
+			Component indexComponent = new Component( getBuildingContext(), collection );
 			indexComponent.setComponentClassName( component.getComponentClassName() );
 			while ( properties.hasNext() ) {
 				Property current = (Property) properties.next();
@@ -368,7 +476,7 @@ public class MapBinder extends CollectionBinder {
 				newProperty.setSelectable( current.isSelectable() );
 				newProperty.setValue(
 						createFormulatedValue(
-								current.getValue(), collection, targetPropertyName, associatedClass, buildingContext
+								current.getValue(), collection, targetPropertyName, associatedClass, associatedClass, buildingContext
 						)
 				);
 				indexComponent.addProperty( newProperty );
@@ -380,7 +488,7 @@ public class MapBinder extends CollectionBinder {
 			SimpleValue targetValue;
 			if ( value instanceof ManyToOne ) {
 				ManyToOne sourceManyToOne = (ManyToOne) sourceValue;
-				ManyToOne targetManyToOne = new ManyToOne( getBuildingContext().getMetadataCollector(), collection.getCollectionTable() );
+				ManyToOne targetManyToOne = new ManyToOne( getBuildingContext(), collection.getCollectionTable() );
 				targetManyToOne.setFetchMode( FetchMode.DEFAULT );
 				targetManyToOne.setLazy( true );
 				//targetValue.setIgnoreNotFound( ); does not make sense for a map key
@@ -388,7 +496,7 @@ public class MapBinder extends CollectionBinder {
 				targetValue = targetManyToOne;
 			}
 			else {
-				targetValue = new SimpleValue( getBuildingContext().getMetadataCollector(), collection.getCollectionTable() );
+				targetValue = new SimpleValue( getBuildingContext(), collection.getCollectionTable() );
 				targetValue.copyTypeFrom( sourceValue );
 			}
 			Iterator columns = sourceValue.getColumnIterator();
@@ -424,5 +532,28 @@ public class MapBinder extends CollectionBinder {
 		else {
 			throw new AssertionFailure( "Unknown type encounters for map key: " + value.getClass() );
 		}
+	}
+
+	private String getFromAndWhereFormula(
+			String tableName,
+			Iterator<Selectable> collectionTableColumns,
+			Iterator<Selectable> referencedEntityColumns) {
+		String alias = "$alias$";
+		StringBuilder fromAndWhereSb = new StringBuilder( " from " )
+				.append( tableName )
+				//.append(" as ") //Oracle doesn't support it in subqueries
+				.append( " " )
+				.append( alias ).append( " where " );
+		while ( collectionTableColumns.hasNext() ) {
+			Column colColumn = (Column) collectionTableColumns.next();
+			Column refColumn = (Column) referencedEntityColumns.next();
+			fromAndWhereSb.append( alias )
+					.append( '.' )
+					.append( refColumn.getQuotedName() )
+					.append( '=' )
+					.append( colColumn.getQuotedName() )
+					.append( " and " );
+		}
+		return fromAndWhereSb.substring( 0, fromAndWhereSb.length() - 5 );
 	}
 }

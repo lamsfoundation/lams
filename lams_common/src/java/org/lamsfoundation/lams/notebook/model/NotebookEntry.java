@@ -27,33 +27,58 @@ package org.lamsfoundation.lams.notebook.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  *
  */
+@Entity
+@Table(name = "lams_notebook_entry")
 public class NotebookEntry implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 653296132134948803L;
 
+    @Id 
+    @Column 
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long uid;
 
+    @Column(name = "external_id")
     private Long externalID;
 
+    @Column(name = "external_id_type")
     private Integer externalIDType;
 
+    @Column(name = "external_signature")
     private String externalSignature;
 
+    @ManyToOne 
+    @JoinColumn(name = "user_id") 
     private User user;
 
+    @Column 
     private String title;
 
+    @Column 
     private String entry;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "last_modified")
     private Date lastModified;
 
+    @Transient
     private String lessonName;
 
     public NotebookEntry() {

@@ -31,7 +31,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatMessageDAO;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
@@ -56,7 +56,7 @@ public class ChatMessageDAO extends LAMSBaseDAO implements IChatMessageDAO {
     public static final String SQL_QUERY_FIND_MESSAGE_BY_UID = "from " + ChatMessage.class.getName() + " where uid=?";
 
     public static final String SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE = "from " + ChatMessage.class.getName()
-	    + " as f where f.chatSession=? order by f.sendDate ";
+	    + " as f where f.chatSession.uid=:chatSessionUid order by f.sendDate ";
 
     public static final String SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER = "select f.fromUser.uid, count(*) from "
 	    + ChatMessage.class.getName() + " as f where f.chatSession.uid=? group by f.fromUser";
@@ -99,7 +99,7 @@ public class ChatMessageDAO extends LAMSBaseDAO implements IChatMessageDAO {
 	try {
 	    Query query = getSessionFactory().getCurrentSession().createQuery(
 		    ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE + (orderAsc ? "asc" : "desc"));
-	    query.setLong(0, chatSession.getUid());
+	    query.setParameter("chatSessionUid", chatSession.getUid());
 	    if (max != null) {
 		query.setMaxResults(max);
 	    }

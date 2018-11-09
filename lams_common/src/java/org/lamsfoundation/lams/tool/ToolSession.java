@@ -27,6 +27,19 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,8 +47,16 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_tool_session")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tool_session_type_id", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class ToolSession implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 310605806277808940L;
     /** Tool session type id for grouped */
     public static final int GROUPED_TYPE = 1;
     /** Tool session type id for non-grouped - all learners in a separate session */
@@ -47,23 +68,30 @@ public abstract class ToolSession implements Serializable {
     public static final int ENDED_STATE = 2;
 
     public static final String UNIQUE_KEY_PREFIX = "uq";
-    /** identifier field */
+
+    @Id
+    @Column(name = "tool_session_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long toolSessionId;
 
-    /** Persistent field * */
+    @Column(name = "tool_session_name")
     private String toolSessionName;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
     private ToolActivity toolActivity;
 
-    /** persistent field */
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
-    /** persistent field */
+    @Column(name = "tool_session_state_id")
     private int toolSessionStateId;
 
+    @Column(name = "unique_key")
     private String uniqueKey;
 
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
     /** Get all the learners who may be part of this tool session. */
@@ -107,17 +135,10 @@ public abstract class ToolSession implements Serializable {
 	this.createDateTime = createDateTime;
     }
 
-    /**
-     * @return Returns the uniqueKey.
-     */
     public String getUniqueKey() {
 	return uniqueKey;
     }
 
-    /**
-     * @param uniqueKey
-     *            The uniqueKey to set.
-     */
     public void setUniqueKey(String uniqueKey) {
 	this.uniqueKey = uniqueKey;
     }

@@ -25,52 +25,27 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
-import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Mitchell Seaton
- * @version 2.1
- *
- *
  */
+@Entity
+@DiscriminatorValue("12")
 public class ToolBranchingActivity extends BranchingActivity implements Serializable {
 
     private static final long serialVersionUID = 8343443197068061495L;
 
-    /** full constructor */
-    public ToolBranchingActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Integer startXcoord, Integer startYcoord, Integer endXcoord, Integer endYcoord,
-	    Boolean stopAfterActivity, Set inputActivities, Set activities, Activity defaultActivity,
-	    SystemTool systemTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, startXcoord, startYcoord, endXcoord, endYcoord, stopAfterActivity,
-		inputActivities, activities, defaultActivity, systemTool, branchActivityEntries);
-    }
-
     /** default constructor */
     public ToolBranchingActivity() {
 	super();
-    }
-
-    /** minimal constructor */
-    public ToolBranchingActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Set activities) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, activities);
     }
 
     /**
@@ -109,8 +84,8 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
      * @return error message key
      */
     @Override
-    public Vector validateActivity(MessageService messageService) {
-	Vector listOfValidationErrors = new Vector();
+    public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
 
 	if (getDefaultActivity() == null) {
 	    listOfValidationErrors.add(
@@ -131,13 +106,13 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 			    this.getActivityUIID()));
 	} else {
 	    boolean conditionsExist = false;
-	    Iterator actIterator = getActivities().iterator();
+	    Iterator<Activity> actIterator = getActivities().iterator();
 	    while (actIterator.hasNext()) {
 		SequenceActivity branch = (SequenceActivity) actIterator.next();
 		if (branch.getBranchEntries() != null) {
-		    Iterator condIterator = branch.getBranchEntries().iterator();
+		    Iterator<BranchActivityEntry> condIterator = branch.getBranchEntries().iterator();
 		    while (condIterator.hasNext()) {
-			BranchActivityEntry entry = (BranchActivityEntry) condIterator.next();
+			BranchActivityEntry entry = condIterator.next();
 			BranchCondition condition = entry.getCondition();
 			if (condition == null) {
 			    listOfValidationErrors
@@ -166,5 +141,4 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 
 	return listOfValidationErrors;
     }
-
 }

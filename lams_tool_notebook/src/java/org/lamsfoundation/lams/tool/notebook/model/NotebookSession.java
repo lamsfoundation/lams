@@ -21,56 +21,63 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.model;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.apache.log4j.Logger;
 
-/**
- *
- * Represents the tool session.
- *
- *
- */
-
+@Entity
+@Table(name = "tl_lantbk11_session")
 public class NotebookSession implements java.io.Serializable {
-
     private static Logger log = Logger.getLogger(NotebookSession.class);
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 4407078136514639026L;
 
-    // Fields
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
 
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
 
+    @Column
     private Integer status;
 
+    @Column(name = "session_id")
     private Long sessionId;
 
+    @Column(name = "session_name")
     private String sessionName;
 
+    @ManyToOne
+    @JoinColumn(name = "notebook_uid")
     private Notebook notebook;
 
-    private Set notebookUsers;
+    @OneToMany(mappedBy = "notebookSession")
+    private Set<NotebookUser> notebookUsers = new HashSet<NotebookUser>();
 
-    // Constructors
-
-    /** default constructor */
     public NotebookSession() {
     }
 
-    /** full constructor */
     public NotebookSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId,
-	    String sessionName, Notebook notebook, Set notebookUsers) {
+	    String sessionName, Notebook notebook, Set<NotebookUser> notebookUsers) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -79,12 +86,6 @@ public class NotebookSession implements java.io.Serializable {
 	this.notebook = notebook;
 	this.notebookUsers = notebookUsers;
     }
-
-    // Property accessors
-    /**
-     *
-     * 
-     */
 
     public Long getUid() {
 	return this.uid;
@@ -94,11 +95,6 @@ public class NotebookSession implements java.io.Serializable {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
     }
@@ -106,11 +102,6 @@ public class NotebookSession implements java.io.Serializable {
     public void setSessionEndDate(Date sessionEndDate) {
 	this.sessionEndDate = sessionEndDate;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
@@ -120,11 +111,6 @@ public class NotebookSession implements java.io.Serializable {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * 
-     */
-
     public Integer getStatus() {
 	return this.status;
     }
@@ -132,11 +118,6 @@ public class NotebookSession implements java.io.Serializable {
     public void setStatus(Integer status) {
 	this.status = status;
     }
-
-    /**
-     *
-     * 
-     */
 
     public Long getSessionId() {
 	return this.sessionId;
@@ -146,11 +127,6 @@ public class NotebookSession implements java.io.Serializable {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * 
-     */
-
     public String getSessionName() {
 	return this.sessionName;
     }
@@ -158,12 +134,6 @@ public class NotebookSession implements java.io.Serializable {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-
-    /**
-     *
-     *
-     * 
-     */
 
     public Notebook getNotebook() {
 	return this.notebook;
@@ -173,26 +143,14 @@ public class NotebookSession implements java.io.Serializable {
 	this.notebook = notebook;
     }
 
-    /**
-     *
-     *
-     *
-     * 
-     */
-
-    public Set getNotebookUsers() {
+    public Set<NotebookUser> getNotebookUsers() {
 	return this.notebookUsers;
     }
 
-    public void setNotebookUsers(Set notebookUsers) {
+    public void setNotebookUsers(Set<NotebookUser> notebookUsers) {
 	this.notebookUsers = notebookUsers;
     }
 
-    /**
-     * toString
-     * 
-     * @return String
-     */
     @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
@@ -238,11 +196,10 @@ public class NotebookSession implements java.io.Serializable {
 	NotebookSession session = null;
 	try {
 	    session = (NotebookSession) super.clone();
-	    session.notebookUsers = new HashSet();
+	    session.notebookUsers = new HashSet<NotebookUser>();
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + NotebookSession.class + " failed");
 	}
 	return session;
     }
-
 }

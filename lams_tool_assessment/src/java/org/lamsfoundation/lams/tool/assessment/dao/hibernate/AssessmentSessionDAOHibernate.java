@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.springframework.stereotype.Repository;
@@ -35,12 +36,11 @@ public class AssessmentSessionDAOHibernate extends LAMSBaseDAO implements Assess
 
     private static final String FIND_BY_SESSION_ID = "from " + AssessmentSession.class.getName()
 	    + " as p where p.sessionId=?";
-    private static final String FIND_BY_CONTENT_ID = "from " + AssessmentSession.class.getName()
-	    + " as p where p.assessment.contentId=? order by p.sessionName asc";
 
+    @SuppressWarnings("unchecked")
     @Override
     public AssessmentSession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List<AssessmentSession> list = (List<AssessmentSession>) doFind(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -48,9 +48,13 @@ public class AssessmentSessionDAOHibernate extends LAMSBaseDAO implements Assess
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<AssessmentSession> getByContentId(Long toolContentId) {
-	return (List<AssessmentSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	final String FIND_BY_CONTENT_ID = "from " + AssessmentSession.class.getName()
+		+ " as p where p.assessment.contentId=:contectId order by p.sessionName asc";
+
+	List<AssessmentSession> result = getSession().createQuery(FIND_BY_CONTENT_ID, AssessmentSession.class)
+		.setParameter("contectId", toolContentId).list();
+	return result;
     }
 
     @Override

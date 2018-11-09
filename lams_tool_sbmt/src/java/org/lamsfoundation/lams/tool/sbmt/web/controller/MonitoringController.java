@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -45,15 +46,15 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
-import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
-import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -122,12 +123,13 @@ public class MonitoringController {
     @RequestMapping("/monitoring")
     public String unspecified(HttpServletRequest request) {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentID);
 
-	List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
+	List<SubmitFilesSession> submitFilesSessionList = submitFilesService
+		.getSubmitFilesSessionByContentID(contentID);
 	summary(request, submitFilesSessionList);
 	statistic(request, contentID);
 
@@ -164,7 +166,7 @@ public class MonitoringController {
     @ResponseBody
     public String getUsers(HttpServletRequest request, HttpServletResponse response) {
 
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	// paging parameters of tablesorter
@@ -242,7 +244,7 @@ public class MonitoringController {
     @RequestMapping("/doStatistic")
     public String doStatistic(HttpServletRequest request) {
 
-	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	statistic(request, contentID);
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 	return "monitoring/parts/statisticpart";
@@ -268,7 +270,7 @@ public class MonitoringController {
     public void releaseMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	// get service then update report table
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	submitFilesService.releaseMarksForSession(sessionID);
     }
 
@@ -278,9 +280,10 @@ public class MonitoringController {
     @RequestMapping("/downloadMarks")
     public void downloadMarks(HttpServletRequest request, HttpServletResponse response) {
 
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	// return FileDetailsDTO list according to the given sessionID
-	Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
+	SortedMap<SubmitUserDTO, List<FileDetailsDTO>> userFilesMap = submitFilesService
+		.getFilesUploadedBySession(sessionID, request.getLocale());
 	// construct Excel file format and download
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
@@ -291,8 +294,8 @@ public class MonitoringController {
 	    HSSFRow row;
 	    HSSFCell cell;
 
-	    Iterator iter = userFilesMap.values().iterator();
-	    Iterator dtoIter;
+	    Iterator<List<FileDetailsDTO>> iter = userFilesMap.values().iterator();
+	    Iterator<FileDetailsDTO> dtoIter;
 
 	    int idx = 0;
 
@@ -310,11 +313,11 @@ public class MonitoringController {
 	    cell.setCellValue(messageService.getMessage("label.learner.comments"));
 
 	    while (iter.hasNext()) {
-		List list = (List) iter.next();
+		List<FileDetailsDTO> list = iter.next();
 		dtoIter = list.iterator();
 
 		while (dtoIter.hasNext()) {
-		    FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+		    FileDetailsDTO dto = dtoIter.next();
 		    if (!dto.isRemoved()) {
 			row = sheet.createRow(idx++);
 
@@ -413,12 +416,13 @@ public class MonitoringController {
      */
     @RequestMapping("/listMark")
     public String listMark(HttpServletRequest request) {
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	Integer userID = WebUtil.readIntParam(request, "userID");
 
 	// return FileDetailsDTO list according to the given userID and sessionID
-	List files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), true);
+	List<FileDetailsDTO> files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(),
+		true);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	request.setAttribute(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
@@ -432,7 +436,7 @@ public class MonitoringController {
     @RequestMapping("/listAllMarks")
     public String listAllMarks(HttpServletRequest request) {
 
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 
 	// return FileDetailsDTO list according to the given sessionID
@@ -510,7 +514,8 @@ public class MonitoringController {
 	    }
 	}
 
-	List files = submitFilesService.getFilesUploadedByUser(learnerUserID, sessionID, request.getLocale(), true);
+	List<FileDetailsDTO> files = submitFilesService.getFilesUploadedByUser(learnerUserID, sessionID,
+		request.getLocale(), true);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	request.setAttribute("report", files);
@@ -559,14 +564,14 @@ public class MonitoringController {
     /**
      * Save Summary information into HttpRequest.
      */
-    private void summary(HttpServletRequest request, List submitFilesSessionList) {
+    private void summary(HttpServletRequest request, List<SubmitFilesSession> submitFilesSessionList) {
 	SortedSet<SessionDTO> sessions = new TreeSet<>(this.new SessionComparator());
 
 	// build a map with all users in the submitFilesSessionList
-	Iterator it = submitFilesSessionList.iterator();
+	Iterator<SubmitFilesSession> it = submitFilesSessionList.iterator();
 	while (it.hasNext()) {
 	    SessionDTO sessionDto = new SessionDTO();
-	    SubmitFilesSession sfs = (SubmitFilesSession) it.next();
+	    SubmitFilesSession sfs = it.next();
 
 	    Long sessionID = sfs.getSessionID();
 	    sessionDto.setSessionID(sessionID);

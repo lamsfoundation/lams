@@ -284,6 +284,7 @@ public class TblMonitoringController {
      * @param activity
      * @param sortedActivities
      */
+    @SuppressWarnings("unchecked")
     private void sortActivitiesByLearningDesignOrder(Activity activity, List<Activity> sortedActivities) {
 	sortedActivities.add(activity);
 
@@ -291,7 +292,7 @@ public class TblMonitoringController {
 	if (activity.isBranchingActivity()) {
 	    BranchingActivity branchingActivity = (BranchingActivity) activity;
 	    Set<SequenceActivity> sequenceActivities = new TreeSet<SequenceActivity>(new ActivityOrderComparator());
-	    sequenceActivities.addAll(branchingActivity.getActivities());
+	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
 	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
 		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService
 			.getActivityById(sequenceActivityNotInitialized.getActivityId());

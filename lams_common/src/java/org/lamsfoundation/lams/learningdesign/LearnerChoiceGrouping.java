@@ -23,34 +23,35 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 /**
  * Grouping formed by learner's choice
  *
  * @author Marcin Cieslak
  */
+@Entity
+@DiscriminatorValue("4")
 public class LearnerChoiceGrouping extends Grouping {
-    /** nullable persistent field */
+    private static final long serialVersionUID = -8162442109881438143L;
+
+    @Column(name = "equal_number_of_learners_per_group")
     private Boolean equalNumberOfLearnersPerGroup;
 
-    /** nullable persistent field */
+    @Column(name = "number_of_groups")
     private Integer numberOfGroups;
 
-    /** nullable persistent field */
+    @Column(name = "learners_per_group")
     private Integer learnersPerGroup;
 
-    /** nullable persistent field */
+    @Column(name = "view_students_before_selection")
     private Boolean viewStudentsBeforeSelection;
 
     /** Creates a new instance of ChosenGrouping */
     public LearnerChoiceGrouping() {
 	super.grouper = new LearnerChoiceGrouper();
-    }
-
-    /** full constructor */
-    public LearnerChoiceGrouping(Long groupingId, Set groups, Set activities) {
-	super(groupingId, groups, activities, new LearnerChoiceGrouper());
     }
 
     /**

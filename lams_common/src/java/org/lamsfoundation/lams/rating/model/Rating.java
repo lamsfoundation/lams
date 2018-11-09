@@ -25,24 +25,46 @@
 
 package org.lamsfoundation.lams.rating.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
+ * The actual rating left by a user
  */
+@Entity
+@Table(name = "lams_rating")
 public class Rating implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 4831819420875651676L;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @ManyToOne 
+    @JoinColumn(name = "rating_criteria_id") 
     private RatingCriteria ratingCriteria;
 
+    @Column(name = "item_id")
     private Long itemId;
 
+    @ManyToOne 
+    @JoinColumn(name = "user_id") 
     private User learner;
 
+    @Column
     private Float rating;
     
+    @Column(name = "tool_session_id")
     private Long toolSessionId;
 
     public Rating() {
@@ -63,8 +85,6 @@ public class Rating implements java.io.Serializable, Cloneable {
 	this.rating = rating;
     }
 
-    /**
-     */
     public Long getUid() {
 	return uid;
     }
@@ -73,8 +93,6 @@ public class Rating implements java.io.Serializable, Cloneable {
 	this.uid = uid;
     }
 
-    /**
-     */
     public Long getItemId() {
 	return itemId;
     }
@@ -83,8 +101,6 @@ public class Rating implements java.io.Serializable, Cloneable {
 	this.itemId = itemId;
     }
 
-    /**
-     */
     public RatingCriteria getRatingCriteria() {
 	return ratingCriteria;
     }
@@ -93,8 +109,6 @@ public class Rating implements java.io.Serializable, Cloneable {
 	this.ratingCriteria = ratingCriteria;
     }
 
-    /**
-     */
     public User getLearner() {
 	return learner;
     }
@@ -103,8 +117,6 @@ public class Rating implements java.io.Serializable, Cloneable {
 	this.learner = learner;
     }
 
-    /**
-     */
     public void setRating(Float rating) {
 	this.rating = rating;
     }

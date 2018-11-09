@@ -654,7 +654,7 @@ public class AuthoringController {
      * @param request
      * @return
      */
-    private List getDeletedResourceItemList(SessionMap sessionMap) {
+    private List<ResourceItem> getDeletedResourceItemList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
     }
 

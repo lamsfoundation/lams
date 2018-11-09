@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.tool.qa.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 
 /**
  * Comparator for <code>QaQueContent</code>. Only the display order is

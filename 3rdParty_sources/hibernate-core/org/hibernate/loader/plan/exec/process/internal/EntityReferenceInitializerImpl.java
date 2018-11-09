@@ -18,7 +18,7 @@ import org.hibernate.engine.internal.TwoPhaseLoad;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.EntityUniqueKey;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.loader.EntityAliases;
 import org.hibernate.loader.plan.exec.process.spi.EntityReferenceInitializer;
@@ -273,7 +273,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 		final Serializable id = entityKey.getIdentifier();
 
 		// Get the persister for the _subclass_
-		final Loadable concreteEntityPersister = (Loadable) context.getSession().getFactory().getEntityPersister( concreteEntityTypeName );
+		final Loadable concreteEntityPersister = (Loadable) context.getSession().getFactory().getMetamodel().entityPersister( concreteEntityTypeName );
 
 		if ( log.isTraceEnabled() ) {
 			log.tracev(
@@ -294,11 +294,10 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 				entityInstance,
 				concreteEntityPersister,
 				lockModeToAcquire,
-				!context.getLoadPlan().areLazyAttributesForceFetched(),
 				context.getSession()
 		);
 
-		final EntityPersister rootEntityPersister = context.getSession().getFactory().getEntityPersister(
+		final EntityPersister rootEntityPersister = context.getSession().getFactory().getMetamodel().entityPersister(
 				concreteEntityPersister.getRootEntityName()
 		);
 		final Object[] values;
@@ -329,6 +328,13 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 			rowId = concreteEntityPersister.hasRowId()
 					? resultSet.getObject( entityReferenceAliases.getColumnAliases().getRowIdAlias() )
 					: null;
+
+			if ( rowId != null && log.isTraceEnabled() ) {
+				log.tracev(
+						"extracted ROWID value: {0}",
+						rowId
+				);
+			}
 		}
 		catch (SQLException e) {
 			throw context.getSession().getFactory().getServiceRegistry().getService( JdbcServices.class ).getSqlExceptionHelper().convert(
@@ -371,7 +377,6 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 				rowId,
 				entityInstance,
 				lockModeToAcquire,
-				!context.getLoadPlan().areLazyAttributesForceFetched(),
 				context.getSession()
 		);
 
@@ -447,7 +452,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 	}
 
 	private void checkVersion(
-			SessionImplementor session,
+			SharedSessionContractImplementor session,
 			ResultSet resultSet,
 			EntityPersister persister,
 			EntityAliases entityAliases,
@@ -476,7 +481,7 @@ public class EntityReferenceInitializerImpl implements EntityReferenceInitialize
 
 			if ( !versionType.isEqual( version, currentVersion ) ) {
 				if ( session.getFactory().getStatistics().isStatisticsEnabled() ) {
-					session.getFactory().getStatisticsImplementor().optimisticFailure( persister.getEntityName() );
+					session.getFactory().getStatistics().optimisticFailure( persister.getEntityName() );
 				}
 				throw new StaleObjectStateException( persister.getEntityName(), entityKey.getIdentifier() );
 			}

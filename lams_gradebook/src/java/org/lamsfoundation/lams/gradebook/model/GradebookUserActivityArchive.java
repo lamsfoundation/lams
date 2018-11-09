@@ -24,18 +24,46 @@ package org.lamsfoundation.lams.gradebook.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_gradebook_user_activity_archive")
 public class GradebookUserActivityArchive {
+    
+    @Id
+    @Column
     private long uid;
+    
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
     private ToolActivity activity;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User learner;
+    
+    @Column
     private Double mark;
+    
+    @Column
     private String feedback;
+
+    @Column(name = "marked_in_gradebook")
     private Boolean markedInGradebook;
+    
+    @Column(name = "update_date")
     private Date updateDate;
+    
+    @Column(name = "archive_date")
     private Date archiveDate;
 
     public GradebookUserActivityArchive() {

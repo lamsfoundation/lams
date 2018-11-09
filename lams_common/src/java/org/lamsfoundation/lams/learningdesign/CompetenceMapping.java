@@ -1,31 +1,31 @@
 package org.lamsfoundation.lams.learningdesign;
 
-/**
- *
- *
- */
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "lams_competence_mapping")
 public class CompetenceMapping {
 
+    @Id
+    @Column(name = "competence_mapping_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long competenceMappingId;
+
+    @ManyToOne
+    @JoinColumn(name = "competence_id")
     private Competence competence;
+
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
     private ToolActivity toolActivity;
 
-    public CompetenceMapping(Long competenceMappingId, Competence competence, ToolActivity toolActivity) {
-	super();
-	this.competenceMappingId = competenceMappingId;
-	this.competence = competence;
-	this.toolActivity = toolActivity;
-    }
-
-    public CompetenceMapping() {
-	super();
-	// TODO Auto-generated constructor stub
-    }
-
-    /** 
-    *
-    *
-    */
     public Long getCompetenceMappingId() {
 	return competenceMappingId;
     }
@@ -34,11 +34,6 @@ public class CompetenceMapping {
 	this.competenceMappingId = competenceMappingId;
     }
 
-    /** 
-    * 
-    *
-    *
-    */
     public Competence getCompetence() {
 	return competence;
     }
@@ -47,11 +42,6 @@ public class CompetenceMapping {
 	this.competence = competence;
     }
 
-    /** 
-    * 
-    *
-    *
-    */
     public ToolActivity getToolActivity() {
 	return this.toolActivity;
     }

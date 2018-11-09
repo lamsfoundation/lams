@@ -16,8 +16,8 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.spi.SessionFactoryOptions;
-import org.hibernate.cache.spi.QueryCacheFactory;
 import org.hibernate.cache.spi.RegionFactory;
+import org.hibernate.cache.spi.TimestampsCacheFactory;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.hql.spi.QueryTranslatorFactory;
 import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
@@ -34,6 +34,7 @@ import org.jboss.logging.Logger;
  *
  * @deprecated Use {@link org.hibernate.boot.spi.SessionFactoryOptions} instead.
  */
+@SuppressWarnings("unused")
 @Deprecated
 public final class Settings {
 	private static final Logger LOG = Logger.getLogger( Settings.class );
@@ -89,12 +90,11 @@ public final class Settings {
 			LOG.debugf( "JTA Track by Thread: %s", enabledDisabled( sessionFactoryOptions.isJtaTrackByThread() ) );
 
 			LOG.debugf( "Query language substitutions: %s", sessionFactoryOptions.getQuerySubstitutions() );
-			LOG.debugf( "JPA query language strict compliance: %s", enabledDisabled( sessionFactoryOptions.isStrictJpaQueryLanguageCompliance() ) );
 			LOG.debugf( "Named query checking : %s", enabledDisabled( sessionFactoryOptions.isNamedQueryStartupCheckingEnabled() ) );
 
 			LOG.debugf( "Second-level cache: %s", enabledDisabled( sessionFactoryOptions.isSecondLevelCacheEnabled() ) );
 			LOG.debugf( "Second-level query cache: %s", enabledDisabled( sessionFactoryOptions.isQueryCacheEnabled() ) );
-			LOG.debugf( "Second-level query cache factory: %s", sessionFactoryOptions.getQueryCacheFactory() );
+			LOG.debugf( "Second-level query cache factory: %s", sessionFactoryOptions.getTimestampsCacheFactory() );
 			LOG.debugf( "Second-level cache region prefix: %s", sessionFactoryOptions.getCacheRegionPrefix() );
 			LOG.debugf( "Optimize second-level cache for minimal puts: %s", enabledDisabled( sessionFactoryOptions.isMinimalPutsEnabled() ) );
 			LOG.debugf( "Structured second-level cache entries: %s", enabledDisabled( sessionFactoryOptions.isStructuredCacheEntriesEnabled() ) );
@@ -109,6 +109,11 @@ public final class Settings {
 			LOG.debugf( "JDBC result set fetch size: %s", sessionFactoryOptions.getJdbcFetchSize() );
 			LOG.debugf( "Connection release mode: %s", sessionFactoryOptions.getConnectionReleaseMode() );
 			LOG.debugf( "Generate SQL with comments: %s", enabledDisabled( sessionFactoryOptions.isCommentsEnabled() ) );
+
+			LOG.debugf( "JPA compliance - query : ", enabledDisabled( sessionFactoryOptions.getJpaCompliance().isJpaQueryComplianceEnabled() ) );
+			LOG.debugf( "JPA compliance - closed-handling : ", enabledDisabled( sessionFactoryOptions.getJpaCompliance().isJpaClosedComplianceEnabled() ) );
+			LOG.debugf( "JPA compliance - lists : ", enabledDisabled( sessionFactoryOptions.getJpaCompliance().isJpaListComplianceEnabled() ) );
+			LOG.debugf( "JPA compliance - transactions : ", enabledDisabled( sessionFactoryOptions.getJpaCompliance().isJpaTransactionComplianceEnabled() ) );
 		}
 	}
 
@@ -203,12 +208,12 @@ public final class Settings {
 		return sessionFactoryOptions.isJtaTrackByThread();
 	}
 
-	public Map getQuerySubstitutions() {
-		return sessionFactoryOptions.getQuerySubstitutions();
-	}
-
 	public boolean isStrictJPAQLCompliance() {
 		return sessionFactoryOptions.isStrictJpaQueryLanguageCompliance();
+	}
+
+	public Map getQuerySubstitutions() {
+		return sessionFactoryOptions.getQuerySubstitutions();
 	}
 
 	public boolean isNamedQueryStartupCheckingEnabled() {
@@ -223,8 +228,8 @@ public final class Settings {
 		return sessionFactoryOptions.isQueryCacheEnabled();
 	}
 
-	public QueryCacheFactory getQueryCacheFactory() {
-		return sessionFactoryOptions.getQueryCacheFactory();
+	public TimestampsCacheFactory getTimestampsCacheFactory() {
+		return sessionFactoryOptions.getTimestampsCacheFactory();
 	}
 
 	public String getCacheRegionPrefix() {

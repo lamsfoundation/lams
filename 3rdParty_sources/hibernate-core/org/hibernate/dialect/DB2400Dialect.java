@@ -6,6 +6,8 @@
  */
 package org.hibernate.dialect;
 
+import org.hibernate.dialect.identity.DB2390IdentityColumnSupport;
+import org.hibernate.dialect.identity.IdentityColumnSupport;
 import org.hibernate.dialect.pagination.AbstractLimitHandler;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.pagination.LimitHelper;
@@ -22,8 +24,11 @@ public class DB2400Dialect extends DB2Dialect {
 	private static final AbstractLimitHandler LIMIT_HANDLER = new AbstractLimitHandler() {
 		@Override
 		public String processSql(String sql, RowSelection selection) {
-			if (LimitHelper.hasFirstRow( selection )) {
-				throw new UnsupportedOperationException( "query result offset is not supported" );
+			if ( LimitHelper.hasFirstRow( selection ) ) {
+				//nest the main query in an outer select
+				return "select * from ( select inner2_.*, rownumber() over(order by order of inner2_) as rownumber_ from ( "
+						+ sql + " fetch first " + getMaxOrLimit( selection ) + " rows only ) as inner2_ ) as inner1_ where rownumber_ > "
+						+ selection.getFirstRow() + " order by rownumber_";
 			}
 			return sql + " fetch first " + getMaxOrLimit( selection ) + " rows only";
 		}
@@ -50,13 +55,13 @@ public class DB2400Dialect extends DB2Dialect {
 	}
 
 	@Override
-	public String getIdentitySelectString() {
-		return "select identity_val_local() from sysibm.sysdummy1";
+	public boolean supportsLimit() {
+		return true;
 	}
 
 	@Override
-	public boolean supportsLimit() {
-		return true;
+	public String getQuerySequencesString() {
+		return null;
 	}
 
 	@Override
@@ -94,5 +99,10 @@ public class DB2400Dialect extends DB2Dialect {
 	@Override
 	public String getForUpdateString() {
 		return " for update with rs";
+	}
+
+	@Override
+	public IdentityColumnSupport getIdentityColumnSupport() {
+		return new DB2390IdentityColumnSupport();
 	}
 }

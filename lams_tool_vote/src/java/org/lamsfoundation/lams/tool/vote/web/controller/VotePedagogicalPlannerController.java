@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.vote.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.web.form.VotePedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.MessageService;
@@ -85,7 +85,7 @@ public class VotePedagogicalPlannerController {
 			VoteQueContent voteQueContent = new VoteQueContent();
 			voteQueContent.setDisplayOrder(nominationIndex);
 			voteQueContent.setVoteContent(voteContent);
-			voteQueContent.setVoteContentId(voteContent.getVoteContentId());
+			voteQueContent.setVoteContent(voteContent);
 			voteQueContent.setQuestion(nomination);
 			voteService.saveOrUpdateVoteQueContent(voteQueContent);
 		    }

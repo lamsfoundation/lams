@@ -2,12 +2,10 @@ package org.lamsfoundation.lams.tool.sbmt.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
 
 /**
- *
  * @author Dapeng.Ni
- *
  */
 public class AuthoringForm {
 

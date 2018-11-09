@@ -25,18 +25,39 @@
 
 package org.lamsfoundation.lams.comments;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * @author Fiona.Malikoff
  *
  */
+@Entity
+@Table(name = "lams_comment_likes")
 public class CommentLike {
 
     public static int LIKE = 1;
     public static int DISLIKE = -1;
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @ManyToOne 
+    @JoinColumn(name = "comment_uid") 
     private Comment comment;
+
+    @Column(name = "user_id")
     private Integer userId;
+
+    @Column
     private int vote;
 
     public Long getUid() {

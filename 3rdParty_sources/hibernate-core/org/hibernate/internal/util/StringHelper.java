@@ -6,19 +6,18 @@
  */
 package org.hibernate.internal.util;
 
-import org.hibernate.dialect.Dialect;
-import org.hibernate.internal.util.collections.ArrayHelper;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.hibernate.dialect.Dialect;
+import org.hibernate.internal.util.collections.ArrayHelper;
 
 public final class StringHelper {
 
@@ -40,23 +39,6 @@ public final class StringHelper {
 		return string.length() - 1;
 	}
 
-	public static String join(String seperator, String[] strings) {
-		int length = strings.length;
-		if ( length == 0 ) {
-			return "";
-		}
-		// Allocate space for length * firstStringLength;
-		// If strings[0] is null, then its length is defined as 4, since that's the
-		// length of "null".
-		final int firstStringLength = strings[0] != null ? strings[0].length() : 4;
-		StringBuilder buf = new StringBuilder( length * firstStringLength )
-				.append( strings[0] );
-		for ( int i = 1; i < length; i++ ) {
-			buf.append( seperator ).append( strings[i] );
-		}
-		return buf.toString();
-	}
-
 	public static String joinWithQualifierAndSuffix(
 			String[] values,
 			String qualifier,
@@ -74,7 +56,7 @@ public final class StringHelper {
 		return buf.toString();
 	}
 
-	public static String join(String seperator, Iterator objects) {
+	public static String join(String seperator, Iterator<?> objects) {
 		StringBuilder buf = new StringBuilder();
 		if ( objects.hasNext() ) {
 			buf.append( objects.next() );
@@ -83,10 +65,6 @@ public final class StringHelper {
 			buf.append( seperator ).append( objects.next() );
 		}
 		return buf.toString();
-	}
-
-	public static String join(String separator, Iterable objects) {
-		return join( separator, objects.iterator() );
 	}
 
 	public static String[] add(String[] x, String sep, String[] y) {
@@ -183,10 +161,16 @@ public final class StringHelper {
 		// there is already a right-parenthesis; we assume there will be a matching right-parenthesis.
 		// 2) "... IN ?1", we assume that "?1" needs to be enclosed in parentheses, because there
 		// is no left-parenthesis.
+
+		// We need to check the placeholder is not used in `Order By FIELD(...)` (HHH-10502)
+		// Examples:
+		// " ... Order By FIELD(id,?1)",  after expand parameters, the sql is "... Order By FIELD(id,?,?,?)"
 		boolean encloseInParens =
 				actuallyReplace
 						&& encloseInParensIfNecessary
-						&& !( getLastNonWhitespaceCharacter( beforePlaceholder ) == '(' );
+						&& !( getLastNonWhitespaceCharacter( beforePlaceholder ) == '(' ) &&
+						!( getLastNonWhitespaceCharacter( beforePlaceholder ) == ',' && getFirstNonWhitespaceCharacter(
+								afterPlaceholder ) == ')' );
 		StringBuilder buf = new StringBuilder( beforePlaceholder );
 		if ( encloseInParens ) {
 			buf.append( '(' );
@@ -205,6 +189,28 @@ public final class StringHelper {
 				)
 		);
 		return buf.toString();
+	}
+
+	/**
+	 * Used to find the ordinal parameters (e.g. '?1') in a string.
+	 */
+	public static int indexOfIdentifierWord(String str, String word) {
+		if ( str == null || str.length() == 0 || word == null || word.length() == 0 ) {
+			return -1;
+		}
+
+		int position = str.indexOf( word );
+		while ( position >= 0 && position < str.length() ) {
+			if (
+					( position == 0 || !Character.isJavaIdentifierPart( str.charAt( position - 1 ) ) ) &&
+					( position + word.length() == str.length() || !Character.isJavaIdentifierPart( str.charAt( position + word.length() ) ) )
+			) {
+				return position;
+			}
+			position = str.indexOf( word, position + 1 );
+		}
+
+		return -1;
 	}
 
 	public static char getLastNonWhitespaceCharacter(String str) {
@@ -270,12 +276,12 @@ public final class StringHelper {
 	}
 
 	public static String unqualify(String qualifiedName) {
-		int loc = qualifiedName.lastIndexOf( "." );
+		int loc = qualifiedName.lastIndexOf( '.' );
 		return ( loc < 0 ) ? qualifiedName : qualifiedName.substring( loc + 1 );
 	}
 
 	public static String qualifier(String qualifiedName) {
-		int loc = qualifiedName.lastIndexOf( "." );
+		int loc = qualifiedName.lastIndexOf( '.' );
 		return ( loc < 0 ) ? "" : qualifiedName.substring( 0, loc );
 	}
 
@@ -829,5 +835,55 @@ public final class StringHelper {
 
 	public static List<String> parseCommaSeparatedString(String incomingString) {
 		return Arrays.asList( incomingString.split( "\\s*,\\s*" ) );
+	}
+
+	public static <T> String join(Collection<T> values, Renderer<T> renderer) {
+		final StringBuilder buffer = new StringBuilder();
+		for ( T value : values ) {
+			buffer.append( String.join(", ", renderer.render( value )) );
+		}
+		return buffer.toString();
+	}
+
+	public static <T> String join(T[] values, Renderer<T> renderer) {
+		return join( Arrays.asList( values ), renderer );
+	}
+
+	public interface Renderer<T> {
+		String render(T value);
+	}
+
+	/**
+	 * @param firstExpression the first expression
+	 * @param secondExpression the second expression
+	 * @return if {@code firstExpression} and {@code secondExpression} are both non-empty,
+	 * then "( " + {@code firstExpression} + " ) and ( " + {@code secondExpression} + " )" is returned;
+	 * if {@code firstExpression} is non-empty and {@code secondExpression} is empty,
+	 * then {@code firstExpression} is returned;
+	 * if {@code firstExpression} is empty and {@code secondExpression} is non-empty,
+	 * then {@code secondExpression} is returned;
+	 * if both {@code firstExpression} and {@code secondExpression} are empty, then null is returned.
+	 */
+	public static String getNonEmptyOrConjunctionIfBothNonEmpty( String firstExpression, String secondExpression ) {
+		final boolean isFirstExpressionNonEmpty = StringHelper.isNotEmpty( firstExpression );
+		final boolean isSecondExpressionNonEmpty = StringHelper.isNotEmpty( secondExpression );
+		if ( isFirstExpressionNonEmpty && isSecondExpressionNonEmpty ) {
+			final StringBuilder buffer = new StringBuilder();
+			buffer.append( "( " )
+					.append( firstExpression )
+					.append( " ) and ( ")
+					.append( secondExpression )
+					.append( " )" );
+			return buffer.toString();
+		}
+		else if ( isFirstExpressionNonEmpty ) {
+			return firstExpression;
+		}
+		else if ( isSecondExpressionNonEmpty ) {
+			return secondExpression;
+		}
+		else {
+			return null;
+		}
 	}
 }

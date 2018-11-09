@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -63,18 +63,18 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.model.QaSession;
+import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -221,7 +221,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid) {
+    public QaQueContent getQuestionByContentAndDisplayOrder(Integer displayOrder, Long contentUid) {
 	return qaQuestionDAO.getQuestionByDisplayOrder(displayOrder, contentUid);
     }
 
@@ -303,7 +303,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Integer questionDisplayOrder,
 	    boolean isAutosave) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -313,7 +313,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	QaSession session = getSessionById(new Long(toolSessionID));
 	QaContent qaContent = session.getQaContent();
 
-	QaQueContent question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder), qaContent.getUid());
+	QaQueContent question = getQuestionByContentAndDisplayOrder(questionDisplayOrder, qaContent.getUid());
 
 	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 	// if response doesn't exist
@@ -944,8 +944,8 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public IToolVO getToolBySignature(String toolSignature) {
-	IToolVO tool = toolService.getToolBySignature(toolSignature);
+    public Tool getToolBySignature(String toolSignature) {
+	Tool tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 

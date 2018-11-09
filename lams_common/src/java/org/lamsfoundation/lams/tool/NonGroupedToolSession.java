@@ -27,6 +27,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -37,9 +42,13 @@ import org.lamsfoundation.lams.usermanagement.User;
  *
  * @author daveg
  */
+@Entity
+@DiscriminatorValue("2")
 public class NonGroupedToolSession extends ToolSession {
+    private static final long serialVersionUID = 8063910455683242612L;
 
-    /** persistent field */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     public NonGroupedToolSession(ToolActivity toolActivity, Date createDateTime, int toolSessionStateId, User user,

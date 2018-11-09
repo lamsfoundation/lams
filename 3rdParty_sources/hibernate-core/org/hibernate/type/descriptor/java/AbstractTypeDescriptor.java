@@ -8,17 +8,22 @@ package org.hibernate.type.descriptor.java;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Objects;
 
 import org.hibernate.HibernateException;
 import org.hibernate.internal.util.compare.ComparableComparator;
-import org.hibernate.internal.util.compare.EqualsHelper;
 
 /**
  * Abstract adapter for Java type descriptors.
  *
+ * @apiNote This abstract descriptor implements BasicJavaDescriptor
+ * because we currently only categorize "basic" JavaTypeDescriptors,
+ * as in the {@link javax.persistence.metamodel.Type.PersistenceType#BASIC}
+ * sense
+ *
  * @author Steve Ebersole
  */
-public abstract class AbstractTypeDescriptor<T> implements JavaTypeDescriptor<T>, Serializable {
+public abstract class AbstractTypeDescriptor<T> implements BasicJavaDescriptor<T>, Serializable {
 	private final Class<T> type;
 	private final MutabilityPlan<T> mutabilityPlan;
 	private final Comparator<T> comparator;
@@ -55,9 +60,17 @@ public abstract class AbstractTypeDescriptor<T> implements JavaTypeDescriptor<T>
 		return mutabilityPlan;
 	}
 
-	@Override
-	public Class<T> getJavaTypeClass() {
+	public Class<T> getJavaType() {
 		return type;
+	}
+
+	/**
+	 * @deprecated Use {@link #getJavaType()} instead
+	 */
+	@Override
+	@Deprecated
+	public Class<T> getJavaTypeClass() {
+		return getJavaType();
 	}
 
 	@Override
@@ -67,7 +80,7 @@ public abstract class AbstractTypeDescriptor<T> implements JavaTypeDescriptor<T>
 
 	@Override
 	public boolean areEqual(T one, T another) {
-		return EqualsHelper.equals( one, another );
+		return Objects.equals( one, another );
 	}
 
 	@Override

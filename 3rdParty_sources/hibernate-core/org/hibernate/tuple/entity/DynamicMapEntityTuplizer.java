@@ -16,10 +16,10 @@ import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
-import org.hibernate.property.access.spi.Getter;
-import org.hibernate.property.access.spi.Setter;
 import org.hibernate.property.access.internal.PropertyAccessStrategyMapImpl;
+import org.hibernate.property.access.spi.Getter;
 import org.hibernate.property.access.spi.PropertyAccess;
+import org.hibernate.property.access.spi.Setter;
 import org.hibernate.proxy.ProxyFactory;
 import org.hibernate.proxy.map.MapProxyFactory;
 import org.hibernate.tuple.DynamicMapInstantiator;
@@ -63,7 +63,7 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 	}
 
 	@Override
-	protected Instantiator buildInstantiator(PersistentClass mappingInfo) {
+	protected Instantiator buildInstantiator(EntityMetamodel entityMetamodel, PersistentClass mappingInfo) {
 		return new DynamicMapInstantiator( mappingInfo );
 	}
 
@@ -100,11 +100,6 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 	}
 
 	@Override
-	public boolean isInstrumented() {
-		return false;
-	}
-
-	@Override
 	public EntityNameResolver[] getEntityNameResolvers() {
 		return new EntityNameResolver[] {BasicEntityNameResolver.INSTANCE};
 	}
@@ -135,7 +130,7 @@ public class DynamicMapEntityTuplizer extends AbstractEntityTuplizer {
 
 		@Override
 		public boolean equals(Object obj) {
-			return getClass().equals( obj.getClass() );
+			return obj != null && getClass().equals( obj.getClass() );
 		}
 
 		@Override

@@ -63,7 +63,6 @@ public class ImageGalleryItemVisitDAOHibernate extends LAMSBaseDAO implements Im
     @Override
     @SuppressWarnings("unchecked")
     public List<ImageGalleryItemVisitLog> getImageGalleryItemLogBySession(Long sessionId, Long itemUid) {
-
 	return (List<ImageGalleryItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 

@@ -77,8 +77,7 @@ public class GradebookLearningController {
 		return null;
 	    }
 	    if (logger.isDebugEnabled()) {
-		GradebookLearningController.logger
-			.debug("Getting learner gradebook for organisation: " + oranisationID);
+		logger.debug("Getting learner gradebook for organisation: " + oranisationID);
 	    }
 
 	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, oranisationID);
@@ -88,7 +87,7 @@ public class GradebookLearningController {
 
 	    return "gradebookCourseLearner";
 	} catch (Exception e) {
-	    GradebookLearningController.logger.error("Failed to load learner gradebook", e);
+	    logger.error("Failed to load learner gradebook", e);
 	    return "error";
 	}
     }

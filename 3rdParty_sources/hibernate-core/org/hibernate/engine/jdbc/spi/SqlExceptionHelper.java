@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.JDBCException;
 import org.hibernate.exception.internal.SQLStateConverter;
@@ -34,6 +36,7 @@ public class SqlExceptionHelper {
 
 	private static final String DEFAULT_EXCEPTION_MSG = "SQL Exception";
 	private static final String DEFAULT_WARNING_MSG = "SQL Warning";
+	private final boolean logWarnings;
 
 	private static final SQLExceptionConverter DEFAULT_CONVERTER = new SQLStateConverter(
 			new ViolatedConstraintNameExtracter() {
@@ -48,8 +51,8 @@ public class SqlExceptionHelper {
 	/**
 	 * Create an exception helper with a default exception converter.
 	 */
-	public SqlExceptionHelper() {
-		sqlExceptionConverter = DEFAULT_CONVERTER;
+	public SqlExceptionHelper( boolean logWarnings) {
+		this( DEFAULT_CONVERTER, logWarnings );
 	}
 
 	/**
@@ -57,8 +60,9 @@ public class SqlExceptionHelper {
 	 *
 	 * @param sqlExceptionConverter The exception converter to use.
 	 */
-	public SqlExceptionHelper(SQLExceptionConverter sqlExceptionConverter) {
+	public SqlExceptionHelper(SQLExceptionConverter sqlExceptionConverter, boolean logWarnings) {
 		this.sqlExceptionConverter = sqlExceptionConverter;
+		this.logWarnings = logWarnings;
 	}
 
 	/**
@@ -122,11 +126,22 @@ public class SqlExceptionHelper {
 				LOG.debug( message, sqlException );
 			}
 			final boolean warnEnabled = LOG.isEnabled( Level.WARN );
+
+			List<String> previousWarnMessages = new ArrayList<>();
+			List<String> previousErrorMessages = new ArrayList<>();
+
 			while ( sqlException != null ) {
 				if ( warnEnabled ) {
-					LOG.warn( "SQL Error: " + sqlException.getErrorCode() + ", SQLState: " + sqlException.getSQLState() );
+					String warnMessage = "SQL Error: " + sqlException.getErrorCode() + ", SQLState: " + sqlException.getSQLState();
+					if ( !previousWarnMessages.contains( warnMessage ) ) {
+						LOG.warn( warnMessage );
+						previousWarnMessages.add( warnMessage );
+					}
 				}
-				LOG.error( sqlException.getMessage() );
+				if ( !previousErrorMessages.contains( sqlException.getMessage() ) ) {
+					LOG.error( sqlException.getMessage() );
+					previousErrorMessages.add( sqlException.getMessage() );
+				}
 				sqlException = sqlException.getNextException();
 			}
 		}
@@ -271,7 +286,9 @@ public class SqlExceptionHelper {
 			Connection connection,
 			WarningHandler handler) {
 		try {
-			walkWarnings( connection.getWarnings(), handler );
+			if ( logWarnings ) {
+				walkWarnings( connection.getWarnings(), handler );
+			}
 		}
 		catch (SQLException sqle) {
 			// workaround for WebLogic
@@ -300,7 +317,7 @@ public class SqlExceptionHelper {
 			WarningHandler handler) {
 		// See HHH-9174.  Statement#getWarnings can be an expensive call for many JDBC libs.  Don't do it unless
 		// the log level would actually allow a warning to be logged.
-		if ( LOG.isEnabled( Level.WARN ) ) {
+		if ( logWarnings ) {
 			try {
 				walkWarnings( statement.getWarnings(), handler );
 			}

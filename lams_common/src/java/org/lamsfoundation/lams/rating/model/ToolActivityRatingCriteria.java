@@ -25,14 +25,21 @@ package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  */
+@Entity
+@DiscriminatorValue("1")
 public class ToolActivityRatingCriteria extends RatingCriteria implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 6459453751049962314L;
     /** Holds value of property toolContentId. */
+    @Column(name="tool_content_id")
     private Long toolContentId;
 
     @Override

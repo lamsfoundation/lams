@@ -50,15 +50,15 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.lamsfoundation.lams.tool.forum.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
+import org.lamsfoundation.lams.tool.forum.model.ForumReport;
+import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumUserComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.MessageDTOByDateComparator;
@@ -287,7 +287,7 @@ public class MonitoringController {
 	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[2]);
+		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID,  (Integer)userAndReflection[2]);
 	    }
 
 	    rows.add(responseRow);

@@ -40,7 +40,7 @@ public class ImageGallerySessionDAOHibernate extends LAMSBaseDAO implements Imag
 
     @Override
     public ImageGallerySession getSessionBySessionId(Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_ID, sessionId);
+	List<?> list = doFind(FIND_BY_SESSION_ID, sessionId);
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

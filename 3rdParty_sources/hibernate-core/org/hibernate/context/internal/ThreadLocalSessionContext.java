@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.transaction.Synchronization;
 
@@ -22,6 +23,7 @@ import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.context.spi.AbstractCurrentSessionContext;
 import org.hibernate.engine.jdbc.LobCreationContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -53,6 +55,7 @@ import org.jboss.logging.Logger;
  * subclassing (for long-running session scenarios, for example).
  *
  * @author Steve Ebersole
+ * @author Sanne Grinovero
  */
 public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 	private static final CoreMessageLogger LOG = Logger.getMessageLogger(
@@ -73,7 +76,7 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 	 * the possibility for multiple SessionFactory instances being used during execution
 	 * of the given thread.
 	 */
-	private static final ThreadLocal<Map> CONTEXT_TL = new ThreadLocal<Map>();
+	private static final ThreadLocal<Map<SessionFactory,Session>> CONTEXT_TL = ThreadLocal.withInitial( HashMap::new );
 
 	/**
 	 * Constructs a ThreadLocal
@@ -106,12 +109,10 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 
 	private boolean needsWrapping(Session session) {
 		// try to make sure we don't wrap and already wrapped session
-		if ( session != null ) {
-			if ( Proxy.isProxyClass( session.getClass() ) ) {
-				final InvocationHandler invocationHandler = Proxy.getInvocationHandler( session );
-				if ( invocationHandler != null && TransactionProtectionWrapper.class.isInstance( invocationHandler ) ) {
-					return false;
-				}
+		if ( Proxy.isProxyClass( session.getClass() ) ) {
+			final InvocationHandler invocationHandler = Proxy.getInvocationHandler( session );
+			if ( invocationHandler != null && TransactionProtectionWrapper.class.isInstance( invocationHandler ) ) {
+				return false;
 			}
 		}
 		return true;
@@ -193,28 +194,32 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 	 */
 	public static void bind(org.hibernate.Session session) {
 		final SessionFactory factory = session.getSessionFactory();
-		cleanupAnyOrphanedSession( factory );
 		doBind( session, factory );
 	}
 
-	private static void cleanupAnyOrphanedSession(SessionFactory factory) {
-		final Session orphan = doUnbind( factory, false );
+	private static void terminateOrphanedSession(Session orphan) {
 		if ( orphan != null ) {
 			LOG.alreadySessionBound();
 			try {
-				if ( orphan.getTransaction() != null && orphan.getTransaction().getStatus() == TransactionStatus.ACTIVE ) {
+				final Transaction orphanTransaction = orphan.getTransaction();
+				if ( orphanTransaction != null && orphanTransaction.getStatus() == TransactionStatus.ACTIVE ) {
 					try {
-						orphan.getTransaction().rollback();
+						orphanTransaction.rollback();
 					}
 					catch( Throwable t ) {
 						LOG.debug( "Unable to rollback transaction for orphaned session", t );
 					}
 				}
-				orphan.close();
 			}
-			catch( Throwable t ) {
-				LOG.debug( "Unable to close orphaned session", t );
+			finally {
+				try {
+					orphan.close();
+				}
+				catch( Throwable t ) {
+					LOG.debug( "Unable to close orphaned session", t );
+				}
 			}
+
 		}
 	}
 
@@ -229,35 +234,25 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 	}
 
 	private static Session existingSession(SessionFactory factory) {
-		final Map sessionMap = sessionMap();
-		if ( sessionMap == null ) {
-			return null;
-		}
-		return (Session) sessionMap.get( factory );
+		return sessionMap().get( factory );
 	}
 
-	protected static Map sessionMap() {
+	protected static Map<SessionFactory,Session> sessionMap() {
 		return CONTEXT_TL.get();
 	}
 
 	@SuppressWarnings({"unchecked"})
 	private static void doBind(org.hibernate.Session session, SessionFactory factory) {
-		Map sessionMap = sessionMap();
-		if ( sessionMap == null ) {
-			sessionMap = new HashMap();
-			CONTEXT_TL.set( sessionMap );
-		}
-		sessionMap.put( factory, session );
+		Session orphanedPreviousSession = sessionMap().put( factory, session );
+		terminateOrphanedSession( orphanedPreviousSession );
 	}
 
 	private static Session doUnbind(SessionFactory factory, boolean releaseMapIfEmpty) {
-		Session session = null;
-		final Map sessionMap = sessionMap();
-		if ( sessionMap != null ) {
-			session = (Session) sessionMap.remove( factory );
-			if ( releaseMapIfEmpty && sessionMap.isEmpty() ) {
-				CONTEXT_TL.set( null );
-			}
+		final Map<SessionFactory, Session> sessionMap = sessionMap();
+		final Session session = sessionMap.remove( factory );
+		if ( releaseMapIfEmpty && sessionMap.isEmpty() ) {
+			//Do not use set(null) as it would prevent the initialValue to be invoked again in case of need.
+			CONTEXT_TL.remove();
 		}
 		return session;
 	}
@@ -291,17 +286,33 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 		}
 
 		@Override
+		@SuppressWarnings("SimplifiableIfStatement")
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			final String methodName = method.getName(); 
+			final String methodName = method.getName();
+
+			// first check methods calls that we handle completely locally:
+			if ( "equals".equals( methodName ) && method.getParameterCount() == 1 ) {
+				if ( args[0] == null
+						|| !Proxy.isProxyClass( args[0].getClass() ) ) {
+					return false;
+				}
+				return this.equals( Proxy.getInvocationHandler( args[0] ) );
+			}
+			else if ( "hashCode".equals( methodName ) && method.getParameterCount() == 0 ) {
+				return this.hashCode();
+			}
+			else if ( "toString".equals( methodName ) && method.getParameterCount() == 0 ) {
+				return String.format( Locale.ROOT, "ThreadLocalSessionContext.TransactionProtectionWrapper[%s]", realSession );
+			}
+
+
+			// then check method calls that we need to delegate to the real Session
 			try {
 				// If close() is called, guarantee unbind()
 				if ( "close".equals( methodName ) ) {
 					unbind( realSession.getSessionFactory() );
 				}
-				else if ( "toString".equals( methodName )
-						|| "equals".equals( methodName )
-						|| "hashCode".equals( methodName )
-						|| "getStatistics".equals( methodName )
+				else if ( "getStatistics".equals( methodName )
 						|| "isOpen".equals( methodName )
 						|| "getListeners".equals( methodName ) ) {
 					// allow these to go through the the real session no matter what
@@ -331,7 +342,8 @@ public class ThreadLocalSessionContext extends AbstractCurrentSessionContext {
 						LOG.tracef( "Allowing invocation [%s] to proceed to real (non-transacted) session - deprecated methods", methodName );
 					}
 					else {
-						throw new HibernateException( methodName + " is not valid without active transaction" );
+						throw new HibernateException( "Calling method '" + methodName + "' is not valid without an active transaction (Current status: "
+								+ realSession.getTransaction().getStatus() + ")" );
 					}
 				}
 				LOG.tracef( "Allowing proxy invocation [%s] to proceed to real session", methodName );

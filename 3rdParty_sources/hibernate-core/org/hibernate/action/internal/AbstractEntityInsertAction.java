@@ -16,7 +16,7 @@ import org.hibernate.engine.internal.Versioning;
 import org.hibernate.engine.spi.CachedNaturalIdValueSource;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.persister.entity.EntityPersister;
 
@@ -48,7 +48,7 @@ public abstract class AbstractEntityInsertAction extends EntityAction {
 			Object instance,
 			boolean isVersionIncrementDisabled,
 			EntityPersister persister,
-			SessionImplementor session) {
+			SharedSessionContractImplementor session) {
 		super( session, id, instance, persister );
 		this.state = state;
 		this.isVersionIncrementDisabled = isVersionIncrementDisabled;
@@ -132,8 +132,7 @@ public abstract class AbstractEntityInsertAction extends EntityAction {
 				LockMode.WRITE,
 				isExecuted,
 				getPersister(),
-				isVersionIncrementDisabled,
-				false
+				isVersionIncrementDisabled
 		);
 	}
 
@@ -151,7 +150,7 @@ public abstract class AbstractEntityInsertAction extends EntityAction {
 	protected abstract EntityKey getEntityKey();
 
 	@Override
-	public void afterDeserialize(SessionImplementor session) {
+	public void afterDeserialize(SharedSessionContractImplementor session) {
 		super.afterDeserialize( session );
 		// IMPL NOTE: non-flushed changes code calls this method with session == null...
 		// guard against NullPointerException
@@ -194,7 +193,7 @@ public abstract class AbstractEntityInsertAction extends EntityAction {
 		// after save, we need to manage the shared cache entries
 		getSession().getPersistenceContext().getNaturalIdHelper().manageSharedNaturalIdCrossReference(
 				getPersister(),
-				getId(),
+				generatedId,
 				state,
 				null,
 				CachedNaturalIdValueSource.INSERT

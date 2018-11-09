@@ -6,6 +6,8 @@
  */
 package org.hibernate.dialect;
 
+import org.hibernate.dialect.identity.DB2390IdentityColumnSupport;
+import org.hibernate.dialect.identity.IdentityColumnSupport;
 import org.hibernate.dialect.pagination.AbstractLimitHandler;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.dialect.pagination.LimitHelper;
@@ -45,14 +47,41 @@ public class DB2390Dialect extends DB2Dialect {
 		}
 	};
 
+	private static final AbstractLimitHandler LEGACY_LIMIT_HANDLER = new AbstractLimitHandler() {
+		@Override
+		public String processSql(String sql, RowSelection selection) {
+			return sql + " fetch first " + getMaxOrLimit( selection ) + " rows only";
+		}
+
+		@Override
+		public boolean supportsLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean supportsLimitOffset() {
+			return false;
+		}
+
+		@Override
+		public boolean useMaxForLimit() {
+			return true;
+		}
+
+		@Override
+		public boolean supportsVariableLimit() {
+			return false;
+		}
+	};
+
 	@Override
 	public boolean supportsSequences() {
 		return false;
 	}
 
 	@Override
-	public String getIdentitySelectString() {
-		return "select identity_val_local() from sysibm.sysdummy1";
+	public String getQuerySequencesString() {
+		return null;
 	}
 
 	@Override
@@ -89,7 +118,16 @@ public class DB2390Dialect extends DB2Dialect {
 
 	@Override
 	public LimitHandler getLimitHandler() {
-		return LIMIT_HANDLER;
+		if ( isLegacyLimitHandlerBehaviorEnabled() ) {
+			return LEGACY_LIMIT_HANDLER;
+		}
+		else {
+			return LIMIT_HANDLER;
+		}
 	}
 
+	@Override
+	public IdentityColumnSupport getIdentityColumnSupport() {
+		return new DB2390IdentityColumnSupport();
+	}
 }

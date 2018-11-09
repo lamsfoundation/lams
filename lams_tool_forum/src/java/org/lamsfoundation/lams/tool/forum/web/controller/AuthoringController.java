@@ -47,18 +47,18 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.forum.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.model.Attachment;
+import org.lamsfoundation.lams.tool.forum.model.Forum;
+import org.lamsfoundation.lams.tool.forum.model.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.model.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.model.ForumUser;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
+import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
@@ -76,7 +76,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Steve.Ni
@@ -417,16 +417,14 @@ public class AuthoringController {
 	message.setModifiedBy(forumUser);
 
 	// set attachment of this topic
-	Set attSet = null;
+	Set<Attachment> attSet = null;
 	if (messageForm.getAttachmentFile() != null
 		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
-	    // only allow one attachment, so replace whatever
-	    attSet = new HashSet();
-	    attSet.add(att);
+	    attSet = setupAttachmentSet(messageForm.getAttachmentFile(),  message);
 	}
 	message.setAttachments(attSet);
 
+	// LDEV-4696 no longer needed - cannot edit in monitoring once a session is created.
 	// create clones of this topic (appropriate only for editing in monitoring)
 	Forum forum = (Forum) sessionMap.get(ForumConstants.AUTHORING_FORUM);
 	if (forum != null) {
@@ -558,9 +556,7 @@ public class AuthoringController {
 	    if (messageForm.getAttachmentFile() != null
 		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
 		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
-		// only allow one attachment, so replace whatever
-		Set attSet = new HashSet();
-		attSet.add(att);
+		Set attSet = setupAttachmentSet(messageForm.getAttachmentFile(), newMsg.getMessage());
 		newMsg.setHasAttachment(true);
 		newMsg.getMessage().setAttachments(attSet);
 	    } else if (!messageForm.isHasAttachment()) {
@@ -576,6 +572,15 @@ public class AuthoringController {
 
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX, topicIndex);
 	return "jsps/authoring/message/topiclist";
+    }
+
+    /* only allow one attachment, so replace whatever */
+    private Set<Attachment> setupAttachmentSet(MultipartFile attachmentFile, Message msg) {
+	Attachment att = forumService.uploadAttachment(attachmentFile);
+	Set<Attachment> attSet = new HashSet<Attachment>();
+	attSet.add(att);
+	att.setMessage(msg);
+	return attSet;
     }
 
     /**

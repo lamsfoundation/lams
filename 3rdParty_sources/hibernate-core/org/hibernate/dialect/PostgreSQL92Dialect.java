@@ -13,7 +13,7 @@ import java.sql.Types;
  * 
  * @author Mark Robinson
  */
-public class PostgreSQL92Dialect extends PostgreSQL9Dialect {
+public class PostgreSQL92Dialect extends PostgreSQL91Dialect {
 
 	/**
 	 * Constructs a PostgreSQL92Dialect
@@ -22,4 +22,10 @@ public class PostgreSQL92Dialect extends PostgreSQL9Dialect {
 		super();
 		this.registerColumnType( Types.JAVA_OBJECT, "json" );
 	}
+
+	@Override
+	public boolean supportsIfExistsAfterAlterTable() {
+		return true;
+	}
+
 }

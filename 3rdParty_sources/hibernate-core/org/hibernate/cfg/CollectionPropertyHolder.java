@@ -26,7 +26,7 @@ import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MapKeyType;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.boot.model.source.spi.AttributePath;
+import org.hibernate.boot.model.convert.spi.ConverterDescriptor;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
@@ -66,8 +66,8 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 		this.collection = collection;
 		setCurrentProperty( property );
 
-		this.elementAttributeConversionInfoMap = new HashMap<String, AttributeConversionInfo>();
-		this.keyAttributeConversionInfoMap = new HashMap<String, AttributeConversionInfo>();
+		this.elementAttributeConversionInfoMap = new HashMap<>();
+		this.keyAttributeConversionInfoMap = new HashMap<>();
 	}
 
 	public Collection getCollectionBinding() {
@@ -288,6 +288,11 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 		return false;
 	}
 
+	@Override
+	public boolean isWithinElementCollection() {
+		return false;
+	}
+
 	public PersistentClass getPersistentClass() {
 		return collection.getOwner();
 	}
@@ -376,7 +381,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 		}
 	}
 
-	public AttributeConverterDefinition resolveElementAttributeConverterDefinition(XClass elementXClass) {
+	public ConverterDescriptor resolveElementAttributeConverterDescriptor(XProperty collectionXProperty, XClass elementXClass) {
 		AttributeConversionInfo info = locateAttributeConversionInfo( "element" );
 		if ( info != null ) {
 			if ( info.isConversionDisabled() ) {
@@ -384,13 +389,10 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 			}
 			else {
 				try {
-					return makeAttributeConverterDefinition( info );
+					return makeAttributeConverterDescriptor( info );
 				}
 				catch (Exception e) {
-					throw new IllegalStateException(
-							String.format( "Unable to instantiate AttributeConverter [%s", info.getConverterClass().getName() ),
-							e
-					);
+					throw buildExceptionFromInstantiationError( info, e );
 				}
 			}
 		}
@@ -400,31 +402,17 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 				collection.getRole()
 		);
 
-		final Class elementClass = determineElementClass( elementXClass );
-		if ( elementClass != null ) {
-			for ( AttributeConverterDefinition attributeConverterDefinition : getContext().getMetadataCollector().getAttributeConverters() ) {
-				if ( ! attributeConverterDefinition.isAutoApply() ) {
-					continue;
-				}
-				log.debugf(
-						"Checking auto-apply AttributeConverter [%s] type [%s] for match [%s]",
-						attributeConverterDefinition.toString(),
-						attributeConverterDefinition.getEntityAttributeType().getSimpleName(),
-						elementClass.getSimpleName()
-				);
-				if ( areTypeMatch( attributeConverterDefinition.getEntityAttributeType(), elementClass ) ) {
-					return attributeConverterDefinition;
-				}
-			}
-		}
+		// todo : do we need to pass along `XClass elementXClass`?
 
-		return null;
+		return getContext().getMetadataCollector()
+				.getAttributeConverterAutoApplyHandler()
+				.findAutoApplyConverterForCollectionElement( collectionXProperty, getContext() );
 	}
 
 	private Class determineElementClass(XClass elementXClass) {
 		if ( elementXClass != null ) {
 			try {
-				return getContext().getBuildingOptions().getReflectionManager().toClass( elementXClass );
+				return getContext().getBootstrapContext().getReflectionManager().toClass( elementXClass );
 			}
 			catch (Exception e) {
 				log.debugf(
@@ -450,7 +438,7 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 		return null;
 	}
 
-	public AttributeConverterDefinition keyElementAttributeConverterDefinition(XClass keyXClass) {
+	public ConverterDescriptor mapKeyAttributeConverterDescriptor(XProperty mapXProperty, XClass keyXClass) {
 		AttributeConversionInfo info = locateAttributeConversionInfo( "key" );
 		if ( info != null ) {
 			if ( info.isConversionDisabled() ) {
@@ -458,13 +446,10 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 			}
 			else {
 				try {
-					return makeAttributeConverterDefinition( info );
+					return makeAttributeConverterDescriptor( info );
 				}
 				catch (Exception e) {
-					throw new IllegalStateException(
-							String.format( "Unable to instantiate AttributeConverter [%s", info.getConverterClass().getName() ),
-							e
-					);
+					throw buildExceptionFromInstantiationError( info, e );
 				}
 			}
 		}
@@ -474,31 +459,17 @@ public class CollectionPropertyHolder extends AbstractPropertyHolder {
 				collection.getRole()
 		);
 
-		final Class elementClass = determineKeyClass( keyXClass );
-		if ( elementClass != null ) {
-			for ( AttributeConverterDefinition attributeConverterDefinition : getContext().getMetadataCollector().getAttributeConverters() ) {
-				if ( ! attributeConverterDefinition.isAutoApply() ) {
-					continue;
-				}
-				log.debugf(
-						"Checking auto-apply AttributeConverter [%s] type [%s] for match [%s]",
-						attributeConverterDefinition.toString(),
-						attributeConverterDefinition.getEntityAttributeType().getSimpleName(),
-						elementClass.getSimpleName()
-				);
-				if ( areTypeMatch( attributeConverterDefinition.getEntityAttributeType(), elementClass ) ) {
-					return attributeConverterDefinition;
-				}
-			}
-		}
+		// todo : do we need to pass along `XClass keyXClass`?
 
-		return null;
+		return getContext().getMetadataCollector()
+				.getAttributeConverterAutoApplyHandler()
+				.findAutoApplyConverterForMapKey( mapXProperty, getContext() );
 	}
 
 	private Class determineKeyClass(XClass keyXClass) {
 		if ( keyXClass != null ) {
 			try {
-				return getContext().getBuildingOptions().getReflectionManager().toClass( keyXClass );
+				return getContext().getBootstrapContext().getReflectionManager().toClass( keyXClass );
 			}
 			catch (Exception e) {
 				log.debugf(

@@ -29,9 +29,7 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 
 /**
- *
  * @author Steve.Ni
- * @version $Revision$
  */
 public class InstructionNavDTO {
 
@@ -39,7 +37,7 @@ public class InstructionNavDTO {
     private int total;
     private int current;
     private ResourceItemInstruction instruction;
-    private List allInstructions;
+    private List<ResourceItemInstruction> allInstructions;
     private short type;
 
     public int getCurrent() {
@@ -82,11 +80,11 @@ public class InstructionNavDTO {
 	this.instruction = instruction;
     }
 
-    public List getAllInstructions() {
+    public List<ResourceItemInstruction> getAllInstructions() {
 	return allInstructions;
     }
 
-    public void setAllInstructions(List allInstructions) {
+    public void setAllInstructions(List<ResourceItemInstruction> allInstructions) {
 	this.allInstructions = allInstructions;
     }
 

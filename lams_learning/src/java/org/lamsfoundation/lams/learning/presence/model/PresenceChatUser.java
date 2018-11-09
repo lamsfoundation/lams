@@ -21,21 +21,28 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.learning.presence.model;
 
 import java.util.Date;
 
-/**
- *
- */
-public class PresenceChatUser implements java.io.Serializable, Cloneable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "lams_presence_user")
+public class PresenceChatUser implements java.io.Serializable, Cloneable {
+    private static final long serialVersionUID = 583967496079297454L;
+
+    @Id
+    @Column
     private String nickname;
 
+    @Column(name = "lesson_id")
     private Long lessonId;
 
+    @Column(name = "last_presence")
     private Date lastPresence;
 
     public PresenceChatUser() {
@@ -47,9 +54,6 @@ public class PresenceChatUser implements java.io.Serializable, Cloneable {
 	this.lastPresence = lastPresence;
     }
 
-    /**
-     *
-     */
     public String getNickname() {
 	return nickname;
     }
@@ -58,9 +62,6 @@ public class PresenceChatUser implements java.io.Serializable, Cloneable {
 	this.nickname = nickname;
     }
 
-    /**
-     *
-     */
     public Long getLessonId() {
 	return lessonId;
     }
@@ -69,9 +70,6 @@ public class PresenceChatUser implements java.io.Serializable, Cloneable {
 	this.lessonId = lessonId;
     }
 
-    /**
-     *
-     */
     public Date getLastPresence() {
 	return lastPresence;
     }

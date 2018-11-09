@@ -7,6 +7,7 @@
 package org.hibernate.mapping;
 
 import org.hibernate.MappingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.type.Type;
 
@@ -22,8 +23,17 @@ public class DependantValue extends SimpleValue {
 	private boolean nullable;
 	private boolean updateable;
 
+	/**
+	 * @deprecated Use {@link DependantValue#DependantValue(MetadataBuildingContext, Table, KeyValue)} instead.
+	 */
+	@Deprecated
 	public DependantValue(MetadataImplementor metadata, Table table, KeyValue prototype) {
 		super( metadata, table );
+		this.wrappedValue = prototype;
+	}
+
+	public DependantValue(MetadataBuildingContext buildingContext, Table table, KeyValue prototype) {
+		super( buildingContext, table );
 		this.wrappedValue = prototype;
 	}
 
@@ -53,4 +63,15 @@ public class DependantValue extends SimpleValue {
 	public void setUpdateable(boolean updateable) {
 		this.updateable = updateable;
 	}
+
+	@Override
+	public boolean isSame(SimpleValue other) {
+		return other instanceof DependantValue && isSame( (DependantValue) other );
+	}
+
+	public boolean isSame(DependantValue other) {
+		return super.isSame( other )
+				&& isSame( wrappedValue, other.wrappedValue );
+	}
+
 }

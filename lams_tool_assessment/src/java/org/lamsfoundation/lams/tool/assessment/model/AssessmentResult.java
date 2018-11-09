@@ -27,6 +27,19 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 
 /**
@@ -34,32 +47,57 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComp
  *
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laasse10_assessment_result")
 public class AssessmentResult {
 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    private Assessment assessment;
+    
+    @Column(name = "start_date")
     private Date startDate;
+    
     //date when user has started activity (pressed start button) that has time limitation
+    @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
+    
     //indicates the latest retry
-    private Boolean isLatest;
+    @Column
+    private Boolean latest;
+    
+    @Column(name = "finish_date")
     private Date finishDate;
-    private AssessmentUser user;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "maximum_grade")
     private int maximumGrade;
+    
+    @Column
     private float grade;
-    private Set<AssessmentQuestionResult> questionResults;
+    
+    @ManyToOne
+    @JoinColumn(name = "assessment_uid")
+    private Assessment assessment;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_uid")
+    private AssessmentUser user;
+    
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "result_uid")
+    private Set<AssessmentQuestionResult> questionResults = new TreeSet<>(new AssessmentQuestionResultComparator());
 
-    // DTO fields:
+    // *************** NON Persist Fields ********************
+    @Transient
     private Date timeTaken;
+    @Transient
     private String overallFeedback;
 
-    public AssessmentResult() {
-	questionResults = new TreeSet<AssessmentQuestionResult>(new AssessmentQuestionResultComparator());
-    }
-
     /**
-     *
      * @return Returns the result Uid.
      */
     public Long getUid() {
@@ -70,10 +108,6 @@ public class AssessmentResult {
 	this.uid = uid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Assessment getAssessment() {
 	return assessment;
     }
@@ -82,10 +116,6 @@ public class AssessmentResult {
 	this.assessment = assessment;
     }
 
-    /**
-     *
-     * @return
-     */
     public AssessmentUser getUser() {
 	return user;
     }
@@ -94,10 +124,6 @@ public class AssessmentResult {
 	this.user = user;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getStartDate() {
 	return startDate;
     }
@@ -106,10 +132,6 @@ public class AssessmentResult {
 	this.startDate = startDate;
     }
     
-    /**
-    *
-    * @return
-    */
    public Date getTimeLimitLaunchedDate() {
 	return timeLimitLaunchedDate;
    }
@@ -118,22 +140,14 @@ public class AssessmentResult {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
    }
 
-    /**
-     *
-     * @return
-     */
     public Boolean isLatest() {
-	return isLatest;
+	return latest;
     }
 
-    public void setLatest(Boolean isLatest) {
-	this.isLatest = isLatest;
+    public void setLatest(Boolean latest) {
+	this.latest = latest;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getFinishDate() {
 	return finishDate;
     }
@@ -142,10 +156,6 @@ public class AssessmentResult {
 	this.finishDate = finishDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }
@@ -154,10 +164,6 @@ public class AssessmentResult {
 	this.sessionId = sessionId;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getMaximumGrade() {
 	return maximumGrade;
     }
@@ -186,10 +192,6 @@ public class AssessmentResult {
     }
 
     /**
-     *
-     *
-     *
-     *
      *
      * @return a set of answerOptions to this AssessmentQuestion.
      */

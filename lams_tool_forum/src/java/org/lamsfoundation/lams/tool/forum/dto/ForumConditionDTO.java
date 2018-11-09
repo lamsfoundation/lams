@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.util.ConditionTopicComparator;
 
 public class ForumConditionDTO extends TextSearchConditionDTO {

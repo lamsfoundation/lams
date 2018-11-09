@@ -24,7 +24,13 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.FloatingActivityStrategy;
@@ -32,49 +38,24 @@ import org.lamsfoundation.lams.tool.SystemTool;
 
 /**
  * @author Mitchell Seaton
- * @version 2.3
- *
- *
  */
+@Entity
+@DiscriminatorValue("15")
 public class FloatingActivity extends ComplexActivity implements Serializable {
+    private static final long serialVersionUID = 6726503617240839444L;
 
     /** preset value for maximum number of floating activities in a design */
     public static final int MAX_NO_OF_ACTIVITIES = 6;
 
-    /** nullable persistent field */
+    @Column(name = "max_number_of_options")
     private Integer maxNumberOfActivities;
-    private SystemTool systemTool;
 
-    /** full constructor */
-    public FloatingActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set activities,
-	    Activity defaultActivity, Integer maxNumberOfActivities, SystemTool sysTool, Set branchActivityEntries) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
-		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-		transitionFrom, languageFile, stopAfterActivity, inputActivities, activities, defaultActivity,
-		branchActivityEntries);
-	this.maxNumberOfActivities = maxNumberOfActivities;
-	this.systemTool = sysTool;
-	super.activityStrategy = new FloatingActivityStrategy(this);
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "system_tool_id")
+    private SystemTool systemTool;
 
     /** default constructor */
     public FloatingActivity() {
-	super.activityStrategy = new FloatingActivityStrategy(this);
-    }
-
-    /** minimal constructor */
-    public FloatingActivity(Long activityId, java.util.Date createDateTime,
-	    org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-	    org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-	    org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-	    org.lamsfoundation.lams.learningdesign.Grouping grouping, Integer activityTypeId, Transition transitionTo,
-	    Transition transitionFrom, Set activities) {
-	super(activityId, createDateTime, learningLibrary, parentActivity, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, activities);
 	super.activityStrategy = new FloatingActivityStrategy(this);
     }
 
@@ -89,9 +70,6 @@ public class FloatingActivity extends ComplexActivity implements Serializable {
 	return newFloatingActivity;
     }
 
-    /**
-     *
-     */
     public Integer getMaxNumberOfActivities() {
 	return this.maxNumberOfActivities;
     }
@@ -108,10 +86,6 @@ public class FloatingActivity extends ComplexActivity implements Serializable {
 	this.maxNumberOfActivities = maxNumberOfActivities;
     }
 
-    /**
-     *
-     *
-     */
     public SystemTool getSystemTool() {
 	return systemTool;
     }
@@ -125,9 +99,6 @@ public class FloatingActivity extends ComplexActivity implements Serializable {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
     @Override
     public boolean isNull() {
 	return false;

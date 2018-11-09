@@ -24,27 +24,42 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * This is a course-level group of groups of learners, i.e. a grouping.
- *
- *
  */
+@Entity
+@Table(name = "lams_organisation_grouping")
 public class OrganisationGrouping implements Serializable {
+    private static final long serialVersionUID = -7641875911260975245L;
 
-    /** identifier field */
+    @Id
+    @Column(name = "grouping_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupingId;
 
-    /** persistent field */
+    @Column(name = "organisation_id")
     private Integer organisationId;
 
-    /** nullable persistent field */
+    @Column
     private String name;
 
-    private Set<OrganisationGroup> groups;
+    @OneToMany(mappedBy = "groupingId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrganisationGroup> groups = new HashSet<OrganisationGroup>();
 
     public OrganisationGrouping() {
     }
@@ -54,9 +69,6 @@ public class OrganisationGrouping implements Serializable {
 	this.name = name;
     }
 
-    /**
-     *
-     */
     public Long getGroupingId() {
 	return groupingId;
     }
@@ -65,9 +77,6 @@ public class OrganisationGrouping implements Serializable {
 	this.groupingId = groupId;
     }
 
-    /**
-     *
-     */
     public Integer getOrganisationId() {
 	return this.organisationId;
     }
@@ -76,9 +85,6 @@ public class OrganisationGrouping implements Serializable {
 	this.organisationId = organisationId;
     }
 
-    /**
-     *
-     */
     public String getName() {
 	return this.name;
     }
@@ -87,11 +93,6 @@ public class OrganisationGrouping implements Serializable {
 	this.name = name;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public Set<OrganisationGroup> getGroups() {
 	return groups;
     }

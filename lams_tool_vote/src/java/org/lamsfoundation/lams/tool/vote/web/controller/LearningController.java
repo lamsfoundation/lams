@@ -45,11 +45,11 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.model.VoteContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.model.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.model.VoteSession;
+import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
@@ -792,7 +792,7 @@ public class LearningController implements VoteAppConstants {
 
 	if (mode.equals("teacher")) {
 
-	    Long sessionUid = user.getVoteSessionId();
+	    Long sessionUid = user.getVoteSession().getUid();
 	    putMapQuestionsContentIntoRequest(request, voteService, user);
 	    Set<String> userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(), sessionUid);
 	    request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
@@ -815,7 +815,7 @@ public class LearningController implements VoteAppConstants {
 	 * been already called up by this user
 	 */
 	if (user.isFinalScreenRequested()) {
-	    Long sessionUid = user.getVoteSessionId();
+	    Long sessionUid = user.getVoteSession().getUid();
 	    VoteSession voteUserSession = voteService.getVoteSessionByUID(sessionUid);
 	    String userSessionId = voteUserSession.getVoteSessionId().toString();
 

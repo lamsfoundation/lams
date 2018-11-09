@@ -7,11 +7,14 @@
 package org.hibernate.boot.spi;
 
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.function.Supplier;
 
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.CustomEntityDirtinessStrategy;
 import org.hibernate.EntityMode;
 import org.hibernate.EntityNameResolver;
+import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.NullPrecedence;
@@ -19,14 +22,18 @@ import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.boot.TempTableDdlTransactionHandling;
 import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.cache.spi.CacheKeysFactory;
-import org.hibernate.cache.spi.QueryCacheFactory;
+import org.hibernate.cache.spi.TimestampsCacheFactory;
 import org.hibernate.cfg.BaselineSessionEventsListenerBuilder;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.dialect.function.SQLFunction;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.hql.spi.id.MultiTableBulkIdStrategy;
+import org.hibernate.jpa.spi.JpaCompliance;
 import org.hibernate.loader.BatchFetchStyle;
 import org.hibernate.proxy.EntityNotFoundDelegate;
+import org.hibernate.query.ImmutableEntityUpdateQueryHandlingMode;
+import org.hibernate.query.criteria.LiteralHandlingMode;
+import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.hibernate.tuple.entity.EntityTuplizerFactory;
 
@@ -37,15 +44,44 @@ import org.hibernate.tuple.entity.EntityTuplizerFactory;
  */
 public interface SessionFactoryOptions {
 	/**
+	 * Get the UUID unique to this SessionFactoryOptions.  Will be the
+	 * same value available as {@link SessionFactoryImplementor#getUuid()}.
+	 *
+	 * @apiNote The value is generated as a {@link java.util.UUID}, but kept
+	 * as a String.
+	 *
+	 * @return The UUID for this SessionFactory.
+	 *
+	 * @see org.hibernate.internal.SessionFactoryRegistry#getSessionFactory
+	 * @see SessionFactoryImplementor#getUuid
+	 */
+	String getUuid();
+
+	/**
 	 * The service registry to use in building the factory.
 	 *
 	 * @return The service registry to use.
 	 */
-	public StandardServiceRegistry getServiceRegistry();
+	StandardServiceRegistry getServiceRegistry();
 
-	public Object getBeanManagerReference();
+	Object getBeanManagerReference();
 
-	public Object getValidatorFactoryReference();
+	Object getValidatorFactoryReference();
+
+	/**
+	 * Was building of the SessionFactory initiated through JPA bootstrapping, or
+	 * through Hibernate's native bootstrapping?
+	 *
+	 * @return {@code true} indicates the SessionFactory was built through JPA
+	 * bootstrapping; {@code false} indicates it was built through native bootstrapping.
+	 */
+	boolean isJpaBootstrap();
+
+	boolean isJtaTransactionAccessEnabled();
+
+	default boolean isAllowRefreshDetachedEntity() {
+		return false;
+	}
 
 	/**
 	 * The name to be used for the SessionFactory.  This is use both in:<ul>
@@ -55,7 +91,7 @@ public interface SessionFactoryOptions {
 	 *
 	 * @return The SessionFactory name
 	 */
-	public String getSessionFactoryName();
+	String getSessionFactoryName();
 
 	/**
 	 * Is the {@link #getSessionFactoryName SesssionFactory name} also a JNDI name, indicating we
@@ -63,113 +99,195 @@ public interface SessionFactoryOptions {
 	 *
 	 * @return {@code true} if the SessionFactory name is also a JNDI name; {@code false} otherwise.
 	 */
-	public boolean isSessionFactoryNameAlsoJndiName();
+	boolean isSessionFactoryNameAlsoJndiName();
 
-	public boolean isFlushBeforeCompletionEnabled();
+	boolean isFlushBeforeCompletionEnabled();
 
-	public boolean isAutoCloseSessionEnabled();
+	boolean isAutoCloseSessionEnabled();
 
-	public boolean isStatisticsEnabled();
+	boolean isStatisticsEnabled();
 
 	/**
 	 * Get the interceptor to use by default for all sessions opened from this factory.
 	 *
 	 * @return The interceptor to use factory wide.  May be {@code null}
 	 */
-	public Interceptor getInterceptor();
+	Interceptor getInterceptor();
 
-	public StatementInspector getStatementInspector();
+	/**
+	 * Get the interceptor to use by default for all sessions opened from this factory.
+	 *
+	 * @return The interceptor to use factory wide.  May be {@code null}
+	 * @deprecated use {@link #getStatelessInterceptorImplementorSupplier()} instead.
+	 */
+	@Deprecated
+	Class<? extends Interceptor> getStatelessInterceptorImplementor();
 
-	public SessionFactoryObserver[] getSessionFactoryObservers();
+	/**
+	 * Get the interceptor to use by default for all sessions opened from this factory.
+	 *
+	 * @return The interceptor to use factory wide.  May be {@code null}
+	 */
+	default Supplier<? extends Interceptor> getStatelessInterceptorImplementorSupplier() {
+		return () -> {
+			try {
+				return getStatelessInterceptorImplementor().newInstance();
+			}
+			catch (InstantiationException | IllegalAccessException e) {
+				throw new HibernateException( "Could not supply session-scoped SessionFactory Interceptor", e );
+			}
+		};
+	}
 
-	public BaselineSessionEventsListenerBuilder getBaselineSessionEventsListenerBuilder();
+	StatementInspector getStatementInspector();
 
-	public boolean isIdentifierRollbackEnabled();
+	SessionFactoryObserver[] getSessionFactoryObservers();
 
-	public EntityMode getDefaultEntityMode();
+	BaselineSessionEventsListenerBuilder getBaselineSessionEventsListenerBuilder();
 
-	public EntityTuplizerFactory getEntityTuplizerFactory();
+	boolean isIdentifierRollbackEnabled();
 
-	public boolean isCheckNullability();
+	EntityMode getDefaultEntityMode();
 
-	public boolean isInitializeLazyStateOutsideTransactionsEnabled();
+	EntityTuplizerFactory getEntityTuplizerFactory();
 
-	public MultiTableBulkIdStrategy getMultiTableBulkIdStrategy();
+	boolean isCheckNullability();
 
-	public TempTableDdlTransactionHandling getTempTableDdlTransactionHandling();
+	boolean isInitializeLazyStateOutsideTransactionsEnabled();
 
-	public BatchFetchStyle getBatchFetchStyle();
+	MultiTableBulkIdStrategy getMultiTableBulkIdStrategy();
 
-	public int getDefaultBatchFetchSize();
+	TempTableDdlTransactionHandling getTempTableDdlTransactionHandling();
 
-	public Integer getMaximumFetchDepth();
+	BatchFetchStyle getBatchFetchStyle();
 
-	public NullPrecedence getDefaultNullPrecedence();
+	boolean isDelayBatchFetchLoaderCreationsEnabled();
 
-	public boolean isOrderUpdatesEnabled();
+	int getDefaultBatchFetchSize();
 
-	public boolean isOrderInsertsEnabled();
+	Integer getMaximumFetchDepth();
 
-	public MultiTenancyStrategy getMultiTenancyStrategy();
+	NullPrecedence getDefaultNullPrecedence();
 
-	public CurrentTenantIdentifierResolver getCurrentTenantIdentifierResolver();
+	boolean isOrderUpdatesEnabled();
 
-	public boolean isJtaTrackByThread();
+	boolean isOrderInsertsEnabled();
 
-	public Map getQuerySubstitutions();
+	MultiTenancyStrategy getMultiTenancyStrategy();
 
-	public boolean isStrictJpaQueryLanguageCompliance();
+	CurrentTenantIdentifierResolver getCurrentTenantIdentifierResolver();
 
-	public boolean isNamedQueryStartupCheckingEnabled();
+	boolean isJtaTrackByThread();
 
-	public boolean isSecondLevelCacheEnabled();
+	Map getQuerySubstitutions();
 
-	public boolean isQueryCacheEnabled();
+	/**
+	 * @deprecated Use {@link JpaCompliance#isJpaQueryComplianceEnabled()} instead
+	 * via {@link #getJpaCompliance()}
+	 */
+	@Deprecated
+	default boolean isStrictJpaQueryLanguageCompliance() {
+		return getJpaCompliance().isJpaQueryComplianceEnabled();
+	}
 
-	public QueryCacheFactory getQueryCacheFactory();
+	boolean isNamedQueryStartupCheckingEnabled();
 
-	public String getCacheRegionPrefix();
+	boolean isConventionalJavaConstants();
 
-	public boolean isMinimalPutsEnabled();
+	boolean isSecondLevelCacheEnabled();
 
-	public boolean isStructuredCacheEntriesEnabled();
+	boolean isQueryCacheEnabled();
 
-	public boolean isDirectReferenceCacheEntriesEnabled();
+	TimestampsCacheFactory getTimestampsCacheFactory();
 
-	public boolean isAutoEvictCollectionCache();
+	String getCacheRegionPrefix();
 
-	public SchemaAutoTooling getSchemaAutoTooling();
+	boolean isMinimalPutsEnabled();
 
-	public int getJdbcBatchSize();
+	boolean isStructuredCacheEntriesEnabled();
 
-	public boolean isJdbcBatchVersionedData();
+	boolean isDirectReferenceCacheEntriesEnabled();
 
-	public boolean isScrollableResultSetsEnabled();
+	boolean isAutoEvictCollectionCache();
 
-	public boolean isWrapResultSetsEnabled();
+	SchemaAutoTooling getSchemaAutoTooling();
 
-	public boolean isGetGeneratedKeysEnabled();
+	int getJdbcBatchSize();
 
-	public Integer getJdbcFetchSize();
+	boolean isJdbcBatchVersionedData();
 
-	public ConnectionReleaseMode getConnectionReleaseMode();
+	boolean isScrollableResultSetsEnabled();
 
-	public boolean isCommentsEnabled();
+	boolean isWrapResultSetsEnabled();
+
+	boolean isGetGeneratedKeysEnabled();
+
+	Integer getJdbcFetchSize();
+
+	PhysicalConnectionHandlingMode getPhysicalConnectionHandlingMode();
+
+	default boolean doesConnectionProviderDisableAutoCommit() {
+		return false;
+	}
+
+	/**
+	 * @deprecated Use {@link #getPhysicalConnectionHandlingMode()} instead
+	 */
+	@Deprecated
+	ConnectionReleaseMode getConnectionReleaseMode();
+
+	boolean isCommentsEnabled();
 
 
-	public CustomEntityDirtinessStrategy getCustomEntityDirtinessStrategy();
-	public EntityNameResolver[] getEntityNameResolvers();
+	CustomEntityDirtinessStrategy getCustomEntityDirtinessStrategy();
+	EntityNameResolver[] getEntityNameResolvers();
 
 	/**
 	 * Get the delegate for handling entity-not-found exception conditions.
 	 *
 	 * @return The specific EntityNotFoundDelegate to use,  May be {@code null}
 	 */
-	public EntityNotFoundDelegate getEntityNotFoundDelegate();
+	EntityNotFoundDelegate getEntityNotFoundDelegate();
 
-	public Map<String, SQLFunction> getCustomSqlFunctionMap();
+	Map<String, SQLFunction> getCustomSqlFunctionMap();
 
 	void setCheckNullability(boolean enabled);
 
-	public boolean isPreferUserTransaction();
+	boolean isPreferUserTransaction();
+
+	boolean isProcedureParameterNullPassingEnabled();
+
+	boolean isCollectionJoinSubqueryRewriteEnabled();
+
+	boolean isAllowOutOfTransactionUpdateOperations();
+
+	boolean isReleaseResourcesOnCloseEnabled();
+
+	TimeZone getJdbcTimeZone();
+
+	default boolean isQueryParametersValidationEnabled(){
+		return isJpaBootstrap();
+	}
+
+	default LiteralHandlingMode getCriteriaLiteralHandlingMode() {
+		return LiteralHandlingMode.AUTO;
+	}
+
+	boolean jdbcStyleParamsZeroBased();
+
+	JpaCompliance getJpaCompliance();
+
+	boolean isFailOnPaginationOverCollectionFetchEnabled();
+
+	default ImmutableEntityUpdateQueryHandlingMode getImmutableEntityUpdateQueryHandlingMode() {
+		return ImmutableEntityUpdateQueryHandlingMode.WARNING;
+	}
+
+	default boolean inClauseParameterPaddingEnabled() {
+		return false;
+	}
+
+	default boolean nativeExceptionHandling51Compliance() {
+		return false;
+	}
 }

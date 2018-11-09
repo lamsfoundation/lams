@@ -9,7 +9,6 @@ package org.hibernate.resource.jdbc.internal;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.hibernate.ResourceClosedException;
 import org.hibernate.TransactionException;
 import org.hibernate.resource.jdbc.ResourceRegistry;
 import org.hibernate.resource.jdbc.spi.LogicalConnectionImplementor;
@@ -35,7 +34,7 @@ public abstract class AbstractLogicalConnectionImplementor implements LogicalCon
 
 	protected void errorIfClosed() {
 		if ( !isOpen() ) {
-			throw new ResourceClosedException( this.toString() + " is closed" );
+			throw new IllegalStateException( this.toString() + " is closed" );
 		}
 	}
 
@@ -63,10 +62,12 @@ public abstract class AbstractLogicalConnectionImplementor implements LogicalCon
 	@Override
 	public void begin() {
 		try {
-			log.trace( "Preparing to begin transaction via JDBC Connection.setAutoCommit(false)" );
-			getConnectionForTransactionManagement().setAutoCommit( false );
+			if ( !doConnectionsFromProviderHaveAutoCommitDisabled() ) {
+				log.trace( "Preparing to begin transaction via JDBC Connection.setAutoCommit(false)" );
+				getConnectionForTransactionManagement().setAutoCommit( false );
+				log.trace( "Transaction begun via JDBC Connection.setAutoCommit(false)" );
+			}
 			status = TransactionStatus.ACTIVE;
-			log.trace( "Transaction begun via JDBC Connection.setAutoCommit(false)" );
 		}
 		catch( SQLException e ) {
 			throw new TransactionException( "JDBC begin transaction failed: ", e );
@@ -117,6 +118,7 @@ public abstract class AbstractLogicalConnectionImplementor implements LogicalCon
 			log.trace( "Transaction rolled-back via JDBC Connection.rollback()" );
 		}
 		catch( SQLException e ) {
+			status = TransactionStatus.FAILED_ROLLBACK;
 			throw new TransactionException( "Unable to rollback against JDBC Connection", e );
 		}
 
@@ -136,5 +138,9 @@ public abstract class AbstractLogicalConnectionImplementor implements LogicalCon
 	@Override
 	public TransactionStatus getStatus(){
 		return status;
+	}
+
+	protected boolean doConnectionsFromProviderHaveAutoCommitDisabled() {
+		return false;
 	}
 }

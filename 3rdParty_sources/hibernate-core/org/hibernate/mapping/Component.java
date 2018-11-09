@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Map;
 
 import org.hibernate.EntityMode;
@@ -18,9 +19,10 @@ import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.ExportableProducer;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.CompositeNestedGeneratedValueGenerator;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.factory.IdentifierGeneratorFactory;
@@ -38,7 +40,7 @@ import org.hibernate.type.TypeFactory;
  * @author Steve Ebersole
  */
 public class Component extends SimpleValue implements MetaAttributable {
-	private ArrayList<Property> properties = new ArrayList<Property>();
+	private ArrayList<Property> properties = new ArrayList<>();
 	private String componentClassName;
 	private boolean embedded;
 	private String parentProperty;
@@ -50,23 +52,67 @@ public class Component extends SimpleValue implements MetaAttributable {
 
 	private java.util.Map<EntityMode,String> tuplizerImpls;
 
+	// cache the status of the type
+	private volatile Type type;
+
+	/**
+	 * @deprecated User {@link Component#Component(MetadataBuildingContext, PersistentClass)} instead.
+	 */
+	@Deprecated
 	public Component(MetadataImplementor metadata, PersistentClass owner) throws MappingException {
 		this( metadata, owner.getTable(), owner );
 	}
 
+	/**
+	 * @deprecated User {@link Component#Component(MetadataBuildingContext, Component)} instead.
+	 */
+	@Deprecated
 	public Component(MetadataImplementor metadata, Component component) throws MappingException {
 		this( metadata, component.getTable(), component.getOwner() );
 	}
 
+	/**
+	 * @deprecated User {@link Component#Component(MetadataBuildingContext, Join)} instead.
+	 */
+	@Deprecated
 	public Component(MetadataImplementor metadata, Join join) throws MappingException {
 		this( metadata, join.getTable(), join.getPersistentClass() );
 	}
 
+	/**
+	 * @deprecated User {@link Component#Component(MetadataBuildingContext, Collection)} instead.
+	 */
+	@Deprecated
 	public Component(MetadataImplementor metadata, Collection collection) throws MappingException {
 		this( metadata, collection.getCollectionTable(), collection.getOwner() );
 	}
 
+	/**
+	 * @deprecated User {@link Component#Component(MetadataBuildingContext, Table, PersistentClass)} instead.
+	 */
+	@Deprecated
 	public Component(MetadataImplementor metadata, Table table, PersistentClass owner) throws MappingException {
+		super( metadata, table );
+		this.owner = owner;
+	}
+
+	public Component(MetadataBuildingContext metadata, PersistentClass owner) throws MappingException {
+		this( metadata, owner.getTable(), owner );
+	}
+
+	public Component(MetadataBuildingContext metadata, Component component) throws MappingException {
+		this( metadata, component.getTable(), component.getOwner() );
+	}
+
+	public Component(MetadataBuildingContext metadata, Join join) throws MappingException {
+		this( metadata, join.getTable(), join.getPersistentClass() );
+	}
+
+	public Component(MetadataBuildingContext metadata, Collection collection) throws MappingException {
+		this( metadata, collection.getCollectionTable(), collection.getOwner() );
+	}
+
+	public Component(MetadataBuildingContext metadata, Table table, PersistentClass owner) throws MappingException {
 		super( metadata, table );
 		this.owner = owner;
 	}
@@ -120,7 +166,8 @@ public class Component extends SimpleValue implements MetaAttributable {
 	}
 
 	public Class getComponentClass() throws MappingException {
-		final ClassLoaderService classLoaderService = getMetadata().getMetadataBuildingOptions()
+		final ClassLoaderService classLoaderService = getMetadata()
+				.getMetadataBuildingOptions()
 				.getServiceRegistry()
 				.getService( ClassLoaderService.class );
 		try {
@@ -165,10 +212,28 @@ public class Component extends SimpleValue implements MetaAttributable {
 
 	@Override
 	public Type getType() throws MappingException {
-		// TODO : temporary initial step towards HHH-1907
-		final ComponentMetamodel metamodel = new ComponentMetamodel( this, getMetadata().getMetadataBuildingOptions() );
-		final TypeFactory factory = getMetadata().getTypeResolver().getTypeFactory();
-		return isEmbedded() ? factory.embeddedComponent( metamodel ) : factory.component( metamodel );
+		// Resolve the type of the value once and for all as this operation generates a proxy class
+		// for each invocation.
+		// Unfortunately, there's no better way of doing that as none of the classes are immutable and
+		// we can't know for sure the current state of the property or the value.
+		Type localType = type;
+
+		if ( localType == null ) {
+			synchronized ( this ) {
+				if ( type == null ) {
+					// TODO : temporary initial step towards HHH-1907
+					final ComponentMetamodel metamodel = new ComponentMetamodel(
+							this,
+							getMetadata().getMetadataBuildingOptions()
+					);
+					final TypeFactory factory = getMetadata().getTypeConfiguration().getTypeResolver().getTypeFactory();
+					localType = isEmbedded() ? factory.embeddedComponent( metamodel ) : factory.component( metamodel );
+					type = localType;
+				}
+			}
+		}
+
+		return localType;
 	}
 
 	@Override
@@ -194,6 +259,20 @@ public class Component extends SimpleValue implements MetaAttributable {
 	@Override
 	public Object accept(ValueVisitor visitor) {
 		return visitor.accept(this);
+	}
+
+	@Override
+	public boolean isSame(SimpleValue other) {
+		return other instanceof Component && isSame( (Component) other );
+	}
+
+	public boolean isSame(Component other) {
+		return super.isSame( other )
+				&& Objects.equals( properties, other.properties )
+				&& Objects.equals( componentClassName, other.componentClassName )
+				&& embedded == other.embedded
+				&& Objects.equals( parentProperty, other.parentProperty )
+				&& Objects.equals( metaAttributes, other.metaAttributes );
 	}
 
 	@Override
@@ -227,22 +306,22 @@ public class Component extends SimpleValue implements MetaAttributable {
 		}
 		return result;
 	}
-	
+
 	public boolean isKey() {
 		return isKey;
 	}
-	
+
 	public void setKey(boolean isKey) {
 		this.isKey = isKey;
 	}
-	
+
 	public boolean hasPojoRepresentation() {
 		return componentClassName!=null;
 	}
 
 	public void addTuplizer(EntityMode entityMode, String implClassName) {
 		if ( tuplizerImpls == null ) {
-			tuplizerImpls = new HashMap<EntityMode,String>();
+			tuplizerImpls = new HashMap<>();
 		}
 		tuplizerImpls.put( entityMode, implClassName );
 	}
@@ -397,7 +476,7 @@ public class Component extends SimpleValue implements MetaAttributable {
 		}
 
 		@Override
-		public Serializable locateGenerationContext(SessionImplementor session, Object incomingObject) {
+		public Serializable locateGenerationContext(SharedSessionContractImplementor session, Object incomingObject) {
 			return session.getEntityPersister( entityName, incomingObject ).getIdentifier( incomingObject, session );
 		}
 	}
@@ -414,7 +493,7 @@ public class Component extends SimpleValue implements MetaAttributable {
 		}
 
 		@Override
-		public void execute(SessionImplementor session, Object incomingObject, Object injectionContext) {
+		public void execute(SharedSessionContractImplementor session, Object incomingObject, Object injectionContext) {
 			final Object generatedValue = subGenerator.generate( session, incomingObject );
 			injector.set( injectionContext, generatedValue, session.getFactory() );
 		}

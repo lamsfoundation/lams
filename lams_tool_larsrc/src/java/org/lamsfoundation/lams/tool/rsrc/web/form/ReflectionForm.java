@@ -23,17 +23,10 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import org.apache.log4j.Logger;
-
 /**
- *
  * Reflection Form.
- *
- *
  */
 public class ReflectionForm {
-    private static final long serialVersionUID = -9054365604649146735L;
-    private static Logger logger = Logger.getLogger(ReflectionForm.class.getName());
 
     private Integer userID;
     private String sessionMapID;

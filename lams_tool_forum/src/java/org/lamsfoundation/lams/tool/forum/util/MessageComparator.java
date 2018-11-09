@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.model.Message;
 
 /**
  * Message comparator by sequence ID.

@@ -33,7 +33,6 @@ import org.springframework.stereotype.Repository;
 /**
  * Hibernate implementation of <code>TaskListDAO</code>.
  *
- * @author Steve.Ni
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListDAO
  */
@@ -42,9 +41,6 @@ public class TaskListDAOHibernate extends LAMSBaseDAO implements TaskListDAO {
     private static final String GET_RESOURCE_BY_CONTENTID = "from " + TaskList.class.getName()
 	    + " as r where r.contentId=?";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TaskList getByContentId(Long contentId) {
 	List list = doFind(GET_RESOURCE_BY_CONTENTID, contentId);
@@ -55,17 +51,11 @@ public class TaskListDAOHibernate extends LAMSBaseDAO implements TaskListDAO {
 	}
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TaskList getByUid(Long taskListUid) {
 	return (TaskList) getObject(TaskList.class, taskListUid);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void delete(TaskList taskList) {
 	getSession().delete(taskList);

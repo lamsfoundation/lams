@@ -53,10 +53,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetDAO;
-import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetMarkDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetSessionDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
-import org.lamsfoundation.lams.tool.spreadsheet.dao.UserModifiedSpreadsheetDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
@@ -72,17 +70,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
- *
  * @author Andrey Balan
- *
  */
 public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentManager, ToolSessionManager {
     private static Logger log = Logger.getLogger(SpreadsheetServiceImpl.class.getName());
     private SpreadsheetDAO spreadsheetDao;
     private SpreadsheetUserDAO spreadsheetUserDao;
     private SpreadsheetSessionDAO spreadsheetSessionDao;
-    private UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao;
-    private SpreadsheetMarkDAO spreadsheetMarkDao;
     // tool service
     private IToolContentHandler spreadsheetToolContentHandler;
     private MessageService messageService;
@@ -98,15 +92,14 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     @Override
     public Spreadsheet getSpreadsheetByContentId(Long contentId) {
-	Spreadsheet rs = spreadsheetDao.getByContentId(contentId);
-	return rs;
+	return spreadsheetDao.getByContentId(contentId);
     }
 
     @Override
     public Spreadsheet getDefaultContent(Long contentId) throws SpreadsheetApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    SpreadsheetServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new SpreadsheetApplicationException(error);
 	}
 
@@ -124,7 +117,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     @Override
     public void saveOrUpdateUserModifiedSpreadsheet(UserModifiedSpreadsheet userModifiedSpreadsheet) {
-	userModifiedSpreadsheetDao.saveObject(userModifiedSpreadsheet);
+	spreadsheetDao.saveObject(userModifiedSpreadsheet);
     }
 
     @Override
@@ -139,8 +132,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     @Override
     public List<SpreadsheetUser> getUserListBySessionId(Long sessionId) {
-	List<SpreadsheetUser> userList = spreadsheetUserDao.getBySessionID(sessionId);
-	return userList;
+	return spreadsheetUserDao.getBySessionID(sessionId);
     }
 
     @Override
@@ -294,9 +286,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
     }
 
-    /**
-     * @param notebookEntry
-     */
     @Override
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
@@ -314,17 +303,16 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    if ((user.getUserModifiedSpreadsheet() != null) && (user.getUserModifiedSpreadsheet().getMark() != null)) {
 		SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
 		mark.setDateMarksReleased(new Date());
-		spreadsheetMarkDao.saveObject(mark);
+		spreadsheetDao.saveObject(mark);
 
 		// send marks to gradebook where applicable
 		if (mark.getMarks() != null) {
-		    Double doubleMark = new Double(mark.getMarks());
+		    Double doubleMark = mark.getMarks().doubleValue();
 		    toolService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId,
 			    false);
 		}
 	    }
 	}
-
     }
 
     @Override
@@ -345,7 +333,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	Spreadsheet defaultSpreadsheet = getSpreadsheetByContentId(defaultSpreadsheetId);
 	if (defaultSpreadsheet == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    SpreadsheetServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new SpreadsheetApplicationException(error);
 	}
 
@@ -353,11 +341,10 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     private Long getToolDefaultContentIdBySignature(String toolSignature) throws SpreadsheetApplicationException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    SpreadsheetServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new SpreadsheetApplicationException(error);
 	}
 	return contentId;
@@ -393,14 +380,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    public void setUserModifiedSpreadsheetDao(UserModifiedSpreadsheetDAO userModifiedSpreadsheetDao) {
-	this.userModifiedSpreadsheetDao = userModifiedSpreadsheetDao;
-    }
-
-    public void setSpreadsheetMarkDao(SpreadsheetMarkDAO spreadsheetMarkDao) {
-	this.spreadsheetMarkDao = spreadsheetMarkDao;
     }
 
     // *******************************************************************************
@@ -449,7 +428,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    SpreadsheetUser user = spreadsheetUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
+	    SpreadsheetUser user = spreadsheetUserDao.getUserByUserIDAndContentID(newUserUid.longValue(),
 		    toolContentId);
 	    if (user == null) {
 		user = new SpreadsheetUser();
@@ -457,7 +436,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		user.setFirstName(sysUser.getFirstName());
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
-		user.setUserId(new Long(newUserUid.longValue()));
+		user.setUserId(newUserUid.longValue());
 		user.setSpreadsheet(toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
@@ -531,8 +510,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
 	if (spreadsheet == null) {
-	    SpreadsheetServiceImpl.log
-		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -543,7 +521,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		UserModifiedSpreadsheet modified = user.getUserModifiedSpreadsheet();
 		if (modified != null) {
 		    user.setUserModifiedSpreadsheet(null);
-		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, modified.getUid());
+		    spreadsheetDao.removeObject(UserModifiedSpreadsheet.class, modified.getUid());
 		}
 	    }
 
@@ -558,9 +536,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (SpreadsheetServiceImpl.log.isDebugEnabled()) {
-	    SpreadsheetServiceImpl.log.debug(
-		    "Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	List<SpreadsheetSession> sessions = spreadsheetSessionDao.getByContentId(toolContentId);
@@ -570,7 +547,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    if (user != null) {
 		user.setSessionFinished(false);
 		if (user.getUserModifiedSpreadsheet() != null) {
-		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
+		    spreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
 			    user.getUserModifiedSpreadsheet().getUid());
 		}
 
@@ -598,11 +575,11 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
-	    SpreadsheetServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
 	}
 	if (learnerId == null) {
-	    SpreadsheetServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
 
@@ -611,8 +588,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    session.setStatus(SpreadsheetConstants.COMPLETED);
 	    spreadsheetSessionDao.saveObject(session);
 	} else {
-	    SpreadsheetServiceImpl.log.error("Fail to leave tool Session.Could not find shared spreadsheet "
-		    + "session by given session id: " + toolSessionId);
+	    log.error("Fail to leave tool Session.Could not find shared spreadsheet " + "session by given session id: "
+		    + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared spreadsheet session by given session id: " + toolSessionId);
 	}

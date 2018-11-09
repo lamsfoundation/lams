@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -231,8 +230,8 @@ public class LearnerController {
 	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
 	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
 	for (Entry<Activity, CompletedActivityProgress> entry : learnerProgress.getCompletedActivities().entrySet()) {
-	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(learnerProgress,
-		    entry.getKey(), entry.getValue().getStartDate(), entry.getValue().getFinishDate());
+	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(
+		    entry.getValue().getStartDate(), entry.getValue().getFinishDate());
 	    completedActivities.put(entry.getKey(), activityArchive);
 	}
 

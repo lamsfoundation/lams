@@ -25,14 +25,14 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
-    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
+    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSession.uid=:mcSessionUid";
 
     private static final String LOAD_MARKS_FOR_SESSION = "SELECT last_attempt_total_mark "
 	    + " FROM tl_lamc11_que_usr usr "
@@ -79,15 +79,15 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 		+ " user where user.queUsrId=:userId and user.mcSession.mcContent.mcContentId=:contentId";
 	
 	return (McQueUsr) getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_AND_CONTENT_ID)
-	.setLong("userId", userId).setLong("contentId", contentId).uniqueResult();
+		.setParameter("userId", userId).setParameter("contentId", contentId).uniqueResult();
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
-	List list = getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_SESSION)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("mcSessionUid", mcSessionUid.longValue()).list();
+	List<?> list = getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_SESSION)
+		.setParameter("queUsrId", queUsrId).setParameter("mcSessionUid", mcSessionUid).list();
 
 	if (list != null && list.size() > 0) {
 	    McQueUsr usr = (McQueUsr) list.get(0);
@@ -104,8 +104,8 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 		" INNER JOIN lams_user luser ON luser.user_id = user.que_usr_id" +
 		" WHERE session.mc_session_id = :sessionId";
 	
-	SQLQuery query = getSession().createSQLQuery(LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID);
-	query.setLong("sessionId", sessionId);
+	NativeQuery<Object[]> query = getSession().createNativeQuery(LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID);
+	query.setParameter("sessionId", sessionId);
 	List<Object[]> list = query.list();
 
 	ArrayList<Object[]> userDtos = new ArrayList<Object[]>();
@@ -163,12 +163,12 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 		.append(LOAD_USERS_JOINWHERE)
 		.append(sortOrder);
 
-	SQLQuery query = getSession().createSQLQuery(bldr.toString());
-	query.setLong("sessionId", sessionId);
+	NativeQuery<Object[]> query = getSession().createSQLQuery(bldr.toString());
+	query.setParameter("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
-	query.setString("sortBy", sortBy);
+	query.setParameter("searchString", searchString);
+	query.setParameter("sortBy", sortBy);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
@@ -205,12 +205,12 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 		+ " WHERE user.mcSession.mcSessionId = :sessionId "
 		+ " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
-	query.setLong("sessionId", sessionId);
+	Query<?> query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME);
+	query.setParameter("sessionId", sessionId);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setString("searchString", searchString);
-	List list = query.list();
+	query.setParameter("searchString", searchString);
+	List<?> list = query.list();
 
 	if ((list == null) || (list.size() == 0)) {
 	    return 0;
@@ -223,12 +223,12 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     @Override
     public Object[] getStatsMarksBySession(Long sessionId) {
 
-	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_SESSION)
+	Query<?> query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_SESSION)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE);
-	query.setLong("sessionId", sessionId);
-	List list = query.list();
+	query.setParameter("sessionId", sessionId);
+	List<?> list = query.list();
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
@@ -240,13 +240,13 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
 
-	Query query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_LEADERS)
+	Query<?> query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_LEADERS)
 		.addScalar("min_grade", FloatType.INSTANCE)
 		.addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE)
 		.addScalar("num_complete", IntegerType.INSTANCE);
-	query.setLong("toolContentId", toolContentId);
-	List list = query.list();
+	query.setParameter("toolContentId", toolContentId);
+	List<?> list = query.list();
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
@@ -258,8 +258,8 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     @Override
     public List<Number> getRawUserMarksBySession(Long sessionId) {
 
-	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_SESSION);
-	query.setLong("sessionId", sessionId);
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
+	query.setParameter("sessionId", sessionId);
 	List<Number> list = query.list();
 	return list;
     }
@@ -268,8 +268,8 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     @Override
     public List<Number> getRawLeaderMarksByToolContentId(Long toolContentId) {
 
-	SQLQuery query = getSession().createSQLQuery(LOAD_MARKS_FOR_LEADERS);
-	query.setLong("toolContentId", toolContentId);
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_LEADERS);
+	query.setParameter("toolContentId", toolContentId);
 	List<Number> list = query.list();
 	return list;
     }

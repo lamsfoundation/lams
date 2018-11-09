@@ -6,10 +6,10 @@
  */
 package org.hibernate.boot.model.source.internal.hbm;
 
-import javax.xml.bind.JAXBElement;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import javax.xml.bind.JAXBElement;
 
 import org.hibernate.MappingException;
 import org.hibernate.boot.jaxb.hbm.internal.ImplicitResultSetMappingDefinition;

@@ -7,6 +7,7 @@
 package org.hibernate;
 
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.internal.build.AllowSysOut;
 
 import org.jboss.logging.Logger;
 
@@ -16,6 +17,8 @@ import org.jboss.logging.Logger;
  * @author Steve Ebersole
  */
 public class Version {
+	private static String version;
+
 	private Version() {
 	}
 
@@ -27,7 +30,13 @@ public class Version {
 	 * @return The Hibernate version
 	 */
 	public static String getVersionString() {
-		return "[WORKING]";
+		if ( version == null ) {
+			version = Version.class.getPackage().getImplementationVersion();
+			if ( version == null ) {
+				version = "[WORKING]";
+			}
+		}
+		return version;
 	}
 
 	/**
@@ -43,6 +52,7 @@ public class Version {
 	 *
 	 * @param args n/a
 	 */
+	@AllowSysOut
 	public static void main(String[] args) {
 		System.out.println( "Hibernate Core {" + getVersionString() + "}" );
 	}

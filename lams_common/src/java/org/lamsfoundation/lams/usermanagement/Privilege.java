@@ -1,39 +1,34 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Entity
+@Table(name = "lams_privilege")
 public class Privilege implements Serializable {
 
-    /** identifier field */
+    private static final long serialVersionUID = 5237905825598226845L;
+
+    @Id
+    @Column(name = "privilege_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long privilegeId;
 
-    /** persistent field */
+    @Column
     private String code;
 
-    /** nullable persistent field */
+    @Column
     private String description;
 
-    /** persistent field */
-    private Set rolePrivileges;
-
-    /** full constructor */
-    public Privilege(String code, String description, Set rolePrivileges) {
-	this.code = code;
-	this.description = description;
-	this.rolePrivileges = rolePrivileges;
-    }
-
-    /** default constructor */
     public Privilege() {
-    }
-
-    /** minimal constructor */
-    public Privilege(String code, Set rolePrivileges) {
-	this.code = code;
-	this.rolePrivileges = rolePrivileges;
     }
 
     public Long getPrivilegeId() {
@@ -60,17 +55,8 @@ public class Privilege implements Serializable {
 	this.description = description;
     }
 
-    public Set getRolePrivileges() {
-	return this.rolePrivileges;
-    }
-
-    public void setRolePrivileges(Set rolePrivileges) {
-	this.rolePrivileges = rolePrivileges;
-    }
-
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("privilegeId", getPrivilegeId()).toString();
     }
-
 }

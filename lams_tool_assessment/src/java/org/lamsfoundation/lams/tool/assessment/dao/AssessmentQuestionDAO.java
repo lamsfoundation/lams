@@ -29,6 +29,4 @@ public interface AssessmentQuestionDAO extends DAO {
 
     AssessmentQuestion getByUid(Long assessmentQuestionUid);
 
-    void evict(Object o);
-
 }

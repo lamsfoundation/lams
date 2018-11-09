@@ -20,10 +20,17 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.planner;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -31,33 +38,43 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
  * Holds additional information about activities used in Pedagogical Planner only.
  *
  * @author Marcin Cieslak
- *
- *
  */
+@Entity
+@Table(name = "lams_planner_activity_metadata")
 public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneable {
+    private static final long serialVersionUID = -5435731085572035606L;
 
+    @Id
+    @Column(name = "activity_id")
     private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "activity_id")
+    @MapsId
     private ToolActivity activity;
 
     /**
      * Tells whether the activity should be collapsed in Pedagogical Planner
      */
+    @Column
     private Boolean collapsed;
 
     /**
      * Tells whether the activity should be expanded in Pedagogical Planner
      */
+    @Column
     private Boolean expanded;
 
     /**
-     * HoTells whether the activity should be hidden in Pedagogical Planner
+     * Tells whether the activity should be hidden in Pedagogical Planner
      */
+    @Column
     private Boolean hidden;
 
     /**
      * Hold editing advice for the activity.
      */
+    @Column(name = "editing_advice")
     private String editingAdvice;
 
     @Override
@@ -77,10 +94,6 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
 	this.editingAdvice = source.editingAdvice;
     }
 
-    /**
-     *
-     *
-     */
     public Long getId() {
 	return id;
     }
@@ -89,9 +102,6 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
 	this.id = id;
     }
 
-    /**
-     *
-     */
     public Boolean getCollapsed() {
 	return collapsed;
     }
@@ -100,9 +110,6 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
 	this.collapsed = plannerCollapsed;
     }
 
-    /**
-     *
-     */
     public Boolean getExpanded() {
 	return expanded;
     }
@@ -111,9 +118,6 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
 	this.expanded = plannerExpanded;
     }
 
-    /**
-     *
-     */
     public Boolean getHidden() {
 	return hidden;
     }
@@ -122,9 +126,6 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
 	this.hidden = plannerHidden;
     }
 
-    /**
-     *
-     */
     public String getEditingAdvice() {
 	return editingAdvice;
     }
@@ -133,10 +134,6 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
 	this.editingAdvice = editingAdvice;
     }
 
-    /**
-     *
-     * @return
-     */
     public ToolActivity getActivity() {
 	return activity;
     }

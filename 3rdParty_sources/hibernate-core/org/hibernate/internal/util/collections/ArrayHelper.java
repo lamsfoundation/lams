@@ -17,6 +17,7 @@ import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
+import org.hibernate.internal.build.AllowSysOut;
 import org.hibernate.type.Type;
 
 public final class ArrayHelper {
@@ -33,12 +34,6 @@ public final class ArrayHelper {
 		}
 		return -1;
 	}
-	
-	/*public static Object[] clone(Class elementClass, Object[] array) {
-		Object[] result = (Object[]) Array.newInstance( elementClass, array.length );
-		System.arraycopy(array, 0, result, 0, array.length);
-		return result;
-	}*/
 
 	public static String[] toStringArray(Object[] objects) {
 		int length = objects.length;
@@ -227,14 +222,6 @@ public final class ArrayHelper {
 		return result;
 	}
 
-	/*public static int countFalse(boolean[] array) {
-		int result=0;
-		for ( int i=0; i<array.length; i++ ) {
-			if ( !array[i] ) result++;
-		}
-		return result;
-	}*/
-
 	public static boolean isAllFalse(boolean... array) {
 		for ( boolean anArray : array ) {
 			if ( anArray ) {
@@ -291,7 +278,6 @@ public final class ArrayHelper {
 	 * calculate the array hash (only the first level)
 	 */
 	public static int hash(Object[] array) {
-		int length = array.length;
 		int seed = SEED;
 		for ( Object anArray : array ) {
 			seed = hash( seed, anArray == null ? 0 : anArray.hashCode() );
@@ -303,7 +289,6 @@ public final class ArrayHelper {
 	 * calculate the array hash (only the first level)
 	 */
 	public static int hash(char[] array) {
-		int length = array.length;
 		int seed = SEED;
 		for ( char anArray : array ) {
 			seed = hash( seed, anArray );
@@ -315,7 +300,6 @@ public final class ArrayHelper {
 	 * calculate the array hash (only the first level)
 	 */
 	public static int hash(byte[] bytes) {
-		int length = bytes.length;
 		int seed = SEED;
 		for ( byte aByte : bytes ) {
 			seed = hash( seed, aByte );
@@ -437,6 +421,7 @@ public final class ArrayHelper {
 		return destination;
 	}
 
+	@AllowSysOut
 	public static void main(String... args) {
 		int[] batchSizes = ArrayHelper.getBatchSizes( 32 );
 

@@ -7,22 +7,58 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
+@Entity
+@Table(name = "lams_outcome_scale")
 public class OutcomeScale implements Serializable {
     private static final long serialVersionUID = 216274187123917942L;
 
+    @Id
+    @Column(name = "scale_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scaleId;
+
+    @ManyToOne
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
+
+    @Column
     private String name;
+
+    @Column
     private String code;
+
+    @Column
     private String description;
+
+    @Column(name = "content_folder_id")
     private String contentFolderId;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by")
     private User createBy;
+
+    @Column(name = "create_date_time")
     private Date createDateTime;
 
+    @OneToMany(mappedBy = "scale", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("value")
     private Set<OutcomeScaleItem> items = new LinkedHashSet<OutcomeScaleItem>();
 
     /**

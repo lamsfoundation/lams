@@ -11,9 +11,10 @@ import java.io.Serializable;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
+import org.hibernate.engine.internal.BatchFetchQueueHelper;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.util.collections.ArrayHelper;
 import org.hibernate.loader.Loader;
 import org.hibernate.persister.entity.OuterJoinLoadable;
@@ -89,14 +90,20 @@ class PaddedBatchingEntityLoaderBuilder extends BatchingEntityLoaderBuilder {
 		}
 
 		@Override
-		public Object load(Serializable id, Object optionalObject, SessionImplementor session, LockOptions lockOptions) {
+		public Object load(Serializable id, Object optionalObject, SharedSessionContractImplementor session, LockOptions lockOptions) {
 			final Serializable[] batch = session.getPersistenceContext()
 					.getBatchFetchQueue()
 					.getEntityBatch( persister(), id, batchSizes[0], persister().getEntityMode() );
 
 			final int numberOfIds = ArrayHelper.countNonNull( batch );
 			if ( numberOfIds <= 1 ) {
-				return ( (UniqueEntityLoader) loaders[batchSizes.length-1] ).load( id, optionalObject, session );
+				final Object result =  ( (UniqueEntityLoader) loaders[batchSizes.length-1] ).load( id, optionalObject, session );
+				if ( result == null ) {
+					// There was no entity with the specified ID. Make sure the EntityKey does not remain
+					// in the batch to avoid including it in future batches that get executed.
+					BatchFetchQueueHelper.removeBatchLoadableEntityKey( id, persister(), session );
+				}
+				return result;
 			}
 
 			// Uses the first batch-size bigger than the number of actual ids in the batch

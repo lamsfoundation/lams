@@ -18,7 +18,7 @@
 <c:set var="questionSummaries" value="${sessionMap.questionSummaries}" />
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 
-<c:set var="userRecordCount" value="${fn:length(recordList)}" />
+<c:set var="userRecordCount" value="${includeMode=='monitoring' ? sessionMap.recordCount : fn:length(recordList)}" />
 <c:set var="groupRecordCount" value="${sessionMap.totalRecordCount}" />
 
 
@@ -53,7 +53,7 @@
 			</c:otherwise>
 		</c:choose>
 		</th>
-		<th><fmt:message key="label.learning.tableheader.summary.group" /></th>
+		<th class="singleSummaryCell"><fmt:message key="label.learning.tableheader.summary.group" /></th>
 	</tr>
 	<tr class="active">
 		<td>
@@ -138,13 +138,13 @@
 										<tr>
 											<c:choose>
 												<c:when test="${empty singleAnswer.answer}">
-													<td class="hint">
-														<fmt:message key="label.learning.summary.emptyanswer" />
+													<td class="hint" width="20px">
+														<fmt:message key="label.learning.summary.emptyanswer" />:
 													</td>
 												</c:when>
 												<c:otherwise>
-													<td>
-														${singleAnswer.answer}
+													<td width="20px">
+														${singleAnswer.answer}:
 													</td>
 												</c:otherwise>
 											</c:choose>
@@ -159,8 +159,8 @@
 								<table class="alternative-color-inner-table">
 									<c:forEach var="singleAnswer" items="${questionSummary.groupSummary}" begin="1">	
 										<tr>
-											<td>
-												${singleAnswer.answer}
+											<td width="20px">
+												${singleAnswer.answer}:
 											</td>
 											<td>
 												${singleAnswer.count}

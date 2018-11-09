@@ -24,33 +24,54 @@
 package org.lamsfoundation.lams.tool.commonCartridge.model;
 
 import java.util.Date;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
- * CommonCartridge
+ * CommonCartridge session
  * 
  * @author Andrey Balan
  */
+@Entity
+@Table(name = "tl_laimsc11_session")
 public class CommonCartridgeSession {
 
-    private static Logger log = Logger.getLogger(CommonCartridgeSession.class);
-
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column(name = "session_id")
     private Long sessionId;
+    
+    @Column(name = "session_name")
     private String sessionName;
+    
+    @ManyToOne
+    @JoinColumn(name = "commonCartridge_uid")
     private CommonCartridge commonCartridge;
+    
+    @Column(name = "session_start_date")
     private Date sessionStartDate;
+    
+    @Column(name = "session_end_date")
     private Date sessionEndDate;
-    //finish or not
+    
+    //finished or not
+    @Column
     private int status;
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
     /**
-     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -61,10 +82,6 @@ public class CommonCartridgeSession {
 	this.uid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     public Date getSessionEndDate() {
 	return sessionEndDate;
     }
@@ -73,11 +90,6 @@ public class CommonCartridgeSession {
 	this.sessionEndDate = sessionEndDate;
     }
 
-    /**
-     *
-     * 
-     * @return
-     */
     public Date getSessionStartDate() {
 	return sessionStartDate;
     }
@@ -86,10 +98,6 @@ public class CommonCartridgeSession {
 	this.sessionStartDate = sessionStartDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getStatus() {
 	return status;
     }
@@ -98,11 +106,6 @@ public class CommonCartridgeSession {
 	this.status = status;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public CommonCartridge getCommonCartridge() {
 	return commonCartridge;
     }
@@ -111,10 +114,6 @@ public class CommonCartridgeSession {
 	this.commonCartridge = commonCartridge;
     }
 
-    /**
-     *
-     * @return
-     */
     public Long getSessionId() {
 	return sessionId;
     }

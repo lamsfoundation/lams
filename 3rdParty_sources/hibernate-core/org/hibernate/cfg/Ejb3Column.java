@@ -42,7 +42,7 @@ import org.jboss.logging.Logger;
  */
 public class Ejb3Column {
 
-    private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, Ejb3Column.class.getName());
+	private static final CoreMessageLogger LOG = Logger.getMessageLogger(CoreMessageLogger.class, Ejb3Column.class.getName());
 
 	private MetadataBuildingContext context;
 
@@ -269,13 +269,9 @@ public class Ejb3Column {
 		if ( applyNamingStrategy ) {
 			if ( StringHelper.isEmpty( columnName ) ) {
 				if ( propertyName != null ) {
-					/// HHH-6005 magic
-					if ( propertyName.contains( ".collection&&element." ) ) {
-						propertyName = propertyName.replace( "collection&&element.", "" );
-					}
 					final AttributePath attributePath = AttributePath.parse( propertyName );
 
-					final Identifier implicitName = normalizer.normalizeIdentifierQuoting(
+					Identifier implicitName = normalizer.normalizeIdentifierQuoting(
 							implicitNamingStrategy.determineBasicColumnName(
 									new ImplicitBasicColumnNameSource() {
 										@Override
@@ -298,6 +294,12 @@ public class Ejb3Column {
 									}
 							)
 					);
+
+					// HHH-6005 magic
+					if ( implicitName.getText().contains( "_collection&&element_" ) ) {
+						implicitName = Identifier.toIdentifier( implicitName.getText().replace( "_collection&&element_", "_" ),
+								implicitName.isQuoted() );
+					}
 
 					final Identifier physicalName = physicalNamingStrategy.toPhysicalColumnName( implicitName, database.getJdbcEnvironment() );
 					mappingColumn.setName( physicalName.render( database.getDialect() ) );
@@ -457,6 +459,12 @@ public class Ejb3Column {
 	}
 
 	public void forceNotNull() {
+		if ( mappingColumn == null ) {
+			throw new CannotForceNonNullableException(
+					"Cannot perform #forceNotNull because internal org.hibernate.mapping.Column reference is null: " +
+							"likely a formula"
+			);
+		}
 		mappingColumn.setNullable( false );
 	}
 
@@ -590,7 +598,7 @@ public class Ejb3Column {
 					column.setPropertyName(
 							BinderHelper.getRelativePath( propertyHolder, inferredData.getPropertyName() )
 					);
-			 		column.setNullable(
+					column.setNullable(
 						col.nullable()
 					); //TODO force to not null if available? This is a (bad) user choice.
 					column.setUnique( col.unique() );
@@ -641,10 +649,17 @@ public class Ejb3Column {
 	}
 
 	private void processExpression(ColumnTransformer annotation) {
-		String nonNullLogicalColumnName = logicalColumnName != null ? logicalColumnName : ""; //use the default for annotations
-		if ( annotation != null &&
-				( StringHelper.isEmpty( annotation.forColumn() )
-						|| annotation.forColumn().equals( nonNullLogicalColumnName ) ) ) {
+		if ( annotation == null ) {
+			return;
+		}
+
+		final String nonNullLogicalColumnName = logicalColumnName != null
+				? logicalColumnName
+				//use the default for annotations
+				: "";
+
+		if ( StringHelper.isEmpty( annotation.forColumn() )
+				|| annotation.forColumn().equals( nonNullLogicalColumnName ) ) {
 			readExpression = annotation.read();
 			if ( StringHelper.isEmpty( readExpression ) ) {
 				readExpression = null;

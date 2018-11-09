@@ -30,14 +30,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScratchieConfigItemDAOHibernate extends LAMSBaseDAO implements ScratchieConfigItemDAO {
-    private static final String LOAD_CONFIG_ITEM_BY_KEY = "from ScratchieConfigItem configuration"
-	    + " where configuration.configKey=:key";
+    private static final String LOAD_CONFIG_ITEM_BY_KEY = "FROM ScratchieConfigItem configuration"
+	    + " WHERE configuration.configKey=:key";
 
     @Override
     public ScratchieConfigItem getConfigItemByKey(final String configKey) {
-	return (ScratchieConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
-		.uniqueResult();
-
+	return getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY, ScratchieConfigItem.class)
+		.setParameter("key", configKey).uniqueResult();
     }
 
     @Override
