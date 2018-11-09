@@ -25,7 +25,7 @@ Commons IO 2.5
 
 Commons Validator 1.6
 
-Hibernate Core 5.0.10
+Hibernate Core 5.3.6
 
 httpunit 1.7
 
