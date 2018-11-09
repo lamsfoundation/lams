@@ -16,12 +16,6 @@
  	-->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="dataSource"/></property>
-		<property name="mappingLocations">
-			<list>
-				<value>classpath*:org/lamsfoundation/lams/**/*.hbm.xml</value>
-				<value>classpath*:org/eucm/lams/**/*.hbm.xml</value>
-			</list>
-		</property>
 		<property name="packagesToScan">
 			<list>
 				<value>org.lamsfoundation.lams.comments</value>
