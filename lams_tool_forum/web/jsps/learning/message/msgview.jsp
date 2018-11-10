@@ -179,20 +179,22 @@
 				&middot;
 			</c:if>
 
-			<!--  Reply Button -->
+			<%--  Reply Button. Must have class replybutton so that the button is hidden when the user reaches the maximum number of posts. See $('#messageForm').submit() --%>
 			<c:if test="${(not sessionMap.finishedLock) && (not noMorePosts)}">
+				<c:set var="replyShown" value="true"/>
 				<c:set var="replytopic">
 					<lams:WebAppURL />learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
 				</c:set>
 				<a href="#${msgDto.message.uid}" onClick="javascript:createReply(${msgDto.message.uid},'${replytopic}',${msgLevel})"
-					class="comment"><fmt:message key="label.reply" /></a>
-				&middot;
+					class="comment replybutton"><fmt:message key="label.reply" /></a>
 			</c:if>
+
 
 			<!--  Edit Button -->
 			<c:if test="${not hidden}">
 				<c:if
 					test='${(sessionMap.mode == "teacher") || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark))}'>
+					<c:if test="${replyShown}"><span class="replybutton">&middot; </span>	</c:if>		
 					<c:set var="edittopic">
 						<lams:WebAppURL />learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}
 					</c:set>

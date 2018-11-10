@@ -14,7 +14,7 @@
 			<a href="javascript:location.href='${refresh}';" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-refresh"></i>
 				<fmt:message key="label.refresh" /></a>
 
-			<c:if test='${sessionMap.allowNewTopics}'>
+			<c:if test='${(not sessionMap.finishedLock) && (sessionMap.allowNewTopics)}'>
 				<a href="javascript:location.href='${newtopic}';" type="button" class="btn btn-xs btn-default"> <i
 					class="fa fa-xm fa-plus"></i> <fmt:message key="label.newtopic" /></a>
 			</c:if>

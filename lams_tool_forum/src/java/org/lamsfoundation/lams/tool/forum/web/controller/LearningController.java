@@ -169,7 +169,7 @@ public class LearningController {
 	sessionMap.put(ForumConstants.ATTR_FORUM_ID, forumId);
 	sessionMap.put(ForumConstants.ATTR_FORUM_UID, forum.getUid());
 	sessionMap.put(ForumConstants.ATTR_USER_UID, forumUser.getUid());
-	sessionMap.put(ForumConstants.ATTR_FINISHED_LOCK, new Boolean(lock));
+	sessionMap.put(ForumConstants.ATTR_FINISHED_LOCK, lock);
 	sessionMap.put(ForumConstants.ATTR_LOCK_WHEN_FINISHED, forum.getLockWhenFinished());
 	sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
