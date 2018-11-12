@@ -1426,7 +1426,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * but will be put straight into run sequences folder of the organisation.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    Long learningLibraryID, String contentFolderID, Integer organisationID) {
 	Integer userID = AuthoringService.getUserId();
@@ -1434,7 +1433,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
 	LearningDesign learningDesign = new LearningDesign(null, null, null, learningDesignTitle, null, null, 1, false,
 		false, null, null, null, new Date(), Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), user,
-		user, null, null, null, null, null, null, null, null, contentFolderID, false, null, 1, null);
+		user, null, null, null, null, null, null, null, contentFolderID, false, null, 1, null);
 
 	WorkspaceFolder folder = null;
 

@@ -142,10 +142,6 @@ public class LearningDesign implements Serializable {
     @JoinColumn(name = "original_learning_design_id")
     private LearningDesign originalLearningDesign;
 
-    @OneToMany
-    @JoinColumn(name = "parent_learning_design_id")
-    private Set<LearningDesign> childLearningDesigns = new HashSet<LearningDesign>();
-
     @OneToMany(mappedBy = "learningDesign")
     private Set<Lesson> lessons = new HashSet<Lesson>();
 
@@ -193,16 +189,18 @@ public class LearningDesign implements Serializable {
      * are null, then it will default to the current datetime.
      */
 
-    /** Full constructor. This is called by AuthoringService.insertSingleActivityLearningDesign with nulls for the 
-     * sets, so if they are null let the default initialisation (above) stand - don't overwrite the empty sets with nulls.
+    /**
+     * Full constructor. This is called by AuthoringService.insertSingleActivityLearningDesign with nulls for the
+     * sets, so if they are null let the default initialisation (above) stand - don't overwrite the empty sets with
+     * nulls.
      */
     public LearningDesign(Long learningDesignId, Integer ui_id, String description, String title,
 	    Activity firstActivity, FloatingActivity floatingActivity, Integer maxID, Boolean validDesign,
 	    Boolean readOnly, Date dateReadOnly, String helpText, Integer copyTypeID, Date createDateTime,
-	    String version, User user, User originalUser, LearningDesign originalLearningDesign,
-	    Set<LearningDesign> childLearningDesigns, Set<Lesson> lessons, Set<Transition> transitions,
-	    SortedSet<Activity> activities, Long duration, String licenseText, License license, String contentFolderID,
-	    Boolean editOverrideLock, User editOverrideUser, Integer designVersion, String designType) {
+	    String version, User user, User originalUser, LearningDesign originalLearningDesign, Set<Lesson> lessons,
+	    Set<Transition> transitions, SortedSet<Activity> activities, Long duration, String licenseText,
+	    License license, String contentFolderID, Boolean editOverrideLock, User editOverrideUser,
+	    Integer designVersion, String designType) {
 	this.learningDesignId = learningDesignId;
 	this.learningDesignUIID = ui_id;
 	this.description = description;
@@ -220,13 +218,15 @@ public class LearningDesign implements Serializable {
 	this.user = user;
 	this.originalUser = originalUser;
 	this.originalLearningDesign = originalLearningDesign;
-	this.childLearningDesigns = childLearningDesigns;
-	if ( lessons != null ) 
+	if (lessons != null) {
 	    this.lessons = lessons;
-	if ( transitions != null )
+	}
+	if (transitions != null) {
 	    this.transitions = transitions;
-	if ( activities  != null )
+	}
+	if (activities != null) {
 	    this.activities = activities;
+	}
 	this.duration = duration;
 	this.licenseText = licenseText;
 	this.license = license;
@@ -446,14 +446,6 @@ public class LearningDesign implements Serializable {
     public void setOriginalLearningDesign(
 	    org.lamsfoundation.lams.learningdesign.LearningDesign originalLearningDesign) {
 	this.originalLearningDesign = originalLearningDesign;
-    }
-
-    public Set<LearningDesign> getChildLearningDesigns() {
-	return this.childLearningDesigns;
-    }
-
-    public void setChildLearningDesigns(Set<LearningDesign> childLearningDesigns) {
-	this.childLearningDesigns = childLearningDesigns;
     }
 
     public Set<Lesson> getLessons() {
