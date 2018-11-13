@@ -171,8 +171,10 @@
 						    </small>
 						</td>
 						<td>
-								<a href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.assign.roles"/></a>
-								&nbsp;
+								<c:if test="${userManageForm.canEditRole == true }">
+									<a href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.assign.roles"/></a>
+									&nbsp;
+								</c:if>
 								<c:if test="${userManageForm.courseAdminCanAddNewUsers == true }">
 									<a href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.edit" /></a>
 									&nbsp;

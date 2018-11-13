@@ -129,8 +129,10 @@
 				<form>
 				
 				<div class="btn-group btn-group-sm">
-					<a id="userCreate" class="btn btn-default" href="user/edit.do"><i class="fa fa-user-plus"></i> <fmt:message key="admin.user.create"/></a>
+					<c:if test="${createGroup == true}">
+					<a id="userCreate" class="btn btn-default" href="user/edit.do?orgId=1"><i class="fa fa-user-plus"></i> <fmt:message key="admin.user.create"/></a>
 					<a id="findUsers" class="btn btn-default" href="usersearch.do"><i class="fa fa-search"></i> <fmt:message key="admin.user.find"/></a>
+					</c:if>
 					
 					<c:if test="${manageGlobalRoles == true}">
 						<a id="manageGlobalRoles" class="btn btn-default" href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>"><i class="fa fa-globe"></i> <fmt:message key="admin.global.roles.manage" /></a>

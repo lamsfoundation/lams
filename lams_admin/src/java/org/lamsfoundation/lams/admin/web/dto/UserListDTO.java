@@ -39,6 +39,7 @@ public class UserListDTO {
     private Boolean courseAdminCanAddNewUsers;
     private Boolean courseAdminCanBrowseAllUsers;
     private Boolean canResetOrgPassword;
+    private Boolean canEditRole;
 
     public List<UserManageBean> getUserManageBeans() {
 	return userManageBeans;
@@ -86,6 +87,14 @@ public class UserListDTO {
 
     public void setCanResetOrgPassword(Boolean canResetOrgPassword) {
 	this.canResetOrgPassword = canResetOrgPassword;
+    }
+
+    public Boolean getCanEditRole() {
+        return canEditRole;
+    }
+
+    public void setCanEditRole(Boolean canEditRole) {
+        this.canEditRole = canEditRole;
     }
 
 }

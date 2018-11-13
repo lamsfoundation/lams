@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,9 @@ import org.lamsfoundation.lams.admin.web.form.UserForm;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -78,13 +82,42 @@ public class UserSaveController {
 	// action input
 	Integer orgId = userForm.getOrgId();
 	Integer userId = userForm.getUserId();
-	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
 
-	// check if logged in User is Sysadmin
-	if (!securityService.isSysadmin(loggeduserId, "Edit User Details " + userId, true)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
-	    return null;
+	boolean canEditRole = false;
+
+	// sysadmin, global course admins can add/change users and their roles.
+	// course manager can add/change users and their roles iff CourseAdminCanAddNewUsers
+	// course admin can add/change users but only set role to learner iff CourseAdminCanAddNewUsers
+	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
+	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin() ) {
+	    canEditRole = true;
+	} else {
+	    
+	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
+	    if (organisation == null) {
+		String message = "No permission to access organisation " + orgId;
+		logErrorMessage(userId, message);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+		return null;
+	    }
+	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+		organisation = organisation.getParentOrganisation();
+	    }
+	    if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(), Role.GROUP_MANAGER)
+		    && !orgId.equals(rootOrgId)) {
+		canEditRole = true;
+	    } else if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(),
+		    Role.GROUP_ADMIN) && !orgId.equals(rootOrgId)) {
+		canEditRole = false;
+	    } else {
+		String message = "No permission to edit user in organisation " + orgId;
+		logErrorMessage(userId, message);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+		return null;
+	    }
 	}
+
 	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	log.debug("orgId: " + orgId);
@@ -190,9 +223,6 @@ public class UserSaveController {
 		    user.setPassword(passwordHash);
 		    log.debug("creating user... new login: " + user.getLogin());
 		    if (errorMap.isEmpty()) {
-			// TODO set theme according to user input
-			// instead of server default.
-			user.setTheme(userManagementService.getDefaultTheme());
 			user.setDisabledFlag(false);
 			user.setCreateDate(new Date());
 			user.setAuthenticationMethod((AuthenticationMethod) userManagementService
@@ -201,7 +231,11 @@ public class UserSaveController {
 			user.setUserId(null);
 			user.setLocale(locale);
 
-			Theme theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
+			Theme theme = null;
+			if ( userForm.getUserTheme() != null )
+				theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
+			if ( theme == null )
+			    theme = userManagementService.getDefaultTheme();
 			user.setTheme(theme);
 
 			userManagementService.saveUser(user);
@@ -216,10 +250,16 @@ public class UserSaveController {
 	}
 
 	if (errorMap.isEmpty()) {
-	    if ((orgId == null) || (orgId == 0)) {
+	    if ((orgId == null) || (orgId == 1)) {
 		return "forward:/usersearch.do";
 	    }
-	    if (edit) {
+	    if ( !edit && !canEditRole) {
+		// Course Admin created new learner
+		userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(Role.ROLE_LEARNER.toString()));
+		request.setAttribute("org", orgId);
+		return "forward:/usermanage.do";
+	    } 
+	    else if (edit) {
 		request.setAttribute("org", orgId);
 		return "forward:/usermanage.do";
 	    } else {
@@ -234,7 +274,17 @@ public class UserSaveController {
 	}
     }
 
-    @RequestMapping(path = "/changePass")
+    private  void  logErrorMessage(Integer userId, String message) {
+	String fullError = null;
+	if ( userId != null ) {
+	    fullError =  new StringBuilder("Updating user ").append(userId).append(": ").append(message).toString();
+	} else {
+	    fullError =  new StringBuilder("Creating new user:  ").append(message).toString();
+	}
+	log.error(fullError);
+    }
+
+    @RequestMapping(path = "/changePass") 
     public String changePass(@ModelAttribute UserForm userForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 

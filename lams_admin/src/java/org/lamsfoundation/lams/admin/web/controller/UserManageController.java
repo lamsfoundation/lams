@@ -101,12 +101,20 @@ public class UserManageController {
 	if (request.isUserInRole(Role.SYSADMIN) || (userManagementService.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))) {
 	    userManageForm.setCourseAdminCanAddNewUsers(true);
 	    userManageForm.setCourseAdminCanBrowseAllUsers(true);
+	    userManageForm.setCanEditRole(true);
 	    request.setAttribute("canDeleteUser", true);
-	} else if ((userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_ADMIN)
-		|| userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_MANAGER))
+	} else if (userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_MANAGER)
 		&& !orgId.equals(rootOrgId)) {
 	    userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 	    userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
+	    userManageForm.setCanEditRole(true);
+	    request.setAttribute("canDeleteUser", false);
+	} else if (userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_ADMIN)
+		&& !orgId.equals(rootOrgId)) {
+	    userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
+	    userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
+	    userManageForm.setCanEditRole(false);
+	    request.setAttribute("canDeleteUser", false);
 	} else {
 	    return forwardError(request, "error.authorisation");
 	}
