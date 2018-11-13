@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -51,21 +50,21 @@ public class Kumalive implements Serializable {
     @Column(name = "kumalive_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long kumaliveId;
-    
-    @ManyToOne(optional=false)
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
-    
+
     @ManyToOne
-    @JoinColumn(name = "create_by")
+    @JoinColumn(name = "created_by")
     private User createdBy;
-    
+
     @Column
     private String name;
-    
+
     @Column
     private Boolean finished = false;
-    
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "kumalive_id")
     @OrderBy("order_id ASC")
