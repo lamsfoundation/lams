@@ -110,6 +110,10 @@
 		<%@ include file="results/attemptsummary.jsp"%>
 		
 		<c:if test="${assessment.displaySummary}">
+			<div class="panel">
+				<c:out value="${assessment.instructions}" escapeXml="false"/>
+			</div>
+		
 			<div class="form-group">
 				<%@ include file="results/allquestions.jsp"%>
 				
