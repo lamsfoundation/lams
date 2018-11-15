@@ -45,6 +45,7 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>

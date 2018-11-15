@@ -95,7 +95,7 @@
 			</lams:Alert>
 		</c:if>
 
-		<c:if test="${notebookDTO.lockOnFinish and mode == 'learner'}">
+		<c:if test="${notebookDTO.lockOnFinish and mode != 'teacher'}">
 			<lams:Alert id="activityLocked" type="info" close="true">
 				<c:choose>
 					<c:when test="${finishedActivity}">

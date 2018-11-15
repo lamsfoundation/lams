@@ -147,7 +147,7 @@
 </div>
 -->
                 <!-- Display the advanced option warnings -->
-                    <c:if test="${wikiDTO.lockOnFinish and mode == 'learner'}">
+                    <c:if test="${wikiDTO.lockOnFinish and mode != 'teacher'}">
                       <lams:Alert type="info" close="true" id="lockWhenFinished">
                         <c:choose>
                           <c:when test="${finishedActivity}">

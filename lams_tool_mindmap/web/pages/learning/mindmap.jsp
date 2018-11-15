@@ -67,7 +67,7 @@
 					<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
 				</div>
 			
-				<c:if test="${mindmapDTO.lockOnFinish and mode == 'learner'}">
+				<c:if test="${mindmapDTO.lockOnFinish and  mode != 'teacher' }">
 					<lams:Alert type="danger" id="lock-on-finish" close="false">
 						<c:choose>
 							<c:when test="${finishedActivity}">
