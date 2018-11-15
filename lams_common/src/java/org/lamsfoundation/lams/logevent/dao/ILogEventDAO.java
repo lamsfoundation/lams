@@ -76,9 +76,10 @@ public interface ILogEventDAO {
     Date getOldestEventDate();
 
     /** Used for displaying paged lists of events */
-    List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
-	    Date endDate, String area, Integer typeId);
+    List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchUser, String searchTarget,
+	    String searchRemarks, Date startDate, Date endDate, String area, Integer typeId);
 
-    int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId);
+    int countEventsWithRestrictions(String searchUser, String searchTarget, String searchRemarks, Date startDate,
+	    Date endDate, String area, Integer typeId);
 
 }

@@ -26,7 +26,8 @@ package org.lamsfoundation.lams.logevent.dao.hibernate;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SQLQuery;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.logevent.LogEvent;
@@ -105,8 +106,8 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
      * Will return List<[LogEvent, String], [LogEvent, String], ... , [LogEvent, String]>
      * where the String is the lesson name. Lesson name may be null.
      */
-    public List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
-	    Date endDate, String area, Integer typeId) {
+    public List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchUser,
+	    String searchTarget, String searchRemarks, Date startDate, Date endDate, String area, Integer typeId) {
 	String sortingOrder;
 	switch (sorting) {
 	    case ILogEventService.SORT_BY_DATE_ASC:
@@ -115,25 +116,62 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	    case ILogEventService.SORT_BY_DATE_DESC:
 		sortingOrder = "occurred_date_time DESC";
 		break;
+	    case ILogEventService.SORT_BY_USER_ASC:
+		sortingOrder = "user.login ASC";
+		break;
+	    case ILogEventService.SORT_BY_USER_DESC:
+		sortingOrder = "user.login DESC";
+		break;
+	    case ILogEventService.SORT_BY_TARGET_ASC:
+		sortingOrder = "target.login ASC";
+		break;
+	    case ILogEventService. SORT_BY_TARGET_DESC:
+		sortingOrder = "target.login DESC";
+		break;
 	    default:
 		sortingOrder = "occurred_date_time ASC";
 	}
 
+	if ( searchUser != null && searchUser.isBlank()) {
+	    searchUser = null;
+    	}
+	if ( searchTarget != null && searchTarget.isBlank()) {
+	    searchTarget = null;
+    	}
+	if ( searchRemarks != null && searchRemarks.isBlank()) {
+	    searchRemarks = null;
+    	}
+
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
-	queryText.append("SELECT le.*, lesson.name lessonName, activity.title activityName FROM lams_log_event le ")
+	queryText.append("SELECT le.*, lesson.name lessonName, activity.title activityName")
+		.append(" FROM lams_log_event le ")
 		.append(" LEFT JOIN lams_lesson lesson ON le.lesson_id = lesson.lesson_id")
 		.append(" LEFT JOIN lams_learning_activity activity ON le.activity_id = activity.activity_id");
+	
+	if ( searchUser != null || sorting == ILogEventService.SORT_BY_USER_ASC || sorting == ILogEventService.SORT_BY_USER_DESC ) {
+	    queryText.append(" LEFT JOIN lams_user user ON user.user_id = le.user_id");
+	}
+	if ( searchTarget != null || sorting == ILogEventService.SORT_BY_TARGET_ASC || sorting == ILogEventService.SORT_BY_TARGET_DESC  ) {
+	    queryText.append(" LEFT JOIN lams_user target ON target.user_id = le.target_user_id");
+	}
 
-	addWhereClause(startDate, endDate, area, typeId, queryText);
-//	// If filtering by name add a name based where clause (LDEV-3779: must come before the Notebook JOIN statement)
-//	buildNameSearch(queryText, searchString);
-//
+	boolean hasAWhereClause = addWhereClause(startDate, endDate, area, typeId, queryText);
+	if ( searchUser != null ) {
+	    hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchUser.strip(), "user");
+	}
+	if ( searchTarget != null ) {
+	    hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchTarget.strip(), "target");
+	}
+	if ( searchRemarks != null ) {
+	    hasAWhereClause = buildRemarksSearch(hasAWhereClause, queryText, searchRemarks.strip());
+	}
+
 	// Now specify the sort based on the switch statement above.
 	queryText.append(" ORDER BY " + sortingOrder);
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("event", LogEvent.class);
 	query.addScalar("lessonName", StringType.INSTANCE);
 	query.addScalar("activityName", StringType.INSTANCE);
@@ -143,7 +181,8 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 
     }
 
-    private void addWhereClause(Date startDate, Date endDate, String area, Integer typeId, StringBuilder queryText) {
+    /* Returns true if a WHERE clause has been added */
+    private boolean addWhereClause(Date startDate, Date endDate, String area, Integer typeId, StringBuilder queryText) {
 	boolean needAnd = false;
 	if ((startDate != null && endDate != null) || area != null || typeId != null) {
 	    queryText.append(" WHERE ");
@@ -161,45 +200,96 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 		queryText.append(
 			" log_event_type_id in (SELECT log_event_type_id FROM lams_log_event_type WHERE area = :area) ");
 	    }
+	    return true;
 	}
+	return false;
     }
 
-    private void addParameters(Date startDate, Date endDate, String area, Integer typeId, SQLQuery query) {
+    private void addParameters(Date startDate, Date endDate, String area, Integer typeId, NativeQuery<Object[]> query) {
 	if (startDate != null && endDate != null) {
-	    query.setDate("startDate", startDate);
-	    query.setDate("endDate", endDate);
+	    query.setParameter("startDate", startDate);
+	    query.setParameter("endDate", endDate);
 	}
 	if (typeId != null) {
-	    query.setInteger("typeId", typeId);
+	    query.setParameter("typeId", typeId);
 	} else if (area != null) {
-	    query.setString("area", area);
+	    query.setParameter("area", area);
 	}
     }
 
-//    private void buildNameSearch(StringBuilder queryText, String searchString) {
-//	if (!StringUtils.isBlank(searchString)) {
-//	    String[] tokens = searchString.trim().split("\\s+");
-//	    for (String token : tokens) {
-//		String escToken = StringEscapeUtils.escapeSql(token);
-//		queryText.append(" AND (user.first_name LIKE '%").append(escToken)
-//			.append("%' OR user.last_name LIKE '%").append(escToken).append("%' OR user.login_name LIKE '%")
-//			.append(escToken).append("%')");
-//	    }
-//	}
-//    }
+    /* Returns true if a WHERE clause has been added */
+    private boolean buildNameSearch(boolean hasAWhereClause, StringBuilder queryText, String searchString,
+	    String userAlias) {
+	if (!hasAWhereClause) {
+	    queryText.append(" WHERE ");
+	}
+	String[] tokens = searchString.trim().split("\\s+");
+	for (String token : tokens) {
+	    String escToken = StringEscapeUtils.escapeSql(token);
+	    if (hasAWhereClause) {
+		queryText.append(" AND ");
+	    }
+	    queryText.append(" (").append(userAlias).append(".first_name LIKE '%").append(escToken).append("%' OR ")
+		    .append(userAlias).append(".last_name LIKE '%").append(escToken).append("%' OR ").append(userAlias)
+		    .append(".login LIKE '%").append(escToken).append("%') ");
+	}
+	return true;
+    }
+    
+    /* Returns true if a WHERE clause has been added */
+    private boolean buildRemarksSearch(boolean hasAWhereClause, StringBuilder queryText, String searchString) {
+	if (!hasAWhereClause) {
+	    queryText.append(" WHERE ");
+	}
+	String[] tokens = searchString.trim().split("\\s+");
+	for (String token : tokens) {
+	    String escToken = StringEscapeUtils.escapeSql(token);
+	    if (hasAWhereClause) {
+		queryText.append(" AND ");
+	    }
+	    queryText.append(" (").append("le.description LIKE '%").append(escToken).append("%') ");
+	}
+	return true;
+    }
+
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area,
-	    Integer typeId) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public int countEventsWithRestrictions(String searchUser, String searchTarget, String searchRemarks, Date startDate, Date endDate, String area, Integer typeId) {
+
+	if ( searchUser != null && searchUser.isBlank()) {
+	    searchUser = null;
+    	}
+	if ( searchTarget != null && searchTarget.isBlank()) {
+	    searchTarget = null;
+    	}
+	if ( searchRemarks != null && searchRemarks.isBlank()) {
+	    searchRemarks = null;
+    	}
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
-	queryText.append("SELECT count(*) FROM lams_log_event e ");
-	addWhereClause(startDate, endDate, area, typeId, queryText);
+	queryText.append("SELECT count(*) FROM lams_log_event le ");
+	if ( searchUser != null  ) {
+	    queryText.append(" LEFT JOIN lams_user user ON user.user_id = le.user_id");
+	}
+	if ( searchTarget != null  ) {
+	    queryText.append(" LEFT JOIN lams_user target ON target.user_id = le.target_user_id");
+	}
 
-	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	boolean hasAWhereClause = addWhereClause(startDate, endDate, area, typeId, queryText);
+	if ( searchUser != null ) {
+		hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchUser.strip(), "user");
+	}
+	if ( searchTarget != null ) {
+		hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchTarget.strip(), "target");
+	}
+	if ( searchRemarks != null ) {
+	    hasAWhereClause = buildRemarksSearch(hasAWhereClause, queryText, searchRemarks.strip());
+	}
+
+	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	addParameters(startDate, endDate, area, typeId, query);
 
 	List list = query.list();

@@ -38,6 +38,11 @@ public interface ILogEventService {
     /** Constants used for sorting */
     static final int SORT_BY_DATE_ASC = 0;
     static final int SORT_BY_DATE_DESC = 1;
+    static final int SORT_BY_USER_ASC = 2;
+    static final int SORT_BY_USER_DESC = 3;
+    static final int SORT_BY_TARGET_ASC = 4;
+    static final int SORT_BY_TARGET_DESC = 5;
+    
 
     /**
      * Records event of specified type in database.
@@ -101,10 +106,11 @@ public interface ILogEventService {
     Date getOldestEventDate();
 
     /** Used for displaying paged lists of events */
-    List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
-	    Date endDate, String area, Integer typeId);
+    List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchUser, String searchTarget,
+	    String searchRemarks, Date startDate, Date endDate, String area, Integer typeId);
 
-    int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area, Integer typeId);
+    int countEventsWithRestrictions(String searchUser, String searchTarget, String searchRemarks, Date startDate,
+	    Date endDate, String area, Integer typeId);
 
     /* ***************************** Helper methods used by tools to keep the audit entries consistent *****************/
     void logChangeLearnerContent(Long learnerUserId, String learnerUserLogin, Long toolContentId, String originalText,

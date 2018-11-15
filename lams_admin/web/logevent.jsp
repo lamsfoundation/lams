@@ -71,7 +71,7 @@
 			    sortInitialOrder: 'desc',
 			    sortList: [[0]],
 			    widgets: [ "uitheme", "resizable", "filter" ],
-			    headers: { 0: { filter: false}, 1: { filter: false, sorter: false}, 2: { filter: false, sorter: false}, 3: { filter: false, sorter: false}, 4: { filter: false, sorter: false},  }, 
+			    headers: { 0: { filter: false, sorter: true}, 1: { filter: false, sorter: false}, 2: { filter: true, sorter: true}, 3: { filter: true, sorter: true}, 4: { filter: true, sorter: false},  }, 
 			    sortList : [[0,1]],
 			    showProcessing: true,
 			    widgetOptions: {
@@ -107,7 +107,7 @@
 								
 								rows += '<tr>';
 	
-								rows += '<td style="width:20%">';
+								rows += '<td>';
 								rows += 	logData['dateOccurred'];
 								rows += '</td>';
 	

@@ -136,15 +136,17 @@ public class LogEventService implements ILogEventService {
     }
 
     @Override
-    public List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchString, Date startDate,
-	    Date endDate, String area, Integer typeId) {
-	return logEventDAO.getEventsForTablesorter(page, size, sorting, searchString, startDate, endDate, area, typeId);
+    public List<Object[]> getEventsForTablesorter(int page, int size, int sorting, String searchUser,
+	    String searchTarget, String searchRemarks, Date startDate, Date endDate, String area, Integer typeId) {
+	return logEventDAO.getEventsForTablesorter(page, size, sorting, searchUser, searchTarget, searchRemarks,
+		startDate, endDate, area, typeId);
     }
 
     @Override
-    public int countEventsWithRestrictions(String searchString, Date startDate, Date endDate, String area,
-	    Integer typeId) {
-	return logEventDAO.countEventsWithRestrictions(searchString, startDate, endDate, area, typeId);
+    public int countEventsWithRestrictions(String searchUser, String searchTarget, String searchRemarks, Date startDate,
+	    Date endDate, String area, Integer typeId) {
+	return logEventDAO.countEventsWithRestrictions(searchUser, searchTarget, searchRemarks, startDate, endDate,
+		area, typeId);
     }
 
     // ********************** Helper methods used by tools to keep the audit entries consistent  *****************

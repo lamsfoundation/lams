@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.logevent.dto.LogEventTypeDTO;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -111,12 +112,20 @@ public class LogEventController {
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
-	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
-//	String searchString = request.getParameter("fcol[0]");
+	Integer isSortDate = WebUtil.readIntParam(request, "column[0]", true);
+	Integer isSortUser = WebUtil.readIntParam(request, "column[2]", true);
+	Integer isSortTarget = WebUtil.readIntParam(request, "column[3]", true);
+	String searchUser = request.getParameter("fcol[2]");
+	String searchTarget = request.getParameter("fcol[3]");
+	String searchRemarks = request.getParameter("fcol[4]");
 
-	int sorting = ILogEventService.SORT_BY_DATE_ASC;
-	if ((isSort1 != null) && isSort1.equals(1)) {
-	    sorting = ILogEventService.SORT_BY_DATE_DESC;
+	int sorting = ILogEventService.SORT_BY_DATE_DESC;
+	if (isSortDate != null) {
+	    sorting = isSortDate.equals(1) ? ILogEventService.SORT_BY_DATE_DESC :  ILogEventService.SORT_BY_DATE_ASC;
+	} else if (isSortUser != null) {
+	    sorting = isSortUser.equals(1) ? ILogEventService.SORT_BY_USER_DESC :  ILogEventService.SORT_BY_USER_ASC;
+	} else if (isSortTarget != null) {
+	    sorting = isSortTarget.equals(1) ? ILogEventService.SORT_BY_TARGET_DESC :  ILogEventService.SORT_BY_TARGET_ASC;
 	}
 
 	Long dateParameter = WebUtil.readLongParam(request, "startDate", true);
@@ -139,20 +148,21 @@ public class LogEventController {
 
 	String area = WebUtil.readStrParam(request, "area", true);
 	Integer typeId = WebUtil.readIntParam(request, "typeId", true);
-	List<Object[]> events = logEventService.getEventsForTablesorter(page, size, sorting, null, startDate, endDate,
-		area, typeId);
+	List<Object[]> events = logEventService.getEventsForTablesorter(page, size, sorting, searchUser, searchTarget,
+		searchRemarks, startDate, endDate, area, typeId);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows",
-		logEventService.countEventsWithRestrictions(null, startDate, endDate, area, typeId));
+	responsedata.put("total_rows", logEventService.countEventsWithRestrictions(searchUser, searchTarget,
+		searchRemarks, startDate, endDate, area, typeId));
 
 	for (Object[] eventDetails : events) {
 	    if (eventDetails.length > 0) {
 		LogEvent event = (LogEvent) eventDetails[0];
 		ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
-		responseRow.put("dateOccurred", JsonUtil.toString(event.getOccurredDateTime()));
+		responseRow.put("dateOccurred", event.getOccurredDateTime() != null ? 
+			DateUtil.convertToStringForJSON(event.getOccurredDateTime(), request.getLocale()) : "");
 		responseRow.put("typeId", event.getLogEventTypeId());
 		responseRow.put("description", event.getDescription());
 		if (event.getLessonId() != null) {
