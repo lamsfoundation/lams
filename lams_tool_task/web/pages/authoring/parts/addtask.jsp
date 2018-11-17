@@ -29,11 +29,8 @@
 			<lams:errors/>
 
 			<form:form action="saveOrUpdateItem.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm" focus="title" >
-	
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="itemIndex" />
-				<form:hidden path="commentsFilesAllowed" value="true"/>
-				<form:hidden path="showCommentsToAll" value="true" />
 				
 				<div class="form-group">
 	            	<label for="title">

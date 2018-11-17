@@ -50,11 +50,6 @@ public class TaskListItemForm {
     private boolean isFilesRequired;
     private boolean isChildTask;
 
-    // The next 2 options always will be true (as it set in jsp). Waiting
-    // for the final decision -- if this options will be needed later.
-    private boolean isCommentsFilesAllowed;
-    private boolean showCommentsToAll;
-
     private String parentTaskName;
 
     private MultipartFile uploadedFile;
@@ -248,48 +243,6 @@ public class TaskListItemForm {
      */
     public void setFilesRequired(boolean isFilesRequired) {
 	this.isFilesRequired = isFilesRequired;
-    }
-
-    // The next 2 options always will be true (as it set in jsp). Waiting
-    // for the final decision -- if this options will be needed later.
-    /**
-     * Returns whether comments are allowed in this <code>TaskLiskItem</code>.
-     *
-     * @return true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
-     */
-    public boolean isCommentsFilesAllowed() {
-	return isCommentsFilesAllowed;
-    }
-
-    /**
-     * Sets whether comments are allowed in this <code>TaskLiskItem</code>.
-     *
-     * @param isCommentsAllowed
-     *            true if comments are allowed in this <code>TaskLiskItem</code>, false otherwise.
-     */
-    public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
-	this.isCommentsFilesAllowed = isCommentsFilesAllowed;
-    }
-
-    /**
-     * Returns whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>.
-     *
-     * @return true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false
-     *         otherwise.
-     */
-    public boolean getShowCommentsToAll() {
-	return showCommentsToAll;
-    }
-
-    /**
-     * Sets whether comments are allowed to be shown to everybody for this <code>TaskLiskItem</code> or not.
-     *
-     * @param showCommentsToAll
-     *            true if comments are allowed to be shown to everybody for this <code>TaskLiskItem</code>, false
-     *            otherwise.
-     */
-    public void setShowCommentsToAll(boolean showCommentsToAll) {
-	this.showCommentsToAll = showCommentsToAll;
     }
 
     /**

@@ -104,20 +104,14 @@
 		<div><em><fmt:message key="label.monitoring.tasksummary.task.required.to.finish" /></em></div>
 		</c:if>				
 
-		<c:if test="${item.childTask || item.commentsFilesAllowed || item.commentsAllowed || item.filesAllowed}">
+		<c:if test="${item.childTask || item.commentsAllowed || item.filesAllowed}">
 			<ul class="list-unstyled">
 				<c:if test="${item.childTask}">
 					<li>
 						(<fmt:message key="label.monitoring.tasksummary.parent.activity" />: ${item.parentTaskName})
 					</li>
-					</c:if>
-<!-- 						
-				<c:if test="${item.commentsFilesAllowed}">
-					<li>
-						<fmt:message key="label.monitoring.tasksummary.comments.files.enabled" />
-					</li>
 				</c:if>
--->					
+
 				<c:if test="${item.commentsAllowed}">
 					<li>
 						<fmt:message key="label.monitoring.tasksummary.comments.allowed" />

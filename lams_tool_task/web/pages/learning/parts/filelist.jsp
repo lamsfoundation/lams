@@ -9,8 +9,7 @@
 		<%-- Display target file type --%>
 		<ul>
 			<c:forEach var="file" items="${fileList}">
-				<c:if
-					test="${item.showCommentsToAll || (sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
+				<c:if test="${(sessionMap.userLogin == file.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 
 					<li><c:out value="${file.fileName}" escapeXml="true" /> <c:if test="${file.createBy != null}">
 						[<c:out value="${file.createBy.firstName} ${file.createBy.lastName}" escapeXml="true" />]

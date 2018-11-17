@@ -604,10 +604,6 @@ public class AuthoringController {
 	taskListItemForm.setCommentsRequired(item.isCommentsRequired());
 	taskListItemForm.setFilesAllowed(item.isFilesAllowed());
 	taskListItemForm.setFilesRequired(item.isFilesRequired());
-	// The next 2 options always will be true (as it set in jsp). Waiting
-	// for the final decision -- if this options will be needed later.
-	taskListItemForm.setCommentsFilesAllowed(item.isCommentsFilesAllowed());
-	taskListItemForm.setShowCommentsToAll(item.getShowCommentsToAll());
 	taskListItemForm.setChildTask(item.isChildTask());
 	taskListItemForm.setParentTaskName(item.getParentTaskName());
     }
@@ -654,10 +650,6 @@ public class AuthoringController {
 	item.setCommentsRequired(itemForm.isCommentsRequired());
 	item.setFilesAllowed(itemForm.isFilesAllowed());
 	item.setFilesRequired(itemForm.isFilesRequired());
-	// The next 2 options always will be true (as it set in jsp). Waiting
-	// for the final decision -- if this options will be needed later.
-	item.setCommentsFilesAllowed(itemForm.isCommentsFilesAllowed());
-	item.setShowCommentsToAll(itemForm.getShowCommentsToAll());
 	item.setChildTask(itemForm.isChildTask());
 	item.setParentTaskName(itemForm.getParentTaskName());
     }
@@ -683,8 +675,6 @@ public class AuthoringController {
 	itemPO.setCommentsRequired(itemFromSession.isCommentsRequired());
 	itemPO.setFilesAllowed(itemFromSession.isFilesAllowed());
 	itemPO.setFilesRequired(itemFromSession.isFilesRequired());
-	itemPO.setCommentsFilesAllowed(itemFromSession.isCommentsFilesAllowed());
-	itemPO.setShowCommentsToAll(itemFromSession.getShowCommentsToAll());
 	itemPO.setChildTask(itemFromSession.isChildTask());
 	itemPO.setParentTaskName(itemFromSession.getParentTaskName());
     }

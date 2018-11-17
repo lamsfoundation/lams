@@ -106,13 +106,6 @@ public class TaskListItem implements Cloneable {
     
     @Column(name = "parent_task_name")
     private String parentTaskName;
-    
-    // advanced options that are not used now
-    @Column(name = "is_comments_files_allowed")
-    private boolean isCommentsFilesAllowed;
-    
-    @Column(name = "show_comments_to_all")
-    private boolean showCommentsToAll;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "taskList_item_uid")
@@ -352,24 +345,6 @@ public class TaskListItem implements Cloneable {
 
     public void setParentTaskName(String parentTaskName) {
 	this.parentTaskName = parentTaskName;
-    }
-
-    public boolean getShowCommentsToAll() {
-	return showCommentsToAll;
-    }
-
-    public void setShowCommentsToAll(boolean showCommentsToAll) {
-	this.showCommentsToAll = showCommentsToAll;
-    }
-
-    public boolean isCommentsFilesAllowed() {
-	// true bacause we can not set it from the UI
-	// TODO get rid of this later
-	return true;
-    }
-
-    public void setCommentsFilesAllowed(boolean isCommentsFilesAllowed) {
-	this.isCommentsFilesAllowed = isCommentsFilesAllowed;
     }
 
     /**

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.taskList.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
+import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
 
 /**
  * Import filter class for different version of TaskList content.
@@ -39,5 +40,13 @@ public class TaskListImportContentVersionFilter extends ToolContentVersionFilter
 	this.removeField(TaskList.class, "onlineInstructions");
 	this.removeField(TaskList.class, "offlineInstructions");
 	this.removeField(TaskList.class, "attachments");
+    }
+    
+    /**
+     * Import 20110510 version content to 20140102 version tool server.
+     */
+    public void up20180425To20181216() {
+	this.removeField(TaskListItem.class, "showCommentsToAll");
+	this.removeField(TaskListItem.class, "commentsFilesAllowed");
     }
 }

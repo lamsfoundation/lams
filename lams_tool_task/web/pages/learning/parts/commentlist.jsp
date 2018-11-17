@@ -12,8 +12,7 @@
 
 <c:forEach var="comment" items="${commentList}">
 
-	<c:if
-		test="${item.showCommentsToAll || (sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
+	<c:if test="${(sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 		<div class="row voffset5">
 			<div class="col-xs-12">
 				<div class="panel panel-default">
