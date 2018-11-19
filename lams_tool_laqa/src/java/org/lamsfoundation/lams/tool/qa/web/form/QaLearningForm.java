@@ -141,7 +141,6 @@ public class QaLearningForm implements QaAppConstants {
 	this.getNextQuestion = null;
 	this.getPreviousQuestion = null;
 	this.endLearning = null;
-	this.refreshAnswers = null;
 	this.submitReflection = null;
 	this.forwardtoReflection = null;
 

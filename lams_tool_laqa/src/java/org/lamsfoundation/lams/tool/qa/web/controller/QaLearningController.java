@@ -171,10 +171,13 @@ public class QaLearningController implements QaAppConstants {
 		// in case user joins the lesson after leader has answers some answers already - we need to make sure
 		// he has the same scratches as leader
 		qaService.copyAnswersFromLeader(user, groupLeader);
+		qaLearningForm.setRefreshAnswers("reload");
 
 		user.setResponseFinalized(true);
 		qaService.updateUser(user);
 	    }
+	} else {
+	    qaLearningForm.setRefreshAnswers("refresh");
 	}
 
 	/* holds the question contents for a given tool session and relevant content */

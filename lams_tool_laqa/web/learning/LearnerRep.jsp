@@ -237,7 +237,14 @@
 				});
 			});
 		 });
-	
+
+		function refreshPage(reload) {
+			if ( "reload" == reload ) { 
+				location.href = "<lams:WebAppURL/>learning/learning.do?mode=learner&toolSessionID="+SESSION_ID;
+			} else {
+				submitMethod('refreshAllResults');
+			}
+		}
 		function submitMethod(actionMethod) {
 			$('.btn').prop('disabled', true);
 			document.forms.qaLearningForm.action=actionMethod+".do"; 
@@ -423,14 +430,14 @@
 				<form:hidden path="userID" id="userID" />
 				<form:hidden path="httpSessionID" />
 				<form:hidden path="totalQuestionCount" />
+				<form:hidden path="refreshAnswers" />
 	
 	
 				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
 					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-	
 						<div class="right-buttons voffset5" align="right" id="learner-submit">
 							<button name="refreshAnswers" type="button" class="btn btn-default voffset5 roffset5 pull-left"
-								onclick="submitMethod('refreshAllResults');">
+								onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
 								<fmt:message key="label.refresh" />
 							</button>
 	
