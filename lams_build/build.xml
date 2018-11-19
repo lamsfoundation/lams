@@ -745,9 +745,8 @@
 	</target>
 	
 	
-	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 14.0.1; do not run twice!">
-		<fail message="This has not been implemented yet" />
-		
+	<target name="slim-standalone"
+			description="Removes unnecessary files from Wildfly 14.0.1 STANDALONE mode; do not run for domain mode!">
 		<delete includeemptydirs="true" verbose="true" failonerror="false">
 			<!-- Domain version of server. Standalone is used. -->
 			<fileset dir="${server.home}/domain/" />
@@ -756,21 +755,20 @@
 			<!-- Binaries -->
 			<fileset dir="${server.home}/bin/">
 				<include name="client/"/>
-				<include name="init.d/"/>
-				<include name="service/"/>
 				<include name=".jbossclirc"/>
 				<include name="add*"/>
 				<include name="appclient*"/>
+				<include name="jboss-cli*"/>
 				<include name="jconsole*"/>
 				<include name="jdr*"/>
 				<include name="domain*"/>
-				<include name="jboss-cli*"/>
-				<include name="run*"/>
-				<include name="vault*"/>
-				<include name="ws*"/>
-				<include name="*.ps1"/>
+				<include name="elytron*"/>
 				<include name="launcher.jar"/>
 				<include name="product.conf"/>
+				<include name="vault*"/>
+				<include name="wildfly-elytron-tool.jar"/>
+				<include name="ws*"/>
+				<include name="*.ps1"/>
 			</fileset>
 			<!-- Config files -->
 			<fileset dir="${server.home}/standalone/configuration/">
@@ -779,44 +777,71 @@
 			<!-- Libraries -->
 			<fileset dir="${server.home}/modules/system/layers/base/">
 				<include name="ch/"/>
-				<include name="com/google/guava/"/>
+				<include name="com/google/"/>
+				<include name="com/googlecode/"/>
 				<include name="com/h2database/"/>
+				<include name="com/jcraft/"/>
 				<include name="com/microsoft/"/>
+				<include name="com/squareup/"/>
+				<include name="com/sun/jsf-impl/"/>
 				<include name="gnu/"/>
+				<include name="io/agroal/"/>
+				<include name="io/jaegertr/"/>
+				<include name="io/opentracing/"/>
+				<include name="io/smallrye/"/>
+				<include name="javax/faces/"/>
 				<include name="nu/"/>
 				<include name="org/apache/avro/"/>
-				<include name="org/apache/lucene/main/"/>
-				<include name="org/apache/lucene/internal/"/>
+				<include name="org/apache/commons/lang3/"/>
+				<include name="org/apache/james/"/>
+				<include name="org/apache/lucene/"/>
+				<include name="org/apache/neethi/"/>
 				<include name="org/apache/openjpa/"/>
+				<include name="org/apache/santuario/"/>
+				<include name="org/apache/qpid/"/>
+				<include name="org/apache/thrift/"/>
+				<include name="org/apache/velocity/"/>
+				<include name="org/apache/xml-resolver/"/>
 				<include name="org/codehaus/jettison/"/>
+				<include name="org/eclipse/microprofile/"/>
 				<include name="org/eclipse/persistence/"/>
+				<include name="org/eclipse/yasson/"/>
 				<include name="org/fusesource/"/>
+				<include name="org/glassfish/soteria/"/>
 				<include name="org/hibernate/4.1/"/>
 				<include name="org/hibernate/4.3/"/>
 				<include name="org/hibernate/5.0/"/>
 				<include name="org/hibernate/jipijapa-hibernate4-3/"/>
+				<include name="org/hibernate/jipijapa-hibernate5/"/>
 				<include name="org/hibernate/envers/"/>
-				<include name="org/hibernate/hql/"/>
 				<include name="org/hibernate/search/"/>
+				<include name="org/hornetq/"/>
+				<include name="org/infinispan/cachestore/"/>
 				<include name="org/jberet/"/>
 				<include name="org/jboss/as/appclient/"/>
 				<include name="org/jboss/as/clustering/ejb3/"/>
 				<include name="org/jboss/as/clustering/web/"/>
 				<include name="org/jboss/as/cmp/"/>
+				<include name="org/jboss/as/configadmin/"/>
 				<include name="org/jboss/as/domain-add-user/"/>
+				<include name="org/jboss/as/domain-http-error-context/"/>
+				<include name="org/jboss/as/jacorb/"/>
 				<include name="org/jboss/as/jaxr/"/>
 				<include name="org/jboss/as/jaxrs/"/>
 				<include name="org/jboss/as/jdr/"/>
 				<include name="org/jboss/as/jpa/hibernate/"/>
+				<include name="org/jboss/as/jsf/"/>
+				<include name="org/jboss/as/jsf-injection/"/>
 				<include name="org/jboss/as/jsr77/"/>
 				<include name="org/jboss/as/mail/"/>
+				<include name="org/jboss/as/management-client-content/"/>
 				<include name="org/jboss/as/modcluster/"/>
+				<include name="org/jboss/as/patching/"/>
 				<include name="org/jboss/as/pojo/"/>
 				<include name="org/jboss/as/sar/"/>
 				<include name="org/jboss/as/security-api/"/>
 				<include name="org/jboss/as/webservices/"/>
 				<include name="org/jboss/as/vault-tool/"/>
-				<include name="org/jboss/as/version/main/jboss-as-version-8.1.0.Final.jar/"/>
 				<include name="org/jboss/as/xts/"/>
 				<include name="org/jboss/genericjms/"/>
 				<include name="org/jboss/integration/"/>
@@ -825,41 +850,49 @@
 				<include name="org/jboss/remoting3/"/>
 				<include name="org/jboss/resteasy/jose-jwt/"/>
 				<include name="org/jboss/resteasy/resteasy-atom-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-cdi/"/>
 				<include name="org/jboss/resteasy/resteasy-crypto/"/>
 				<include name="org/jboss/resteasy/resteasy-jackson2-provider/"/>
 				<include name="org/jboss/resteasy/resteasy-jackson-provider/"/>
 				<include name="org/jboss/resteasy/resteasy-jettison-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jaxb-provider/"/>
 				<include name="org/jboss/resteasy/resteasy-jsapi/"/>
+				<include name="org/jboss/resteasy/resteasy-json-binding-provider/"/>
 				<include name="org/jboss/resteasy/resteasy-json-p-provider/"/>
 				<include name="org/jboss/resteasy/resteasy-multipart-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-rxjava2/"/>
 				<include name="org/jboss/resteasy/resteasy-spring/"/>
 				<include name="org/jboss/resteasy/resteasy-yaml-provider/"/>
-				<include name="org/jboss/shrinkwrap/"/>
+				<include name="org/jboss/resteasy/resteasy-validator-provider-11/"/>
+				<include name="org/jboss/security/xacml/"/>
 				<include name="org/jboss/ws/saaj-impl/"/>
 				<include name="org/jboss/ws/tools/"/>
-				<include name="org/jboss/xb/"/>
 				<include name="org/jsoup/"/>
-				<include name="org/osgi/"/>
 				<include name="org/opensaml/"/>
 				<include name="org/picketlink/"/>
 				<include name="org/wildfly/extension/batch/"/>
+				<include name="org/wildfly/extension/datasources-agroal/"/>
+				<include name="org/wildfly/extension/discovery/"/>
+				<include name="org/wildfly/extension/ee-security/"/>
+				<include name="org/wildfly/extension/elytron/"/>
+				<include name="org/wildfly/extension/messaging-activemq/"/>
+				<include name="org/wildfly/extension/microprofile/"/>
 				<include name="org/wildfly/extension/mod_cluster/"/>
+				<include name="org/wildfly/extension/picketlink/"/>
 				<include name="org/wildfly/extension/rts/"/>
-				<include name="org/wildfly/jberet/"/>
+				<include name="org/wildfly/microprofile/"/>
 				<include name="org/wildfly/mod_cluster/"/>
 				<include name="org/yaml/"/>
-				<include name="sun/scripting/"/>
 			</fileset>
 			<!-- Default content -->
 			<fileset dir="${server.home}">
-				<include name="welcome-content/" />
+				<include name="README.txt" />
 			</fileset>
 			<!-- Other -->
 			<fileset dir="${server.home}/standalone/deployments/">
 				<include name="README.txt"/>
 			</fileset>
 			<fileset dir="${server.home}/docs/" />
-			<fileset dir="${server.home}/.installation/" />
 		</delete>
 	</target>
 </project>
