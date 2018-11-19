@@ -101,7 +101,6 @@
 		<ant antfile="../lams_gradebook/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_www/build.xml"                target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_assessment/build.xml"    target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_doku/build.xml"          target="copy-tags" inheritAll="false"/>
