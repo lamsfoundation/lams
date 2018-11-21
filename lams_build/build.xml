@@ -164,6 +164,7 @@
 		<ant antfile="../lams_learning/build.xml"          target="_build-product" inheritAll="false" />
 		<ant antfile="../lams_monitoring/build.xml"        target="_build-product" inheritAll="false" />
 		<ant antfile="../lams_admin/build.xml"             target="_build-product" inheritAll="false" />
+		<ant antfile="../lams_www/build.xml"               target="_clean-dirs"     inheritAll="false" />
 		<ant antfile="../lams_www/build.xml"               target="_build-war"     inheritAll="false" />
 		<ant antfile="../lams_gradebook/build.xml"         target="_build-product" inheritAll="false" />
 	</target>
