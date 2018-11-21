@@ -29,6 +29,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
@@ -68,12 +69,14 @@ public class GroupUser implements Serializable {
     @EmbeddedId
     private GroupUserPrimaryKey id;
 
+    @MapsId("id")
     @ManyToOne
-    @MapsId("groupId")
+    @JoinColumn(name = "group_id")
     private Group group;
 
+    @MapsId("id")
     @ManyToOne
-    @MapsId("userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "scheduled_lesson_end_date")
