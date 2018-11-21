@@ -9,7 +9,7 @@
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
-		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
 		<link type="text/css" href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet">	

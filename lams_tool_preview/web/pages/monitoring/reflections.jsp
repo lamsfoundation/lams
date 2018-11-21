@@ -13,7 +13,7 @@
 	</title>
 	<%@ include file="/common/header.jsp"%>
 	
-	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" />
 	

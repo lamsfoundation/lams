@@ -7,7 +7,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
-		<link href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css">
+		<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css">		

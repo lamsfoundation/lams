@@ -13,7 +13,7 @@
 		<title> <fmt:message key="label.view.reflection"/> </title>
 		
 		<lams:css />
-		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet">
 		<lams:css suffix="jquery.jRating"/>
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">

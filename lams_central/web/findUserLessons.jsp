@@ -15,7 +15,7 @@
 	<lams:css />
 	<title><fmt:message key="index.searchlesson" /></title>
 
-	<link rel="stylesheet" href="${lams}/css/jquery-ui-smoothness-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="${lams}/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<style media="screen,projection" type="text/css">
 		li.ui-menu-item {
 			list-style: none;

@@ -11,7 +11,7 @@
 	<lams:css/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet" />
 
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>

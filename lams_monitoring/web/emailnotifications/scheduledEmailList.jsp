@@ -11,7 +11,7 @@
 	</c:if>	
 	
 	<lams:css/>	
-	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-smoothness-theme.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-bootstrap-theme.css" rel="stylesheet" />
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
