@@ -85,7 +85,7 @@ public class CommonCartridge implements Cloneable {
     private boolean contentInUse;
 
     // general infomation
-    
+
     @Column(name = "create_date")
     private Date created;
 
@@ -135,7 +135,7 @@ public class CommonCartridge implements Cloneable {
     @Override
     public Object clone() {
 	CommonCartridge commonCartridge = null;
-	
+
 	try {
 	    commonCartridge = (CommonCartridge) super.clone();
 	    commonCartridge.setUid(null);
@@ -261,7 +261,7 @@ public class CommonCartridge implements Cloneable {
     public String getTitle() {
 	return title;
     }
-    
+
     public void setTitle(String title) {
 	this.title = title;
     }
@@ -350,7 +350,7 @@ public class CommonCartridge implements Cloneable {
 	return reflectOnActivity;
     }
 
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
+    public void setReflectOnActivity(Boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity == null ? false : reflectOnActivity;
     }
 }
