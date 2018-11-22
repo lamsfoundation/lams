@@ -30,9 +30,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -57,7 +57,7 @@ public class SurveyCondition extends TextSearchCondition {
      */
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "tl_lasurv11_condition_questions", joinColumns = @JoinColumn(name = "condition_id"), inverseJoinColumns = @JoinColumn(name = "question_uid"))
-    @OrderBy("question_uid")
+    @SortComparator(QuestionsComparator.class)
     private Set<SurveyQuestion> questions = new TreeSet<SurveyQuestion>(new QuestionsComparator());
 
     public SurveyCondition() {

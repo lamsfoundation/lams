@@ -1916,7 +1916,7 @@ GeneralLib = {
 						case 13:
 							// draw both edge points straight away and mark the whole canvas for auto reaarange,
 							// re-arrange only if it is old SVG being converted into new one
-							arrangeNeeded |= activityData.xCoord && activityData.yCoord;
+							arrangeNeeded |= activityData.xCoord != null && activityData.yCoord != null;
 							var branchingType = branchingType || 'optional',
 								branchingEdge = new ActivityDefs.BranchingEdgeActivity(activityData.activityID,
 										activityData.activityUIID,
