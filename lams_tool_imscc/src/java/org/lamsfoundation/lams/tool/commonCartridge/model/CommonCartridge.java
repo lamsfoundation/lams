@@ -103,7 +103,7 @@ public class CommonCartridge implements Cloneable {
     private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();;
 
     @Column(name = "reflect_instructions")
-    private boolean reflectOnActivity;
+    private Boolean reflectOnActivity;
 
     @Column(name = "reflect_on_activity")
     private String reflectInstructions;
@@ -346,11 +346,11 @@ public class CommonCartridge implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    public boolean isReflectOnActivity() {
+    public Boolean isReflectOnActivity() {
 	return reflectOnActivity;
     }
 
     public void setReflectOnActivity(Boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity == null ? false : reflectOnActivity;
+	this.reflectOnActivity = reflectOnActivity;
     }
 }
