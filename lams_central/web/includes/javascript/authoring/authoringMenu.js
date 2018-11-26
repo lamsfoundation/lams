@@ -258,7 +258,7 @@ var MenuLib = {
 		.click(function(){
 			exportLDDialog.modal('hide');
 		});
-		$('#exportLDDialogContents').clone().attr('id', null).show().appendTo($('.modal-body', exportLDDialog).empty());
+		$('#exportLDDialogContents').clone().attr('id', null).appendTo($('.modal-body', exportLDDialog).empty()).show();
 		exportLDDialog.modal('show');
 	},
 
