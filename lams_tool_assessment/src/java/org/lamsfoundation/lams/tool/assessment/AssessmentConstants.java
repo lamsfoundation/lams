@@ -68,6 +68,8 @@ public class AssessmentConstants {
     public static final String PARAM_FILE_UUID = "fileUuid";
 
     public static final String PARAM_QUESTION_INDEX = "questionIndex";
+    
+    public static final String PARAM_QUESTION_SEQUENCE_ID = "questionSequenceId";
 
     public static final String PARAM_QUESTION_REFERENCE_INDEX = "questionReferenceIndex";
 
@@ -86,6 +88,12 @@ public class AssessmentConstants {
     public static final String PARAM_QUESTION_RESULT_UID = "questionResultUid";
 
     // for request attribute name
+    
+    /**
+     * used to signify edit in monitor when assessment has been attempted already
+     */
+    public static final String ATTR_IS_AUTHORING_RESTRICTED = "isAuthoringRestricted";
+    
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
@@ -111,6 +119,8 @@ public class AssessmentConstants {
     public static final String ATTR_OPTION_ACCEPTED_ERROR_PREFIX = "optionAcceptedError";
 
     public static final String ATTR_OPTION_FEEDBACK_PREFIX = "optionFeedback";
+    
+    public static final String ATTR_OPTION_UID_PREFIX = "optionUid";
 
     public static final String ATTR_OPTION_SEQUENCE_ID_PREFIX = "optionSequenceId";
 

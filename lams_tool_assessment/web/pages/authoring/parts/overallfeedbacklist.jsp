@@ -4,7 +4,6 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-	<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 	<c:set var="overallFeedbackListSize" value="${fn:length(overallFeedbackList)}" />
 	
 	<script lang="javascript">

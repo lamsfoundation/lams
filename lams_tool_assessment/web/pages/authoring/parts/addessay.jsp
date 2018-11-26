@@ -115,9 +115,11 @@
 			<lams:errors/>
 			
 			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
+				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="questionType" value="6"/>
-				<form:hidden path="questionIndex" />
+				<form:hidden path="sequenceId" />
 				
 				<div class="form-group">
 				    <label for="title">
@@ -142,13 +144,15 @@
 					</label>
 				</div>
 
-				<div class="form-group form-inline">
-				    <label for="defaultGrade">
-				    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
-				    </label>
-				    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
-				</div>
+				<c:if test="${!isAuthoringRestricted}">
+					<div class="form-group form-inline">
+					    <label for="defaultGrade">
+					    	<fmt:message key="label.authoring.basic.default.question.grade" />:
+					    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					    </label>
+					    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+					</div>
+				</c:if>
 				
 				<div class="checkbox">
 					<label for="allow-rich-editor">

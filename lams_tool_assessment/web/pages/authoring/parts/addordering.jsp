@@ -107,10 +107,12 @@
 		    </div>		
 			
 			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
+				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="questionIndex" />
+				<form:hidden path="sequenceId" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				<form:hidden path="feedbackOnCorrect" id="feedbackOnCorrect"/>
 				<form:hidden path="feedbackOnIncorrect" id="feedbackOnIncorrect"/>
@@ -139,11 +141,13 @@
 				</div>
 				
 				<div class="form-group form-inline">
-				    <label for="defaultGrade">
-				    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
-				    </label>
-				    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+					<c:if test="${!isAuthoringRestricted}">
+					    <label for="defaultGrade">
+					    	<fmt:message key="label.authoring.basic.default.question.grade" />:
+					    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					    </label>
+					    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+				    </c:if>
 
 				    <label class="loffset10" for="penaltyFactor">
 				    	<fmt:message key="label.authoring.basic.penalty.factor" />:

@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -61,6 +60,8 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.questions.Answer;
+import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -96,6 +97,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
@@ -366,8 +368,7 @@ public class AssessmentServiceImpl
 
     @Override
     public Assessment getAssessmentByContentId(Long contentId) {
-	Assessment rs = assessmentDao.getByContentId(contentId);
-	return rs;
+	return assessmentDao.getByContentId(contentId);
     }
 
     @Override
@@ -553,12 +554,6 @@ public class AssessmentServiceImpl
     /*
      * Auxiliary method for setAttemptStarted(). Simply init new AssessmentQuestionResult object and fills it in with
      * values.
-     *
-     * @param question
-     *
-     * @param questionResults
-     *
-     * @return
      */
     private AssessmentQuestionResult createQuestionResultObject(AssessmentQuestion question) {
 	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
@@ -574,16 +569,53 @@ public class AssessmentServiceImpl
 
 	return questionResult;
     }
+    
+    
+    @Override
+    public void storeSingleMarkHedgingQuestion(Assessment assessment, Long userId,
+	    List<Set<QuestionDTO>> pagedQuestions, Long singleMarkHedgingQuestionUid)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessment.getUid(), userId);
+
+	// prohibit users from submitting (or autosubmitting) answers after result is finished but Resubmit button is
+	// not pressed (e.g. using 2 browsers)
+	if (result.getFinishDate() != null) {
+	    return;
+	}
+
+	// search for the question corresponding to single MarkHedging question
+	QuestionDTO questionDto = null;
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
+	    for (QuestionDTO questionDtoIter : questionsForOnePage) {
+		if (questionDtoIter.getUid().equals(singleMarkHedgingQuestionUid)) {
+		    questionDto = questionDtoIter;
+		}
+	    }
+	}
+	
+	AssessmentQuestionResult questionResult = storeUserAnswer(result, questionDto);
+	questionResult.setFinishDate(new Date());
+	
+	float mark = 0;
+	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+	    if (optionDto.isCorrect()) {
+		//if hedgingMark is a default '-1', change it to '0'
+		int hedgingMark = optionDto.getAnswerInt() == -1 ? 0 : optionDto.getAnswerInt();
+		mark += hedgingMark;
+		break;
+	    }
+	}
+	questionResult.setMark(mark);
+	questionResult.setMaxMark((float) questionDto.getGrade());
+	assessmentResultDao.saveObject(questionResult);
+	
+	//for displaying purposes calculate mark and set it to questionDto
+	questionDto.setMark(mark);
+    }
 
     @Override
     public boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
-	    Long singleMarkHedgingQuestionUid, boolean isAutosave)
-	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-
-	int maximumGrade = 0;
-	float grade = 0;
-
-	Set<AssessmentQuestion> questions = assessment.getQuestions();
+	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessment.getUid(), userId);
 
 	// prohibit users from submitting (or autosubmitting) answers after result is finished but Resubmit button is
@@ -595,51 +627,34 @@ public class AssessmentServiceImpl
 	// store all answers (in all pages)
 	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
 	    for (QuestionDTO questionDto : questionsForOnePage) {
-
-		// in case single MarkHedging question needs to be stored -- search for that question
-		if ((singleMarkHedgingQuestionUid != null)
-			&& !questionDto.getUid().equals(singleMarkHedgingQuestionUid)) {
-		    continue;
-		}
-
-		// In case if assessment was modified in monitor after result has been started check question still exists in DB as
-		// it could be deleted
-		if (assessment.isContentModifiedInMonitor(result.getStartDate())) {
-
-		    Set<QuestionReference> references = assessment.getQuestionReferences();
-
-		    boolean isQuestionExists = false;
-		    for (QuestionReference reference : references) {
-			if (!reference.isRandomQuestion()
-				&& reference.getQuestion().getUid().equals(questionDto.getUid())) {
-			    isQuestionExists = true;
-			    break;
-			}
-			if (reference.isRandomQuestion()) {
-			    for (AssessmentQuestion questionDb : questions) {
-				if (questionDb.getUid().equals(questionDto.getUid())) {
-				    isQuestionExists = true;
-				    break;
-				}
-			    }
-			}
-		    }
-		    if (!isQuestionExists) {
-			continue;
-		    }
-		}
-
-		float userQeustionGrade = storeUserAnswer(result, questionDto, isAutosave);
-		grade += userQeustionGrade;
-
-		maximumGrade += questionDto.getGrade();
+		storeUserAnswer(result, questionDto);
 	    }
 	}
 
 	// store grades and finished date only on user hitting submit all answers button (and not submit mark hedging
 	// question)
-	boolean isStoreResult = !isAutosave && (singleMarkHedgingQuestionUid == null);
-	if (isStoreResult) {
+	if (!isAutosave) {
+	    int maximumGrade = 0;
+	    float grade = 0;
+
+	    //sum up user grade and max grade for all questions
+	    for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
+		for (QuestionDTO questionDto : questionsForOnePage) {
+		    // get questionResult from DB instance of AssessmentResult
+		    AssessmentQuestionResult questionResult = null;
+		    for (AssessmentQuestionResult questionResultIter : result.getQuestionResults()) {
+			if (questionDto.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
+			    questionResult = questionResultIter;
+			}
+		    }
+		    calculateAnswerMark(assessment.getUid(), userId, questionResult, questionDto);
+		    questionResult.setFinishDate(new Date());
+		    
+		    grade += questionResult.getMark();
+		    maximumGrade += questionDto.getGrade();
+		}
+	    }
+	    
 	    result.setMaximumGrade(maximumGrade);
 	    result.setGrade(grade);
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
@@ -651,33 +666,24 @@ public class AssessmentServiceImpl
 
     /**
      * Stores given AssessmentQuestion's answer.
-     *
-     * @param isAutosave
-     *            in case of autosave there is no need to calculate marks
-     * @return grade that user scored by answering that question
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
-    private float storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto, boolean isAutosave)
+    private AssessmentQuestionResult storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	Assessment assessment = assessmentResult.getAssessment();
 
-	AssessmentQuestionResult questionResult = null;
 	// get questionResult from DB instance of AssessmentResult
+	AssessmentQuestionResult questionResult = null;
 	for (AssessmentQuestionResult questionResultIter : assessmentResult.getQuestionResults()) {
 	    if (questionDto.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
 		questionResult = questionResultIter;
 	    }
 	}
 
-	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult
-	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate()) && questionResult == null) {
-	    //update questionDto
+	//if teacher modified question in monitor - update questionDto now
+	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())) {
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
 	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
 	    PropertyUtils.copyProperties(questionDto, updatedQuestionDto);
-	    return 0;
 	}
 
 	// store question answer values
@@ -708,7 +714,16 @@ public class AssessmentServiceImpl
 	if (assessment.isEnableConfidenceLevels()) {
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
 	}
-
+	
+	return questionResult;
+    }
+    
+    /**
+     *
+     * @return grade that user scored by answering that question
+     */
+    private void calculateAnswerMark(Long assessmentUid, Long userId, AssessmentQuestionResult questionResult,
+	    QuestionDTO questionDto) {
 	//calculate both mark and maxMark
 	float mark = 0;
 	float maxMark = questionDto.getGrade();
@@ -852,49 +867,127 @@ public class AssessmentServiceImpl
 		}
 	    }
 	}
+	    
+	//total mark can't be more than maxMark
+	if (mark > maxMark) {
+	    mark = maxMark;
 
-	// we start calculating and storing marks only in case it's not an autosave request
-	if (!isAutosave) {
-
-	    questionResult.setFinishDate(new Date());
-
-	    if (mark > maxMark) {
-		mark = maxMark;
-
-		// in case options have negative grades (<0), their total mark can't be less than -maxMark
-	    } else if (mark < -maxMark) {
-		mark = -maxMark;
-	    }
-
-	    // calculate penalty
-	    if (mark > 0) {
-		// calculate number of wrong answers
-		Long assessmentUid = assessmentResult.getAssessment().getUid();
-		Long userId = assessmentResult.getUser().getUserId();
-		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
-			userId, questionDto.getUid());
-
-		// calculate penalty itself
-		float penalty = questionDto.getPenaltyFactor() * numberWrongAnswers;
-		mark -= penalty;
-		if (penalty > maxMark) {
-		    penalty = maxMark;
-		}
-		questionResult.setPenalty(penalty);
-
-		// don't let penalty make mark less than 0
-		if (mark < 0) {
-		    mark = 0;
-		}
-	    }
-
-	    questionResult.setMark(mark);
-	    questionResult.setMaxMark(maxMark);
-	    // for displaying purposes in case of submitSingleMarkHedgingQuestion() Ajax call
-	    questionDto.setMark(mark);
+	// in case options have negative grades (<0), their total mark can't be less than -maxMark
+	} else if (mark < -maxMark) {
+	    mark = -maxMark;
 	}
 
-	return mark;
+	// calculate penalty
+	if (mark > 0) {
+	    // calculate number of wrong answers
+	    int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
+		    userId, questionDto.getUid());
+
+	    // calculate penalty itself
+	    float penalty = questionDto.getPenaltyFactor() * numberWrongAnswers;
+	    mark -= penalty;
+	    if (penalty > maxMark) {
+		penalty = maxMark;
+	    }
+	    questionResult.setPenalty(penalty);
+
+	    // don't let penalty make mark less than 0
+	    if (mark < 0) {
+		mark = 0;
+	    }
+	}
+
+	questionResult.setMark(mark);
+	questionResult.setMaxMark(maxMark);
+    }
+    
+    @Override
+    public void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos) {
+	//get the latest result (it can be unfinished one)
+	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
+	//if there is no results yet - no action required
+	if (lastResult == null) {
+	    return;
+	}
+
+	//get the latest finished result (required for mark hedging type of questions only)
+	AssessmentResult lastFinishedResult = null;
+	if (lastResult.getFinishDate() == null) {
+	    lastFinishedResult = getLastFinishedAssessmentResult(assessmentUid, userId);
+	}
+
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
+	    for (QuestionDTO questionDto : questionsForOnePage) {
+
+		//load last finished results for hedging type of questions (in order to prevent retry)
+		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
+		if ((questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)
+			&& (lastResult.getFinishDate() == null) && (lastFinishedResult != null)) {
+		    questionResults = lastFinishedResult.getQuestionResults();
+		}
+
+		for (AssessmentQuestionResult questionResult : questionResults) {
+		    if (questionDto.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
+			break;
+		    }
+		}
+	    }
+	}
+    }
+    
+    /**
+     * Loads up all information from questionResult into questionDto.
+     */
+    private void loadupQuestionResultIntoQuestionDto(QuestionDTO questionDto, AssessmentQuestionResult questionResult) {
+	questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
+	questionDto.setAnswerFloat(questionResult.getAnswerFloat());
+	questionDto.setAnswerString(questionResult.getAnswerString());
+	questionDto.setMark(questionResult.getMark());
+	questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
+	questionDto.setPenalty(questionResult.getPenalty());
+	questionDto.setConfidenceLevel(questionResult.getConfidenceLevel());
+
+	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+
+	    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
+		if (optionDto.getUid().equals(optionAnswer.getOptionUid())) {
+		    optionDto.setAnswerBoolean(optionAnswer.getAnswerBoolean());
+		    optionDto.setAnswerInt(optionAnswer.getAnswerInt());
+		    break;
+		}
+	    }
+	}
+
+	//sort ordering type of question in order to show how learner has sorted them
+	if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+
+	    //don't sort ordering type of questions that haven't been submitted to not break their shuffled order
+	    boolean isOptionAnswersNeverSubmitted = true;
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (optionDto.getAnswerInt() != 0) {
+		    isOptionAnswersNeverSubmitted = false;
+		}
+	    }
+
+	    if (!isOptionAnswersNeverSubmitted) {
+		TreeSet<OptionDTO> orderedSet = new TreeSet<>(new AnswerIntComparator());
+		orderedSet.addAll(questionDto.getOptionDtos());
+		questionDto.setOptionDtos(orderedSet);
+	    }
+	}
+
+	// set answerTotalGrade to let jsp know whether the question was answered correctly/partly/incorrectly even if mark=0
+	if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    float totalGrade = 0;
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (optionDto.getAnswerBoolean()) {
+		    totalGrade += optionDto.getGrade();
+		}
+	    }
+	    questionDto.setAnswerTotalGrade(totalGrade);
+	}
+
     }
 
     @Override
@@ -981,6 +1074,11 @@ public class AssessmentServiceImpl
     @Override
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
+    }
+    
+    @Override
+    public boolean isAssessmentAttempted(Long assessmentUid) {
+	return assessmentResultDao.isAssessmentAttempted(assessmentUid);
     }
 
     @Override
@@ -2075,25 +2173,30 @@ public class AssessmentServiceImpl
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void recalculateUserAnswers(final Long assessmentUid, final Long toolContentId,
 	    Set<AssessmentQuestion> oldQuestions, Set<AssessmentQuestion> newQuestions,
-	    List<AssessmentQuestion> deletedQuestions, Set<QuestionReference> oldReferences,
-	    Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences) {
+	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences) {
 
 	// create list of modified questions
 	List<AssessmentQuestion> modifiedQuestions = new ArrayList<>();
 	for (AssessmentQuestion oldQuestion : oldQuestions) {
+	    
+	    if (AssessmentConstants.QUESTION_TYPE_ESSAY == oldQuestion.getType()
+		    || AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS == oldQuestion.getType()) {
+		continue;
+	    }
 
 	    for (AssessmentQuestion newQuestion : newQuestions) {
 		if (oldQuestion.getUid().equals(newQuestion.getUid())) {
 
 		    boolean isQuestionModified = false;
 
-		    // title or question is different
-		    if (!oldQuestion.getTitle().equals(newQuestion.getTitle())
-			    || !oldQuestion.getQuestion().equals(newQuestion.getQuestion())
-			    || (oldQuestion.getCorrectAnswer() != newQuestion.getCorrectAnswer())) {
+		    // title or question is different - do nothing. Also question grade can't be changed
+		    
+		    //AssessmentConstants.QUESTION_TYPE_TRUE_FALSE
+		    if (oldQuestion.getCorrectAnswer() != newQuestion.getCorrectAnswer()) {
 			isQuestionModified = true;
 		    }
 
@@ -2104,20 +2207,24 @@ public class AssessmentServiceImpl
 			for (AssessmentQuestionOption newOption : newOptions) {
 			    if (oldOption.getUid().equals(newOption.getUid())) {
 
+				//ordering
 				if (((oldQuestion.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)
 					&& (oldOption.getSequenceId() != newOption.getSequenceId()))
-					|| !StringUtils.equals(oldOption.getQuestion(), newOption.getQuestion())
-					|| !StringUtils.equals(oldOption.getOptionString(), newOption.getOptionString())
+					//short answer
+					|| ((oldQuestion.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
+						&& !StringUtils.equals(oldOption.getOptionString(),
+							newOption.getOptionString()))
+					//numbering
 					|| (oldOption.getOptionFloat() != newOption.getOptionFloat())
 					|| (oldOption.getAcceptedError() != newOption.getAcceptedError())
-					|| (oldOption.getGrade() != newOption.getGrade())) {
+					//option grade
+					|| (oldOption.getGrade() != newOption.getGrade())
+					//changed correct option
+					|| (oldOption.isCorrect() != newOption.isCorrect())) {
 				    isQuestionModified = true;
 				}
 			    }
 			}
-		    }
-		    if (oldOptions.size() != newOptions.size()) {
-			isQuestionModified = true;
 		    }
 
 		    if (isQuestionModified) {
@@ -2127,7 +2234,7 @@ public class AssessmentServiceImpl
 	    }
 	}
 
-	// create list of modified references
+	// create list of references with modified grades.
 	// modifiedReferences holds pairs newReference -> oldReference.getDefaultGrade()
 	Map<QuestionReference, Integer> modifiedReferences = new HashMap<>();
 	for (QuestionReference oldReference : oldReferences) {
@@ -2136,23 +2243,6 @@ public class AssessmentServiceImpl
 			&& (oldReference.getDefaultGrade() != newReference.getDefaultGrade())) {
 		    modifiedReferences.put(newReference, oldReference.getDefaultGrade());
 		}
-	    }
-	}
-
-	// create list of added references
-	List<QuestionReference> addedReferences = new ArrayList<>();
-	for (QuestionReference newReference : newReferences) {
-	    boolean isNewReferenceMetInOldReferences = false;
-
-	    for (QuestionReference oldReference : oldReferences) {
-		if (oldReference.getUid().equals(newReference.getUid())) {
-		    isNewReferenceMetInOldReferences = true;
-		}
-	    }
-
-	    // if the new reference was not met in old references then it's the newly added reference
-	    if (!isNewReferenceMetInOldReferences) {
-		addedReferences.add(newReference);
 	    }
 	}
 
@@ -2179,146 +2269,98 @@ public class AssessmentServiceImpl
 
 		    float assessmentMark = assessmentResult.getGrade();
 		    int assessmentMaxMark = assessmentResult.getMaximumGrade();
+		    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
+		    
+		    // [+] if the question is modified
+		    for (AssessmentQuestionResult questionResult : questionResults) {
+			AssessmentQuestion question = questionResult.getAssessmentQuestion();
 
-		    Set<AssessmentQuestionResult> questionAnswers = assessmentResult.getQuestionResults();
-		    Iterator<AssessmentQuestionResult> iter = questionAnswers.iterator();
-		    while (iter.hasNext()) {
-			AssessmentQuestionResult questionAnswer = iter.next();
-			AssessmentQuestion question = questionAnswer.getAssessmentQuestion();
+			//check whether according question was modified
+			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
+			    if (question.getUid().equals(modifiedQuestion.getUid())) {
+				Float oldQuestionAnswerMark = questionResult.getMark();
 
-			boolean isRemoveQuestionResult = false;
-
-			// [+] if the question reference was removed
-			for (QuestionReference deletedReference : deletedReferences) {
-			    if (!deletedReference.isRandomQuestion()
-				    && question.getUid().equals(deletedReference.getQuestion().getUid())) {
-				isRemoveQuestionResult = true;
-				assessmentMaxMark -= deletedReference.getDefaultGrade();
+				//actually recalculate marks
+				QuestionDTO questionDto = question.getQuestionDTO();
+				questionDto.setGrade(questionResult.getMaxMark().intValue());
+				loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
+				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult, questionDto);
+				assessmentQuestionResultDao.saveObject(questionResult);
+				
+				float newQuestionAnswerMark = questionResult.getMark();
+				assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
 				break;
 			    }
 			}
-
-			// [+] if the question reference mark is modified
+		    }
+		    
+		    // [+] if the question reference mark is modified
+		    for (AssessmentQuestionResult questionResult:questionResults) {
+			Long questionUid = questionResult.getAssessmentQuestion().getUid();
+			
 			for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
 			    if (!modifiedReference.isRandomQuestion()
-				    && question.getUid().equals(modifiedReference.getQuestion().getUid())) {
+				    && questionUid.equals(modifiedReference.getQuestion().getUid())) {
 				int newReferenceGrade = modifiedReference.getDefaultGrade();
 				int oldReferenceGrade = modifiedReferences.get(modifiedReference);
 
 				// update question answer's mark
-				Float oldQuestionAnswerMark = questionAnswer.getMark();
+				Float oldQuestionAnswerMark = questionResult.getMark();
 				float newQuestionAnswerMark = (oldQuestionAnswerMark * newReferenceGrade)
 					/ oldReferenceGrade;
-				questionAnswer.setMark(newQuestionAnswerMark);
-				questionAnswer.setMaxMark((float) newReferenceGrade);
-				assessmentQuestionResultDao.saveObject(questionAnswer);
+				questionResult.setMark(newQuestionAnswerMark);
+				questionResult.setMaxMark((float) newReferenceGrade);
+				assessmentQuestionResultDao.saveObject(questionResult);
 
 				assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
 				assessmentMaxMark += newReferenceGrade - oldReferenceGrade;
 				break;
 			    }
-
 			}
-
-			// [+] if the question is modified
-			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
-			    if (question.getUid().equals(modifiedQuestion.getUid())) {
-				isRemoveQuestionResult = true;
-				break;
-			    }
-			}
-
-			// [+] if the question was removed
-			for (AssessmentQuestion deletedQuestion : deletedQuestions) {
-			    if (question.getUid().equals(deletedQuestion.getUid())) {
-				isRemoveQuestionResult = true;
-				break;
-			    }
-			}
-
-			if (isRemoveQuestionResult) {
-
-			    assessmentMark -= questionAnswer.getMark();
-			    iter.remove();
-			    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
-				    questionAnswer.getUid());
-			}
-
-			// [+] doing nothing if the new question was added
-
 		    }
 
-		    // find all question answers from random question reference
-		    ArrayList<AssessmentQuestionResult> nonRandomQuestionAnswers = new ArrayList<>();
-		    for (AssessmentQuestionResult questionAnswer : questionAnswers) {
+		    // find all question results from random question references
+		    ArrayList<AssessmentQuestionResult> nonRandomQuestionResults = new ArrayList<>();
+		    for (AssessmentQuestionResult questionResult : questionResults) {
 			for (QuestionReference reference : newReferences) {
-			    if (!reference.isRandomQuestion() && questionAnswer.getAssessmentQuestion().getUid()
+			    if (!reference.isRandomQuestion() && questionResult.getAssessmentQuestion().getUid()
 				    .equals(reference.getQuestion().getUid())) {
-				nonRandomQuestionAnswers.add(questionAnswer);
+				nonRandomQuestionResults.add(questionResult);
 			    }
 			}
 		    }
-		    Collection<AssessmentQuestionResult> randomQuestionAnswers = CollectionUtils
-			    .subtract(questionAnswers, nonRandomQuestionAnswers);
-
-		    // [+] if the question reference was removed (in case of random question references)
-		    for (QuestionReference deletedReference : deletedReferences) {
-
-			// in case of random question reference - search for the answer with the same maxmark
-			if (deletedReference.isRandomQuestion()) {
-
-			    Iterator<AssessmentQuestionResult> iter2 = randomQuestionAnswers.iterator();
-			    while (iter2.hasNext()) {
-				AssessmentQuestionResult randomQuestionAnswer = iter2.next();
-				if (randomQuestionAnswer.getMaxMark().intValue() == deletedReference
-					.getDefaultGrade()) {
-
-				    assessmentMark -= randomQuestionAnswer.getMark();
-				    assessmentMaxMark -= deletedReference.getDefaultGrade();
-				    iter2.remove();
-				    questionAnswers.remove(randomQuestionAnswer);
-				    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
-					    randomQuestionAnswer.getUid());
-				    break;
-				}
-			    }
-			}
-		    }
+		    Collection<AssessmentQuestionResult> randomQuestionResults = CollectionUtils
+			    .subtract(questionResults, nonRandomQuestionResults);
 
 		    // [+] if the question reference mark is modified (in case of random question references)
 		    for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
 
-			// in case of random question reference - search for the answer with the same maxmark
+			// in case of random question reference - search for the answer with the same maxmark (it does not matter to which random reference this question belong originally as the only thing that differentiate those references is defaultGrade)
 			if (modifiedReference.isRandomQuestion()) {
 
-			    for (AssessmentQuestionResult randomQuestionAnswer : randomQuestionAnswers) {
+			    for (AssessmentQuestionResult randomQuestionResult : randomQuestionResults) {
 				int newReferenceGrade = modifiedReference.getDefaultGrade();
 				int oldReferenceGrade = modifiedReferences.get(modifiedReference);
 
-				if (randomQuestionAnswer.getMaxMark().intValue() == oldReferenceGrade) {
+				if (randomQuestionResult.getMaxMark().intValue() == oldReferenceGrade) {
 
 				    // update question answer's mark
-				    Float oldQuestionAnswerMark = randomQuestionAnswer.getMark();
-				    float newQuestionAnswerMark = (oldQuestionAnswerMark * newReferenceGrade)
+				    Float oldQuestionResultMark = randomQuestionResult.getMark();
+				    float newQuestionResultMark = (oldQuestionResultMark * newReferenceGrade)
 					    / oldReferenceGrade;
-				    randomQuestionAnswer.setMark(newQuestionAnswerMark);
-				    randomQuestionAnswer.setMaxMark((float) newReferenceGrade);
-				    assessmentQuestionResultDao.saveObject(randomQuestionAnswer);
+				    randomQuestionResult.setMark(newQuestionResultMark);
+				    randomQuestionResult.setMaxMark((float) newReferenceGrade);
+				    assessmentQuestionResultDao.saveObject(randomQuestionResult);
 
-				    nonRandomQuestionAnswers.add(randomQuestionAnswer);
+				    nonRandomQuestionResults.add(randomQuestionResult);
 
-				    assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
+				    assessmentMark += newQuestionResultMark - oldQuestionResultMark;
 				    assessmentMaxMark += newReferenceGrade - oldReferenceGrade;
 				    break;
 				}
 			    }
 			}
 
-		    }
-
-		    // [+] if the new question reference was added
-		    for (QuestionReference addedReference : addedReferences) {
-			assessmentMaxMark += addedReference.getDefaultGrade();
 		    }
 
 		    // store new mark and maxMark if they were changed

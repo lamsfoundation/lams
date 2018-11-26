@@ -7,7 +7,6 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
-	<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
