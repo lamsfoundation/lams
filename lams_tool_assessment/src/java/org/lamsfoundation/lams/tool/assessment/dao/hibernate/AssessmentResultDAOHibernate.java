@@ -66,6 +66,9 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+    
+    private static final String IS_ASSESSMENT_RESULT_EXIST_BY_ASSESSMENT = "select COUNT(*) > 0 FROM "
+	    + AssessmentResult.class.getName() + " AS r WHERE r.assessment.uid=:assessmentUid";
 
     private static final String LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=:userId AND r.assessment.uid=:assessmentUid AND (r.finishDate != null) AND r.latest=1";
@@ -264,6 +267,13 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
+    }
+    
+    @Override
+    public boolean isAssessmentAttempted(Long assessmentUid) {
+	Query<Boolean> q = getSession().createQuery(IS_ASSESSMENT_RESULT_EXIST_BY_ASSESSMENT, Boolean.class);
+	q.setParameter("assessmentUid", assessmentUid);
+	return q.uniqueResult();
     }
 
     @Override

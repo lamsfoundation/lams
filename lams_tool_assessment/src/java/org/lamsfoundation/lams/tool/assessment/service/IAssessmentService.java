@@ -228,6 +228,10 @@ public interface IAssessmentService {
      * @param assessmentResult
      */
     void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);
+    
+    void storeSingleMarkHedgingQuestion(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
+	    Long singleMarkHedgingQuestionUid)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
     /**
      * Store user answers into DB. It can be autosave and non-autosave requests.
@@ -235,19 +239,15 @@ public interface IAssessmentService {
      * @param assessment
      * @param userId
      * @param pagedQuestions
-     * @param singleMarkHedgingQuestionUid
-     *            - if provided - means only that current single MarkHedging question needs to be stored
      * @param isAutosave
      *            indicates whether it's autosave request
      *
      * @return whether storing results is allowed, false otherwise
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
-	    Long singleMarkHedgingQuestionUid, boolean isAutosave)
-	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+    
+    void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
     /**
      * Return the latest result (it can be unfinished).
@@ -351,6 +351,11 @@ public interface IAssessmentService {
      * @return
      */
     int getAssessmentResultCount(Long assessmentUid, Long userId);
+    
+    /**
+     * Checks whether anyone has attempted this assessment.
+     */
+    boolean isAssessmentAttempted(Long assessmentUid);
 
     AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid);
 
@@ -525,8 +530,7 @@ public interface IAssessmentService {
      */
     void recalculateUserAnswers(final Long assessmentUid, final Long toolContentId,
 	    Set<AssessmentQuestion> oldQuestions, Set<AssessmentQuestion> newQuestions,
-	    List<AssessmentQuestion> deletedQuestions, Set<QuestionReference> oldReferences,
-	    Set<QuestionReference> newReferences, List<QuestionReference> deletedReferences);
+	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences);
 
     void releaseFromCache(Object object);
 
@@ -539,4 +543,5 @@ public interface IAssessmentService {
      * to refresh page because new data is available
      */
     void notifyLearnersOnAnswerDisclose(long toolContentId);
+
 }

@@ -88,6 +88,11 @@ public interface AssessmentResultDAO extends DAO {
     List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId);
 
     int getAssessmentResultCount(Long assessmentUid, Long userId);
+    
+    /**
+     * Checks whether anyone has attempted this assessment.
+     */
+    boolean isAssessmentAttempted(Long assessmentUid);
 
     AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
     

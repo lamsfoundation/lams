@@ -42,10 +42,13 @@
 		 			</c:if>
 				</td>			
 
-				<td width="30px">
-					<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
-						onclick="javascript:removeOption(${status.index})"></i>
-				</td>
+				<c:if test="${!isAuthoringRestricted}">
+					<td width="30px">
+						<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
+							onclick="javascript:removeOption(${status.index})"></i>
+					</td>
+				</c:if>
+				
 			</tr>
 		</c:forEach>
 	</table>

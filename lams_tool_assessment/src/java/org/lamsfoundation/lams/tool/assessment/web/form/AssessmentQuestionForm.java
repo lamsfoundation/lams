@@ -31,7 +31,7 @@ package org.lamsfoundation.lams.tool.assessment.web.form;
  */
 public class AssessmentQuestionForm {
 
-    private String questionIndex;
+    private int sequenceId;
     private String sessionMapID;
     private String contentFolderID;
 
@@ -101,12 +101,12 @@ public class AssessmentQuestionForm {
 	this.question = question;
     }
 
-    public String getQuestionIndex() {
-	return questionIndex;
+    public int getSequenceId() {
+	return sequenceId;
     }
 
-    public void setQuestionIndex(String questionIndex) {
-	this.questionIndex = questionIndex;
+    public void setSequenceId(int sequenceId) {
+	this.sequenceId = sequenceId;
     }
 
     public short getQuestionType() {

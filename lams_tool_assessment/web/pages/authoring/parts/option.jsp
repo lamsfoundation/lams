@@ -1,4 +1,5 @@
-<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">
+<input type="hidden" name="optionSequenceId${status.index}" value="${option.sequenceId}">
+<input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 
 <div class="form-group">			
 	<fmt:message key="label.authoring.basic.option.answer"/>&thinsp; ${status.index+1}

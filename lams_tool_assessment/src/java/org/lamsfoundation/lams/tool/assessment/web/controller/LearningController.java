@@ -58,7 +58,6 @@ import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
@@ -68,7 +67,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
-import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
@@ -353,8 +351,8 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 
-	// loadupLastAttempt for display purpose
-	loadupLastAttempt(sessionMap);
+	// loadupLastAttempt for displaying purposes
+	service.loadupLastAttempt(assessment.getUid(), user.getUserId(), pagedQuestionDtos);
 
 	if (showResults) {
 
@@ -509,13 +507,7 @@ public class LearningController {
 
 	// store results from sessionMap into DB
 	Long singleMarkHedgingQuestionUid = WebUtil.readLongParam(request, "singleMarkHedgingQuestionUid");
-	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos,
-		singleMarkHedgingQuestionUid, false);
-	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
-	// using 2 browsers). Then show last stored results
-	if (!isResultsStored) {
-	    //loadupLastAttempt(sessionMap);
-	}
+	service.storeSingleMarkHedgingQuestion(assessment, userId, pagedQuestionDtos, singleMarkHedgingQuestionUid);
 
 	//find according question in order to get its mark
 	QuestionDTO questionDto = null;
@@ -548,6 +540,7 @@ public class LearningController {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/submitAll")
     public String submitAll(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -573,7 +566,11 @@ public class LearningController {
 	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
 	// using 2 browsers). Then show last stored results
 	if (!isResultsStored) {
-	    loadupLastAttempt(sessionMap);
+	    List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		    .get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	    Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
+	    Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	    service.loadupLastAttempt(assessmentUid, userId, pagedQuestionDtos);
 	}
 
 	String redirectURL = "redirect:/learning/start.do";
@@ -1107,92 +1104,6 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadupLastAttempt(SessionMap<String, Object> sessionMap) {
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
-	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	//get the latest result (it can be unfinished one)
-	AssessmentResult lastResult = service.getLastAssessmentResult(assessmentUid, userId);
-	//if there is no results yet - no action required
-	if (lastResult == null) {
-	    return;
-	}
-
-	//get the latest finished result (required for mark hedging type of questions only)
-	AssessmentResult lastFinishedResult = null;
-	if (lastResult.getFinishDate() == null) {
-	    lastFinishedResult = service.getLastFinishedAssessmentResult(assessmentUid, userId);
-	}
-
-	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
-	    for (QuestionDTO questionDto : questionsForOnePage) {
-
-		//load last finished results for hedging type of questions (in order to prevent retry)
-		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
-		if ((questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)
-			&& (lastResult.getFinishDate() == null) && (lastFinishedResult != null)) {
-		    questionResults = lastFinishedResult.getQuestionResults();
-		}
-
-		for (AssessmentQuestionResult questionResult : questionResults) {
-		    if (questionDto.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-			questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
-			questionDto.setAnswerFloat(questionResult.getAnswerFloat());
-			questionDto.setAnswerString(questionResult.getAnswerString());
-			questionDto.setMark(questionResult.getMark());
-			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
-			questionDto.setPenalty(questionResult.getPenalty());
-			questionDto.setConfidenceLevel(questionResult.getConfidenceLevel());
-
-			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-
-			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-				if (optionDto.getUid().equals(optionAnswer.getOptionUid())) {
-				    optionDto.setAnswerBoolean(optionAnswer.getAnswerBoolean());
-				    optionDto.setAnswerInt(optionAnswer.getAnswerInt());
-				    break;
-				}
-			    }
-			}
-
-			//sort ordering type of question in order to show how learner has sorted them
-			if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-
-			    //don't sort ordering type of questions that haven't been submitted to not break their shuffled order
-			    boolean isOptionAnswersNeverSubmitted = true;
-			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				if (optionDto.getAnswerInt() != 0) {
-				    isOptionAnswersNeverSubmitted = false;
-				}
-			    }
-
-			    if (!isOptionAnswersNeverSubmitted) {
-				TreeSet<OptionDTO> orderedSet = new TreeSet<>(new AnswerIntComparator());
-				orderedSet.addAll(questionDto.getOptionDtos());
-				questionDto.setOptionDtos(orderedSet);
-			    }
-			}
-
-			// set answerTotalGrade to let jsp know whether the question was answered correctly/partly/incorrectly even if mark=0
-			if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-			    float totalGrade = 0;
-			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				if (optionDto.getAnswerBoolean()) {
-				    totalGrade += optionDto.getGrade();
-				}
-			    }
-			    questionDto.setAnswerTotalGrade(totalGrade);
-			}
-
-			break;
-		    }
-		}
-	    }
-	}
-    }
-
     /**
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
      */
@@ -1207,7 +1118,7 @@ public class LearningController {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 
-	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos, null, isAutosave);
+	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos, isAutosave);
 
 	// notify teachers
 	if ((mode != null) && !mode.isTeacher() && !isAutosave && isResultsStored

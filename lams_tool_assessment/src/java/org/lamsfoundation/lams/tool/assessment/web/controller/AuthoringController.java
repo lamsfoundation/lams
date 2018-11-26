@@ -69,6 +69,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
+import org.lamsfoundation.lams.tool.assessment.util.QTIUtil;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
@@ -114,8 +115,7 @@ public class AuthoringController {
     public String start(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm, HttpServletRequest request)
 	    throws ServletException {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	return showStartPage(assessmentForm, request);
+	return readDatabaseData(assessmentForm, request, mode);
     }
 
     @RequestMapping("/definelater")
@@ -131,14 +131,14 @@ public class AuthoringController {
 	//audit log the teacher has started editing activity in monitor
 	service.auditLogStartEditingActivityInMonitor(contentId);
 
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	return showStartPage(assessmentForm, request);
+	return readDatabaseData(assessmentForm, request, ToolAccessMode.TEACHER);
     }
 
     /**
      * Common method for "start" and "defineLater"
      */
-    private String showStartPage(AssessmentForm assessmentForm, HttpServletRequest request) throws ServletException {
+    private String readDatabaseData(AssessmentForm assessmentForm, HttpServletRequest request, ToolAccessMode mode)
+	    throws ServletException {
 	// save toolContentID into HTTPSession
 	Long contentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
@@ -189,6 +189,10 @@ public class AuthoringController {
 	// init available questions
 	reinitializeAvailableQuestions(sessionMap);
 
+	boolean isAssessmentAttempted = assessment.getUid() == null ? false
+		: service.isAssessmentAttempted(assessment.getUid());
+	sessionMap.put(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED, isAssessmentAttempted && mode.isTeacher());
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
 	return "pages/authoring/start";
     }
@@ -208,9 +212,6 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-
 	return "pages/authoring/authoring";
     }
 
@@ -225,7 +226,7 @@ public class AuthoringController {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(assessmentForm.getSessionMapID());
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = assessmentForm.getAssessment();
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
@@ -290,17 +291,17 @@ public class AuthoringController {
 	}
 	assessmentPO.setQuestions(newQuestions);
 
-	List<AssessmentQuestion> deletedQuestions = getDeletedQuestionList(sessionMap);
-	Set<QuestionReference> newReferences = updateQuestionReferencesGrades(request, sessionMap, true);
-	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
+	Set<QuestionReference> newReferences = updateQuestionReferencesGrades(request, sessionMap, true);	
 	
-	//recalculate results in case content is edited from monitoring
-	if (mode.isTeacher()) {
+	//recalculate results in case content is edited from monitoring and it's been already attempted by a student
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+	if (isAuthoringRestricted) {
 	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
-		    newQuestions, deletedQuestions, oldReferences, newReferences, deletedReferences);
+		    newQuestions, oldReferences, newReferences);
 	}
 
-	// delete References from database.
+	// delete References from database
+	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
 	Iterator<QuestionReference> iterRef = deletedReferences.iterator();
 	while (iterRef.hasNext()) {
 	    QuestionReference reference = iterRef.next();
@@ -310,7 +311,8 @@ public class AuthoringController {
 	    }
 	}
 
-	// delete Questions from database.
+	// delete Questions from database
+	List<AssessmentQuestion> deletedQuestions = getDeletedQuestionList(sessionMap);
 	Iterator<AssessmentQuestion> iter = deletedQuestions.iterator();
 	while (iter.hasNext()) {
 	    AssessmentQuestion question = iter.next();
@@ -334,7 +336,7 @@ public class AuthoringController {
 	assessmentForm.setAssessment(assessmentPO);
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return "pages/authoring/authoring";
     }
 
@@ -349,6 +351,7 @@ public class AuthoringController {
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	questionForm.setSessionMapID(sessionMapID);
+	questionForm.setSequenceId(-1);//which signifies it's a new question
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0");
@@ -390,22 +393,27 @@ public class AuthoringController {
 	    HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
+	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	int questionSequenceId = WebUtil.readIntParam(request, AssessmentConstants.PARAM_QUESTION_SEQUENCE_ID);
 	AssessmentQuestion question = null;
-	if (questionIdx != -1) {
-	    SortedSet<AssessmentQuestion> assessmentList = getQuestionList(sessionMap);
-	    List<AssessmentQuestion> rList = new ArrayList<>(assessmentList);
-	    question = rList.get(questionIdx);
-	    if (question != null) {
-		populateQuestionToForm(questionIdx, question, questionForm, request);
-		questionForm.setContentFolderID(contentFolderID);
+	for (AssessmentQuestion questionIter : questionList) {
+	    if (questionIter.getSequenceId() == questionSequenceId) {
+		question = questionIter;
+		break;
 	    }
 	}
+	if (question == null) {
+	    throw new RuntimeException("Question with sequenceId:" + questionSequenceId + " was not found!");
+	}
+	populateQuestionToForm(question, questionForm, request);
+
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, question.getType());
+	
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	questionForm.setContentFolderID(contentFolderID);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return findForward(question == null ? -1 : question.getType());
+	return findForward(question.getType());
     }
 
     /**
@@ -418,15 +426,25 @@ public class AuthoringController {
     @RequestMapping("/saveOrUpdateQuestion")
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
 	    HttpServletRequest request) {
-	extractFormToAssessmentQuestion(request, questionForm);
-
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(questionForm.getSessionMapID());
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	
+	// check whether it is "edit(old Question)" or "add(new Question)"
+	extractFormToAssessmentQuestion(request, questionList, questionForm, isAuthoringRestricted);
+
 	reinitializeAvailableQuestions(sessionMap);
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, questionForm.getSessionMapID());
-	return "pages/authoring/parts/questionlist";
+	
+	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options 
+	if (isAuthoringRestricted) {
+	    return "pages/authoring/parts/questionlistRestricted";    
+	} else {
+	    return "pages/authoring/parts/questionlist";
+	}
     }
 
     /**
@@ -438,255 +456,9 @@ public class AuthoringController {
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 
-	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
-	for (Question question : questions) {
-	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    int maxSeq = 0;
-	    if ((questionList != null) && (questionList.size() > 0)) {
-		AssessmentQuestion last = questionList.last();
-		maxSeq = last.getSequenceId() + 1;
-	    }
-	    assessmentQuestion.setSequenceId(maxSeq);
-	    assessmentQuestion.setTitle(question.getTitle());
-	    assessmentQuestion.setQuestion(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
-	    assessmentQuestion.setGeneralFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
-		    contentFolderID, question.getResourcesFolderPath()));
-	    assessmentQuestion.setPenaltyFactor(0);
-
-	    int questionGrade = 1;
-
-	    // options are different depending on the type
-	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
-		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())
-		    || Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType())) {
-		boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
-		boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
-
-		// setting answers is very similar in both types, so they were put together here
-		if (isMarkHedgingType) {
-		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MARK_HEDGING);
-
-		} else if (isMultipleChoice) {
-		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		    assessmentQuestion.setMultipleAnswersAllowed(false);
-		    assessmentQuestion.setShuffle(false);
-		    assessmentQuestion.setPrefixAnswersWithLetters(false);
-
-		} else {
-		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER);
-		    assessmentQuestion.setCaseSensitive(false);
-		}
-
-		String correctAnswer = null;
-		if (question.getAnswers() != null) {
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
-		    int orderId = 0;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
-			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
-			    continue;
-			}
-			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			assessmentAnswer.setOptionString(answerText);
-			assessmentAnswer.setSequenceId(orderId++);
-			assessmentAnswer.setFeedback(answer.getFeedback());
-
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full grade
-			    if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-				// 100% goes to the correct answer
-				assessmentAnswer.setGrade(1);
-				correctAnswer = answerText;
-			    } else {
-				log.warn("Choosing only first correct answer, despite another one was found: "
-					+ answerText);
-				assessmentAnswer.setGrade(0);
-			    }
-			} else {
-			    assessmentAnswer.setGrade(0);
-			}
-
-			optionList.add(assessmentAnswer);
-		    }
-
-		    assessmentQuestion.setOptions(optionList);
-		}
-
-		if (correctAnswer == null) {
-		    log.warn("No correct answer found for question: " + question.getText());
-		    continue;
-		}
-
-	    } else if (Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		assessmentQuestion.setMultipleAnswersAllowed(true);
-		assessmentQuestion.setShuffle(false);
-		assessmentQuestion.setPrefixAnswersWithLetters(false);
-
-		if (question.getAnswers() != null) {
-		    float totalScore = 0;
-		    for (Answer answer : question.getAnswers()) {
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // the question score information is stored as sum of answer scores
-			    totalScore += answer.getScore();
-			}
-		    }
-		    questionGrade = Double.valueOf(Math.round(totalScore)).intValue();
-
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
-		    int orderId = 1;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = answer.getText();
-			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			assessmentAnswer.setOptionString(answerText);
-			assessmentAnswer.setSequenceId(orderId++);
-			assessmentAnswer.setFeedback(answer.getFeedback());
-
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // set the factor of score for correct answers
-			    assessmentAnswer.setGrade(answer.getScore() / totalScore);
-			} else {
-			    assessmentAnswer.setGrade(0);
-			}
-
-			optionList.add(assessmentAnswer);
-		    }
-
-		    assessmentQuestion.setOptions(optionList);
-		}
-
-	    } else if (Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_TRUE_FALSE);
-
-		if (question.getAnswers() == null) {
-		    log.warn("Answers missing from true-false question: " + question.getText());
-		    continue;
-		} else {
-		    for (Answer answer : question.getAnswers()) {
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    assessmentQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
-			    questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-			}
-			if (!StringUtils.isBlank(answer.getFeedback())) {
-			    // set feedback for true/false answers
-			    if (Boolean.parseBoolean(answer.getText())) {
-				assessmentQuestion.setFeedbackOnCorrect(answer.getFeedback());
-			    } else {
-				assessmentQuestion.setFeedbackOnIncorrect(answer.getFeedback());
-			    }
-			}
-		    }
-		}
-	    } else if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
-		assessmentQuestion.setShuffle(true);
-
-		if (question.getAnswers() != null) {
-		    // the question score information is stored as sum of answer scores
-		    float totalScore = 0;
-		    for (Answer answer : question.getAnswers()) {
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    totalScore += answer.getScore();
-			}
-		    }
-		    questionGrade = Double.valueOf(Math.round(totalScore)).intValue();
-
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
-		    int orderId = 1;
-		    for (int answerIndex = 0; answerIndex < question.getAnswers().size(); answerIndex++) {
-			// QTI allows answers without a match, but LAMS assessment tool does not
-			Integer matchAnswerIndex = question.getMatchMap() == null ? null
-				: question.getMatchMap().get(answerIndex);
-			Answer matchAnswer = (matchAnswerIndex == null) || (question.getMatchAnswers() == null) ? null
-				: question.getMatchAnswers().get(matchAnswerIndex);
-			if (matchAnswer != null) {
-			    Answer answer = question.getAnswers().get(answerIndex);
-			    String answerText = answer.getText();
-			    AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			    assessmentAnswer.setQuestion(answerText);
-			    assessmentAnswer.setOptionString(matchAnswer.getText());
-			    assessmentAnswer.setSequenceId(orderId++);
-			    assessmentAnswer.setFeedback(answer.getFeedback());
-
-			    optionList.add(assessmentAnswer);
-			}
-		    }
-
-		    assessmentQuestion.setOptions(optionList);
-		}
-	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_ESSAY);
-		assessmentQuestion.setAllowRichEditor(false);
-
-	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		assessmentQuestion.setShuffle(false);
-		assessmentQuestion.setPrefixAnswersWithLetters(false);
-
-		String correctAnswer = null;
-		if (question.getAnswers() != null) {
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
-		    int orderId = 1;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
-			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
-			    continue;
-			}
-			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			assessmentAnswer.setOptionString(answerText);
-			assessmentAnswer.setSequenceId(orderId++);
-			assessmentAnswer.setFeedback(answer.getFeedback());
-
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full grade
-			    if (correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-				// 100% goes to the correct answer
-				assessmentAnswer.setGrade(1);
-				correctAnswer = answerText;
-			    } else {
-				log.warn("Choosing only first correct answer, despite another one was found: "
-					+ answerText);
-				assessmentAnswer.setGrade(0);
-			    }
-			} else {
-			    assessmentAnswer.setGrade(0);
-			}
-
-			optionList.add(assessmentAnswer);
-		    }
-
-		    assessmentQuestion.setOptions(optionList);
-		}
-
-		if (correctAnswer == null) {
-		    log.warn("No correct answer found for question: " + question.getText());
-		    continue;
-		}
-
-	    } else {
-		log.warn("Unknow QTI question type: " + question.getType());
-		continue;
-	    }
-
-	    assessmentQuestion.setDefaultGrade(questionGrade);
-
-	    questionList.add(assessmentQuestion);
-	    if (log.isDebugEnabled()) {
-		log.debug("Added question: " + assessmentQuestion.getTitle());
-	    }
-	}
+	QTIUtil.saveQTI(request, questionList, contentFolderID);
 
 	reinitializeAvailableQuestions(sessionMap);
-
 	return "pages/authoring/parts/questionlist";
     }
 
@@ -697,162 +469,9 @@ public class AuthoringController {
     public String exportQTI(HttpServletRequest request, HttpServletResponse response)
 	    throws UnsupportedEncodingException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	List<Question> questions = new LinkedList<>();
-	for (AssessmentQuestion assessmentQuestion : questionList) {
-	    Question question = new Question();
-	    List<Answer> answers = new ArrayList<>();
-
-	    switch (assessmentQuestion.getType()) {
-
-		case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-
-		    if (assessmentQuestion.isMultipleAnswersAllowed()) {
-			question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
-			int correctAnswerCount = 0;
-
-			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			    if (assessmentAnswer.getGrade() > 0) {
-				correctAnswerCount++;
-			    }
-			}
-
-			Float correctAnswerScore = correctAnswerCount > 0
-				? Integer.valueOf(100 / correctAnswerCount).floatValue()
-				: null;
-			int incorrectAnswerCount = assessmentQuestion.getOptions().size() - correctAnswerCount;
-			Float incorrectAnswerScore = incorrectAnswerCount > 0
-				? Integer.valueOf(-100 / incorrectAnswerCount).floatValue()
-				: null;
-
-			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getGrade() > 0;
-
-			    answer.setText(assessmentAnswer.getOptionString());
-			    answer.setScore(isCorrectAnswer ? correctAnswerScore : incorrectAnswerScore);
-			    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
-				    : assessmentQuestion.getFeedbackOnIncorrect());
-
-			    answers.add(assessmentAnswer.getSequenceId(), answer);
-			}
-
-		    } else {
-			question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-
-			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getGrade() == 1F;
-
-			    answer.setText(assessmentAnswer.getOptionString());
-			    answer.setScore(
-				    isCorrectAnswer ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue()
-					    : 0);
-			    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
-				    : assessmentQuestion.getFeedbackOnIncorrect());
-
-			    answers.add(assessmentAnswer.getSequenceId(), answer);
-			}
-		    }
-		    break;
-
-		case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		    question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
-
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			// only answer which has more than 0% is considered a correct one
-			if (assessmentAnswer.getGrade() > 0) {
-			    Answer answer = new Answer();
-			    answer.setText(assessmentAnswer.getOptionString());
-			    answer.setScore(Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue());
-
-			    answers.add(answer);
-			}
-		    }
-		    break;
-
-		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		    question.setType(Question.QUESTION_TYPE_TRUE_FALSE);
-		    boolean isTrueCorrect = assessmentQuestion.getCorrectAnswer();
-
-		    // true/false question is basically the same for QTI, just with special answers
-		    Answer trueAnswer = new Answer();
-		    trueAnswer.setText("True");
-		    trueAnswer.setScore(
-			    isTrueCorrect ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
-		    trueAnswer.setFeedback(isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect()
-			    : assessmentQuestion.getFeedbackOnIncorrect());
-		    answers.add(trueAnswer);
-
-		    Answer falseAnswer = new Answer();
-		    falseAnswer.setText("False");
-		    falseAnswer.setScore(
-			    !isTrueCorrect ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
-		    falseAnswer.setFeedback(!isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect()
-			    : assessmentQuestion.getFeedbackOnIncorrect());
-		    answers.add(falseAnswer);
-		    break;
-
-		case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		    question.setType(Question.QUESTION_TYPE_MATCHING);
-
-		    int answerIndex = 0;
-		    float score = assessmentQuestion.getDefaultGrade() / assessmentQuestion.getOptions().size();
-		    question.setMatchAnswers(new ArrayList<Answer>(assessmentQuestion.getOptions().size()));
-		    question.setMatchMap(new TreeMap<Integer, Integer>());
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			Answer answer = new Answer();
-
-			answer.setText(assessmentAnswer.getQuestion());
-			answer.setScore(score);
-			answer.setFeedback(assessmentAnswer.getFeedback());
-			answers.add(answer);
-
-			Answer matchingAnswer = new Answer();
-			matchingAnswer.setText(assessmentAnswer.getOptionString());
-			question.getMatchAnswers().add(matchingAnswer);
-			question.getMatchMap().put(answerIndex, answerIndex);
-			answerIndex++;
-		    }
-
-		    break;
-
-		case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		    // not much to do with essay
-		    question.setType(Question.QUESTION_TYPE_ESSAY);
-		    answers = null;
-		    break;
-
-		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-
-		    question.setType(Question.QUESTION_TYPE_MARK_HEDGING);
-
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			Answer answer = new Answer();
-			boolean isCorrectAnswer = assessmentAnswer.isCorrect();
-
-			answer.setText(assessmentAnswer.getOptionString());
-			answer.setScore(
-				isCorrectAnswer ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
-			answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
-				: assessmentQuestion.getFeedbackOnIncorrect());
-
-			answers.add(assessmentAnswer.getSequenceId(), answer);
-		    }
-		    break;
-
-		default:
-		    continue;
-	    }
-
-	    question.setTitle(assessmentQuestion.getTitle());
-	    question.setText(assessmentQuestion.getQuestion());
-	    question.setFeedback(assessmentQuestion.getGeneralFeedback());
-	    question.setAnswers(answers);
-
-	    questions.add(question);
-	}
+	
+	List<Question> questions = QTIUtil.exportQTI(questionList);
 
 	String title = request.getParameter("title");
 	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
@@ -870,47 +489,49 @@ public class AuthoringController {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
-	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
-	if (questionIdx != -1) {
-	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	    List<AssessmentQuestion> rList = new ArrayList<>(questionList);
-	    AssessmentQuestion question = rList.remove(questionIdx);
-	    questionList.clear();
-	    questionList.addAll(rList);
-	    // add to delList
-	    List<AssessmentQuestion> delList = getDeletedQuestionList(sessionMap);
-	    delList.add(question);
+	int deletedQuestionSequenceId = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_SEQUENCE_ID), -1);
+	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	Iterator<AssessmentQuestion> iterator = questionList.iterator();
+	AssessmentQuestion deletedQuestion = null;
+	while (iterator.hasNext()) {
+	    AssessmentQuestion questionIter = iterator.next();
+	    if (questionIter.getSequenceId() == deletedQuestionSequenceId) {
+		deletedQuestion = questionIter;
+		iterator.remove();
+	    }
+	}
+	
+	// add to delList
+	List<AssessmentQuestion> delList = getDeletedQuestionList(sessionMap);
+	delList.add(deletedQuestion);
 
-	    // remove according questionReference, if exists
-	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
-	    QuestionReference questionReferenceToDelete = null;
+	// remove according questionReference, if exists
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	QuestionReference questionReferenceToDelete = null;
+	for (QuestionReference questionReference : questionReferences) {
+	    if ((questionReference.getQuestion() != null)
+		    && (questionReference.getQuestion().getSequenceId() == deletedQuestionSequenceId)) {
+		questionReferenceToDelete = questionReference;
+	    }
+	}
+	// check if we need to delete random question reference
+	if ((questionReferenceToDelete == null) && (questionReferences.size() > questionList.size())) {
+	    // find the first random question
 	    for (QuestionReference questionReference : questionReferences) {
-		if ((questionReference.getQuestion() != null)
-			&& (questionReference.getQuestion().getSequenceId() == question.getSequenceId())) {
+		if (questionReference.isRandomQuestion()) {
 		    questionReferenceToDelete = questionReference;
+		    break;
 		}
 	    }
-	    // check if we need to delete random question reference
-	    if ((questionReferenceToDelete == null) && (questionReferences.size() > questionList.size())) {
-		// find the first random question
-		for (QuestionReference questionReference : questionReferences) {
-		    if (questionReference.isRandomQuestion()) {
-			questionReferenceToDelete = questionReference;
-			break;
-		    }
-		}
-	    }
-	    if (questionReferenceToDelete != null) {
-		questionReferences.remove(questionReferenceToDelete);
-		// add to delList
-		List<QuestionReference> delReferencesList = getDeletedQuestionReferences(sessionMap);
-		delReferencesList.add(questionReferenceToDelete);
-	    }
-
+	}
+	if (questionReferenceToDelete != null) {
+	    questionReferences.remove(questionReferenceToDelete);
+	    // add to delList
+	    List<QuestionReference> delReferencesList = getDeletedQuestionReferences(sessionMap);
+	    delReferencesList.add(questionReferenceToDelete);
 	}
 
 	reinitializeAvailableQuestions(sessionMap);
-
 	return "pages/authoring/parts/questionlist";
     }
 
@@ -1030,7 +651,13 @@ public class AuthoringController {
 	    references.addAll(rList);
 	}
 
-	return "pages/authoring/parts/questionlist";
+	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+	if (isAuthoringRestricted) {
+	    return "pages/authoring/parts/questionlistRestricted";    
+	} else {
+	    return "pages/authoring/parts/questionlist";
+	}
     }
 
     /**
@@ -1332,8 +959,6 @@ public class AuthoringController {
 
     /**
      * refreshes set of all available questions for adding to question list
-     *
-     * @param sessionMap
      */
     @SuppressWarnings("unchecked")
     private void reinitializeAvailableQuestions(SessionMap<String, Object> sessionMap) {
@@ -1352,9 +977,6 @@ public class AuthoringController {
 
     /**
      * List save current assessment questions.
-     *
-     * @param request
-     * @return
      */
     @SuppressWarnings("unchecked")
     private SortedSet<AssessmentQuestion> getQuestionList(SessionMap<String, Object> sessionMap) {
@@ -1383,7 +1005,6 @@ public class AuthoringController {
 
     /**
      * List save deleted assessment questions, which could be persisted or non-persisted questions.
-
      */
     @SuppressWarnings("unchecked")
     private List<AssessmentQuestion> getDeletedQuestionList(SessionMap<String, Object> sessionMap) {
@@ -1450,7 +1071,7 @@ public class AuthoringController {
     /**
      * This method will populate assessment question information to its form for edit use.
      */
-    private void populateQuestionToForm(int questionIdx, AssessmentQuestion question, AssessmentQuestionForm form,
+    private void populateQuestionToForm(AssessmentQuestion question, AssessmentQuestionForm form,
 	    HttpServletRequest request) {
 	form.setTitle(question.getTitle());
 	form.setQuestion(question.getQuestion());
@@ -1472,9 +1093,7 @@ public class AuthoringController {
 	form.setMaxWordsLimit(question.getMaxWordsLimit());
 	form.setMinWordsLimit(question.getMinWordsLimit());
 	form.setHedgingJustificationEnabled(question.isHedgingJustificationEnabled());
-	if (questionIdx >= 0) {
-	    form.setQuestionIndex(String.valueOf(questionIdx));
-	}
+	form.setSequenceId(question.getSequenceId());
 
 	short questionType = question.getType();
 	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
@@ -1494,24 +1113,18 @@ public class AuthoringController {
 
     /**
      * Extract web form content to assessment question.
+     * 
+     * BE CAREFUL: This method will copy necessary info from request form to an old or new AssessmentQuestion
+     * instance. It gets all info EXCEPT AssessmentQuestion.createDate, which need be set when
+     * persisting this assessment Question.
      */
-    @SuppressWarnings("unchecked")
-    private void extractFormToAssessmentQuestion(HttpServletRequest request, AssessmentQuestionForm questionForm) {
-	/*
-	 * BE CAREFUL: This method will copy nessary info from request form to an old or new AssessmentQuestion
-	 * instance. It
-	 * gets all info EXCEPT AssessmentQuestion.createDate, which need be set when
-	 * persisting
-	 * this assessment Question.
-	 */
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(questionForm.getSessionMapID());
-	// check whether it is "edit(old Question)" or "add(new Question)"
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	int questionIdx = NumberUtils.toInt(questionForm.getQuestionIndex(), -1);
-	AssessmentQuestion question = null;
+    private void extractFormToAssessmentQuestion(HttpServletRequest request, SortedSet<AssessmentQuestion> questionList,
+	    AssessmentQuestionForm questionForm, boolean isAuthoringRestricted) {
 
-	if (questionIdx == -1) { // add
+	//find according question
+	AssessmentQuestion question = null;
+	// add
+	if (questionForm.getSequenceId() == -1) { 
 	    question = new AssessmentQuestion();
 	    int maxSeq = 1;
 	    if ((questionList != null) && (questionList.size() > 0)) {
@@ -1520,17 +1133,26 @@ public class AuthoringController {
 	    }
 	    question.setSequenceId(maxSeq);
 	    questionList.add(question);
-	} else { // edit
-	    List<AssessmentQuestion> rList = new ArrayList<>(questionList);
-	    question = rList.get(questionIdx);
+	    
+	// edit
+	} else {
+	    for (AssessmentQuestion questionIter : questionList) {
+		if (questionIter.getSequenceId() == questionForm.getSequenceId()) {
+		    question = questionIter;
+		    break;
+		}
+	    }
 	}
+	
 	short type = questionForm.getQuestionType();
-	question.setType(questionForm.getQuestionType());
+	question.setType(type);
 
 	question.setTitle(questionForm.getTitle());
 	question.setQuestion(questionForm.getQuestion());
 
-	question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
+	if (!isAuthoringRestricted) {
+	    question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
+	}
 	question.setGeneralFeedback(questionForm.getGeneralFeedback());
 	question.setAnswerRequired(questionForm.isAnswerRequired());
 
@@ -1645,8 +1267,17 @@ public class AuthoringController {
 	int questionType = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE);
 	Integer correctOptionIndex = (paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT) == null) ? null
 		: NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT));
+	
 	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
+	    AssessmentQuestionOption option = new AssessmentQuestionOption();
+	    String uid = paramMap.get(AssessmentConstants.ATTR_OPTION_UID_PREFIX + i);
+	    if (uid != null) {
+		option.setUid(NumberUtils.toLong(uid));
+	    }
+	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+	    option.setSequenceId(NumberUtils.toInt(sequenceId));
+	    
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
 		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
@@ -1654,26 +1285,20 @@ public class AuthoringController {
 		    continue;
 		}
 
-		AssessmentQuestionOption option = new AssessmentQuestionOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
-		optionList.add(option);
+
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 		String question = paramMap.get(AssessmentConstants.ATTR_OPTION_QUESTION_PREFIX + i);
 		if ((question == null) && isForSaving) {
 		    continue;
 		}
 
-		AssessmentQuestionOption option = new AssessmentQuestionOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i));
 		option.setQuestion(question);
-		optionList.add(option);
+
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 		String optionFloatStr = paramMap.get(AssessmentConstants.ATTR_OPTION_FLOAT_PREFIX + i);
 		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
@@ -1683,9 +1308,6 @@ public class AuthoringController {
 		    continue;
 		}
 
-		AssessmentQuestionOption option = new AssessmentQuestionOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		try {
 		    float optionFloat = Float.valueOf(optionFloatStr);
 		    option.setOptionFloat(optionFloat);
@@ -1701,36 +1323,31 @@ public class AuthoringController {
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
-		optionList.add(option);
+
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
 		if ((optionString == null) && isForSaving) {
 		    continue;
 		}
 
-		AssessmentQuestionOption option = new AssessmentQuestionOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
 		//TODO check the following line is not required
-//		option.setAnswerInt(i);
-		optionList.add(option);
+		//option.setAnswerInt(i);
+		
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
 		if ((optionString == null) && isForSaving) {
 		    continue;
 		}
 
-		AssessmentQuestionOption option = new AssessmentQuestionOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
 		if ((correctOptionIndex != null) && correctOptionIndex.equals(Integer.valueOf(sequenceId))) {
 		    option.setCorrect(true);
 		}
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
-		optionList.add(option);
 	    }
+	    
+	    optionList.add(option);
 	}
 	return optionList;
     }

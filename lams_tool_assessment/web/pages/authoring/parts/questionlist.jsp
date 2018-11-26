@@ -1,8 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="availableQuestions" value="${sessionMap.availableQuestions}" />
 
@@ -140,9 +136,7 @@
 			<a onclick="javascript:exportQuestions();" class="btn btn-default btn-xs " id="exportButton">  
 				<fmt:message key="label.authoring.basic.export.questions" />
 			</a>
-		</div>	
-
-		
+		</div>
 	</div>
 
 	<table class="table table-condensed" id="questionTable">
@@ -191,13 +185,14 @@
 				
 				<td class="text-right">
 					<c:set var="editQuestionUrl" >
-						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
+						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionSequenceId=${question.sequenceId}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>
-					
 					<a href="${editQuestionUrl}" class="thickbox roffset5" style="margin-left: 20px;"> 
-						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i></a>
+						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
+					</a>
+						
 					<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
-						onclick="javascript:deleteQuestion(${status.index})"></i>
+						onclick="javascript:deleteQuestion(${question.sequenceId})"></i>
 				</td>
 			</tr>
 		</c:forEach>
