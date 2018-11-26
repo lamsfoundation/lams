@@ -102,10 +102,10 @@ public class CommonCartridge implements Cloneable {
     @OrderBy("create_date DESC")
     private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();;
 
-    @Column(name = "reflect_instructions")
+    @Column(name = "reflect_on_activity")
     private Boolean reflectOnActivity;
 
-    @Column(name = "reflect_on_activity")
+    @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
     // *************** NON Persist Fields ********************
