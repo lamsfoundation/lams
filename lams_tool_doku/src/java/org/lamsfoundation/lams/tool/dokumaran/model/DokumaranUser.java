@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,43 +55,43 @@ public class DokumaranUser implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "login_name")
     private String loginName;
-    
+
     @Column(name = "session_finished")
     private boolean sessionFinished;
-    
+
     @Column
     private boolean leader;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_uid")
     private DokumaranSession session;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dokumaran_uid")
     private Dokumaran dokumaran;
 
     // =============== NON Persisit value: for display use ===========
-    
+
     // the user access some reousrce item date time. Use in monitoring summary page
     @Transient
     private Date accessDate;
-    
+
     // dokumaran item complete date. Use in monitoring summary page
     @Transient
     private Date completeDate;
-    
+
     // difference between completeDate and accessDate
     @Transient
     private Date timeTaken;
@@ -223,13 +224,13 @@ public class DokumaranUser implements Cloneable {
 	this.sessionFinished = sessionFinished;
     }
 
-   public boolean isLeader() {
+    public boolean isLeader() {
 	return leader;
-   }
+    }
 
-   public void setLeader(boolean leader) {
+    public void setLeader(boolean leader) {
 	this.leader = leader;
-   }
+    }
 
     public Date getAccessDate() {
 	return accessDate;

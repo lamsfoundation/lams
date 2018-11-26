@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.model;
 
 import java.util.Date;
@@ -30,6 +29,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -72,8 +72,8 @@ public class MindmapSession implements java.io.Serializable {
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne 
-    @JoinColumn(name = "mindmap_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mindmap_uid")
     private Mindmap mindmap;
 
     @OneToMany(mappedBy = "mindmapSession")

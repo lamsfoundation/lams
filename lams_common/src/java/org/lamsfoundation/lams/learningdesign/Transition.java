@@ -31,6 +31,7 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -88,17 +89,17 @@ public class Transition implements Serializable {
     @Column(name = "create_date_time")
     private Date createDateTime;
 
-    @OneToOne(optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "to_activity_id")
     @Cascade(CascadeType.SAVE_UPDATE)
     Activity toActivity;
 
-    @OneToOne(optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "from_activity_id")
     @Cascade(CascadeType.SAVE_UPDATE)
     Activity fromActivity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "learning_design_id")
     @Cascade(CascadeType.SAVE_UPDATE)
     LearningDesign learningDesign;

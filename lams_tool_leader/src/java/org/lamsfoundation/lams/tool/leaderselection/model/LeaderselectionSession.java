@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -68,14 +69,14 @@ public class LeaderselectionSession implements java.io.Serializable {
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leaderselection_uid")
     private Leaderselection leaderselection;
 
     @OneToMany(mappedBy = "leaderselectionSession")
     private Set<LeaderselectionUser> users = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_leader_uid")
     private LeaderselectionUser groupLeader;
 

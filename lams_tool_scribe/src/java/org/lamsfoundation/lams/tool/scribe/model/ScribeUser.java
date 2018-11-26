@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.scribe.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -66,7 +67,7 @@ public class ScribeUser implements java.io.Serializable {
     @Column(name = "login_name")
     private String loginName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scribe_session_uid")
     private ScribeSession scribeSession;
 

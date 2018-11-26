@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -61,8 +62,8 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @Column
     private Integer displayOrder;
 
-    @ManyToOne 
-    @JoinColumn(name = "mc_que_content_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mc_que_content_id")
     private McQueContent mcQueContent;
 
     @Transient
@@ -168,6 +169,6 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     }
 
     public String formatPrefixLetter(int index) {
- 	return new String(Character.toChars(97 + index)) + ")";
-     }
+	return new String(Character.toChars(97 + index)) + ")";
+    }
 }

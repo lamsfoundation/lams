@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -52,28 +53,28 @@ public class ScratchieUser implements Cloneable, Comparable<ScratchieUser> {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "login_name")
     private String loginName;
-    
+
     @Column(name = "session_finished")
     private boolean sessionFinished;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_uid")
     private ScratchieSession session;
-    
+
     //******************** DTO **********************
-    
+
     @Transient
     private Long portraitId;
 

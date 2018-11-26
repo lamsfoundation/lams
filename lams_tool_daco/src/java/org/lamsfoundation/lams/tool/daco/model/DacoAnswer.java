@@ -26,6 +26,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -52,8 +53,8 @@ public class DacoAnswer implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @ManyToOne 
-    @JoinColumn(name = "user_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_uid")
     private DacoUser user;
 
     @Column(name = "record_id")
@@ -62,9 +63,9 @@ public class DacoAnswer implements Cloneable {
     @Column
     private String answer;
 
-    @ManyToOne 
-    @JoinColumn(name = "question_uid") 
-   private DacoQuestion question;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_uid")
+    private DacoQuestion question;
 
     @Column(name = "file_uuid")
     private Long fileUuid;

@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,12 +45,12 @@ public class MindmapNode implements Cloneable {
     @Column(name = "node_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long nodeId;
-    
+
     @Column(name = "unique_id")
     private Long uniqueId;
 
-    @ManyToOne 
-    @JoinColumn(name = "parent_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private MindmapNode parent;
 
     @Column(name = "node_text")
@@ -59,17 +59,17 @@ public class MindmapNode implements Cloneable {
     @Column(name = "node_color")
     private String color;
 
-    @ManyToOne 
-    @JoinColumn(name = "session_id") 
-     private MindmapSession session;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
+    private MindmapSession session;
 
-    @ManyToOne 
-    @JoinColumn(name = "user_id") 
-     private MindmapUser user;
-    
-    @ManyToOne 
-    @JoinColumn(name = "mindmap_id") 
-     private Mindmap mindmap;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private MindmapUser user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mindmap_id")
+    private Mindmap mindmap;
 
     /** default constructor */
     public MindmapNode() {

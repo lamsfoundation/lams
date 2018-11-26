@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
@@ -48,7 +49,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
     @Column(name = "activity_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id")
     @MapsId
     private ToolActivity activity;

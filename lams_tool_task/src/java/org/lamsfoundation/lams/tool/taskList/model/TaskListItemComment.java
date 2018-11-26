@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,14 +51,14 @@ public class TaskListItemComment implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column
     private String comment;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private TaskListUser createBy;
-    
+
     @Column(name = "create_date")
     private Date createDate;
 

@@ -21,12 +21,11 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.rating.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,20 +49,20 @@ public class Rating implements java.io.Serializable, Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @ManyToOne 
-    @JoinColumn(name = "rating_criteria_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rating_criteria_id")
     private RatingCriteria ratingCriteria;
 
     @Column(name = "item_id")
     private Long itemId;
 
-    @ManyToOne 
-    @JoinColumn(name = "user_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User learner;
 
     @Column
     private Float rating;
-    
+
     @Column(name = "tool_session_id")
     private Long toolSessionId;
 

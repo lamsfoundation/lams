@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.model;
 
 import java.util.Date;
@@ -30,6 +29,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
 public class WikiSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(WikiSession.class);
-     private static final long serialVersionUID = 7762187772612318324L;
+    private static final long serialVersionUID = 7762187772612318324L;
 
     @Id
     @Column
@@ -74,8 +74,8 @@ public class WikiSession implements java.io.Serializable {
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne 
-    @JoinColumn(name = "wiki_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wiki_uid")
     private Wiki wiki;
 
     @OneToMany(mappedBy = "wikiSession")
@@ -85,8 +85,8 @@ public class WikiSession implements java.io.Serializable {
     @OrderBy("uid ASC")
     private Set<WikiPage> wikiPages; // Need a runtime copy for each wikiPage
 
-    @ManyToOne 
-    @JoinColumn(name = "wiki_main_page_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wiki_main_page_uid")
     private WikiPage mainPage; //Need a runtime reference to the main page
 
     /** default constructor */

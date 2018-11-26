@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -107,14 +108,14 @@ public class Resource implements Cloneable {
     private String reflectInstructions;
 
     // general infomation
-    
+
     @Column(name = "create_date")
     private Date created;
 
     @Column(name = "update_date")
     private Date updated;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private ResourceUser createdBy;
@@ -150,7 +151,7 @@ public class Resource implements Cloneable {
 		item.setCreateBy(toContent.getCreatedBy());
 	    }
 	}
-	
+
 	// reset contentId
 	if (toContent.getRatingCriterias() != null) {
 	    Set<LearnerItemRatingCriteria> criterias = toContent.getRatingCriterias();
@@ -184,7 +185,7 @@ public class Resource implements Cloneable {
 	    if (createdBy != null) {
 		resource.setCreatedBy((ResourceUser) createdBy.clone());
 	    }
-	    
+
 	    // clone ratingCriterias as well
 	    if (ratingCriterias != null) {
 		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<>();
@@ -196,7 +197,6 @@ public class Resource implements Cloneable {
 		resource.ratingCriterias = newCriterias;
 	    }
 
-	    
 	} catch (CloneNotSupportedException e) {
 	    Resource.log.error("When clone " + Resource.class + " failed");
 	}
@@ -441,12 +441,12 @@ public class Resource implements Cloneable {
 	this.notifyTeachersOnFileUpload = notifyTeachersOnFileUpload;
     }
 
-   public Set<LearnerItemRatingCriteria> getRatingCriterias() {
+    public Set<LearnerItemRatingCriteria> getRatingCriterias() {
 	return ratingCriterias;
-   }
+    }
 
-   public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
+    public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.ratingCriterias = ratingCriterias;
-   }
+    }
 
 }

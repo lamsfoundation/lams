@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -66,8 +67,8 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
     private boolean responseFinalised;
 
     //please pay attention this columns is the *sessionUid* and not sessionId (this is due to Ozgur gave wrong name to this field)
-    @ManyToOne 
-    @JoinColumn(name = "mc_session_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mc_session_id")
     private McSession mcSession;
 
     @Column(name = "number_attempts")
@@ -148,8 +149,7 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).append("queUsrId", getQueUsrId())
 		.append("username", getUsername()).append("fullname", getFullname())
-		.append("responseFinalised", isResponseFinalised())
-		.append("numberOfAttempts", getNumberOfAttempts())
+		.append("responseFinalised", isResponseFinalised()).append("numberOfAttempts", getNumberOfAttempts())
 		.append("lastAttemptTotalMark", getLastAttemptTotalMark()).toString();
     }
 

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,28 +17,28 @@ import org.lamsfoundation.lams.usermanagement.User;
 @Entity
 @Table(name = "lams_policy_consent")
 public class PolicyConsent {
-    
+
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "date_agreed_on")
     private Date dateAgreedOn;
 
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_uid")
     private Policy policy;
-    
-    @ManyToOne 
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    
+
     /** default constructor */
     public PolicyConsent() {
 	dateAgreedOn = new Date(); // default value is set to when the object is created
     }
-    
+
     public Long getUid() {
 	return uid;
     }
@@ -45,7 +46,7 @@ public class PolicyConsent {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-    
+
     public Date getDateAgreedOn() {
 	return dateAgreedOn;
     }
@@ -62,7 +63,7 @@ public class PolicyConsent {
     public void setPolicy(Policy policy) {
 	this.policy = policy;
     }
-    
+
     public User getUser() {
 	return this.user;
     }

@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,26 +51,26 @@ public class TaskListSession {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column(name = "session_name")
     private String sessionName;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "taskList_uid")
     private TaskList taskList;
-    
+
     @Column(name = "session_start_date")
     private Date sessionStartDate;
-    
+
     @Column(name = "session_end_date")
     private Date sessionEndDate;
-    
+
     @Column
     private int status;
-    
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "session_uid")
     @OrderBy("create_date DESC")
@@ -139,7 +140,7 @@ public class TaskListSession {
     }
 
     /**
-     * 
+     *
      * @param sessionName
      *            The session name to set.
      */

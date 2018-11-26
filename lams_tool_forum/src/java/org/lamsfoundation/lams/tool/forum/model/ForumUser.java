@@ -21,14 +21,13 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.model;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -71,7 +70,7 @@ public class ForumUser implements Serializable, Cloneable {
     @Column(name = "session_finished")
     private boolean sessionFinished;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id")
     private ForumToolSession session;
 

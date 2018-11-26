@@ -21,12 +21,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.spreadsheet.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,11 +45,11 @@ public class UserModifiedSpreadsheet {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_modified_spreadsheet")
     private String userModifiedSpreadsheet;
-    
-    @ManyToOne(cascade = CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "mark_id")
     private SpreadsheetMark mark;
 

@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
@@ -39,8 +39,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 public class LessonRatingCriteria extends RatingCriteria implements Cloneable, Serializable {
 
     /** Holds value of property lessonId. */
-    @ManyToOne 
-    @JoinColumn(name = "lesson_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
     @Override

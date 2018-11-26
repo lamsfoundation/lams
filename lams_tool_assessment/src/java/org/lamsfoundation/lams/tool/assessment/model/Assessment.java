@@ -144,7 +144,7 @@ public class Assessment implements Cloneable {
     @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private AssessmentUser createdBy;

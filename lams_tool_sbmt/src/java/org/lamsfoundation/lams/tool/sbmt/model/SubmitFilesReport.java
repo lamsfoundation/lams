@@ -21,58 +21,38 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Parameter;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "tl_lasbmt11_report")
 public class SubmitFilesReport implements Serializable, Cloneable {
     private static final long serialVersionUID = -3415065437595925246L;
     private static Logger log = Logger.getLogger(SubmitFilesReport.class);
-    
+
     @Id
     @Column(name = "report_id")
     private Long reportID;
 
     @MapsId
-    @OneToOne(mappedBy = "report")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "report")
     @JoinColumn(name = "report_id")
     private SubmissionDetails details;
-
-    
-    
-//    @Id
-//    @GeneratedValue(generator="foreign")
-//    @GenericGenerator(name="foreign", strategy = "foreign", parameters={
-//        @Parameter(name="property", value="person")
-//    })
-//    @Column(name="report_id")
-    
-//    @Id
-//    @Column(name = "report_id")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    
 
     @Column
     private String comments;

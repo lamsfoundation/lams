@@ -29,6 +29,7 @@ import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -44,7 +45,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Spreadsheet user
- * 
+ *
  * @author Andrey Balan
  */
 @Entity
@@ -57,36 +58,36 @@ public class SpreadsheetUser implements Cloneable, Serializable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "login_name")
     private String loginName;
-    
+
     @Column(name = "session_finished")
     private boolean sessionFinished;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_uid")
     private SpreadsheetSession session;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spreadsheet_uid")
     private Spreadsheet spreadsheet;
-    
-    @ManyToOne(cascade = CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_modified_spreadsheet_uid")
     private UserModifiedSpreadsheet userModifiedSpreadsheet;
 
     //=============== NON Persisit value: for display use ===========
-    
+
     //the user access some reousrce item date time. Use in monitoring summary page
     @Transient
     private Date accessDate;
@@ -232,16 +233,11 @@ public class SpreadsheetUser implements Cloneable, Serializable {
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
     }
-    
+
     /** Username displayed in monitoring */
     public String getFullUsername() {
 	StringBuilder buf = new StringBuilder();
-	buf.append(getLastName())
-	   .append(" ")
-	   .append(getFirstName())
-	   .append(" (")
-	   .append(getLoginName())
-	   .append(")");
+	buf.append(getLastName()).append(" ").append(getFirstName()).append(" (").append(getLoginName()).append(")");
 	return buf.toString();
     }
 

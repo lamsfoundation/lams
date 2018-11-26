@@ -28,6 +28,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -120,7 +121,7 @@ public class WorkspaceFolderContent implements Serializable {
      * <code>WorkspaceFolder</code> that contains
      * this content
      **/
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_folder_id")
     private WorkspaceFolder workspaceFolder;
 

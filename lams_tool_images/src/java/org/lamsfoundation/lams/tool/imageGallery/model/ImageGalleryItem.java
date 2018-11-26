@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -72,7 +73,7 @@ public class ImageGalleryItem implements Cloneable {
     @Column(name = "create_date")
     private Date createDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private ImageGalleryUser createBy;
 
@@ -132,7 +133,7 @@ public class ImageGalleryItem implements Cloneable {
 
 	return image;
     }
-    
+
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", uid).append(" title", title).toString();

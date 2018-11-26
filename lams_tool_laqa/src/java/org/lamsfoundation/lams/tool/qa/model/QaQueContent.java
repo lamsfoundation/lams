@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -74,7 +75,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     @Column(name = "min_words_limit")
     private int minWordsLimit;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
 

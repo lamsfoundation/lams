@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,7 +37,7 @@ import javax.persistence.Table;
 
 /**
  * Spreadsheet session
- * 
+ *
  * @author Andrey Balan
  */
 @Entity
@@ -47,23 +48,23 @@ public class SpreadsheetSession {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column(name = "session_name")
     private String sessionName;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spreadsheet_uid")
     private Spreadsheet spreadsheet;
-    
+
     @Column(name = "session_start_date")
     private Date sessionStartDate;
-    
+
     @Column(name = "session_end_date")
     private Date sessionEndDate;
-    
+
     //finish or not
     @Column
     private int status;

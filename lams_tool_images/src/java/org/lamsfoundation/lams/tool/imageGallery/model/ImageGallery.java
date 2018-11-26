@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -84,7 +85,7 @@ public class ImageGallery implements Serializable, Cloneable {
 
     @Column(name = "define_later")
     private boolean defineLater;
-    
+
     @Column(name = "content_in_use")
     private boolean contentInUse;
 
@@ -96,7 +97,7 @@ public class ImageGallery implements Serializable, Cloneable {
 
     @Column(name = "minimum_rates")
     private int minimumRates;
-    
+
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
     @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
@@ -112,14 +113,14 @@ public class ImageGallery implements Serializable, Cloneable {
     private boolean notifyTeachersOnImageSumbit;
 
     // general information
-    
+
     @Column(name = "create_date")
     private Date created;
 
     @Column(name = "update_date")
     private Date updated;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private ImageGalleryUser createdBy;

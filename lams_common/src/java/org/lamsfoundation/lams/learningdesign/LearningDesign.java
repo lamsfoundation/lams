@@ -35,6 +35,7 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -84,11 +85,11 @@ public class LearningDesign implements Serializable {
     @Column
     private String title;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "first_activity_id")
     private Activity firstActivity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "floating_activity_id")
     private FloatingActivity floatingActivity;
 
@@ -111,7 +112,7 @@ public class LearningDesign implements Serializable {
     @Column(name = "edit_override_lock")
     private Boolean editOverrideLock;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "edit_override_user_id")
     private User editOverrideUser;
 
@@ -130,15 +131,15 @@ public class LearningDesign implements Serializable {
     @Column
     private String version;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "original_user_id")
     private User originalUser;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "original_learning_design_id")
     private LearningDesign originalLearningDesign;
 
@@ -158,7 +159,7 @@ public class LearningDesign implements Serializable {
     @OneToMany(mappedBy = "learningDesignId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<LearningDesignAnnotation> annotations = new HashSet<LearningDesignAnnotation>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_folder_id")
     private WorkspaceFolder workspaceFolder;
 
@@ -171,7 +172,7 @@ public class LearningDesign implements Serializable {
     @Column(name = "license_text")
     private String licenseText;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "license_id")
     private License license;
 

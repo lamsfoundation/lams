@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.wiki.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,12 +48,12 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 @Table(name = "tl_lawiki10_user")
 public class WikiUser implements java.io.Serializable {
 
-     private static final long serialVersionUID = -534126658843778423L;
+    private static final long serialVersionUID = -534126658843778423L;
 
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     private Long uid;
+    private Long uid;
 
     @Column(name = "user_id")
     private Long userId;
@@ -67,8 +67,8 @@ public class WikiUser implements java.io.Serializable {
     @Column(name = "login_name")
     private String loginName;
 
-    @ManyToOne 
-    @JoinColumn(name = "wiki_session_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wiki_session_uid")
     private WikiSession wikiSession;
 
     @Column

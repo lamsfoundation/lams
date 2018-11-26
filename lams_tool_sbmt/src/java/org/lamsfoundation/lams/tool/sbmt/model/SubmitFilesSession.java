@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
@@ -32,6 +31,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -61,7 +61,7 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 
     @Column
     private Integer status;
-    
+
     @Column(name = "marks_released")
     private boolean marksReleased;
 
@@ -69,14 +69,14 @@ public class SubmitFilesSession implements Serializable, Cloneable {
     private Set<SubmissionDetails> submissionDetails = new HashSet<>();
 
     /** persistent field, but not cloned to avoid to clone block */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id")
     private SubmitFilesContent content;
-    
-    @ManyToOne(cascade = CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "group_leader_uid")
     private SubmitUser groupLeader;
-    
+
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("sessionID", getSessionID()).append("status", getStatus()).toString();
@@ -143,7 +143,6 @@ public class SubmitFilesSession implements Serializable, Cloneable {
 	this.status = status;
     }
 
-
     /**
      * @return Returns the submissionDetails.
      */
@@ -188,15 +187,15 @@ public class SubmitFilesSession implements Serializable, Cloneable {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-    
+
     public SubmitUser getGroupLeader() {
-   	return groupLeader;
+	return groupLeader;
     }
 
     public void setGroupLeader(SubmitUser groupLeader) {
-   	this.groupLeader = groupLeader;
+	this.groupLeader = groupLeader;
     }
-    
+
     public boolean isMarksReleased() {
 	return marksReleased;
     }

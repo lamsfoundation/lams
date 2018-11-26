@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,7 +38,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wiki_uid")
     private Wiki parentWiki;
 
@@ -55,15 +56,15 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     @OrderBy("uid ASC")
     private Set<WikiPageContent> wikiContentVersions;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wiki_current_content")
     private WikiPageContent currentWikiContent;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wiki_session_uid")
     private WikiSession wikiSession;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "added_by")
     private WikiUser addedBy;
 

@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -75,7 +76,7 @@ public class ScribeSession implements java.io.Serializable {
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scribe_uid")
     private Scribe scribe;
 
@@ -86,7 +87,7 @@ public class ScribeSession implements java.io.Serializable {
     @JoinColumn(name = "scribe_session_uid")
     private Set<ScribeReportEntry> scribeReportEntries;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointed_scribe_uid")
     private ScribeUser appointedScribe;
 

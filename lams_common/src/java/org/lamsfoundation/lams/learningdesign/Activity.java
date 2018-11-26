@@ -38,6 +38,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -175,7 +176,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     private String libraryActivityUiImage;
 
     /** The LearningLibrary of which this activity is a part */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "learning_library_id")
     private LearningLibrary learningLibrary;
 
@@ -183,24 +184,24 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * The activity that acts as a container/parent for this activity. Normally would be one of the complex activities
      * which have child activities defined inside them.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_activity_id")
     private Activity parentActivity;
 
     /**
      * Single Library can have one or more activities defined inside it. This field indicates which activity is this.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_activity_id")
     private Activity libraryActivity;
 
     /** The LearningDesign to which this activity belongs */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "learning_design_id")
     private LearningDesign learningDesign;
 
     /** The Grouping that applies to this activity */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grouping_id")
     private Grouping grouping;
 
@@ -216,11 +217,11 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     @Column(name = "activity_category_id")
     private Integer activityCategoryID;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transition_to_id")
     private Transition transitionTo;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transition_from_id")
     private Transition transitionFrom;
 

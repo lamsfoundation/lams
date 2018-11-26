@@ -56,7 +56,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
     private Integer createGroupingUIID;
 
     /** The grouping that this activity creates */
-    @OneToOne(optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "create_grouping_id")
     public Grouping createGrouping;
 

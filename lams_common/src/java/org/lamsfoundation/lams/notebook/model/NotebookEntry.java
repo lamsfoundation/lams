@@ -21,14 +21,13 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.notebook.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,9 +47,9 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = 653296132134948803L;
 
-    @Id 
-    @Column 
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
     @Column(name = "external_id")
@@ -62,14 +61,14 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
     @Column(name = "external_signature")
     private String externalSignature;
 
-    @ManyToOne 
-    @JoinColumn(name = "user_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column 
+    @Column
     private String title;
 
-    @Column 
+    @Column
     private String entry;
 
     @Column(name = "create_date")

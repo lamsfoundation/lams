@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.comments;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,16 +62,16 @@ public class Comment implements Cloneable {
 
     @Column(name = "create_date")
     private Date created;
-    
-    @ManyToOne 
-    @JoinColumn(name = "create_by") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "create_by")
     private User createdBy;
 
     @Column(name = "update_date")
     private Date updated;
 
-    @ManyToOne 
-    @JoinColumn(name = "update_by") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "update_by")
     private User updatedBy;
 
     @Column(name = "last_reply_date")
@@ -92,23 +92,23 @@ public class Comment implements Cloneable {
     @Column
     private boolean anonymous;
 
-    @ManyToOne 
-    @JoinColumn(name = "root_comment_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "root_comment_uid")
     private Comment rootComment;
-    
-    @ManyToOne 
-    @JoinColumn(name = "thread_comment_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "thread_comment_uid")
     private Comment threadComment;
 
     @Column(name = "comment_level")
     private short commentLevel;
 
-    @ManyToOne 
-    @JoinColumn(name = "parent_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_uid")
     private Comment parent;
 
-    @ManyToOne 
-    @JoinColumn(name = "session_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
     private CommentSession session;
 
     /** Read only fields - calculated when loaded from the database */

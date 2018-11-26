@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -68,13 +69,13 @@ public class Dokumaran implements Cloneable {
 
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
-    
+
     @Column(name = "allow_multiple_leaders")
     private boolean allowMultipleLeaders;
-    
+
     @Column(name = "time_limit")
     private int timeLimit;
-    
+
     //date when teacher has started time counter (pressed start button)
     @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
@@ -84,7 +85,7 @@ public class Dokumaran implements Cloneable {
 
     @Column(name = "show_line_numbers")
     private boolean showLineNumbers;
-    
+
     @Column(name = "shared_pad_id")
     private String sharedPadId;
 
@@ -104,14 +105,14 @@ public class Dokumaran implements Cloneable {
     private String reflectInstructions;
 
     // general information
-    
+
     @Column(name = "create_date")
     private Date created;
 
     @Column(name = "update_date")
     private Date updated;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private DokumaranUser createdBy;
@@ -309,7 +310,7 @@ public class Dokumaran implements Cloneable {
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
     }
-    
+
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
@@ -324,17 +325,17 @@ public class Dokumaran implements Cloneable {
     public void setTimeLimit(int timeLimit) {
 	this.timeLimit = timeLimit;
     }
-    
-    /**
-    * @return date when teacher has started time counter (pressed start button)
-    */
-   public Date getTimeLimitLaunchedDate() {
-	return timeLimitLaunchedDate;
-   }
 
-   public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
+    /**
+     * @return date when teacher has started time counter (pressed start button)
+     */
+    public Date getTimeLimitLaunchedDate() {
+	return timeLimitLaunchedDate;
+    }
+
+    public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
-   }
+    }
 
     public boolean isShowChat() {
 	return showChat;
@@ -352,17 +353,17 @@ public class Dokumaran implements Cloneable {
 	this.showLineNumbers = showLineNumbers;
     }
 
-   public String getSharedPadId() {
+    public String getSharedPadId() {
 	return sharedPadId;
-   }
+    }
 
-   public void setSharedPadId(String sharedPadId) {
+    public void setSharedPadId(String sharedPadId) {
 	this.sharedPadId = sharedPadId;
-   }
-   
-   public boolean isSharedPadEnabled() {
-       return StringUtils.isNotEmpty(sharedPadId);
-   }
+    }
+
+    public boolean isSharedPadEnabled() {
+	return StringUtils.isNotEmpty(sharedPadId);
+    }
 
     public boolean isUseSelectLeaderToolOuput() {
 	return useSelectLeaderToolOuput;
@@ -372,13 +373,13 @@ public class Dokumaran implements Cloneable {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
-   public boolean isAllowMultipleLeaders() {
+    public boolean isAllowMultipleLeaders() {
 	return allowMultipleLeaders;
-   }
+    }
 
-   public void setAllowMultipleLeaders(boolean allowMultipleLeaders) {
+    public void setAllowMultipleLeaders(boolean allowMultipleLeaders) {
 	this.allowMultipleLeaders = allowMultipleLeaders;
-   }
+    }
 
     public String getReflectInstructions() {
 	return reflectInstructions;

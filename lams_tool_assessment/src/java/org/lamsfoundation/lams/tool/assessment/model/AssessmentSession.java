@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -52,40 +53,40 @@ public class AssessmentSession {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assessment_uid")
     private Assessment assessment;
-    
+
     @Column(name = "session_start_date")
     private Date sessionStartDate;
-    
+
     @Column(name = "session_end_date")
     private Date sessionEndDate;
-    
+
     // finish or not
     @Column
     private int status;
-    
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "session_uid")
     @OrderBy("last_name ASC")
     private Set<AssessmentUser> assessmentUsers = new HashSet<>();
-    
-    @ManyToOne(cascade = CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "group_leader_uid")
     private AssessmentUser groupLeader;
 
     // **********************************************************
     // Get/Set methods
     // **********************************************************
-    
+
     public Long getUid() {
 	return uid;
     }

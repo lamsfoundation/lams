@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,24 +48,24 @@ public class ResourceItemVisitLog {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uid")
     private ResourceUser user;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resource_item_uid")
     private ResourceItem resourceItem;
-    
+
     @Column
     private boolean complete;
-    
+
     @Column(name = "complete_date")
     private Date completeDate;
-    
+
     @Column(name = "access_date")
     private Date accessDate;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
 

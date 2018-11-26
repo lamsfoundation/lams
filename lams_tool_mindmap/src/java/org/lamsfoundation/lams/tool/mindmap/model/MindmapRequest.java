@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,7 +47,7 @@ public class MindmapRequest implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "unique_id")
     private Long uniqueId;
 
@@ -62,13 +62,13 @@ public class MindmapRequest implements Cloneable {
 
     @Column(name = "node_child_id")
     private Long nodeChildId;
-    
-    @ManyToOne()
-    @JoinColumn(name = "user_id") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private MindmapUser user;
-    
-    @ManyToOne()
-    @JoinColumn(name = "mindmap_id") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mindmap_id")
     private Mindmap mindmap;
 
     /** default constructor */
@@ -148,8 +148,7 @@ public class MindmapRequest implements Cloneable {
     public void setMindmap(Mindmap mindmap) {
 	this.mindmap = mindmap;
     }
-    
-    
+
     @Override
     public String toString() {
 	return "MindmapRequest [uid=" + uid + ", uniqueId=" + uniqueId + ", globalId=" + globalId + ", type=" + type

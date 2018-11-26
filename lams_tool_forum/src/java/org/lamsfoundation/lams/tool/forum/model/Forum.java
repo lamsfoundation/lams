@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.model;
 
 import java.util.Date;
@@ -59,11 +58,11 @@ public class Forum implements Cloneable {
 
     private static final Logger log = Logger.getLogger(Forum.class);
 
-    @Id 
-    @Column 
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    private Long uid; 
- 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long uid;
+
     // tool contentID
     @Column(name = "content_id")
     private Long contentId;
@@ -119,15 +118,19 @@ public class Forum implements Cloneable {
     @Column(name = "update_date")
     private Date updated;
 
-    /* TODO: I don't think this is going to work as the create_by column is in this table and hibernate will expect it in the user table.
+    /*
+     * TODO: I don't think this is going to work as the create_by column is in this table and hibernate will expect it
+     * in the user table.
      * Probably need to revert to a hacked many - to - one
-     * @ManyToOne 
-    * @JoinColumn(name = "create_by") 
+     * 
+     * @ManyToOne(fetch = FetchType.LAZY)
+     * 
+     * @JoinColumn(name = "create_by")
      */
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "create_by")
     private ForumUser createdBy;
-    
+
     // TODO why doesn't this have cascades. Why do we remove the messages manually?
     @OneToMany(mappedBy = "forum")
     @OrderBy("created DESC")

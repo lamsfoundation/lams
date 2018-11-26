@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -127,7 +128,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     @OrderBy("uid ASC")
     private Set<WikiPage> wikiPages;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wiki_main_page_uid")
     private WikiPage mainPage;
 

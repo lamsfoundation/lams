@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -105,7 +106,7 @@ public class Survey implements Cloneable {
     @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private SurveyUser createdBy;

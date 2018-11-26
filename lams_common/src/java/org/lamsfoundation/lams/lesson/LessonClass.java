@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
@@ -55,11 +56,11 @@ public class LessonClass extends Grouping {
 
     private static Logger log = Logger.getLogger(LessonClass.class);
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_group_id")
     private Group staffGroup;
 
-    @OneToOne(mappedBy = "lessonClass")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "lessonClass")
     private Lesson lesson;
 
     /** Creates a new instance of LessonClass */

@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -78,12 +79,12 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
     @Column
     private boolean learnerFinished;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_session_id")
     private QaSession qaSession;
 
     @OneToMany(mappedBy = "qaQueUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<QaUsrResp>qaUsrResps;
+    private Set<QaUsrResp> qaUsrResps;
 
     public QaQueUsr() {
 	this.qaUsrResps = new TreeSet<QaUsrResp>();

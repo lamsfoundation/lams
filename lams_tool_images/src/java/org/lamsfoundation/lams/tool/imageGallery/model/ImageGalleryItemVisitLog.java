@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,21 +48,21 @@ public class ImageGalleryItemVisitLog {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uid")
     private ImageGalleryUser user;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imageGallery_item_uid")
     private ImageGalleryItem imageGalleryItem;
-    
+
     @Column
     private boolean complete;
-    
+
     @Column(name = "access_date")
     private Date accessDate;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
 

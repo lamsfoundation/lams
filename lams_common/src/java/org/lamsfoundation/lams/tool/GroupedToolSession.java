@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
@@ -48,7 +49,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class GroupedToolSession extends ToolSession {
     private static final long serialVersionUID = 8638128083435243375L;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group sessionGroup;
 

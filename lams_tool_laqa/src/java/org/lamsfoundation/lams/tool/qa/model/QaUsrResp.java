@@ -28,6 +28,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -58,26 +59,26 @@ public class QaUsrResp implements Serializable, Comparable {
     @Id
     @Column(name = "response_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long responseId;
+    private Long responseId;
 
     @Column
     private String answer;
 
     @Column(name = "answer_autosaved")
-     private String answerAutosaved;
+    private String answerAutosaved;
 
     @Column(name = "attempt_time")
     private Date attemptTime;
 
-    @ManyToOne 
-    @JoinColumn(name = "qa_que_content_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "qa_que_content_id")
     private QaQueContent qaQuestion;
 
     @Column
     private boolean visible;
 
-    @ManyToOne 
-    @JoinColumn(name = "que_usr_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "que_usr_id")
     private QaQueUsr qaQueUser;
 
     @Column(name = "time_zone")

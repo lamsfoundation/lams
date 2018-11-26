@@ -51,11 +51,11 @@ public class Kumalive implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long kumaliveId;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 

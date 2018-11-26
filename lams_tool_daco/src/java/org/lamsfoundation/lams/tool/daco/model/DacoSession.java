@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -58,15 +59,15 @@ public class DacoSession {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
 
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne 
-    @JoinColumn(name = "content_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "content_uid")
     private Daco daco;
 
     @Column(name = "session_start_date")
@@ -74,7 +75,7 @@ public class DacoSession {
 
     @Column(name = "session_end_date")
     private Date sessionEndDate;
-    
+
     // finish or not
     @Column
     private int status;
@@ -84,7 +85,7 @@ public class DacoSession {
     @OrderBy("createDate")
     private Set<DacoQuestion> dacoQuestions;
 
-     public Long getUid() {
+    public Long getUid() {
 	return uid;
     }
 

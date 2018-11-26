@@ -90,11 +90,11 @@ public class DacoQuestion implements Cloneable {
     @Column(name = "create_date")
     private Date createDate;
     
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "create_by") 
     private DacoUser createBy;
 
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "content_uid") 
     private Daco daco;
 

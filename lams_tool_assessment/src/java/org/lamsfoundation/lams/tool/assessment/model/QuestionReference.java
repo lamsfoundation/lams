@@ -20,11 +20,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -64,7 +64,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     @Column(name = "random_question")
     private boolean randomQuestion;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_uid")
     private AssessmentQuestion question;
 

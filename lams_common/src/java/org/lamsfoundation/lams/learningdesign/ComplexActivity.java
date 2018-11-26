@@ -59,7 +59,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     @SortComparator(ActivityOrderComparator.class)
     private Set<Activity> activities = new TreeSet<Activity>(new ActivityOrderComparator());
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "default_activity_id")
     protected Activity defaultActivity;
 

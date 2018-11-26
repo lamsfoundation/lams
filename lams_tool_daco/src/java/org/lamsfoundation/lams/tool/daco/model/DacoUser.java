@@ -79,11 +79,11 @@ public class DacoUser implements Cloneable {
     @Column(name = "session_finished")
     private boolean sessionFinished;
 
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "session_uid") 
     private DacoSession session;
     
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "content_uid") 
     private Daco daco;
     

@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
@@ -47,7 +48,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class NonGroupedToolSession extends ToolSession {
     private static final long serialVersionUID = 8063910455683242612L;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
