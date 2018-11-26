@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -65,7 +66,7 @@ public class NoticeboardUser implements Serializable {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nb_session_uid")
     private NoticeboardSession nbSession;
 
@@ -74,7 +75,7 @@ public class NoticeboardUser implements Serializable {
 
     @Column
     private String fullname;
-    
+
     @Column(name = "user_status")
     private String userStatus;
 
@@ -107,7 +108,7 @@ public class NoticeboardUser implements Serializable {
 	this.userStatus = status;
     }
 
-     public String getFullname() {
+    public String getFullname() {
 	return fullname;
     }
 
@@ -115,7 +116,7 @@ public class NoticeboardUser implements Serializable {
 	this.fullname = fullname;
     }
 
-     public NoticeboardSession getNbSession() {
+    public NoticeboardSession getNbSession() {
 	return nbSession;
     }
 
@@ -123,19 +124,19 @@ public class NoticeboardUser implements Serializable {
 	this.nbSession = nbSession;
     }
 
-     public Long getUid() {
+    public Long getUid() {
 	return uid;
     }
 
-     public void setUid(Long uid) {
+    public void setUid(Long uid) {
 	this.uid = uid;
     }
 
-     public Long getUserId() {
+    public Long getUserId() {
 	return userId;
     }
 
-     public void setUserId(Long userId) {
+    public void setUserId(Long userId) {
 	this.userId = userId;
     }
 
@@ -143,7 +144,7 @@ public class NoticeboardUser implements Serializable {
 	return username;
     }
 
-     public void setUsername(String username) {
+    public void setUsername(String username) {
 	this.username = username;
     }
 
@@ -151,7 +152,7 @@ public class NoticeboardUser implements Serializable {
 	return userStatus;
     }
 
-     public void setUserStatus(String userStatus) {
+    public void setUserStatus(String userStatus) {
 	this.userStatus = userStatus;
     }
 }

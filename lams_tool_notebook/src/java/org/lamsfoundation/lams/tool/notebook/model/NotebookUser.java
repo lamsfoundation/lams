@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.notebook.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -63,7 +64,7 @@ public class NotebookUser implements java.io.Serializable {
     @Column(name = "login_name")
     private String loginName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notebook_session_uid")
     private NotebookSession notebookSession;
 

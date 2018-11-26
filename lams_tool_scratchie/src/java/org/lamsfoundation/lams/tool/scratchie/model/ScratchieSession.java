@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,43 +55,43 @@ public class ScratchieSession {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column(name = "session_name")
     private String sessionName;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scratchie_uid")
     private Scratchie scratchie;
-    
+
     @Column(name = "session_start_date")
     private Date sessionStartDate;
-    
+
     @Column(name = "session_end_date")
     private Date sessionEndDate;
-    
+
     //date when user has started activity (pressed start button) that has time limitation
     @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
-    
+
     // finish or not
     @Column
     private int status;
-    
+
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("create_date DESC")
     @JoinColumn(name = "session_uid")
     private Set<ScratchieItem> scratchieItems = new HashSet<>();
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_leader_uid")
     private ScratchieUser groupLeader;
-    
+
     @Column
     private int mark;
-    
+
     @Column(name = "scratching_finished")
     private boolean scratchingFinished;
 

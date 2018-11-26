@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.integration;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,7 +50,7 @@ public class ExtServerLessonMap {
     @Column(name = "resource_link_id")
     private String resourceLinkId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 

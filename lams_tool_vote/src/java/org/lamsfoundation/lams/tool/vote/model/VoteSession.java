@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -77,14 +78,14 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
     @Column
     private String session_name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vote_content_id")
     private VoteContent voteContent;
 
     @OneToMany(mappedBy = "voteSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VoteQueUsr> voteQueUsers;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "group_leader_uid")
     private VoteQueUsr groupLeader;
 

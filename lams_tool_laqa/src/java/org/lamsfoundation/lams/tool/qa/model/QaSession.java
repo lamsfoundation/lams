@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -82,20 +83,20 @@ public class QaSession implements Serializable, Comparable, Nullable {
     @Column(name = "session_name")
     private String session_name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
 
     @OneToMany(mappedBy = "qaSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<QaQueUsr> qaQueUsers;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_group_leader_uid")
     private QaQueUsr groupLeader;
 
     public QaSession() {
 	this.qaQueUsers = new TreeSet<QaQueUsr>();
-   };
+    };
 
     public QaSession(Long qaSessionId, Date session_start_date, Date session_end_date, String session_status,
 	    QaContent qaContent, Set<QaQueUsr> qaQueUsers) {

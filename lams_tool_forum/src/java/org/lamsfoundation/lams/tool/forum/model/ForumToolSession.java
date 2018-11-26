@@ -21,14 +21,13 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -58,7 +57,7 @@ public class ForumToolSession implements Cloneable {
     @Column(name = "session_name")
     private String sessionName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "forum_uid")
     private Forum forum;
 
@@ -120,7 +119,7 @@ public class ForumToolSession implements Cloneable {
 
     /**
      *
-     * 
+     *
      * @return
      */
     public Date getSessionStartDate() {
@@ -177,7 +176,7 @@ public class ForumToolSession implements Cloneable {
     }
 
     /**
-     * 
+     *
      * @param sessionName
      *            The session name to set.
      */

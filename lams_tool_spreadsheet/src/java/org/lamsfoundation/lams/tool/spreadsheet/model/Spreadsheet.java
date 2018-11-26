@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,51 +54,51 @@ public class Spreadsheet implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "content_id")
     private Long contentId;
-    
+
     @Column
     private String title;
-    
+
     @Column
     private String instructions;
-    
+
     @Column
     private String code;
 
     // advance
-    
+
     @Column(name = "is_learner_allowed_to_save")
     private boolean isLearnerAllowedToSave;
-    
+
     @Column(name = "is_marking_enabled")
     private boolean isMarkingEnabled;
 
     @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
-    
+
     @Column(name = "define_later")
     private boolean defineLater;
-    
+
     @Column(name = "content_in_use")
     private boolean contentInUse;
 
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
-    
+
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
     // general infomation
-    
+
     @Column(name = "create_date")
     private Date created;
-    
+
     @Column(name = "update_date")
     private Date updated;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private SpreadsheetUser createdBy;

@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -44,18 +45,18 @@ public class KumaliveRubric implements Serializable {
     @Column(name = "rubric_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rubricId;
-    
-    @ManyToOne(optional=false)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kumalive_id")
     private Kumalive kumalive;
-    
+
     @Column(name = "order_id")
     private Short orderId;
-    
+
     @Column
     private String name;
 

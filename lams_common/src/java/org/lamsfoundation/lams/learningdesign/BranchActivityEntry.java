@@ -67,15 +67,15 @@ public class BranchActivityEntry {
     @Column(name = "entry_ui_id")
     protected Integer entryUIID;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sequence_activity_id")
     protected SequenceActivity branchSequenceActivity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_activity_id")
     protected Activity branchingActivity;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 

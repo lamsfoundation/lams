@@ -57,12 +57,12 @@ public class LearnerProgressArchive implements Serializable {
     private Long learnerProgressId;
 
     /** The User to whom this progress data belongs. */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     /** The Lesson this progress data is for */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
@@ -93,7 +93,7 @@ public class LearnerProgressArchive implements Serializable {
      * not the leaf node. The main purpose of current activity is to restore the
      * progress states if the user exist without finishing the activity.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_activity_id")
     private Activity currentActivity;
 

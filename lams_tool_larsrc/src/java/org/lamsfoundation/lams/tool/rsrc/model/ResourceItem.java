@@ -115,7 +115,7 @@ public class ResourceItem implements Cloneable {
     @Column(name = "create_date")
     private Date createDate;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private ResourceUser createBy;
     

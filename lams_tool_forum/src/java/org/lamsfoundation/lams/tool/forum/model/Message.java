@@ -59,10 +59,10 @@ public class Message implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column
     private String subject;
-    
+
     @Column
     private String body;
 
@@ -80,7 +80,7 @@ public class Message implements Cloneable {
 
     @Column(name = "create_date")
     private Date created;
-    
+
     @Column(name = "update_date")
     private Date updated;
 
@@ -93,37 +93,34 @@ public class Message implements Cloneable {
     @Column(name = "hide_flag")
     private boolean hideFlag;
 
-    @ManyToOne 
-    @JoinColumn(name = "parent_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_uid")
     private Message parent;
 
-    @ManyToOne 
-    @JoinColumn(name = "forum_session_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "forum_session_uid")
     private ForumToolSession toolSession;
-    
-    @ManyToOne 
-    @JoinColumn(name = "forum_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "forum_uid")
     private Forum forum;
-    
-    @ManyToOne 
-    @JoinColumn(name = "create_by") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "create_by")
     private ForumUser createdBy;
 
-    @ManyToOne 
-    @JoinColumn(name = "modified_by") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modified_by")
     private ForumUser modifiedBy;
- 
-    @OneToMany(mappedBy = "message", 
-	        cascade = CascadeType.ALL, 
-	        orphanRemoval = true,
-	        fetch = FetchType.EAGER) 
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Attachment> attachments;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "report_id")
     private ForumReport report;
-    
-    @OneToMany(fetch = FetchType.EAGER) 
+
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "authored_parent_uid")
     private Set<Message> sessionClones;
 

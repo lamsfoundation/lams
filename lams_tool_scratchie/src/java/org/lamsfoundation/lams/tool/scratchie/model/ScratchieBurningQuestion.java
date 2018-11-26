@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,20 +47,20 @@ public class ScratchieBurningQuestion {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scratchie_item_uid")
     private ScratchieItem scratchieItem;
-    
+
     @Column(name = "access_date")
     private Date accessDate;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column
     private String question;
-    
+
     @Column(name = "general_question")
     private boolean generalQuestion;
 

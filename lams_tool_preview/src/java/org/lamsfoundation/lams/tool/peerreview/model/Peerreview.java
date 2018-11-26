@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -100,7 +101,7 @@ public class Peerreview implements Serializable, Cloneable {
     @Column(name = "update_date")
     private Date updated;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private PeerreviewUser createdBy;
@@ -110,7 +111,7 @@ public class Peerreview implements Serializable, Cloneable {
 
     @Column(name = "show_ratings_left_for_user")
     private boolean showRatingsLeftForUser;
-    
+
     @Column(name = "show_ratings_left_by_user")
     private boolean showRatingsLeftByUser;
 
@@ -119,13 +120,13 @@ public class Peerreview implements Serializable, Cloneable {
 
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
-    
+
     @Column(name = "self_review")
     private boolean selfReview;
 
     @Column(name = "notify_users_of_results")
     private boolean notifyUsersOfResults;
-    
+
     // **********************************************************
     // Function method for Peerreview
     // **********************************************************
@@ -430,26 +431,26 @@ public class Peerreview implements Serializable, Cloneable {
     }
 
     public boolean isSelfReview() {
-        return selfReview;
+	return selfReview;
     }
 
     public void setSelfReview(boolean selfReview) {
-        this.selfReview = selfReview;
+	this.selfReview = selfReview;
     }
-    
+
     public boolean isNotifyUsersOfResults() {
-        return notifyUsersOfResults;
+	return notifyUsersOfResults;
     }
 
     public void setNotifyUsersOfResults(boolean notifyUsersOfResults) {
-        this.notifyUsersOfResults = notifyUsersOfResults;
+	this.notifyUsersOfResults = notifyUsersOfResults;
     }
 
     public boolean isShowRatingsLeftByUser() {
-        return showRatingsLeftByUser;
+	return showRatingsLeftByUser;
     }
 
     public void setShowRatingsLeftByUser(boolean showRatingsLeftByUser) {
-        this.showRatingsLeftByUser = showRatingsLeftByUser;
+	this.showRatingsLeftByUser = showRatingsLeftByUser;
     }
 }

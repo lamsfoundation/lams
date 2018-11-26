@@ -125,12 +125,12 @@ public class LearnerProgress implements Serializable {
     private Long learnerProgressId;
 
     /** The User to whom this progress data belongs. */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     /** The Lesson this progress data is for */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
@@ -154,7 +154,7 @@ public class LearnerProgress implements Serializable {
      * The activity that user just completed. The purpose of this activity is to
      * allow lams to remove unecessary frame for next activity.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "previous_activity_id")
     private Activity previousActivity;
 
@@ -166,7 +166,7 @@ public class LearnerProgress implements Serializable {
      * not the leaf node. The main purpose of current activity is to restore the
      * progress states if the user exist without finishing the activity.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_activity_id")
     private Activity currentActivity;
 
@@ -175,7 +175,7 @@ public class LearnerProgress implements Serializable {
      * next activity following the transition or leaf activity within a complex
      * activity.
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next_activity_id")
     private Activity nextActivity;
 

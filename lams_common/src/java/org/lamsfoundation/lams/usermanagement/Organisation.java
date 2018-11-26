@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -66,21 +67,21 @@ public class Organisation implements Serializable, Comparable<Organisation> {
     @Column
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_organisation_id")
     private Organisation parentOrganisation;
 
     @Column(name = "create_date")
     private Date createDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
     @OneToMany(mappedBy = "organisationID", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WorkspaceFolder> workspaceFolders = new HashSet<WorkspaceFolder>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_type_id")
     private OrganisationType organisationType;
 
@@ -94,7 +95,7 @@ public class Organisation implements Serializable, Comparable<Organisation> {
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<Lesson> lessons = new HashSet<Lesson>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_state_id")
     private OrganisationState organisationState;
 

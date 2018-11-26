@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,48 +63,48 @@ public class TaskListItem implements Cloneable {
 
     @Column
     private String title;
-    
+
     @Column
     private String description;
-    
+
     @Column(name = "sequence_id")
     private int sequenceId;
 
     @Column(name = "init_item")
     private String initialItem;
-    
+
     @Column(name = "organization_xml")
     private String organizationXml;
-    
+
     @Column(name = "create_by_author")
     private boolean isCreateByAuthor;
 
     @Column(name = "create_date")
     private Date createDate;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private TaskListUser createBy;
-    
+
     //************ advanced tab ***************
     @Column(name = "is_required")
     private boolean isRequired;
-    
+
     @Column(name = "is_comments_allowed")
     private boolean isCommentsAllowed;
-    
+
     @Column(name = "is_comments_required")
     private boolean isCommentsRequired;
-    
+
     @Column(name = "is_files_allowed")
     private boolean isFilesAllowed;
-    
+
     @Column(name = "is_files_required")
     private boolean isFilesRequired;
-    
+
     @Column(name = "is_child_task")
     private boolean isChildTask;
-    
+
     @Column(name = "parent_task_name")
     private String parentTaskName;
 
@@ -111,7 +112,7 @@ public class TaskListItem implements Cloneable {
     @JoinColumn(name = "taskList_item_uid")
     @OrderBy("create_date ASC")
     private Set<TaskListItemAttachment> attachments = new HashSet<TaskListItemAttachment>();
-    
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "taskList_item_uid")
     @OrderBy("create_date ASC")

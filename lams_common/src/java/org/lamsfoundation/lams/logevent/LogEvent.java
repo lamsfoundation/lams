@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.logevent;
 
 import java.io.Serializable;
@@ -28,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -63,12 +63,12 @@ public class LogEvent implements Serializable {
     public static final int TYPE_ACTIVITY_EDIT = 9; // Audit Service
     public static final int TYPE_FORCE_COMPLETE = 10; // Audit Service
     public static final int TYPE_USER_ORG_ADMIN = 11;
-    public static final int TYPE_LOGIN_AS  = 12;
-    public static final int TYPE_PASSWORD_CHANGE  = 13;
+    public static final int TYPE_LOGIN_AS = 12;
+    public static final int TYPE_PASSWORD_CHANGE = 13;
     public static final int TYPE_ROLE_FAILURE = 14;
     public static final int TYPE_ACCOUNT_LOCKED = 15;
-    public static final int TYPE_NOTIFICATION  = 16;
-    public static final int TYPE_MARK_UPDATED = 17;  // Audit Service
+    public static final int TYPE_NOTIFICATION = 16;
+    public static final int TYPE_MARK_UPDATED = 17; // Audit Service
     public static final int TYPE_MARK_RELEASED = 18; // Marks released in Gradebook
     public static final int TYPE_LEARNER_CONTENT_UPDATED = 19; // Audit Service
     public static final int TYPE_LEARNER_CONTENT_SHOW_HIDE = 20; // Audit Service
@@ -87,7 +87,7 @@ public class LogEvent implements Serializable {
     private Integer logEventTypeId;
 
     //TODO perhaps make this field possible to be null
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -95,7 +95,7 @@ public class LogEvent implements Serializable {
     @Column(name = "occurred_date_time")
     private Date occurredDateTime;
 
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_user_id")
     private User targetUser;
 
@@ -104,7 +104,7 @@ public class LogEvent implements Serializable {
 
     @Column(name = "activity_id")
     private Long activityId;
-    
+
     @Column
     private String description;
 

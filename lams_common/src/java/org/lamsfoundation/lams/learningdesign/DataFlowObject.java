@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,7 +49,7 @@ public class DataFlowObject implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dataFlowObjectId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transition_id")
     private DataTransition dataTransition;
 

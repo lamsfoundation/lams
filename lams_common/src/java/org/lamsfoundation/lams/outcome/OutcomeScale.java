@@ -34,7 +34,7 @@ public class OutcomeScale implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scaleId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
@@ -50,7 +50,7 @@ public class OutcomeScale implements Serializable {
     @Column(name = "content_folder_id")
     private String contentFolderId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private User createBy;
 

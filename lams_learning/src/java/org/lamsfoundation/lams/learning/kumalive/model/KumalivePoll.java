@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,26 +48,26 @@ public class KumalivePoll implements Serializable {
     @Column(name = "poll_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pollId;
-    
-    @ManyToOne(optional=false)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "kumalive_id")
     private Kumalive kumalive;
-    
+
     @Column
     private String name;
-    
+
     @Column(name = "votes_released")
     private Boolean votesReleased;
-    
+
     @Column(name = "voters_released")
     private Boolean votersReleased;
-    
+
     @Column(name = "start_date")
     private Date startDate;
-    
+
     @Column(name = "finish_date")
     private Date finishDate;
-    
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "poll_id")
     @OrderBy("order_id ASC")

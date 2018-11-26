@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.model;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,8 +62,8 @@ public class LeaderselectionUser implements Serializable {
 
     @Column(name = "login_name")
     private String loginName;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leaderselection_session_uid")
     private LeaderselectionSession leaderselectionSession;
 

@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,7 +42,7 @@ import org.apache.log4j.Logger;
 /**
  * A Wrapper class for uploaded files. An Attachment cannot exist independently and must belong to a
  * TaskListItem.
- * 
+ *
  * @author Andrey Balan
  */
 @Entity
@@ -69,7 +70,7 @@ public class TaskListItemAttachment implements Cloneable {
     @Column(name = "create_date")
     private Date created;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private TaskListUser createBy;
 

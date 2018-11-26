@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,7 +62,7 @@ public class ScratchieAnswer implements Cloneable {
     @Column(name = "order_id")
     private Integer orderId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scratchie_item_uid")
     private ScratchieItem scratchieItem;
 
@@ -173,7 +173,7 @@ public class ScratchieAnswer implements Cloneable {
     public void setAttempts(int[] attempts) {
 	this.attempts = attempts;
     }
-    
+
     public List<ConfidenceLevelDTO> getConfidenceLevelDtos() {
 	return confidenceLevelDtos;
     }

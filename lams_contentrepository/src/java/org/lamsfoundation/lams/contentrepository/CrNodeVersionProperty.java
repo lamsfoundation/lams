@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
@@ -33,6 +32,7 @@ import java.util.GregorianCalendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -65,8 +65,8 @@ public class CrNodeVersionProperty implements IValue, Serializable {
     @Column
     private int type;
 
-    @ManyToOne 
-    @JoinColumn(name = "nv_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nv_id")
     private org.lamsfoundation.lams.contentrepository.CrNodeVersion crNodeVersion;
 
     /** full constructor */
@@ -82,7 +82,7 @@ public class CrNodeVersionProperty implements IValue, Serializable {
     public CrNodeVersionProperty() {
     }
 
-     public Long getId() {
+    public Long getId() {
 	return this.id;
     }
 
@@ -157,7 +157,8 @@ public class CrNodeVersionProperty implements IValue, Serializable {
 
     /* ** Implementation of IValue interface ** */
 
-    @Transient protected Logger log = Logger.getLogger(CrNodeVersionProperty.class);
+    @Transient
+    protected Logger log = Logger.getLogger(CrNodeVersionProperty.class);
 
     /**
      * Returns a string representation of the value.

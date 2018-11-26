@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.commonCartridge.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,21 +46,21 @@ public class CommonCartridgeItemVisitLog {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uid")
     private CommonCartridgeUser user;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "commonCartridge_item_uid")
     private CommonCartridgeItem commonCartridgeItem;
-    
+
     @Column
     private boolean complete;
-    
+
     @Column(name = "access_date")
     private Date accessDate;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
 

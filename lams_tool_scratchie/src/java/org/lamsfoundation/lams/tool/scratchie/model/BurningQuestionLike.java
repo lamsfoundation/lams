@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,11 +21,11 @@ public class BurningQuestionLike {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "burning_question_uid")
     private ScratchieBurningQuestion burningQuestion;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
 

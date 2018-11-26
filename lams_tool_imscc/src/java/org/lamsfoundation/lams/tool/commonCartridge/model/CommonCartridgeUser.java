@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,7 +43,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * CommonCartridge
- * 
+ *
  * @author Andrey Balan
  */
 @Entity
@@ -54,32 +55,32 @@ public class CommonCartridgeUser implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "login_name")
     private String loginName;
-    
+
     @Column(name = "session_finished")
     private boolean sessionFinished;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_uid")
     private CommonCartridgeSession session;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "commonCartridge_uid")
     private CommonCartridge commonCartridge;
 
     //=============== NON Persisit value: for display use ===========
-    
+
     //the user access some reousrce item date time. Use in monitoring summary page
     @Transient
     private Date accessDate;
@@ -121,7 +122,7 @@ public class CommonCartridgeUser implements Cloneable {
 
 	return user;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
 	if (this == obj) {

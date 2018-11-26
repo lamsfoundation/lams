@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -67,18 +68,18 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
     @Column
     private boolean passed;
 
-    @ManyToOne 
-    @JoinColumn(name = "mc_que_content_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mc_que_content_id")
     private McQueContent mcQueContent;
 
-    @ManyToOne 
-    @JoinColumn(name = "que_usr_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "que_usr_id")
     private McQueUsr mcQueUsr;
 
-    @ManyToOne 
-    @JoinColumn(name = "mc_que_option_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mc_que_option_id")
     private McOptsContent mcOptionsContent;
-    
+
     @Column(name = "confidence_level")
     private int confidenceLevel;
 
@@ -217,7 +218,7 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
     public void setAttemptCorrect(boolean attemptCorrect) {
 	this.attemptCorrect = attemptCorrect;
     }
-    
+
     public int getConfidenceLevel() {
 	return confidenceLevel;
     }

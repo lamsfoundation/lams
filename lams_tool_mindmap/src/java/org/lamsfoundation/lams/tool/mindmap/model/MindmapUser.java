@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,7 +51,7 @@ public class MindmapUser implements java.io.Serializable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
 
@@ -63,9 +63,9 @@ public class MindmapUser implements java.io.Serializable {
 
     @Column(name = "login_name")
     private String loginName;
-    
-    @ManyToOne 
-    @JoinColumn(name = "mindmap_session_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mindmap_session_uid")
     private MindmapSession mindmapSession;
 
     @Column(name = "finishedActivity")

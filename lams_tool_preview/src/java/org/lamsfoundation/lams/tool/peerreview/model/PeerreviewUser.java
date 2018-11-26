@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.peerreview.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,32 +54,32 @@ public class PeerreviewUser implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "login_name")
     private String loginName;
-    
+
     @Column(name = "session_finished")
     private boolean sessionFinished;
-    
+
     //status set by monitor to indicate users that shouldn't be rated
     @Column
     private boolean hidden;
 
-    @ManyToOne 
-    @JoinColumn(name = "session_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_uid")
     private PeerreviewSession session;
-    
-    @ManyToOne 
-    @JoinColumn(name = "peerreview_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "peerreview_uid")
     private Peerreview peerreview;
 
     public PeerreviewUser() {
@@ -231,17 +232,17 @@ public class PeerreviewUser implements Cloneable {
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
     }
-    
-    /**
-    * @return status set by monitor to indicate users that shouldn't be rated
-    */
-   public boolean isHidden() {
-	return hidden;
-   }
 
-   public void setHidden(boolean hidden) {
+    /**
+     * @return status set by monitor to indicate users that shouldn't be rated
+     */
+    public boolean isHidden() {
+	return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
 	this.hidden = hidden;
-   }
+    }
 
     @Override
     public boolean equals(Object obj) {

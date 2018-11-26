@@ -61,7 +61,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     @Column(name = "gate_open_flag")
     private Boolean gateOpen;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gate_open_user")
     private User gateOpenUser;
 

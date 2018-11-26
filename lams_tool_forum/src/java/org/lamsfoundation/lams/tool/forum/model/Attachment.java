@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,30 +50,30 @@ import org.apache.log4j.Logger;
 public class Attachment implements Cloneable, Comparable<Attachment> {
     private static final Logger log = Logger.getLogger(Attachment.class);
 
-    @Id 
-    @Column 
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    private Long uid; 
- 
+    @Id
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long uid;
+
     @Column(name = "file_uuid")
     private Long fileUuid;
-    
+
     @Column(name = "file_version_id")
     private Long fileVersionId;
-    
+
     @Column(name = "file_type")
     private String fileType;
-    
+
     @Column(name = "file_name")
     private String fileName;
-    
+
     @Column(name = "create_date")
     private Date created;
-    
-    @ManyToOne 
-    @JoinColumn(name = "message_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_uid")
     private Message message;
-    
+
     //Default contruction method
     public Attachment() {
 
@@ -127,7 +128,7 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
 	this.uid = uid;
     }
 
-     public Long getFileVersionId() {
+    public Long getFileVersionId() {
 	return fileVersionId;
     }
 
@@ -135,7 +136,7 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
 	this.fileVersionId = version;
     }
 
-     public String getFileType() {
+    public String getFileType() {
 	return fileType;
     }
 
@@ -143,7 +144,7 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
 	this.fileType = type;
     }
 
-     public String getFileName() {
+    public String getFileName() {
 	return fileName;
     }
 
@@ -151,7 +152,7 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
 	this.fileName = name;
     }
 
-     public Long getFileUuid() {
+    public Long getFileUuid() {
 	return fileUuid;
     }
 
@@ -168,13 +169,12 @@ public class Attachment implements Cloneable, Comparable<Attachment> {
     }
 
     public Message getMessage() {
-        return message;
+	return message;
     }
 
     public void setMessage(Message message) {
-        this.message = message;
+	this.message = message;
     }
-
 
     @Override
     public int compareTo(Attachment o) {

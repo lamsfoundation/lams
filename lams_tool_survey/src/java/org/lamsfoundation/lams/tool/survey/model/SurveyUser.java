@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.survey.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -69,11 +70,11 @@ public class SurveyUser implements Cloneable {
     @Column(name = "response_finalized")
     private boolean responseFinalized;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_uid")
     private SurveySession session;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_uid")
     private Survey survey;
 

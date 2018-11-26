@@ -36,7 +36,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -81,14 +80,14 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     @OneToMany(mappedBy = "toolActivity")
     private Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
 
-    @OneToOne(mappedBy = "activity")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private ActivityEvaluation evaluation;
 
     @OneToMany(mappedBy = "activity")
     private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<GradebookUserActivity>();
 
-    @OneToOne(mappedBy = "activity", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity", cascade = CascadeType.ALL)
     private PedagogicalPlannerActivityMetadata plannerMetadata;
 
     /** default constructor */

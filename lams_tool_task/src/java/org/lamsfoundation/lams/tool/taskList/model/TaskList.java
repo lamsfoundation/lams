@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,37 +63,37 @@ public class TaskList implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "content_id")
     private Long contentId;
-    
+
     @Column
     private String title;
-    
+
     @Column
     private String instructions;
 
     @Column(name = "lock_when_finished")
     private boolean lockWhenFinished;
-    
+
     @Column(name = "is_sequential_order")
     private boolean sequentialOrder;
-    
+
     @Column(name = "minimum_number_tasks")
     private int minimumNumberTasks;
-    
+
     @Column(name = "allow_contribute_tasks")
     private boolean allowContributeTasks;
-    
+
     @Column(name = "is_monitor_verification_required")
     private boolean monitorVerificationRequired;
 
     @Column(name = "define_later")
     private boolean defineLater;
-    
+
     @Column(name = "content_in_use")
     private boolean contentInUse;
-    
+
     @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
@@ -103,11 +104,11 @@ public class TaskList implements Cloneable {
 
     @Column(name = "create_date")
     private Date created;
-    
+
     @Column(name = "update_date")
     private Date updated;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private TaskListUser createdBy;
@@ -119,7 +120,7 @@ public class TaskList implements Cloneable {
 
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
-    
+
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
@@ -306,7 +307,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns <code>TaskList</code> id.
-     * 
+     *
      * @return tasklist id
      */
     public Long getUid() {
@@ -315,7 +316,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets <code>TaskList</code> id.
-     * 
+     *
      * @param uid
      *            tasklist id
      */
@@ -325,7 +326,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns the tasklist title.
-     * 
+     *
      * @return tasklist title.
      */
     public String getTitle() {
@@ -334,7 +335,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets the tasklist title
-     * 
+     *
      * @param title
      *            tasklist title
      */
@@ -382,7 +383,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Return set of TaskListItems
-     * 
+     *
      * @return set of TaskListItems
      */
     public Set<TaskListItem> getTaskListItems() {
@@ -391,7 +392,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets set of TaskListItems.
-     * 
+     *
      * @param taskListItems
      *            set of TaskListItems
      */
@@ -403,7 +404,7 @@ public class TaskList implements Cloneable {
      * Checks whether this tasklist is in use.
      *
      * @return
-     * 
+     *
      *
      */
     public boolean isContentInUse() {
@@ -412,7 +413,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets whether this tasklist in use or not.
-     * 
+     *
      * @param contentInUse
      *            whether this tasklist in use or not
      */
@@ -422,9 +423,9 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns whether this tasklist should be defined later.
-     * 
+     *
      * @return whether this tasklist should be defined later
-     * 
+     *
      *
      */
     public boolean isDefineLater() {
@@ -433,7 +434,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets whether this tasklist should be defined later or not.
-     * 
+     *
      * @param defineLater
      *            boolean described whether this tasklist should be defined later or not
      */
@@ -443,9 +444,9 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns ContentId
-     * 
+     *
      * @return ContentId
-     * 
+     *
      *
      */
     public Long getContentId() {
@@ -454,7 +455,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets ContentId.
-     * 
+     *
      * @param contentId
      *            ContentId
      */
@@ -485,7 +486,7 @@ public class TaskList implements Cloneable {
      * Returns if learners are allowed to contribute tasks.
      *
      * @return whether learners are allowed to contribute tasks
-     * 
+     *
      *
      */
     public boolean isAllowContributeTasks() {
@@ -494,7 +495,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets whether learners are allowed to contribute tasks.
-     * 
+     *
      * @param allowContributeTasks
      *            boolean describing whether learners are allowed to contribute tasks
      */
@@ -504,9 +505,9 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns whether the learners should be verified by monitor before they can finish tasklist.
-     * 
+     *
      * @return whether the learners should be verified by monitor before they can finish tasklist
-     * 
+     *
      *
      */
     public boolean isMonitorVerificationRequired() {
@@ -515,7 +516,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets whether the learners should be verified by monitor before they can finish tasklist.
-     * 
+     *
      * @param monitorVerificationRequired
      *            boolean describing whether the learners should be verified by monitor before they can finish tasklist
      */
@@ -525,9 +526,9 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns if the tasks should be done in a sequential order.
-     * 
+     *
      * @return if the tasks should be done in a sequential order
-     * 
+     *
      *
      */
     public boolean isSequentialOrder() {
@@ -536,7 +537,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets if the tasks should be done in a sequential order.
-     * 
+     *
      * @param sequentialOrder
      *            if the tasks should be done in a sequential order
      */
@@ -546,9 +547,9 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns the minimum number of tasks needed to be completed to finish this activity.
-     * 
+     *
      * @return the minimum number of tasks needed to be completed to finish this activity
-     * 
+     *
      *
      */
     public int getMinimumNumberTasks() {
@@ -557,7 +558,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets the minimum number of tasks needed to be completed to finish this activity.
-     * 
+     *
      * @param numberTasksToComplete
      *            the minimum number of tasks needed to be completed to finish this activity
      */
@@ -603,9 +604,9 @@ public class TaskList implements Cloneable {
 
     /**
      * Returns the number of tasks needed to be completed to finish this activity.
-     * 
+     *
      * @return the number of tasks needed to be completed to finish this activity
-     * 
+     *
      */
     public String getMinimumNumberTasksErrorStr() {
 	return minimumNumberTasksErrorStr;
@@ -613,7 +614,7 @@ public class TaskList implements Cloneable {
 
     /**
      * Sets the number of tasks needed to be completed to finish this activity.
-     * 
+     *
      * @param numberTasksToComplete
      *            the number of tasks needed to be completed to finish this activity
      */

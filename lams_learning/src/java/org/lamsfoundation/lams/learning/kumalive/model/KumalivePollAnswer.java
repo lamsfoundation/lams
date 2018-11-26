@@ -50,32 +50,32 @@ public class KumalivePollAnswer implements Serializable {
     @Column(name = "answer_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long answerId;
-    
-    @ManyToOne(optional=false)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "poll_id")
     private KumalivePoll poll;
-    
+
     @Column(name = "order_id")
     private Short orderId;
-    
+
     @Column
     private String name;
-    
+
 //	 <map table="lams_kumalive_poll_vote" name="votes" lazy="false" order-by="vote_date ASC">
 //         <key column="answer_id"/>
 //         <index column="user_id" type="java.lang.Integer"/>
 //         <element column="vote_date" type="java.util.Date"/>
 //	</map>
-    
+
 //    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 //    @JoinColumn(name = "kumalive_id")
 //    @OrderBy("sequence_id ASC")
-    
+
     @ElementCollection(fetch = FetchType.LAZY)
     @OrderBy("vote_date ASC")
-    @MapKeyColumn(name="user_id")
-    @Column(name="vote_date")
-    @CollectionTable(name="lams_kumalive_poll_vote", joinColumns=@JoinColumn(name="answer_id"))
+    @MapKeyColumn(name = "user_id")
+    @Column(name = "vote_date")
+    @CollectionTable(name = "lams_kumalive_poll_vote", joinColumns = @JoinColumn(name = "answer_id"))
     private Map<Integer, Date> votes = new TreeMap<>();
 
     public KumalivePollAnswer() {

@@ -79,11 +79,11 @@ public class AssessmentResult {
     @Column
     private float grade;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assessment_uid")
     private Assessment assessment;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uid")
     private AssessmentUser user;
     

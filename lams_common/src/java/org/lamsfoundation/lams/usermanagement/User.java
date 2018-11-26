@@ -153,7 +153,7 @@ public class User implements Serializable, Comparable<User> {
     @Column(name = "create_date")
     private Date createDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "workspace_folder_id")
     private WorkspaceFolder workspaceFolder;
 

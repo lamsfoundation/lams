@@ -26,6 +26,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -38,25 +39,25 @@ import org.lamsfoundation.lams.usermanagement.User;
 @Entity
 @Table(name = "lams_gradebook_user_lesson_archive")
 public class GradebookUserLessonArchive {
-    
+
     @Id
     @Column
     private long uid;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User learner;
-    
+
     @Column
     private Double mark;
-    
+
     @Column
     private String feedback;
-    
+
     @Column(name = "archive_date")
     private Date archiveDate;
 

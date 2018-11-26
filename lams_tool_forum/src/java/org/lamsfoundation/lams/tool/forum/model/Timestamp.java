@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -43,20 +43,20 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "tl_lafrum11_timestamp")
 public class Timestamp implements Cloneable {
-    
+
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid; 
-    
-    @ManyToOne 
-    @JoinColumn(name = "forum_user_uid") 
+    private Long uid;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "forum_user_uid")
     private ForumUser forumUser;
-    
-    @ManyToOne 
-    @JoinColumn(name = "message_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_uid")
     private Message message;
-    
+
     @Column(name = "timestamp_date")
     private Date timestamp;
 

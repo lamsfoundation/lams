@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.integration;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,11 +46,11 @@ public class ExtServerToolAdapterMap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tool_id")
     private Tool tool;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ext_server_org_map_id")
     private ExtServer extServer;
 

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
@@ -29,6 +28,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -51,15 +51,15 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     private Long contentID;
 
     // basic tab fields
-    
+
     @Column(nullable = false)
     private String title;
-    
+
     @Column(nullable = false)
     private String instruction;
 
     // advance tab fields
-    
+
     @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
@@ -70,13 +70,13 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     private boolean notifyTeachersOnFileSubmit;
 
     // system level fields
-    
+
     @Column(name = "define_later")
     private boolean defineLater;
 
     @Column(name = "content_in_use")
     private boolean contentInUse;
-    
+
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
@@ -101,7 +101,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "created_by")
     private SubmitUser createdBy;
@@ -311,12 +311,12 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
 	this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
     }
-    
+
     public boolean isUseSelectLeaderToolOuput() {
-   	return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-   	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 }

@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -77,18 +78,16 @@ public class McSession implements Serializable, Comparable<McSession> {
     @Column(name = "session_name")
     private String session_name;
 
-    @ManyToOne 
-    @JoinColumn(name = "mc_content_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mc_content_id")
     private org.lamsfoundation.lams.tool.mc.model.McContent mcContent;
 
-    @OneToMany(mappedBy = "mcSession",
-	    cascade = CascadeType.ALL,
-	    orphanRemoval = true)
+    @OneToMany(mappedBy = "mcSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<McQueUsr> mcQueUsers;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "mc_group_leader_uid") 
-     private McQueUsr groupLeader;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "mc_group_leader_uid")
+    private McQueUsr groupLeader;
 
     /** full constructor */
     public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus,

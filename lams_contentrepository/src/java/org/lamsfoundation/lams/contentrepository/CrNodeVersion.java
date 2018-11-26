@@ -70,7 +70,7 @@ public class CrNodeVersion implements Serializable {
     @Column(name = "user_id")
     private Integer userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "node_id")
     private org.lamsfoundation.lams.contentrepository.CrNode node;
 

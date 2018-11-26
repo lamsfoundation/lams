@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,13 +47,13 @@ public class CrWorkspaceCredential implements Serializable {
     @Column(name = "wc_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wcId;
-    
-    @ManyToOne 
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace;
 
-    @ManyToOne 
-    @JoinColumn(name = "credential_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "credential_id")
     private org.lamsfoundation.lams.contentrepository.CrCredential crCredential;
 
     /** full constructor */
@@ -75,7 +75,7 @@ public class CrWorkspaceCredential implements Serializable {
 	this.wcId = wcId;
     }
 
-     public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
+    public org.lamsfoundation.lams.contentrepository.CrWorkspace getCrWorkspace() {
 	return this.crWorkspace;
     }
 

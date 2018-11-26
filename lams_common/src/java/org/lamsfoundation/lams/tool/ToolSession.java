@@ -31,6 +31,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,7 +55,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 public abstract class ToolSession implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 310605806277808940L;
     /** Tool session type id for grouped */
@@ -77,7 +78,7 @@ public abstract class ToolSession implements Serializable {
     @Column(name = "tool_session_name")
     private String toolSessionName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id")
     private ToolActivity toolActivity;
 
@@ -90,7 +91,7 @@ public abstract class ToolSession implements Serializable {
     @Column(name = "unique_key")
     private String uniqueKey;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.model;
 
 import java.io.Serializable;
@@ -30,14 +29,13 @@ import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -53,7 +51,7 @@ public class SubmissionDetails implements Serializable, Cloneable {
     private static Logger log = Logger.getLogger(SubmissionDetails.class);
 
     @Id
-    @Column(name = "submission_id",unique=true, nullable=false)
+    @Column(name = "submission_id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long submissionID;
 
@@ -75,17 +73,15 @@ public class SubmissionDetails implements Serializable, Cloneable {
     @Column(nullable = false)
     private Boolean removed;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-//    @PrimaryKeyJoinColumn(name="submission_id", referencedColumnName="report_id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private SubmitFilesReport report;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "learner_id")
     private SubmitUser learner;
-    
+
     /** persistent field, but not cloned to avoid to clone block */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "session_id")
     private SubmitFilesSession submitFileSession;
@@ -141,7 +137,7 @@ public class SubmissionDetails implements Serializable, Cloneable {
 	}
 	return obj;
     }
-    
+
     // ***********************************************************
     // Get / Set methods
     // ***********************************************************
@@ -246,6 +242,5 @@ public class SubmissionDetails implements Serializable, Cloneable {
     public void setRemoved(Boolean removed) {
 	this.removed = removed;
     }
-
 
 }

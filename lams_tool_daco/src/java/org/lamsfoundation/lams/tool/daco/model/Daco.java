@@ -93,7 +93,7 @@ public class Daco implements Cloneable {
     @Column(name = "update_date")
     private Date updated;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "create_by")
     private DacoUser createdBy;
 

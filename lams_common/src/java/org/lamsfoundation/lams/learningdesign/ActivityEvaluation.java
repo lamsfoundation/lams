@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
@@ -44,7 +45,7 @@ public class ActivityEvaluation {
     @Column(name = "activity_id")
     private Long activityId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id")
     @MapsId
     private ToolActivity activity;

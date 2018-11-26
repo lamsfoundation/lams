@@ -20,11 +20,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,15 +50,15 @@ public class ImageVote implements Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "is_voted")
     private boolean voted;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
     private ImageGalleryUser createBy;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "imageGallery_item_uid")
     private ImageGalleryItem imageGalleryItem;
 

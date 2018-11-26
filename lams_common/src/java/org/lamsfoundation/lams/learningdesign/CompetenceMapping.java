@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,11 +19,11 @@ public class CompetenceMapping {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long competenceMappingId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "competence_id")
     private Competence competence;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id")
     private ToolActivity toolActivity;
 

@@ -20,13 +20,13 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rating.model;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,23 +50,23 @@ public class RatingComment implements java.io.Serializable, Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @ManyToOne 
-    @JoinColumn(name = "rating_criteria_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rating_criteria_id")
     private RatingCriteria ratingCriteria;
 
     @Column(name = "item_id")
     private Long itemId;
 
-    @ManyToOne 
-    @JoinColumn(name = "user_id") 
-   private User learner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User learner;
 
     @Column
     private String comment;
 
     @Column(name = "posted_date")
     private Date postedDate;
-    
+
     @Column(name = "tool_session_id")
     private Long toolSessionId;
 
@@ -146,7 +146,7 @@ public class RatingComment implements java.io.Serializable, Cloneable {
     public void setPostedDate(Date postedDate) {
 	this.postedDate = postedDate;
     }
-    
+
     public Long getToolSessionId() {
 	return toolSessionId;
     }

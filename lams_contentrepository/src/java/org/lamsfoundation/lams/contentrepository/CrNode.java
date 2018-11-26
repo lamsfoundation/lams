@@ -69,11 +69,11 @@ public class CrNode implements Serializable {
     @Column(name = "next_version_id")
     private Long nextVersionId;
 
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "workspace_id") 
     private org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace;
 
-    @ManyToOne 
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "parent_nv_id") 
     private org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion;
 

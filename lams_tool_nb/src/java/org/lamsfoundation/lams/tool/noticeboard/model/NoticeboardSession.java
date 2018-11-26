@@ -91,7 +91,7 @@ public class NoticeboardSession implements Serializable {
     @Column(name = "session_status")
     private String sessionStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nb_content_uid")
     private NoticeboardContent nbContent;
 

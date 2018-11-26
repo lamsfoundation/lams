@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -70,11 +71,11 @@ public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> 
     @Column
     private boolean singleUserEntry;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vote_nomination_content_id")
     private VoteQueContent voteQueContent;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "que_usr_id")
     private VoteQueUsr voteQueUsr;
 

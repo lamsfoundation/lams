@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,34 +50,34 @@ public class DokumaranSession {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column(name = "session_name")
     private String sessionName;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dokumaran_uid")
     private Dokumaran dokumaran;
-    
+
     @Column(name = "session_start_date")
     private Date sessionStartDate;
-    
+
     @Column(name = "session_end_date")
     private Date sessionEndDate;
-    
+
     // finished or not
     @Column
     private int status;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_leader_uid")
     private DokumaranUser groupLeader;
-    
+
     @Column(name = "etherpad_group_id")
     private String etherpadGroupId;
-    
+
     @Column(name = "etherpad_read_only_id")
     private String etherpadReadOnlyId;
 
@@ -148,47 +149,47 @@ public class DokumaranSession {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-    
+
     /**
     */
-   public DokumaranUser getGroupLeader() {
+    public DokumaranUser getGroupLeader() {
 	return this.groupLeader;
-   }
+    }
 
-   public void setGroupLeader(DokumaranUser groupLeader) {
+    public void setGroupLeader(DokumaranUser groupLeader) {
 	this.groupLeader = groupLeader;
-   }
-   
-   /**
-    * @return Returns the etherpadReadOnlyId
-    */
-   public String getEtherpadGroupId() {
+    }
+
+    /**
+     * @return Returns the etherpadReadOnlyId
+     */
+    public String getEtherpadGroupId() {
 	return etherpadGroupId;
-   }
+    }
 
-   /**
-    * @param etherpadReadOnlyId
-    *            The etherpadReadOnlyId to set.
-    */
-   public void setEtherpadGroupId(String etherpadGroupId) {
+    /**
+     * @param etherpadReadOnlyId
+     *            The etherpadReadOnlyId to set.
+     */
+    public void setEtherpadGroupId(String etherpadGroupId) {
 	this.etherpadGroupId = etherpadGroupId;
-   }
-   
-   /**
-    * @return Returns the etherpadReadOnlyId
-    */
-   public String getEtherpadReadOnlyId() {
-	return etherpadReadOnlyId;
-   }
+    }
 
-   /**
-    * @param etherpadReadOnlyId
-    *            The etherpadReadOnlyId to set.
-    */
-   public void setEtherpadReadOnlyId(String etherpadReadOnlyId) {
+    /**
+     * @return Returns the etherpadReadOnlyId
+     */
+    public String getEtherpadReadOnlyId() {
+	return etherpadReadOnlyId;
+    }
+
+    /**
+     * @param etherpadReadOnlyId
+     *            The etherpadReadOnlyId to set.
+     */
+    public void setEtherpadReadOnlyId(String etherpadReadOnlyId) {
 	this.etherpadReadOnlyId = etherpadReadOnlyId;
-   }
-   
+    }
+
     public String getPadId() {
 	// HashUtil.sha1(DokumaranConstants.DEFAULT_PAD_NAME + sessionId);
 	return etherpadGroupId + "$" + DokumaranConstants.DEFAULT_PAD_NAME;

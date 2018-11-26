@@ -186,7 +186,7 @@ public class Lesson implements Serializable {
     @Column(name = "scheduled_number_days_to_lesson_finish")
     private Integer scheduledNumberDaysToLessonFinish;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

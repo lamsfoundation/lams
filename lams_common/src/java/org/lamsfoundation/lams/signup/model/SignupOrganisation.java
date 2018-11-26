@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,9 +30,9 @@ public class SignupOrganisation {
     @Column(name = "signup_organisation_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer signupOrganisationId;
-    
-    @ManyToOne 
-    @JoinColumn(name = "organisation_id") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
     @Column(name = "add_to_lessons")

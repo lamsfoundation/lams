@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -56,21 +57,21 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
-    @ManyToOne 
-    @JoinColumn(name = "wiki_page_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wiki_page_uid")
     private WikiPage wikiPage;
-    
+
     @Column
     private String body;
 
-    @ManyToOne 
-    @JoinColumn(name = "editor") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "editor")
     private WikiUser editor;
-    
+
     @Column(name = "edit_date")
     private Date editDate;
-    
+
     @Column
     private Long version;
 

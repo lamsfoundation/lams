@@ -85,11 +85,11 @@ public class AssessmentQuestionResult {
     @Column(name = "confidence_level")
     private int confidenceLevel;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assessment_question_uid")
     private AssessmentQuestion assessmentQuestion;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
     private AssessmentResult assessmentResult;
     
