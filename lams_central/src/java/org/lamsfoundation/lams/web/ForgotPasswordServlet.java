@@ -21,6 +21,7 @@ import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -64,7 +65,15 @@ public class ForgotPasswordServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String method = request.getParameter("method");
 
-	if (method.equals("requestEmail")) {
+	if (method.equals("showForgotYourPasswordPage")) {
+	    if (Configuration.getAsBoolean(ConfigurationKeys.FORGOT_YOUR_PASSWORD_LINK_ENABLE)) {
+		request.getRequestDispatcher("/forgotPassword.jsp").forward(request, response);
+	    } else {
+		//if people try to get to the forgot your password page by going to the URL directly, we display a 404 error message 
+		response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	    }
+	
+	} else if (method.equals("requestEmail")) {
 	    String selectType = request.getParameter("selectType");
 	    Boolean findByEmail = false;
 	    String param = "";

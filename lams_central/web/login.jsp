@@ -14,6 +14,7 @@
 	<c:set var="login" value="${sessionScope.login}" />
 	<c:set var="password" value="${sessionScope.password}" />
 </c:if>
+<c:set var="isForgotYourPasswordEnabled"><%=Configuration.get(ConfigurationKeys.FORGOT_YOUR_PASSWORD_LINK_ENABLE)%></c:set>
 
 <!DOCTYPE html>
 <lams:html>
@@ -59,6 +60,16 @@
 					}
 					$('#j_username').focus();
 					$('#news').load('/lams/www/news.html');
+
+					//make a POST call to ForgotPasswordRequest
+					$("#forgot-password-link").click(function() {
+						var $form=$(document.createElement('form'))
+							.css({display:'none'})
+							.attr("method","POST")
+							.attr("action","<lams:LAMSURL/>ForgotPasswordRequest?method=showForgotYourPasswordPage");
+						$("body").append($form);
+						$form.submit();
+					});
 				});
 			</script>
 		</lams:head>
@@ -118,12 +129,15 @@
 								<input id="j_password" type="password" class="form-control" name="j_password" placeholder="<fmt:message key='label.password' />" onkeypress="onEnter(event)" tabindex="2">
 							</div>
 							<div class="form-group voffset5" style="margin-bottom: 5px;">
-						   	<div class="col-md-12 control" style="font-size:75%">
-										<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" /></a>
-						    	</div>
+								<c:if test="${isForgotYourPasswordEnabled}">
+							   		<div class="col-md-12 control" style="font-size:75%">
+										<a id="forgot-password-link" href="#nogo"> <fmt:message key="label.forgot.password" /></a>
+							    	</div>
+							    </c:if>
+							    
 								<!-- Button -->
 								<div class="col-sm-12 controls voffset5">
-								  <a id="loginButton" href="javascript:submitForm()" class="btn btn-primary btn-block" tabindex="3"><fmt:message key="button.login" /></a>
+									<a id="loginButton" href="javascript:submitForm()" class="btn btn-primary btn-block" tabindex="3"><fmt:message key="button.login" /></a>
 								</div>
 							</div>
 						</form>     
