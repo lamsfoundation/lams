@@ -1535,7 +1535,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      */
     @Override
     public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId) {
-	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
+	List<LearningDesignAccess> accessList = learningDesignDAO.getLearningDesignAccess(userId);
 	List<LearningDesignAccess> result = new LinkedList<>();
 	for (int accessIndex = 0; accessIndex < accessList.size(); accessIndex++) {
 	    LearningDesignAccess access = accessList.get(accessIndex);
@@ -1549,7 +1549,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		log.warn("When getting recent access list for Author with ID " + userId + " LD with ID "
 			+ access.getLearningDesignId() + " was found missing. Deleting access entry.");
 		baseDAO.delete(access);
-	    } else if (learningDesign.getWorkspaceFolder() != null) {
+		continue;
+	    }
+	    if (learningDesign.getWorkspaceFolder() != null) {
 		access.setTitle(learningDesign.getTitle());
 		access.setWorkspaceFolderId(learningDesign.getWorkspaceFolder().getWorkspaceFolderId());
 		result.add(access);
@@ -1560,8 +1562,11 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     @Override
     public void storeLearningDesignAccess(Long learningDesignId, Integer userId) {
-	LearningDesignAccess access = new LearningDesignAccess();
-	access.setId(new LearningDesignAccessPrimaryKey(learningDesignId, userId));
+	LearningDesignAccess access = learningDesignDAO.getLearningDesignAccess(learningDesignId, userId);
+	if (access == null) {
+	    access = new LearningDesignAccess();
+	    access.setId(new LearningDesignAccessPrimaryKey(learningDesignId, userId));
+	}
 	access.setAccessDate(new Date());
 	learningDesignDAO.insertOrUpdate(access);
     }

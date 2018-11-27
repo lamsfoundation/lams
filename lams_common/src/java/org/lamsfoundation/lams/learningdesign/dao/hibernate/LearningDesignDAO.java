@@ -55,6 +55,9 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
     private static final String ACCESS_BY_USER = "from " + LearningDesignAccess.class.getName()
 	    + " as a where a.id.userId = ? order by a.accessDate desc";
 
+    private static final String ACCESS_BY_LD_AND_USER = "from " + LearningDesignAccess.class.getName()
+	    + " as a where a.id.learningDesignId = ? and a.id.userId = ?";
+
     /*
      * @see
      * org.lamsfoundation.lams.learningdesign.dao.interfaces.ILearningDesignDAO#getLearningDesignById(java.lang.Long)
@@ -108,8 +111,16 @@ public class LearningDesignDAO extends LAMSBaseDAO implements ILearningDesignDAO
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<LearningDesignAccess> getAccessByUser(Integer userId) {
+    public List<LearningDesignAccess> getLearningDesignAccess(Integer userId) {
 	return (List<LearningDesignAccess>) this.doFind(ACCESS_BY_USER, userId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public LearningDesignAccess getLearningDesignAccess(Long learningDesignId, Integer userId) {
+	List<LearningDesignAccess> list = (List<LearningDesignAccess>) this.doFind(ACCESS_BY_LD_AND_USER,
+		learningDesignId, userId);
+	return list.isEmpty() ? null : list.get(0);
     }
 
     @Override

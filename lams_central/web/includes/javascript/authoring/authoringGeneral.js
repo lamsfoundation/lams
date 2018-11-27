@@ -3067,9 +3067,7 @@ GeneralLib = {
 										$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
 									}
 								});
-						}).attr('src', LAMS_URL 
-									   + 'authoring/generateSVG.do?selectable=false&learningDesignID='
-									   + learningDesignID);
+						}).attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 					}
 				});
 			}
