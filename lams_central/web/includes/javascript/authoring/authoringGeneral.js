@@ -1537,6 +1537,9 @@ GeneralLib = {
 	 * Tells the backend to remove the system gate.
 	 */
 	cancelLiveEdit : function(){
+		var cancelLiveEditButton = $('#cancelLiveEditButton');
+		cancelLiveEditButton.button('loading');
+		
 		if (GeneralLib.canClose() || confirm(LABELS.LIVEEDIT_CANCEL_CONFIRM)) {
 			$.ajax({
 				type  : 'POST',
@@ -1552,6 +1555,8 @@ GeneralLib = {
 					window.parent.closeDialog('dialogAuthoring');
 				}
 			});
+		} else {
+			cancelLiveEditButton.button('reset');
 		}
 	},
 	

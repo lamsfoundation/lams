@@ -16,7 +16,6 @@
 	<lams:css suffix="authoring"/>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.simple-color.js"></script>
@@ -25,7 +24,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/treeview-min.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
@@ -329,7 +328,8 @@
 		</div>
 
 		<div class="btn-group btn-group-sm">
-			<button id="saveButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()">
+			<button id="saveButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()"
+					data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.page.menu.save' /></span>">
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 			</button>
@@ -343,7 +343,8 @@
 			</ul>
 		</div>
 		
-		<button id="cancelLiveEditButton" class="btn btn-default" onClick="javascript:GeneralLib.cancelLiveEdit()">
+		<button id="cancelLiveEditButton" class="btn btn-default" onClick="javascript:GeneralLib.cancelLiveEdit()"
+				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.cancel.button' /></span>">
 			<i class="fa fa-ban"></i> 
 			<span><fmt:message key="authoring.fla.cancel.button" /></span>
 		</button>
