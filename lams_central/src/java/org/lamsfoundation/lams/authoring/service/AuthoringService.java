@@ -1537,7 +1537,13 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId) {
 	List<LearningDesignAccess> accessList = learningDesignDAO.getAccessByUser(userId);
 	List<LearningDesignAccess> result = new LinkedList<>();
-	for (LearningDesignAccess access : accessList) {
+	for (int accessIndex = 0; accessIndex < accessList.size(); accessIndex++) {
+	    LearningDesignAccess access = accessList.get(accessIndex);
+	    if (accessIndex >= LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT) {
+		// remove oldest entries above limit
+		baseDAO.delete(access);
+		continue;
+	    }
 	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(access.getLearningDesignId());
 	    if (learningDesign == null) {
 		log.warn("When getting recent access list for Author with ID " + userId + " LD with ID "
