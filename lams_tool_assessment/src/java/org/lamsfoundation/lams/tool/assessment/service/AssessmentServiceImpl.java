@@ -2226,6 +2226,9 @@ public class AssessmentServiceImpl
 			    }
 			}
 		    }
+		    if (oldOptions.size() != newOptions.size()) {
+			isQuestionModified = true;
+		    }
 
 		    if (isQuestionModified) {
 			modifiedQuestions.add(newQuestion);
