@@ -1239,17 +1239,20 @@ function loadLearningDesignSVG() {
 				return;
 			}
 			// iframe just to load Authoring for a single purpose, generate the SVG
-			$('<iframe />').appendTo('body').load(function(){
+			$('<iframe />').appendTo('body').css('visibility', 'hidden').load(function(){
 				// call svgGenerator.jsp code to store LD SVG on the server
 				var frame = $(this),
 					win = frame[0].contentWindow || frame[0].contentDocument;
-				win.GeneralLib.saveLearningDesignImage();
-				frame.remove();
-				
-				// run the whole fetch again
-				updateSequenceTab();
-			}).attr('src', LAMS_URL 
-						   + 'authoring/generateSVG.do?selectable=false&learningDesignID=' + ldId).attr('width',0).attr('height',0).attr('style','border: 0px');
+			    // when LD opens, make a callback which save the thumbnail and displays it in current window
+				win.GeneralLib.openLearningDesign(ldId, function(){
+					result = win.GeneralLib.saveLearningDesignImage();
+					frame.remove();
+					if (result) {
+						// load the image again
+						updateSequenceTab();
+					}
+				});
+			}).attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 			
 		}
 	});
