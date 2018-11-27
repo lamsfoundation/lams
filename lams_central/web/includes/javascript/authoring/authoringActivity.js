@@ -1351,7 +1351,7 @@ ActivityLib = {
 		// fetch authoring URL for a Tool Activity
 		if (!activity.authorURL && activity.toolID) {
 			$.ajax({
-				async : false,
+				async : true,
 				cache : false,
 				url : LAMS_URL + "authoring/createToolContent.do",
 				dataType : 'json',

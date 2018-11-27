@@ -350,7 +350,7 @@ GeneralInitLib = {
 			
 			$.ajax({
 				cache : false,
-				async : false,
+				async : true,
 				url : LAMS_URL + "workspace/createFolder.do",
 				dataType : 'text',
 				data : {
@@ -454,7 +454,7 @@ GeneralInitLib = {
 			
 			$.ajax({
 				cache : false,
-				async : false,
+				async : true,
 				url : LAMS_URL + "workspace/deleteResource.do",
 				dataType : 'text',
 				data : {
@@ -508,7 +508,7 @@ GeneralInitLib = {
 			
 			$.ajax({
 				cache : false,
-				async : false,
+				async : true,
 				url : LAMS_URL + "workspace/renameResource.do",
 				dataType : 'text',
 				data : {
@@ -1540,7 +1540,7 @@ GeneralLib = {
 		if (GeneralLib.canClose() || confirm(LABELS.LIVEEDIT_CANCEL_CONFIRM)) {
 			$.ajax({
 				type  : 'POST',
-				async : false,
+				async : true,
 				cache : false,
 				url : LAMS_URL + 'authoring/finishLearningDesignEdit.do',
 				data : {
@@ -1720,7 +1720,7 @@ GeneralLib = {
 		}
 		// get LD details
 		$.ajax({
-			async : false,
+			async : true,
 			cache : false,
 			url : LAMS_URL + "authoring/openLearningDesign.do",
 			dataType : 'json',
