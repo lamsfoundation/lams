@@ -1713,7 +1713,7 @@ GeneralLib = {
 	/**
 	 * Replace current canvas contents with the loaded sequence.
 	 */
-	openLearningDesign : function(learningDesignID) {
+	openLearningDesign : function(learningDesignID, callback) {
 		if (!learningDesignID){
 			// do just a re-load
 			learningDesignID = layout.ld.learningDesignID;
@@ -2273,6 +2273,10 @@ GeneralLib = {
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
 					layout.infoDialog.data('show')(LABELS.SEQUENCE_NOT_VALID);
+				}
+				
+				if (callback) {
+					callback(); 
 				}
 			}
 		});
@@ -3049,15 +3053,18 @@ GeneralLib = {
 						$('<iframe />').appendTo('body').load(function(){
 							// call svgGenerator.jsp code to store LD SVG on the server
 							var frame = $(this),
-								win = frame[0].contentWindow || frame[0].contentDocument,
-								result = win.GeneralLib.saveLearningDesignImage();
-							frame.remove();
-							if (result) {
-								// load the image again
-								GeneralLib.showLearningDesignThumbnail(learningDesignID);
-							} else {
-								$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
-							}
+								win = frame[0].contentWindow || frame[0].contentDocument;
+							    // when LD opens, make a callback which save the thumbnail and displays it in current window
+								win.GeneralLib.openLearningDesign(learningDesignID, function(){
+									result = win.GeneralLib.saveLearningDesignImage();
+									frame.remove();
+									if (result) {
+										// load the image again
+										GeneralLib.showLearningDesignThumbnail(learningDesignID);
+									} else {
+										$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
+									}
+								});
 						}).attr('src', LAMS_URL 
 									   + 'authoring/generateSVG.do?selectable=false&learningDesignID='
 									   + learningDesignID);
