@@ -484,10 +484,10 @@ GeneralInitLib = {
     		}
     		var isFolder = !ldNode.data.learningDesignId,
     			title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
-						+ ' "' + ldNode.label + '"');
+						+ ' "' + ldNode.data.label + '"');
 			
 			// skip if no name or the same name was provided
-			if (!title || ldNode.label == title) {
+			if (!title || ldNode.data.label == title) {
 				return;
 			}
 			if (!GeneralLib.validateName(title)) {
@@ -496,7 +496,7 @@ GeneralInitLib = {
     		}
 			
 			$.each(ldNode.parent.children, function(){
-				if (this.label == title && (isFolder == (this.data.folderID != null))) {
+				if (this.data.label == title && (isFolder == (this.data.folderID != null))) {
 					alert(isFolder ? LABELS.FOLDER_EXISTS_ERROR : LABELS.SEQUENCE_EXISTS_ERROR);
 					title = null;
 					return false;
@@ -518,7 +518,7 @@ GeneralInitLib = {
 				},
 				success : function(response) {
 					if (isFolder) {
-						ldNode.label = title;
+						ldNode.data.label = title;
 						ldNode.getLabelEl().innerHTML = title;
 					} else {
 						// refresh all opened folders in the tree
