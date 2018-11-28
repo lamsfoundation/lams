@@ -7,7 +7,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="forum" value="${sessionMap.forum}" />
 
-<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">

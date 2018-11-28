@@ -46,6 +46,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public interface IAuthoringFullService extends IAuthoringService {
 
+    static int LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT = 7;
+
     /**
      * Create a copy of learning design as per the requested learning design and saves it in the given workspacefolder.
      * Designed to be called when user tries to copy a learning design using the Authoring interface. Does not set the

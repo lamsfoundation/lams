@@ -15,7 +15,7 @@
 			<fmt:message key="activity.title" />
 		</title>
 		<lams:css/>
-		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" />
+		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" />
 		<style type="text/css">
 	    	.dialog{display: none;}
 	    	.ui-dialog-titlebar-close{display: none;}

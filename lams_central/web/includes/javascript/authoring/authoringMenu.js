@@ -258,7 +258,7 @@ var MenuLib = {
 		.click(function(){
 			exportLDDialog.modal('hide');
 		});
-		$('#exportLDDialogContents').clone().attr('id', null).show().appendTo($('.modal-body', exportLDDialog).empty());
+		$('#exportLDDialogContents').clone().attr('id', null).appendTo($('.modal-body', exportLDDialog).empty()).show();
 		exportLDDialog.modal('show');
 	},
 
@@ -650,7 +650,8 @@ var MenuLib = {
 	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
 	 */
 	saveLearningDesign : function(showDialog){
-		$('#saveButton').blur();
+		var saveButton = $('#saveButton').blur();
+		saveButton.button('loading');
 		
 		if (!showDialog && layout.ld.learningDesignID) {
 			if (!layout.ld.canModify || (!canSetReadOnly && layout.ld.readOnly)) {
@@ -658,6 +659,7 @@ var MenuLib = {
 			} else {
 				GeneralLib.saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title, layout.ld.readOnly);
 			}
+			saveButton.button('reset');
 			return;
 		}
 		
@@ -666,6 +668,7 @@ var MenuLib = {
 		layout.ldStoreDialog.on('shown.bs.modal', function(){
 			$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).focus();
 		});
+		saveButton.button('reset');
 		layout.ldStoreDialog.modal('show');
 	},
 	

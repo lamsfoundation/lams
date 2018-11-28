@@ -14,7 +14,7 @@
 	<title><fmt:message key="title.author.window"/></title>
 	
 	<lams:css />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css">
 	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css">
 	<lams:css suffix="authoring"/>

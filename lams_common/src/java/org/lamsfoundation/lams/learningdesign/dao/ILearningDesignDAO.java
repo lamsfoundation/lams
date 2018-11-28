@@ -43,7 +43,7 @@ public interface ILearningDesignDAO extends IBaseDAO {
     /**
      * This method returns a list of all designs that are valid in
      * the given workspaceFolder.
-     * 
+     *
      * @param workspaceFolderID
      *            The workspace_folder_id of the WorkspaceFolder
      *            from where the designs have to be fetched.
@@ -54,7 +54,7 @@ public interface ILearningDesignDAO extends IBaseDAO {
     /**
      * This method returns a list of all available designs in
      * the given workspaceFolder.
-     * 
+     *
      * @param workspaceFolderID
      *            The workspace_folder_id of the WorkspaceFolder
      *            from where the designs have to be fetched.
@@ -65,7 +65,7 @@ public interface ILearningDesignDAO extends IBaseDAO {
     /**
      * This method returns a List of Learning Designs with given
      * <code>original_learning_design_id</code>
-     * 
+     *
      * @param originalDesignID
      *            The <code>original_learning_design_id</code>
      * @return List The List of all corresponding Learning designs with
@@ -78,7 +78,9 @@ public interface ILearningDesignDAO extends IBaseDAO {
      */
     public List getLearningDesignTitlesByWorkspaceFolder(Integer workspaceFolderID, String prefix);
 
-    public List<LearningDesignAccess> getAccessByUser(Integer userId);
+    public List<LearningDesignAccess> getLearningDesignAccess(Integer userId);
+
+    public LearningDesignAccess getLearningDesignAccess(Long learningDesignID, Integer userId);
 
     /**
      * Get a portion of the learning designs in the given folder. If page & size are null, the effect the same data

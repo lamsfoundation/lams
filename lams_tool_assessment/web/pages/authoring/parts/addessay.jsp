@@ -3,7 +3,7 @@
 
 <lams:html>
 <lams:head>
-	<link href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css">
+	<link href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 	<%@ include file="/common/header.jsp"%>
 	<link href="<lams:WebAppURL/>includes/css/addQuestion.css" rel="stylesheet" type="text/css">
 

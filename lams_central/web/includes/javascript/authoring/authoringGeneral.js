@@ -350,7 +350,7 @@ GeneralInitLib = {
 			
 			$.ajax({
 				cache : false,
-				async : false,
+				async : true,
 				url : LAMS_URL + "workspace/createFolder.do",
 				dataType : 'text',
 				data : {
@@ -454,7 +454,7 @@ GeneralInitLib = {
 			
 			$.ajax({
 				cache : false,
-				async : false,
+				async : true,
 				url : LAMS_URL + "workspace/deleteResource.do",
 				dataType : 'text',
 				data : {
@@ -484,10 +484,10 @@ GeneralInitLib = {
     		}
     		var isFolder = !ldNode.data.learningDesignId,
     			title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
-						+ ' "' + ldNode.label + '"');
+						+ ' "' + ldNode.data.label + '"');
 			
 			// skip if no name or the same name was provided
-			if (!title || ldNode.label == title) {
+			if (!title || ldNode.data.label == title) {
 				return;
 			}
 			if (!GeneralLib.validateName(title)) {
@@ -496,7 +496,7 @@ GeneralInitLib = {
     		}
 			
 			$.each(ldNode.parent.children, function(){
-				if (this.label == title && (isFolder == (this.data.folderID != null))) {
+				if (this.data.label == title && (isFolder == (this.data.folderID != null))) {
 					alert(isFolder ? LABELS.FOLDER_EXISTS_ERROR : LABELS.SEQUENCE_EXISTS_ERROR);
 					title = null;
 					return false;
@@ -508,7 +508,7 @@ GeneralInitLib = {
 			
 			$.ajax({
 				cache : false,
-				async : false,
+				async : true,
 				url : LAMS_URL + "workspace/renameResource.do",
 				dataType : 'text',
 				data : {
@@ -518,7 +518,7 @@ GeneralInitLib = {
 				},
 				success : function(response) {
 					if (isFolder) {
-						ldNode.label = title;
+						ldNode.data.label = title;
 						ldNode.getLabelEl().innerHTML = title;
 					} else {
 						// refresh all opened folders in the tree
@@ -542,6 +542,7 @@ GeneralInitLib = {
 	    
 		$('#ldStoreDialogSaveButton', ldStoreDialogContents).click(function(){
     		var dialog = layout.ldStoreDialog,
+    			saveButton = $('#ldStoreDialogSaveButton', dialog),
 				title = $('#ldStoreDialogNameContainer input', dialog).val().trim();
 			if (!title) {
 				alert(LABELS.SAVE_SEQUENCE_TITLE_PROMPT);
@@ -552,7 +553,7 @@ GeneralInitLib = {
 				alert(LABELS.TITLE_VALIDATION_ERROR);
 				return;
 			}
-			
+			saveButton.prop('disabled', true).button('loading');
 			var folderNode = null,
 				folderID = null,
 				tree = dialog.data('ldTree'),
@@ -562,6 +563,7 @@ GeneralInitLib = {
 				folderNode = node.data.learningDesignId ? node.parent : node;
 				if (!folderNode.data.canSave) {
 					alert(LABELS.FOLDER_CAN_NOT_SAVE_ERROR);
+					saveButton.button('reset');
 					return;
 				}
 				folderID = folderNode.data.folderID;
@@ -578,6 +580,7 @@ GeneralInitLib = {
 			if (!folderID) {
 				// although an existing sequence can be highlighted 
 				alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
+				saveButton.button('reset');
 				return;
 			}
 			
@@ -596,9 +599,11 @@ GeneralInitLib = {
 			}
 			if (nodeData && (!nodeData.canModify || (!canSetReadOnly && nodeData.readOnly))){
 				alert(LABELS.READONLY_FORBIDDEN_ERROR);
+				saveButton.button('reset');
 				return;
 			}
 			if (nodeData && !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+				saveButton.button('reset');
 				return;
 			}
 			var readOnly = (nodeData && !nodeData.canModify) || 
@@ -609,14 +614,17 @@ GeneralInitLib = {
 				GeneralLib.openLearningDesign();
 				dialog.modal('hide');
 			}
+			saveButton.button('reset');
 		});
 		
 		$('#ldStoreDialogOpenButton', ldStoreDialogContents).click(function(){
     		var dialog = layout.ldStoreDialog,
+    			openButton = $('#ldStoreDialogOpenButton', dialog),
 				tree = dialog.data('ldTree'),
 				ldNode = tree.getHighlightedNode(),
 				learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
-		
+    		
+    		openButton.button('loading');
 			if (!learningDesignID) {
 				learningDesignID = +$('#ldStoreDialogAccessDiv > div.selected', dialog)
 								   .data('learningDesignId');
@@ -625,9 +633,11 @@ GeneralInitLib = {
 			// no LD was chosen
 			if (!learningDesignID) {
 				alert(LABELS.SEQUENCE_NOT_SELECTED_ERROR);
+				openButton.button('reset');
 				return;
 			}
 			
+			openButton.button('reset');
 			dialog.modal('hide');
 			GeneralLib.openLearningDesign(learningDesignID);
 		});
@@ -1537,10 +1547,13 @@ GeneralLib = {
 	 * Tells the backend to remove the system gate.
 	 */
 	cancelLiveEdit : function(){
+		var cancelLiveEditButton = $('#cancelLiveEditButton');
+		cancelLiveEditButton.button('loading');
+		
 		if (GeneralLib.canClose() || confirm(LABELS.LIVEEDIT_CANCEL_CONFIRM)) {
 			$.ajax({
 				type  : 'POST',
-				async : false,
+				async : true,
 				cache : false,
 				url : LAMS_URL + 'authoring/finishLearningDesignEdit.do',
 				data : {
@@ -1552,6 +1565,8 @@ GeneralLib = {
 					window.parent.closeDialog('dialogAuthoring');
 				}
 			});
+		} else {
+			cancelLiveEditButton.button('reset');
 		}
 	},
 	
@@ -1713,14 +1728,14 @@ GeneralLib = {
 	/**
 	 * Replace current canvas contents with the loaded sequence.
 	 */
-	openLearningDesign : function(learningDesignID) {
+	openLearningDesign : function(learningDesignID, callback) {
 		if (!learningDesignID){
 			// do just a re-load
 			learningDesignID = layout.ld.learningDesignID;
 		}
 		// get LD details
 		$.ajax({
-			async : false,
+			async : true,
 			cache : false,
 			url : LAMS_URL + "authoring/openLearningDesign.do",
 			dataType : 'json',
@@ -1916,7 +1931,9 @@ GeneralLib = {
 						case 13:
 							// draw both edge points straight away and mark the whole canvas for auto reaarange,
 							// re-arrange only if it is old SVG being converted into new one
-							arrangeNeeded |= activityData.xCoord != null && activityData.yCoord != null;
+							arrangeNeeded |= (activityData.xCoord != null && activityData.yCoord != null)
+											 || activityData.startXCoord == null
+											 || activityData.startXCoord == null;
 							var branchingType = branchingType || 'optional',
 								branchingEdge = new ActivityDefs.BranchingEdgeActivity(activityData.activityID,
 										activityData.activityUIID,
@@ -2273,6 +2290,10 @@ GeneralLib = {
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
 					layout.infoDialog.data('show')(LABELS.SEQUENCE_NOT_VALID);
+				}
+				
+				if (callback) {
+					callback(); 
 				}
 			}
 		});
@@ -3046,21 +3067,22 @@ GeneralLib = {
 							return;
 						}
 						// iframe just to load another instance of Authoring for a single purpose, generate the SVG
-						$('<iframe />').appendTo('body').load(function(){
+						$('<iframe />').appendTo('body').css('visibility', 'hidden').load(function(){
 							// call svgGenerator.jsp code to store LD SVG on the server
 							var frame = $(this),
-								win = frame[0].contentWindow || frame[0].contentDocument,
-								result = win.GeneralLib.saveLearningDesignImage();
-							frame.remove();
-							if (result) {
-								// load the image again
-								GeneralLib.showLearningDesignThumbnail(learningDesignID);
-							} else {
-								$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
-							}
-						}).attr('src', LAMS_URL 
-									   + 'authoring/generateSVG.do?selectable=false&learningDesignID='
-									   + learningDesignID);
+								win = frame[0].contentWindow || frame[0].contentDocument;
+							    // when LD opens, make a callback which save the thumbnail and displays it in current window
+								win.GeneralLib.openLearningDesign(learningDesignID, function(){
+									result = win.GeneralLib.saveLearningDesignImage();
+									frame.remove();
+									if (result) {
+										// load the image again
+										GeneralLib.showLearningDesignThumbnail(learningDesignID);
+									} else {
+										$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
+									}
+								});
+						}).attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 					}
 				});
 			}

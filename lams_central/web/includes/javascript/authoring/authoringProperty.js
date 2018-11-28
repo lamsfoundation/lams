@@ -1731,6 +1731,7 @@ PropertyLib = {
 			modalContent = $('.modal-content', dialog);
 		modalBody.children().detach();
 		modalBody.append(object.propertiesContent);
+		object.propertiesContent.show();
 		modalBody.change(function(){
 			dialog.height(modalContent.height() + 10);
 		});

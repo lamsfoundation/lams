@@ -11,7 +11,7 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="${lams}css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="${lams}css/orgGrouping.css" type="text/css" media="screen" />
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>

@@ -117,8 +117,6 @@ public class AuthoringController {
     @Autowired
     WebApplicationContext applicationContext;
 
-    private static int LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT = 7;
-
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -150,8 +148,6 @@ public class AuthoringController {
 	request.setAttribute("learningLibraryGroups", groupsJSON.toString());
 
 	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(getUserId());
-	accessList = accessList.subList(0,
-		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	request.setAttribute("access", JsonUtil.toString(accessList));
 	request.setAttribute("licenses", authoringService.getAvailableLicenses());
 
@@ -227,8 +223,6 @@ public class AuthoringController {
 	responseJSON.set("ld", ldJSON);
 
 	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(userId);
-	accessList = accessList.subList(0,
-		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
 	responseJSON.set("access", JsonUtil.readArray(accessList));
 
 	response.setContentType("application/json;charset=utf-8");
@@ -417,9 +411,6 @@ public class AuthoringController {
 	Integer userId = getUserId();
 
 	List<LearningDesignAccess> accessList = authoringService.updateLearningDesignAccessByUser(userId);
-	accessList = accessList.subList(0,
-		Math.min(accessList.size(), AuthoringController.LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT - 1));
-
 	response.setContentType("application/json;charset=utf-8");
 	return JsonUtil.toString(accessList);
     }
