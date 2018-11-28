@@ -29,9 +29,9 @@
 		};
 
 		var mustHaveUppercase = ${mustHaveUppercase},
-	     mustHaveNumerics  = ${mustHaveNumerics},
-	     mustHaveLowercase  = ${mustHaveLowercase},
-	     mustHaveSymbols   = ${mustHaveSymbols};
+	    	mustHaveNumerics  = ${mustHaveNumerics},
+	    	mustHaveLowercase  = ${mustHaveLowercase},
+	    	mustHaveSymbols   = ${mustHaveSymbols};
 
 	     $.validator.addMethod("pwcheck", function(value) {
 	     	return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
@@ -87,7 +87,6 @@
 					document.changePass.submit();
 				}
 			});
-
 		});
 	</script>
 </lams:head>

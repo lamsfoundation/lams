@@ -112,7 +112,11 @@
 			<div class="panel">
 				<c:out value="${assessment.instructions}" escapeXml="false"/>
 			</div>
+<<<<<<< HEAD
 		
+=======
+			
+>>>>>>> refs/remotes/origin/master
 			<div class="form-group">
 				<%@ include file="results/allquestions.jsp"%>
 				

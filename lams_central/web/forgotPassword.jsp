@@ -70,8 +70,9 @@
 			if (keycode == 13) {
 				validateForm();
 				return false;
-			} else
+			} else {
 				return true;
+			}
 		}
 	</script>
 </lams:head>
@@ -105,26 +106,25 @@
 						<div class="form-group">
 							<input type="radio" id="loginCheck" name="selectType"
 								value="radioUsername" onclick="radioSelected();" checked>
-							<label for="loginCheck"><fmt:message
-									key="label.forgot.password.username" /></label>
+							<label for="loginCheck">
+								<fmt:message key="label.forgot.password.username" />
+							</label>
 						</div>
 						<div class="form-group">
-							<input type="text" name="login" id="login" class="form-control"
-								maxlength="50" tabindex="1"
+							<input type="text" name="login" id="login" class="form-control" maxlength="50" tabindex="1"
 								onKeyPress="return submitenter(this,event)" />
 						</div>
 
 						<hr class="msg-hr" />
 
 						<div class="form-group">
-							<input type="radio" id="emailCheck" name="selectType"
-								value="radioEmail" onclick="radioSelected();"> <label
-								for="emailCheck"><fmt:message
-									key="label.forgot.password.email" /></label>
+							<input type="radio" id="emailCheck" name="selectType" value="radioEmail" onclick="radioSelected();"> 
+							<label for="emailCheck">
+								<fmt:message key="label.forgot.password.email" />
+							</label>
 						</div>
 						<div class="form-group">
-							<input type="text" name="email" id="email" class="form-control"
-								maxlength="50" tabindex="1"
+							<input type="text" name="email" id="email" class="form-control" maxlength="50" tabindex="1"
 								onKeyPress="return submitenter(this,event)" />
 						</div>
 

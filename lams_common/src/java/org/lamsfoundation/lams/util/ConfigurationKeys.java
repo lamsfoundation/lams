@@ -225,6 +225,8 @@ public class ConfigurationKeys {
     public static String SMTP_AUTH_SECURITY = "SMTPAuthSecurity";
 
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
+    
+    public static String FORGOT_YOUR_PASSWORD_LINK_ENABLE = "EnableForgotYourPasswordLink";
 
     public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
 

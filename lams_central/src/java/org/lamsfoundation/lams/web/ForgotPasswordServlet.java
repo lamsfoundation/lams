@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.id.Configurable;
@@ -23,6 +24,7 @@ import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -40,29 +42,25 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 public class ForgotPasswordServlet extends HttpServlet {
     private static final long serialVersionUID = -4833236166181290760L;
     private static Logger log = Logger.getLogger(ForgotPasswordServlet.class);
-    
+
     @Autowired
     protected MessageService centralMessageService;
     @Autowired
     protected IUserManagementService userManagementService;
 
     // states
-    public static String SMTP_SERVER_NOT_SET = "error.support.email.not.set";
-    public static String USER_NOT_FOUND = "error.user.not.found";
-    public static String PASSWORD_REQUEST_EXPIRED = "error.password.request.expired";
-    public static String SUCCESS_REQUEST_EMAIL = "forgot.password.email.sent";
-    public static String SUCCESS_CHANGE_PASS = "heading.password.changed.screen";
-    public static String EMAIL_NOT_FOUND = "error.email.not.found";
-    public static String INTERNAL_ERROR = "error.email.internal";
-    public static String EMAIL_FAILED = "error.email.not.sent";
-    public static String REQUEST_KEY_NOT_FOUND = "error.forgot.password.incorrect.key";
+    private static String SMTP_SERVER_NOT_SET = "error.support.email.not.set";
+    private static String PASSWORD_REQUEST_EXPIRED = "error.password.request.expired";
+    private static String REQUEST_PROCESSED = "forgot.password.request.processed";
+    private static String SUCCESS_CHANGE_PASS = "heading.password.changed.screen";
+    private static String INTERNAL_ERROR = "error.email.internal";
+    private static String EMAIL_FAILED = "error.email.not.sent";
+    private static String REQUEST_KEY_NOT_FOUND = "error.forgot.password.incorrect.key";
 
     private static int MILLISECONDS_IN_A_DAY = 86400000;
 
-    private static String STATE = "&state=";
     private static String LANGUAGE_KEY = "&languageKey=";
-    private static String EMAIL_SENT = "&emailSent=";
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -77,7 +75,15 @@ public class ForgotPasswordServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String method = request.getParameter("method");
 
-	if (method.equals("requestEmail")) {
+	if (method.equals("showForgotYourPasswordPage")) {
+	    if (Configuration.getAsBoolean(ConfigurationKeys.FORGOT_YOUR_PASSWORD_LINK_ENABLE)) {
+		request.getRequestDispatcher("/forgotPassword.jsp").forward(request, response);
+	    } else {
+		//if people try to get to the forgot your password page by going to the URL directly, we display a 404 error message
+		response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	    }
+
+	} else if (method.equals("requestEmail")) {
 	    String selectType = request.getParameter("selectType");
 	    Boolean findByEmail = false;
 	    String param = "";
@@ -87,16 +93,16 @@ public class ForgotPasswordServlet extends HttpServlet {
 	    } else {
 		param = request.getParameter("login");
 	    }
-
 	    handleEmailRequest(findByEmail, param.trim(), response);
+
 	} else if (method.equals("requestPasswordChange")) {
 	    String newPassword = request.getParameter("newPassword");
 	    String key = request.getParameter("key");
 	    handlePasswordChange(newPassword, key, response);
+
 	} else {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	}
-
     }
 
     /**
@@ -113,12 +119,6 @@ public class ForgotPasswordServlet extends HttpServlet {
      */
     public void handleEmailRequest(Boolean findByEmail, String param, HttpServletResponse response)
 	    throws ServletException, IOException {
-
-	int success = 0;
-	String languageKey = "";
-
-	boolean err = false;
-
 	if ((param == null) || param.equals("")) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
@@ -128,47 +128,48 @@ public class ForgotPasswordServlet extends HttpServlet {
 	String supportEmail = Configuration.get("LamsSupportEmail");
 	User user = null;
 
-	if ((SMPTServer == null) || SMPTServer.equals("") || (supportEmail == null) || supportEmail.equals("")) {
+	String languageKey = null;
+	boolean skipSendingEmail = false;
+	if (StringUtils.isBlank(SMPTServer) || StringUtils.isBlank(supportEmail)) {
 	    // Validate SMTP not set up
 	    languageKey = ForgotPasswordServlet.SMTP_SERVER_NOT_SET;
-	    
+
 	} else {
 	    // get the user by email or login
 	    if (!findByEmail) {
 		if (userManagementService.getUserByLogin(param) != null) {
 		    user = userManagementService.getUserByLogin(param);
+
 		} else {
 		    // validate user is not found
-		    languageKey = ForgotPasswordServlet.USER_NOT_FOUND;
-		    err = true;
+		    skipSendingEmail = true;
 		}
-		
+
 	    } else {
 		try {
 		    List<User> users = userManagementService.getAllUsersWithEmail(param);
 		    if (users.size() == 1) {
 			user = users.get(0);
-			
+
 		    } else if (users.size() == 0) {
 			// validate no user with email found
-			languageKey = ForgotPasswordServlet.EMAIL_NOT_FOUND;
-			err = true;
-			
+			skipSendingEmail = true;
+
 		    } else {
 			// validate multiple users with email found
 			languageKey = ForgotPasswordServlet.INTERNAL_ERROR;
-			ForgotPasswordServlet.log
-				.info("Password recovery: The email is assigned to multiple users: " + param);
-			err = true;
+			log.info("Password recovery: The email is assigned to multiple users: " + param);
+			skipSendingEmail = true;
+
 		    }
 		} catch (Exception e) {
 		    languageKey = ForgotPasswordServlet.INTERNAL_ERROR;
-		    ForgotPasswordServlet.log.error("Error while recovering password.", e);
-		    err = true;
+		    log.error("Error while recovering password.", e);
+		    skipSendingEmail = true;
 		}
 	    }
 
-	    if (!err) {
+	    if (!skipSendingEmail) {
 		boolean isHtmlFormat = false;
 		// generate a key for the request
 		String key = ForgotPasswordServlet.generateUniqueKey();
@@ -188,43 +189,31 @@ public class ForgotPasswordServlet extends HttpServlet {
 		try {
 		    Emailer.sendFromSupportEmail(centralMessageService.getMessage("forgot.password.email.subject"),
 			    user.getEmail(), body, isHtmlFormat);
-		    languageKey = ForgotPasswordServlet.SUCCESS_REQUEST_EMAIL;
-		    success = 1;
 		} catch (AddressException e) {
 		    // failure handling
-		    ForgotPasswordServlet.log.error(
-			    "Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
-		    // response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		    log.error("Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
 		    languageKey = ForgotPasswordServlet.EMAIL_FAILED;
-		    success = 0;
 		} catch (MessagingException e) {
 		    // failure handling
-		    ForgotPasswordServlet.log.error(
-			    "Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
-		    // response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		    log.error("Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
 		    languageKey = ForgotPasswordServlet.EMAIL_FAILED;
-		    success = 0;
 		} catch (Exception e) {
 		    // failure handling
-		    ForgotPasswordServlet.log.error(
-			    "Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
+		    log.error("Problem sending email to: " + user.getLogin() + " with email: " + user.getEmail(), e);
 		    languageKey = ForgotPasswordServlet.EMAIL_FAILED;
-		    success = 0;
-		    // response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
-
 	    }
-
 	}
 
-	String redirectStr = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + ForgotPasswordServlet.STATE
-		+ success + ForgotPasswordServlet.LANGUAGE_KEY + languageKey;
+	//show message as an error only in case message differs from the default one
+	boolean showErrorMessage = languageKey != null;
+	//show default message if there is no error message
+	languageKey = languageKey == null ? ForgotPasswordServlet.REQUEST_PROCESSED : languageKey;
 
-	if ((success == 1) && (user.getEmail() != null)) {
-	    redirectStr += ForgotPasswordServlet.EMAIL_SENT + java.net.URLEncoder.encode(user.getEmail(), "UTF-8");
-	}
+	String redirectUrl = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?"
+		+ ForgotPasswordServlet.LANGUAGE_KEY + languageKey + "&showErrorMessage=" + showErrorMessage;
 
-	response.sendRedirect(redirectStr);
+	response.sendRedirect(redirectUrl);
     }
 
     /**
@@ -236,48 +225,47 @@ public class ForgotPasswordServlet extends HttpServlet {
     public void handlePasswordChange(String newPassword, String key, HttpServletResponse response)
 	    throws ServletException, IOException {
 	int success = 0;
-	String languageKey = "";
 
 	if ((key == null) || key.equals("") || (newPassword == null) || newPassword.equals("")) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    return;
 	}
 
+	String languageKey = "";
+	boolean showErrorMessage = false;
 	ForgotPasswordRequest fp = userManagementService.getForgotPasswordRequest(key);
-
 	if (fp == null) {
-	    response.sendRedirect(
-		    Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + ForgotPasswordServlet.STATE + 0
-			    + ForgotPasswordServlet.LANGUAGE_KEY + ForgotPasswordServlet.REQUEST_KEY_NOT_FOUND);
-	    return;
-	}
+	    languageKey = ForgotPasswordServlet.REQUEST_KEY_NOT_FOUND;
+	    showErrorMessage = true;
 
-	long cutoffTime = fp.getRequestDate().getTime() + ForgotPasswordServlet.MILLISECONDS_IN_A_DAY;
-	Date now = new Date();
-	long nowLong = now.getTime();
-
-	if (nowLong < cutoffTime) {
-	    User user = (User) userManagementService.findById(User.class, fp.getUserId());
-	    userManagementService.updatePassword(user.getLogin(), newPassword);
-	    userManagementService.logPasswordChanged(user, user);
-	    languageKey = ForgotPasswordServlet.SUCCESS_CHANGE_PASS;
-	    success = 1;
 	} else {
-	    // validate password request expired
-	    languageKey = ForgotPasswordServlet.PASSWORD_REQUEST_EXPIRED;
+	    long cutoffTime = fp.getRequestDate().getTime() + ForgotPasswordServlet.MILLISECONDS_IN_A_DAY;
+	    long now = new Date().getTime();
+
+	    if (now < cutoffTime) {
+		User user = (User) userManagementService.findById(User.class, fp.getUserId());
+		userManagementService.updatePassword(user.getLogin(), newPassword);
+		userManagementService.logPasswordChanged(user, user);
+		languageKey = ForgotPasswordServlet.SUCCESS_CHANGE_PASS;
+
+	    } else {
+		// validate password request expired
+		languageKey = ForgotPasswordServlet.PASSWORD_REQUEST_EXPIRED;
+		showErrorMessage = true;
+	    }
+	    userManagementService.delete(fp);
 	}
 
-	userManagementService.delete(fp);
-
-	response.sendRedirect(Configuration.get("ServerURL") + "forgotPasswordProc.jsp?" + ForgotPasswordServlet.STATE
-		+ success + ForgotPasswordServlet.LANGUAGE_KEY + languageKey);
+	String redirectUrl = Configuration.get("ServerURL") + "forgotPasswordProc.jsp?"
+		+ ForgotPasswordServlet.LANGUAGE_KEY + languageKey + "&showErrorMessage=" + showErrorMessage;
+	response.sendRedirect(response.encodeRedirectURL(redirectUrl));
     }
 
     /**
      * Generates the unique key used for the forgot password request
      *
      * @return a unique key
-     * @throws HibernateException 
+     * @throws HibernateException
      * @throws FileUtilException
      * @throws IOException
      */
