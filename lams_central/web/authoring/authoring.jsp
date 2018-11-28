@@ -580,12 +580,14 @@
 								<span><fmt:message key="authoring.fla.cancel.button" /></span>
 							</button>
 
-							<button id="ldStoreDialogSaveButton" class="btn btn-sm btn-primary">
+							<button id="ldStoreDialogSaveButton" class="btn btn-sm btn-primary"
+									data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.save.button' /></span>">
 								<i class="fa fa-save"></i> 
 								<span><fmt:message key="authoring.fla.save.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogOpenButton" class="btn btn-sm btn-primary">
+							<button id="ldStoreDialogOpenButton" class="btn btn-sm btn-primary"
+									data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.open.button' /></span>">
 								<i class="fa fa-folder-open-o"></i> 
 								<span><fmt:message key="authoring.fla.open.button" /></span>
 							</button>

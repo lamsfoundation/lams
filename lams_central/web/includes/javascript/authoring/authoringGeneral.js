@@ -542,6 +542,7 @@ GeneralInitLib = {
 	    
 		$('#ldStoreDialogSaveButton', ldStoreDialogContents).click(function(){
     		var dialog = layout.ldStoreDialog,
+    			saveButton = $('#ldStoreDialogSaveButton', dialog),
 				title = $('#ldStoreDialogNameContainer input', dialog).val().trim();
 			if (!title) {
 				alert(LABELS.SAVE_SEQUENCE_TITLE_PROMPT);
@@ -552,7 +553,7 @@ GeneralInitLib = {
 				alert(LABELS.TITLE_VALIDATION_ERROR);
 				return;
 			}
-			
+			saveButton.prop('disabled', true).button('loading');
 			var folderNode = null,
 				folderID = null,
 				tree = dialog.data('ldTree'),
@@ -562,6 +563,7 @@ GeneralInitLib = {
 				folderNode = node.data.learningDesignId ? node.parent : node;
 				if (!folderNode.data.canSave) {
 					alert(LABELS.FOLDER_CAN_NOT_SAVE_ERROR);
+					saveButton.button('reset');
 					return;
 				}
 				folderID = folderNode.data.folderID;
@@ -578,6 +580,7 @@ GeneralInitLib = {
 			if (!folderID) {
 				// although an existing sequence can be highlighted 
 				alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
+				saveButton.button('reset');
 				return;
 			}
 			
@@ -596,9 +599,11 @@ GeneralInitLib = {
 			}
 			if (nodeData && (!nodeData.canModify || (!canSetReadOnly && nodeData.readOnly))){
 				alert(LABELS.READONLY_FORBIDDEN_ERROR);
+				saveButton.button('reset');
 				return;
 			}
 			if (nodeData && !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+				saveButton.button('reset');
 				return;
 			}
 			var readOnly = (nodeData && !nodeData.canModify) || 
@@ -609,14 +614,17 @@ GeneralInitLib = {
 				GeneralLib.openLearningDesign();
 				dialog.modal('hide');
 			}
+			saveButton.button('reset');
 		});
 		
 		$('#ldStoreDialogOpenButton', ldStoreDialogContents).click(function(){
     		var dialog = layout.ldStoreDialog,
+    			openButton = $('#ldStoreDialogOpenButton', dialog),
 				tree = dialog.data('ldTree'),
 				ldNode = tree.getHighlightedNode(),
 				learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
-		
+    		
+    		openButton.button('loading');
 			if (!learningDesignID) {
 				learningDesignID = +$('#ldStoreDialogAccessDiv > div.selected', dialog)
 								   .data('learningDesignId');
@@ -625,9 +633,11 @@ GeneralInitLib = {
 			// no LD was chosen
 			if (!learningDesignID) {
 				alert(LABELS.SEQUENCE_NOT_SELECTED_ERROR);
+				openButton.button('reset');
 				return;
 			}
 			
+			openButton.button('reset');
 			dialog.modal('hide');
 			GeneralLib.openLearningDesign(learningDesignID);
 		});

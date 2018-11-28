@@ -16,6 +16,7 @@
 		<lams:css />
 		
 		<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
  		<script type="text/javascript" src="/lams/includes/javascript/upload.js"></script>
  	
 		<script type="text/javascript">
@@ -24,16 +25,21 @@
 			}
 			
 			function verifyAndSubmit() {
+				var importButton = $('#importButton');
+				importButton.button('loading');
+				
 				var fileSelect = document.getElementById('UPLOAD_FILE');
 				var files = fileSelect.files;
  				if (files.length == 0) {
 					clearFileError();
 					showFileError('<fmt:message key="button.select.importfile"/>');
+					importButton.button('reset');
 					return false;
 				} else {
 					var file = files[0];
 					if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
 							 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+						importButton.button('reset');
 						return false;
 					}
 				}
@@ -66,7 +72,10 @@
 					<lams:WaitingSpinner id="itemAttachment_Busy"/>
 
 					<div class="pull-right voffset10">
- 						<a href="javascript:;" class="btn btn-primary" onclick="javascript:verifyAndSubmit();"><fmt:message key="button.import" /></a>
+ 						<button id="importButton" class="btn btn-primary" onclick="javascript:verifyAndSubmit();"
+ 								data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='button.import' /></span>">
+ 							<fmt:message key="button.import" />
+ 						</button>
  					</div>
 				</form>
 
