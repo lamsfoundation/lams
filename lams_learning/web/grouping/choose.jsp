@@ -35,6 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:set>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript"
 		src="${lams}includes/javascript/common.js"></script>
 </lams:head>
@@ -58,8 +59,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	      <div class="modal-body text-center" style="min-height: 60px;">
 	      </div>
 	      <div class="modal-footer" style="padding: 8px">
-	        	<button type="button" class="btn  btn-sm btn-default" data-dismiss="modal"><fmt:message key="label.cancel.button" /></button>
-						<button id="submitter" onclick="" class="btn btn-sm btn-primary"><fmt:message key="label.group.confirm.button"/></button>
+	        	<button type="button" class="btn  btn-sm btn-default" data-dismiss="modal"
+	        			data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.cancel.button' /></span>">
+	        		<fmt:message key="label.cancel.button" />
+	        	</button>
+				<button id="submitter" onclick="" class="btn btn-sm btn-primary"
+						data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.group.confirm.button' /></span>">
+					<fmt:message key="label.group.confirm.button"/>
+				</button>
 	      </div>
 	    </div>
 	  </div>
@@ -102,6 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</form:form>							
 									<button type="button" class="btn btn-sm btn-primary" 
 										data-toggle="modal" data-target="#confirmationModal" 
+										data-backdrop="static" data-keyboar="false"
 										data-u="form${user.userID}${activityID}${group.groupID}" 
 										data-gn="<c:out value="${group.groupName}" />"><fmt:message key="label.choose.group.button" />
 									</button>							
@@ -119,9 +127,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  var url = button.data('u') 
 			  var groupName = button.data('gn')
 	
-			  var modal = $(this)
+			  var modal = $(this);
 			  modal.find('.modal-body').html('<fmt:message key="label.group.confirm.areyoujoining"/>:&nbsp;<strong>' + groupName + '</strong>?')
-			  modal.find('#submitter').attr('onclick', "javascript:document.getElementById('" +url+ "').submit();")
+			  modal.find('#submitter').click(function(){
+				$(this).parent().children('button').button('loading');
+				document.getElementById(url).submit();
+			  });
 			})
 	</script>
 
