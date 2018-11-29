@@ -1319,7 +1319,7 @@ ActivityLib = {
 								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
 			},
 			cache : false,
-			async: false,
+			async: true,
 			dataType : 'json',
 			success : function(response) {
 				activity.outputDefinitions = response;
