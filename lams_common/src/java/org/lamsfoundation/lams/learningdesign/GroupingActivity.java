@@ -56,7 +56,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
     private Integer createGroupingUIID;
 
     /** The grouping that this activity creates */
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_grouping_id")
     public Grouping createGrouping;
 
@@ -91,17 +91,10 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
-    /**
-     * @return Returns the createGrouping.
-     */
     public Grouping getCreateGrouping() {
 	return createGrouping;
     }
 
-    /**
-     * @param createGrouping
-     *            The createGrouping to set.
-     */
     public void setCreateGrouping(Grouping createGrouping) {
 	this.createGrouping = createGrouping;
     }
@@ -114,9 +107,6 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
 	this.createGroupingUIID = create_grouping_ui_id;
     }
 
-    /**
-     * @see org.lamsfoundation.lams.util.Nullable#isNull()
-     */
     @Override
     public boolean isNull() {
 	return false;
