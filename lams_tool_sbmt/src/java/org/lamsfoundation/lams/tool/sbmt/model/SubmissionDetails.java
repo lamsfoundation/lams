@@ -36,6 +36,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -74,6 +75,7 @@ public class SubmissionDetails implements Serializable, Cloneable {
     private Boolean removed;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private SubmitFilesReport report;
 
     @ManyToOne(fetch = FetchType.LAZY)

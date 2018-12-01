@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.organisation.entry"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
+	<script type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 	<script type="text/javascript">
 		function warnIfRemoved(){
 			// check if "Remove" state was selected
@@ -38,14 +37,14 @@
 </lams:head>
     
 <body class="stripes">
-
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
 		<form:form action="../orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
 				<form:hidden path="typeId" />
 				
-				<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+				<p>
+					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
 					<c:if test="${organisationForm.typeId == 3}">
 						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${organisationForm.parentId}" />" class="btn btn-default"><c:out value="${organisationForm.parentName}"/></a>
 					</c:if>
@@ -75,7 +74,6 @@
 					<fmt:message key="label.delete.all.lesson.count" />&nbsp;<span id="lessonCount"></span> / <span id="totalLessonCount"></span>
 					<fmt:message key="label.delete.all.lesson.progress" />
 				</div>
-				
 				
 				<table class="table table-condensed table-no-border">
 					<tr>
@@ -169,12 +167,7 @@
 						<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 					</div>
 				
-				</form:form>
-
+		</form:form>
 	</lams:Page>
-
 </body>
 </lams:html>
-
-
-

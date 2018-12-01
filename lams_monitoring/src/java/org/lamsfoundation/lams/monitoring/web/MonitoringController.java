@@ -234,7 +234,7 @@ public class MonitoringController {
     /**
      * Renames lesson. Invoked by Ajax call from general LAMS monitoring.
      */
-    @RequestMapping("/startLesson")
+    @RequestMapping("/renameLesson")
     @ResponseBody
     public String renameLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
@@ -431,22 +431,21 @@ public class MonitoringController {
      * Adds all course learners to the given lesson.
      */
     @RequestMapping("/addAllOrganisationLearnersToLesson")
-    public String addAllOrganisationLearnersToLesson(HttpServletRequest request, HttpServletResponse response)
+    public void addAllOrganisationLearnersToLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonId, getUserId(), "add all lesson learners to lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
+	    return;
 	}
 	Lesson lesson = lessonService.getLesson(lessonId);
 	Vector<User> learners = userManagementService
 		.getUsersFromOrganisationByRole(lesson.getOrganisation().getOrganisationId(), Role.LEARNER, true);
 	lessonService.addLearners(lesson, learners);
-	return null;
     }
 
     @RequestMapping("/startOnScheduleLesson")
-    public String startOnScheduleLesson(HttpServletRequest request, HttpServletResponse response)
+    public void startOnScheduleLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws ParseException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
@@ -456,8 +455,6 @@ public class MonitoringController {
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
-
-	return null;
     }
 
     /**
@@ -467,7 +464,7 @@ public class MonitoringController {
      * @throws ServletException
      */
     @RequestMapping("/archiveLesson")
-    public String archiveLesson(HttpServletRequest request, HttpServletResponse response)
+    public void archiveLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -476,8 +473,6 @@ public class MonitoringController {
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
-
-	return null;
     }
 
     /**
@@ -487,7 +482,7 @@ public class MonitoringController {
      * @throws ServletException
      */
     @RequestMapping("/unarchiveLesson")
-    public String unarchiveLesson(HttpServletRequest request, HttpServletResponse response)
+    public void unarchiveLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
@@ -495,7 +490,6 @@ public class MonitoringController {
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
-	return null;
     }
 
     /**
@@ -504,7 +498,7 @@ public class MonitoringController {
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
      */
     @RequestMapping("/suspendLesson")
-    public String suspendLesson(HttpServletRequest request, HttpServletResponse response)
+    public void suspendLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, ParseException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_END_DATE, true);
@@ -518,7 +512,6 @@ public class MonitoringController {
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
-	return null;
     }
 
     /**
@@ -534,7 +527,7 @@ public class MonitoringController {
      * @throws ServletException
      */
     @RequestMapping("/unsuspendLesson")
-    public String unsuspendLesson(HttpServletRequest request, HttpServletResponse response)
+    public void unsuspendLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
@@ -542,7 +535,6 @@ public class MonitoringController {
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
-	return null;
     }
 
     /**
@@ -605,7 +597,7 @@ public class MonitoringController {
      */
     @RequestMapping("/forceComplete")
     @ResponseBody
-    public String forceComplete(HttpServletRequest request, HttpServletResponse response)
+    public void forceComplete(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 
 	// get parameters
@@ -658,7 +650,7 @@ public class MonitoringController {
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
+	    return;
 	}
 
 	if (MonitoringController.log.isDebugEnabled()) {
@@ -676,7 +668,6 @@ public class MonitoringController {
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
-	return null;
     }
 
     /**
@@ -834,11 +825,11 @@ public class MonitoringController {
      * Adds/removes learners and monitors to/from lesson class.
      */
     @RequestMapping("/updateLessonClass")
-    public String updateLessonClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void updateLessonClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	    return null;
+	    return;
 	}
 
 	int userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
@@ -868,8 +859,6 @@ public class MonitoringController {
 	    MonitoringController.log.warn("Failed when trying to " + (add ? "add a " : "remove a ") + role + " with ID "
 		    + userId + (add ? " to" : " from") + " lesson " + lessonId);
 	}
-
-	return null;
     }
 
     @RequestMapping("/getDictionaryXML")

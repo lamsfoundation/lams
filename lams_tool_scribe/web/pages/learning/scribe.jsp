@@ -1,16 +1,9 @@
 <!DOCTYPE html>
-	
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL /></c:set>
 
 <lams:html>
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-	<c:set var="tool">
-		<lams:WebAppURL />
-	</c:set>
-	
 	<lams:head>
 		<title>
 			<fmt:message key="activity.title" />
@@ -21,15 +14,9 @@
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	
 	</lams:head>
+	
 	<body class="stripes">
-		<c:set var="lams">
-			<lams:LAMSURL />
-		</c:set>
-		<c:set var="tool">
-			<lams:WebAppURL />
-		</c:set>
 		
 		<script type="text/javascript" src='${lams}includes/javascript/jquery.js'></script>
 		<script type="text/javascript">
@@ -193,13 +180,10 @@
 					</div>
 				</div>
 			</c:if>
-		
-		
 			<hr>
 		
-		
 			<form:form action="forceCompleteActivity.do" modelAttribute="learningForm" onsubmit="return confirmForceComplete();">
-				<form:hidden path="scribeUserUID" value="${scribeUserDTO.uid}" />
+				<input type="hidden" name="scribeUserUID" value="${scribeUserDTO.uid}" />
 				<form:hidden path="mode" />
 		
 				<div id="forceCompleteBtn">
@@ -210,8 +194,8 @@
 			</form:form>
 		
 			<div id="agreeButton">
-				<a id="agreeButton" class="btn btn-success pull-left" onclick="javascript:submitApproval();"> <fmt:message
-						key="button.agree" />
+				<a id="agreeButton" class="btn btn-success pull-left" onclick="javascript:submitApproval();"> 
+					<fmt:message key="button.agree" />
 				</a>
 			</div>
 		

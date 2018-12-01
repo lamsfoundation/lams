@@ -422,7 +422,6 @@
 	
 				</c:forEach>
 			</c:if>
-	
 			<!-- End of others questions -->
 	
 			<!-- buttons -->
@@ -432,26 +431,24 @@
 				<form:hidden path="totalQuestionCount" />
 				<form:hidden path="refreshAnswers" />
 	
-	
 				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
 					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 						<div class="right-buttons voffset5" align="right" id="learner-submit">
-							<button name="refreshAnswers" type="button" class="btn btn-default voffset5 roffset5 pull-left"
-								onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
+							<button type="button" class="btn btn-default voffset5 roffset5 pull-left"
+									onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
 								<fmt:message key="label.refresh" />
 							</button>
 	
 							<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
 								<button name="redoQuestions" type="button" class="btn btn-default voffset5  pull-left"
-									onclick="submitMethod('redoQuestions');">
+										onclick="submitMethod('redoQuestions');">
 									<fmt:message key="label.redo" />
 								</button>
 							</c:if>
 	
-	
 							<c:if test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 								<button type="button" id="finishButton"
-									onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
+										onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
 									<c:choose>
 										<c:when test="${sessionMap.activityPosition.last}">
 											<fmt:message key="button.submit" />
@@ -465,7 +462,7 @@
 	
 							<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
 								<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-									class="btn btn-default">
+										class="btn btn-default">
 									<fmt:message key="label.continue" />
 								</button>
 							</c:if>
