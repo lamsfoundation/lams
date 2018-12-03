@@ -53,4 +53,8 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(McQueContent.class, "mcUsrAttempts");
 	this.removeField(McOptsContent.class, "mcUsrAttempts");
     }
+
+    public void up20170101To20181202() {
+	this.renameClass("org.lamsfoundation.lams.tool.mc.pojos.", "org.lamsfoundation.lams.tool.mc.model.");
+    }
 }

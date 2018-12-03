@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
@@ -46,5 +45,18 @@ public class SubmitFilesImportContentVersionFilter extends ToolContentVersionFil
      */
     public void up20140407To20140520() {
 	this.removeField(SubmitFilesContent.class, "createdBy");
+    }
+
+    public void up20170101To20181202() {
+	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent",
+		"org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent");
+	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesDetails",
+		"org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesDetails");
+	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport",
+		"org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesReport");
+	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesUser",
+		"org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesUser");
+	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession",
+		"org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession");
     }
 }

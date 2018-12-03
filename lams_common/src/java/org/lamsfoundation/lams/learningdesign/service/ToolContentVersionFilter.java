@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,11 +43,13 @@ public class ToolContentVersionFilter {
     private List<RemovedField> removedFieldList;
     private List<AddedField> addedFieldList;
     private List<RenamedField> renamedFieldList;
+    private Map<String, String> renamedClassMap;
 
     public ToolContentVersionFilter() {
 	removedFieldList = new ArrayList<RemovedField>();
 	addedFieldList = new ArrayList<AddedField>();
 	renamedFieldList = new ArrayList<RenamedField>();
+	renamedClassMap = new HashMap<String, String>();
     }
 
     // container class for removed class
@@ -146,6 +151,10 @@ public class ToolContentVersionFilter {
 	renamedFieldList.add(new RenamedField(ownerClass, oldFieldname, newFieldname));
     }
 
+    public void renameClass(String oldClassName, String newClassName) {
+	renamedClassMap.put(oldClassName, newClassName);
+    }
+
     /**
      * Call by lams import tool service core. Do not use it in tool version filter class.
      *
@@ -202,38 +211,17 @@ public class ToolContentVersionFilter {
 	// rename all marked fields for this class
 	for (RenamedField renamed : renamedFieldList) {
 	    if (StringUtils.equals(root.getNodeName(), renamed.ownerClass)) {
-		Node node = root.getFirstChild();
-		while (node != null) {
-		    Node oldNode = node;
-		    node = node.getNextSibling();
-		    if (oldNode.getNodeName().equals(renamed.oldFieldname)) {
-			Element newElement = root.getOwnerDocument().createElement(renamed.newFieldname);
-			if (oldNode.hasChildNodes()) {
-			    
-			    //copy attributes
-			    if (oldNode.getAttributes() != null) {
-				NamedNodeMap attributes = oldNode.getAttributes();
-				for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
-				    Node clonedAttribute = attributes.item(attrIndex).cloneNode(true);
-				    newElement.getAttributes().setNamedItem(clonedAttribute);
-				}
-			    }
-			    
-			    //copy child nodes
-			    NodeList children = oldNode.getChildNodes();
-			    for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
-				Node clonedChildNode = children.item(childIndex).cloneNode(true);
-				newElement.appendChild(clonedChildNode);
-			    }
-			} else {
-			    newElement.setTextContent(oldNode.getTextContent());
-			}
-			root.replaceChild(newElement, oldNode);
-			ToolContentVersionFilter.log.debug("Field " + renamed.oldFieldname + " in class "
-				+ renamed.ownerClass + " was renamed to " + renamed.newFieldname);
-		    }
+		NodeList children = root.getChildNodes();
+		for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
+		    Node childNode = children.item(childIndex);
+		    ToolContentVersionFilter.renameNode(childNode, renamed.oldFieldname, renamed.newFieldname);
 		}
 	    }
+	}
+
+	for (Entry<String, String> renamed : renamedClassMap.entrySet()) {
+	    // if root element was replaced in one of tool.xml files, it needs to be fetched here for further processing
+	    root = (Element) ToolContentVersionFilter.renameClass(root, renamed.getKey(), renamed.getValue());
 	}
 
 	// remove fields
@@ -244,5 +232,73 @@ public class ToolContentVersionFilter {
 		retrieveXML((Element) node);
 	    }
 	}
+    }
+
+    /**
+     * Renames an entity name or package.
+     */
+    private static Node renameClass(Node node, String oldName, String newName) {
+	String currentName = node.getNodeName();
+	String exactNewName = null;
+	String exactOldName = null;
+	// if names provided in renameClassMap end with ".", we rename whole packages
+	if (oldName.endsWith(".")) {
+	    if (currentName.startsWith(oldName)) {
+		exactNewName = currentName.replace(oldName, newName);
+		exactOldName = currentName;
+	    }
+	} else if (StringUtils.equals(currentName, oldName)) {
+	    // this is renaming of a single class
+	    exactNewName = newName;
+	    exactOldName = oldName;
+	}
+
+	if (exactOldName != null) {
+	    node = ToolContentVersionFilter.renameNode(node, exactOldName, exactNewName);
+	}
+
+	// go through children and see if they need renaming too
+	NodeList children = node.getChildNodes();
+	for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
+	    Node childNode = children.item(childIndex);
+	    ToolContentVersionFilter.renameClass(childNode, oldName, newName);
+	}
+
+	return node;
+    }
+
+    private static Node renameNode(Node oldNode, String oldName, String newName) {
+	if (oldNode.getNodeName().equals(oldName)) {
+	    Element newNode = oldNode.getOwnerDocument().createElement(newName);
+
+	    //copy attributes
+	    if (oldNode.getAttributes() != null) {
+		NamedNodeMap attributes = oldNode.getAttributes();
+		for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
+		    Node clonedAttribute = attributes.item(attrIndex).cloneNode(true);
+		    String value = clonedAttribute.getTextContent();
+		    if (value != null && value.contains(oldName)) {
+			value = value.replace(oldName, newName);
+			clonedAttribute.setTextContent(value);
+		    }
+		    newNode.getAttributes().setNamedItem(clonedAttribute);
+		}
+	    }
+
+	    if (oldNode.hasChildNodes()) {
+		//copy child nodes
+		NodeList children = oldNode.getChildNodes();
+		for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
+		    Node clonedChildNode = children.item(childIndex).cloneNode(true);
+		    newNode.appendChild(clonedChildNode);
+		}
+	    } else {
+		newNode.setTextContent(oldNode.getTextContent());
+	    }
+	    oldNode.getParentNode().replaceChild(newNode, oldNode);
+	    ToolContentVersionFilter.log.debug("Node " + oldName + " was renamed to " + newName);
+	    return newNode;
+	}
+	return oldNode;
     }
 }

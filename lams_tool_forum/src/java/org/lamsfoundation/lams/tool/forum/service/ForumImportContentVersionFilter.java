@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
@@ -47,5 +46,10 @@ public class ForumImportContentVersionFilter extends ToolContentVersionFilter {
     public void up20140102To20141216() {
 	this.renameField(Forum.class, "limitedChar", "maxCharacters");
 	this.renameField(Forum.class, "limitedInput", "limitedMaxCharacters");
+    }
+
+    public void up20170101To20181202() {
+	this.renameClass("org.lamsfoundation.lams.tool.forum.persistence.",
+		"org.lamsfoundation.lams.tool.forum.model.");
     }
 }
