@@ -72,4 +72,18 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 
 	this.addField(QaQueContent.class, "minWordsLimit", "0");
     }
+
+    public void up20170101To20181202() {
+	this.renameClass("org.lamsfoundation.lams.tool.qa.QaContent",
+		"org.lamsfoundation.lams.tool.qa.model.QaContent");
+	this.renameClass("org.lamsfoundation.lams.tool.qa.QaCondition",
+		"org.lamsfoundation.lams.tool.qa.model.QaCondition");
+	this.renameClass("org.lamsfoundation.lams.tool.qa.QaQueContent",
+		"org.lamsfoundation.lams.tool.qa.model.QaQueContent");
+	this.renameClass("org.lamsfoundation.lams.tool.qa.QaQueUsr", "org.lamsfoundation.lams.tool.qa.model.QaQueUsr");
+	this.renameClass("org.lamsfoundation.lams.tool.qa.QaSession",
+		"org.lamsfoundation.lams.tool.qa.model.QaSession");
+	this.renameClass("org.lamsfoundation.lams.tool.qa.QaUsrResp",
+		"org.lamsfoundation.lams.tool.qa.model.QaUsrResp");
+    }
 }

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
@@ -39,5 +38,14 @@ public class NoticeboardImportContentVersionFilter extends ToolContentVersionFil
 	this.removeField(NoticeboardContent.class, "onlineInstructions");
 	this.removeField(NoticeboardContent.class, "offlineInstructions");
 	this.removeField(NoticeboardContent.class, "nbAttachments");
+    }
+
+    public void up20170101To20181202() {
+	this.renameClass("org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent",
+		"org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent");
+	this.renameClass("org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession",
+		"org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession");
+	this.renameClass("org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser",
+		"org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser");
     }
 }

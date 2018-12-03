@@ -66,4 +66,8 @@ public class VoteImportContentVersionFilter extends ToolContentVersionFilter {
     public void up20140102To20140520() {
 	this.removeField(VoteContent.class, "contentInUse");
     }
+
+    public void up20170101To20181202() {
+	this.renameClass("org.lamsfoundation.lams.tool.vote.pojos.", "org.lamsfoundation.lams.tool.vote.model.");
+    }
 }
