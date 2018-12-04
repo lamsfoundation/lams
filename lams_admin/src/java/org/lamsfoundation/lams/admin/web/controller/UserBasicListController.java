@@ -70,8 +70,7 @@ public class UserBasicListController {
 		    } else {
 			// get all potential users of this org instead... filters results according to user's roles
 			// get group
-			Organisation org = (Organisation) userManagementService.findById(Organisation.class,
-				orgId);
+			Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 			Organisation group;
 			if (org != null) {
 			    if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
@@ -81,12 +80,11 @@ public class UserBasicListController {
 			    }
 			    // get users
 			    List users = new ArrayList();
-			    if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin()) {
+			    if (request.isUserInRole(Role.SYSADMIN)
+				    || userManagementService.isUserGlobalGroupManager()) {
 				users = userManagementService.getAllUsers(org.getOrganisationId());
 			    } else if (userManagementService.isUserInRole(userId, group.getOrganisationId(),
-				    Role.GROUP_ADMIN)
-				    || userManagementService.isUserInRole(userId, group.getOrganisationId(),
-					    Role.GROUP_MANAGER)) {
+				    Role.GROUP_MANAGER)) {
 				if (group.getCourseAdminCanBrowseAllUsers()) {
 				    users = userManagementService.getAllUsers(org.getOrganisationId());
 				} else if (org.getOrganisationType().getOrganisationTypeId()

@@ -460,7 +460,7 @@ public class GradebookController {
 
 	} else if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
 	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(),
-		    new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook", false)) {
+		    new String[] { Role.GROUP_MANAGER}, "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"User is not a group manager or admin in the organisation");
 		return null;

@@ -568,7 +568,6 @@
 			<role-name>MONITOR</role-name>
 			<role-name>AUTHOR</role-name>
 			<role-name>GROUP MANAGER</role-name>
-			<role-name>GROUP ADMIN</role-name>
 			<role-name>SYSADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
@@ -635,7 +634,6 @@
 			<role-name>AUTHOR</role-name>
 			<role-name>MONITOR</role-name>
 			<role-name>GROUP MANAGER</role-name>
-			<role-name>GROUP ADMIN</role-name>
 			<role-name>SYSADMIN</role-name>
 		</auth-constraint>
 	</security-constraint>
@@ -695,10 +693,6 @@
 	<security-role>
 		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
-	</security-role>
-	<security-role>
-		<description>Group Administrator</description>
-		<role-name>GROUP ADMIN</role-name>
 	</security-role>
 	<security-role>
 		<description>LAMS System Adminstrator</description>

@@ -358,7 +358,7 @@ public interface IUserManagementService {
     /**
      * Return true if user is a global group admin.
      */
-    boolean isUserGlobalGroupAdmin();
+    boolean isUserGlobalGroupManager();
 
     /**
      * Return true if user has sysadmin role in root organisation.

@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class UserOrgSaveController {
     private static Logger log = Logger.getLogger(UserOrgSaveController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     private List<Role> rolelist;
@@ -67,16 +67,18 @@ public class UserOrgSaveController {
 	request.setAttribute("org", orgId);
 
 	boolean canEditRole = false;
-	
+
 	// sysadmin, global course admins can add/change users and their roles.
 	// course manager can add existing users in any role except sysadmin
 	// course admin can add existing users but only as learner
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN) || (userManagementService.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))) {
+	if (request.isUserInRole(Role.SYSADMIN)
+		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
 	    canEditRole = true;
 	} else {
-	    
-	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+
+	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER))
+		    .getUserID();
 	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (organisation == null) {
 		String message = "Adding users to organisation: No permission to access organisation " + orgId;
@@ -90,9 +92,6 @@ public class UserOrgSaveController {
 	    if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(), Role.GROUP_MANAGER)
 		    && !orgId.equals(rootOrgId)) {
 		canEditRole = true;
-	    } else if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(),
-		    Role.GROUP_ADMIN) && !orgId.equals(rootOrgId)) {
-		canEditRole = false;
 	    } else {
 		String message = "Adding users to organisation: No permission to access organisation " + orgId;
 		log.error(message);
@@ -100,7 +99,7 @@ public class UserOrgSaveController {
 		return null;
 	    }
 	}
-	
+
 	if (rolelist == null) {
 	    rolelist = userManagementService.findAll(Role.class);
 	}
@@ -155,16 +154,17 @@ public class UserOrgSaveController {
 	if (newUserOrganisations.isEmpty()) {
 	    log.debug("no new users to add to orgId=" + orgId);
 	    return "redirect:/usermanage.do?org=" + orgId;
-	} else if ( !canEditRole ){
+	} else if (!canEditRole) {
 	    // course admin can only setup learners
 	    log.debug("adding new users as learners to orgId=" + orgId);
-	    for ( UserOrganisation uo : newUserOrganisations ) {
-		    userManagementService.setRolesForUserOrganisation(uo.getUser(), orgId, Arrays.asList(Role.ROLE_LEARNER.toString()));
+	    for (UserOrganisation uo : newUserOrganisations) {
+		userManagementService.setRolesForUserOrganisation(uo.getUser(), orgId,
+			Arrays.asList(Role.ROLE_LEARNER.toString()));
 	    }
 	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {
-	    request.setAttribute("roles", userManagementService.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
-		    organisation.getOrganisationType()));
+	    request.setAttribute("roles", userManagementService.filterRoles(rolelist,
+		    request.isUserInRole(Role.SYSADMIN), organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);
 	    return "forward:/userorgrole.do";

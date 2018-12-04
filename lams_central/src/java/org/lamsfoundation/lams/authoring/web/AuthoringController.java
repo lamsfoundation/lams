@@ -152,7 +152,7 @@ public class AuthoringController {
 	request.setAttribute("licenses", authoringService.getAvailableLicenses());
 
 	boolean canSetReadOnly = userManagementService.isUserSysAdmin()
-		|| userManagementService.isUserGlobalGroupAdmin();
+		|| userManagementService.isUserGlobalGroupManager();
 	request.setAttribute("canSetReadOnly", canSetReadOnly);
 
 	return "authoring/authoring";

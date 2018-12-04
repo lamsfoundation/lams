@@ -72,7 +72,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/user")
 public class UserController {
     private static Logger log = Logger.getLogger(UserController.class);
-    
+
     @Autowired
     private ILogEventService logEventService;
     @Autowired
@@ -84,7 +84,7 @@ public class UserController {
     private ITimezoneService timezoneService;
     @Autowired
     private IUserManagementService userManagementService;
-    
+
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
@@ -119,7 +119,7 @@ public class UserController {
 
 	// test requestor's permission
 	Organisation org = null;
-	Boolean canEdit = userManagementService.isUserGlobalGroupAdmin();
+	Boolean canEdit = userManagementService.isUserGlobalGroupManager();
 	if (orgId != null) {
 	    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (!canEdit) {
@@ -128,9 +128,9 @@ public class UserController {
 			? org.getParentOrganisation().getOrganisationId()
 			: orgId;
 		User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
-		if (userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
-			|| userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
-		    Organisation course = (Organisation) userManagementService.findById(Organisation.class, orgIdOfCourse);
+		if (userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
+		    Organisation course = (Organisation) userManagementService.findById(Organisation.class,
+			    orgIdOfCourse);
 		    canEdit = course.getCourseAdminCanAddNewUsers();
 		}
 	    }
@@ -283,7 +283,7 @@ public class UserController {
     // determine whether to disable or delete user based on their lams data
     @RequestMapping(path = "/remove")
     public String remove(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -303,7 +303,7 @@ public class UserController {
 
     @RequestMapping(path = "/disable")
     public String disable(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -328,7 +328,7 @@ public class UserController {
 
     @RequestMapping(path = "/delete")
     public String delete(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";
@@ -360,7 +360,7 @@ public class UserController {
     // called from disabled users screen
     @RequestMapping(path = "/enable")
     public String enable(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
 	    request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
 	    return "error";

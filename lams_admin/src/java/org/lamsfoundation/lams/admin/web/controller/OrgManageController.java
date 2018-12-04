@@ -29,7 +29,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.OrgManageForm;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -60,8 +59,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 public class OrgManageController {
-    private static Logger log = Logger.getLogger(UserSaveController.class);
-
     @Autowired
     private ISecurityService securityService;
     @Autowired
@@ -98,15 +95,14 @@ public class OrgManageController {
 	}
 
 	// check if user is allowed to view and edit groups
-	if (!request.isUserInRole(Role.SYSADMIN) && !userManagementService.isUserGlobalGroupAdmin()
-		&& !(isRootOrganisation
-			? request.isUserInRole(Role.GROUP_ADMIN) || request.isUserInRole(Role.GROUP_MANAGER)
-			: securityService.hasOrgRole(orgId, userId,
-				new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER }, "manage courses", false))) {
+	if (!request.isUserInRole(Role.SYSADMIN) && !userManagementService.isUserGlobalGroupManager()
+		&& !(isRootOrganisation ? request.isUserInRole(Role.GROUP_MANAGER)
+			: securityService.hasOrgRole(orgId, userId, new String[] { Role.GROUP_MANAGER },
+				"manage courses", false))) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	    return null;
 	}
-	
+
 	// get number of users figure
 	// TODO use hql that does a count instead of getting whole objects
 	int numUsers = org == rootOrganisation ? userManagementService.getCountUsers()
@@ -147,7 +143,7 @@ public class OrgManageController {
 
 	// let the jsp know whether to display links
 	request.setAttribute("createGroup",
-		request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin());
+		request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager());
 	request.setAttribute("editGroup", true);
 	request.setAttribute("manageGlobalRoles", request.isUserInRole(Role.SYSADMIN));
 	return "organisation/list";

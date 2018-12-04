@@ -237,10 +237,6 @@
 		<description>Group Manager</description>
 		<role-name>GROUP MANAGER</role-name>
 	</security-role>
-	<security-role>
-		<description>Group Administrator</description>
-		<role-name>GROUP ADMIN</role-name>
-	</security-role>
 
 	<security-role>
 		<description>LAMS System Adminstrator</description>
