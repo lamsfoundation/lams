@@ -179,6 +179,11 @@ public class ToolContentVersionFilter {
     }
 
     private void retrieveXML(Element root) throws IOException {
+	for (Entry<String, String> renamed : renamedClassMap.entrySet()) {
+	    // if root element was replaced in one of tool.xml files, it needs to be fetched here for further processing
+	    root = (Element) ToolContentVersionFilter.renameClass(root, renamed.getKey(), renamed.getValue());
+	}
+
 	for (RemovedField remove : removedFieldList) {
 	    if (StringUtils.equals(root.getNodeName(), remove.ownerClass)
 		    || StringUtils.equals(root.getAttribute("class"), remove.ownerClass)) {
@@ -219,12 +224,6 @@ public class ToolContentVersionFilter {
 	    }
 	}
 
-	for (Entry<String, String> renamed : renamedClassMap.entrySet()) {
-	    // if root element was replaced in one of tool.xml files, it needs to be fetched here for further processing
-	    root = (Element) ToolContentVersionFilter.renameClass(root, renamed.getKey(), renamed.getValue());
-	}
-
-	// remove fields
 	NodeList children = root.getChildNodes();
 	for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
 	    Node node = children.item(childIndex);
@@ -255,13 +254,6 @@ public class ToolContentVersionFilter {
 
 	if (exactOldName != null) {
 	    node = ToolContentVersionFilter.renameNode(node, exactOldName, exactNewName);
-	}
-
-	// go through children and see if they need renaming too
-	NodeList children = node.getChildNodes();
-	for (int childIndex = 0; childIndex < children.getLength(); childIndex++) {
-	    Node childNode = children.item(childIndex);
-	    ToolContentVersionFilter.renameClass(childNode, oldName, newName);
 	}
 
 	return node;
