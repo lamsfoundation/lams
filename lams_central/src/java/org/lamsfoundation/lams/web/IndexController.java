@@ -191,7 +191,7 @@ public class IndexController {
 
     private void setAdminLinks(HttpServletRequest request) {
 	List<IndexLinkBean> adminLinks = new ArrayList<>();
-	if (request.isUserInRole(Role.GROUP_MANAGER)) {
+	if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_MANAGER)) {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
 		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
 	}
