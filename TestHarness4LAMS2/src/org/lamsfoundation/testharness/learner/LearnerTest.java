@@ -28,16 +28,13 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.testharness.AbstractTest;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="LearnerTest.java.html"><i>View Source</i></a>
- *          </p>
+ * <p>
+ * <a href="LearnerTest.java.html"><i>View Source</i></a>
+ * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class LearnerTest extends AbstractTest {
-
     private static final Logger log = Logger.getLogger(LearnerTest.class);
 
     protected String joinLessonURL;
@@ -47,7 +44,6 @@ public class LearnerTest extends AbstractTest {
 
     /**
      * LearnerTest Constructor
-     *
      */
     public LearnerTest(String testName, Integer minDelay, Integer maxDelay, String joinLessonURL, String lessonEntryURL,
 	    String[] filesToUpload) {

@@ -36,16 +36,13 @@ import org.lamsfoundation.testharness.admin.MockAdmin;
 import com.meterware.httpunit.WebResponse;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="MockMonitor.java.html"><i>View Source</i></a>
- *          </p>
+ * <p>
+ * <a href="MockMonitor.java.html"><i>View Source</i></a>
+ * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class MockMonitor extends MockUser implements Runnable {
-
     private static final Logger log = Logger.getLogger(MockMonitor.class);
 
     public static final String DEFAULT_NAME = "Monitor";
@@ -90,7 +87,7 @@ public class MockMonitor extends MockUser implements Runnable {
 
 	    InputStream is = new ByteArrayInputStream(bodyBuilder.toString().getBytes("UTF-8"));
 	    new Call(wc, test, username + " creates lesson class", url, is).execute();
-	    MockMonitor.log.info(username + " set the lesson class");
+	    log.info(username + " set the lesson class");
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -106,11 +103,11 @@ public class MockMonitor extends MockUser implements Runnable {
 	    String url = initLessonURL.replace(MockMonitor.LDID_PATTERN, ldId)
 		    .replace(MockMonitor.ORGANISATION_ID_PATTERN, organisationID)
 		    .replace(MockMonitor.USER_ID_PATTERN, userId).replace(MockMonitor.LESSON_NAME_PATTERN, name);
-	    MockMonitor.log.debug("initLessonURL:  " + url);
+	    log.debug("initLessonURL:  " + url);
 	    WebResponse resp = (WebResponse) new Call(wc, test, username + " inits lesson", url).execute();
 
 	    String idAsString = resp.getText().trim();
-	    MockMonitor.log.info(username + " initialized the lesson " + name + " and the id is " + idAsString);
+	    log.info(username + " initialized the lesson " + name + " and the id is " + idAsString);
 	    return idAsString;
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
@@ -120,19 +117,19 @@ public class MockMonitor extends MockUser implements Runnable {
     @Override
     public void run() {
 	try {
-	    MockMonitor.log.info(username + " is monitoring");
+	    log.info(username + " is monitoring");
 	    MonitorTest monitorTest = (MonitorTest) test;
 
 	    while (stopSignal == null) {
 		delay();
-		MockMonitor.log.debug(username + " is refreshing all learners progress");
+		log.debug(username + " is refreshing all learners progress");
 		getAllLearnersProgress(monitorTest.getGetAllLearnersProgressURL(), monitorTest.getLsId());
 	    }
-	    new Call(wc, test, username + " logs out", "/lams/home.do?method=logout").execute();
-	    MockMonitor.log.info(username + " stopped monitoring");
+	    new Call(wc, test, username + " logs out", "/lams/home/logout.do").execute();
+	    log.info(username + " stopped monitoring");
 	    stopSignal.countDown();
 	} catch (Exception e) {
-	    MockMonitor.log.error(username + " aborted on monitoring", e);
+	    log.error(username + " aborted on monitoring", e);
 	}
     }
 
@@ -146,10 +143,10 @@ public class MockMonitor extends MockUser implements Runnable {
 		    .replace(MockMonitor.USER_ID_PATTERN, userId);
 	    WebResponse resp = (WebResponse) new Call(wc, test, username + " starts Lesson", url).execute();
 	    if (!MockUser.checkPageContains(resp, MockMonitor.LESSON_CREATED_FLAG)) {
-		MockMonitor.log.debug(resp.getText());
+		log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to create lesson with the url " + url);
 	    }
-	    MockMonitor.log.info(username + " started the lesson " + lsId);
+	    log.info(username + " started the lesson " + lsId);
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -159,6 +156,6 @@ public class MockMonitor extends MockUser implements Runnable {
 	// it gets some redundant information, but reflects what Monitor would be doing in his interface
 	String url = getAllLearnersProgressURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId);
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " get all learners progress", url).execute();
-	MockMonitor.log.debug("Learner progress: " + resp.getText());
+	log.debug("Learner progress: " + resp.getText());
     }
 }

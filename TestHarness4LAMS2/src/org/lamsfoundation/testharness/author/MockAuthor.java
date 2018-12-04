@@ -37,16 +37,13 @@ import org.xml.sax.SAXException;
 import com.meterware.httpunit.WebResponse;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="MockAuthor.java.html"><i>View Source</i></a>
- *          </p>
+ * <p>
+ * <a href="MockAuthor.java.html"><i>View Source</i></a>
+ * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class MockAuthor extends MockUser {
-
     private static final Logger log = Logger.getLogger(MockAuthor.class);
 
     public static final String DEFAULT_NAME = "Author";
@@ -59,8 +56,6 @@ public class MockAuthor extends MockUser {
 
     /**
      * MockAuthor Constructor
-     *
-     * @param
      */
     public MockAuthor(AuthorTest test, String username, String password, String userId) {
 	super(test, username, password, MockAdmin.AUTHOR_ROLE, userId);
@@ -72,7 +67,7 @@ public class MockAuthor extends MockUser {
 	    WebResponse resp = (WebResponse) new Call(wc, test, username + " import Learning Design",
 		    learningDesignUploadURL).execute();
 	    if (!MockUser.checkPageContains(resp, MockAuthor.IMPORT_FORM_FLAG)) {
-		MockAuthor.log.debug(resp.getText());
+		log.debug(resp.getText());
 		throw new TestHarnessException(
 			username + " did not get learning design import page with the url:" + learningDesignUploadURL);
 	    }
@@ -81,16 +76,15 @@ public class MockAuthor extends MockUser {
 	    resp = (WebResponse) new Call(wc, test, username + " submits Learning Design import form",
 		    fillForm(resp, 0, params)).execute();
 	    if (!MockUser.checkPageContains(resp, MockAuthor.IMPORT_SUCCESS_FLAG)) {
-		MockAuthor.log.debug(resp.getText());
+		log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to upload file:" + file.getAbsolutePath());
 	    }
 	    String text = resp.getText();
 	    int startIndex = text.indexOf(MockAuthor.LD_START_TAG);
 	    int endIndex = text.indexOf(MockAuthor.LD_END_TAG, startIndex);
 	    String idAsString = text.substring(startIndex + MockAuthor.LD_START_TAG.length(), endIndex);
-	    MockAuthor.log
-		    .info(username + " imported learning design " + file.getName() + " and the id is " + idAsString);
-	    new Call(wc, test, username + " logs out", "/lams/home.do?method=logout").execute();
+	    log.info(username + " imported learning design " + file.getName() + " and the id is " + idAsString);
+	    new Call(wc, test, username + " logs out", "/lams/home/logout.do").execute();
 	    return idAsString;
 	} catch (IOException e) {
 	    throw new RuntimeException(e);

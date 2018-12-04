@@ -27,11 +27,9 @@ import java.io.File;
 import org.lamsfoundation.testharness.AbstractTest;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="AuthorTest.java.html"><i>View Source</i></a>
- *          </p>
+ * <p>
+ * <a href="AuthorTest.java.html"><i>View Source</i></a>
+ * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */

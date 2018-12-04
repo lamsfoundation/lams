@@ -28,11 +28,9 @@ import org.lamsfoundation.testharness.AbstractTest;
 import org.lamsfoundation.testharness.TestUtil;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="MonitorTest.java.html"><i>View Source</i></a>
- *          </p>
+ * <p>
+ * <a href="MonitorTest.java.html"><i>View Source</i></a>
+ * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
@@ -50,7 +48,6 @@ public class MonitorTest extends AbstractTest {
 
     /**
      * MonitorTest Construtor
-     *
      */
     public MonitorTest(String testName, Integer minDelay, Integer maxDelay, String initLessonURL,
 	    String createLessonClassURL, String startLessonURL, String getAllLearnersProgressURL, String lessonName,
