@@ -142,8 +142,7 @@ public class GroupingUploadAJAXController {
 
 	// check if user is allowed to view and edit groups
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
-		"view organisation groups", false)) {
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR }, "view organisation groups", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return;
 	}
@@ -287,7 +286,7 @@ public class GroupingUploadAJAXController {
 
 	// check if user is allowed to save grouping
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"save organisation grouping from spreadsheet", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	    return null;

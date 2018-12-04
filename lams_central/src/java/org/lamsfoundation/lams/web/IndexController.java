@@ -140,8 +140,7 @@ public class IndexController {
 	    boolean isIntegrationUser = integrationService.isIntegrationUser(userDTO.getUserID());
 	    //prevent integration users with mere learner rights from accessing index.do
 	    if (isIntegrationUser && !request.isUserInRole(Role.AUTHOR) && !request.isUserInRole(Role.MONITOR)
-		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.GROUP_ADMIN)
-		    && !request.isUserInRole(Role.SYSADMIN)) {
+		    && !request.isUserInRole(Role.GROUP_MANAGER) && !request.isUserInRole(Role.SYSADMIN)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"Integration users with learner right are not allowed to access this page");
 		return null;
@@ -192,12 +191,11 @@ public class IndexController {
 
     private void setAdminLinks(HttpServletRequest request) {
 	List<IndexLinkBean> adminLinks = new ArrayList<>();
-	if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN)
-		|| request.isUserInRole(Role.GROUP_MANAGER)) {
+	if (request.isUserInRole(Role.GROUP_MANAGER)) {
 	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
 		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
 	}
-	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin()) {
+	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager()) {
 	    adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 	}
 	request.setAttribute("adminLinks", adminLinks);

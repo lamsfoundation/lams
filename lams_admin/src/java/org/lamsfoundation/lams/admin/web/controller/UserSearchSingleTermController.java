@@ -61,8 +61,7 @@ public class UserSearchSingleTermController {
 	    List users = new ArrayList();
 	    if (orgId != null) {
 		// filter results according to user's roles
-		Organisation org = (Organisation) userManagementService.findById(Organisation.class,
-			orgId);
+		Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 		Organisation group;
 		if (org != null) {
 		    HttpSession session = SessionManager.getSession();
@@ -76,12 +75,11 @@ public class UserSearchSingleTermController {
 				group = org;
 			    }
 			    // get search results, filtered according to orgId
-			    if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin()) {
+			    if (request.isUserInRole(Role.SYSADMIN)
+				    || userManagementService.isUserGlobalGroupManager()) {
 				users = userManagementService.findUsers(term, orgId);
 			    } else if (userManagementService.isUserInRole(userId, group.getOrganisationId(),
-				    Role.GROUP_ADMIN)
-				    || userManagementService.isUserInRole(userId, group.getOrganisationId(),
-					    Role.GROUP_MANAGER)) {
+				    Role.GROUP_MANAGER)) {
 				if (group.getCourseAdminCanBrowseAllUsers()) {
 				    users = userManagementService.findUsers(term, orgId);
 				} else if (org.getOrganisationType().getOrganisationTypeId()

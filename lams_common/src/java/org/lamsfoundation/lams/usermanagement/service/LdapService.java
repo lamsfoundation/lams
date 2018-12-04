@@ -370,10 +370,6 @@ public class LdapService implements ILdapService {
 			&& !roleIds.contains(Role.ROLE_AUTHOR.toString())) {
 		    roleIds.add(Role.ROLE_AUTHOR.toString());
 		}
-		if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_GROUP_ADMIN_MAP), role)
-			&& !roleIds.contains(Role.ROLE_GROUP_ADMIN.toString())) {
-		    roleIds.add(Role.ROLE_GROUP_ADMIN.toString());
-		}
 		if (isRoleInList(Configuration.get(ConfigurationKeys.LDAP_GROUP_MANAGER_MAP), role)
 			&& !roleIds.contains(Role.ROLE_GROUP_MANAGER.toString())) {
 		    roleIds.add(Role.ROLE_GROUP_MANAGER.toString());

@@ -313,7 +313,7 @@ public class GroupingAJAXController {
 
 	// check if user is allowed to view and edit groupings
 	if (!securityService.hasOrgRole(organisationId, userId,
-		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"view organisation groupings", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;

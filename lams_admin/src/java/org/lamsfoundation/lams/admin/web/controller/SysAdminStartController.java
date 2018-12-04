@@ -83,7 +83,7 @@ public class SysAdminStartController {
 	    links.add(new LinkBean("ldap/start.do", "sysadmin.ldap.configuration"));
 	    groupedLinks.add(new Object[] { AdminConstants.START_COURSE_LINKS, links });
 
-	} else if (userManagementService.isUserGlobalGroupAdmin()) {
+	} else if (userManagementService.isUserGlobalGroupManager()) {
 	    ArrayList<LinkBean> links = new ArrayList<>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
 	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));

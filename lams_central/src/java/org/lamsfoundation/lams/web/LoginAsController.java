@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class LoginAsController {
-    
+
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
@@ -118,8 +118,7 @@ public class LoginAsController {
 	for (Set<Integer> orgRoleSet : orgRoleSets.values()) {
 	    for (Integer role : orgRoleSet) {
 		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR)
-			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_GROUP_ADMIN)
-			|| role.equals(Role.ROLE_SYSADMIN)) {
+			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_SYSADMIN)) {
 		    return false;
 		}
 	    }

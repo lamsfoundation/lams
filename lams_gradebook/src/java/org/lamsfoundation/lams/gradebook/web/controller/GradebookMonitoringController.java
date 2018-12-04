@@ -136,8 +136,8 @@ public class GradebookMonitoringController {
 		log.error("User missing from session. ");
 		return "error";
 	    }
-	    if (!securityService.hasOrgRole(organisationID, user.getUserID(),
-		    new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook page", false)) {
+	    if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
+		    "get course gradebook page", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
 	    }
@@ -311,8 +311,8 @@ public class GradebookMonitoringController {
     public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
-	if (!securityService.hasOrgRole(organisationID, user.getUserID(),
-		new String[] { Role.GROUP_MANAGER, Role.GROUP_ADMIN }, "get course gradebook spreadsheet", false)) {
+	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
+		"get course gradebook spreadsheet", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	}
 

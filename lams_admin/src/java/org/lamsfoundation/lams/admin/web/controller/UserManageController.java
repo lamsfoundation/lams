@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class UserManageController {
     private static final Logger log = Logger.getLogger(UserManageController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -63,7 +63,7 @@ public class UserManageController {
 
     @RequestMapping(path = "/usermanage")
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
+
 	// get id of org to list users for
 	Integer orgId = WebUtil.readIntParam(request, "org", true);
 	if (orgId == null) {
@@ -98,7 +98,8 @@ public class UserManageController {
 		: organisation;
 	// check permission
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN) || (userManagementService.isUserGlobalGroupAdmin() && !orgId.equals(rootOrgId))) {
+	if (request.isUserInRole(Role.SYSADMIN)
+		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
 	    userManageForm.setCourseAdminCanAddNewUsers(true);
 	    userManageForm.setCourseAdminCanBrowseAllUsers(true);
 	    userManageForm.setCanEditRole(true);
@@ -108,12 +109,6 @@ public class UserManageController {
 	    userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
 	    userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
 	    userManageForm.setCanEditRole(true);
-	    request.setAttribute("canDeleteUser", false);
-	} else if (userManagementService.isUserInRole(userId, orgOfCourseAdmin.getOrganisationId(), Role.GROUP_ADMIN)
-		&& !orgId.equals(rootOrgId)) {
-	    userManageForm.setCourseAdminCanAddNewUsers(orgOfCourseAdmin.getCourseAdminCanAddNewUsers());
-	    userManageForm.setCourseAdminCanBrowseAllUsers(orgOfCourseAdmin.getCourseAdminCanBrowseAllUsers());
-	    userManageForm.setCanEditRole(false);
 	    request.setAttribute("canDeleteUser", false);
 	} else {
 	    return forwardError(request, "error.authorisation");
@@ -135,13 +130,12 @@ public class UserManageController {
 	HashMap<String, Integer> roleCount = new HashMap<>();
 	if (orgId.equals(rootOrgId)) {
 	    roleCount.put(Role.SYSADMIN, Role.ROLE_SYSADMIN);
-	    roleCount.put(Role.GROUP_ADMIN, Role.ROLE_GROUP_ADMIN);
+	    roleCount.put(Role.GROUP_MANAGER, Role.ROLE_GROUP_MANAGER);
 	} else {
 	    roleCount.put(Role.LEARNER, Role.ROLE_LEARNER);
 	    roleCount.put(Role.MONITOR, Role.ROLE_MONITOR);
 	    roleCount.put(Role.AUTHOR, Role.ROLE_AUTHOR);
 	    roleCount.put(Role.GROUP_MANAGER, Role.ROLE_GROUP_MANAGER);
-	    roleCount.put(Role.GROUP_ADMIN, Role.ROLE_GROUP_ADMIN);
 	}
 	for (String role : roleCount.keySet()) {
 	    Integer count = userManagementService.getCountRoleForOrg(orgId, roleCount.get(role), null);

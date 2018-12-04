@@ -49,7 +49,7 @@ public class Role implements Serializable, Comparable<Role> {
 
     public static final String GROUP_MANAGER = "GROUP MANAGER";
 
-    public static final String GROUP_ADMIN = "GROUP ADMIN";
+//    public static final String GROUP_ADMIN = "GROUP ADMIN";
 
     public static final String SYSADMIN = "SYSADMIN";// for future use
 
@@ -64,7 +64,7 @@ public class Role implements Serializable, Comparable<Role> {
     public static final Integer ROLE_AUTHOR = 3;
     public static final Integer ROLE_MONITOR = 4;
     public static final Integer ROLE_LEARNER = 5;
-    public static final Integer ROLE_GROUP_ADMIN = 6;
+//    public static final Integer ROLE_GROUP_ADMIN = 6;
     /***********************************************************/
 
     @Id
@@ -135,10 +135,6 @@ public class Role implements Serializable, Comparable<Role> {
 
     public boolean isGroupManager() {
 	return this.roleId.equals(Role.ROLE_GROUP_MANAGER);
-    }
-
-    public boolean isGroupAdmin() {
-	return this.roleId.equals(Role.ROLE_GROUP_ADMIN);
     }
 
     public boolean isMonitor() {

@@ -62,7 +62,7 @@ public class UserSearchController {
 
     @RequestMapping("/usersearch")
     public String unspecified(HttpServletRequest request) throws Exception {
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    log.debug("user not sysadmin or global group admin");
 
 	    request.setAttribute("errorName", "UserSearchAction authorisation");

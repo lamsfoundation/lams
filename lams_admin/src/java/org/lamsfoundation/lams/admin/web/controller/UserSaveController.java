@@ -89,11 +89,12 @@ public class UserSaveController {
 	// course manager can add/change users and their roles iff CourseAdminCanAddNewUsers
 	// course admin can add/change users but only set role to learner iff CourseAdminCanAddNewUsers
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin() ) {
+	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager()) {
 	    canEditRole = true;
 	} else {
-	    
-	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+
+	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER))
+		    .getUserID();
 	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (organisation == null) {
 		String message = "No permission to access organisation " + orgId;
@@ -107,9 +108,6 @@ public class UserSaveController {
 	    if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(), Role.GROUP_MANAGER)
 		    && !orgId.equals(rootOrgId)) {
 		canEditRole = true;
-	    } else if (userManagementService.isUserInRole(loggeduserId, organisation.getOrganisationId(),
-		    Role.GROUP_ADMIN) && !orgId.equals(rootOrgId)) {
-		canEditRole = false;
 	    } else {
 		String message = "No permission to edit user in organisation " + orgId;
 		logErrorMessage(userId, message);
@@ -232,10 +230,12 @@ public class UserSaveController {
 			user.setLocale(locale);
 
 			Theme theme = null;
-			if ( userForm.getUserTheme() != null )
-				theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
-			if ( theme == null )
+			if (userForm.getUserTheme() != null) {
+			    theme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
+			}
+			if (theme == null) {
 			    theme = userManagementService.getDefaultTheme();
+			}
 			user.setTheme(theme);
 
 			userManagementService.saveUser(user);
@@ -253,13 +253,13 @@ public class UserSaveController {
 	    if ((orgId == null) || (orgId == 1)) {
 		return "forward:/usersearch.do";
 	    }
-	    if ( !edit && !canEditRole) {
+	    if (!edit && !canEditRole) {
 		// Course Admin created new learner
-		userManagementService.setRolesForUserOrganisation(user, orgId, Arrays.asList(Role.ROLE_LEARNER.toString()));
+		userManagementService.setRolesForUserOrganisation(user, orgId,
+			Arrays.asList(Role.ROLE_LEARNER.toString()));
 		request.setAttribute("org", orgId);
 		return "forward:/usermanage.do";
-	    } 
-	    else if (edit) {
+	    } else if (edit) {
 		request.setAttribute("org", orgId);
 		return "forward:/usermanage.do";
 	    } else {
@@ -274,17 +274,17 @@ public class UserSaveController {
 	}
     }
 
-    private  void  logErrorMessage(Integer userId, String message) {
+    private void logErrorMessage(Integer userId, String message) {
 	String fullError = null;
-	if ( userId != null ) {
-	    fullError =  new StringBuilder("Updating user ").append(userId).append(": ").append(message).toString();
+	if (userId != null) {
+	    fullError = new StringBuilder("Updating user ").append(userId).append(": ").append(message).toString();
 	} else {
-	    fullError =  new StringBuilder("Creating new user:  ").append(message).toString();
+	    fullError = new StringBuilder("Creating new user:  ").append(message).toString();
 	}
 	log.error(fullError);
     }
 
-    @RequestMapping(path = "/changePass") 
+    @RequestMapping(path = "/changePass")
     public String changePass(@ModelAttribute UserForm userForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 

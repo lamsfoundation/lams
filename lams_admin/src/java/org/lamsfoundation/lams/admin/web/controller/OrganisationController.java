@@ -111,7 +111,7 @@ public class OrganisationController {
 		    }
 		    request.getSession().setAttribute("status", status);
 		    if (userManagementService.isUserSysAdmin()
-			    || userManagementService.isUserGlobalGroupAdmin()) {
+			    || userManagementService.isUserGlobalGroupManager()) {
 			return "organisation/createOrEdit";
 		    } else {
 			return "organisation/courseAdminEdit";
@@ -128,7 +128,7 @@ public class OrganisationController {
 	    throws Exception {
 	initLocalesAndStatus();
 
-	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupAdmin())) {
+	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    // only sysadmins and global group admins can create groups
 	    if (((organisationForm.getTypeId() != null)
 		    && organisationForm.getTypeId().equals(OrganisationType.COURSE_TYPE))

@@ -787,10 +787,6 @@ public class UserManagementService implements IUserManagementService {
 	if (!orgType.getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
 	    role.setRoleId(Role.ROLE_GROUP_MANAGER);
 	    allRoles.remove(role);
-	    if (!orgType.getOrganisationTypeId().equals(OrganisationType.ROOT_TYPE)) {
-		role.setRoleId(Role.ROLE_GROUP_ADMIN);
-		allRoles.remove(role);
-	    }
 	}
 	return allRoles;
     }
@@ -854,10 +850,10 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public boolean isUserGlobalGroupAdmin() {
+    public boolean isUserGlobalGroupManager() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
-	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false;
+	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_MANAGER) : false;
     }
 
     @Override
@@ -1003,7 +999,7 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public boolean canEditGroup(Integer userId, Integer orgId) {
-	if (isUserSysAdmin() || isUserGlobalGroupAdmin()) {
+	if (isUserSysAdmin() || isUserGlobalGroupManager()) {
 	    return true;
 	}
 	Organisation org = (Organisation) findById(Organisation.class, orgId);
@@ -1012,7 +1008,7 @@ public class UserManagementService implements IUserManagementService {
 	    if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 		groupId = org.getParentOrganisation().getOrganisationId();
 	    }
-	    return isUserInRole(userId, groupId, Role.GROUP_ADMIN) || isUserInRole(userId, groupId, Role.GROUP_MANAGER);
+	    return isUserInRole(userId, groupId, Role.GROUP_MANAGER);
 	}
 	return false;
     }

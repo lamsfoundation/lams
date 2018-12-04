@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.security;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -45,8 +44,6 @@ public class SecurityService implements ISecurityService {
     private static Logger log = Logger.getLogger(SecurityService.class);
 
     private static final String[] GROUP_MONITOR_ROLES = new String[] { Role.GROUP_MANAGER, Role.MONITOR };
-    private static final List<String> GROUP_SUPER_ROLES = Collections
-	    .unmodifiableList(Arrays.asList(Role.GROUP_ADMIN, Role.GROUP_MANAGER));
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private ISecurityDAO securityDAO;
@@ -346,8 +343,7 @@ public class SecurityService implements ISecurityService {
 
 	    // check for super roles in the parent organisations
 	    List<String> roleList = new ArrayList<String>(Arrays.asList(roles));
-	    roleList.retainAll(SecurityService.GROUP_SUPER_ROLES);
-	    if (!roleList.isEmpty()) {
+	    if (!roleList.contains(Role.GROUP_MANAGER)) {
 		Organisation organisation = (Organisation) securityDAO.find(Organisation.class, orgId);
 		if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
 		    organisation = organisation.getParentOrganisation();

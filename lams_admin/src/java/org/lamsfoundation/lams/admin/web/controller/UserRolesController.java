@@ -55,13 +55,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class UserRolesController {
     private static Logger log = Logger.getLogger(UserRolesController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
-    
+
     private static List<Role> rolelist;
 
     @RequestMapping("/userroles")
@@ -73,7 +73,7 @@ public class UserRolesController {
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	
+
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
@@ -81,10 +81,10 @@ public class UserRolesController {
 	if (orgId == null) {
 	    orgId = (Integer) request.getAttribute("orgId");
 	}
-	
+
 	userRolesForm.setOrgId(orgId);
 	userRolesForm.setUserId(userId);
-	
+
 	if (orgId == null) {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.org.invalid"));
 	    request.setAttribute("errorMap", errorMap);
@@ -110,10 +110,8 @@ public class UserRolesController {
 	Boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	Boolean requestorHasRole = userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)
-		|| (userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
-			&& !rootOrgId.equals(orgId))
-		|| (userManagementService.isUserGlobalGroupAdmin() && !rootOrgId.equals(orgId));
+	Boolean requestorHasRole = userManagementService.isUserInRole(requestor.getUserId(), orgIdOfCourse,
+		Role.GROUP_MANAGER) || (userManagementService.isUserGlobalGroupManager() && !rootOrgId.equals(orgId));
 
 	if (!(requestorHasRole || isSysadmin)) {
 	    request.setAttribute("errorName", "UserRolesController");

@@ -145,16 +145,14 @@ public class DisplayGroupController {
 	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "fa fa-fw fa-list-ol", null));
 	}
 
-	if (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
-		|| roles.contains(Role.ROLE_MONITOR)) {
+	if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-		if ((!isSysAdmin)
-			&& (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER))) {
+		if ((!isSysAdmin) && (roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(new IndexLinkBean("index.classman",
 			    "javascript:openOrgManagement(" + organisationId + ")", "fa fa-fw fa-ellipsis-v", null));
 		}
-		if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
-			|| roles.contains(Role.ROLE_AUTHOR) || roles.contains(Role.ROLE_MONITOR))) {
+		if ((roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_AUTHOR)
+			|| roles.contains(Role.ROLE_MONITOR))) {
 		    moreLinks.add(new IndexLinkBean("index.orggroup",
 			    "javascript:showOrgGroupingDialog(" + organisationId + ")", "fa fa-fw fa-users", null));
 		}
@@ -192,7 +190,7 @@ public class DisplayGroupController {
 		}
 
 		// Adding gradebook course monitor links if enabled
-		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
+		if (roles.contains(Role.ROLE_GROUP_MANAGER)) {
 		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
 			    "index.coursegradebook.tooltip"));
@@ -208,7 +206,7 @@ public class DisplayGroupController {
 		}
 
 		// Adding gradebook course monitor links if enabled
-		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
+		if (roles.contains(Role.ROLE_GROUP_MANAGER)) {
 		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
 		    moreLinks.add(
 			    new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
@@ -255,7 +253,7 @@ public class DisplayGroupController {
 			    .getUserOrganisationRoles(organisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
 		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isSysAdmin
-			    && !roles.contains(Role.ROLE_GROUP_ADMIN) && !roles.contains(Role.ROLE_GROUP_MANAGER)) {
+			    && !roles.contains(Role.ROLE_GROUP_MANAGER)) {
 			continue;
 		    }
 
