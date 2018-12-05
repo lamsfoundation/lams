@@ -258,7 +258,7 @@
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:5.0">
             <datasources>
-				<datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="false" jta="true">
+				<datasource jndi-name="java:jboss/datasources/lams-ds" pool-name="lams-ds" spy="false" jta="true" statistics-enabled="true">
 				    <connection-url>@db.url.run@</connection-url>
 				    <driver>MySQL</driver>
 				    <connection-property name="characterEncoding">utf8</connection-property>
