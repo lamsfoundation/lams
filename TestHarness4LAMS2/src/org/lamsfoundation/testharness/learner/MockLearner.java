@@ -117,7 +117,6 @@ public class MockLearner extends MockUser implements Runnable {
 	    .compile("'(/lams/tool/laimag10/learning/finish\\.do\\?.*)'");
 
     private static final String QA_TOOL_SUBSTRING = "laqa11";
-    private static final String QA_STORE_ALL_RESULTS_BUTTON = "submitMethod('storeAllResults')";
 
     private static final String TASK_FINISH_SUBSTRING = "/lams/tool/latask10/learning/finish.do";
 
@@ -393,13 +392,8 @@ public class MockLearner extends MockUser implements Runnable {
 	} else {
 	    nextResp = handlePageWithoutForms(resp);
 	}
-
-	String asText = nextResp == null ? null : nextResp.getText();
-	boolean isActivityFinished = (asText != null) && (asText.contains(MockLearner.ACTIVITY_FINISHED_FLAG)
-		|| asText.contains(MockLearner.LESSON_FINISHED_FLAG)
-		|| asText.contains(MockLearner.LOAD_TOOL_ACTIVITY_FLAG));
 	
-	return isActivityFinished ? nextResp : handleActivity(nextResp);
+	return isActivityFinished(nextResp) ? nextResp : handleActivity(nextResp);
     }
 
     private WebResponse handleLoadToolActivity(String asText) throws SAXException, IOException {
@@ -455,23 +449,25 @@ public class MockLearner extends MockUser implements Runnable {
 	    if (action.startsWith(MockLearner.CHAT_FINISH_SUBSTRING)) {
 		handleToolChat(resp);
 		
-	    } else if (action.contains(MockLearner.QA_TOOL_SUBSTRING)) {
-		String qaAction = asText.contains(MockLearner.QA_STORE_ALL_RESULTS_BUTTON) ? "storeAllResults.do" : action;
-		// make QA look at "answerX__textarea" form fields rather than "answerX"
-		qaAction += "?testHarness=true";
-		form.setAttribute("action", qaAction);
+	    } else if (action.contains(MockLearner.QA_TOOL_SUBSTRING) || action.equals("getNextQuestion.do")) {
+		return handleToolQA(resp, form, action);
 		
 	    } else if (asText.contains(MockLearner.VOTE_LEARNER_FINISHED_BUTTON_STRING)) {
 		// this is normally done by Javascript in browser
 		form.setAttribute("action", "learnerFinished.do");
+		
 	    } else if (asText.contains(MockLearner.VOTE_VIEW_ALL_RESULTS_BUTTON_STRING)) {
 		form.setAttribute("action", "viewAllResults.do");
+		
 	    } else if (asText.contains(MockLearner.WIKI_EDIT_BUTTON_STRING)) {
 		form = handleToolWiki(form, action);
+		
 	    } else if (asText.contains(MockLearner.ASSESSMENT_TOOL_SUBSTRING)) {
 		return handleToolAssessment(resp, form, action);
+		
 	    } else if (asText.contains(SCRIBE_TOOL_SUBSTRING)) {
 		return handleToolScribe(resp, form);
+		
 	    } else if (asText.contains(NB_SUBSTRING)) {
 		handleToolNb(resp, form);
 	    }
@@ -910,6 +906,105 @@ public class MockLearner extends MockUser implements Runnable {
 	    form.setAttribute("action", "finish.do");
 	}
     }
+    
+    private WebResponse handleToolQA(WebResponse resp, WebForm form, String action) throws SAXException, IOException {
+	final String HAS_FINISH_BUTTON = "javascript:submitMethod('endLearning')";
+	final String HAS_CHECK_LEADER_METHOD_INVOCATION = "setInterval(\"checkLeaderProgress();\"";
+	final Pattern SESSION_ID_PATTERN = Pattern.compile("name=\"toolSessionID\" type=\"hidden\" value=\"(\\d+)\"");
+	final String STORE_ALL_RESULTS_BUTTON = "submitMethod('storeAllResults')";
+	final String SUBMIT_ANSWERS_BUTTON = "submitMethod('submitAnswersContent')";
+
+	String asText = resp.getText();
+	boolean containsFinishButton = asText.contains(HAS_FINISH_BUTTON);
+	
+	// check if current user is the leader
+	boolean hasEditRights = !asText.contains(HAS_CHECK_LEADER_METHOD_INVOCATION);
+	if (hasEditRights) {
+	    // this is a Leader or it is a non-Leader Q&A
+	    while (!containsFinishButton) {
+		//find new form, action, and asText
+		int index = -1;
+		WebForm[] forms = resp.getForms();
+		form = null;
+		action = null;
+		asText = resp.getText();
+		do {
+		    index++;
+		    form = forms[index];
+		    action = form.getAction();
+		} while (index + 1 < forms.length && ((action == null) || (action.trim().length() == 0)));
+		
+		//enforce storeAllResults.do path for IndividualLearnerResults.jsp
+		if (asText.contains(STORE_ALL_RESULTS_BUTTON)) {
+		    action = "storeAllResults.do";
+		}
+		//enforce submitAnswersContent.do path for SequencialAnswersContent.jsp
+		if (asText.contains(SUBMIT_ANSWERS_BUTTON)) {
+		    action = "submitAnswersContent.do";
+		}		
+		
+		// make QA look at "answerX__textarea" form fields rather than "answerX"
+		if (action.contains("submitAnswersContent.do")) {
+		    action += "?testHarness=true";
+		}
+		form.setAttribute("action", action);
+		
+		// iterate through pages
+		resp = (WebResponse) new Call(wc, test, username + " submits Assessment form",
+			fillFormArbitrarily(form)).execute();
+
+		containsFinishButton = asText.contains(HAS_FINISH_BUTTON) || isActivityFinished(resp);
+	    }
+	    
+	} else {
+	    String toolSessionID = null;
+	    String checkLeaderProgressURL = null;
+	    // read session map ID for the current user
+	    Matcher m = SESSION_ID_PATTERN.matcher(asText);
+	    if (m.find()) {
+		// prepare URLs
+		toolSessionID = m.group(1);
+		checkLeaderProgressURL = "/lams/tool/laqa11/learning/checkLeaderProgress.do?toolSessionID="
+			+ toolSessionID;
+	    } else {
+		log.debug(asText);
+		throw new TestHarnessException("Tool Session ID was not found in Q&A Tool");
+	    }
+
+	    boolean isWaitForLeader = !containsFinishButton;
+	    while (isWaitForLeader) {
+		log.debug("Waiting for leader to finish Q&A");
+		try {
+		    // in normal browser flow learners wait 45 seconds too
+		    Thread.sleep(45000);
+		} catch (InterruptedException e) {
+		    log.error("Interrupted waiting between check Leader progress in Q&A");
+		}
+		// the reply is JSON
+		WebResponse checkResp = (WebResponse) new Call(wc, test, username + " checks Q&A if leader finished",
+			checkLeaderProgressURL).execute();
+		log.debug("check resp:" + checkResp.getText());
+		isWaitForLeader = checkResp.getText().contains("false");
+	    }
+	    
+	    //if page doesn't contain finish button - reload it to emulate learner's behavior
+	    if (!containsFinishButton) {
+		String assessmentReloadUrl = "/lams/tool/laqa11/learning/learning.do?mode=learner&toolSessionID="
+			+ toolSessionID;
+		log.debug("Going to reload Assessment for non-leader. reload URL: " + assessmentReloadUrl);
+		resp = (WebResponse) new Call(wc, test, username + " refreshes Assessment",
+			assessmentReloadUrl).execute();
+	    }
+	}
+	
+	//fillFormArbitrarily in activity is not finished yet
+	if (!isActivityFinished(resp)) {
+	    form.setAttribute("action", "endLearning.do");
+	    resp = (WebResponse) new Call(wc, test, username + " finishes Q&A", fillFormArbitrarily(form)).execute();
+	}
+	
+	return resp;
+    }
 
     private WebResponse handleToolAssessment(WebResponse resp, WebForm form, String action) throws SAXException, IOException {
 	String asText = resp.getText();
@@ -962,7 +1057,7 @@ public class MockLearner extends MockUser implements Runnable {
 	    if (!containsFinishButton) {
 		String assessmentReloadUrl = "/lams/tool/laasse10/learning/start.do?mode=learner&toolSessionID="
 			+ toolSessionID;
-		log.debug("Going to reload Assessment for non-leader. reload URL: " + assessmentReloadUrl);
+		log.debug("Going to reload Assessment for a non-leader. reload URL: " + assessmentReloadUrl);
 		WebResponse nextResp = (WebResponse) new Call(wc, test, username + " refreshes Assessment",
 			assessmentReloadUrl).execute();
 		asText = nextResp.getText();
@@ -1141,5 +1236,13 @@ public class MockLearner extends MockUser implements Runnable {
 		nextURL = MockLearner.parseOutNextURL(resp);
 	    }
 	}
+    }
+    
+    private boolean isActivityFinished(WebResponse resp) throws IOException {
+	String asText = resp == null ? null : resp.getText();
+	
+	return (asText != null) && (asText.contains(MockLearner.ACTIVITY_FINISHED_FLAG)
+		|| asText.contains(MockLearner.LESSON_FINISHED_FLAG)
+		|| asText.contains(MockLearner.LOAD_TOOL_ACTIVITY_FLAG));
     }
 }
