@@ -41,7 +41,7 @@
 
 <!-- Table --> 
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-10">
+<div class="col-xs-12 col-md-12 col-lg-12">
 <div class="panel">
 <div class="panel-body table-responsive">
           

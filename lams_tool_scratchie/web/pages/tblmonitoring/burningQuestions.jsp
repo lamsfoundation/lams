@@ -12,7 +12,7 @@
 
 <!-- Tables -->
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-10">
+<div class="col-xs-12 col-md-12 col-lg-12">
 
 	<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 		<c:set var="burningQsCount" value="${fn:length(burningQuestionItemDto.burningQuestionDtos)}"/>

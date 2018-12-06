@@ -43,7 +43,7 @@
 
 <!-- Tables -->
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-10">
+<div class="col-xs-12 col-md-12 col-lg-12">
 
 <c:forEach var="question" items="${questions}" varStatus="i">
 	<div class="panel panel-default">

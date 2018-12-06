@@ -156,7 +156,7 @@
 			<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
 				<%-- Release correct/groups answers for all questions in this assessment --%>
 				<div class="row no-gutter">
-					<div class="col-xs-12 col-md-12 col-lg-10">
+					<div class="col-xs-12 col-md-12 col-lg-12">
 						<div class="btn-group-sm pull-right disclose-all-button-group">
 							<div class="btn btn-default disclose-all-correct-button">
 								<fmt:message key="label.disclose.all.correct.answers"/>
@@ -171,7 +171,7 @@
 			
 			<c:forEach var="question" items="${assessmentDto.questions}" varStatus="i">
 				<div class="row no-gutter">
-				<div class="col-xs-12 col-md-12 col-lg-10">
+				<div class="col-xs-12 col-md-12 col-lg-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="panel-title">

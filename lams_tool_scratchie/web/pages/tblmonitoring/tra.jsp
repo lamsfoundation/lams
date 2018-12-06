@@ -74,7 +74,7 @@
 <!-- Tables -->
 <c:forEach var="item" items="${items}" varStatus="i">
 	<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-10">
+	<div class="col-xs-12 col-md-12 col-lg-12">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
@@ -108,7 +108,7 @@
 
 <!-- Chart -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-10">
+	<div class="col-xs-12 col-md-12 col-lg-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<fmt:message key="label.tra.results.by.team"/> <small>(<fmt:message key="label.average"/>)</small>
