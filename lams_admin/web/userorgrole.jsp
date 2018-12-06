@@ -41,18 +41,18 @@
 		</c:if>
 		</h4>
 		
-		<h1><fmt:message key="admin.user.assign.roles" /></h1>
+		<h3><fmt:message key="admin.user.assign.roles" /></h3>
 		
 		<p><fmt:message key="msg.roles.mandatory.users"/></p>
 		
 		<form:form action="userorgrolesave.do" modelAttribute="userOrgRoleForm" id="userOrgRoleForm" method="post">
 		<form:hidden path="orgId" />
 		
-		<table class="table table-condensed table-no-border">
+		<table class="table table-condensed table-striped table-hover">
 		<tr>
-			<th><fmt:message key="admin.user.login"/></th>
+			<th style="width: 20%"><fmt:message key="admin.user.login"/></th>
 			<c:forEach var="role" items="${roles}" varStatus="roleIndex">
-				<th><input type="checkbox" 
+				<th style="width: 20%"><input type="checkbox" 
 							name="<c:out value="${roleIndex.index}" />" 
 							onclick="toggleCheckboxes(<c:out value="${roleIndex.index}" />, this);" 
 							onkeyup="toggleCheckboxes(<c:out value="${roleIndex.index}" />, this);" />&nbsp;
