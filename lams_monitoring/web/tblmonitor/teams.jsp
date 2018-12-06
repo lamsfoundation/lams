@@ -141,8 +141,7 @@
 
 			//load modal dialog content using Ajax
 			$('#tra-modal .modal-body').load(
-				"<lams:LAMSURL/>tool/lascrt11/tblmonitoring.do", {
-					method: "getModalDialogForTeamsTab",
+				"<lams:LAMSURL/>tool/lascrt11/tblmonitoring/getModalDialogForTeamsTab.do", {
 					toolContentID: "${traToolContentId}",
 					userID: userId
 				},

@@ -246,7 +246,7 @@
 			<div class="col-sm-6">
 				<div id="emailTextareaDiv">
 					<h4><fmt:message key="email.notifications.message.header"/></h4>
-					<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body.header"/><br/><br/><fmt:message key="email.notifications.lesson.email.body.msg"/><br/><br/><br/><fmt:message key="email.notifications.lesson.email.body.footer" ><fmt:param>${lesson.lessonName}</fmt:param><fmt:param><lams:LAMSURL/>home.do?method=learner&lessonID=${lesson.lessonId}</fmt:param></fmt:message>
+					<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body.header"/><br/><br/><fmt:message key="email.notifications.lesson.email.body.msg"/><br/><br/><br/><fmt:message key="email.notifications.lesson.email.body.footer" ><fmt:param>${lesson.lessonName}</fmt:param><fmt:param><lams:LAMSURL/>home/learner.do?lessonID=${lesson.lessonId}</fmt:param></fmt:message>
 					</c:set>
 					<textarea rows="8" name="emailBody" id="emailBody" width="100%" class="form-control">${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
 					<br/>

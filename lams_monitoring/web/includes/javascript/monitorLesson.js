@@ -98,7 +98,7 @@ function initLessonTab(){
 	$('#lesson-name-strong').editable({
 	    type: 'text',
 	    pk: lessonId,
-	    url: LAMS_URL + 'monitoring/monitoring.do?method=renameLesson',
+	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do',
 	    validate: function(value) {
 		    //close editing area on validation failure
             if (!value.trim()) {
