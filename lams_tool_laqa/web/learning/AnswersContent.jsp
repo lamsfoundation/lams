@@ -96,13 +96,12 @@
 			document.forms.qaLearningForm.action=actionMethod+".do"; 
 			document.forms.qaLearningForm.submit();
 		}
-		
-		if (${!hasEditRight && mode != "teacher"}) {
+
+		<c:if test="${!hasEditRight && mode != 'teacher'}">
 			setInterval("checkLeaderProgress();",45000);// Auto-Refresh every 1 minute for non-leaders
-		}
+		</c:if>
 		
 		function checkLeaderProgress() {
-			
 	        $.ajax({
 	        	async: false,
 	            url: '<c:url value="checkLeaderProgress.do"/>',
