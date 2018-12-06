@@ -54,7 +54,7 @@
 							</c:choose>
 						</div>
 
-						<form:hidden path="currentQuestionIndex" value="${questionEntry.key}" />
+						<input type="hidden" name="currentQuestionIndex" value="${questionEntry.key}" />
 	</c:if>
 </c:forEach>
 
