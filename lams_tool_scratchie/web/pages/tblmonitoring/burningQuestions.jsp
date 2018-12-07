@@ -34,8 +34,9 @@
 					<span class="burning-question-description">
 						<c:out value="${item.description}" escapeXml="false"/> 
 					</span>
-
-					<span class="burning-question-count"><small>[${burningQsCount}]</small></span>
+                    <c:if test="${burningQsCount > 0}">
+					   <span class="badge pull-right" style="margin-right: 4px">${burningQsCount}</span>
+                    </c:if>    
 				</h4>
 			</div>
 		
@@ -54,7 +55,7 @@
 										${burningQuestionDto.escapedBurningQuestion}
 									</td>
 									<td class="text-nowrap">
-										${burningQuestionDto.likeCount} <i class="fa fa-thumbs-o-up" style="color:darkblue"></i>
+										<span class="badge">${burningQuestionDto.likeCount}</span> &nbsp; <i class="fa fa-thumbs-o-up" style="color:darkblue"></i>
 									</td>
 								</tr>
 							</c:forEach>
