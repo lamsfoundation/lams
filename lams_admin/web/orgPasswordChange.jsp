@@ -292,7 +292,7 @@
 								var id = +$(this).attr('id'),
 									selected = $(this).hasClass('success');
 								// if row is not selected and is not excluded, select it
-								if (!selected && !excluded.includes(id)) {
+								if (!selected && (!excluded || !excluded.includes(id))) {
 									// select without triggering onSelectRow
 									grid.jqGrid('setSelection', id, false);
 								}
