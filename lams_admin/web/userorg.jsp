@@ -165,7 +165,7 @@
 					</c:if>
 				</p>
 				
-				<h4><fmt:message key="admin.user.add"/></h4>
+				<h3><fmt:message key="admin.user.add"/></h3>
 				
 				<div align="center">
 				</div>
@@ -176,7 +176,7 @@
 					</lams:Alert>
 				</c:if>
 				
-				<h3><fmt:message key="heading.users"/></h3>
+				<h4><fmt:message key="heading.users"/></h4>
 				<div class="pull-right"><span id="totalUsers"><c:out value="${numExistUsers}"/></span></div>
 				<p>
 					 <fmt:message key="msg.click.remove.user"/>

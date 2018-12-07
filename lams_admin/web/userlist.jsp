@@ -172,15 +172,15 @@
 						</td>
 						<td>
 								<c:if test="${userManageForm.canEditRole == true }">
-									<a href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.assign.roles"/></a>
+                                    <a title="<fmt:message key="admin.user.assign.roles"/>" href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-primary btn-xs"><i class="fa fa-users"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.user.assign.roles"/></span></button></a>
 									&nbsp;
 								</c:if>
 								<c:if test="${userManageForm.courseAdminCanAddNewUsers == true }">
-									<a href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.edit" /></a>
+                                    <a title="<fmt:message key="admin.edit" />" href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit" /></span></button></a>
 									&nbsp;
 								</c:if>
 								<c:if test="${canDeleteUser == true}">
-									<a href="<lams:LAMSURL/>admin/user/remove.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.delete"/></a>
+                                    <a title="<fmt:message key="admin.user.delete"/>" href="<lams:LAMSURL/>admin/user/remove.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.user.delete"/></span></button></a>
 								</c:if>
 								<br/>
 						</td>		
