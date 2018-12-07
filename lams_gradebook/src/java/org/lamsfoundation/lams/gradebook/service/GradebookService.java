@@ -146,7 +146,7 @@ public class GradebookService implements IGradebookFullService {
 	Lesson lesson = lessonService.getLesson(lessonId);
 	User learner = (User) userService.findById(User.class, userId);
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, userId);
 	for (ToolActivity activity : activities) {
@@ -241,7 +241,7 @@ public class GradebookService implements IGradebookFullService {
 	Activity activity = getActivityById(activityId);
 	Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 	List<GradebookUserLessonArchive> lessonArchives = gradebookDAO.getArchivedLessonMarks(lesson.getLessonId(),
 		userId);
 	int attemptOrder = lessonArchives.size();
@@ -280,7 +280,7 @@ public class GradebookService implements IGradebookFullService {
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 	User learner = (User) userService.findById(User.class, userId);
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, userId);
 	for (ToolActivity activity : activities) {
@@ -318,7 +318,7 @@ public class GradebookService implements IGradebookFullService {
 	GradebookService.logger.debug("Getting gradebook data for lesson: " + lessonId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	List<ToolActivity> activities = getLessonToolActivitiesForLesson(lesson);
 
@@ -351,7 +351,7 @@ public class GradebookService implements IGradebookFullService {
 	Long lessonId = lesson.getLessonId();
 	Long activityId = activity.getActivityId();
 
-	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<>();
 
 	List<User> learners = null;
 	if (groupId != null) {
@@ -417,10 +417,10 @@ public class GradebookService implements IGradebookFullService {
 		    gUserDTO.setMark(gradebookUserActivity.getMark());
 
 		}
-		
+
 		boolean hasArchivedMarks = gradebookDAO.hasArchivedMarks(lesson.getLessonId(), learner.getUserId());
 		gUserDTO.setHasArchivedMarks(hasArchivedMarks);
-		
+
 		gradebookUserDTOs.add(gUserDTO);
 	    }
 	}
@@ -438,7 +438,7 @@ public class GradebookService implements IGradebookFullService {
     public ArrayList<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy,
 	    String sortOrder, String searchString, TimeZone userTimeZone) {
 
-	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<>();
 
 	if (lesson != null) {
 	    List<User> learners;
@@ -524,7 +524,7 @@ public class GradebookService implements IGradebookFullService {
     public ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation, int page, int size,
 	    String sortOrder, String searchString) {
 
-	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<>();
 
 	if (organisation != null) {
 	    List<User> learners = gradebookDAO.getUsersFromOrganisation(organisation.getOrganisationId(), page, size,
@@ -765,7 +765,7 @@ public class GradebookService implements IGradebookFullService {
 
     @Override
     public List<String[]> getWeights(LearningDesign design) {
-	List<String[]> evaluations = new ArrayList<String[]>();
+	List<String[]> evaluations = new ArrayList<>();
 	Set<Activity> activities = design.getActivities();
 	for (Activity activity : activities) {
 	    if (activity.isToolActivity()) {
@@ -931,7 +931,7 @@ public class GradebookService implements IGradebookFullService {
     @Override
     public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view,
 	    int page, int size, String sortBy, String sortOrder, String searchString, TimeZone userTimeZone) {
-	List<GBLessonGridRowDTO> lessonRows = new ArrayList<GBLessonGridRowDTO>();
+	List<GBLessonGridRowDTO> lessonRows = new ArrayList<>();
 	Integer userId = user.getUserId();
 	Integer orgId = organisation.getOrganisationId();
 
@@ -1041,7 +1041,7 @@ public class GradebookService implements IGradebookFullService {
 
     private Map<ToolActivity, List<GBUserGridRowDTO>> getDataForLessonGradebookExport(Lesson lesson) {
 
-	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new LinkedHashMap<ToolActivity, List<GBUserGridRowDTO>>();
+	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new LinkedHashMap<>();
 
 	Set<User> learners = new TreeSet<User>(new LastNameAlphabeticComparator());
 	if (lesson.getAllLearners() != null) {
@@ -1098,7 +1098,7 @@ public class GradebookService implements IGradebookFullService {
 	Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(
 		toolActivity, null);
 
-	List<GBUserGridRowDTO> userDTOs = new ArrayList<GBUserGridRowDTO>();
+	List<GBUserGridRowDTO> userDTOs = new ArrayList<>();
 
 	for (User learner : learners) {
 	    GBUserGridRowDTO userDTO = new GBUserGridRowDTO(learner);
@@ -1126,12 +1126,12 @@ public class GradebookService implements IGradebookFullService {
 
 	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 
 	// -------------------- process summary excel page --------------------------------
 
 	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 
 	// Adding the lesson average data to the summary
 	Double lessonAverageMarkValue = getAverageMarkForLesson(lesson.getLessonId());
@@ -1215,7 +1215,7 @@ public class GradebookService implements IGradebookFullService {
 
 	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
 	//filter out all activities that doesn't have numeric outputs
-	Map<ToolActivity, List<GBUserGridRowDTO>> filteredActivityToUserDTOMap = new LinkedHashMap<ToolActivity, List<GBUserGridRowDTO>>();
+	Map<ToolActivity, List<GBUserGridRowDTO>> filteredActivityToUserDTOMap = new LinkedHashMap<>();
 	for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    //check whether toolActivity has a NumericToolOutput
@@ -1276,7 +1276,7 @@ public class GradebookService implements IGradebookFullService {
 	dataToExport.put(getMessage("gradebook.export.lesson.summary"), summaryData);
 
 	// -------------------- process activity excel page --------------------------------
-	List<ExcelCell[]> rowList1 = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList1 = new LinkedList<>();
 
 	for (Activity activity : activityToUserDTOMap.keySet()) {
 
@@ -1329,7 +1329,7 @@ public class GradebookService implements IGradebookFullService {
 	    learners.addAll(lesson.getAllLearners());
 	}
 
-	rowList = new LinkedList<ExcelCell[]>();
+	rowList = new LinkedList<>();
 	for (User learner : learners) {
 
 	    userTitleRow = new ExcelCell[4];
@@ -1344,7 +1344,7 @@ public class GradebookService implements IGradebookFullService {
 	    titleRow[4] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
 	    rowList.add(titleRow);
 
-	    Map<Long, String> activityIdToName = new HashMap<Long, String>();
+	    Map<Long, String> activityIdToName = new HashMap<>();
 
 	    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 
@@ -1411,40 +1411,36 @@ public class GradebookService implements IGradebookFullService {
 		    attemptRow[3] = new ExcelCell(lessonArchive.getMark(), false);
 		    rowList.add(attemptRow);
 
+		    Date archiveDate = lessonArchive.getArchiveDate();
+		    LearnerProgressArchive learnerProgress = learnerProgressDAO
+			    .getLearnerProgressArchive(lesson.getLessonId(), learner.getUserId(), archiveDate);
+
 		    // go throuch each activity and see if there is an archived mark for it
 		    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
-			ExcelCell[] activityDataRow = null;
+			GradebookUserActivityArchive activityArchive = null;
 			List<GradebookUserActivityArchive> activityArchives = gradebookDAO
 				.getArchivedActivityMarks(activity.getActivityId(), learner.getUserId());
-			Date archiveDate = lessonArchive.getArchiveDate();
-			for (GradebookUserActivityArchive activityArchive : activityArchives) {
+			for (GradebookUserActivityArchive possibleActivityArchive : activityArchives) {
 			    // if it matches, we found an archived mark for this activity and this attempt
-			    if (archiveDate.equals(activityArchive.getArchiveDate())) {
-				LearnerProgressArchive learnerProgress = learnerProgressDAO.getLearnerProgressArchive(
-					lesson.getLessonId(), learner.getUserId(), lessonArchive.getArchiveDate());
-				activityDataRow = new ExcelCell[5];
-				activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()),
-					false);
-				Date startDate = getActivityStartDate(learnerProgress, activity, null);
-				activityDataRow[1] = new ExcelCell(
-					startDate == null ? ""
-						: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(startDate),
-					false);
-				Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
-				activityDataRow[2] = new ExcelCell(
-					finishDate == null ? ""
-						: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate),
-					false);
-				activityDataRow[3] = new ExcelCell(
-					getActivityDuration(learnerProgress, activity) / 1000, false);
-				activityDataRow[4] = new ExcelCell(activityArchive.getMark(), false);
+			    if (archiveDate.equals(possibleActivityArchive.getArchiveDate())) {
+				activityArchive = possibleActivityArchive;
 				break;
 			    }
 			}
-			if (activityDataRow == null) {
-			    activityDataRow = new ExcelCell[1];
-			    activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()), false);
-			}
+
+			ExcelCell[] activityDataRow = new ExcelCell[5];
+			activityDataRow[0] = new ExcelCell(activityIdToName.get(activity.getActivityId()), false);
+			Date startDate = getActivityStartDate(learnerProgress, activity, null);
+			activityDataRow[1] = new ExcelCell(startDate == null ? ""
+				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(startDate), false);
+			Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
+			activityDataRow[2] = new ExcelCell(finishDate == null ? ""
+				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate), false);
+			activityDataRow[3] = new ExcelCell(getActivityDuration(learnerProgress, activity) / 1000,
+				false);
+			activityDataRow[4] = new ExcelCell(activityArchive == null ? "" : activityArchive.getMark(),
+				false);
+
 			rowList.add(activityDataRow);
 		    }
 		    attemptOrder--;
@@ -1463,15 +1459,15 @@ public class GradebookService implements IGradebookFullService {
     @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId) {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 
 	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 
-	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());
+	Set<Lesson> lessons = new TreeSet<>(new LessonComparator());
 	lessons.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
 
-	Map<Long, Boolean> isWeightedLessonMap = new HashMap<Long, Boolean>();
+	Map<Long, Boolean> isWeightedLessonMap = new HashMap<>();
 
 	if ((lessons != null) && (lessons.size() > 0)) {
 
@@ -1511,8 +1507,8 @@ public class GradebookService implements IGradebookFullService {
 	    rowList.add(headerRow);
 
 	    // collect users from all lessons & check if lesson uses weightings
-	    LinkedHashSet<User> allLearners = new LinkedHashSet<User>();
-	    List<Long> lessonIds = new LinkedList<Long>();
+	    LinkedHashSet<User> allLearners = new LinkedHashSet<>();
+	    List<Long> lessonIds = new LinkedList<>();
 	    for (Lesson lesson : lessons) {
 		Set dbLessonUsers = lesson.getAllLearners();
 		allLearners.addAll(dbLessonUsers);
@@ -1522,8 +1518,8 @@ public class GradebookService implements IGradebookFullService {
 	    }
 
 	    // Fetching the user data
-	    List<LearnerProgress> learnerProgresses = new LinkedList<LearnerProgress>();
-	    List<GradebookUserLesson> gradebookUserLessons = new LinkedList<GradebookUserLesson>();
+	    List<LearnerProgress> learnerProgresses = new LinkedList<>();
+	    List<GradebookUserLesson> gradebookUserLessons = new LinkedList<>();
 	    if (!allLearners.isEmpty()) {
 		learnerProgresses = learnerProgressDAO.getLearnerProgressForLessons(lessonIds);
 		gradebookUserLessons = gradebookDAO.getGradebookUserLessons(lessonIds);
@@ -1626,16 +1622,16 @@ public class GradebookService implements IGradebookFullService {
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
 	    String[] lessonIds, boolean simplified) {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 
 	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationId);
 
 	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 
 	User user = (User) userService.findById(User.class, userId);
-	Set<Lesson> selectedLessons = new TreeSet<Lesson>(new LessonComparator());
-	Map<Long, Boolean> isWeightedLessonMap = new HashMap<Long, Boolean>();
+	Set<Lesson> selectedLessons = new TreeSet<>(new LessonComparator());
+	Map<Long, Boolean> isWeightedLessonMap = new HashMap<>();
 
 	// Don't include lesson in list if the user doesn't have permission
 	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
@@ -1644,9 +1640,9 @@ public class GradebookService implements IGradebookFullService {
 	boolean isGroupManager = userService.isUserInRole(userId, organisationToCheckPermission, Role.GROUP_MANAGER);
 
 	// collect users from all lessons
-	Set<User> allLearners = new LinkedHashSet<User>();
-	Map<Long, List<ToolActivity>> lessonActivitiesMap = new HashMap<Long, List<ToolActivity>>();
-	List<ToolActivity> allActivities = new ArrayList<ToolActivity>();
+	Set<User> allLearners = new LinkedHashSet<>();
+	Map<Long, List<ToolActivity>> lessonActivitiesMap = new HashMap<>();
+	List<ToolActivity> allActivities = new ArrayList<>();
 
 	for (String lessonIdStr : lessonIds) {
 	    Long lessonId = Long.parseLong(lessonIdStr);
@@ -1670,18 +1666,18 @@ public class GradebookService implements IGradebookFullService {
 	if (!selectedLessons.isEmpty()) {
 
 	    // Fetching the user data
-	    List<Long> lessonIdLongs = new LinkedList<Long>();
+	    List<Long> lessonIdLongs = new LinkedList<>();
 	    for (String lessonId : lessonIds) {
 		lessonIdLongs.add(Long.valueOf(lessonId));
 	    }
-	    List<LearnerProgress> learnerProgresses = new LinkedList<LearnerProgress>();
+	    List<LearnerProgress> learnerProgresses = new LinkedList<>();
 	    if (!allLearners.isEmpty()) {
 		learnerProgresses = learnerProgressDAO.getLearnerProgressForLessons(lessonIdLongs);
 	    }
 
 	    Map<Long, Long> activityToTotalMarkMap = getActivityToTotalMarkMap(allActivities);
 
-	    Map<Long, Map<Integer, GradebookUserActivity>> activityTouserToGradebookUserActivityMap = new HashMap<Long, Map<Integer, GradebookUserActivity>>();
+	    Map<Long, Map<Integer, GradebookUserActivity>> activityTouserToGradebookUserActivityMap = new HashMap<>();
 	    for (ToolActivity activity : allActivities) {
 		Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(
 			activity, null);
@@ -2058,7 +2054,7 @@ public class GradebookService implements IGradebookFullService {
      * Returns a completely flat list of lesson activities for the whole lesson.
      */
     private List<ToolActivity> getLessonToolActivitiesForLesson(Lesson lesson) {
-	List<ToolActivity> toolActivities = new ArrayList<ToolActivity>();
+	List<ToolActivity> toolActivities = new ArrayList<>();
 	List<ActivityURL> activityUrls = getLearnerService().getStructuredActivityURLs(lesson.getLessonId());
 	for (ActivityURL activityUrl : activityUrls) {
 	    processLessonToolActivity(activityUrl, toolActivities);
@@ -2083,7 +2079,7 @@ public class GradebookService implements IGradebookFullService {
      * The sequence activities allow the export to tweak the learner out.
      */
     private List<Activity> getLessonActivitiesForLesson(Lesson lesson) {
-	List<Activity> activities = new ArrayList<Activity>();
+	List<Activity> activities = new ArrayList<>();
 	List<ActivityURL> activityUrls = getLearnerService().getStructuredActivityURLs(lesson.getLessonId());
 	for (ActivityURL activityUrl : activityUrls) {
 	    processLessonActivity(activityUrl, activities);
@@ -2107,7 +2103,7 @@ public class GradebookService implements IGradebookFullService {
      */
     @SuppressWarnings("unchecked")
     private List<ToolActivity> getLessonActivitiesForLearner(Lesson lesson, Integer learnerId) {
-	List<ToolActivity> toolActivities = new ArrayList<ToolActivity>();
+	List<ToolActivity> toolActivities = new ArrayList<>();
 	Object[] objs = getLearnerService().getStructuredActivityURLs(learnerId, lesson.getLessonId());
 	// will be null if learner has not started the lesson.
 	if (objs != null) {
@@ -2301,9 +2297,9 @@ public class GradebookService implements IGradebookFullService {
 
 	    // this construct looks bad but see LDEV-4609 commit for explanation
 	    if (learnerProgress instanceof LearnerProgressArchive) {
-		startDate = ((LearnerProgressArchive) learnerProgress).getStartDate();
+		startDate = ((LearnerProgressArchive) learnerProgress).getAttemptedActivities().get(activity);
 	    } else {
-		startDate = ((LearnerProgress) learnerProgress).getStartDate();
+		startDate = ((LearnerProgress) learnerProgress).getAttemptedActivities().get(activity);
 	    }
 	    if (startDate == null) {
 		if (learnerProgress instanceof LearnerProgressArchive) {
@@ -2466,7 +2462,7 @@ public class GradebookService implements IGradebookFullService {
      */
     private Map<Integer, LearnerProgress> getUserToLearnerProgressMap(Lesson lesson, List<User> learners) {
 
-	Map<Integer, LearnerProgress> map = new HashMap<Integer, LearnerProgress>();
+	Map<Integer, LearnerProgress> map = new HashMap<>();
 	if (lesson == null || learners != null && learners.isEmpty()) {
 	    return map;
 	}
@@ -2477,7 +2473,7 @@ public class GradebookService implements IGradebookFullService {
 	    learnerProgresses = lessonService.getUserProgressForLesson(lesson.getLessonId());
 	} else {
 
-	    List<Integer> userIds = new LinkedList<Integer>();
+	    List<Integer> userIds = new LinkedList<>();
 	    for (User learner : learners) {
 		userIds.add(learner.getUserId());
 	    }
@@ -2501,7 +2497,7 @@ public class GradebookService implements IGradebookFullService {
     private Map<Integer, GradebookUserActivity> getUserToGradebookUserActivityMap(Activity activity,
 	    List<User> learners) {
 
-	Map<Integer, GradebookUserActivity> map = new HashMap<Integer, GradebookUserActivity>();
+	Map<Integer, GradebookUserActivity> map = new HashMap<>();
 	if (activity == null || learners != null && learners.isEmpty()) {
 	    return map;
 	}
@@ -2512,7 +2508,7 @@ public class GradebookService implements IGradebookFullService {
 	    gradebookUserActivities = gradebookDAO.getAllGradebookUserActivitiesForActivity(activity.getActivityId());
 	} else {
 
-	    List<Integer> userIds = new LinkedList<Integer>();
+	    List<Integer> userIds = new LinkedList<>();
 	    for (User learner : learners) {
 		userIds.add(learner.getUserId());
 	    }
@@ -2536,7 +2532,7 @@ public class GradebookService implements IGradebookFullService {
      */
     private Map<Long, Long> getActivityToTotalMarkMap(Collection<ToolActivity> activities) {
 
-	Map<Long, Long> map = new HashMap<Long, Long>();
+	Map<Long, Long> map = new HashMap<>();
 	for (ToolActivity activity : activities) {
 	    map.put(activity.getActivityId(), toolService.getActivityMaxPossibleMark(activity));
 	}
@@ -2553,7 +2549,7 @@ public class GradebookService implements IGradebookFullService {
      */
     private Map<Integer, GradebookUserLesson> getUserToGradebookUserLessonMap(Lesson lesson, List<User> learners) {
 
-	Map<Integer, GradebookUserLesson> map = new HashMap<Integer, GradebookUserLesson>();
+	Map<Integer, GradebookUserLesson> map = new HashMap<>();
 	if (lesson == null || learners != null && learners.isEmpty()) {
 	    return map;
 	}
@@ -2564,7 +2560,7 @@ public class GradebookService implements IGradebookFullService {
 	    gradebookUserLessons = gradebookDAO.getGradebookUserLessons(lesson);
 	} else {
 
-	    List<Integer> userIds = new LinkedList<Integer>();
+	    List<Integer> userIds = new LinkedList<>();
 	    for (User learner : learners) {
 		userIds.add(learner.getUserId());
 	    }
