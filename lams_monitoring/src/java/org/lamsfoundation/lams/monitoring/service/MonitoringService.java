@@ -712,7 +712,7 @@ public class MonitoringService implements IMonitoringFullService {
 	LearningDesign design = requestedLesson.getLearningDesign();
 	boolean designModified = false;
 
-	for (Activity activity : (Set<Activity>) design.getActivities()) {
+	for (Activity activity : design.getActivities()) {
 	    Integer newMaxId = startSystemActivity(activity, design.getMaxID(), lessonStartTime,
 		    requestedLesson.getLessonName());
 	    if (newMaxId != null) {
@@ -1124,11 +1124,15 @@ public class MonitoringService implements IMonitoringFullService {
 	lessonDAO.deleteByProperties(NotebookEntry.class, notebookProperties);
 	lessonDAO.deleteLesson(lesson);
 
+	// manually delete transitions as subsequent activity removal does not cascade to them
+	lessonDAO.deleteByProperty(Transition.class, "learningDesign.learningDesignId",
+		learningDesign.getLearningDesignId());
+
 	// remove each Tool activity content
 	// It has to be done before removing BranchEntries as fetching Tool content
 	// in its own transaction would re-add connected BranchEntries (Hibernate error)
 	Set<Activity> systemActivities = new HashSet<Activity>();
-	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+	for (Activity activity : learningDesign.getActivities()) {
 	    // get the real object, not the proxy
 	    activity = activityDAO.getActivityByActivityId(activity.getActivityId());
 	    if (activity.isToolActivity()) {
@@ -1585,7 +1589,7 @@ public class MonitoringService implements IMonitoringFullService {
 		    ComplexActivity complexActivity = (ComplexActivity) getActivityById(
 			    currentActivity.getActivityId());
 		    // forget all records within complex activity
-		    for (Activity childActivity : (Set<Activity>) complexActivity.getActivities()) {
+		    for (Activity childActivity : complexActivity.getActivities()) {
 			if (childActivity.isSequenceActivity()) {
 			    // mark the activity to be "unbranched"
 			    groupings.add(childActivity);
@@ -2347,7 +2351,7 @@ public class MonitoringService implements IMonitoringFullService {
 	Grouping grouping = branchingActivity.getGrouping();
 	if (grouping.getGroups().isEmpty()) {
 	    LearningDesign design = branchingActivity.getLearningDesign();
-	    for (Activity childActivity : (Set<Activity>) branchingActivity.getActivities()) {
+	    for (Activity childActivity : branchingActivity.getActivities()) {
 		SequenceActivity branch = (SequenceActivity) getActivityById(childActivity.getActivityId());
 		Group group = lessonService.createGroup(grouping, branch.getTitle());
 		groupingDAO.insert(group);
