@@ -250,22 +250,26 @@ public class GradebookService implements IGradebookFullService {
 	    Date archiveDate = lessonArchive.getArchiveDate();
 	    GBActivityArchiveGridRowDTO activityDTO = new GBActivityArchiveGridRowDTO(attemptOrder,
 		    lessonArchive.getMark());
-	    for (GradebookUserActivityArchive activityArchive : activityArchives) {
-		if (archiveDate.equals(activityArchive.getArchiveDate())) {
-		    activityDTO.setMark(activityArchive.getMark());
-		    activityDTO.setFeedback(activityArchive.getFeedback());
+	    LearnerProgressArchive learnerProgress = learnerProgressDAO.getLearnerProgressArchive(lesson.getLessonId(),
+		    userId, lessonArchive.getArchiveDate());
 
-		    LearnerProgressArchive learnerProgress = learnerProgressDAO
-			    .getLearnerProgressArchive(lesson.getLessonId(), userId, lessonArchive.getArchiveDate());
-		    // Setting status
-		    activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, userTimezone));
-		    activityDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, userTimezone));
-		    activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
-		    activityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
+	    if (learnerProgress != null) {
+		// Setting status
+		activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, userTimezone));
+		activityDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, userTimezone));
+		activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+		activityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
-		    break;
+		for (GradebookUserActivityArchive activityArchive : activityArchives) {
+		    // if it matches, we found an archived mark for this activity and this attempt
+		    if (archiveDate.equals(activityArchive.getArchiveDate())) {
+			activityDTO.setMark(activityArchive.getMark());
+			activityDTO.setFeedback(activityArchive.getFeedback());
+			break;
+		    }
 		}
 	    }
+
 	    gradebookActivityDTOs.add(activityDTO);
 	    attemptOrder--;
 	}
