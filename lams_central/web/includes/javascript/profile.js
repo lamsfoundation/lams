@@ -3,11 +3,12 @@ function updateMyProfileDialogSettings(title, height) {
 	var dialog = $("#" + id, window.parent.document);
 
 	// update height
-	$('.modal-content', dialog).height(height);
 	if (height.match("%$")) {
-		$('.modal-dialog', dialog).height(height);
+		$('.modal-content', dialog).css('height', height);
+		$('.modal-dialog', dialog).css('height', height);
 	} else {
-		$('.modal-dialog', dialog).height('');
+		$('.modal-content', dialog).css('height', height + 'px');
+		$('.modal-dialog', dialog).css('height', null);
 	}
 
 	// update title
