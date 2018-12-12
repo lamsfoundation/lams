@@ -8,7 +8,29 @@
 				.allowButton {
 					width: 100%;
 				}
+				
+				.column-heading {
+			    	margin-right: 10px;
+				    margin-left: 7px;
+				}
+				
 			</style>
+								
+			<script type="text/javascript">
+			
+				function selectUnselectAll(column){
+					if ( $("#all-select-"+column).is(":checked") ) {
+						$("[id^="+column+"-]:input[type='checkbox']").prop("checked", true);
+					} else {
+						$("[id^="+column+"-]:input[type='checkbox']").prop("checked", false);
+					}
+				}
+				
+				function updateSelectAll(column){
+					$("#all-select-"+column).prop("checked", 
+							$("[id^="+column+"-]:input[type='checkbox']").length == $("[id^="+column+"-]:input[type='checkbox']:checked").length );
+				}
+			</script>
 			
 			<hr />
 			<p><fmt:message key="label.gate.open.single.learner"/></p>
@@ -18,10 +40,12 @@
 			
 			<div class="row">
 				<div class="col-sm-4">
-					  <p class="text-danger text-center"><strong><fmt:message key="label.gate.list.all.learners"/></strong></p>
+					   
+					  <p class="text-danger text-center column-heading"> <input id="all-select-forbidden" onClick="javascript:selectUnselectAll('forbidden');" type="checkbox"  class="pull-left" />
+					  <strong><fmt:message key="label.gate.list.all.learners"/></strong></p>
 						<div class="panel panel-default gateLearners" id="forbidden">
 							<c:forEach var="learner" items="${gateForm.forbiddenLearnerList}">
-								<input id="forbidden-${learner.userId}" type="checkbox" value="${learner.userId}" />
+								<input id="forbidden-${learner.userId}" type="checkbox" value="${learner.userId}" onClick="javascript:updateSelectAll('forbidden')" />
 								<label for="forbidden-${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></label>
 								<br />
 							</c:forEach>
@@ -31,10 +55,11 @@
 							   onclick="javascript:allowUsers('forbidden')"/>	
 				</div>
 				<div class="col-sm-4">
-						<p class="text-center"><strong><fmt:message key="label.gate.list.waiting.learners"/></strong></p>
+						<p class="text-center column-heading"> <input id="all-select-waiting" onClick="javascript:selectUnselectAll('waiting');" type="checkbox"  class="pull-left" />
+						<strong><fmt:message key="label.gate.list.waiting.learners"/></strong></p>
 						<div class="panel panel-default gateLearners" id="waiting">
 							<c:forEach var="learner" items="${gateForm.waitingLearnerList}">
-								<input id="waiting-${learner.userId}" type="checkbox" value="${learner.userId}" />
+								<input id="waiting-${learner.userId}" type="checkbox" value="${learner.userId}" onClick="javascript:updateSelectAll('waiting')"/>
 								<label for="waiting-${learner.userId}"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></label>
 								<br />
 							</c:forEach>
