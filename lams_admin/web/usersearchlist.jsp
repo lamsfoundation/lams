@@ -93,23 +93,23 @@
 								rows += '</td>';
 								
 								rows += '<td>';
-								rows += 	'[<a href="<lams:LAMSURL/>admin/user/edit.do?userId=' + orgData["userId"] + '">';
-								rows += 		'<fmt:message key="admin.edit"/>';
-								rows += 	'</a>]';
+								rows += 	'<a title="<fmt:message key="admin.user.delete"/>" href="<lams:LAMSURL/>admin/user/remove.do?userId=' + orgData["userId"] + '">';
+								rows += 		'<button type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"/> <span class="hidden-xs hidden-sm"><fmt:message key="admin.user.delete"/></span></button>';
+								rows += 	'</a>';
 								rows += 	'&nbsp;';
-								rows += 	'[<a href="<lams:LAMSURL/>admin/user/remove.do?userId=' + orgData["userId"] + '">';
-								rows += 		'<fmt:message key="admin.user.delete"/>';
-								rows += 	'</a>]';
+								rows += 	'<a title="<fmt:message key="admin.edit"/>" href="<lams:LAMSURL/>admin/user/edit.do?userId=' + orgData["userId"] + '">';
+								rows += 		'<button type="button" class="btn btn-primary btn-xs"><i class="fa fa-pencil"/> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit"/></span></button>';
+								rows += 	'</a>';
 								rows += 	'&nbsp;';
-								rows += 	'[<a href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';
-								rows += 		'<fmt:message key="label.login.as"/>';
-								rows += 	'</a>]';
+								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';
+								rows += 		'<button type="button" class="btn btn-primary btn-xs"><i class="fa fa-sign-in"/><span class="hidden-xs hidden-sm"> <fmt:message key="label.login.as"/></span></button>';
+								rows += 	'</a>';
 								rows += 	'&nbsp;';
 	
 								if (${(useInternalSMTPServer || not empty smtpServer)} && orgData["email"] != null && orgData["email"] != "") {
-								rows += 	'[<a href="<lams:LAMSURL/>emailUser/composeMail.do?returnUrl=/lams/admin/usersearch.do&userID=' + orgData["userId"] + '">';
-								rows += 		'<fmt:message key="label.email"/>';
-								rows += 	'</a>]';
+								rows += 	'<a title="<fmt:message key="label.email"/>" href="<lams:LAMSURL/>emailUser/composeMail.do?returnUrl=/lams/admin/usersearch.do&userID=' + orgData["userId"] + '">';
+								rows += 		'<button type="button" class="btn btn-primary btn-xs"><i class="fa fa-envelope"/> <span class="hidden-xs hidden-sm"><fmt:message key="label.email"/></span></button>';
+								rows += 	'</a>';
 								}
 								
 								rows += '</td>';
