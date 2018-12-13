@@ -38,7 +38,7 @@ public class ForumConfigItem implements java.io.Serializable {
     public static final String KEY_KEEP_LEARNER_CONTENT = "keepLearnerContent";
 
     @Id
-    @Column
+    @Column(name = "uid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
