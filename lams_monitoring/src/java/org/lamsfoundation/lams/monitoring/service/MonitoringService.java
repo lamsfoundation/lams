@@ -95,6 +95,7 @@ import org.lamsfoundation.lams.monitoring.quartz.job.OpenScheduleGateJob;
 import org.lamsfoundation.lams.monitoring.quartz.job.StartScheduleLessonJob;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -1135,6 +1136,9 @@ public class MonitoringService implements IMonitoringFullService {
 	for (Activity activity : learningDesign.getActivities()) {
 	    // get the real object, not the proxy
 	    activity = activityDAO.getActivityByActivityId(activity.getActivityId());
+	    activity.setTransitionFrom(null);
+	    activity.setTransitionTo(null);
+
 	    if (activity.isToolActivity()) {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		// delete content of each tool
@@ -1149,6 +1153,7 @@ public class MonitoringService implements IMonitoringFullService {
 		//  possible nonthreadsafe access to session!!!
 		lessonDAO.flush();
 		Long toolContentId = toolActivity.getToolContentId();
+		lessonDAO.deleteByProperty(ToolActivityRatingCriteria.class, "toolContentId", toolContentId);
 		lessonDAO.deleteById(ToolContent.class, toolContentId);
 	    } else {
 		systemActivities.add(activity);
