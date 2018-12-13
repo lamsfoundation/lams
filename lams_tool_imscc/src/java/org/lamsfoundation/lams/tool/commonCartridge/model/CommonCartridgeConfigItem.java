@@ -38,13 +38,13 @@ public class CommonCartridgeConfigItem implements java.io.Serializable {
     public static final String KEY_EXPOSE_USER_EMAIL = "allowExposeUserEmail";
 
     @Id
-    @Column
+    @Column(name = "uid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    
+
     @Column(name = "config_key")
     String configKey;
-    
+
     @Column(name = "config_value")
     String configValue;
 
