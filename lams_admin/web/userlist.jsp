@@ -107,10 +107,6 @@
 						<td><c:out value="${MONITOR}"/></td>
 					</tr>
 					<tr>
-						<td ><fmt:message key="label.group.admins"/>:</td>
-						<td><c:out value="${GROUP_ADMIN}"/></td>
-					</tr>
-					<tr>
 						<td><fmt:message key="label.authors"/>:</td>
 						<td><c:out value="${AUTHOR}"/></td>
 					</tr>
@@ -127,10 +123,6 @@
 					<tr>
 						<td width="30%"><fmt:message key="label.sysadmins"/>:</td>
 						<td><c:out value="${SYSADMIN}"/></td>
-					</tr>
-					<tr>
-						<td width="30%"><fmt:message key="label.group.admins"/>:</td>
-						<td><c:out value="${GROUP_ADMIN}"/></td>
 					</tr>
 					<tr>
 						<td colspan="2">
