@@ -63,6 +63,9 @@ public class License implements Serializable {
     @Column(name = "picture_url")
     private String pictureURL;
 
+    @Column(name = "order_id")
+    private Integer orderId;
+    
     public License() {
 
     }
@@ -127,6 +130,14 @@ public class License implements Serializable {
 
     public void setCode(String code) {
 	this.code = code;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 
     /**

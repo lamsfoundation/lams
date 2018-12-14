@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
-import org.lamsfoundation.lams.learningdesign.License;
+import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
@@ -117,7 +117,7 @@ public interface IAuthoringFullService extends IAuthoringService {
      *
      * @return Vector of LicenseDTO objects.
      */
-    Vector<License> getAvailableLicenses();
+    Vector<LicenseDTO> getAvailableLicenses();
 
     /**
      *

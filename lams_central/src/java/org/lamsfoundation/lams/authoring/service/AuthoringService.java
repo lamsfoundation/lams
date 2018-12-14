@@ -76,6 +76,7 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -1410,12 +1411,10 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getAvailableLicenses()
      */
     @Override
-    public Vector getAvailableLicenses() {
-	List licenses = licenseDAO.findAll(License.class);
-	Vector licenseDTOList = new Vector(licenses.size());
-	Iterator iter = licenses.iterator();
-	while (iter.hasNext()) {
-	    License element = (License) iter.next();
+    public Vector<LicenseDTO> getAvailableLicenses() {
+	List<License> licenses = licenseDAO.getLicensesByOrderId();
+	Vector<LicenseDTO> licenseDTOList = new Vector(licenses.size());
+	for ( License element : licenses ) {
 	    licenseDTOList.add(element.getLicenseDTO(Configuration.get(ConfigurationKeys.SERVER_URL)));
 	}
 	return licenseDTOList;

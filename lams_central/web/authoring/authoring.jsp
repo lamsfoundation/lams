@@ -470,14 +470,16 @@
 						 onClick="javascript:MenuLib.toggleDescriptionDiv()">
 						<span id="ldDescriptionFieldTitle"><fmt:message key="authoring.fla.page.ld.title" /></span>
 						<span id="ldDescriptionFieldModified"></span>
-						<span id="ldDescriptionHideTip">?</span>
+						<span id="ldDescriptionHideTip">▼</span>
 					</div>
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.description" /></div>
 						<div id="ldDescriptionEditorContainer">
 							 <lams:CKEditor id="ldDescriptionFieldDescription" value="" contentFolderID="${contentFolderID}"></lams:CKEditor>
 						</div>
-						
+
+						<div id="ldLicenseDetails">						
+						<img id="ldDescriptionLicenseImage" class="pull-right"/>
 						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license" /></div>
 						<select id="ldDescriptionLicenseSelect">
 							<option value="0" selected="selected"><fmt:message key="authoring.fla.page.ld.license.none" /></option>
@@ -490,8 +492,7 @@
 								</option>
 							</c:forEach>
 						</select>
-						<img id="ldDescriptionLicenseImage" />
-						<button id="ldDescriptionLicenseButton" class="btn btn-default"><span>View</span></button>
+						<button id="ldDescriptionLicenseButton" class="btn btn-default btn-xs"><span><fmt:message key="label.view"/></span></button>
 						<div id="ldDescriptionLicenseTextContainer">
 							<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license.info" /></div>
 							<textarea id="ldDescriptionLicenseText" rows="5"></textarea>
