@@ -190,8 +190,8 @@ public class OrgPasswordChangeController {
 	Boolean email = orgPasswordChangeForm.isEmail();
 	Boolean force = orgPasswordChangeForm.isForce();
 
-	Boolean isStaffChange = orgPasswordChangeForm.getIsStaffChange();
-	Boolean isLearnerChange = orgPasswordChangeForm.getIsLearnerChange();
+	Boolean isStaffChange = orgPasswordChangeForm.getStaffChange();
+	Boolean isLearnerChange = orgPasswordChangeForm.getLearnerChange();
 	// get data needed for each group
 	if (isStaffChange) {
 	    String staffString = orgPasswordChangeForm.getExcludedStaff();
@@ -251,11 +251,13 @@ public class OrgPasswordChangeController {
 	    if (includedUsers == null) {
 		boolean excluded = false;
 		// skip excluded (unchecked on the page) users
-		for (int index = 0; index < excludedUsers.size(); index++) {
-		    Integer excludedUserID = excludedUsers.get(index).asInt();
-		    if (user.getUserId().equals(excludedUserID)) {
-			excluded = true;
-			break;
+		if (excludedUsers != null) {
+		    for (int index = 0; index < excludedUsers.size(); index++) {
+			Integer excludedUserID = excludedUsers.get(index).asInt();
+			if (user.getUserId().equals(excludedUserID)) {
+			    excluded = true;
+			    break;
+			}
 		    }
 		}
 		if (excluded) {
@@ -263,11 +265,13 @@ public class OrgPasswordChangeController {
 		}
 	    } else {
 		boolean included = false;
-		for (int index = 0; index < includedUsers.size(); index++) {
-		    Integer includedUserID = includedUsers.get(index).asInt();
-		    if (user.getUserId().equals(includedUserID)) {
-			included = true;
-			break;
+		if (includedUsers != null) {
+		    for (int index = 0; index < includedUsers.size(); index++) {
+			Integer includedUserID = includedUsers.get(index).asInt();
+			if (user.getUserId().equals(includedUserID)) {
+			    included = true;
+			    break;
+			}
 		    }
 		}
 		if (!included) {

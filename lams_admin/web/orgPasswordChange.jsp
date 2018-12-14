@@ -95,8 +95,8 @@
 	
 		$(function() {
 			// assign grid ID to each checkbox and define what happens when it gets (un)checked
-			var changeCheckboxes = $('#isStaffChange').data('grid', 'staffGrid')
-								  .add($('#isLearnerChange').data('grid', 'learnerGrid'))
+			var changeCheckboxes = $('#staffChange').data('grid', 'staffGrid')
+								  .add($('#learnerChange').data('grid', 'learnerGrid'))
 								  .change(function(){
 									  		var checkbox = $(this);
 											// prevent both checkboxes from being unchecked
@@ -416,7 +416,7 @@
 									<td class="changeContainer">
 										<div class="checkbox">
 											<label>
-												<form:checkbox path="isStaffChange" id="isStaffChange" />
+												<form:checkbox path="staffChange" id="staffChange" />
 													<fmt:message key="admin.org.password.change.is.staff" />
 											</label>
 										</div>
@@ -427,7 +427,7 @@
 									<td class="changeContainer">
 										<div class="checkbox">
 											<label>
-												<form:checkbox path="isLearnerChange" id="isLearnerChange" />
+												<form:checkbox path="learnerChange" id="learnerChange" />
 													<fmt:message key="admin.org.password.change.is.learner" />
 											</label>
 										</div>
