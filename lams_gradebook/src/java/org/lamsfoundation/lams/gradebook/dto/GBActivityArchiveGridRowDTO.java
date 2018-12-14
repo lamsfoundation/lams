@@ -55,7 +55,7 @@ public class GBActivityArchiveGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add(lessonMark.toString());
+	    ret.add(lessonMark != null ? GradebookUtil.niceFormatting(lessonMark) : CELL_EMPTY);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	}
 
