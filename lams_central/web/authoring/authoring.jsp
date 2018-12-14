@@ -499,6 +499,7 @@
 						</div>
 					</div>
 				</div>
+				</div>
 				<div id="canvas"></div>
 			</td>
 		</tr>
