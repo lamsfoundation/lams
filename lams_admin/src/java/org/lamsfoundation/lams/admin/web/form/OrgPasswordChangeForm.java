@@ -28,17 +28,17 @@ public class OrgPasswordChangeForm {
 
     private String orgName;
 
-    private boolean isStaffChange = false;
+    private boolean staffChange = false;
 
-    private boolean isLearnerChange = false;
+    private boolean learnerChange = false;
 
-    private String includedLearners; // initial=""/>
+    private String includedLearners = "";
 
-    private String excludedLearners;
+    private String excludedLearners = "[]";
 
-    private String includedStaff; // initial=""/>
+    private String includedStaff = "";
 
-    private String excludedStaff; // initial="[]"/>
+    private String excludedStaff = "[]";
 
     private String learnerPass;
 
@@ -64,20 +64,20 @@ public class OrgPasswordChangeForm {
 	this.orgName = orgName;
     }
 
-    public boolean getIsStaffChange() {
-	return isStaffChange;
+    public boolean getStaffChange() {
+	return staffChange;
     }
 
-    public void setStaffChange(boolean isStaffChange) {
-	this.isStaffChange = isStaffChange;
+    public void setStaffChange(boolean staffChange) {
+	this.staffChange = staffChange;
     }
 
-    public boolean getIsLearnerChange() {
-	return isLearnerChange;
+    public boolean getLearnerChange() {
+	return learnerChange;
     }
 
-    public void setLearnerChange(boolean isLearnerChange) {
-	this.isLearnerChange = isLearnerChange;
+    public void setLearnerChange(boolean learnerChange) {
+	this.learnerChange = learnerChange;
     }
 
     public String getIncludedLearners() {
