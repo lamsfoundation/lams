@@ -68,7 +68,7 @@
 			'select' : function(event, ui){
 				var input = $(this);
 				$.ajax({
-					'url' : '<lams:LAMSURL/>outcome/outcomeMap',
+					'url' : '<lams:LAMSURL/>outcome/outcomeMap.do',
 					'data': $.extend({
 						'outcomeId' : ui.item.value
 					}, outcomeData${outcomeTagId}),
