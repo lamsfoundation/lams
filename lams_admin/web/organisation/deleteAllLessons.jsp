@@ -46,6 +46,7 @@
 			return;
 		}
 		$.ajax({
+			'type': 'POST',
 			'cache'   : false,
 			'url'     : '<lams:LAMSURL/>admin/organisation/deleteAllLessons.do',
 			'data'    : {

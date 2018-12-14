@@ -134,10 +134,11 @@
     
 <body class="stripes">
 
+	<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
+
 	<lams:Page type="admin" title="${title}" formID="cloneForm">
 			
 			<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
-				<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
 				<c:if test="${org.organisationType.organisationTypeId eq classTypeId}">
 					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />" class="btn btn-default">
 						<c:out value="${org.parentOrganisation.name}" />
@@ -192,6 +193,7 @@
 			
 			
 			<form name="cloneForm" id="cloneForm" action="start.do" method="post">
+				<input type="hidden" name="method" value="clone">
 				<input type="hidden" name="groupId" value="<c:out value="${org.organisationId}" />">
 				<input type="hidden" name="lessons">
 				<input type="hidden" name="staff">

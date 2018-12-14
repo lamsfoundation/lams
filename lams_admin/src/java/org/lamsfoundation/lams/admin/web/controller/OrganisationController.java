@@ -164,7 +164,7 @@ public class OrganisationController {
 	return null;
     }
 
-    @RequestMapping(path = "/deleteAllLessonsInit", method = RequestMethod.POST)
+    @RequestMapping(path = "/deleteAllLessonsInit")
     public String deleteAllLessonsInit(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	if (!securityService.isSysadmin(getUserID(), "display cleanup preview lessons", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
