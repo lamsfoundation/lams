@@ -75,14 +75,18 @@ public class UserRolesSaveController {
 
 	request.setAttribute("org", orgId);
 	
-	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
+	if (log.isDebugEnabled()) {
+	    String numRoles = roles != null ? Integer.toString(roles.length) : "0";
+	    log.debug(new StringBuilder("userId: ").append(userId).append(", orgId: ").append(orgId)
+		    .append(" will have ").append(numRoles).append(" roles").toString());
+	}
 	Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	User user = (User) userManagementService.findById(User.class, userId);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	// user must have at least 1 role
-	if (roles.length < 1) {
+	if (roles == null || roles.length < 1) {
 	    errorMap.add("roles", messageService.getMessage("error.roles.empty"));
 	    request.setAttribute("errorMap", errorMap);
 	    request.setAttribute("rolelist",
