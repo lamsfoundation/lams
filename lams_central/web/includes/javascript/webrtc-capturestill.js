@@ -41,30 +41,27 @@
     		URL.revokeObjectURL(objectURL);
     	}
     };
-
-    navigator.getMedia = ( navigator.getUserMedia ||
-                           navigator.webkitGetUserMedia ||
-                           navigator.mozGetUserMedia ||
-                           navigator.msGetUserMedia);
-
-    navigator.getMedia(
-      {
-        video: true,
-        audio: false
-      },
-      function(stream) {
-        if (navigator.mozGetUserMedia) {
-          video.mozSrcObject = stream;
-        } else {
-          var vendorURL = window.URL || window.webkitURL;
-          video.src = vendorURL.createObjectURL(stream);
-        }
-        video.play();
-      },
-      function(err) {
-        console.log("An error occured! " + err);
-      }
-    );
+    
+    //*LAMS* updated the following paragraph to support newer method (as per https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
+    navigator.mediaDevices.getUserMedia({ 
+    	audio: false, 
+    	video: true 
+    })
+    .then(function(stream) {
+    	// Older browsers may not have srcObject
+    	if ("srcObject" in video) {
+    		video.srcObject = stream;
+    	} else {
+    		// Avoid using this in new browsers, as it is going away.
+    		video.src = window.URL.createObjectURL(stream);
+    	}
+    	video.onloadedmetadata = function(e) {
+    		video.play();
+    	};
+    })
+    .catch(function(err) {
+    	console.log("An error occured! " + err.name + ": " + err.message);
+    });
 
     video.addEventListener('canplay', function(ev){
       if (!streaming) {
