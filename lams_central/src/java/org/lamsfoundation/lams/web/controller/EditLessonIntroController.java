@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Edit lesson intro page.
@@ -65,16 +66,15 @@ public class EditLessonIntroController {
      * Save lesson intro page.
      */
     @RequestMapping(path = "/save", method = RequestMethod.POST)
+    @ResponseBody
     public String save(HttpServletRequest req) throws IOException, ServletException {
 
 	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
-	String lessonName = WebUtil.readStrParam(req, "lessonName");
 	String lessonDescription = WebUtil.readStrParam(req, "lessonDescription");
 	boolean displayDesignImage = WebUtil.readBooleanParam(req, "displayDesignImage", false);
 
-	//sore lesson in DB
-	lesson.setLessonName(lessonName);
+	// store lesson in DB
 	lesson.setLessonDescription(lessonDescription);
 	lesson.setDisplayDesignImage(displayDesignImage);
 	lessonService.saveLesson(lesson);

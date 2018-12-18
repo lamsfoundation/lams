@@ -37,18 +37,14 @@
 <body class="stripes">
 	
 	<lams:Page type="admin">		
-		<form action="editLessonIntro/save.do" method="post" id="lessonForm">
+		<form action="save.do" method="post" id="lessonForm">
 			<input type="hidden" name="lessonID" value="${lesson.lessonId}"/>
 	
-			<div class="field-group">
-				<label for="lessonName"><fmt:message key="label.lesson.name"></fmt:message></label>
-				<input type="text" name="lessonName" value="<c:out value='${lesson.lessonName}' />" class="form-control" style="width: 99%;" />
-			</div>
+			<H4><c:out value='${lesson.lessonName}' /></H4>
 			
 			<div class="field-group">
 				<label for="lessonDescription"><fmt:message key="label.instructions"></fmt:message></label>
-				<lams:CKEditor id="lessonDescription" value="${lesson.lessonDescription}"
-					contentFolderID="${contentFolderID}">
+				<lams:CKEditor id="lessonDescription" value="${lesson.lessonDescription}" contentFolderID="${contentFolderID}" toolbarSet="LessonDescription" >
 				</lams:CKEditor>
 			</div>
 		

@@ -180,7 +180,7 @@
 							 <fmt:message key="label.tab.advanced.intro.description" />
 							</div>
 							<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" value="">
-							</lams:CKEditor>+
+							</lams:CKEditor>
 
 							<div class="checkbox">
 								<label>
