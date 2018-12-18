@@ -1110,6 +1110,11 @@ public class MonitoringService implements IMonitoringFullService {
 
     @SuppressWarnings("unchecked")
     @Override
+    // For this method to work, the Lesson must not be loaded into the Hibernate cache. If it is, then the call
+    // lessonDAO.deleteByProperty(Transition.class...) call will trigger a 
+    // "deleted object would be re-saved by cascade (remove deleted object from associations)" exception
+    // on the Lesson object. If you only access the lesson id then it will work. You can still load the Organisation,
+    // but do not load the Lesson collection in the Organisation
     public void removeLessonPermanently(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "remove lesson permanently", true);
 

@@ -208,4 +208,10 @@ public interface ILessonDAO extends IBaseDAO {
      * Finds IDs of preview lessons.
      */
     List<Long> getPreviewLessons(Integer limit);
+    
+    /**
+     * Finds IDs of all lessons in an organisation. When calling MonitoringService.removeLessonPermanently() you cannot load the Lessons
+     * or a Hibernate error occurs. So we need a way to get the ids withouth calling Organisation.getLessons()
+     */
+    List<Long> getOrganisationLessons(Integer organisationId) ;
 }

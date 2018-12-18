@@ -690,6 +690,11 @@ public class LessonService implements ILessonService {
     }
 
     @Override
+    public List<Long> getOrganisationLessons(Integer organisationId)  {
+	return lessonDAO.getOrganisationLessons(organisationId) ;
+    }
+    
+    @Override
     public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
 	Lesson lesson = getLesson(lessonId);
 	if (lesson != null) {

@@ -32,8 +32,8 @@ import java.util.Map;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
-import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -95,6 +95,9 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     private final static String FIND_PREVIEW_LESSON_IDS = "SELECT lesson.lessonId FROM " + Lesson.class.getName()
 	    + " AS lesson WHERE lesson.learningDesign.copyTypeID = " + LearningDesign.COPY_TYPE_PREVIEW;
 
+    private final static String FIND_LESSON_IDS_BY_ORG_ID = "SELECT lesson.lessonId FROM " + Lesson.class.getName()
+	    + " AS lesson WHERE lesson.organisation.organisationId = :organisationId";
+
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
      *
@@ -104,7 +107,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      */
     @Override
     public Lesson getLesson(Long lessonId) {
-	Lesson lesson = (Lesson) getSession().get(Lesson.class, lessonId);
+	Lesson lesson = getSession().get(Lesson.class, lessonId);
 	return lesson;
     }
 
@@ -372,7 +375,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	queryTextBuilder.append(" ORDER BY users.first_name ").append(order).append(", users.last_name ").append(order)
 		.append(", users.login ").append(order);
 
-	Query query = getSession().createSQLQuery(queryTextBuilder.toString()).addEntity(User.class)
+	Query<Object[]> query = getSession().createSQLQuery(queryTextBuilder.toString()).addEntity(User.class)
 		.addScalar("participant").setLong("lessonId", lessonId)
 		.setInteger("roleId", role.equals(Role.MONITOR) ? Role.ROLE_MONITOR : Role.ROLE_LEARNER);
 	if (limit != null) {
@@ -406,10 +409,18 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Long> getPreviewLessons(Integer limit) {
-	Query query = getSession().createQuery(FIND_PREVIEW_LESSON_IDS);
+	Query<Long> query = getSession().createQuery(FIND_PREVIEW_LESSON_IDS);
 	if (limit != null) {
 	    query.setMaxResults(limit);
 	}
 	return query.list();
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Long> getOrganisationLessons(Integer organisationId) {
+	Query<Long> query = getSession().createQuery(FIND_LESSON_IDS_BY_ORG_ID).setParameter("organisationId", organisationId);
+	return query.list();
+    }
+
 }

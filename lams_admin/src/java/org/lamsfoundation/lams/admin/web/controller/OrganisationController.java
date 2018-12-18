@@ -34,7 +34,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.OrganisationForm;
-import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -72,6 +72,9 @@ public class OrganisationController {
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
+    @Autowired
+    @Qualifier("lessonService")
+    private ILessonService lessonService;
     
     private static List status;
 
@@ -192,10 +195,11 @@ public class OrganisationController {
 	Integer limit = WebUtil.readIntParam(request, "limit", true);
 	Integer organisationId = WebUtil.readIntParam(request, "orgId");
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
-	for (Lesson lesson : (Set<Lesson>) organisation.getLessons()) {
-	    log.info("Deleting lesson: " + lesson.getLessonId());
-	    // role is checked in this method
-	    monitoringService.removeLessonPermanently(lesson.getLessonId(), userID);
+	List<Long> lessonIDs = lessonService.getOrganisationLessons(organisationId);
+	for ( Long lessonId : lessonIDs) {
+	    log.info("Deleting lesson: " + lessonId);
+	    // role is checked in this method. This method requires that the lesson object has not be loaded into the Hibernate cache
+	    monitoringService.removeLessonPermanently(lessonId, userID);
 	    if (limit != null) {
 		limit--;
 		if (limit == 0) {
@@ -203,8 +207,6 @@ public class OrganisationController {
 		}
 	    }
 	}
-
-	organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(organisation.getLessons().size());
 	return null;
