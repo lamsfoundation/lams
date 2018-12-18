@@ -23,9 +23,11 @@
 		    background-color: transparent ;
 		}
 		#nowDiv{padding: 0px;}
+		#nowDiv .ui-jqgrid-bootstrap{border-radius: 0px;}
 		.ui-jqgrid-hbox {padding-left: 0;}
 		#accordion {width: 100%;}
 		#accordion h3 a {border-bottom: 0;}
+		#accordion h4 {margin-bottom: 0;border-bottom: 1px;}
 		#accordion p {text-align: center; padding-bottom: 0px; margin-bottom: 0xp; font-size:12px;}
 	</style>	
 	

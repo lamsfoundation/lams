@@ -13,6 +13,18 @@
 	<lams:css/>	
 	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-bootstrap-theme.css" rel="stylesheet" />
 	
+	
+	<c:choose>
+		<c:when test="${lessonID != null}">
+			<c:set var="returnUrlParams">getLessonView.do?lessonID=${lessonID}</c:set>
+			<c:set var="deleteUrlParams">lessonID=${lessonID}</c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="returnUrlParams">getCourseView.do?organisationID=${organisationID}</c:set>
+			<c:set var="deleteUrlParams">organisationID=${organisationID}</c:set>
+		</c:otherwise>
+	</c:choose>
+	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 	var deleteConfirmationMessage1 = '<fmt:message key="email.notification.delete.alert1"><fmt:param>%replace%</fmt:param></fmt:message>';
@@ -24,8 +36,8 @@
 		if (confirm(msg+'\n\n'+deleteConfirmationMessage2)) {
  			$.ajax({
 				async : false,
-				url : '<c:url value="/emailNotifications/"/>',
- 				data : deleteUrlParams+'&triggerName=' + triggerName,
+				url : '<c:url value="/emailNotifications/"/>deleteNotification.do',
+ 				data : '${deleteUrlParams}&triggerName=' + triggerName,
  				type : "POST",
 				success : function(json) {
  					if (json.deleteNotification == 'true') {
@@ -49,17 +61,6 @@
 	<h4>
 		<fmt:message key="email.notifications.scheduled.messages.list"/>
 	</h4>
-
-	<c:choose>
-		<c:when test="${lessonID != null}">
-			<c:set var="returnUrlParams">getLessonView.do?lessonID=${lessonID}</c:set>
-			<c:set var="deleteUrlParams">deleteNotification.do?lessonID=${lessonID}</c:set>
-		</c:when>
-		<c:otherwise>
-			<c:set var="returnUrlParams">getCourseView.do?organisationID=${organisationID}</c:set>
-			<c:set var="deleteUrlParams">deleteNotification.do?organisationID=${organisationID}</c:set>
-		</c:otherwise>
-	</c:choose>
 
 	<table class="table table-condensed table-striped">
 		<thead>
