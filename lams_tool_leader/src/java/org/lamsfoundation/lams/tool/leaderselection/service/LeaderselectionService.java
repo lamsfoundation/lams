@@ -466,6 +466,23 @@ public class LeaderselectionService
 	saveOrUpdateUser(leaderselectionUser);
 	return leaderselectionUser;
     }
+    
+    @Override
+    public String finishToolSession(Long toolSessionId, Long userId) {
+	LeaderselectionUser user = leaderselectionUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+	user.setFinishedActivity(true);
+	leaderselectionUserDAO.saveOrUpdate(user);
+
+	String nextUrl = null;
+	try {
+	    nextUrl = leaveToolSession(toolSessionId, userId);
+	} catch (DataMissingException e) {
+	    throw new LeaderselectionException(e);
+	} catch (ToolException e) {
+	    throw new LeaderselectionException(e);
+	}
+	return nextUrl;
+    }
 
     // =========================================================================================
     /* ********** Used by Spring to "inject" the linked objects ************* */

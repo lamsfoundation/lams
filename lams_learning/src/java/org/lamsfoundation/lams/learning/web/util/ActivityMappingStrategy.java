@@ -30,10 +30,9 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 
 /**
  * @author daveg
- *
  */
 public class ActivityMappingStrategy implements Serializable {
-
+    private static final long serialVersionUID = -6418428916496098347L;
     private static Logger log = Logger.getLogger(ActivityMappingStrategy.class);
 
     private static final String PROGRESS_BROKEN_ACTION = "/progressBroken.jsp";

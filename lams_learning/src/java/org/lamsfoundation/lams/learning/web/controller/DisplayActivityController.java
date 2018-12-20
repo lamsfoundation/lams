@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -38,7 +37,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display an activity. This is used when UI calls starts of the learning process. It is needed to put
@@ -47,7 +45,6 @@ import org.springframework.web.context.WebApplicationContext;
  *
  * Request values: lessonID (mandatory), InitialDisplay (optional - Set to "true" for normal display, set to "false"
  * when you want it to assume it is inside parallel frameset. Defaults to true).
- *
  */
 @Controller
 public class DisplayActivityController {
@@ -58,7 +55,7 @@ public class DisplayActivityController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
@@ -83,12 +80,10 @@ public class DisplayActivityController {
 	boolean displayParallelFrames = WebUtil.readBooleanParam(request,
 		DisplayActivityController.PARAM_INITIAL_DISPLAY, true);
 
-	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(applicationContext.getServletContext());
-	String forward = actionMappings.getProgressForward(learnerProgress, false, displayParallelFrames, request,
+	String forward = activityMapping.getProgressForward(learnerProgress, false, displayParallelFrames, request,
 		learnerService);
-
-	if (DisplayActivityController.log.isDebugEnabled()) {
-	    DisplayActivityController.log.debug(forward);
+	if (log.isDebugEnabled()) {
+	    log.debug(forward);
 	}
 
 	return forward;

@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -67,7 +66,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -109,7 +107,7 @@ public class LearnerController {
     @Qualifier("learningMessageService")
     private MessageService messageService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     private static final String[] MONITOR_MESSAGE_KEYS = new String[] {
 	    "label.learner.progress.activity.current.tooltip", "label.learner.progress.activity.completed.tooltip",
@@ -179,26 +177,23 @@ public class LearnerController {
 		return "msgContent";
 	    }
 
-	    if (LearnerController.log.isDebugEnabled()) {
-		LearnerController.log.debug("The learner [" + learner + "] is joining the lesson [" + lessonID + "]");
+	    if (log.isDebugEnabled()) {
+		log.debug("The learner [" + learner + "] is joining the lesson [" + lessonID + "]");
 	    }
 
 	    // join user to the lesson on the server
 	    LearnerProgress learnerProgress = learnerService.joinLesson(learner, lessonID);
 
-	    if (LearnerController.log.isDebugEnabled()) {
-		LearnerController.log.debug("The learner [" + learner + "] joined lesson. The" + "progress data is:"
+	    if (log.isDebugEnabled()) {
+		log.debug("The learner [" + learner + "] joined lesson. The" + "progress data is:"
 			+ learnerProgress.toString());
 	    }
 
-	    ActivityMapping activityMapping = LearnerServiceProxy
-		    .getActivityMapping(this.applicationContext.getServletContext());
 	    String url = "learning/" + activityMapping.getDisplayActivityAction(lessonID);
-
 	    redirectToURL(response, url);
 
 	} catch (Exception e) {
-	    LearnerController.log
+	    log
 		    .error("An error occurred while learner " + learner + " attempting to join the lesson.", e);
 	    return "error";
 	}
@@ -344,13 +339,11 @@ public class LearnerController {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	learnerService.moveToActivity(learnerId, lessonId, fromActivity, toActivity);
 
-	if (LearnerController.log.isDebugEnabled()) {
-	    LearnerController.log.debug("Force move for learner " + learnerId + " lesson " + lessonId + ". ");
+	if (log.isDebugEnabled()) {
+	    log.debug("Force move for learner " + learnerId + " lesson " + lessonId + ". ");
 	}
 
 	String url = null;
-	ActivityMapping activityMapping = LearnerServiceProxy
-		.getActivityMapping(this.applicationContext.getServletContext());
 	if (!toActivity.isFloating()) {
 	    url = "/learning" + activityMapping.getDisplayActivityAction(lessonId);
 	} else {

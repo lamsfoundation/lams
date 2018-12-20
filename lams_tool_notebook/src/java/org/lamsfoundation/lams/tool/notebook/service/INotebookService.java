@@ -112,18 +112,8 @@ public interface INotebookService {
     NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession);
 
     boolean notifyUser(Integer userId, String comment);
-
-    /**
-     *
-     * @param id
-     * @param idType
-     * @param signature
-     * @param userID
-     * @param title
-     * @param entry
-     * @return
-     */
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+    
+    String finishToolSession(NotebookUser notebookUser, Boolean isContentEditable, String entryText);
 
     /**
      *
@@ -131,14 +121,6 @@ public interface INotebookService {
      * @return
      */
     NotebookEntry getEntry(Long uid);
-
-    /**
-     *
-     * @param uid
-     * @param title
-     * @param entry
-     */
-    void updateEntry(Long uid, String entry);
 
     /**
      * Creates an unique name for a ChatCondition. It consists of the tool output definition name and a unique positive

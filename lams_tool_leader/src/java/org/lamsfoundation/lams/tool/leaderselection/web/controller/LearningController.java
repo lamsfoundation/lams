@@ -31,14 +31,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
-import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -90,7 +88,7 @@ public class LearningController {
 
 	// Set the content in use flag.
 	if (!content.isContentInUse()) {
-	    content.setContentInUse(new Boolean(true));
+	    content.setContentInUse(true);
 	    leaderselectionService.saveOrUpdateLeaderselection(content);
 	}
 
@@ -124,8 +122,8 @@ public class LearningController {
      * @throws JSONException
      */
     @RequestMapping(value = "/becomeLeader")
-    public String becomeLeader(HttpServletRequest request) throws IOException {
-	Long toolSessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+    public void becomeLeader(HttpServletRequest request) throws IOException {
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	LeaderselectionSession session = leaderselectionService.getSessionBySessionId(toolSessionId);
 
 	LeaderselectionUser groupLeader = session.getGroupLeader();
@@ -134,31 +132,16 @@ public class LearningController {
 	    LeaderselectionUser user = getCurrentUser(toolSessionId);
 	    leaderselectionService.setGroupLeader(user.getUid(), toolSessionId);
 	}
-
-	return null;
     }
 
     @RequestMapping(value = "/finishActivity")
-    public String finishActivity(HttpServletRequest request, HttpServletResponse response) {
-
+    public void finishActivity(HttpServletRequest request, HttpServletResponse response) {
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	LeaderselectionUser user = getCurrentUser(toolSessionID);
-
-	if (user != null) {
-	    user.setFinishedActivity(true);
-	    leaderselectionService.saveOrUpdateUser(user);
-	} else {
-	    log.error("finishActivity(): couldn't find LeaderselectionUser with id: " + user.getUserId()
-		    + "and toolSessionID: " + toolSessionID);
-	}
-
-	ToolSessionManager sessionMgrService = LeaderselectionServiceProxy
-		.getLeaderselectionSessionManager(applicationContext.getServletContext());
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String nextActivityUrl;
 	try {
-	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, user.getUserId());
+	    nextActivityUrl = leaderselectionService.finishToolSession(toolSessionID, user.getUserID().longValue());
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new LeaderselectionException(e);
@@ -167,8 +150,6 @@ public class LearningController {
 	} catch (IOException e) {
 	    throw new LeaderselectionException(e);
 	}
-
-	return null;
     }
 
     private LeaderselectionUser getCurrentUser(Long toolSessionId) {
@@ -176,7 +157,7 @@ public class LearningController {
 
 	// attempt to retrieve user using userId and toolSessionId
 	LeaderselectionUser leaderselectionUser = leaderselectionService
-		.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()), toolSessionId);
+		.getUserByUserIdAndSessionId(user.getUserID().longValue(), toolSessionId);
 
 	if (leaderselectionUser == null) {
 	    LeaderselectionSession leaderselectionSession = leaderselectionService.getSessionBySessionId(toolSessionId);

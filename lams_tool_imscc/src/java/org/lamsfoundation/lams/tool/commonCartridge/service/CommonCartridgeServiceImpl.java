@@ -142,7 +142,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public CommonCartridge getDefaultContent(Long contentId) throws CommonCartridgeApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    CommonCartridgeServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new CommonCartridgeApplicationException(error);
 	}
 
@@ -292,7 +292,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	int miniView = commonCartridgeItemVisitDao.getUserViewLogCount(toolSessionId, userUid);
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(toolSessionId);
 	if (session == null) {
-	    CommonCartridgeServiceImpl.log.error("Failed get session by ID [" + toolSessionId + "]");
+	    log.error("Failed get session by ID [" + toolSessionId + "]");
 	    return 0;
 	}
 	int reqView = session.getCommonCartridge().getMiniViewCommonCartridgeNumber();
@@ -443,7 +443,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	CommonCartridge defaultCommonCartridge = getCommonCartridgeByContentId(defaultCommonCartridgeId);
 	if (defaultCommonCartridge == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    CommonCartridgeServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new CommonCartridgeApplicationException(error);
 	}
 
@@ -455,7 +455,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    CommonCartridgeServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new CommonCartridgeApplicationException(error);
 	}
 	return contentId;
@@ -486,16 +486,13 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    return items;
 
 	} catch (ZipFileUtilException e) {
-	    CommonCartridgeServiceImpl.log
-		    .error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
+	    log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.zip.file.exception"));
 	} catch (FileNotFoundException e) {
-	    CommonCartridgeServiceImpl.log
-		    .error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
+	    log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.file.not.found"));
 	} catch (IOException e) {
-	    CommonCartridgeServiceImpl.log
-		    .error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
+	    log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.io.exception"));
 	}
     }
@@ -725,8 +722,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public void removeToolContent(Long toolContentId) throws ToolException {
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
 	if (commonCartridge == null) {
-	    CommonCartridgeServiceImpl.log
-		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -741,17 +737,15 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (CommonCartridgeServiceImpl.log.isDebugEnabled()) {
-	    CommonCartridgeServiceImpl.log.debug(
+	if (log.isDebugEnabled()) {
+	    log.debug(
 		    "Removing Common Cartridge content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	CommonCartridge cartridge = commonCartridgeDao.getByContentId(toolContentId);
 	if (cartridge == null) {
-	    CommonCartridgeServiceImpl.log
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -808,11 +802,11 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
-	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
 	}
 	if (learnerId == null) {
-	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
 
@@ -821,7 +815,7 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    session.setStatus(CommonCartridgeConstants.COMPLETED);
 	    commonCartridgeSessionDao.saveObject(session);
 	} else {
-	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session.Could not find shared commonCartridge "
+	    log.error("Fail to leave tool Session.Could not find shared commonCartridge "
 		    + "session by given session id: " + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared commonCartridge session by given session id: " + toolSessionId);
@@ -871,57 +865,9 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	//no actions required
     }
 
-    /* =================================================================================== */
-
-    public IExportToolContentService getExportContentService() {
-	return exportContentService;
-    }
-
-    public void setExportContentService(IExportToolContentService exportContentService) {
-	this.exportContentService = exportContentService;
-    }
-
-    public IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
-    public void setUserManagementService(IUserManagementService userManagementService) {
-	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
-    @Override
-    public IEventNotificationService getEventNotificationService() {
-	return eventNotificationService;
-    }
-
-    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
-	this.eventNotificationService = eventNotificationService;
-    }
-
-    @Override
-    public String getLocalisedMessage(String key, Object[] args) {
-	return messageService.getMessage(key, args);
-    }
-
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
-    }
-
     @Override
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
-	return getLessonService().getMonitorsByToolSessionId(sessionId);
+	return lessonService.getMonitorsByToolSessionId(sessionId);
     }
 
     @Override
@@ -942,6 +888,38 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	} else {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, (Date) dates[0], null);
 	}
+    }
+
+    @Override
+    public String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
+
+    /* =================================================================================== */
+
+    public void setExportContentService(IExportToolContentService exportContentService) {
+	this.exportContentService = exportContentService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
+
+    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+	this.coreNotebookService = coreNotebookService;
+    }
+
+    @Override
+    public IEventNotificationService getEventNotificationService() {
+	return eventNotificationService;
+    }
+
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+	this.eventNotificationService = eventNotificationService;
+    }
+
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
     }
 
 }

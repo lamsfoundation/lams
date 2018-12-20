@@ -35,13 +35,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
-import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
@@ -64,7 +62,6 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-
     private static Logger log = Logger.getLogger(LearningController.class);
 
     @Autowired
@@ -119,7 +116,7 @@ public class LearningController {
 
 	// Ensure that the content is use flag is set.
 	if (!chat.isContentInUse()) {
-	    chat.setContentInUse(new Boolean(true));
+	    chat.setContentInUse(true);
 	    chatService.saveOrUpdateChat(chat);
 	}
 
@@ -153,28 +150,11 @@ public class LearningController {
     @RequestMapping("/finishActivity")
     public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-
-	// set the finished flag
-	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
-	if (chatUser != null) {
-	    chatUser.setFinishedActivity(true);
-	    chatService.saveOrUpdateChatUser(chatUser);
-	} else {
-	    LearningController.log
-		    .error("finishActivity(): couldn't find ChatUser with uid: " + learningForm.getChatUserUID());
-	}
-
-	ToolSessionManager sessionMgrService = ChatServiceProxy
-		.getChatSessionManager(applicationContext.getServletContext());
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(user.getUserID().longValue());
-	Long toolSessionID = chatUser.getChatSession().getSessionId();
+	Long userUid = learningForm.getChatUserUID();
 
 	String nextActivityUrl;
 	try {
-	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, userID);
+	    nextActivityUrl = chatService.finishToolSession(userUid);
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new ChatException(e);

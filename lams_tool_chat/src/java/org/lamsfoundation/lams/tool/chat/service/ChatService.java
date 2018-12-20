@@ -162,6 +162,19 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	// }
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
+    
+    @Override
+    public String finishToolSession(Long userUid) {
+
+	// set the finished flag
+	ChatUser chatUser = getUserByUID(userUid);
+	if (chatUser != null) {
+	    chatUser.setFinishedActivity(true);
+	    saveOrUpdateChatUser(chatUser);
+	}
+
+	return leaveToolSession(chatUser.getChatSession().getSessionId(), chatUser.getUserId());
+    }
 
     @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId)

@@ -362,10 +362,31 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     /* ********** INotebookService Methods ********************************* */
-
+    
     @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+    public String finishToolSession(NotebookUser notebookUser, Boolean isContentEditable, String entryText) {
+	Long userId = notebookUser.getUserId();
+	Long toolSessionId = notebookUser.getNotebookSession().getSessionId();
+	
+	// learningForm.getContentEditable() will be null if the deadline has passed
+	if (isContentEditable != null && isContentEditable) {
+	    // TODO fix idType to use real value not 999
+	    if (notebookUser.getEntryUID() == null) {
+		Long entryUID = coreNotebookService.createNotebookEntry(toolSessionId,
+			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
+			notebookUser.getUserId().intValue(), "", entryText);
+		notebookUser.setEntryUID(entryUID);
+		
+	    } else {
+		// update existing entry.
+		coreNotebookService.updateEntry(notebookUser.getEntryUID(), "", entryText);
+	    }
+
+	    notebookUser.setFinishedActivity(true);
+	    saveOrUpdateNotebookUser(notebookUser);
+	}
+
+	return leaveToolSession(toolSessionId, userId);
     }
 
     @Override
@@ -374,14 +395,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     @Override
-    public void updateEntry(Long uid, String entry) {
-	coreNotebookService.updateEntry(uid, "", entry);
-    }
-
-    @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
-	Long toolContentId = null;
-	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long toolContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (toolContentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
 	    NotebookService.logger.error(error);

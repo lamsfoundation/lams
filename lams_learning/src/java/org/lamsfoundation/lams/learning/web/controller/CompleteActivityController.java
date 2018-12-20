@@ -44,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author daveg
@@ -59,9 +58,8 @@ public class CompleteActivityController {
     private IIntegrationService integrationService;
     @Autowired
     private ILearnerFullService learnerService;
-
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Sets the current activity as complete and uses the progress engine to find the next activity (may be null).
@@ -75,9 +73,6 @@ public class CompleteActivityController {
     @RequestMapping("/CompleteActivity")
     public String execute(@ModelAttribute("messageForm") ActivityForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
-
 	Integer learnerId = LearningWebUtil.getUserId();
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
@@ -109,7 +104,7 @@ public class CompleteActivityController {
 	String forward = null;
 	// Set activity as complete
 	try {
-	    forward = LearningWebUtil.completeActivity(request, response, actionMappings, progress, activity, learnerId,
+	    forward = LearningWebUtil.completeActivity(request, response, activityMapping, progress, activity, learnerId,
 		    learnerService, false);
 	} catch (LearnerServiceException e) {
 	    return "error";

@@ -29,9 +29,12 @@ import java.util.List;
 
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
+import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -133,6 +136,8 @@ public interface ILeaderselectionService {
      * @return
      */
     LeaderselectionUser createLeaderselectionUser(UserDTO user, LeaderselectionSession leaderselectionSession);
+    
+    String finishToolSession(Long toolSessionId, Long userId);
 
     /**
      *

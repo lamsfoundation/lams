@@ -16,10 +16,11 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
-import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -67,13 +68,13 @@ public class LearningWebsocketServer {
 		    }
 		} catch (Exception e) {
 		    // error caught, but carry on
-		    LearningWebsocketServer.log.error("Error in Leader worker thread", e);
+		    log.error("Error in Leader worker thread", e);
 		} finally {
 		    HibernateSessionManager.closeSession();
 		    try {
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
 		    } catch (InterruptedException e) {
-			LearningWebsocketServer.log.warn("Stopping Leader worker thread");
+			log.warn("Stopping Leader worker thread");
 			stopFlag = true;
 		    }
 		}
@@ -155,10 +156,11 @@ public class LearningWebsocketServer {
     }
 
     private static ILeaderselectionService getLeaderService() {
-	if (LearningWebsocketServer.leaderService == null) {
-	    LearningWebsocketServer.leaderService = LeaderselectionServiceProxy
-		    .getLeaderselectionService(SessionManager.getServletContext());
+	if (leaderService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    leaderService = (ILeaderselectionService) wac.getBean("leaderselectionService");
 	}
-	return LearningWebsocketServer.leaderService;
+	return leaderService;
     }
 }

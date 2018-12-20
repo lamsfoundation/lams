@@ -28,9 +28,9 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
  * @author daveg
- *
  */
 public class ParallelActivityMappingStrategy extends ActivityMappingStrategy {
+    private static final long serialVersionUID = 2433891791486019818L;
 
     /**
      * Returns the struts action used to display the specified activity.

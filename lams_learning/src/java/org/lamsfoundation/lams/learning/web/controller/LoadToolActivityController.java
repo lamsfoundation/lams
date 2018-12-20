@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -43,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
@@ -54,9 +52,9 @@ import org.springframework.web.context.WebApplicationContext;
 public class LoadToolActivityController {
     private static Logger log = Logger.getLogger(LoadToolActivityController.class);
     @Autowired
-    private ILearnerFullService learnerService;
+    private ILearnerFullService learnerService; 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     public static final String PARAM_ACTIVITY_URL = "activityURL";
     public static final String PARAM_IS_BRANCHING = "isBranching";
@@ -68,9 +66,6 @@ public class LoadToolActivityController {
      */
     @RequestMapping("/LoadToolActivity")
     public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
-
-	ActivityMapping actionMappings = LearnerServiceProxy
-		.getActivityMapping(this.applicationContext.getServletContext());
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
@@ -106,7 +101,6 @@ public class LoadToolActivityController {
 	     * LamsAction.log.warn("Got exception while trying to create a tool session, but carrying on.", e);
 	     */
 	} catch (RequiredGroupMissingException e) {
-
 	    //got here when activity requires existing grouping but no group for user exists yet
 	    log.warn(e.getMessage());
 	    request.setAttribute("messageKey", e.getMessage());
@@ -116,8 +110,7 @@ public class LoadToolActivityController {
 	form.setActivityID(activity.getActivityId());
 
 	if (activity.isToolActivity() || activity.isSystemToolActivity()) {
-
-	    String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), activity,
+	    String url = activityMapping.getLearnerToolURL(learnerProgress.getLesson(), activity,
 		    learnerProgress.getUser());
 	    form.addActivityURL(new ActivityURL(activity.getActivityId(), url));
 
